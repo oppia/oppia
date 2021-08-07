@@ -21,12 +21,13 @@ from __future__ import unicode_literals
 
 import re
 
-import bs4
 import constants
 from extensions.objects.models import objects
 import feconf
 import python_utils
 import utils
+
+import bs4
 
 
 class BaseRteComponent(python_utils.OBJECT):
@@ -100,9 +101,7 @@ class Collapsible(BaseRteComponent):
         """Validates Collapsible component."""
         super(Collapsible, cls).validate(value_dict)
         content = value_dict['content-with-value']
-        inner_soup = bs4.BeautifulSoup(
-            content.encode(encoding='utf-8'),
-            'html.parser')
+        inner_soup = bs4.BeautifulSoup(content, 'html.parser')
         collapsible = inner_soup.findAll(
             name='oppia-noninteractive-collapsible')
         tabs = inner_soup.findAll(
@@ -122,19 +121,6 @@ class Image(BaseRteComponent):
         filepath = value_dict['filepath-with-value']
         if not re.match(filename_re, filepath):
             raise utils.ValidationError('Invalid filepath')
-
-
-class Svgdiagram(BaseRteComponent):
-    """Class for Svgdiagram component."""
-
-    @classmethod
-    def validate(cls, value_dict):
-        """Validates Svgdiagram component."""
-        super(Svgdiagram, cls).validate(value_dict)
-        filename_re = r'^[A-Za-z0-9+/_-]*\.(svg)$'
-        filename = value_dict['svg_filename-with-value']
-        if not re.match(filename_re, filename):
-            raise utils.ValidationError('Invalid filename')
 
 
 class Link(BaseRteComponent):
@@ -173,9 +159,8 @@ class Tabs(BaseRteComponent):
         super(Tabs, cls).validate(value_dict)
         tab_contents = value_dict['tab_contents-with-value']
         for tab_content in tab_contents:
-            inner_soup = bs4.BeautifulSoup(
-                tab_content['content'].encode(encoding='utf-8'),
-                'html.parser')
+            inner_soup = (
+                bs4.BeautifulSoup(tab_content['content'], 'html.parser'))
             collapsible = inner_soup.findAll(
                 name='oppia-noninteractive-collapsible')
             tabs = inner_soup.findAll(

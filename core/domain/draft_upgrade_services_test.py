@@ -23,6 +23,7 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import state_domain
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -108,10 +109,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         'to_version': '37'
     })]
 
-    # EXP_ID and USER_ID used to create default explorations.
-    EXP_ID = 'exp_id'
-    USER_ID = 'user_id'
-
     def create_and_migrate_new_exploration(
             self, current_schema_version, target_schema_version):
         """Creates an exploration and applies a state schema migration to it.
@@ -141,12 +138,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # state schema version, so we set the latest schema version to be the
         # target_schema_version.
         with self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION',
-            int(target_schema_version)):
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', int(target_schema_version)):
 
             # Create and migrate the exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-            exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
             exp_services.update_exploration(
                 self.USER_ID, self.EXP_ID, exp_migration_change_list,
                 'Ran Exploration Migration job.')
@@ -156,8 +151,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
             self.assertEqual(exploration.version, 2)
             self.assertEqual(
-                python_utils.UNICODE(
-                    exploration.states_schema_version),
+                python_utils.UNICODE(exploration.states_schema_version),
                 target_schema_version)
 
     def test_convert_to_latest_schema_version_implemented(self):
@@ -169,6 +163,47 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
+
+    def test_convert_states_v46_dict_to_v47_dict(self):
+        draft_change_list_v46 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': state_domain.SubtitledHtml(
+                    'content',
+                    '<oppia-noninteractive-svgdiagram '
+                    'svg_filename-with-value="&amp;quot;img12.svg&amp;quot;"'
+                    ' alt-with-value="&amp;quot;Image&amp;quot;">'
+                    '</oppia-noninteractive-svgdiagram>'
+                    '<oppia-noninteractive-svgdiagram '
+                    'svg_filename-with-value="&amp;quot;img2.svg&amp;quot;"'
+                    ' alt-with-value="&amp;quot;Image123&amp;quot;">'
+                    '</oppia-noninteractive-svgdiagram>'
+                    '<oppia-noninteractive-svgdiagram '
+                    'alt-with-value="&amp;quot;Image12345&amp;quot;"'
+                    ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
+                    '</oppia-noninteractive-svgdiagram>'
+                ).to_dict()
+            })
+        ]
+        # Migrate exploration to state schema version 47.
+        self.create_and_migrate_new_exploration('46', '47')
+        migrated_draft_change_list_v47 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v46, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v46_dict_list = [
+            change.to_dict() for change in draft_change_list_v46
+        ]
+        migrated_draft_change_list_v47_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v47
+        ]
+        self.assertEqual(
+            draft_change_list_v46_dict_list,
+            migrated_draft_change_list_v47_dict_list)
 
     def test_convert_states_v45_dict_to_v46_dict(self):
         draft_change_list_v45 = [
@@ -1286,7 +1321,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_v33_dict_list = [
             change.to_dict() for change in migrated_draft_change_list_v33
         ]
-        self.assertEqual(
+        self.assertItemsEqual(
             expected_draft_change_list_v33_dict_list,
             migrated_draft_change_list_v33_dict_list)
 

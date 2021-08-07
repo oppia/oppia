@@ -37,7 +37,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             'Task %s in queue %s with payload %s is sent to %s.' % (
                 task_name if task_name else 'Default',
                 queue_name,
-                python_utils.convert_to_bytes(payload), # type: ignore[no-untyped-call]
+                python_utils.UNICODE(payload), # type: ignore[no-untyped-call]
                 url)
         )
 
@@ -105,7 +105,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.convert_to_bytes(self.payload1), # type: ignore[no-untyped-call]
+                    python_utils.UNICODE(self.payload1), # type: ignore[no-untyped-call]
                     self.url)
             ]
         )
@@ -117,11 +117,11 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.convert_to_bytes(self.payload1), # type: ignore[no-untyped-call]
+                    python_utils.UNICODE(self.payload1), # type: ignore[no-untyped-call]
                     self.url),
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name2,
-                    python_utils.convert_to_bytes(self.payload2), # type: ignore[no-untyped-call]
+                    python_utils.UNICODE(self.payload2), # type: ignore[no-untyped-call]
                     self.url),
             ]
         )
@@ -142,11 +142,11 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.convert_to_bytes(self.payload1), # type: ignore[no-untyped-call]
+                    python_utils.UNICODE(self.payload1), # type: ignore[no-untyped-call]
                     self.url),
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name2,
-                    python_utils.convert_to_bytes(self.payload2), # type: ignore[no-untyped-call]
+                    python_utils.UNICODE(self.payload2), # type: ignore[no-untyped-call]
                     self.url),
             ]
         )

@@ -26,16 +26,11 @@ from typing import Any, Callable # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, improvements_models
+    from mypy_imports import base_models
+    from mypy_imports import improvements_models
 
 base_models, improvements_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.improvements])
-
-
-def _always_returns(value):
-    # type: (Any) -> Callable[..., Any]
-    """Creates a function which always returns the input value."""
-    return lambda: value
 
 
 class TaskEntryModelTests(test_utils.GenericTestBase):

@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import cast, Dict, List, Set, Text, Union  # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -116,24 +116,26 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # type: () -> None
         model = base_models.BaseModel()
 
-        all_models = [m for m in base_models.BaseModel.get_all()]
-        self.assertEqual(len(all_models), 0)
+        all_models = base_models.BaseModel.get_all()
+        self.assertEqual(all_models.count(), 0)
 
         model.update_timestamps()
         model.put()
-        all_models = [m for m in base_models.BaseModel.get_all()]
-        self.assertEqual(len(all_models), 1)
-        self.assertEqual(all_models[0], model)
+        all_models = base_models.BaseModel.get_all()
+        self.assertEqual(all_models.count(), 1)
+        base_model = cast(base_models.BaseModel, all_models.get())
+        self.assertEqual(base_model, model)
 
-        model_id = all_models[0].id
+        model_id = base_model.id
         self.assertEqual(model, base_models.BaseModel.get(model_id))
 
         model.delete()
-        all_models = [m for m in base_models.BaseModel.get_all()]
-        self.assertEqual(len(all_models), 0)
+        all_models = base_models.BaseModel.get_all()
+        self.assertEqual(all_models.count(), 0)
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
-            'Entity for class BaseModel with id 1 not found'):
+            'Entity for class BaseModel with id 4 not found'
+        ):
             model.get(model_id)
 
     def test_put(self):
@@ -321,7 +323,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self):
             # type: (base_models.BaseHumanMaintainedModel) -> None
-            """Function to make changes in datastore entities used for
+            """Function to save the entities to the datastore used for
             testing.
             """
             self._last_updated_timestamp_is_fresh = True
@@ -335,10 +337,9 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             if self.last_updated is None:
                 self.last_updated = datetime.datetime.utcnow()
 
-            # We have not used BaseHumanMaintainedModel.put() because it is
-            # not implemented and throws error rather than saving the changes.
-            # We have used BaseModel.put() because we wanted the
-            # changes made above to be saved.
+            # We are using BaseModel.put() to save the changes to the datastore
+            # since the put() method which TestBaseHumanMaintainedModel class
+            # inherits from BaseHumanMaintainedModel raises NotImplementedError.
             base_models.BaseModel.put(self)
 
         with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):

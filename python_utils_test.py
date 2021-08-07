@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import StringIO
 import ast
+import builtins
 import io
 import sys
 import tempfile
@@ -29,8 +29,6 @@ import unittest
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 import python_utils
-
-import future  # isort:skip
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -60,7 +58,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_quote(self):
         self.assertEqual(
-            python_utils.url_quote(b'/~connolly/'), b'/%7Econnolly/')
+            python_utils.url_quote('/~connolly/'), '/~connolly/')
 
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}
@@ -94,7 +92,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_unquote_plus(self):
         self.assertEqual(
-            python_utils.url_unquote_plus(b'/El+Ni%C3%B1o/'), b'/El Niño/')
+            python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
 
     def test_divide(self):
         self.assertEqual(python_utils.divide(4, 2), 2)
@@ -143,7 +141,10 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_convert_to_bytes(self):
         string1 = 'Home'
         string2 = u'Лорем'
-        self.assertEqual(python_utils.convert_to_bytes(string1), string1)
+        self.assertEqual(
+            python_utils.convert_to_bytes(string1),
+            string1.encode(encoding='utf-8')
+        )
         self.assertEqual(
             python_utils.convert_to_bytes(string2),
             string2.encode(encoding='utf-8'))
@@ -163,8 +164,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 
     def test_urllib_unquote(self):
-        response = python_utils.urllib_unquote(b'/El%20Ni%C3%B1o/')
-        self.assertEqual(response, b'/El Niño/')
+        response = python_utils.urllib_unquote('/El%20Ni%C3%B1o/')
+        self.assertEqual(response, '/El Niño/')
 
     def test_url_parse(self):
         response = python_utils.url_parse('http://www.google.com')
@@ -178,8 +179,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_recursively_convert_to_str_with_dict(self):
         test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
         test_var_2_in_unicode = python_utils.UNICODE('test_var_2')
-        test_var_3_in_bytes = test_var_1_in_unicode.encode('utf-8')
-        test_var_4_in_bytes = test_var_2_in_unicode.encode('utf-8')
+        test_var_3_in_bytes = test_var_1_in_unicode.encode(encoding='utf-8')
+        test_var_4_in_bytes = test_var_2_in_unicode.encode(encoding='utf-8')
         test_dict = {
             test_var_1_in_unicode: test_var_3_in_bytes,
             test_var_2_in_unicode: test_var_4_in_bytes
@@ -189,8 +190,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             {'test_var_1': b'test_var_1', 'test_var_2': b'test_var_2'})
 
         for key, val in test_dict.items():
-            self.assertEqual(type(key), future.types.newstr)
-            self.assertEqual(type(val), future.types.newbytes)
+            self.assertEqual(type(key), python_utils.UNICODE)
+            self.assertEqual(type(val), builtins.bytes)
 
         dict_in_str = python_utils._recursively_convert_to_str(test_dict)  # pylint: disable=protected-access
         self.assertEqual(
@@ -198,14 +199,18 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             {'test_var_1': 'test_var_1', 'test_var_2': 'test_var_2'})
 
         for key, val in dict_in_str.items():
-            self.assertEqual(type(key), unicode)
-            self.assertEqual(type(val), bytes)
+            self.assertEqual(type(key), python_utils.UNICODE)
+            self.assertEqual(type(val), python_utils.UNICODE)
 
     def test_recursively_convert_to_str_with_nested_structure(self):
         test_var_1_in_unicode = python_utils.UNICODE('test_var_1')
         test_list_1 = [
-            test_var_1_in_unicode, test_var_1_in_unicode.encode('utf-8'),
-            'test_var_2', b'test_var_3', {'test_var_4': b'test_var_5'}]
+            test_var_1_in_unicode,
+            test_var_1_in_unicode.encode(encoding='utf-8'),
+            'test_var_2',
+            b'test_var_3',
+            {'test_var_4': b'test_var_5'}
+        ]
         test_dict = {test_var_1_in_unicode: test_list_1}
         self.assertEqual(
             test_dict,
@@ -221,28 +226,22 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             dict_in_str,
             {
                 'test_var_1': [
-                    'test_var_1', b'test_var_1', 'test_var_2', 'test_var_3',
+                    'test_var_1', 'test_var_1', 'test_var_2', 'test_var_3',
                     {'test_var_4': 'test_var_5'}]
             }
         )
 
         for key, value in dict_in_str.items():
-            self.assertNotEqual(type(key), future.types.newstr)
-            self.assertNotEqual(type(key), future.types.newbytes)
-            self.assertTrue(isinstance(key, unicode))
+            self.assertNotEqual(type(key), builtins.bytes)
+            self.assertTrue(isinstance(key, str))
 
             for item in value:
-                self.assertNotEqual(type(item), future.types.newstr)
-                self.assertNotEqual(type(item), future.types.newbytes)
-                self.assertTrue(isinstance(item, (unicode, bytes, dict)))
+                self.assertNotEqual(type(item), builtins.bytes)
+                self.assertTrue(isinstance(item, (str, bytes, dict)))
 
             for k, v in value[-1].items():
-                self.assertNotEqual(type(k), future.types.newstr)
-                self.assertNotEqual(type(k), future.types.newbytes)
-                self.assertNotEqual(type(v), future.types.newstr)
-                self.assertNotEqual(type(v), future.types.newbytes)
-                self.assertEqual(type(k), unicode)
-                self.assertEqual(type(v), bytes)
+                self.assertEqual(type(k), str)
+                self.assertEqual(type(v), str)
 
     def test_is_string(self):
         self.assertTrue(python_utils.is_string('abc'))
@@ -294,7 +293,7 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
 
     def test_string_io(self):
         stdout = python_utils.string_io()
-        self.assertIsInstance(stdout, StringIO.StringIO)
+        self.assertIsInstance(stdout, io.StringIO)
 
     def test_unicode_and_str_chars_in_file(self):
         self.assertIsInstance(

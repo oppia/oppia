@@ -26,11 +26,13 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import
+from typing import Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, email_models, user_models
+    from mypy_imports import base_models
+    from mypy_imports import email_models
+    from mypy_imports import user_models # pylint: disable=unused-import
 
 (base_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
@@ -164,9 +166,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
                 Exception,
                 'Expected datetime, received Not a datetime object of type '
-                '<type \'unicode\'>'):
-                # Here ignore[arg-type] is used to test method for invalid
-                # input type.
+                '<class \'str\'>'
+            ):
+                # TODO(#13528): Remove this test after the backend is fully
+                # type-annotated. Here ignore[arg-type] is used to test method
+                # get_by_hash() for invalid input type.
                 email_models.SentEmailModel.get_by_hash(
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]

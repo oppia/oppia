@@ -24,7 +24,8 @@ from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # p
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services, skill_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -348,10 +349,19 @@ class SkillSummaryModel(base_models.BaseModel):
                     'DecreasingUpdatedOn']):
             sort = cls.skill_model_last_updated
 
-        query_models, next_cursor, more = (
-            cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
+        sort_query = cls.query().order(sort)
+        query_models, next_cursor, _ = (
+            sort_query.fetch_page(page_size, start_cursor=cursor))
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = (
+            sort_query.fetch_page(page_size + 1, start_cursor=cursor))
+        # The urlsafe returns bytes and we need to decode them to string.
+        more_results = len(plus_one_query_models) == page_size + 1
         new_urlsafe_start_cursor = (
-            next_cursor.urlsafe() if (next_cursor and more) else None)
+            next_cursor.urlsafe().decode('utf-8')
+            if (next_cursor and more_results) else None
+        )
         return (
             cast(List[SkillSummaryModel], query_models),
-            new_urlsafe_start_cursor, more)
+            new_urlsafe_start_cursor, more_results)

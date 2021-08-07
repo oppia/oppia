@@ -26,24 +26,10 @@ from core.tests import test_utils
 import feconf
 import python_utils
 from scripts import common
-from scripts import servers
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
-
-    @classmethod
-    def setUpClass(cls):
-        # type: () -> None
-        super(RedisCacheServicesUnitTests, cls).setUpClass()
-        cls._managed_redis_server = servers.managed_redis_server() # type: ignore[attr-defined]
-        cls._managed_redis_server.__enter__() # type: ignore[attr-defined]
-
-    @classmethod
-    def tearDownClass(cls):
-        # type: () -> None
-        cls._managed_redis_server.__exit__(None, None, None) # type: ignore[attr-defined]
-        super(RedisCacheServicesUnitTests, cls).tearDownClass()
 
     def test_memory_stats_returns_dict(self):
         # type: () -> None
@@ -54,19 +40,20 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     def test_flush_cache_wipes_cache_clean(self):
         # type: () -> None
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         key_value_mapping = {'a1': '1', 'b1': '2', 'c1': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
             redis_cache_services.get_multi(['a1', 'b1', 'c1']), ['1', '2', '3'])
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         self.assertEqual(
             redis_cache_services.get_multi(['a1', 'b1', 'c1']),
-            [None, None, None])
+            [None, None, None]
+        )
 
     def test_get_multi_retrieves_cache_elements(self):
         # type: () -> None
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         self.assertEqual(
             redis_cache_services.get_multi(['a2', 'b2', 'c2']),
             [None, None, None])
@@ -80,18 +67,20 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     def test_set_multi_sets_elements(self):
         # type: () -> None
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         key_value_mapping = {'a3': '1', 'b3': '2', 'c3': '3'}
         response = redis_cache_services.set_multi(key_value_mapping)
         self.assertTrue(response)
 
     def test_delete_multi_deletes_cache_elements(self):
         # type: () -> None
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         key_value_mapping = {'a4': '1', 'b4': '2', 'c4': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a4', 'b4', 'c4']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a4', 'b4', 'c4']),
+            ['1', '2', '3']
+        )
         return_number_of_keys_set = redis_cache_services.delete_multi(
             ['a4', 'b4', 'c4'])
         self.assertEqual(
@@ -105,7 +94,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     def test_partial_fetches_returns_reasonable_output(self):
         # type: () -> None
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         self.assertEqual(
             redis_cache_services.get_multi(['a5', 'b5', 'c5']),
             [None, None, None])
@@ -122,12 +111,11 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     def test_partial_deletes_deletes_correct_elements(self):
         # type: () -> None
-        redis_cache_services.flush_cache()
+        redis_cache_services.flush_caches()
         key_value_mapping = {'a6': '1', 'b6': '2', 'c6': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a6', 'b6', 'c6']),
-            ['1', '2', '3'])
+            redis_cache_services.get_multi(['a6', 'b6', 'c6']), ['1', '2', '3'])
         self.assertEqual(
             redis_cache_services.delete_multi(['a6', 'd6', 'e6']), 1)
         self.assertEqual(
@@ -143,9 +131,9 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
         with python_utils.open_file( # type: ignore[no-untyped-call]
-            os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
+                os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
             self.assertEqual(
-                elements[1], python_utils.convert_to_bytes(feconf.REDISPORT)) # type: ignore[no-untyped-call]
+                elements[1], python_utils.UNICODE(feconf.REDISPORT)) # type: ignore[no-untyped-call]

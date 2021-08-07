@@ -26,7 +26,8 @@ from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disab
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -145,8 +146,11 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        models = cls.query(cls.resolver_id == user_id).fetch()
-        cls.delete_multi(cast(List[TaskEntryModel], models))
+        task_entry_models = cast(
+            List[TaskEntryModel],
+            cls.query(cls.resolver_id == user_id).fetch()
+        )
+        cls.delete_multi(task_entry_models)
 
     @staticmethod
     def get_model_association_to_user():

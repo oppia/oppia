@@ -27,7 +27,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services, user_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -340,7 +341,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         query = (
             cls.get_all()
-            .order(cls.key)
             .filter(
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id.IN(exp_ids))

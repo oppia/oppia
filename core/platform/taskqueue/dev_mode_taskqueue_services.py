@@ -29,9 +29,7 @@ import requests
 
 from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
 
-GOOGLE_APP_ENGINE_PORT = (
-    os.environ[b'SERVER_PORT']
-    if 'SERVER_PORT' in os.environ else '8181')
+GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
 def _task_handler(url, payload, queue_name, task_name=None):

@@ -29,7 +29,8 @@ from typing import Any, Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, suggestion_models, user_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import suggestion_models
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.suggestion, models.NAMES.user])
@@ -197,7 +198,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Value u\'invalid_suggestion_type\' for property'
+            Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
@@ -1081,7 +1082,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         user_data = (
             suggestion_models.GeneralSuggestionModel
             .export_data('non_existent_user'))
-        self.assertEqual(user_data, {})
+        test_data = {} # type: Dict[Text, Text]
+        self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
         # type: () -> None
@@ -1291,7 +1293,8 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         user_data = (
             suggestion_models.GeneralVoiceoverApplicationModel
             .export_data('non_existent_user'))
-        self.assertEqual(user_data, {})
+        test_data = {} # type: Dict[Text, Text]
+        self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
         # type: () -> None

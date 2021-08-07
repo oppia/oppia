@@ -28,7 +28,8 @@ import python_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, skill_models
+    from mypy_imports import base_models
+    from mypy_imports import skill_models
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -122,15 +123,18 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
                 10, None, 'Oldest Created'))
         self.assertEqual(skill_summaries[0].id, 'skill_id1')
         self.assertEqual(skill_summaries[1].id, 'skill_id2')
+        self.assertFalse(more)
 
         skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(
                 10, None, 'Most Recently Updated'))
         self.assertEqual(skill_summaries[0].id, 'skill_id2')
         self.assertEqual(skill_summaries[1].id, 'skill_id1')
+        self.assertFalse(more)
 
         skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(
                 10, None, 'Least Recently Updated'))
         self.assertEqual(skill_summaries[0].id, 'skill_id1')
         self.assertEqual(skill_summaries[1].id, 'skill_id2')
+        self.assertFalse(more)

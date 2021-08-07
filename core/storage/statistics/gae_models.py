@@ -23,6 +23,8 @@ import datetime
 import json
 import sys
 
+from core.domain import exp_domain # pylint: disable=invalid-import
+from core.domain import stats_domain # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
@@ -32,9 +34,9 @@ from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # p
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import ( # pylint: disable=unused-import
-        base_models, datastore_services, transaction_services)
-    from core.domain import exp_domain
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import transaction_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -429,11 +431,14 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id,
             params, play_type, unused_version=1):
-        # type: (Text, int, Text, Text, Dict[Text, Any], Text, int) -> Text
+        # type: (Text, int, Text, Text, Dict[Text, Text], Text, int) -> Text
         """Creates a new start exploration event and then writes it to
         the datastore.
 
@@ -576,11 +581,14 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id,
             client_time_spent_in_secs, params, play_type):
-        # type: (Text, int, Text, Text, float, Dict[Text, Any], Text) -> None
+        # type: (Text, int, Text, Text, float, Dict[Text, Text], Text) -> None
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -714,11 +722,14 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id,
             client_time_spent_in_secs, params, play_type):
-        # type: (Text, int, Text, Text, float, Dict[Text, Any], Text) -> Text
+        # type: (Text, int, Text, Text, float, Dict[Text, Text], Text) -> Text
         """Creates a new exploration completion event and then writes it
         to the datastore.
 
@@ -932,11 +943,14 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id, params,
             play_type):
-        # type: (Text, int, Text, Text, Dict[Text, Any], Text) -> Text
+        # type: (Text, int, Text, Text, Dict[Text, Text], Text) -> Text
         """Creates a new state hit event entity and then writes
         it to the datastore.
 
@@ -1659,10 +1673,15 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # to remove Any used below.
     @classmethod
     def create_model_instance(
-            cls, entity_type, state_reference, interaction_id,
-            learner_answer_info_list, learner_answer_info_schema_version,
-            accumulated_answer_info_json_size_bytes):
-        # type: (Text, Text, Text, List[Dict[Text, Any]], int, int) -> None
+            cls,
+            entity_type, # type: Text
+            state_reference, # type: Text
+            interaction_id, # type: Text
+            learner_answer_info_list, # type: List[stats_domain.LearnerAnswerInfo]
+            learner_answer_info_schema_version, # type: int
+            accumulated_answer_info_json_size_bytes # type: int
+    ):
+        # type: (...) -> None
         """Creates a new LearnerAnswerDetailsModel for the given entity type
         then writes it to the datastore.
 
@@ -1675,7 +1694,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 the form 'question_id'.
             interaction_id: str. The ID of the interaction for which the
                 answer details are received.
-            learner_answer_info_list: list(dict). The list of
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
                 LearnerAnswerInfo objects in dict format, which is defined in
                 the stats_domain.
             learner_answer_info_schema_version: int. The version of
@@ -1690,7 +1709,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entity_type=entity_type,
             state_reference=state_reference,
             interaction_id=interaction_id,
-            learner_answer_info_list=learner_answer_info_list,
+            learner_answer_info_list=(
+                [learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                for learner_answer_info in learner_answer_info_list]),
             learner_answer_info_schema_version=(
                 learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(
@@ -1794,20 +1815,20 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     def create(
             cls, exp_id, version, num_starts, num_completions,
             state_hit_counts):
-        # type: (Text, int, int, int, Dict[Text, int]) -> None
+        # type: (Text, Text, int, int, Dict[Text, int]) -> None
         """Creates a new ExplorationAnnotationsModel and
         then writes it to the datastore.
 
         Args:
             exp_id: str. ID of the exploration currently being played.
-            version: int. Version of exploration.
+            version: str. Version of exploration.
             num_starts: int. Number of students who started the exploration.
             num_completions: int. Number of students who have completed
                 the exploration.
             state_hit_counts: dict. Describes the number of hits
                 for each state.
         """
-        entity_id = cls.get_entity_id(exp_id, version)
+        entity_id = cls.get_entity_id(exp_id, int(version))
         cls(
             id=entity_id,
             exploration_id=exp_id,
@@ -1818,7 +1839,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_versions(cls, exploration_id):
-        # type: (Text) -> List[int]
+        # type: (Text) -> List[Text]
         """This function returns a list containing versions of
         ExplorationAnnotationsModel for a specific exploration_id.
 
@@ -1826,7 +1847,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id: str. ID of the exploration currently being played.
 
         Returns:
-            list(int). List of versions corresponding to annotation models
+            list(str). List of versions corresponding to annotation models
             with given exp_id.
         """
         return [
