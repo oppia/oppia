@@ -45,8 +45,8 @@ angular.module('oppia').directive('questionsTab', [
           ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.getGroupedSkillSummaries =
-              SkillEditorStateService.getGroupedSkillSummaries;
+            $scope.groupedSkillSummaries =
+              SkillEditorStateService.getGroupedSkillSummaries();
             $scope.skillIdToRubricsObject = {};
             $scope.skillIdToRubricsObject[$scope.skill.getId()] =
               $scope.skill.getRubrics();
