@@ -68,6 +68,11 @@ var login = async function(email, useManualNavigation = true) {
   await action.sendKeys('Email input', emailInput, email);
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
+
+  // Login page performs client side redirection which cause
+  // "both angularJS testability and angular testability are undefined" flake.
+  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
+  // angular is disabled during client side redirects.
   await browser.waitForAngularEnabled(false);
   await action.click('Sign in button', signInButton);
 
@@ -77,10 +82,17 @@ var login = async function(email, useManualNavigation = true) {
 
 var logout = async function() {
   await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+
+  // Logout page performs client side redirection which cause
+  // "both angularJS testability and angular testability are undefined" flake.
+  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
+  // angular is disabled during client side redirects.
+  await browser.waitForAngularEnabled(false);
   // Wait for logout page to load.
   await waitFor.pageToFullyLoad();
   // Wait for redirection to occur.
   await waitFor.pageToFullyLoad();
+  await browser.waitForAngularEnabled(true);
 };
 
 // The user needs to log in immediately before this method is called. Note
