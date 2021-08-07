@@ -22,7 +22,8 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, recommendations_models
+    from mypy_imports import base_models
+    from mypy_imports import recommendations_models
 
 (base_models, recommendations_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.recommendations])

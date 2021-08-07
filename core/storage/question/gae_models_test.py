@@ -32,7 +32,8 @@ from typing import List # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, question_models
+    from mypy_imports import base_models
+    from mypy_imports import question_models
 
 (base_models, question_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.question])

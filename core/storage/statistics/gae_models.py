@@ -23,8 +23,8 @@ import datetime
 import json
 import sys
 
-from core.domain import exp_domain
-from core.domain import stats_domain
+from core.domain import exp_domain # pylint: disable=invalid-import
+from core.domain import stats_domain # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
@@ -34,8 +34,9 @@ from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # p
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import ( # pylint: disable=unused-import
-        base_models, datastore_services, transaction_services)
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import transaction_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
