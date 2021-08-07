@@ -27,7 +27,14 @@ export interface SubscriptionSummary {
   'creator_impact': number;
 }
 
-export interface PreferencesBackendDict {
+export interface EmailPreferencesBackendDict {
+  'can_receive_email_updates': boolean;
+  'can_receive_editor_role_email': boolean;
+  'can_receive_feedback_message_email': boolean;
+  'can_receive_subscription_email': boolean;
+}
+
+export type PreferencesBackendDict = {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
@@ -35,12 +42,8 @@ export interface PreferencesBackendDict {
   'default_dashboard': string;
   'user_bio': string;
   'subject_interests': string;
-  'can_receive_email_updates': boolean;
-  'can_receive_editor_role_email': boolean;
-  'can_receive_feedback_message_email': boolean;
-  'can_receive_subscription_email': boolean;
   'subscription_list': SubscriptionSummary[];
-}
+} & EmailPreferencesBackendDict;
 
 export interface UpdatePreferencesResponse {
   'bulk_email_signup_message_should_be_shown': boolean
@@ -125,7 +128,7 @@ export class UserBackendApiService {
 
   async updatePreferencesDataAsync(
       updateType: string,
-      data: boolean | string | string[] | SubscriptionSummary[]):
+      data: boolean | string | string[] | EmailPreferencesBackendDict):
       Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
       update_type: updateType,

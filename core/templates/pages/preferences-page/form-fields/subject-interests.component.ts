@@ -38,8 +38,8 @@ export class SubjectInterestsComponent {
   formCtrl = new FormControl();
   filteredSubjectInterests: Observable<string[]>;
   allSubjectInterests: string[] = [];
-  @ViewChild('chipList') chipList: MatChipList;
-  @ViewChild('subjectInterestInput') subjectInterestInput:
+  @ViewChild('chipList') chipList!: MatChipList;
+  @ViewChild('subjectInterestInput') subjectInterestInput!:
   ElementRef<HTMLInputElement>;
 
   constructor() {

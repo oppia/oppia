@@ -69,6 +69,8 @@ class MatIcon {
   constructor(
       public readonly tooltip: string,
       public readonly code: string,
+      // The color is null if the job state is 'cancelling',
+      // 'cancelled' or 'drained'.
       public readonly color: string | null) {}
 }
 
@@ -139,7 +141,7 @@ export class BeamJobRun {
     return this.matIcon.code;
   }
 
-  getJobStatusMaterialThemeColor(): string {
+  getJobStatusMaterialThemeColor(): string | null {
     return this.matIcon.color;
   }
 

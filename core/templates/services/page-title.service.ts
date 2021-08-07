@@ -24,8 +24,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class PageTitleService {
-  pageTitleForMobile: string = null;
-  pageSubtitleForMobile: string = null;
+  // The following properties are 'null' when no title needs to
+  // displayed in the mobile view.
+  pageTitleForMobile: string | null = null;
+  pageSubtitleForMobile: string | null = null;
   constructor(
     private metaTagService: Meta,
     private titleService: Title) {}
@@ -65,11 +67,11 @@ export class PageTitleService {
     this.pageSubtitleForMobile = subtitle;
   }
 
-  getPageTitleForMobileView(): string {
+  getPageTitleForMobileView(): string | null {
     return this.pageTitleForMobile;
   }
 
-  getPageSubtitleForMobileView(): string {
+  getPageSubtitleForMobileView(): string | null {
     return this.pageSubtitleForMobile;
   }
 }

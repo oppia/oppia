@@ -30,12 +30,14 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './edit-profile-picture-modal.component.html'
 })
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
-  uploadedImage: SafeResourceUrl;
+  // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
+  uploadedImage: SafeResourceUrl | null = null;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
+  // 'cropper' will be undefined if it has not been initialized.
+  cropper: Cropper | undefined;
+  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -86,6 +88,9 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
+    if (this.cropper === undefined) {
+      throw new Error('Cropper has not been initialized');
+    }
     this.cropppedImageDataUrl = (
       this.cropper.getCroppedCanvas({
         height: 150,
