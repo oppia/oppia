@@ -19,7 +19,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { LostChangeBackendDict, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { LostChangeBackendDict, LostChangeObjectFactory, LostChangeValue } from 'domain/exploration/LostChangeObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
@@ -146,10 +146,12 @@ describe('Changes in Human Readable Form Directive', () => {
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
-          html: 'newValue'
+          html: 'newValue',
+          content_id: ''
         },
         old_value: {
-          html: 'oldValue'
+          html: 'oldValue',
+          content_id: ''
         },
         property_name: 'content'
       })];
@@ -574,8 +576,8 @@ describe('Changes in Human Readable Form Directive', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: {},
-      old_value: {
+      new_value: <LostChangeValue>{},
+      old_value: <LostChangeValue><unknown>{
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
@@ -630,14 +632,15 @@ describe('Changes in Human Readable Form Directive', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: outcomeObjectFactory.createFromBackendDict({
-        dest: 'outcome 2',
-        feedback: {
-          content_id: 'feedback_2',
-          html: 'Html'
-        },
-      } as unknown as OutcomeBackendDict),
-      old_value: {},
+      new_value: <LostChangeValue><unknown>(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'outcome 2',
+          feedback: {
+            content_id: 'feedback_2',
+            html: 'Html'
+          },
+        } as unknown as OutcomeBackendDict)),
+      old_value: <LostChangeValue>{},
       property_name: 'default_outcome'
     })];
 
@@ -689,20 +692,22 @@ describe('Changes in Human Readable Form Directive', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: outcomeObjectFactory.createFromBackendDict({
-        dest: 'outcome 2',
-        feedback: {
-          content_id: 'feedback_2',
-          html: 'Html'
-        },
-      } as unknown as OutcomeBackendDict),
-      old_value: outcomeObjectFactory.createFromBackendDict({
-        dest: 'outcome 1',
-        feedback: {
-          content_id: 'feedback_2',
-          html: 'Html'
-        },
-      } as unknown as OutcomeBackendDict),
+      new_value: <LostChangeValue><unknown>(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'outcome 2',
+          feedback: {
+            content_id: 'feedback_2',
+            html: 'Html'
+          },
+        } as unknown as OutcomeBackendDict)),
+      old_value: <LostChangeValue><unknown>(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'outcome 1',
+          feedback: {
+            content_id: 'feedback_2',
+            html: 'Html'
+          },
+        } as unknown as OutcomeBackendDict)),
       property_name: 'default_outcome'
     })];
 
@@ -747,8 +752,8 @@ describe('Changes in Human Readable Form Directive', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: {},
-      old_value: {
+      new_value: <LostChangeValue>{},
+      old_value: <LostChangeValue><unknown>{
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
