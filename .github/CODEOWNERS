@@ -44,7 +44,7 @@
 
 
 # Android team
-/android_validation_constants*.py @BenHenning
+/android_validation_constants*.py @seanlip @BenHenning
 
 
 # Angular Migration team
@@ -131,12 +131,12 @@
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
+/core/templates/pages/about-page/about-page.constants.ts @seanlip
 /core/templates/pages/license-page/ @vojtechjelinek
-/core/templates/pages/license-page/license-page.component.html @seanlip @BenHenning
+/core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
-/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep
 /core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
 
@@ -303,7 +303,7 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @brianrodri
+/core/domain/customization_args_util*.py @iamprayush
 /core/domain/expression_parser*.py @iamprayush
 /core/domain/interaction_registry*.py @iamprayush
 /core/domain/object_registry*.py @iamprayush
@@ -311,12 +311,12 @@
 /core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
-/core/templates/expressions/ @brianrodri
+/core/templates/expressions/ @vojtechjelinek
 /core/templates/services/code-normalizer.service*.ts @iamprayush
 /core/templates/services/guppy-configuration.service.ts @iamprayush
 /core/templates/services/guppy-initialization.service.ts @iamprayush
 /core/templates/services/math-interactions.service.ts @iamprayush
-/extensions/domain*.py @brianrodri
+/extensions/domain*.py @iamprayush
 /extensions/interactions/ @iamprayush @vojtechjelinek
 /extensions/objects/ @iamprayush @vojtechjelinek
 /extensions/objects/templates/filepath-editor.component*.ts @kevintab95
@@ -326,38 +326,38 @@
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/controllers/improvements*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/improvements_domain*.py @brianrodri
-/core/domain/improvements_services*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/components/statistics-directives/ @brianrodri
-/core/templates/domain/statistics/ @brianrodri
-/core/templates/domain/improvements/ @brianrodri
-/core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/services/exploration-improvements.service*.ts @brianrodri
-/core/templates/services/exploration-improvements-backend-api.service*.ts @brianrodri
-/core/templates/services/exploration-improvements-task-registry.service*.ts @brianrodri
-/core/templates/services/exploration-stats.service*.ts @brianrodri
-/core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
-/core/templates/services/improvements.service*.ts @brianrodri
-/core/templates/services/messenger.service.ts @brianrodri
-/core/templates/services/playthrough*.ts @brianrodri
-/core/templates/services/state-interaction-stats.service*.ts @brianrodri
-/core/templates/services/state-top-answers-stats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+/core/controllers/features*.py @seanlip
+/core/controllers/improvements*.py @seanlip
+/core/domain/action_registry*.py @seanlip
+/core/domain/calculation_registry*.py @seanlip
+/core/domain/event_services*.py @seanlip
+/core/domain/improvements_domain*.py @seanlip
+/core/domain/improvements_services*.py @seanlip
+/core/domain/playthrough_issue_registry*.py @seanlip
+/core/domain/stats*.py @seanlip
+/core/domain/visualization_registry*.py @seanlip
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @seanlip
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @seanlip
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @seanlip
+/core/templates/components/statistics-directives/ @seanlip
+/core/templates/domain/statistics/ @seanlip
+/core/templates/domain/improvements/ @seanlip
+/core/templates/pages/exploration-editor-page/improvements-tab/ @seanlip
+/core/templates/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/services/exploration-improvements.service*.ts @seanlip
+/core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
+/core/templates/services/exploration-improvements-task-registry.service*.ts @seanlip
+/core/templates/services/exploration-stats.service*.ts @seanlip
+/core/templates/services/exploration-stats-backend-api.service*.ts @seanlip
+/core/templates/services/improvements.service*.ts @seanlip
+/core/templates/services/messenger.service.ts @seanlip
+/core/templates/services/playthrough*.ts @seanlip
+/core/templates/services/state-interaction-stats.service*.ts @seanlip
+/core/templates/services/state-top-answers-stats*.ts @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
@@ -452,10 +452,10 @@
 
 
 # Infrastructure.
-/jobs/ @brianrodri
-/jobs/transforms @rohitkatlaa @brianrodri
-/jobs/types @rohitkatlaa @brianrodri
-/core/templates/domain/jobs/ @brianrodri
+/jobs/ @vojtechjelinek
+/jobs/transforms @rohitkatlaa @vojtechjelinek
+/jobs/types @rohitkatlaa @vojtechjelinek
+/core/templates/domain/jobs/ @vojtechjelinek
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main*.py @DubeySandeep @nithusha21
@@ -463,18 +463,18 @@
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
-/core/domain/beam_job*.py @brianrodri
+/core/domain/beam_job*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
-/core/platform/ @brianrodri
+/core/platform/ @vojtechjelinek
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
-/core/templates/pages/login-page/ @brianrodri
-/core/templates/pages/logout-page/ @brianrodri
+/core/templates/pages/login-page/ @vojtechjelinek
+/core/templates/pages/logout-page/ @vojtechjelinek
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
@@ -482,9 +482,9 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
-/redis.conf @seanlip @BenHenning
+/redis.conf @seanlip
 /release_constants.json @nithusha21
-/.firebase.json @brianrodri
+/.firebase.json @vojtechjelinek
 
 
 # Miscellaneous.
@@ -657,7 +657,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
-/core/controllers/android_e2e_config*.py @BenHenning
+/core/controllers/android_e2e_config*.py @seanlip @BenHenning
 /core/templates/karma.module.ts @vojtechjelinek
 /core/tests/protractor_utils/ @kevintab95 @krishnarao22 @U8NWXD
 /core/tests/protractor_desktop/ @kevintab95 @krishnarao22 @U8NWXD
@@ -673,11 +673,11 @@
 
 
 # Python 3 Migration project.
-/core/domain/auth*.py @brianrodri
-/core/domain/caching*.py @brianrodri
-/core/domain/taskqueue*.py @brianrodri
-/core/templates/services/auth.service*.ts @brianrodri
-/core/templates/services/auth-backend-api.service*.ts @brianrodri
+/core/domain/auth*.py @vojtechjelinek
+/core/domain/caching*.py @vojtechjelinek
+/core/domain/taskqueue*.py @vojtechjelinek
+/core/templates/services/auth.service*.ts @vojtechjelinek
+/core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
 
 
 # Critical files.
@@ -690,15 +690,15 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-/core/templates/services/svg-sanitizer.service.ts @seanlip @BenHenning
-/scripts/linters/warranted_angular_security_bypasses.py @seanlip @BenHenning
-/core/controllers/acl_decorators*.py @seanlip @BenHenning
-/core/controllers/base*.py @seanlip @BenHenning
-/core/domain/html*.py @seanlip @BenHenning
-/core/domain/rights_manager*.py @seanlip @BenHenning
-/core/domain/role_services*.py @seanlip @BenHenning
-/core/storage/ @seanlip @BenHenning
-/core/domain/user*.py @seanlip @BenHenning
+/core/templates/services/svg-sanitizer.service.ts @seanlip
+/scripts/linters/warranted_angular_security_bypasses.py @seanlip
+/core/controllers/acl_decorators*.py @seanlip
+/core/controllers/base*.py @seanlip
+/core/domain/html*.py @seanlip
+/core/domain/rights_manager*.py @seanlip
+/core/domain/role_services*.py @seanlip
+/core/storage/ @seanlip
+/core/domain/user*.py @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
