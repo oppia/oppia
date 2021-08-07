@@ -29,19 +29,26 @@ import { GuppyConfigurationService } from 'services/guppy-configuration.service'
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
+interface FocusObj {
+  focused: boolean;
+}
+
 @Component({
   selector: 'numeric-expression-editor',
   templateUrl: './numeric-expression-editor.component.html'
 })
 export class NumericExpressionEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string;
+  currentValue!: string;
   @Output() valueChanged = new EventEmitter();
 
   warningText = '';
   hasBeenTouched = false;
-  currentValue: string;
-  alwaysEditable: boolean;
+  alwaysEditable: boolean = false;
   eventBusGroup: EventBusGroup;
 
   constructor(
@@ -75,7 +82,7 @@ export class NumericExpressionEditorComponent implements OnInit {
     // for touch-based devices) to capture input from user and the 'change'
     // event while using the normal keyboard.
     if (eventType === 'focus') {
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: FocusObj) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -87,7 +94,7 @@ export class NumericExpressionEditorComponent implements OnInit {
         }
       });
     } else {
-      Guppy.event('change', (focusObj) => {
+      Guppy.event('change', (focusObj: FocusObj) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -98,7 +105,7 @@ export class NumericExpressionEditorComponent implements OnInit {
           this.isCurrentAnswerValid();
         }
       });
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: FocusObj) => {
         if (!focusObj.focused) {
           this.isCurrentAnswerValid();
         }

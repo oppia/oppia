@@ -35,14 +35,14 @@ import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFacto
 import constants from 'assets/constants';
 
 interface LostChangeValues {
-  'outcome'?: Outcome;
-  'dest'?: string;
-  'feedback'?: SubtitledHtml;
-  'rules'?: Object;
-  'html'?: string;
+  'outcome': Outcome;
+  'dest': string;
+  'feedback': SubtitledHtml;
+  'rules': Object;
+  'html': string;
 }
 
-type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
+export type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
   InteractionBackendDict | ParamChangeBackendDict[] |
   RecordedVoiceOverBackendDict | WrittenTranslationsBackendDict |
   ParamChangeBackendDict[] | ParamSpecBackendDict | boolean | number | string |
@@ -63,24 +63,29 @@ export interface LostChangeBackendDict {
   'language_code'?: string;
 }
 
+// Properties are optional in 'LostChangeBackendDict' because all of them may
+// not be present in the dict and may change according to the cmd. Therefore,
+// they can be undefined.
 export class LostChange {
   cmd: string;
-  stateName: string;
-  newStateName: string;
-  oldStateName: string;
-  newValue: LostChangeValue;
-  oldValue: LostChangeValue;
-  propertyName: string;
-  contentId: string;
-  languageCode: string;
-  translationHTML: string;
+  stateName: string | undefined;
+  newStateName: string | undefined;
+  oldStateName: string | undefined;
+  newValue: LostChangeValue | undefined;
+  oldValue: LostChangeValue | undefined;
+  propertyName: string | undefined;
+  contentId: string | undefined;
+  languageCode: string | undefined;
+  translationHTML: string | undefined;
   utilsService: UtilsService;
 
   constructor(
-      utilsService: UtilsService, cmd: string, newStateName: string,
-      oldStateName: string, stateName: string, newValue: LostChangeValue,
-      oldValue: LostChangeValue, propertyName: string, contentId: string,
-      languageCode: string, translationHTML: string) {
+      utilsService: UtilsService, cmd: string, newStateName: string | undefined,
+      oldStateName: string | undefined, stateName: string | undefined,
+      newValue: LostChangeValue | undefined,
+      oldValue: LostChangeValue | undefined, propertyName: string | undefined,
+      contentId: string | undefined, languageCode: string | undefined,
+      translationHTML: string | undefined) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -112,11 +117,17 @@ export class LostChange {
   }
 
   isOldValueEmpty(): boolean {
-    return this.utilsService.isEmpty(this.oldValue);
+    if (this.oldValue) {
+      return this.utilsService.isEmpty(this.oldValue);
+    }
+    return false;
   }
 
   isNewValueEmpty(): boolean {
-    return this.utilsService.isEmpty(this.newValue);
+    if (this.newValue) {
+      return this.utilsService.isEmpty(this.newValue);
+    }
+    return false;
   }
 
   isOutcomeFeedbackEqual(): boolean {

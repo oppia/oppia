@@ -34,8 +34,7 @@ describe('RatioExpression', () => {
       RatioExpressionEditorComponent).componentInstance;
   }));
 
-  it('should initialize ctrl.value with an default value', () => {
-    component.value = null;
+  it('should initialize @Input() value with an default value', () => {
     component.ngOnInit();
     expect(component.value).not.toBeNull();
   });

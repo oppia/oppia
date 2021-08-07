@@ -42,11 +42,11 @@ interface ExplorationSnapshots {
   providedIn: 'root'
 })
 export class VersionTreeService {
-  private _snapshots: ExplorationSnapshots = null;
-  private _treeParents: {} = null;
+  private _snapshots: ExplorationSnapshots = {};
+  private _treeParents: number[] = [];
 
   init(snapshotsData: ExplorationSnapshot[]): void {
-    this._treeParents = {};
+    this._treeParents = [];
     this._snapshots = {};
     var numberOfVersions = snapshotsData.length;
 
@@ -88,7 +88,8 @@ export class VersionTreeService {
   }
 
   // Finds lowest common ancestor of v1 and v2 in the version tree.
-  findLCA(v1: number, v2: number): number {
+  // LCA will be null when maxIndex is zero.
+  findLCA(v1: number, v2: number): number | null {
     // Find paths from root to v1 and v2.
     var pathToV1 = [];
     var pathToV2 = [];

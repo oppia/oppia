@@ -25,7 +25,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 export interface ImagesData {
   filename: string;
-  imageBlob: Blob;
+  // 'imageBlob' will be null when filenames
+  // are not present in localStorage.
+  imageBlob: Blob | null;
 }
 
 @Injectable({
@@ -38,14 +40,15 @@ export class ImageLocalStorageService {
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
   MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
-  thumbnailBgColor: string = null;
+  thumbnailBgColor!: string;
 
   constructor(
     private alertsService: AlertsService,
     private imageUploadHelperService: ImageUploadHelperService,
     private windowRef: WindowRef) {}
 
-  getRawImageData(filename: string): string {
+  // Function returns null if filename doesn't exist in local storage.
+  getRawImageData(filename: string): string | null {
     return this.windowRef.nativeWindow.sessionStorage.getItem(filename);
   }
 
@@ -102,7 +105,7 @@ export class ImageLocalStorageService {
   flushStoredImagesData(): void {
     this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
-    this.thumbnailBgColor = null;
+    this.thumbnailBgColor = '';
   }
 }
 

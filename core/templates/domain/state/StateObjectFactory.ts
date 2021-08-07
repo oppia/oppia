@@ -44,7 +44,9 @@ import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 
 export interface StateBackendDict {
-  'classifier_model_id': string;
+  // The classifier model ID associated with a state, if applicable
+  // null otherwise.
+  'classifier_model_id': string | null;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
   'param_changes': readonly ParamChangeBackendDict[];
@@ -58,7 +60,7 @@ export interface StateBackendDict {
 
 export class State {
   name: string;
-  classifierModelId: string;
+  classifierModelId: string | null;
   linkedSkillId: string;
   content: SubtitledHtml;
   interaction: Interaction;
@@ -69,7 +71,7 @@ export class State {
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
   constructor(
-      name: string, classifierModelId: string, linkedSkillId: string,
+      name: string, classifierModelId: string | null, linkedSkillId: string,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
       solicitAnswerDetails: boolean, cardIsCheckpoint: boolean,
@@ -122,6 +124,12 @@ export class State {
 
   getRequiredWrittenTranslationContentIds(): Set<string> {
     let interactionId = this.interaction.id;
+    let interactionSpecs: {
+      [interaction: string]: {
+        'is_linear': boolean;
+        'is_terminal': boolean;
+      };
+    } = INTERACTION_SPECS;
 
     let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
 
@@ -129,8 +137,8 @@ export class State {
     // interaction, so these hints' written translations are not counted in
     // checking status of a state.
     if (!interactionId ||
-      INTERACTION_SPECS[interactionId].is_linear ||
-      INTERACTION_SPECS[interactionId].is_terminal) {
+      interactionSpecs[interactionId].is_linear ||
+      interactionSpecs[interactionId].is_terminal) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
           allContentIds.delete(contentId);
@@ -155,8 +163,10 @@ export class StateObjectFactory {
     private paramchangesObject: ParamChangesObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
+  // Type of Constanst here doesn't match with the type StateBackendDict,
+  // so we will have to typecast it as unknown first.
   get NEW_STATE_TEMPLATE(): StateBackendDict {
-    return constants.NEW_STATE_TEMPLATE;
+    return constants.NEW_STATE_TEMPLATE as unknown as StateBackendDict;
   }
 
   createDefaultState(newStateName: string): State {
@@ -173,7 +183,11 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    newState.interaction.defaultOutcome.dest = newStateName;
+    if (newState.interaction.defaultOutcome) {
+      newState.interaction.defaultOutcome.dest = newStateName;
+    } else {
+      throw new Error('Default Outcome doesn\'t exist');
+    }
     return newState;
   }
 
