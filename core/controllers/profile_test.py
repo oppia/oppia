@@ -42,7 +42,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
     def test_get_profile_page_of_existing_user(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
-        self.assertIn('<oppia-root></oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -128,7 +128,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn('<oppia-root></oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 

@@ -458,9 +458,6 @@ URLS = [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
-        r'/joboutputhandler', release_coordinator.JobOutputHandler),
-    get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
-    get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
@@ -872,20 +869,14 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
                 r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # Manually redirect routes with url fragments to the oppia root page.
-URLS = URLS + [
+URLS.extend((
     get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
     get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage),
     get_redirect_route(
-        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage)
-]
-
-# Redirect all routes handled using angular router to the oppia root page.
-for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-    URLS.append(
-        get_redirect_route(
-            r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
+))
 
 # Add cron urls.
 URLS.extend((
