@@ -62,7 +62,6 @@ import utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-
 PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
@@ -395,11 +394,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'attachment; filename=topic_similarities.csv')
 
         self.assertIn(
-            'Architecture,Art,Biology,Business,Chemistry,Computing,Economics,'
-            'Education,Engineering,Environment,Geography,Government,Hobbies,'
-            'Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,'
-            'Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,'
-            'Statistics,Welcome',
+            b'Architecture,Art,Biology,Business,Chemistry,Computing,Economics,'
+            b'Education,Engineering,Environment,Geography,Government,Hobbies,'
+            b'Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,'
+            b'Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,'
+            b'Statistics,Welcome',
             response.body)
 
         self.logout()
@@ -723,6 +722,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
+        error_msg = (
+            'Schema validation for \'new_rules\' failed: \'int\' '
+            'object is not subscriptable')
         response = self.post_json(
             '/adminhandler', {
                 'action': 'update_feature_flag_rules',
@@ -733,9 +735,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-        error_msg = (
-            'Schema validation for \'new_rules\' failed: \'int\' '
-            'object has no attribute \'__getitem__\'')
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -957,17 +956,17 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_publish': 1,
+                'num_dummy_exps_to_generate': 'invalid_type'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
         error_msg = (
             'Schema validation for \'num_dummy_exps_to_generate\' failed: '
-            'Could not convert unicode to int: invalid_type')
-        with self.assertRaisesRegexp(Exception, error_msg):
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'generate_dummy_explorations',
-                    'num_dummy_exps_to_publish': 1,
-                    'num_dummy_exps_to_generate': 'invalid_type'
-                }, csrf_token=csrf_token)
-
+            'Could not convert str to int: invalid_type')
+        self.assertEqual(response['error'], error_msg)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(generated_exps, {})
@@ -979,17 +978,17 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_publish': 'invalid_type',
+                'num_dummy_exps_to_generate': 1
+            }, csrf_token=csrf_token, expected_status_int=400)
+
         error_msg = (
             'Schema validation for \'num_dummy_exps_to_publish\' failed: '
-            'Could not convert unicode to int: invalid_type')
-        with self.assertRaisesRegexp(Exception, error_msg):
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'generate_dummy_explorations',
-                    'num_dummy_exps_to_publish': 'invalid_type',
-                    'num_dummy_exps_to_generate': 1
-                }, csrf_token=csrf_token)
-
+            'Could not convert str to int: invalid_type')
+        self.assertEqual(response['error'], error_msg)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(generated_exps, {})
@@ -1111,7 +1110,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         error_msg = (
             'Schema validation for \'filter_criterion\' failed: Received '
             'invalid which is not in the allowed range of choices: '
-            '[u\'role\', u\'username\']')
+            '[\'role\', \'username\']')
         self.assertEqual(response['error'], error_msg)
 
     def test_replacing_user_role_from_topic_manager_to_moderator(self):
@@ -1654,16 +1653,14 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0
         }
 
+        error_msg = (
+            'Schema validation for \'exp_version\' failed: '
+            'Could not convert str to int: a')
         response = self.get_json(
             '/explorationdataextractionhandler',
             params=payload,
-            expected_status_int=400
-        )
-        error_msg = (
-            'Schema validation for \'exp_version\' failed: '
-            'Could not convert unicode to int: a')
-        self.assertEqual(
-            response['error'], error_msg)
+            expected_status_int=400)
+        self.assertEqual(response['error'], error_msg)
 
     def test_that_handler_raises_exception(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1852,7 +1849,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         error_msg = (
             'Schema validation for \'new_username\' failed: Validation failed'
-            ': has_length_at_most ({u\'max_value\': %s}) for object %s'
+            ': has_length_at_most ({\'max_value\': %s}) for object %s'
             % (constants.MAX_USERNAME_LENGTH, long_username))
         self.assertEqual(response['error'], error_msg)
 

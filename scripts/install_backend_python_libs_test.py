@@ -138,7 +138,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
             def communicate(self):
                 """Return required method."""
-                return '', 'can\'t combine user with prefix'
+                return b'', b'can\'t combine user with prefix'
 
         def mock_check_call_error(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
@@ -164,17 +164,17 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_wrong_pip_version_raises_import_error(self):
         import pip
 
-        with self.swap_Popen, self.swap(pip, '__version__', '20.2.4'):
+        with self.swap_Popen, self.swap(pip, '__version__', '21.1.0'):
             install_backend_python_libs.verify_pip_is_installed()
 
         self.assertEqual(self.cmd_token_list, [
-            ['pip', 'install', 'pip==20.3.4'],
+            ['pip', 'install', 'pip==21.2.3'],
         ])
 
     def test_correct_pip_version_does_nothing(self):
         import pip
 
-        with self.swap_check_call, self.swap(pip, '__version__', '20.3.4'):
+        with self.swap_check_call, self.swap(pip, '__version__', '21.0.1'):
             install_backend_python_libs.verify_pip_is_installed()
 
         self.assertEqual(self.cmd_token_list, [])
@@ -532,7 +532,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with swap_rm_tree, swap_list_dir, swap_is_dir:
                     install_backend_python_libs.main()
 
-        self.assertEqual(
+        self.assertItemsEqual(
             self.cmd_token_list,
             [
                 ['scripts.regenerate_requirements'],
@@ -559,7 +559,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 ]
             ]
         )
-        self.assertEqual(
+        self.assertItemsEqual(
             paths_to_delete,
             [
                 u'flask-10.0.1.dist-info',
@@ -677,9 +677,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_pip_install_exception_handling(self):
         with self.assertRaisesRegexp(
-            Exception, 'Error installing package') as context:
+            Exception, 'Error installing package'
+        ):
             install_backend_python_libs.pip_install('package==version', 'path')
-        self.assertTrue('Error installing package' in context.exception)
 
     def test_pip_install_with_import_error_and_darwin_os(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
@@ -689,7 +689,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
                 with self.assertRaisesRegexp(
-                    ImportError, 'Error importing pip: No module named pip'):
+                    ImportError,
+                    'Error importing pip: import of pip halted; '
+                    'None in sys.modules'
+                ):
                     install_backend_python_libs.pip_install(
                         'package==version', 'path')
         finally:
@@ -706,7 +709,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
                 with self.assertRaisesRegexp(
-                    Exception, 'Error importing pip: No module named pip'):
+                    ImportError,
+                    'Error importing pip: import of pip halted; '
+                    'None in sys.modules'
+                ):
                     install_backend_python_libs.pip_install(
                         'package==version', 'path')
         finally:
@@ -722,7 +728,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
                 with self.assertRaisesRegexp(
-                    Exception, 'Error importing pip: No module named pip'):
+                    ImportError,
+                    'Error importing pip: import of pip halted; '
+                    'None in sys.modules'
+                ):
                     install_backend_python_libs.pip_install(
                         'package==version', 'path')
         finally:
