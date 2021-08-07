@@ -884,7 +884,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'The parameter \'translation_html\' should be a string.')
+            'The parameter \'translation_html\' should be a string or a list.')
         self.logout()
 
     def test_update_suggestion_updates_question_suggestion_content(self):
