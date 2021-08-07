@@ -55,7 +55,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
-  internetRequiringComponents: string[] = [];
+  componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
   componentRe = (
@@ -217,7 +217,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
-    this.internetRequiringComponents = [];
+    this.componentsThatRequireInternet = [];
 
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
@@ -233,7 +233,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         icons.push(componentDefn.iconDataUrl);
       }
       if (componentDefn.requiresInternet) {
-        this.internetRequiringComponents.push(componentDefn.id);
+        this.componentsThatRequireInternet.push(componentDefn.id);
       }
     });
 
@@ -455,7 +455,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   disableRTEicons(): void {
     // Add disabled cursor pointer to the icons.
     // TODO(#12882): Remove the use of jQuery.
-    this.internetRequiringComponents.forEach((name) => {
+    this.componentsThatRequireInternet.forEach((name) => {
       $('.cke_button__oppia' + name)
         .css('background-color', '#cccccc')
         .css('pointer-events', 'none');
@@ -468,7 +468,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   }
   enableRTEicons(): void {
     // TODO(#12882): Remove the use of jQuery.
-    this.internetRequiringComponents.forEach((name) => {
+    this.componentsThatRequireInternet.forEach((name) => {
       $('.cke_button__oppia' + name)
         .css('background-color', '')
         .css('pointer-events', '');
