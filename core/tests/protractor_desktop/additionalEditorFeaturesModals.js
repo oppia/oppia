@@ -380,6 +380,141 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
+  it(
+    'should show toast message to inform when offline and online',
+    async function() {
+      await users.createUser('user16@editor.com', 'user16Editor');
+
+      await users.login('user16@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
+
+      // Set network connection to offline.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: true,
+          latency: 1000,
+          download_throughput: 0,
+          upload_throughput: 0});
+
+      // Check that toast message appeared when offline.
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Offline warning toast message taking too long to appear.');
+
+      // Set network connection to online.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: false,
+          latency: 150,
+          download_throughput: 450 * 1024,
+          upload_throughput: 150 * 1024});
+
+      // Check that toast message appeared when reconnected.
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Online warning toast message taking too long to appear.');
+      await users.logout();
+    });
+
+  it(
+    'should be able to save changes when offline',
+    async function() {
+      await users.createUser('user17@editor.com', 'user17Editor');
+
+      await users.login('user17@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
+
+      // Set network connection to offline.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: true,
+          latency: 1000,
+          download_throughput: 0,
+          upload_throughput: 0});
+
+      // Add a content change to check changes can be done when offline.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+
+      // Set network connection to online.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: false,
+          latency: 150,
+          download_throughput: 450 * 1024,
+          upload_throughput: 150 * 1024});
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Online warning toast message taking too long to appear.');
+
+      // Check that the changes are auto-saved when reconnected.
+      await action.waitForAutosave();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
+      await users.logout();
+    });
+
+  it(
+    'should disable save changes buttons when offline',
+    async function() {
+      await users.createUser('user18@editor.com', 'user18Editor');
+
+      await users.login('user18@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+
+      // Check that the save changes button is clickable when online.
+      var saveChangesButton = element(by.css('.protractor-test-save-changes'));
+      await waitFor.elementToBeClickable(
+        saveChangesButton,
+        'Save changes button taking too long to be clickable.');
+
+      // Set network connection to offline.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: true,
+          latency: 1000,
+          download_throughput: 0,
+          upload_throughput: 0});
+
+      // Check that the save changes button is clickable when offline.
+      expect(await saveChangesButton.isEnabled()).toEqual(false);
+
+      // Set network connection to online.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: false,
+          latency: 150,
+          download_throughput: 450 * 1024,
+          upload_throughput: 150 * 1024});
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Online warning toast message taking too long to appear.');
+
+      // Check that the save changes button is clickable when reconnected.
+      await waitFor.elementToBeClickable(
+        saveChangesButton,
+        'Save changes button taking too long to be clickable.');
+
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
+      await users.logout();
+    });
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
