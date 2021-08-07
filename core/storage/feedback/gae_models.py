@@ -19,7 +19,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core.domain import feedback_domain # pylint: disable=unused-import
+# TODO(#13594): After the domain layer is refactored to be independent of
+# the storage layer, the pylint: disable=invalid-import will
+# be removed.
+# The following import is dangerous and should not be generally
+# used. We had to use this ignore as we need to import the domain layer
+# for type-annotation.
+from core.domain import feedback_domain # pylint: disable=unused-import, invalid-import
 from core.platform import models
 import feconf
 import python_utils
