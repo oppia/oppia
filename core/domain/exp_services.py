@@ -27,6 +27,7 @@ from __future__ import unicode_literals
 
 import collections
 import datetime
+import io
 import logging
 import math
 import os
@@ -180,8 +181,8 @@ def get_exploration_ids_matching_query(
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_offset is None):
             break
-        else:
-            logging.error(
+
+        logging.error(
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
@@ -282,16 +283,17 @@ def export_to_zip_file(exploration_id, version=None):
             exploration is exported.
 
     Returns:
-        str. The contents of the ZIP archive of the exploration (which can be
-        subsequently converted into a zip file via zipfile.ZipFile()).
+        BytesIO. The contents of the ZIP archive of the exploration
+        (which can be subsequently converted into a zip file via
+        zipfile.ZipFile()).
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    temp_file = python_utils.string_io()
+    temp_file = io.BytesIO()
     with zipfile.ZipFile(
-        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
@@ -308,14 +310,11 @@ def export_to_zip_file(exploration_id, version=None):
         for filename in image_filenames:
             filepath = 'image/%s' % filename
             file_contents = fs.get(filepath)
-
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, python_utils.UNICODE)
-            unicode_filepath = str_filepath.decode('utf-8')
-            logging.error(unicode_filepath)
-            zfile.writestr(unicode_filepath, file_contents)
+            logging.error(str_filepath)
+            zfile.writestr(str_filepath, file_contents)
 
-    return temp_file.getvalue()
+    return temp_file
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -1537,8 +1536,7 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-        assets_list)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id, assets_list)
 
     publish_exploration_and_update_user_profiles(
         user_services.get_system_user(), exploration_id)
@@ -1790,12 +1788,9 @@ def are_changes_mergeable(exp_id, change_list_version, change_list):
 
     if send_email:
         change_list_dict = [change.to_dict() for change in change_list]
-        (
-            email_manager
-            .send_not_mergeable_change_list_to_admin_for_review(
-                exp_id, change_list_version,
-                current_exploration.version,
-                change_list_dict))
+        email_manager.send_not_mergeable_change_list_to_admin_for_review(
+            exp_id, change_list_version, current_exploration.version,
+            change_list_dict)
     return changes_are_mergeable
 
 
