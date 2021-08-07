@@ -688,7 +688,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         self.post_json(
             '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
@@ -1364,8 +1365,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, received <type'
-            ' \'unicode\'>')
+            'Expected target_version_at_submission to be an int, '
+            'received <class \'str\'>'
+        )
         self.assertEqual(len(suggestions), 1)
         self.logout()
 
@@ -1395,7 +1397,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
 
         self.post_json(
@@ -2081,7 +2084,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {

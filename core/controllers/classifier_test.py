@@ -215,11 +215,11 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                     feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
-                self.assertEqual(messages[0].subject.decode(), expected_subject)
+                self.assertEqual(messages[0].subject, expected_subject)
                 messages = (
                     self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
                 self.assertEqual(len(messages), 1)
-                self.assertEqual(messages[0].subject.decode(), expected_subject)
+                self.assertEqual(messages[0].subject, expected_subject)
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.

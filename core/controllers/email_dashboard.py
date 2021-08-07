@@ -21,7 +21,6 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
 import feconf
@@ -46,7 +45,7 @@ def _generate_user_query_dicts(user_queries):
         list(dict(str, str)). List of data dicts for the user queries.
     """
     submitters_settings = user_services.get_users_settings(
-        list(set([model.submitter_id for model in user_queries])))
+        list(set(model.submitter_id for model in user_queries)))
     user_id_to_username = {
         submitter.user_id: submitter.username
         for submitter in submitters_settings
@@ -98,11 +97,6 @@ class EmailDashboardDataHandler(base.BaseHandler):
             self.user_id, kwargs)
 
         # Start MR job in background.
-        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': user_query_id}
-        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
-
         user_query = (
             user_query_services.get_user_query(user_query_id, strict=True))
         data = {
@@ -154,7 +148,7 @@ class EmailDashboardResultPage(base.BaseHandler):
 
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.user_id)
+                '%s is not an authorized user for this query.' % self.username)
 
         self.render_template('email-dashboard-result.mainpage.html')
 
@@ -169,7 +163,7 @@ class EmailDashboardResultPage(base.BaseHandler):
 
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.user_id)
+                '%s is not an authorized user for this query.' % self.username)
 
         data = self.payload['data']
         email_subject = data['email_subject']
@@ -195,7 +189,7 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
 
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.user_id)
+                '%s is not an authorized user for this query.' % self.username)
         user_query_services.archive_user_query(user_query.id)
         self.render_json({})
 
@@ -218,7 +212,7 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
 
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.user_id)
+                '%s is not an authorized user for this query.' % self.username)
 
         email_subject = self.payload['email_subject']
         email_body = self.payload['email_body']

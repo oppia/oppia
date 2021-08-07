@@ -121,17 +121,17 @@ def get_remote_name():
     task = subprocess.Popen(
         get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
-    remotes = python_utils.UNICODE(out)[:-1].split('\n')
+    remotes = out[:-1].split(b'\n')
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
-                'git config --get remote.%s.url' % remote).split()
+                b'git config --get remote.%s.url' % remote).split()
             task = subprocess.Popen(
                 get_remotes_url_cmd, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
-                if remote_url.endswith('oppia/oppia.git\n'):
+                if remote_url.endswith(b'oppia/oppia.git\n'):
                     remote_num += 1
                     remote_name = remote
             else:
@@ -192,7 +192,8 @@ def git_diff_name_status(left, right, diff_filter=''):
             #
             # We extract the first char (indicating the status), and the string
             # after the last tab character.
-            file_list.append(FileDiff(line[0], line[line.rfind('\t') + 1:]))
+            file_list.append(
+                FileDiff(bytes([line[0]]), line[line.rfind(b'\t') + 1:]))
         return file_list
     else:
         raise ValueError(err)
@@ -240,7 +241,7 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
         ValueError. Raise ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
-    git_remote = '%s/%s' % (remote, remote_branch)
+    git_remote = b'%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
     start_subprocess_for_result(['git', 'pull', remote])
     # Only compare differences to the merge base of the local and remote
@@ -253,8 +254,7 @@ def extract_files_to_lint(file_diffs):
     """Grab only files out of a list of FileDiffs that have a ACMRT status."""
     if not file_diffs:
         return []
-    lint_files = [f.name for f in file_diffs
-                  if f.status.upper() in 'ACMRT']
+    lint_files = [f.name for f in file_diffs if f.status in b'ACMRT']
     return lint_files
 
 
@@ -267,7 +267,7 @@ def get_parent_branch_name_for_diff():
     if common.is_current_branch_a_hotfix_branch():
         return 'release-%s' % common.get_current_release_version_number(
             common.get_current_branch_name())
-    return 'develop'
+    return b'develop'
 
 
 def collect_files_being_pushed(ref_list, remote):
@@ -413,7 +413,7 @@ def does_diff_include_js_or_ts_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.ts') or file_path.endswith('.js'):
+        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
             return True
     return False
 
@@ -429,7 +429,7 @@ def does_diff_include_ts_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.ts'):
+        if file_path.endswith(b'.ts'):
             return True
     return False
 
@@ -446,7 +446,7 @@ def does_diff_include_ci_config_or_js_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.js') or re.search(r'e2e_.*\.yml', file_path):
+        if file_path.endswith(b'.js') or re.search(rb'e2e_.*\.yml', file_path):
             return True
     return False
 

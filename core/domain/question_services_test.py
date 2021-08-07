@@ -572,7 +572,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, '\'unicode\' object has no attribute \'cmd\'')
+            Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(
@@ -1010,7 +1010,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
         self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
         updated_question = question_services.get_question_by_id(
             self.question_id)
         updated_answer_groups = (

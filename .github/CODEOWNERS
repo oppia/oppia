@@ -237,11 +237,9 @@
 
 
 # Google-app-engine configurations
-/appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
 /index.yaml @vojtechjelinek
 /queue.yaml @nithusha21
-/main_taskqueue.py @nithusha21
 
 
 # Global components and filters.
@@ -460,8 +458,7 @@
 /core/templates/domain/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
-/main_cron.py @nithusha21
-/main.py @DubeySandeep @nithusha21
+/main*.py @DubeySandeep @nithusha21
 /feconf.py @DubeySandeep @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
@@ -469,7 +466,6 @@
 /core/domain/beam_job*.py @brianrodri
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
-/core/jobs*.py @brianrodri
 /core/platform/ @brianrodri
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
@@ -526,6 +522,7 @@
 
 
 # Release team.
+/.gcloudignore @nithusha21
 /core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
 /core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
 /scripts/release_scripts/ @nithusha21 @vojtechjelinek
@@ -602,8 +599,7 @@
 /core/templates/pages/header_js_libs.html @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @vojtechjelinek
 /core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
-/.lighthouserc.js @jimbyo @vojtechjelinek
-/.lighthouserc-accessibility.js @jimbyo @vojtechjelinek
+/.lighthouserc*.js @jimbyo @vojtechjelinek
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
 /scripts/run_lighthouse_tests.py @vojtechjelinek
 /webpack.*.ts @nithusha21 @vojtechjelinek
