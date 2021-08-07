@@ -34,11 +34,13 @@ import { LearnerDashboardActivityIds } from
 export class LearnerDashboardIconsComponent implements OnInit {
   activityIsCurrentlyHoveredOver: boolean = true;
   playlistTooltipIsEnabled: boolean = false;
-  learnerDashboardActivityIds: LearnerDashboardActivityIds;
-
-  @Input() activityType: string;
-  @Input() activityId: string;
-  @Input() activityTitle: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
+  @Input() activityType!: string;
+  @Input() activityId!: string;
+  @Input() activityTitle!: string;
   @Input()
   get activityActive(): boolean {
     return this.activityIsCurrentlyHoveredOver;
@@ -46,8 +48,8 @@ export class LearnerDashboardIconsComponent implements OnInit {
   set activityActive(hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }
-  @Input() isContainerNarrow: boolean;
-  @Input() isAddToPlaylistIconShown: boolean;
+  @Input() isContainerNarrow: boolean = false;
+  @Input() isAddToPlaylistIconShown: boolean = false;
 
   constructor(
     private learnerDashboardIdsBackendApiService:
@@ -90,6 +92,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
         }
       }
     }
+    return false;
   }
 
   belongsToLearnerPlaylist(): boolean {
@@ -105,6 +108,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
             this.activityId));
       }
     }
+    return false;
   }
 
   belongsToCompletedActivities(): boolean {
@@ -128,6 +132,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
             this.activityId));
       }
     }
+    return false;
   }
 
   belongsToIncompleteActivities(): boolean {
@@ -147,6 +152,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
             this.activityId));
       }
     }
+    return false;
   }
 
   addToLearnerPlaylist(activityId: string, activityType: string): void {

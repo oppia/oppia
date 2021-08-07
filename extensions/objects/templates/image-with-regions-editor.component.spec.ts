@@ -32,17 +32,17 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   class MockImageObject {
     source = null;
-    onload = null;
+    onload!: () => string;
     width = 0;
     height = 0;
-    constructor(_width?: 0, _height?: 0) {
+    constructor(_width: 0, _height: 0) {
       this.width = _width;
       this.height = _height;
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url) {
+    set src(url: string) {
       this.onload();
     }
   }
@@ -369,12 +369,12 @@ describe('ImageWithRegionsEditorComponent', () => {
       regionType: 'Rectangle',
       area: [
         [
-          0,
-          0
+          0.23225103021579202,
+          0.08157179492961315
         ],
         [
-          0.21361468893287125,
-          0.16115734093948267
+          0.553006091537647,
+          0.3235816208679242
         ]
       ]
     });
@@ -436,12 +436,12 @@ describe('ImageWithRegionsEditorComponent', () => {
       regionType: 'Rectangle',
       area: [
         [
-          0.7863853110671288,
-          0.8388426590605174
+          0.23225103021579202,
+          0.08157179492961315
         ],
         [
-          1,
-          1
+          0.553006091537647,
+          0.3235816208679242
         ]
       ]
     });
@@ -510,12 +510,12 @@ describe('ImageWithRegionsEditorComponent', () => {
       regionType: 'Rectangle',
       area: [
         [
-          0.04985965130585909,
-          0.0765451050371804
+          0.23225103021579202,
+          0.08157179492961315
         ],
         [
-          0.36828795073404025,
-          0.21547700963701794
+          0.553006091537647,
+          0.3235816208679242
         ]
       ]
     });
