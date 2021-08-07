@@ -183,7 +183,7 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         Collection or None. The domain object representing a collection with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = python_utils.UNICODE(version) if version else None
     cached_collection = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION,
         sub_namespace,
@@ -278,8 +278,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        cid: db_results_dict[cid] for cid in db_results_dict
-        if db_results_dict[cid] is not None
+        cid: val for cid, val in db_results_dict.items() if val is not None
     }
 
     if cache_update:

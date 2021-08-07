@@ -17,13 +17,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core import jobs
-from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
 import feconf
-import utils
 
 
 class JobsHandler(base.BaseHandler):
@@ -122,5 +119,5 @@ class MemoryCacheHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_memcache
     def delete(self):
-        caching_services.flush_memory_cache()
+        caching_services.flush_memory_caches()
         self.render_json({})
