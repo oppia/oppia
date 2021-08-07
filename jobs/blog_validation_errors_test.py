@@ -24,11 +24,11 @@ from jobs import blog_validation_errors
 from jobs.types import base_validation_errors_test
 import utils
 
-(blog_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
-    [models.NAMES.blog, ])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
 
-datastore_services = (
-    models.Registry.import_datastore_services()) # type: ignore[no-untyped-call]
+(blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 
 class DuplicateBlogTitleErrorTests(
