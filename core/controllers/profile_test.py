@@ -1075,7 +1075,7 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
     def test_get_pending_account_deletion_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/pending-account-deletion')
-            self.assertIn('<oppia-root></oppia-root>', response.body)
+            self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

@@ -77,7 +77,19 @@ var login = async function(email, useManualNavigation = true) {
   await browser.waitForAngularEnabled(false);
   await action.click('Sign in button', signInButton);
 
+  // The await action.click only waits until button is clicked, it doesnot wait
+  // for the redirection to trigger. So, manually waiting for redirection here.
+  await browser.driver.wait(async() => {
+    const URL = await browser.driver.getCurrentUrl();
+
+    return /signup/.test(URL);
+  }, 10000);
+
+  // The above solution only waits until url is changed, so invoking
+  // pageToFullyLoad to wait for all async tasks on new page to finish before
+  // proceeding.
   await waitFor.pageToFullyLoad();
+
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
 };
@@ -92,8 +104,20 @@ var logout = async function() {
   await browser.waitForAngularEnabled(false);
   // Wait for logout page to load.
   await waitFor.pageToFullyLoad();
-  // Wait for redirection to occur.
+
+  // Manually waiting for redirection here.
+  await browser.driver.wait(async() => {
+    const URL = await browser.driver.getCurrentUrl();
+    // As redirect url can be any url, so instead of testing for new url,
+    // checking whether the url is not /logout.
+    return !(/logout/.test(URL));
+  }, 10000);
+
+  // The above solution only waits until url is changed, so invoking
+  // pageToFullyLoad to wait for all async tasks on new page to finish before
+  // proceeding.
   await waitFor.pageToFullyLoad();
+
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
 };
@@ -122,7 +146,7 @@ var _completeSignup = async function(username) {
 
   // Signup page performs client side redirection which is known to cause
   // "both angularJS testability and angular testability are undefined" flake.
-  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
+  // As suggested by protractor devs here (http://git.io/v4gXM), waiting for
   // angular is disabled during client side redirects.
   await browser.waitForAngularEnabled(false);
   await action.click('Register user button', registerUser);
@@ -131,11 +155,14 @@ var _completeSignup = async function(username) {
   // for the redirection to trigger. So, manually waiting for redirection here.
   await browser.driver.wait(async() => {
     const URL = await browser.driver.getCurrentUrl();
-    // As redirect url can be any url, so instead of new url, checking whether
-    // the url is not /signup.
+    // As redirect url can be any url, so instead of testing for new url,
+    // checking whether the url is not /signup.
     return !(/signup/.test(URL));
   }, 10000);
 
+  // The above solution only waits until url is changed, so invoking
+  // pageToFullyLoad to wait for all async tasks on new page to finish before
+  // proceeding.
   await waitFor.pageToFullyLoad();
 
   // Client side redirection is complete, enabling wait for angular here.
