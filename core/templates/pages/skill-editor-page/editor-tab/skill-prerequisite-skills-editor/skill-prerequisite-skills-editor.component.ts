@@ -35,7 +35,7 @@ require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
   bindings: {},
-  template: require('./skill-prerequisite-skills-editor.directive.html'),
+  template: require('./skill-prerequisite-skills-editor.component.html'),
   controller: [
     '$scope', 'AlertsService',
     'NgbModal', 'SkillEditorStateService', 'SkillUpdateService',
@@ -48,13 +48,7 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
       var ctrl = this;
       var categorizedSkills = null;
       var untriagedSkillSummaries = null;
-      TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-        .then(function(response) {
-          categorizedSkills = response.categorizedSkillsDict;
-          untriagedSkillSummaries = response.untriagedSkillSummaries;
-        });
-      var groupedSkillSummaries =
-        SkillEditorStateService.getGroupedSkillSummaries();
+      var groupedSkillSummaries = null;
 
       $scope.removeSkillId = function(skillId) {
         SkillUpdateService.deletePrerequisiteSkill($scope.skill, skillId);
@@ -115,6 +109,13 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
         }
       };
       ctrl.$onInit = function() {
+        groupedSkillSummaries = SkillEditorStateService.getGroupedSkillSummaries();
+        TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+        .then(function(response) {
+          categorizedSkills = response.categorizedSkillsDict;
+          untriagedSkillSummaries = response.untriagedSkillSummaries;
+        });
+
         $scope.skill = SkillEditorStateService.getSkill();
         $scope.prerequisiteSkillsAreShown = (
           !WindowDimensionsService.isWindowNarrow());
