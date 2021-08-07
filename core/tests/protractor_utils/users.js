@@ -69,7 +69,7 @@ var login = async function(email, useManualNavigation = true) {
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
 
-  // Login page performs client side redirection which cause
+  // Login page performs client side redirection which is known to cause
   // "both angularJS testability and angular testability are undefined" flake.
   // As suggested protractor devs here (http://git.io/v4gXM), waiting for
   // angular is disabled during client side redirects.
@@ -77,13 +77,14 @@ var login = async function(email, useManualNavigation = true) {
   await action.click('Sign in button', signInButton);
 
   await waitFor.pageToFullyLoad();
+  // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
 };
 
 var logout = async function() {
   await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
 
-  // Logout page performs client side redirection which cause
+  // Logout page performs client side redirection which is known to cause
   // "both angularJS testability and angular testability are undefined" flake.
   // As suggested protractor devs here (http://git.io/v4gXM), waiting for
   // angular is disabled during client side redirects.
@@ -92,6 +93,7 @@ var logout = async function() {
   await waitFor.pageToFullyLoad();
   // Wait for redirection to occur.
   await waitFor.pageToFullyLoad();
+  // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
 };
 
@@ -116,9 +118,17 @@ var _completeSignup = async function(username) {
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
   var registerUser = element(by.css('.protractor-test-register-user'));
-  await action.click('Register user button', registerUser);
 
+  // Signup page performs client side redirection which is known to cause
+  // "both angularJS testability and angular testability are undefined" flake.
+  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
+  // angular is disabled during client side redirects.
+  await browser.waitForAngularEnabled(false);
+  await action.click('Register user button', registerUser);
+  // Waiting for redirection to occur.
   await waitFor.pageToFullyLoad();
+  // Client side redirection is complete, enabling wait for angular here.
+  await browser.waitForAngularEnabled(true);
 };
 
 var createAndLoginUser = async function(
