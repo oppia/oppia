@@ -136,6 +136,8 @@ var _completeSignup = async function(username) {
     return !(/signup/.test(URL));
   }, 10000);
 
+  await waitFor.pageToFullyLoad();
+
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
 };
