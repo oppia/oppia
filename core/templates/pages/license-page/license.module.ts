@@ -16,25 +16,18 @@
  * @fileoverview Module for the license page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-
 import { LicensePageComponent } from './license-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LicensePageRootComponent } from './license-page-root.component';
+import { CommonModule } from '@angular/common';
+import { LicensePageRoutingModule } from './license-page-routing.module';
+import { NgModule } from '@angular/core';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    LicensePageRoutingModule
   ],
   declarations: [
     LicensePageComponent,
@@ -43,20 +36,6 @@ import { LicensePageRootComponent } from './license-page-root.component';
   entryComponents: [
     LicensePageComponent,
     LicensePageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [LicensePageRootComponent]
+  ]
 })
 export class LicensePageModule {}

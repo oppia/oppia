@@ -319,7 +319,12 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = base64.b64decode(self.normalized_request.get('q'))
+        # The query is encoded into base64 string in the frontend, and b64decode
+        # accepts base64 bytes, thus we need to encode the base64 string to
+        # base64 bytes, then decode them to just bytes and then decode those
+        # back to string.
+        q = self.normalized_request.get('q').encode('utf-8')
+        query_string = base64.b64decode(q).decode('utf-8')
 
         search_offset = self.normalized_request.get('cursor')
 

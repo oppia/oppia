@@ -22,20 +22,21 @@ import { PreventPageUnloadEventService }
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe ('Prevent page unload event service', function() {
-  let preventPageUnloadEventService: PreventPageUnloadEventService = null;
-  let windowRef: WindowRef = null;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let windowRef: WindowRef;
 
   var reloadEvt = document.createEvent('Event');
   reloadEvt.initEvent('mockbeforeunload', true, true);
-  reloadEvt.returnValue = null;
+  reloadEvt.returnValue = false;
   reloadEvt.preventDefault = () => {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [PreventPageUnloadEventService]
     });
-    preventPageUnloadEventService = TestBed.get(PreventPageUnloadEventService);
-    windowRef = TestBed.get(WindowRef);
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService);
+    windowRef = TestBed.inject(WindowRef);
   });
 
 
@@ -55,22 +56,25 @@ describe ('Prevent page unload event service', function() {
   };
 
   it('should adding listener', () => {
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
 
     preventPageUnloadEventService.addListener();
 
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
   });
 
   it('should removing listener', () => {
     spyOn(preventPageUnloadEventService, 'removeListener').and.callThrough();
+    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
+    preventPageUnloadEventService.removeListener();
+    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
     preventPageUnloadEventService.addListener();
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
 
     preventPageUnloadEventService.removeListener();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
   });
 
   it('should test if Alert is displayed', () => {
@@ -81,7 +85,7 @@ describe ('Prevent page unload event service', function() {
     windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
   });
 
   it('should prevent multiple listeners', () => {
@@ -90,7 +94,7 @@ describe ('Prevent page unload event service', function() {
     expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(0);
     preventPageUnloadEventService.addListener();
     expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(1);
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
 
     preventPageUnloadEventService.addListener();
 
@@ -114,7 +118,7 @@ describe ('Prevent page unload event service', function() {
     windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
   });
 
   it('should test if Alert is not displayed when a condition is passed', () => {
@@ -128,6 +132,6 @@ describe ('Prevent page unload event service', function() {
     windowRef.nativeWindow.location.reload(validationCallback());
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
   });
 });
