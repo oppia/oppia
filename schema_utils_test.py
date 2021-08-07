@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
+import re
 
 from core.domain import email_manager
 from core.tests import test_utils
@@ -446,103 +447,137 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         # type: () -> None
         """Test validation of schemas."""
         invalid_schemas_with_error_messages = [
-            ([
-                'type'
-            ], r'Expected dict, got \[u\'type\'\]'),
-            ({
-                'type': 'invalid'
-            }, 'invalid is not an allowed schema type'),
-            ({
-                'type': 'dict',
-            }, 'Missing keys: {u\'type\': u\'dict\'}'),
-            ({
-                'type': 'list',
-                'items': {}
-            }, 'type is not present in schema key types'),
-            ({
-                'type': 'list',
-                'items': {
-                    'type': 'unicode'
+            (['type'], re.escape('Expected dict, got [\'type\']')),
+            ({'type': 'invalid'}, 'invalid is not an allowed schema type'),
+            ({'type': 'dict'}, 'Missing keys: {\'type\': \'dict\'}'),
+            (
+                {
+                    'type': 'list',
+                    'items': {}
                 },
-                'len': -1
-            }, 'Expected length greater than 0, got -1'),
-            ({
-                'type': 'list',
-                'items': {
-                    'type': 'unicode'
-                },
-                'len': 0
-            }, 'Expected length greater than 0, got 0'),
-            ({
-                'type': 'list',
-                'items': {
-                    'type': 'unicode'
-                },
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 0
-                }]
-            },
-             r'Validation failed: is_at_least \({u\'min_value\': 1}\) for '
-             r'object 0'),
-            ({
-                'type': 'dict',
-                'items': {
-                    'type': 'float'
-                }
-            },
-             r'Missing keys: {u\'items\': {u\'type\': u\'float\'}, '
-             r'u\'type\': u\'dict\'}'),
-            ({
-                'type': 'dict',
-                'properties': {
-                    123: {
+                'type is not present in schema key types'
+            ),
+            (
+                {
+                    'type': 'list',
+                    'items': {
                         'type': 'unicode'
+                    },
+                    'len': -1
+                },
+                'Expected length greater than 0, got -1'
+            ),
+            (
+                {
+                    'type': 'list',
+                    'items': {
+                        'type': 'unicode'
+                    },
+                    'len': 0
+                },
+                'Expected length greater than 0, got 0'
+            ),
+            (
+                {
+                    'type': 'list',
+                    'items': {
+                        'type': 'unicode'
+                    },
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': 0
+                    }]
+                },
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) for '
+                    'object 0'
+                )
+            ),
+            (
+                {
+                    'type': 'dict',
+                    'items': {
+                        'type': 'float'
                     }
-                }
-            }, 'u\'len\''),
-            ({
-                'type': 'unicode',
-                'validators': [{
-                    'id': 'fake_validator',
-                }]
-            }, 'fake_validator is not present in reference_dict'),
-            ({
-                'type': 'unicode',
-                'validators': [{
-                    'id': 'is_nonempty',
-                    'fake_arg': 'unused_value',
-                }]
-            }, r'Missing keys: \[\], Extra keys: \[u\'fake_arg\'\]'),
-            ({
-                'type': 'unicode',
-                'validators': [{
-                    'id': 'matches_regex',
-                }]
-            }, r'Missing keys: \[u\'regex\'\], Extra keys: \[\]'),
-            ({
-                'type': 'float',
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 'value_of_wrong_type',
-                }]
-            }, 'Could not convert unicode to float: value_of_wrong_type'),
-            ({
-                'type': 'unicode',
-                'ui_config': {
-                    'rows': -1,
-                }
-            },
-             r'Validation failed: is_at_least \({u\'min_value\': 1}\) for '
-             r'object -1'),
-            ({
-                'type': 'unicode',
-                'ui_config': {
-                    'coding_mode': 'invalid_mode',
-                }
-            },
-             r'Received invalid_mode which is not in the allowed range of '
-             r'choices: \[u\'none\', u\'python\', u\'coffeescript\'\]')]
+                },
+                re.escape(
+                    'Missing keys: {\'type\': \'dict\', '
+                    '\'items\': {\'type\': \'float\'}}'
+                )
+            ),
+            (
+                {
+                    'type': 'dict',
+                    'properties': {
+                        123: {
+                            'type': 'unicode'
+                        }
+                    }
+                },
+                re.escape('\'len\'')
+            ),
+            (
+                {
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'fake_validator',
+                    }]
+                },
+                'fake_validator is not present in reference_dict'),
+            (
+                {
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'is_nonempty',
+                        'fake_arg': 'unused_value',
+                    }]
+                },
+                re.escape('Missing keys: [], Extra keys: [\'fake_arg\']')
+            ),
+            (
+                {
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'matches_regex',
+                    }]
+                },
+                re.escape('Missing keys: [\'regex\'], Extra keys: []')
+            ),
+            (
+                {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 'value_of_wrong_type',
+                    }]
+                },
+                'Could not convert str to float: value_of_wrong_type'
+            ),
+            (
+                {
+                    'type': 'unicode',
+                    'ui_config': {
+                        'rows': -1,
+                    }
+                },
+                re.escape(
+                    'Validation failed: is_at_least ({\'min_value\': 1}) for '
+                    'object -1'
+                )
+            ),
+            (
+                {
+                    'type': 'unicode',
+                    'ui_config': {
+                        'coding_mode': 'invalid_mode',
+                    }
+                },
+                re.escape(
+                    'Received invalid_mode which is not in the allowed range '
+                    'of choices: [\'none\', \'python\', \'coffeescript\']'
+                )
+            )
+        ]
 
         valid_schemas = [{
             'type': 'float'
@@ -833,8 +868,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [(1.2, 1.2), (3, 3.0), (-1, -1.0), ('1', 1.0)]
         invalid_values_with_error_messages = [
-            ([13], r'Could not convert list to float: \[13\]'),
-            ('abc', 'Could not convert unicode to float: abc'),
+            ([13], re.escape('Could not convert list to float: [13]')),
+            ('abc', 'Could not convert str to float: abc'),
             (None, 'Could not convert NoneType to float: None')]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -846,8 +881,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [(1.2, 1), (3.7, 3), (-1, -1), ('1', 1)]
         invalid_values_with_error_messages = [
-            ([13], r'Could not convert list to int: \[13\]'),
-            ('abc', 'Could not convert unicode to int: abc'),
+            ([13], re.escape('Could not convert list to int: [13]')),
+            ('abc', 'Could not convert str to int: abc'),
             (None, 'Could not convert NoneType to int: None')]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -879,7 +914,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (['adaA13', '13'], ['adaA13', '13'])]
         invalid_values_with_error_messages = [
             (['1', 13], 'Expected unicode string, received 13'),
-            ({'a': 'b'}, r'Expected list, received {u\'a\': u\'b\'}'),
+            ({'a': 'b'}, 'Expected list, received {\'a\': \'b\'}'),
             ({}, 'Expected list, received {}'),
             (None, 'Expected list, received None'),
             (123, 'Expected list, received 123'),
@@ -901,14 +936,20 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ('<script></script>', ''),
             (b'<script></script>', ''),
             (
-                '<a class="webLink" href="https'
-                '://www.oppia.com/"><img src="images/oppia.png"></a>',
-                '<a href="https://www.oppia.com/"></a>')]
+                '<a class="webLink" href="https://www.oppia.com/">'
+                '<img src="images/oppia.png"></a>',
+                '<a href="https://www.oppia.com/"></a>'
+            )
+        ]
         invalid_values_with_error_messages = [
             (
                 ['<script></script>', '<script></script>'],
-                r'Expected unicode HTML string, received \[u\'<script></script>'
-                r'\', u\'<script></script>\'\]')]
+                re.escape(
+                    'Expected unicode HTML string, received ['
+                    '\'<script></script>\', \'<script></script>\']'
+                )
+            )
+        ]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
@@ -951,7 +992,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (['adaA13', '13'], ['adaA13', '13'])]
         invalid_values_with_error_messages = [
             (['1', 13], 'Expected unicode string, received 13'),
-            ({'a': 'b'}, r'Expected list, received {u\'a\': u\'b\'}'),
+            ({'a': 'b'}, re.escape('Expected list, received {\'a\': \'b\'}')),
             ({}, 'Expected list, received {}'),
             (None, 'Expected list, received None'),
             (123, 'Expected list, received 123'),
@@ -1017,27 +1058,39 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         })]
 
         invalid_values_with_error_messages = [
-            ({
-                'unicodeListProp': [],
-                'intPROP': 1,
-                'dictProp': {
-                    'floatProp': 3.0
-                }
-            }, r'Missing keys: \[u\'intProp\'\], Extra keys: \[u\'intPROP\'\]'),
-            ({
-                'unicodeListProp': ['aaa'],
-                'intProp': 1,
-            }, r'Missing keys: \[u\'dictProp\'\], Extra keys: \[\]'),
-            ({
-                'unicodeListProp': [],
-                'intProp': 3,
-                'dictProp': {},
-            }, r'Missing keys: \[u\'floatProp\'\], Extra keys: \[\]'),
-            ([
-                'unicodeListProp', 'intProp', 'dictProp'
-            ],
-             r'Expected dict, received \[u\'unicodeListProp\', u\'intProp\', '
-             r'u\'dictProp\'\]'),
+            (
+                {
+                    'unicodeListProp': [],
+                    'intPROP': 1,
+                    'dictProp': {
+                        'floatProp': 3.0
+                    }
+                },
+                re.escape(
+                    'Missing keys: [\'intProp\'], Extra keys: [\'intPROP\']')
+            ),
+            (
+                {
+                    'unicodeListProp': ['aaa'],
+                    'intProp': 1,
+                },
+                re.escape('Missing keys: [\'dictProp\'], Extra keys: []')
+            ),
+            (
+                {
+                    'unicodeListProp': [],
+                    'intProp': 3,
+                    'dictProp': {},
+                },
+                re.escape('Missing keys: [\'floatProp\'], Extra keys: []')
+            ),
+            (
+                ['unicodeListProp', 'intProp', 'dictProp'],
+                 re.escape(
+                     'Expected dict, received [\'unicodeListProp\', '
+                     '\'intProp\', \'dictProp\']'
+                 )
+            ),
             (None, 'Expected dict, received None'),
             (123, 'Expected dict, received 123'),
             ('abc', 'Expected dict, received abc')]
@@ -1101,7 +1154,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        invalid_values_with_error_messages = [] # type: List[Tuple[Any, unicode]]
+        invalid_values_with_error_messages = [] # type: List[Tuple[Any, str]]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -1125,13 +1178,19 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (valid_user_id_list, valid_user_id_list)]
         invalid_values_with_error_messages = [
             (
-                [u'uid_%s' % ('a' * 28)],
-                r'Validation failed: is_valid_user_id \({}\) for object '
-                r'%s' % 'uid_%s' % ('a' * 28)),
+                ['uid_%s' % ('a' * 28)],
+                re.escape(
+                    'Validation failed: is_valid_user_id ({}) for '
+                    'object uid_%s' % ('a' * 28)
+                )
+            ),
             (
                 big_user_id_list,
-                r'Validation failed: has_length_at_most \({u\'max_value\': 5}\)'
-                r' for object \[.*\]'),
+                re.escape(
+                    'Validation failed: has_length_at_most '
+                    '({\'max_value\': 5}) for object ['
+                ) + '.*' + re.escape(']')
+            )
         ]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -1187,7 +1246,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             sanitize_url('http://example.com/~path;parameters?q=arg#fragment'),
-            'http://example.com/%7Epath%3Bparameters?q%3Darg#fragment')
+            'http://example.com/~path%3Bparameters?q%3Darg#fragment')
 
         self.assertEqual(
             'https://www.web.com/%3Cscript%20type%3D%22text/javascript%22%'

@@ -25,7 +25,7 @@ import os
 
 from constants import constants
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Text, Union # isort:skip # pylint: disable=unused-import
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -42,9 +42,13 @@ DEBUG = False
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
-if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
-        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
-    raise Exception('DEV_MODE can\'t be true on production.')
+if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+    server_software = os.getenv('SERVER_SOFTWARE')
+    if (
+            server_software and
+            not server_software.startswith(('Development', 'gunicorn'))
+    ):
+        raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -253,7 +257,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 46
+CURRENT_STATE_SCHEMA_VERSION = 47
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -265,13 +269,13 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 3
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 4
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 3
+CURRENT_RUBRIC_SCHEMA_VERSION = 4
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
@@ -280,7 +284,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 3
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -413,7 +417,7 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 }
 
 # Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
+XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
@@ -475,6 +479,13 @@ ES_PASSWORD = None
 # redis.conf.
 REDISHOST = 'localhost'
 REDISPORT = 6379
+
+# The DB numbers for various Redis instances that Oppia uses. Do not reuse these
+# if you're creating a new Redis client.
+OPPIA_REDIS_DB_INDEX = 0
+CLOUD_NDB_REDIS_DB_INDEX = 1
+STORAGE_EMULATOR_REDIS_DB_INDEX = 2
+
 
 # NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
 # project id when switching to the prod server.
@@ -687,9 +698,6 @@ ALLOWED_RTE_EXTENSIONS = {
     },
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
-    },
-    'Svgdiagram': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
     },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
@@ -1119,8 +1127,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1138,8 +1145,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgdiagram'
+            'oppia-noninteractive-tabs'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -1157,9 +1163,6 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-svgdiagram': [
-                'blockquote', 'li', '[document]'
-            ],
             'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
@@ -1182,20 +1185,10 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgdiagram'
+            'oppia-noninteractive-tabs'
         ]
 
     }
-}
-
-# A dict representing available landing pages, having subject as a key and list
-# of topics as the value.
-# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
-# oppia constant defined in
-# core/templates/pages/landing-pages/TopicLandingPage.js file.
-AVAILABLE_LANDING_PAGES = {
-    'math': ['fractions', 'negative-numbers', 'ratios']
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
@@ -1320,10 +1313,11 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
-}]
+}] # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS)
+    COMMON_RIGHTS_ALLOWED_COMMANDS
+) # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],

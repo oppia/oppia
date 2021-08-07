@@ -32,35 +32,36 @@ describe('On Screen Keyboard', () => {
   };
 
   class MockGuppy implements Guppy {
-    asciimath: () => void;
-    configure: () => void;
-    deactivate: () => void;
-    doc: () => Object;
-    equations: () => Object[];
-    evaluate: (evaluators?: Object) => Object;
-    event: (name: string, handler: Function) => void;
-    func: (evaluators?: Object) => Function;
+    asciimath!: () => string;
+    configure!: () => void;
+    deactivate!: () => void;
+    doc!: () => Object;
+    equations!: () => Object[];
+    evaluate!: (evaluators?: Object) => Object;
+    event!: (name: string, handler: Function) => void;
+    func!: (evaluators?: Object) => Function;
     'import_latex': (text: string) => void;
     'import_syntax_tree': (tree: Object) => void;
     'import_text': (text: string) => void;
     'import_xml': (xml: string) => void;
     'is_changed': () => boolean;
-    latex: () => string;
+    latex!: () => string;
     'recompute_locations_paths': () => void;
-    render: (updated?: boolean) => void;
+    render!: (updated?: boolean) => void;
     'render_node': (t: string) => string;
     'select_to': (x: number, y: number, mouse: Object) => void;
     'symbols_used': (groups?: string[]) => string[];
     'syntax_tree': () => Object;
-    text: () => string;
-    vars: () => string[];
-    xml: () => string;
+    text!: () => string;
+    vars!: () => string[];
+    xml!: () => string;
     engine = {
       insert_string: (_: string) => {},
       insert_symbol: (_: string) => {},
       backspace: () => {},
       left: () => {},
       right: () => {},
+      end: () => {},
     };
 
     activate(): void {
@@ -110,7 +111,7 @@ describe('On Screen Keyboard', () => {
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and
-      .returnValue(new GuppyObject(null, new MockGuppy()));
+      .returnValue(new GuppyObject('divId', new MockGuppy()));
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     componentInstance.hideOSK();
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
@@ -121,7 +122,7 @@ describe('On Screen Keyboard', () => {
       spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
       spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
       spyOn(guppyInitializationService, 'findActiveGuppyObject')
-        .and.returnValue(new GuppyObject(null, new MockGuppy()));
+        .and.returnValue(new GuppyObject('divId', new MockGuppy()));
       expect(componentInstance.showOSK()).toBeTrue();
 
       expect(guppy.isActive).toBeFalse();

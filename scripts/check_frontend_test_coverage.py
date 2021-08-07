@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import fnmatch
+import logging
 import os
 import re
 import sys
@@ -73,40 +74,30 @@ NOT_FULLY_COVERED_FILENAMES = [
     'fatigue-detection.service.ts',
     'feedback-popup.component.ts',
     'feedback-popup.directive.ts',
-    'filepath-editor.component.ts',
     'focus-on.directive.ts',
     'format-timer.pipe.ts',
     'google-analytics.initializer.ts',
     'graph-input-validation.service.ts',
-    'graph-property-editor.component.ts',
     'hint-editor.directive.ts',
     'html-select.directive.ts',
+    'image-editor.component.ts',
     'input-response-pair.component.ts',
     'language-util.service.ts',
     'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
     'learner-view-rating.service.ts',
-    'list-of-sets-of-translatable-html-content-ids-editor.component.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
     'oppia-interactive-pencil-code-editor.directive.ts',
-    'oppia-response-music-notes-input.directive.ts',
-    'oppia-response-pencil-code-editor.directive.ts',
     'oppia-root.directive.ts',
-    'oppia-short-response-music-notes-input.directive.ts',
-    'oppia-short-response-pencil-code-editor.directive.ts',
-    'oppia-visualization-enumerated-frequency-table.directive.ts',
-    'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
-    'random-selector.directive.ts',
-    'real-editor.component.ts',
     'refresher-exploration-confirmation-modal.service.ts',
     'release-coordinator-page.component.ts',
     'remove-duplicates-in-array.pipe.ts',
@@ -136,7 +127,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-prerequisite-skills-editor.directive.ts',
     'skill-questions-tab.directive.ts',
     'skill-rubrics-editor.directive.ts',
-    'skill-selector-editor.component.ts',
     'skills-mastery-list.directive.ts',
     'solution-editor.directive.ts',
     'solution-explanation-editor.directive.ts',
@@ -146,7 +136,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-solution-editor.directive.ts',
     'story-creation.service.ts',
     'story-editor-navbar-breadcrumb.component.ts',
-    'story-editor-state.service.ts',
     'story-editor.directive.ts',
     'story-node-editor.directive.ts',
     'story-node.model.ts',
@@ -158,9 +147,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'suggestion-modal-for-exploration-editor.service.ts',
     'top-navigation-bar.component.ts',
     'topic-creation.service.ts',
-    'topic-editor-navbar-breadcrumb.component.ts',
-    'topic-editor-state.service.ts',
-    'topic-editor-stories-list.directive.ts',
     'topic-summary-tile.component.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
@@ -249,9 +235,10 @@ def check_not_fully_covered_filenames_list_is_sorted():
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
-        sys.exit(
+        logging.error(
             'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
             ' kept in alphabetical order.')
+        sys.exit(1)
 
 
 def check_coverage_changes():
@@ -312,7 +299,8 @@ def check_coverage_changes():
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')
         python_utils.PRINT('------------------------------------')
-        sys.exit(errors)
+        logging.error(errors)
+        sys.exit(1)
     else:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('All Frontend Coverage Checks Passed.')

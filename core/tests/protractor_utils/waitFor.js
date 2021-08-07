@@ -25,6 +25,7 @@ var Constants = require('./ProtractorConstants');
 // server since the mobile tests are run on a real
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
+var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
@@ -130,7 +131,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
     var url = await browser.getCurrentUrl();
     await browser.waitForAngularEnabled(true);
     return await url.match(urlToMatch);
-  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+  }, DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB, errorMessage);
 };
 
 /**
