@@ -61,6 +61,7 @@ var login = async function(email, useManualNavigation = true) {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
+
   var loginPage = element(by.css('.protractor-test-login-page'));
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
@@ -126,12 +127,15 @@ var _completeSignup = async function(username) {
   await browser.waitForAngularEnabled(false);
   await action.click('Register user button', registerUser);
 
-  // The await action.click only waits until button is click, it doesnot wait
+  // The await action.click only waits until button is clicked, it doesnot wait
   // for the redirection to trigger. So, manually waiting for redirection here.
-  // eslint-disable-next-line oppia/protractor-practices
-  await browser.sleep(3000);
-  // Waiting for redirection to occur.
-  await waitFor.pageToFullyLoad();
+  await browser.driver.wait(async() => {
+    const URL = await browser.driver.getCurrentUrl();
+    // As redirect url can be any url, so instead of new url, checking whether
+    // the url is not /signup.
+    return !(/signup/.test(URL));
+  }, 10000);
+
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
 };
