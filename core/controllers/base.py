@@ -367,10 +367,6 @@ class BaseHandler(webapp2.RequestHandler):
             self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
             request_method == 'GET')
 
-        # This flag is used to normalize string arguments which are expected to
-        # be boolean.
-        allow_string_to_bool_conversion = False
-
         if self.URL_PATH_ARGS_SCHEMAS is None:
             raise NotImplementedError(
                 'Missing schema for url path args in %s handler class.' % (
