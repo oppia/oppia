@@ -454,11 +454,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
   disableRTEicons(): void {
     // Add disabled cursor pointer to the icons.
-    // TODO(#12882): Remove the use of jQuery.
     this.componentsThatRequireInternet.forEach((name) => {
-      $('.cke_button__oppia' + name)
-        .css('background-color', '#cccccc')
-        .css('pointer-events', 'none');
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '#cccccc';
+        buttons[i].style.pointerEvents = 'none';
+      }
     });
     let offline = this.elementRef.nativeElement.getElementsByClassName(
       'cke-offline-warning');
@@ -467,11 +469,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     }
   }
   enableRTEicons(): void {
-    // TODO(#12882): Remove the use of jQuery.
     this.componentsThatRequireInternet.forEach((name) => {
-      $('.cke_button__oppia' + name)
-        .css('background-color', '')
-        .css('pointer-events', '');
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '';
+        buttons[i].style.pointerEvents = '';
+      }
     });
     let offline = this.elementRef.nativeElement.getElementsByClassName(
       'cke-offline-warning');
