@@ -20,29 +20,81 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var TopicsAndSkillsDashboardPage =
+  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+var TopicAndStoryViewerPage = require(
+  '../protractor_utils/TopicAndStoryViewerPage.js');
+var forms = require('../protractor_utils/forms.js');
+const { browser } = require('protractor');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
+  var topicsAndSkillsDashboardPage = null;
+  var adminPage = null;
   var libraryPage = null;
+  var topicEditorPage = null;
+  var storyEditorPage = null;
+  var topicAndStoryViewerPage = null;
+  var explorationEditorMainTab = null;
   var learnerDashboardPage = null;
   var subscriptionDashboardPage = null;
+  var skillEditorPage = null;
+  var dummyExplorationIds = [];
+
+  var createDummyExplorations = async function() {
+    var EXPLORATION = {
+      category: 'Learning',
+      objective: 'The goal is to check story viewer functionality.',
+      language: 'English'
+    };
+
+    for (var i = 1; i <= 3; i++) {
+      await workflow.createAndPublishTwoCardExploration(
+        `Exploration TASV1 - ${i}`,
+        EXPLORATION.category,
+        EXPLORATION.objective,
+        EXPLORATION.language,
+        i === 1,
+        true
+      );
+      dummyExplorationIds.push(await general.getExplorationIdFromEditor());
+    }
+  };
 
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    adminPage = new AdminPage.AdminPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    topicAndStoryViewerPage = (
+      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
   it('should display learners subscriptions', async function() {
+    var driver = browser.driver;
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
@@ -77,7 +129,9 @@ describe('Learner dashboard functionality', function() {
     // Both creators should be present in the subscriptions section of the
     // dashboard.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToSubscriptionsSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    await driver.findElement(
+      by.css('.protractor-test-subscriptions-section'));
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
     await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
@@ -119,6 +173,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should add exploration to play later list', async function() {
+    var driver = browser.driver;
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -153,16 +208,240 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.findExploration(EXPLORATION_FRACTION);
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    await driver.findElement(
+      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_SINGING);
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    await driver.findElement(
+      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
+    await users.logout();
+  });
+
+  it('should display correct topics in edit goals, suggested for you section,' +
+    ' current goals and continue where you left off section', async function() {
+    var driver = browser.driver;
+    var TOPIC_NAME = 'Topic 1';
+    var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
+    var TOPIC_DESCRIPTION = 'Topic description';
+    await users.createAndLoginCurriculumAdminUser(
+      'creator@learnerDashboard1.com', 'learnerDashboard1');
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
+    await topicEditorPage.createStory(
+      'Story Title', 'story-one', 'Story description',
+      '../data/test_svg.svg');
+    await storyEditorPage.returnToTopic();
+
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
+    await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    await storyEditorPage.saveStory('Added thumbnail.');
+    await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
+    await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
+
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+    await topicsAndSkillsDashboardPage.get();
+    (
+      await
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false));
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill 1', 'Topic 1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+
+    await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+
+    await topicEditorPage.updateMetaTagContent('meta tag content');
+    await topicEditorPage.updatePageTitleFragment('fragment');
+    await topicEditorPage.saveTopic('Added meta tag.');
+
+    await topicEditorPage.publishTopic();
+    /**  There is one topic on the server named Topic 1 which is linked to a
+     * subtopic named Subtopic 1 and a story called Story Title.
+     * Subtopic 1 has one skill in it named Skill 1.
+     */
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectCountOfTopicInSuggestedForYou(1);
+    await learnerDashboardPage.navigateToGoalsSection();
+    await driver.findElement(
+      by.css('.protractor-test-edit-goals-section'));
+    await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
+      TOPIC_NAME);
+    await driver.findElement(By.css(
+      '.protractor-test-add-topic-to-current-goals-button')).click();
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
+      `Learn ${TOPIC_NAME}`);
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectCountOfTopicInContinueWhereYouLeftOff(1);
+    await users.logout();
+  });
+
+  it('should display all the topics that are partially learnt or learnt ' +
+    'in skill proficiency section, learnt topics in completed goals section ' +
+    'and completed stories in completed stories section', async function() {
+    await users.createAndLoginCurriculumAdminUser(
+      'creator@learnerDashboard2.com', 'learnerDashboard2');
+    await createDummyExplorations();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic TASV1', 'topic-tasv-one', 'Description', false);
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill TASV1', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', ['correct']);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    await skillEditorPage.saveQuestion();
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill TASV1', 'Topic TASV1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.addSubtopic(
+      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    await topicEditorPage.publishTopic();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.createStory(
+      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    for (var i = 0; i < 3; i++) {
+      await storyEditorPage.createNewChapter(
+        `Chapter ${i}`, dummyExplorationIds[i], Constants.TEST_SVG_PATH);
+      await storyEditorPage.navigateToChapterWithName(`Chapter ${i}`);
+      await storyEditorPage.changeNodeDescription('Chapter description');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText(`outline ${i}`));
+      await storyEditorPage.navigateToStoryEditorTab();
+    }
+    await storyEditorPage.saveStory('First save');
+    await storyEditorPage.publishStory();
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.goToChapterIndex(1);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.goToChapterIndex(2);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    /**  There are two topics on the server named Topic 1 which is linked to a
+     * subtopic named Subtopic 1 and a story called Story Title and Topic TASV1
+     * which is linked to a subtopic named Subtopic TASV1 and a story called
+     * Story TASV1. Subtopic 1 has one skill in it named Skill 1 and
+     * Subtopic TASV1 has one skill in it named Skill TASV1.
+     */
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectNameOfTopicInSkillProficiencyToMatch(
+      'Topic TASV1'
+    );
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectCountOfStoryInCompletedStory(1);
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInCompletedGoalsToMatch(
+      'Topic TASV1');
     await users.logout();
   });
 
