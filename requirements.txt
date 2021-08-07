@@ -78,8 +78,6 @@ google-api-python-client==1.11.0
     # via firebase-admin
 google-apitools==0.5.31
     # via apache-beam
-google-auth-httplib2==0.0.4
-    # via google-api-python-client
 google-auth==1.28.1
     # via
     #   -r requirements.in
@@ -89,6 +87,8 @@ google-auth==1.28.1
     #   google-auth-httplib2
     #   google-cloud-core
     #   google-cloud-storage
+google-auth-httplib2==0.0.4
+    # via google-api-python-client
 google-cloud-bigquery==1.28.0
     # via apache-beam
 google-cloud-bigtable==1.7.0
@@ -156,10 +156,6 @@ grpc-google-iam-v1==0.12.3
     #   google-cloud-pubsub
     #   google-cloud-spanner
     #   google-cloud-tasks
-grpcio-gcp==0.2.2
-    # via
-    #   apache-beam
-    #   google-api-core
 grpcio==1.32.0
     # via
     #   apache-beam
@@ -167,6 +163,10 @@ grpcio==1.32.0
     #   googleapis-common-protos
     #   grpc-google-iam-v1
     #   grpcio-gcp
+grpcio-gcp==0.2.2
+    # via
+    #   apache-beam
+    #   google-api-core
 hdfs==2.6.0
     # via apache-beam
 html5lib==1.0.1
@@ -181,10 +181,6 @@ httplib2==0.9.2
     #   oauth2client
 idna==2.10
     # via requests
-importlib-metadata==3.10.1
-    # via
-    #   pluggy
-    #   pytest
 iniconfig==1.1.1
     # via pytest
 mailchimp3==3.0.14
@@ -230,15 +226,15 @@ py==1.10.0
     # via pytest
 pyarrow==0.17.1
     # via apache-beam
-pyasn1-modules==0.2.8
-    # via
-    #   google-auth
-    #   oauth2client
 pyasn1==0.4.8
     # via
     #   oauth2client
     #   pyasn1-modules
     #   rsa
+pyasn1-modules==0.2.8
+    # via
+    #   google-auth
+    #   oauth2client
 pycparser==2.20
     # via cffi
 pydot==1.4.2
@@ -269,10 +265,6 @@ redis==3.5.3
     # via
     #   -r requirements.in
     #   google-cloud-ndb
-requests-mock==1.5.2
-    # via -r requirements.in
-requests-toolbelt==0.9.1
-    # via -r requirements.in
 requests==2.24.0
     # via
     #   -r requirements.in
@@ -284,7 +276,11 @@ requests==2.24.0
     #   mailchimp3
     #   requests-mock
     #   requests-toolbelt
-rsa==4.5
+requests-mock==1.5.2
+    # via -r requirements.in
+requests-toolbelt==0.9.1
+    # via -r requirements.in
+rsa==4.7
     # via
     #   google-auth
     #   oauth2client
@@ -321,9 +317,7 @@ soupsieve==1.9.5
 toml==0.10.2
     # via pytest
 typing-extensions==3.7.4.3
-    # via
-    #   apache-beam
-    #   importlib-metadata
+    # via apache-beam
 uritemplate==3.0.1
     # via google-api-python-client
 urllib3==1.25.11
@@ -339,8 +333,6 @@ webencodings==0.5.1
     #   html5lib
 webob==1.8.7
     # via webapp2
-zipp==3.4.1
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
