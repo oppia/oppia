@@ -27,8 +27,8 @@ describe('URL Interpolation Service', () => {
   let uis: UrlInterpolationService;
   let urlService: UrlService;
   let mockLocation: Pick<Location, 'origin'>;
-  let alertsService: AlertsService;
-  let alertsObject: { alertsService: AlertsService };
+  let _alertsService: AlertsService;
+  let alertsObject: Record<'alertsService', AlertsService>;
   beforeEach(() => {
     mockLocation = {
       origin: 'http://sample.com'
@@ -36,11 +36,11 @@ describe('URL Interpolation Service', () => {
 
     uis = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
-    alertsService = TestBed.inject(AlertsService);
+    _alertsService = TestBed.inject(AlertsService);
     spyOnProperty(uis, 'DEV_MODE', 'get').and.returnValue(false);
     spyOn(urlService, 'getCurrentLocation').and.returnValue(
       <Location> mockLocation);
-    alertsObject = { alertsService: alertsService };
+    alertsObject = { alertsService: _alertsService };
   });
 
   it('should add hash to url if hash is set', () => {
