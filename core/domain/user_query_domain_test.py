@@ -36,7 +36,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(
             inactive_in_last_n_days=20
-        ),
+        )
         self.user_query = user_query_domain.UserQuery(
             query_id='user_query_id',
             query_params=self.user_query_params,
