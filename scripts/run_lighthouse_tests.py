@@ -36,8 +36,14 @@ SERVER_MODE_PROD = 'dev'
 SERVER_MODE_DEV = 'prod'
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_CONFIG_FILENAMES = {
-    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
+    LIGHTHOUSE_MODE_PERFORMANCE: {
+        '1': '.lighthouserc-1.js',
+        '2': '.lighthouserc-2.js'
+    },
+    LIGHTHOUSE_MODE_ACCESSIBILITY: {
+        '1': '.lighthouserc-accessibility-1.js',
+        '2': '.lighthouserc-accessibility-2.js'
+    }
 }
 APP_YAML_FILENAMES = {
     SERVER_MODE_PROD: 'app.yaml',
@@ -53,7 +59,11 @@ Note that the root folder MUST be named 'oppia'.
 
 _PARSER.add_argument(
     '--mode', help='Sets the mode for the lighthouse tests',
-    required=True, choices=['accessibility', 'performance'],)
+    required=True, choices=['accessibility', 'performance'])
+
+_PARSER.add_argument(
+    '--shard', help='Sets the shard for the lighthouse tests',
+    required=True, choices=['1', '2'])
 
 
 def run_lighthouse_puppeteer_script():
@@ -67,15 +77,21 @@ def run_lighthouse_puppeteer_script():
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-        for line in stdout.split('\n'):
-            export_url(line)
+        for line in stdout.split(b'\n'):
+            # Standard output is in bytes, we need to decode the line to
+            # print it.
+            export_url(line.decode('utf-8'))
         python_utils.PRINT('Puppeteer script completed successfully.')
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
-        python_utils.PRINT(stdout)
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
+        python_utils.PRINT(stdout.decode('utf-8'))
         python_utils.PRINT('ERROR:')
-        python_utils.PRINT(stderr)
+        # Error output is in bytes, we need to decode the line to
+        # print it.
+        python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Puppeteer script failed. More details can be found above.')
         sys.exit(1)
@@ -92,7 +108,6 @@ def run_webpack_compilation():
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
-            return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     if not os.path.isdir(webpack_bundles_dir_name):
@@ -123,19 +138,20 @@ def export_url(line):
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode):
-    """Runs the lighthouse checks through the .lighthouserc.js config.
+def run_lighthouse_checks(lighthouse_mode, shard):
+    """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
+        shard: str. Specifies which shard of the tests should be run.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
     # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
+        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode][shard],
         '--max-old-space-size=4096'
     ]
 
@@ -147,9 +163,13 @@ def run_lighthouse_checks(lighthouse_mode):
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
-        python_utils.PRINT(stdout)
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
+        python_utils.PRINT(stdout.decode('utf-8'))
         python_utils.PRINT('ERROR:')
-        python_utils.PRINT(stderr)
+        # Error output is in bytes, we need to decode the line to
+        # print it.
+        python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
@@ -182,22 +202,21 @@ def main(args=None):
             common.CONSTANTS_FILE_PATH,
             '"ENABLE_ACCOUNT_DELETION": .*',
             '"ENABLE_ACCOUNT_DELETION": true,'))
-
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
+            stack.enter_context(servers.managed_cloud_datastore_emulator())
 
         stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],
             port=GOOGLE_APP_ENGINE_PORT,
-            clear_datastore=True,
             log_level='critical',
             skip_sdk_update_check=True))
 
         run_lighthouse_puppeteer_script()
-        run_lighthouse_checks(lighthouse_mode)
+        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 
 if __name__ == '__main__':

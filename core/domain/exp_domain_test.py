@@ -1042,7 +1042,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            r'There is no state in \[u\'ABC\'\] corresponding to '
+            r'There is no state in \[\'ABC\'\] corresponding to '
             'the exploration\'s initial state name initname.')
 
         # Test whether a default outcome to a non-existing state is invalid.
@@ -1093,9 +1093,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
 
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
-            ]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
         init_state.update_interaction_answer_groups(new_answer_groups)
 
         exploration.validate()
@@ -1113,7 +1113,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_groups)
             for answer_groups in old_answer_groups
-            ]
+        ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
@@ -1141,7 +1141,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
             AssertionError, 'Expected list, received 15'
-            ):
+        ):
             exploration.validate()
 
         self.set_interaction_for_state(
@@ -1153,9 +1153,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'inputs': {'x': '{{ExampleParam}}'}
         }
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
-            ]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         old_answer_groups[0]['rule_specs'][0] = temp_rule
 
@@ -1197,7 +1197,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.labelled_as_correct = True
         with self.assertRaisesRegexp(
             Exception, 'is labelled correct but is a self-loop.'
-            ):
+        ):
             exploration.validate(strict=True)
         exploration.validate()
 
@@ -1264,9 +1264,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.set_interaction_for_state(init_state, 'TextInput')
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
-            ]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
@@ -1306,9 +1306,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer groups to be a list')
 
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
-            ]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
@@ -1322,7 +1322,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Non-terminal interactions must have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'EndExploration')
-        init_state.interaction.answer_groups = [answer_groups]
+        init_state.interaction.answer_groups = answer_groups
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
@@ -1334,11 +1334,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(init_state, 'TextInput')
-        answer_groups_list = [
-            state_domain.AnswerGroup.from_dict(answer_group)
-            for answer_group in [answer_groups]
-            ]
-        init_state.update_interaction_answer_groups(answer_groups_list)
+        init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
         solution_dict = {
@@ -1604,7 +1600,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
-                'New state', 'Renamed state'],
+                'Renamed state', 'New state'],
             'state_names_with_unchanged_answer_groups': []
         }
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -1649,7 +1645,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
-                'Renamed state', 'New state3'],
+                'Renamed state', 'New state3'
+            ],
             'state_names_with_unchanged_answer_groups': []
         }
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -4896,7 +4893,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         actual_outcome_list = exploration.get_all_html_content_strings()
 
-        self.assertEqual(set(actual_outcome_list), set(expected_html_list))
+        self.assertItemsEqual(set(actual_outcome_list), set(expected_html_list))
 
 
 class ExplorationChangesMergeabilityUnitTests(
@@ -10299,20 +10296,21 @@ class ExplorationChangesMergeabilityUnitTests(
             self.assertEqual(changes_are_not_mergeable, False)
 
             change_list_3_dict = [{
-                'old_value': {
-                    'html': '',
-                    'content_id': 'content'
-                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'state_name': 'Introduction',
                 'new_value': {
                     'html': '<p>Hello Aryaman!</p>',
                     'content_id': 'content'
                 },
-                'state_name': 'Introduction',
-                'property_name': 'content',
-                'cmd': 'edit_state_property'
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
             }]
+
             expected_email_html_body = (
-                '(Sent from dummy-cloudsdk-project-id)<br/><br/>'
+                '(Sent from dev-project-id)<br/><br/>'
                 'Hi Admin,<br><br>'
                 'Some draft changes were rejected in exploration %s because '
                 'the changes were conflicting and could not be saved. Please '
@@ -10320,13 +10318,12 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3))
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
+            )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
             self):
@@ -10385,20 +10382,20 @@ class ExplorationChangesMergeabilityUnitTests(
             self.assertEqual(changes_are_not_mergeable, False)
 
             change_list_3_dict = [{
-                'old_value': {
-                    'html': 'End State',
-                    'content_id': 'content'
-                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'state_name': 'End',
                 'new_value': {
                     'html': '<p>End State Changed</p>',
                     'content_id': 'content'
                 },
-                'state_name': 'End',
-                'property_name': 'content',
-                'cmd': 'edit_state_property'
+                'old_value': {
+                    'html': 'End State',
+                    'content_id': 'content'
+                },
             }]
             expected_email_html_body = (
-                '(Sent from dummy-cloudsdk-project-id)<br/><br/>'
+                '(Sent from dev-project-id)<br/><br/>'
                 'Hi Admin,<br><br>'
                 'Some draft changes were rejected in exploration %s because '
                 'the changes were conflicting and could not be saved. Please '
@@ -10406,13 +10403,12 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3))
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
+            )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertEqual(expected_email_html_body, messages[0].html)
 
             # Add a translation after state renames.
             change_list_4 = [exp_domain.ExplorationChange({
@@ -10431,13 +10427,14 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list_4_dict = [{
                 'cmd': 'add_written_translation',
                 'state_name': 'End',
-                'translation_html': '<p>State 2 Content Translation.</p>',
-                'data_format': 'html',
-                'language_code': 'de',
                 'content_id': 'content',
-                'content_html': 'N/A'}]
+                'language_code': 'de',
+                'content_html': 'N/A',
+                'translation_html': '<p>State 2 Content Translation.</p>',
+                'data_format': 'html'
+            }]
             expected_email_html_body_2 = (
-                '(Sent from dummy-cloudsdk-project-id)<br/><br/>'
+                '(Sent from dev-project-id)<br/><br/>'
                 'Hi Admin,<br><br>'
                 'Some draft changes were rejected in exploration %s because '
                 'the changes were conflicting and could not be saved. Please '
@@ -10445,10 +10442,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_4_dict, 2, 3))
+                'Thanks!' % (self.EXP_0_ID, change_list_4_dict, 2, 3)
+            )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
-            self.assertEqual(
-                expected_email_html_body_2,
-                messages[1].html.decode())
+            self.assertEqual(expected_email_html_body_2, messages[1].html)
