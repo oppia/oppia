@@ -1997,6 +1997,48 @@ def can_modify_exploration_roles(handler):
     return test_can_modify
 
 
+def can_perform_tasks_in_taskqueue(handler):
+    """Decorator to ensure that the handler is being called by task scheduler or
+    by a superadmin of the application.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also ensures that
+        the handler can only be executed if it is called by task scheduler or by
+        a superadmin of the application.
+    """
+
+    def test_can_perform(self, **kwargs):
+        """Checks if the handler is called by task scheduler or by a superadmin
+        of the application.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        # The X-AppEngine-QueueName header is set inside AppEngine and if
+        # a request from outside comes with this header AppEngine will get
+        # rid of it.
+        # https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_app_engine_task_request_headers
+        if (self.request.headers.get('X-AppEngine-QueueName') is None and
+                not self.current_user_is_super_admin):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        else:
+            return handler(self, **kwargs)
+    test_can_perform.__wrapped__ = True
+
+    return test_can_perform
+
+
 def can_perform_cron_tasks(handler):
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
@@ -2024,12 +2066,15 @@ def can_perform_cron_tasks(handler):
             UnauthorizedUserException. The user does not have
                 credentials to access the page.
         """
+        # The X-AppEngine-Cron header is set inside AppEngine and if a request
+        # from outside comes with this header AppEngine will get rid of it.
+        # https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#validating_cron_requests
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        else:
-            return handler(self, **kwargs)
+
+        return handler(self, **kwargs)
     test_can_perform.__wrapped__ = True
 
     return test_can_perform

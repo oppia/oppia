@@ -769,12 +769,12 @@ def untag_deleted_misconceptions(
         old_question_state_data_dict = question.question_state_data.to_dict()
         answer_groups = (
             list(question.question_state_data.interaction.answer_groups))
-        for i in python_utils.RANGE(len(answer_groups)):
+        for answer_group in answer_groups:
             tagged_skill_misconception_id = (
-                answer_groups[i].to_dict()['tagged_skill_misconception_id'])
+                answer_group.to_dict()['tagged_skill_misconception_id'])
             if (tagged_skill_misconception_id
                     in deleted_skill_misconception_ids):
-                answer_groups[i].tagged_skill_misconception_id = None
+                answer_group.tagged_skill_misconception_id = None
         question.question_state_data.interaction.answer_groups = answer_groups
         change_list.append(question_domain.QuestionChange({
             'cmd': 'update_question_property',
