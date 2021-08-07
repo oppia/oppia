@@ -31,7 +31,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import suggestion_models
-    from mypy_imports import user_models
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.suggestion, models.NAMES.user])
