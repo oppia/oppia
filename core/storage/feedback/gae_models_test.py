@@ -32,7 +32,9 @@ from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, feedback_models, user_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import feedback_models
+    from mypy_imports import user_models
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.feedback, models.NAMES.user])

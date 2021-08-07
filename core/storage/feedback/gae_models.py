@@ -20,7 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # TODO(#13594): After the domain layer is refactored to be independent of
-# the storage layer, the pylint: disable=invalid-import will
+# the storage layer, the disable=invalid-import will
 # be removed.
 # The following import is dangerous and should not be generally
 # used. We had to use this ignore as we need to import the domain layer
@@ -35,7 +35,9 @@ from typing import Dict, List, Optional, Text, Tuple, Union, cast # isort:skip #
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services, user_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import user_models # pylint: disable=unused-import
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
