@@ -20,13 +20,15 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import os
+import re
 
-import bs4
 from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
 import python_utils
+
+import bs4
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):
@@ -145,7 +147,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ]
         }
 
-        self.assertEqual(
+        self.assertItemsEqual(
             actual_output_for_ckeditor, expected_output_for_ckeditor)
 
     def test_validate_soup_for_rte(self):
@@ -500,7 +502,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
             )],
-            'Missing keys: [u\'title\'], Extra keys: [u\'url\']': [(
+            'Missing keys: [\'title\'], Extra keys: [\'url\']': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'
@@ -509,7 +511,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'Could not convert unicode to int: Hello': [(
+            'Could not convert str to int: Hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="&amp;quot;Hello&amp;'
                 'quot;" video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
@@ -536,8 +538,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )]}
 
         self.assertEqual(set(actual_output.keys()), set(expected_output.keys()))
-        for key in expected_output:
-            self.assertEqual(set(actual_output[key]), set(expected_output[key]))
+        for key, expected in expected_output.items():
+            self.assertEqual(set(actual_output[key]), set(expected))
 
     def test_validate_customization_args_in_tag(self):
         test_cases = [{
@@ -580,7 +582,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'or \'https://\'; received htt://link.com'
             )],
             ['Missing attributes: alt-with-value, Extra attributes: '],
-            [u'Expected dict, received [1, 2, 3]']
+            ['Expected dict, received [1, 2, 3]']
         ]
         for test_case in test_cases:
             html_string = test_case['html_string']
@@ -663,42 +665,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.does_svg_tag_contains_xmlns_attribute(
                 invalid_svg_string))
 
-    def test_get_svg_with_xmlns_attribute(self):
-        # An invalid SVG string without xmlns attribute.
-        invalid_svg_string = (
-            '<svg version="1.0" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        self.assertFalse(
-            html_validation_service.does_svg_tag_contains_xmlns_attribute(
-                invalid_svg_string))
-
-        new_svg = html_validation_service.get_svg_with_xmlns_attribute(
-            invalid_svg_string.encode(encoding='utf-8'))
-
-        self.assertTrue(
-            html_validation_service.does_svg_tag_contains_xmlns_attribute(
-                new_svg))
-
-    def test_get_svg_with_xmlns_attribute_with_svg_xmlns_attribute(self):
-        old_svg_string = (
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
-            'width="100pt" height="100pt" viewBox="0 0 100 100">'
-            '<g><path d="M5455 2632 9z"/></g>'
-            '<text transform="matrix(1 0 0 -1 0 0)" font-size="884px" '
-            'font-family="serif">Ì</text></svg>')
-
-        self.assertTrue(
-            html_validation_service.does_svg_tag_contains_xmlns_attribute(
-                old_svg_string.encode(encoding='utf-8')))
-
-        new_svg_string = html_validation_service.get_svg_with_xmlns_attribute(
-            old_svg_string)
-
-        self.assertEqual(old_svg_string, new_svg_string)
-
     def test_add_math_content_to_math_rte_components(self):
         test_cases = [{
             'html_content': (
@@ -779,7 +745,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
         with self.assertRaisesRegexp(
-            Exception, 'No JSON object could be decoded'
+            Exception, re.escape('Expecting value: line 1 column 1 (char 0)')
         ):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[0]['html_content'])
@@ -875,120 +841,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for invalid_tag in invalid_tags:
             self.assertTrue(
                 python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
-
-    def test_extract_latex_strings_when_all_math_tags_have_empty_svg_filename(
-            self):
-        """Test that get_latex_strings_without_svg_from_html
-        extracts filenames when all math tags have empty filename field.
-        """
-        html_string = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
-            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
-            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
-            ';quot;}"></oppia-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
-
-        expected_list_of_latex_strings = [
-            '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
-        expected_list_of_encoded_latex_strings = [
-            string.encode(encoding='utf-8') for string in (
-                expected_list_of_latex_strings)]
-
-        list_of_latex_string = (
-            html_validation_service.
-            get_latex_strings_without_svg_from_html(
-                html_string))
-        self.assertEqual(
-            sorted(list_of_latex_string),
-            sorted(expected_list_of_encoded_latex_strings))
-
-    def test_extract_latex_strings_when_latex_strings_have_unicode_characters(
-            self):
-        """Test that get_latex_strings_without_svg_from_html
-        extracts filenames when LaTeX strings have unicode characters.
-        """
-        html_string = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
-            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\u03A7\u03A6'
-            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
-            ';quot;}"></oppia-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈ&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
-
-        expected_list_of_latex_strings = [
-            'ÀÁÂÃÄÅÆÇÈ', '\u03A7\u03A6',
-            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
-        expected_list_of_encoded_latex_strings = [
-            string.encode(encoding='utf-8') for string in (
-                expected_list_of_latex_strings)]
-        list_of_latex_string = (
-            html_validation_service.
-            get_latex_strings_without_svg_from_html(
-                html_string))
-        self.assertEqual(
-            sorted(list_of_latex_string),
-            sorted(expected_list_of_encoded_latex_strings))
-
-    def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
-            self):
-        """Test that get_latex_strings_without_svg_from_html
-        extracts filenames when some math tags have non empty filename field.
-        """
-
-        html_string = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
-            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'
-            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
-            ';quot;}"></oppia-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+(x^2)&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;\\\\sqrt{x}&amp;quot;, &am'
-            'p;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></opp'
-            'ia-noninteractive-math>')
-
-        # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
-        # math tag has a non-empty svg_filename field.
-        expected_list_of_latex_strings = ['\\sqrt{x}', '\\frac{x}{y}']
-        expected_list_of_encoded_latex_strings = [
-            string.encode(encoding='utf-8') for string in (
-                expected_list_of_latex_strings)]
-        list_of_latex_string = (
-            html_validation_service.
-            get_latex_strings_without_svg_from_html(
-                html_string))
-        self.assertEqual(
-            sorted(list_of_latex_string),
-            sorted(expected_list_of_encoded_latex_strings))
-
-    def test_extract_latex_strings_when_no_math_tags_are_present(self):
-        """Test that get_latex_strings_without_svg_from_html
-        when there are no math tags present in the HTML.
-        """
-        html_string_with_no_math = (
-            '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
-            '</oppia-noninteractive-image>Hello this is test case to check that'
-            ' dimensions are added to the oppia noninteractive image tags.</p>'
-        )
-        self.assertEqual(
-            html_validation_service.
-            get_latex_strings_without_svg_from_html(
-                html_string_with_no_math), [])
 
     def test_extract_svg_filenames_in_math_rte_components(self):
         """Test that the extract_svg_filenames_in_math_rte_components
@@ -1173,12 +1025,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'alid_4d123_width_23d122_vertical_2d123.svg')
             }]
 
-        self.assertEqual(
-            sorted(
-                html_validation_service.
-                validate_math_content_attribute_in_html(
-                    html_string_with_filename_having_invalid_format)), sorted(
-                        expected_output))
+        self.assertItemsEqual(
+            html_validation_service.validate_math_content_attribute_in_html(
+                html_string_with_filename_having_invalid_format
+            ),
+            expected_output
+        )
 
     def test_check_for_svgdiagram_component_in_html(self):
         """Test that the check_for_svgdiagram_component_in_html method checks
@@ -1296,28 +1148,27 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 r'</oppia-noninteractive-tabs>'
             ),
             'expected_output': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;oppia-'
-                'noninteractive-image alt-with-value=\\&amp;quot;&amp;amp;'
-                'amp;quot;desc&amp;amp;amp;quot;\\&amp;quot; '
-                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;'
-                'amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;'
-                '&amp;amp;amp;quot;img_20210727_054514_9l3scri3mg_'
-                'height_350_width_450.svg&amp;amp;amp;quot;\\&amp;quot;'
-                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;'
-                '&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint '
-                'introduction&amp;quot;}, {&amp;quot;content&amp;quot;: '
-                '&amp;quot;&amp;lt;oppia-noninteractive-image &amp;amp;'
-                'amp;quot;abc&amp;amp;amp;quot;ng-version=\\&amp;quot;'
-                '11.2.14\\&amp;quot; alt-with-value=\\&amp;quot; '
-                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;'
-                'amp;quot;&amp;amp;amp;quot;\\&amp;quot; '
-                'filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;'
-                'img_20210727_054530_g653s2p0af_height_350_width_450.svg'
-                '&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;&amp;quot;, '
-                '&amp;quot;title&amp;quot;: &amp;quot;Hint 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
+                r'<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                r'quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;, '
+                r'&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;'
+                r'oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;'
+                r'amp;amp;quot;desc&amp;amp;amp;quot;\&amp;quot; '
+                r'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                r'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+                r'quot;img_20210727_054514_9l3scri3mg_height_350_width_450.svg'
+                r'&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-image&amp;gt;&amp;quot;}, {&amp;quot;'
+                r'title&amp;quot;: &amp;quot;Hint 1&amp;quot;, &amp;quot;'
+                r'content&amp;quot;: &amp;quot;&amp;lt;'
+                r'oppia-noninteractive-image &amp;amp;amp;quot;abc&amp;amp;amp;'
+                r'quot;ng-version=\&amp;quot;11.2.14\&amp;quot; '
+                r'alt-with-value=\&amp;quot; \&amp;quot; '
+                r'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                r'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+                r'quot;img_20210727_054530_g653s2p0af_height_350_width_450.svg'
+                r'&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-image&amp;gt;&amp;quot;}]">'
+                r'</oppia-noninteractive-tabs>'
             )
         }, {
             'html_content': (
