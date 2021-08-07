@@ -159,8 +159,9 @@ def does_classroom_exist(handler):
                 raise self.PageNotFoundException
             else:
                 # As this decorator is not expected to be used with other
-                # handler types, raising a internal error here.
-                raise self.InternalErrorException
+                # handler types, raising an error here.
+                raise Exception('does_classroom_exist decorator is expected to '
+                                'be only used with json return type handlers')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
