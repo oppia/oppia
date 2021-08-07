@@ -130,7 +130,7 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  // 'suggestionBackendDict' will be undefined when threadId is invalid
+  // 'suggestionBackendDict' will be 'undefined' when threadId is invalid
   // resulting the function to throw an error.
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
@@ -172,8 +172,8 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-        // Key values for this property will be null if the thread is not found
-        // or threadId is invalid.
+        // Key values for this property will be 'null' if the thread is
+        // not found or threadId is invalid.
         let suggestionBackendDictsByThreadId:
           Map<string | null, SuggestionBackendDict> = new Map(
             suggestionBackendDicts.map(dict => [
@@ -195,7 +195,7 @@ export class ThreadDataBackendApiService {
       async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  // A thread will be null if threadId is invalid.
+  // A thread will be 'null' if threadId is invalid.
   async getMessagesAsync(thread: SuggestionAndFeedbackThread | null):
    Promise<ThreadMessage[]> {
     if (!thread) {
@@ -243,7 +243,7 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  // A thread will be null if threadId is invalid.
+  // A thread will be 'null' if threadId is invalid.
   async markThreadAsSeenAsync(
       thread: SuggestionAndFeedbackThread | null): Promise<void> {
     if (!thread) {
@@ -256,7 +256,7 @@ export class ThreadDataBackendApiService {
     }).toPromise().then();
   }
 
-  // A thread will be null if threadId is invalid.
+  // A thread will be 'null' if threadId is invalid.
   async addNewMessageAsync(
       thread: SuggestionAndFeedbackThread | null, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
@@ -288,7 +288,7 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  // A thread will be null if threadId is invalid.
+  // A thread will be 'null' if threadId is invalid.
   async resolveSuggestionAsync(
       thread: SuggestionAndFeedbackThread | null,
       action: string,
