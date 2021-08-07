@@ -814,7 +814,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
     def test_get_delete_account_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/delete-account')
-            self.assertIn('<oppia-root></oppia-root>', response.body)
+            self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):

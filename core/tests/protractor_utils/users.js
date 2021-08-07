@@ -125,6 +125,11 @@ var _completeSignup = async function(username) {
   // angular is disabled during client side redirects.
   await browser.waitForAngularEnabled(false);
   await action.click('Register user button', registerUser);
+
+  // The await action.click only waits until button is click, it doesnot wait
+  // for the redirection to trigger. So, manually waiting for redirection here.
+  // eslint-disable-next-line oppia/protractor-practices
+  await browser.sleep(3000);
   // Waiting for redirection to occur.
   await waitFor.pageToFullyLoad();
   // Client side redirection is complete, enabling wait for angular here.
