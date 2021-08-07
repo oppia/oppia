@@ -43,9 +43,9 @@ interface KeyboardEventToCodes {
 
 export interface EventToCodes {
   [keys: string]: string;
-  enter: string,
-  tab: string,
-  shiftTab: string,
+  enter: string;
+  tab: string;
+  shiftTab: string;
 }
 
 @Injectable({
