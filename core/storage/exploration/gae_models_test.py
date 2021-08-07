@@ -34,7 +34,9 @@ from typing import Any, Dict, List, Text, cast # isort:skip # pylint: disable=un
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, exp_models, user_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import exp_models
+    from mypy_imports import user_models
 
 (base_models, exp_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
@@ -581,12 +583,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception,
-            'max_age must be a datetime.timedelta instance or None.'):
+            Exception, 'max_age must be a datetime.timedelta instance or None.'
+        ):
             # TODO(#13528): Remove this test after the backend is fully
             # type-annotated. Here ignore[arg-type] is used to test method
             # get_all_non_private_commits() for invalid input type.
-            results, _, more = (
+            results, _, _ = (
                 exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1)) # type: ignore[arg-type]
 

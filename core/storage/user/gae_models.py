@@ -32,8 +32,8 @@ from typing import Dict, List, Optional, Text, Tuple, Union, cast # isort:skip #
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import ( # pylint: disable=unused-import
-        base_models, datastore_services, transaction_services)
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -2289,14 +2289,23 @@ class UserQueryModel(base_models.BaseModel):
                     this batch.
         """
         cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
-        query_models, next_cursor, more = (
-            cls.query().order(-cls.created_on).
-            fetch_page(page_size, start_cursor=cursor))
+
+        created_on_query = cls.query().order(-cls.created_on)
+        query_models, next_cursor, _ = (
+            created_on_query.fetch_page(page_size, start_cursor=cursor))
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = (
+            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+        more_results = len(plus_one_query_models) == page_size + 1
+        # The urlsafe returns bytes and we need to decode them to string.
         next_cursor_str = (
-            next_cursor.urlsafe() if (next_cursor and more) else None)
+            next_cursor.urlsafe().decode('utf-8')
+            if (next_cursor and more_results) else None
+        )
         return (
             cast(List[UserQueryModel], query_models),
-            next_cursor_str, more)
+            next_cursor_str, more_results)
 
 
 class UserBulkEmailsModel(base_models.BaseModel):

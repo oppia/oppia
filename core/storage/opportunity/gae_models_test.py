@@ -27,7 +27,8 @@ from typing import Dict, List, Optional, Text, Tuple # isort:skip # pylint: disa
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, opportunity_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import opportunity_models
 
 (base_models, opportunity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.opportunity])
@@ -232,18 +233,18 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     def test_get_skill_opportunities_pagination(self):
         # type: () -> None
         results, cursor, more = (
-            opportunity_models.SkillOpportunityModel
-            .get_skill_opportunities(1, None))
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertTrue(more)
+        self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
         results, cursor, more = (
-            opportunity_models.SkillOpportunityModel
-            .get_skill_opportunities(1, cursor))
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, cursor))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
@@ -259,6 +260,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
+        self.assertFalse(more)
 
         opportunity_models.SkillOpportunityModel.delete_all()
 

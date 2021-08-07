@@ -336,7 +336,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'User id invalid_user_id not known in list of user_ids '
-                '[u\'invalid_user_id\']'
+                '[\'invalid_user_id\']'
             ])
 
     def test_get_human_readable_user_ids(self):
@@ -1239,13 +1239,36 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': 'user_id',
         }
-        invalid_schema_versions = [
-            -1, 0, user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1,
-            '', 'abc', '-1', '1'
-        ]
+        current_version_plus_one = (
+            user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1)
+        invalid_schema_versions = (
+            -1, 0, current_version_plus_one
+        )
         for version in invalid_schema_versions:
-            error_msg = 'Invalid version %s received.' % version
             user_data_dict['schema_version'] = version
+            error_msg = 'Invalid version %s received.' % version
+            with self.assertRaisesRegexp(Exception, error_msg):
+                user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+
+    def test_from_raw_dict_with_invalid_schema_version_type_raises_error(self):
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        invalid_schema_versions = (
+            '', 'abc', '-1', '1', {}, [1], 1.0
+        )
+        for version in invalid_schema_versions:
+            user_data_dict['schema_version'] = version
+            error_msg = (
+                'Version has invalid type, expected int, '
+                'received %s' % type(version)
+            )
             with self.assertRaisesRegexp(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 

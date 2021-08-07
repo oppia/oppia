@@ -197,7 +197,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Value u\'invalid_suggestion_type\' for property'
+            Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 

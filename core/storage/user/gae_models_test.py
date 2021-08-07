@@ -34,7 +34,8 @@ from typing import Dict, List, Set, Text, Union # isort:skip # pylint: disable=u
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, user_models # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import user_models
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -183,7 +184,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel.get_by_role(
                 feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
