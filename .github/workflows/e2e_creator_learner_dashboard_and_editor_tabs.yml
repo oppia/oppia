@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_miscellaneous_tests:
+  e2e_creator_learner_dashboard_and_editor_tabs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -35,34 +35,24 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
-      - name: Run e2e File Upload Features Test
+      - name: Run Creator Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="fileUploadFeatures" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Play Voiceovers Test
+      - name: Run Improvements Tab E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationImprovementsTab" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e File Upload Extensions Test
+      - name: Run Feedback Tab E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationFeedbackTab" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Contributor Dashboard Test
+      - name: Run Learner Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Publication Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="publication"  --skip-install --skip-build --server_log_level="info" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Feature Gating Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading protractor-video as Artifacts

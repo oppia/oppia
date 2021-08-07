@@ -1,0 +1,33 @@
+name: Custom ESLint tests
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  run_tests:
+    name: Run Tests for Custom ESLint Checks
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '2.x'
+          architecture: 'x64'
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install wheel==0.35.0
+      - name: Install Third Party Dependencies
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_third_party_libs
+      - name: Run ESLint Tests
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_custom_eslint_tests
