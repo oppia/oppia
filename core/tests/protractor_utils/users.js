@@ -81,8 +81,9 @@ var login = async function(email, useManualNavigation = true) {
   // for the redirection to trigger. So, manually waiting for redirection here.
   await browser.driver.wait(async() => {
     const URL = await browser.driver.getCurrentUrl();
-
-    return /signup/.test(URL);
+    // As redirect url can be any url, so instead of testing for new url,
+    // checking whether the url is not /login.
+    return !(/login/.test(URL));
   }, 10000);
 
   // The above solution only waits until url is changed, so invoking
