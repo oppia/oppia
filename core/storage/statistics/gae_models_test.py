@@ -22,11 +22,12 @@ from __future__ import unicode_literals
 import types
 
 from core.domain import exp_domain
+from core.domain import stats_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict, List # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -525,12 +526,13 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         state_reference = 'exp_id:state_name'
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
+        learner_answer_info_list = [] # type: List[stats_domain.LearnerAnswerInfo]
         learner_answer_info_schema_version = (
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
-            [], learner_answer_info_schema_version,
+            learner_answer_info_list, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
@@ -547,12 +549,13 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         state_reference = 'question_id'
         entity_type = feconf.ENTITY_TYPE_QUESTION
         interaction_id = 'TextInput'
+        learner_answer_info_list_2 = [] # type: List[stats_domain.LearnerAnswerInfo]
         learner_answer_info_schema_version = (
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
-            [], learner_answer_info_schema_version,
+            learner_answer_info_list_2, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
@@ -581,12 +584,13 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             state_reference, '123:%s' % (state_name))
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
+        learner_answer_info_list = [] # type: List[stats_domain.LearnerAnswerInfo]
         learner_answer_info_schema_version = (
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
-            [], learner_answer_info_schema_version,
+            learner_answer_info_list, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(

@@ -23,6 +23,8 @@ import datetime
 import json
 import sys
 
+from core.domain import exp_domain
+from core.domain import stats_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -34,7 +36,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import ( # pylint: disable=unused-import
         base_models, datastore_services, transaction_services)
-    from core.domain import exp_domain
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -576,11 +577,14 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id,
             client_time_spent_in_secs, params, play_type):
-        # type: (Text, int, Text, Text, float, Dict[Text, Any], Text) -> None
+        # type: (Text, int, Text, Text, float, Dict[Text, Text], Text) -> None
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -714,6 +718,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id,
@@ -932,6 +939,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id, params,
@@ -1659,10 +1669,15 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # to remove Any used below.
     @classmethod
     def create_model_instance(
-            cls, entity_type, state_reference, interaction_id,
-            learner_answer_info_list, learner_answer_info_schema_version,
-            accumulated_answer_info_json_size_bytes):
-        # type: (Text, Text, Text, List[Dict[Text, Any]], int, int) -> None
+            cls,
+            entity_type, # type: Text
+            state_reference, # type: Text
+            interaction_id, # type: Text
+            learner_answer_info_list, # type: List[stats_domain.LearnerAnswerInfo]
+            learner_answer_info_schema_version, # type: int
+            accumulated_answer_info_json_size_bytes # type: int
+    ):
+        # type: (...) -> None
         """Creates a new LearnerAnswerDetailsModel for the given entity type
         then writes it to the datastore.
 
@@ -1675,7 +1690,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 the form 'question_id'.
             interaction_id: str. The ID of the interaction for which the
                 answer details are received.
-            learner_answer_info_list: list(dict). The list of
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
                 LearnerAnswerInfo objects in dict format, which is defined in
                 the stats_domain.
             learner_answer_info_schema_version: int. The version of
@@ -1690,7 +1705,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entity_type=entity_type,
             state_reference=state_reference,
             interaction_id=interaction_id,
-            learner_answer_info_list=learner_answer_info_list,
+            learner_answer_info_list=(
+                [learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                for learner_answer_info in learner_answer_info_list]),
             learner_answer_info_schema_version=(
                 learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(

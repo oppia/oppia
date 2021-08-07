@@ -1081,7 +1081,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         user_data = (
             suggestion_models.GeneralSuggestionModel
             .export_data('non_existent_user'))
-        self.assertEqual(user_data, {})
+        test_data = {} # type: Dict[Text, Text]
+        self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
         # type: () -> None
@@ -1291,7 +1292,8 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         user_data = (
             suggestion_models.GeneralVoiceoverApplicationModel
             .export_data('non_existent_user'))
-        self.assertEqual(user_data, {})
+        test_data = {} # type: Dict[Text, Text]
+        self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
         # type: () -> None

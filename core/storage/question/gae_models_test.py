@@ -68,7 +68,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
-        self.assertItemsEqual(question_model.linked_skill_ids, [])
+        self.assertItemsEqual(question_model.linked_skill_ids, []) # type: ignore[no-untyped-call]
 
     def test_create_question_with_skill_ids(self):
         # type: () -> None
@@ -84,7 +84,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             question_model.linked_skill_ids, linked_skill_ids)
 
     def test_create_question_with_inapplicable_skill_misconception_ids(self):
@@ -99,7 +99,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_state_data, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids)
 
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             question_model.inapplicable_skill_misconception_ids,
             inapplicable_skill_misconception_ids)
 
@@ -124,9 +124,9 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert question_model2 is not None
 
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             question_model1.linked_skill_ids, ['skill_id1', 'skill_id2'])
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             question_model2.linked_skill_ids, ['skill_id1', 'skill_id2'])
 
         question_model1.linked_skill_ids = ['skill_id3']
@@ -135,14 +135,18 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         question_models.QuestionModel.put_multi_questions(
             [question_model1, question_model2])
 
-        question_model1 = question_models.QuestionModel.get(question_ids[0])
+        updated_question_model1 = question_models.QuestionModel.get(
+            question_ids[0])
         # Ruling out the possibility of None for mypy type checking.
-        assert question_model1 is not None
-        question_model2 = question_models.QuestionModel.get(question_ids[1])
+        assert updated_question_model1 is not None
+        updated_question_model2 = question_models.QuestionModel.get(
+            question_ids[1])
         # Ruling out the possibility of None for mypy type checking.
-        assert question_model2 is not None
-        self.assertEqual(question_model1.linked_skill_ids, ['skill_id3'])
-        self.assertEqual(question_model2.linked_skill_ids, ['skill_id3'])
+        assert updated_question_model2 is not None
+        self.assertEqual(
+            updated_question_model1.linked_skill_ids, ['skill_id3'])
+        self.assertEqual(
+            updated_question_model2.linked_skill_ids, ['skill_id3'])
 
     def test_raise_exception_by_mocking_collision(self):
         # type: () -> None
@@ -524,7 +528,12 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             # type: (...) -> List[question_models.QuestionSkillLinkModel]
             if num >= len(alist):
                 return alist
-            alist.sort(key=lambda x: x.question_id)
+            # The key for sorting is defined separately because of a mypy bug.
+            # A [no-any-return] is thrown if key is defined in the sort()
+            # method instead.
+            # https://github.com/python/mypy/issues/9590
+            k = lambda x: x.question_id
+            alist.sort(key=k)
             return alist[:num]
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
@@ -731,7 +740,12 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             # type: (...) -> List[question_models.QuestionSkillLinkModel]
             if num >= len(alist):
                 return alist
-            alist.sort(key=lambda x: x.question_id)
+            # The key for sorting is defined separately because of a mypy bug.
+            # A [no-any-return] is thrown if key is defined in the sort()
+            # method instead.
+            # https://github.com/python/mypy/issues/9590
+            k = lambda x: x.question_id
+            alist.sort(key=k)
             return alist[:num]
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
