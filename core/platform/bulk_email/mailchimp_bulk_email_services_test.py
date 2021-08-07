@@ -20,9 +20,9 @@ from __future__ import unicode_literals
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 import feconf
-from mailchimp3 import mailchimpclient
-
 import python_utils
+
+from mailchimp3 import mailchimpclient
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):

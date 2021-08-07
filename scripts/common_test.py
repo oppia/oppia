@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import contextlib
+import errno
 import getpass
 import http.server
 import os
@@ -76,7 +77,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
-            'Test for common.py')
+            b'Test for common.py')
 
     def test_ensure_directory_exists_with_existing_dir(self):
         check_function_calls = {
@@ -218,40 +219,44 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_get_remote_alias_with_correct_alias(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'remote1 url1\nremote2 url2'
+            return b'remote1 url1\nremote2 url2'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.get_remote_alias('url1'), 'remote1')
 
     def test_get_remote_alias_with_incorrect_alias(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'remote1 url1\nremote2 url2'
+            return b'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(
             Exception,
-            'ERROR: There is no existing remote alias for the url3 repo.'):
+            'ERROR: There is no existing remote alias for the url3 repo.'
+        ):
             common.get_remote_alias('url3')
 
     def test_verify_local_repo_is_clean_with_clean_repo(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'nothing to commit, working directory clean'
+            return b'nothing to commit, working directory clean'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             common.verify_local_repo_is_clean()
 
     def test_verify_local_repo_is_clean_with_unclean_repo(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'invalid'
+            return b'invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(
-            Exception, 'ERROR: This script should be run from a clean branch.'):
+            Exception, 'ERROR: This script should be run from a clean branch.'
+        ):
             common.verify_local_repo_is_clean()
 
     def test_get_current_branch_name(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch test'
+            return b'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
@@ -277,75 +282,76 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch release-1.2.3'
+            return b'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
 
     def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch release-1.2.3-hotfix-1'
+            return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
 
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch release-1.2.3'
+            return b'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
     def test_is_current_branch_a_release_branch_with_hotfix_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch release-1.2.3-hotfix-1'
+            return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
     def test_is_current_branch_a_release_branch_with_maintenance_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch release-maintenance-1.2.3'
+            return b'On branch release-maintenance-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
     def test_is_current_branch_a_release_branch_with_non_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch test'
+            return b'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
     def test_is_current_branch_a_test_branch_with_test_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch test-common'
+            return b'On branch test-common'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), True)
 
     def test_is_current_branch_a_test_branch_with_non_test_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch invalid-test'
+            return b'On branch invalid-test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
     def test_verify_current_branch_name_with_correct_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch test'
+            return b'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             common.verify_current_branch_name('test')
 
     def test_verify_current_branch_name_with_incorrect_branch(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'On branch invalid'
+            return b'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(
             Exception,
-            'ERROR: This script can only be run from the "test" branch.'):
+            'ERROR: This script can only be run from the "test" branch.'
+        ):
             common.verify_current_branch_name('test')
 
     def test_is_port_in_use(self):
@@ -400,17 +406,23 @@ class CommonTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     oct(stat.S_IMODE(
                         os.stat(os.path.join(root, directory)).st_mode)),
-                    '0744')
+                    '0o744')
                 self.assertEqual(
                     os.stat(os.path.join(root, directory)).st_uid, os.getuid())
 
             for filename in filenames:
                 self.assertEqual(
-                    oct(stat.S_IMODE(
-                        os.stat(os.path.join(root, filename)).st_mode)), '0744')
+                    oct(
+                        stat.S_IMODE(
+                            os.stat(os.path.join(root, filename)).st_mode
+                        )
+                    ),
+                    '0o744'
+                )
                 self.assertEqual(
                     os.stat(os.path.join(root, filename)).st_uid, os.getuid())
 
+        temp_file.close()
         shutil.rmtree(root_temp_dir)
 
     def test_print_each_string_after_two_new_lines(self):
@@ -453,11 +465,16 @@ class CommonTests(test_utils.GenericTestBase):
 
             self.assertTrue(os.path.exists('temp_file'))
             temp_file.close()
+            if os.path.isfile('temp_file'):
+                # Occasionally this temp file is not deleted.
+                os.remove('temp_file')
 
         self.assertFalse(os.path.exists('temp_file'))
 
         with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
             common.install_npm_library('library_name', 'version', 'path')
+
+        self.assertFalse(os.path.exists('temp_file'))
 
     def test_ask_user_to_confirm(self):
         def mock_input():
@@ -744,8 +761,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_fix_third_party_imports_correctly_sets_up_imports(self):
         common.fix_third_party_imports()
         # Asserts that imports from problematic modules do not error.
-        from google.cloud import tasks_v2 # pylint: disable=unused-variable
-        from google.appengine.api import app_identity # pylint: disable=unused-variable
+        from google.cloud import tasks_v2  # pylint: disable=unused-import
 
     def test_swap_env_when_var_had_a_value(self):
         os.environ['ABC'] = 'Hard as Rocket Science'
@@ -760,3 +776,36 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertIsNone(old_value)
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
+
+    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self):
+        raised_once = False
+        def write_raise_oserror(unused_fileno, bytes_to_write):
+            self.assertEqual(bytes_to_write, 'test'.encode('utf-8'))
+
+            nonlocal raised_once
+            if not raised_once:
+                raised_once = True
+                raise OSError(errno.EAGAIN, 'OS error that should be repeated')
+
+            return 4
+
+        write_swap = self.swap_with_checks(
+            os,
+            'write',
+            write_raise_oserror,
+            expected_args=(
+                (sys.stdout.fileno(), b'test'),
+                (sys.stdout.fileno(), b'test')
+            )
+        )
+        with write_swap:
+            # This test makes sure that when write fails (with errno.EAGAIN)
+            # the call is repeated.
+            common.write_stdout_safe('test')
+
+        self.assertTrue(raised_once)
+
+    def test_write_stdout_safe_with_oserror(self):
+        write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
+        with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
+            common.write_stdout_safe('test')
