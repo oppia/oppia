@@ -153,7 +153,7 @@ def verify_target_version_compatible_with_latest_release(
     # This will need to be overridden if the major version changes.
     assert prev_major == curr_major, 'Unexpected major version change.'
     if prev_minor == curr_minor:
-        assert int(curr_patch) == int(prev_patch) + 1, (
+        assert int(curr_patch) == int(prev_patch) + 2, (
             'The current patch version is not equal to previous patch '
             'version plus one.')
     else:
