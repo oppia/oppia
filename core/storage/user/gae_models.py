@@ -32,9 +32,6 @@ from typing import Dict, List, Optional, Text, Tuple, Union, cast # isort:skip #
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import (
-        transaction_services)  # pylint: disable=unused-import
-
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 

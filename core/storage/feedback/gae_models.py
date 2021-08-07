@@ -25,9 +25,7 @@ from __future__ import unicode_literals
 # The following import is dangerous and should not be generally
 # used. We had to use this ignore as we need to import the domain layer
 # for type-annotation.
-from core.domain import (
-    feedback_domain)  # pylint: disable=unused-import, invalid-import
-
+from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
