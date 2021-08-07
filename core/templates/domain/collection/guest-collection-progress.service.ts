@@ -66,12 +66,11 @@ export class GuestCollectionProgressService {
     const collectionId = collection.getId();
     const guestCollectionProgress = this.loadGuestCollectionProgress();
     let completedExplorationIds: string[];
-    if (collectionId) {
-      completedExplorationIds = (
-        guestCollectionProgress.getCompletedExplorationIds(collectionId));
-    } else {
+    if (collectionId === null) {
       throw new Error('Collection does not exist!');
     }
+    completedExplorationIds = (
+      guestCollectionProgress.getCompletedExplorationIds(collectionId));
     // Filter the exploration IDs by whether they are contained within the
     // specified collection structure.
     return completedExplorationIds.filter((expId) => {

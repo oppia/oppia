@@ -145,13 +145,13 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  // A null value will be returned if threadId is invalid.
+  // A 'null' value will be returned if threadId is invalid.
   getThread(threadId: string): SuggestionAndFeedbackThread | null {
     return this.threadsById.get(threadId) || null;
   }
 
   async getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
-    let suggestions$ = this.http.get<SuggestionData>(
+    let suggestions = this.http.get<SuggestionData>(
       this.getSuggestionListHandlerUrl(), {
         params: {
           target_type: 'exploration',
@@ -160,10 +160,10 @@ export class ThreadDataBackendApiService {
       }
     );
 
-    let threads$ = this.http.get<ThreadData>(
+    let threads = this.http.get<ThreadData>(
       this.getThreadListHandlerUrl());
 
-    return forkJoin([suggestions$, threads$])
+    return forkJoin([suggestions, threads])
       .toPromise()
       .then((response: [SuggestionData, ThreadData]) => {
         let [suggestionData, threadData] = response;
