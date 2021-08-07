@@ -146,7 +146,7 @@ def get_story_by_id(story_id, strict=True, version=None):
         Story or None. The domain object representing a story with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = python_utils.UNICODE(version) if version else None
     cached_story = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_STORY,
         sub_namespace,

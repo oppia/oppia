@@ -77,13 +77,6 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = mock.Mock()
 
-    def setUp(self):
-        # TODO(#11475): Remove this hack. We need to set this up before calling
-        # super().setUp() because that method creates a job using JOB_CLASS.
-        self.JOB_CLASS.return_value.datastoreio_stub.context.return_value = (
-            python_utils.nullcontext())
-        super(JobTestBaseTests, self).setUp()
-
     def tearDown(self):
         self.JOB_CLASS.reset_mock()
         super(JobTestBaseTests, self).tearDown()
