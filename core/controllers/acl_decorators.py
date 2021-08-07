@@ -1298,6 +1298,8 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
         regex_pattern = constants.VALID_THREAD_ID_REGEX
         regex_matched = bool(re.match(regex_pattern, thread_id))
         if not regex_matched:
@@ -1358,6 +1360,8 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
         regex_pattern = constants.VALID_THREAD_ID_REGEX
         regex_matched = bool(re.match(regex_pattern, thread_id))
         if not regex_matched:
