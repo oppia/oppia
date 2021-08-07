@@ -28,7 +28,7 @@ from core.domain import exp_domain
 from core.domain import state_domain
 import python_utils
 
-from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, Text # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
 def validate_exploration_change(obj):
@@ -100,7 +100,7 @@ def validate_collection_change(obj):
 
 
 def validate_state_dict(state_dict):
-    # type: (Dict[Any, Any]) -> None
+    # type: (Dict[Text, Any]) -> None
     """Validates state dict.
 
     Args:

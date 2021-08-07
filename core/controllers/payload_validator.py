@@ -29,8 +29,8 @@ from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= w
 
 def validate(
         handler_args, handler_args_schemas, allowed_extra_args,
-        allow_string_to_bool_conversion):
-    # type: (Any, Any, bool, bool) -> Tuple[Dict[Any, Any], List[Text]]
+        allow_string_to_bool_conversion=False):
+    # type: (Dict[Text, Any], Dict[Text, Any], bool, bool) -> Tuple[Dict[Text, Any], List[Text]]
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -95,7 +95,7 @@ def convert_string_to_bool(param):
     """Converts a request param of type string into expected bool type.
 
     Args:
-        param: Str. The params which needs normalization.
+        param: str. The params which needs normalization.
 
     Returns:
         bool. Converts the string param into its expected bool type.
