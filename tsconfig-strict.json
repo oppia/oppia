@@ -664,7 +664,13 @@
     "extensions/objects/templates/normalized-string-editor.component.ts",
     "extensions/objects/templates/normalized-string-editor.component.spec.ts",
     "core/templates/pages/login-page/login-page.component.ts",
-    "core/templates/pages/login-page/login-page.component.spec.ts"
+    "core/templates/pages/login-page/login-page.component.spec.ts",
+    "core/templates/pages/maintenance-page/maintenance-page.component.ts",
+    "core/templates/pages/maintenance-page/maintenance-page.component.spec.ts",
+    "core/templates/pages/logout-page/logout-page.component.ts",
+    "core/templates/pages/logout-page/logout-page.component.spec.ts",
+    "core/templates/pages/participation-playbook/playbook.component.ts",
+    "core/templates/pages/participation-playbook/playbook.component.spec.ts"
   ],
   "include": [
     "core/templates/components/code-mirror/*.ts",

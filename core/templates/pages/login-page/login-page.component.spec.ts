@@ -68,7 +68,7 @@ class PendingPromise<T = void> {
   }
 }
 
-fdescribe('Login Page', () => {
+describe('Login Page', () => {
   let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
   let loaderService: jasmine.SpyObj<LoaderService>;
@@ -156,7 +156,7 @@ fdescribe('Login Page', () => {
       user_is_logged_in: true,
     }));
 
-    expect(windowRef.location).toBeNull();
+    expect(windowRef.location).toBe('');
 
     loginPageComponent.ngOnInit();
     flush();
@@ -186,7 +186,7 @@ fdescribe('Login Page', () => {
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(authService.signInWithEmail).toHaveBeenCalled();
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       signInPromise.resolve();
       flush();
@@ -199,7 +199,7 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.onClickSignInButtonAsync(email);
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       signInPromise.reject({code: 'auth/user-disabled', message: '!'});
       flushMicrotasks();
@@ -214,12 +214,12 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.onClickSignInButtonAsync(email);
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       signInPromise.reject({code: 'auth/unknown-error', message: '?'});
       flush();
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
       expect(alertsService.addWarning).toHaveBeenCalledWith('?');
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
 
@@ -232,7 +232,7 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.onClickSignInButtonAsync(email);
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       signInPromise.resolve();
       flushMicrotasks();
@@ -254,7 +254,7 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.ngOnInit();
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       redirectResultPromise.resolve(true);
       flushMicrotasks();
@@ -269,7 +269,7 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.ngOnInit();
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       redirectResultPromise.reject({code: 'auth/user-disabled', message: '!'});
       flushMicrotasks();
@@ -284,13 +284,13 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.ngOnInit();
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       redirectResultPromise.reject({code: 'auth/unknown-error', message: '?'});
 
       // An error should have appeared, but it will not redirect immediately.
       flushMicrotasks();
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
       expect(alertsService.addWarning).toHaveBeenCalledWith('?');
 
       // The user will be given 2 seconds to acknowledge the warning.
@@ -321,7 +321,7 @@ fdescribe('Login Page', () => {
 
       loginPageComponent.ngOnInit();
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       redirectResultPromise.resolve(true);
       flushMicrotasks();
@@ -336,7 +336,7 @@ fdescribe('Login Page', () => {
         loginPageComponent.ngOnInit();
         flushMicrotasks();
 
-        expect(windowRef.location).toBeNull();
+        expect(windowRef.location).toBe('');
 
         signInWithRedirectAsyncPromise.reject(
           {code: 'auth/unknown-error', message: '?'});
@@ -350,7 +350,7 @@ fdescribe('Login Page', () => {
       'logged in', fakeAsync(() => {
       userService.getUserInfoAsync.and.rejectWith(Error('uh-oh!'));
 
-      expect(windowRef.location).toBeNull();
+      expect(windowRef.location).toBe('');
 
       loginPageComponent.ngOnInit();
       flush();

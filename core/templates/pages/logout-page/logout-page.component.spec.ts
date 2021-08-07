@@ -26,7 +26,7 @@ import { LoaderService } from 'services/loader.service';
 
 class MockWindowRef {
   constructor(
-      public location: string = null, public searchParams: string = '') {}
+      public location: string = '', public searchParams: string = '') {}
 
   get nativeWindow() {
     const that = this;
@@ -46,11 +46,11 @@ class MockWindowRef {
 class PendingPromise<T = void> {
   public readonly promise: Promise<T>;
   public readonly resolve: (_: T | PromiseLike<T>) => void;
-  public readonly reject: (_?) => void;
+  public readonly reject: (_?: Object) => void;
 
   constructor() {
-    let resolve: (_: T | PromiseLike<T>) => void;
-    let reject: (_?) => void;
+    let resolve: (_: T | PromiseLike<T>) => void = () => {};
+    let reject: (_?: Object) => void = () => {};
     this.promise = new Promise((res, rej) => {
       // Can't assign to this directly because resolve and reject are readonly.
       resolve = res;
@@ -106,7 +106,7 @@ describe('Logout Page', function() {
   it('should call to signOutAsync and then redirect', fakeAsync(() => {
     const signOutPromise = spyOnSignOutAsync();
 
-    expect(windowRef.location).toBeNull();
+    expect(windowRef.location).toBe('');
 
     component.ngOnInit();
 
@@ -131,7 +131,7 @@ describe('Logout Page', function() {
   it('should add warning on error and redirect anyway', fakeAsync(() => {
     const signOutPromise = spyOnSignOutAsync();
 
-    expect(windowRef.location).toBeNull();
+    expect(windowRef.location).toBe('');
 
     component.ngOnInit();
 
@@ -144,7 +144,7 @@ describe('Logout Page', function() {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith('uh-oh!');
     // We should still be on the same page for an opportunity to read the error.
-    expect(windowRef.location).toBeNull();
+    expect(windowRef.location).toBe('');
 
     tick(3000);
 
