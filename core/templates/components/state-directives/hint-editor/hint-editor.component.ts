@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the hint editor.
+ * @fileoverview Component for the hint editor.
  */
 
 require(

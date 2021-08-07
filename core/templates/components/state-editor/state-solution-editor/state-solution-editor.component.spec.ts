@@ -155,6 +155,7 @@ describe('StateSolutionEditorComponent', () => {
 
   it('should check if current solution is valid or not', () => {
     spyOn(StateEditorService, 'isCurrentSolutionValid').and.returnValue(true);
+
     expect($scope.isSolutionValid()).toBe(true);
   });
 

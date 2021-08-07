@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the solution viewer and editor section in the
+ * @fileoverview Component for the solution viewer and editor section in the
  * state editor.
  */
 
