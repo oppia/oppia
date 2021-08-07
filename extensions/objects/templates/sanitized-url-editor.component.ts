@@ -21,9 +21,15 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 interface SanitizedUrlSchema {
   type: string;
-  validators: {
-    id: string;
-  }[];
+  validators: [
+    {
+      id: string;
+    },
+    {
+      id: string;
+      regexPattern: string;
+    }
+  ];
   'ui_config': {
     placeholder: string;
   };
@@ -46,9 +52,15 @@ export class SanitizedUrlEditorComponent {
   @Output() valueChanged = new EventEmitter();
   schema: SanitizedUrlSchema = {
     type: 'unicode',
-    validators: [{
-      id: 'is_nonempty'
-    }],
+    validators: [
+      {
+        id: 'is_nonempty'
+      },
+      {
+        id: 'is_regex_matched',
+        regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
+      }
+    ],
     ui_config: {
       placeholder: 'https://www.example.com'
     }

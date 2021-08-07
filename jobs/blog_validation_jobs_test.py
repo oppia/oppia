@@ -24,8 +24,11 @@ from jobs import blog_validation_errors
 from jobs import blog_validation_jobs
 from jobs import job_test_utils
 
-(blog_models, user_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
-    [models.NAMES.blog, models.NAMES.user])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
+
+(blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 
 class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
