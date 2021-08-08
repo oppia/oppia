@@ -105,7 +105,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         error_msg = (
             'Schema validation for \'filename\' failed: Validation'
             ' failed: is_regex_matched ({\'regex_pattern\': '
-            '\'\\\w+[.]\\\w+\'}) for object .png'
+            '\'\\\\w+[.]\\\\w+\'}) for object .png'
         )
         self.assertEqual(response_dict['error'], error_msg)
 
