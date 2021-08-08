@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 # for type-annotation.
 # Here feedback_domain is imported outside the 'if MYPY:' block. If it is
 # imported inside the 'if MYPY:' block, during runtime feedback_domain
-# won't be accessible during runtime.
+# won't be accessible.
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 import feconf
