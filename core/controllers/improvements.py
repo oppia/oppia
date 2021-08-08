@@ -82,10 +82,10 @@ class ExplorationImprovementsHandler(base.BaseHandler):
         task_entries = self.normalized_payload.get('task_entries')
         task_entries_to_put = []
         for task_entry in task_entries:
-            entity_version = task_entry.get('entity_version')
-            task_type = task_entry.get('task_type')
-            target_id = task_entry.get('target_id')
-            status = task_entry.get('status')
+            entity_version = task_entry['entity_version'
+            task_type = task_entry['task_type']
+            target_id = task_entry['target_id']
+            status = task_entry['status']
             # The issue_description is allowed to be None.
             issue_description = task_entry.get('issue_description', None)
             task_entries_to_put.append(
