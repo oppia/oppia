@@ -362,17 +362,6 @@ describe('ImageWithRegionsEditorComponent', () => {
         ]
       ]
     });
-    component.value = {
-      labeledRegions: <Region[]>[{
-        region: {
-          regionType: 'Rectangle',
-          area: [[], []]
-        },
-        label: ''
-      }],
-      imagePath: ''
-    };
-    component.selectedRegion = 0;
     component.onSvgMouseMove(evt);
 
     expect(component.value.labeledRegions[0].region).toEqual({

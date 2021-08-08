@@ -352,8 +352,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
         this.originalMouseY - this.mouseY);
     } else if (this.userIsCurrentlyDragging) {
       const labeledRegions = this.value.labeledRegions;
-      const draggedRegion =
-        this.selectedRegion ? labeledRegions[this.selectedRegion].region : null;
+      const draggedRegion = labeledRegions[<number> this.selectedRegion].region;
       const deltaX = this.mouseX - this.originalMouseX;
       const deltaY = this.mouseY - this.originalMouseY;
       let newX1 = this.originalRectArea.x + deltaX;
