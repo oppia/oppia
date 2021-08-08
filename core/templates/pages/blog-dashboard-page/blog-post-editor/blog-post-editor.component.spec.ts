@@ -152,7 +152,7 @@ describe('Blog Post Editor Component', () => {
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(component.blogPostData).toEqual(expectedBlogPost);
-    expect(component.blogPostId).toEqual(undefined);
+    expect(component.blogPostId).toEqual('');
     expect(component.MAX_CHARS_IN_BLOG_POST_TITLE).toBe(
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     expect(component.initEditor).toHaveBeenCalled;
