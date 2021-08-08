@@ -29,7 +29,7 @@ import { CustomSchema } from 'services/schema-default-value.service';
 import { UtilsService } from 'services/utils.service';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 
-interface Region {
+export interface Region {
   region: {
     regionType: string;
     area: number[][];
