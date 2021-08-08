@@ -91,9 +91,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
             raise Exception('Exception raised from parse_script()')
 
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', lambda: None)
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
-        with esprima_swap, self.assertRaisesRegexp(
+        with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegexp(
             Exception, re.escape('Exception raised from parse_script()')
         ):
             js_ts_linter.JsTsLintChecksManager(
@@ -169,7 +171,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_popen(unused_cmd, stdout, stderr):  # pylint: disable=unused-argument
             return process
         def mock_communicate(unused_self):
-            return ('Output', 'Invalid')
+            return (b'Output', b'Invalid')
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)

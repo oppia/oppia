@@ -180,37 +180,6 @@ describe('Rte Helper Service', function() {
       requiresFs: false,
       tooltip: 'Insert Concept Card Link'
     }, {
-      backendId: 'svgdiagram',
-      customizationArgSpecs: [{
-        name: 'svg_filename',
-        description: 'The SVG Diagram Editor',
-        schema: {
-          type: 'custom',
-          obj_type: 'SvgFilename'
-        },
-        default_value: ''
-      }, {
-        name: 'alt',
-        description: 'Briefly explain this diagram to a visually impaired' +
-        ' learner',
-        schema: {
-          type: 'unicode',
-          validators: [{
-            id: 'is_nonempty'
-          }],
-          ui_config: {
-            placeholder: 'Description of the diagram'
-          }
-        },
-        default_value: ''
-      }],
-      id: 'svgdiagram',
-      iconDataUrl: '/rich_text_components/Svgdiagram/Svgdiagram.png',
-      isComplex: false,
-      isBlockElement: true,
-      requiresFs: true,
-      tooltip: 'Insert diagram'
-    }, {
       backendId: 'Tabs',
       customizationArgSpecs: [{
         name: 'tab_contents',
@@ -297,7 +266,6 @@ describe('Rte Helper Service', function() {
     expect(RteHelperService.isInlineComponent('video')).toBe(false);
     expect(RteHelperService.isInlineComponent('tabs')).toBe(false);
     expect(RteHelperService.isInlineComponent('image')).toBe(false);
-    expect(RteHelperService.isInlineComponent('svgdiagram')).toBe(false);
   });
 
   it('should create customization arg dict from attributes', function() {

@@ -87,9 +87,8 @@ describe('Editor Navbar Breadcrumb directive', function() {
 
   it('should update nav bar title when exploration property changes',
     function() {
-      mockExplorationPropertyChangedEventEmitter.emit();
+      mockExplorationPropertyChangedEventEmitter.emit('title');
 
-      expect($scope.navbarTitle).toBe(
-        'Exploration Title...');
+      expect($scope.navbarTitle).toBe('Exploration Title...');
     });
 });
