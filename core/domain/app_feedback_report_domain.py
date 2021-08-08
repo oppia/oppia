@@ -1371,7 +1371,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             'archived': self.archived,
             'newest_report_creation_timestamp': (
                 self.newest_report_creation_timestamp.isoformat()),
-            'reports': [report_id for report_id in self.reports]
+            'reports': self.reports
         }
 
     def validate(self):
@@ -1636,11 +1636,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
             dict. A dict, mapping all fields of ReportStatsParameterValueCounts
             instance.
         """
-        return {
-            param_value_name: value_count
-            for (param_value_name, value_count) in (
-                self.parameter_value_counts.items())
-        }
+        return self.parameter_value_counts
 
     def validate(self):
         # type: () -> None

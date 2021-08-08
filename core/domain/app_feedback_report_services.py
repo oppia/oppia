@@ -320,13 +320,9 @@ def create_app_daily_stats_from_model_json(daily_param_stats):
         # For each parameter possible, create a
         # ReportStatsParameterValueCounts domain object of possible parameter
         # values and number of reports with that value.
-        parameter_counts = {
-            value_name: value_count
-            for (value_name, value_count) in stats_values_dict.items()
-        }
         counts_obj = (
             app_feedback_report_domain.ReportStatsParameterValueCounts(
-                parameter_counts))
+                stats_values_dict))
         stats_dict[stats_name] = counts_obj
     return stats_dict
 
