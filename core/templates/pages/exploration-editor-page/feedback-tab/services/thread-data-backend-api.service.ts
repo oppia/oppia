@@ -36,6 +36,11 @@ import { SuggestionsService } from 'services/suggestions.service';
 
 export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
+// Key values for this property will be 'null' if the thread is
+// not found or threadId is invalid.
+type SuggestionBackendDictsByThreadId = (
+  Map<string | null, SuggestionBackendDict>);
+
 interface NumberOfOpenThreads {
   'num_open_threads': number;
 }
@@ -170,10 +175,8 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-        // Key values for this property will be 'null' if the thread is
-        // not found or threadId is invalid.
-        let suggestionBackendDictsByThreadId:
-          Map<string | null, SuggestionBackendDict> = new Map(
+        let suggestionBackendDictsByThreadId: SuggestionBackendDictsByThreadId =
+          new Map(
             suggestionBackendDicts.map(dict => [
               this.suggestionsService
                 .getThreadIdFromSuggestionBackendDict(dict),
