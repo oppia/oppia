@@ -144,6 +144,8 @@ describe('Feedback popup directive', function() {
 
   it('should save feedback successfully when ' +
     'clicking on save button', fakeAsync(function() {
+    expect($scope.feedbackSubmitted).toBe(false);
+
     $scope.feedbackText = 'feedback';
     $element.wrap('<div uib-popover-template></div>');
     $element.wrap(
@@ -161,6 +163,8 @@ describe('Feedback popup directive', function() {
     $httpBackend.flush();
     tick();
     $timeout.flush();
+
+    expect($scope.feedbackSubmitted).toBe(true);
   }));
 
   it('should show error message when there ' +
