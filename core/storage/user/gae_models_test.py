@@ -118,7 +118,9 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
-    def test_apply_deletion_policy_for_registered_users_deletes_them(self) -> None:
+    def test_apply_deletion_policy_for_registered_users_deletes_them(
+            self
+    ) -> None:
         # Case for a full user.
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
@@ -140,7 +142,9 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
 
-    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self) -> None:
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
+            self
+    ) -> None:
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.NONEXISTENT_USER_ID))
         user_models.UserSettingsModel.apply_deletion_policy(
@@ -214,7 +218,9 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_user_data, user_data)
 
-    def test_export_data_for_nontrivial_case_returns_data_correctly(self) -> None:
+    def test_export_data_for_nontrivial_case_returns_data_correctly(
+            self
+    ) -> None:
         user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -2257,7 +2263,9 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertIn(user_models.UserContributionProficiencyModel.get(
             'user1', 'category3'), user_score_models)
 
-    def test_get_all_scores_of_user_with_an_invalid_user_id_is_empty(self) -> None:
+    def test_get_all_scores_of_user_with_an_invalid_user_id_is_empty(
+            self
+    ) -> None:
         user_score_models = (
             user_models.UserContributionProficiencyModel
             .get_all_scores_of_user('invalid_user_id'))
@@ -2283,7 +2291,9 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
 
-    def test_get_categories_where_user_can_review_with_invalid_user_id(self) -> None:
+    def test_get_categories_where_user_can_review_with_invalid_user_id(
+            self
+    ) -> None:
         score_categories = (
             user_models.UserContributionProficiencyModel
             .get_all_categories_where_user_can_review('invalid_user_id'))
@@ -2484,13 +2494,17 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
-    def test_apply_deletion_policy_for_registered_user_deletes_them(self) -> None:
+    def test_apply_deletion_policy_for_registered_user_deletes_them(
+            self
+    ) -> None:
         user_models.PendingDeletionRequestModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
 
-    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self) -> None:
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
+            self
+    ) -> None:
         self.assertIsNone(
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.NONEXISTENT_USER_ID))

@@ -441,7 +441,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-    def test_revert_to_version_with_all_viewer_ids_field_successful(self) -> None:
+    def test_revert_to_version_with_all_viewer_ids_field_successful(
+            self
+    ) -> None:
         # TODO(#13523): Use of Any in the type-annotation below will be
         # removed when the snapshot of ExplorationRightsModel
         # is converted to TypedDict/Domain Object.

@@ -446,7 +446,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def create_multi(
             cls,
-            message_identifiers: List[feedback_domain.FullyQualifiedMessageIdentifier]
+            message_identifiers: List[
+                feedback_domain.FullyQualifiedMessageIdentifier]
     ) -> List[GeneralFeedbackMessageModel]:
         """Creates a new GeneralFeedbackMessageModel entry for each
         (thread_id, message_id) pair.

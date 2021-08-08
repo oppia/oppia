@@ -619,7 +619,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user, since a user
         has multiple playthroughs associated with their account.
         """
@@ -681,7 +682,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             cls,
             user_id: str,
             exploration_id: str
-    ) -> ExpUserLastPlaythroughModel:
+    ) -> 'ExpUserLastPlaythroughModel':
         """Creates a new ExpUserLastPlaythroughModel instance and returns it.
 
         Args:
@@ -703,7 +704,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             cls,
             user_id: str,
             exploration_id: str
-    ) -> Optional[ExpUserLastPlaythroughModel]:
+    ) -> Optional['ExpUserLastPlaythroughModel']:
         """Gets the ExpUserLastPlaythroughModel for the given user and
         exploration id.
 
@@ -922,7 +923,8 @@ class UserContributionsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1399,7 +1401,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         return cls.get_by_id(user_id) is not None
 
     @classmethod
-    def get_or_create(cls, user_id: str) -> UserStatsModel:
+    def get_or_create(cls, user_id: str) -> 'UserStatsModel':
         """Creates a new UserStatsModel instance, if it does not already exist.
 
         Args:
@@ -1585,7 +1587,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             cls,
             user_id: str,
             exploration_id: str
-    ) -> ExplorationUserDataModel:
+    ) -> 'ExplorationUserDataModel':
         """Creates a new ExplorationUserDataModel instance and returns it.
 
         Note that the client is responsible for actually saving this entity to
@@ -1786,7 +1788,7 @@ class CollectionProgressModel(base_models.BaseModel):
             cls,
             user_id: str,
             collection_id: str
-    ) -> CollectionProgressModel:
+    ) -> 'CollectionProgressModel':
         """Creates a new CollectionProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -1811,7 +1813,7 @@ class CollectionProgressModel(base_models.BaseModel):
             cls,
             user_id: str,
             collection_id: str
-    ) -> Optional[CollectionProgressModel]:
+    ) -> Optional['CollectionProgressModel']:
         """Gets the CollectionProgressModel for the given user and collection
         id.
 
@@ -1834,7 +1836,7 @@ class CollectionProgressModel(base_models.BaseModel):
             cls,
             user_id: str,
             collection_ids: List[str]
-    ) -> List[Optional[CollectionProgressModel]]:
+    ) -> List[Optional['CollectionProgressModel']]:
         """Gets the CollectionProgressModels for the given user and collection
         ids.
 
@@ -1857,7 +1859,7 @@ class CollectionProgressModel(base_models.BaseModel):
             cls,
             user_id: str,
             collection_id: str
-    ) -> CollectionProgressModel:
+    ) -> 'CollectionProgressModel':
         """Gets the CollectionProgressModel for the given user and collection
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -1981,7 +1983,7 @@ class StoryProgressModel(base_models.BaseModel):
         return '%s.%s' % (user_id, story_id)
 
     @classmethod
-    def create(cls, user_id: str, story_id: str) -> StoryProgressModel:
+    def create(cls, user_id: str, story_id: str) -> 'StoryProgressModel':
         """Creates a new StoryProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -2007,7 +2009,7 @@ class StoryProgressModel(base_models.BaseModel):
             user_id: str,
             story_id: str,
             strict: bool = True
-    ) -> Optional[StoryProgressModel]:
+    ) -> Optional['StoryProgressModel']:
         """Gets the StoryProgressModel for the given user and story
         id.
 
@@ -2032,7 +2034,7 @@ class StoryProgressModel(base_models.BaseModel):
             cls,
             user_id: str,
             story_ids: List[str]
-    ) -> List[Optional[StoryProgressModel]]:
+    ) -> List[Optional['StoryProgressModel']]:
         """Gets the StoryProgressModels for the given user and story
         ids.
 
@@ -2051,7 +2053,7 @@ class StoryProgressModel(base_models.BaseModel):
             instance_ids)
 
     @classmethod
-    def get_or_create(cls, user_id: str, story_id: str) -> StoryProgressModel:
+    def get_or_create(cls, user_id: str, story_id: str) -> 'StoryProgressModel':
         """Gets the StoryProgressModel for the given user and story
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -2680,8 +2682,10 @@ class UserContributionRightsModel(base_models.BaseModel):
         cls.delete_by_id(user_id)
 
     @classmethod
-    def export_data(cls,
-                    user_id: str) -> Dict[str, Union[bool, List[str], None]]:
+    def export_data(
+            cls,
+            user_id: str
+    ) -> Dict[str, Union[bool, List[str], None]]:
         """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
 
