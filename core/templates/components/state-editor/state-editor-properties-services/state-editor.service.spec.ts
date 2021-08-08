@@ -172,7 +172,7 @@ describe('Editor state service', () => {
 
   it('should not allow invalid state names to be set', () => {
     ecs.setActiveStateName('');
-    expect(ecs.getActiveStateName()).toBeNull();
+    expect(ecs.getActiveStateName()).toBeUndefined();
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {
@@ -399,7 +399,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction', () => {
-    expect(ecs.getInteraction()).toEqual(null);
+    expect(ecs.getInteraction()).toBeUndefined();
     ecs.setInteraction(mockInteraction);
     expect(ecs.getInteraction()).toEqual(mockInteraction);
   });
