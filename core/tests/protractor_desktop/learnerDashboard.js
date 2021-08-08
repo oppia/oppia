@@ -225,6 +225,11 @@ describe('Learner dashboard functionality', function() {
     await users.createAndLoginCurriculumAdminUser(
       'creator@learnerDashboard1.com', 'learnerDashboard1');
     var handle = await browser.getWindowHandle();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectNumberOfTopicsInSuggestedForYou(0);
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectNumberOfStoriesInCompletedStory(0);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
@@ -290,6 +295,7 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToHomeSection();
     await learnerDashboardPage.expectNumberOfTopicsInSuggestedForYou(1);
+    await learnerDashboardPage.expectNumberOfTopicsInContinueWhereYouLeftOff(0);
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
       TOPIC_NAME);
