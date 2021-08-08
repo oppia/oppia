@@ -383,10 +383,10 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {}
         }
+
         @acl_decorators.does_classroom_exist
         def get(self, _):
             self.render_json('oppia-root.mainpage.html')
-
 
     def setUp(self):
         super(ClassroomExistDecoratorTests, self).setUp()
@@ -423,12 +423,13 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
     def test_redirects_user_to_default_classroom_if_given_not_available(
             self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_classroom_data/invalid', expected_status_int=404)
+            self.get_json(
+                '/mock_classroom_data/invalid', expected_status_int=404)
 
     def test_raises_error_if_return_type_is_not_json(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_html_response('/mock_classroom_page/invalid',
-            expected_status_int=500)
+            self.get_html_response(
+                '/mock_classroom_page/invalid', expected_status_int=500)
 
 
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
