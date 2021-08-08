@@ -253,7 +253,7 @@ describe('Skill editor main tab directive', function() {
   it('should remove skill id when calling \'removeSkillId\'', function() {
     let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
       .and.returnValue(null);
-  
+
     $scope.removeSkillId();
 
     expect(deleteSpy).toHaveBeenCalled();

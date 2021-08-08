@@ -44,7 +44,7 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
         $scope, AlertsService,
         NgbModal, SkillEditorStateService, SkillUpdateService,
         TopicsAndSkillsDashboardBackendApiService, WindowDimensionsService,
-        ) {
+    ) {
       var ctrl = this;
       var categorizedSkills = null;
       var untriagedSkillSummaries = null;
@@ -109,12 +109,13 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
         }
       };
       ctrl.$onInit = function() {
-        groupedSkillSummaries = SkillEditorStateService.getGroupedSkillSummaries();
+        groupedSkillSummaries = SkillEditorStateService
+          .getGroupedSkillSummaries();
         TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-        .then(function(response) {
-          categorizedSkills = response.categorizedSkillsDict;
-          untriagedSkillSummaries = response.untriagedSkillSummaries;
-        });
+          .then(function(response) {
+            categorizedSkills = response.categorizedSkillsDict;
+            untriagedSkillSummaries = response.untriagedSkillSummaries;
+          });
 
         $scope.skill = SkillEditorStateService.getSkill();
         $scope.prerequisiteSkillsAreShown = (
@@ -130,5 +131,5 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
         }
       };
     }]
-  }
+}
 );
