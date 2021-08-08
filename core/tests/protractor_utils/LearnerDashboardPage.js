@@ -154,24 +154,36 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
-    await waitFor.visibilityOf(
-      topicNameInLearnerTopicSummaryTiles.first(),
-      'Learner Topic Name takes too long to appear');
-    expect(await topicNameInLearnerTopicSummaryTiles.count()).toEqual(value);
+    if (value > 0) {
+      await waitFor.visibilityOf(
+        topicNameInLearnerTopicSummaryTiles.first(),
+        'Learner Topic Name takes too long to appear');
+      expect(await topicNameInLearnerTopicSummaryTiles.count()).toEqual(value);
+    } else {
+      expect(await topicNameInLearnerTopicSummaryTiles.count()).toEqual(0);
+    }
   };
 
   this.expectNumberOfStoriesInCompletedStory = async function(value) {
-    await waitFor.visibilityOf(
-      storyNameInLearnerStorySummaryTiles.first(),
-      'Story Name Card takes too long to appear');
-    expect(await storyNameInLearnerStorySummaryTiles.count()).toEqual(value);
+    if (value > 0) {
+      await waitFor.visibilityOf(
+        storyNameInLearnerStorySummaryTiles.first(),
+        'Story Name Card takes too long to appear');
+      expect(await storyNameInLearnerStorySummaryTiles.count()).toEqual(value);
+    } else {
+      expect(await storyNameInLearnerStorySummaryTiles.count()).toEqual(0);
+    }
   };
 
   this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
-    await waitFor.visibilityOf(
-      topicNameInLearnerStorySummaryTiles.first(),
-      'Topic Name Card takes too long to appear');
-    expect(await topicNameInLearnerStorySummaryTiles.count()).toEqual(value);
+    if (value > 0) {
+      await waitFor.visibilityOf(
+        topicNameInLearnerStorySummaryTiles.first(),
+        'Topic Name Card takes too long to appear');
+      expect(await topicNameInLearnerStorySummaryTiles.count()).toEqual(value);
+    } else {
+      expect(await topicNameInLearnerStorySummaryTiles.count()).toEqual(0);
+    }
   };
 
   this.addTopicToLearnerGoals = async function() {
