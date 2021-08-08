@@ -28,7 +28,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 import python_utils
 
-
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
