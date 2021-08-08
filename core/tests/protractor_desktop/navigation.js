@@ -154,12 +154,21 @@ describe('Static Pages Tour', function() {
       // angular is disabled during client side redirects.
       await browser.waitForAngularEnabled(false);
 
-      // Waiting for redirection.
+      // Waiting for first redirection (login page to splash page).
       await browser.driver.wait(async() => {
         const URL = await browser.driver.getCurrentUrl();
         // As redirect url can be any url, so instead of testing for new url,
         // checking whether the url is not /signup.
         return !(/login/.test(URL));
+      }, 10000);
+
+      // Waiting for second redirection (splash page to preferred dashboard
+      // page).
+      await browser.driver.wait(async() => {
+        const URL = await browser.driver.getCurrentUrl();
+        // As redirect url can be any url, so instead of testing for new url,
+        // checking whether the url is not /.
+        return URL !== 'http://localhost:9001/';
       }, 10000);
 
       // The above solution only waits until url is changed, so invoking
