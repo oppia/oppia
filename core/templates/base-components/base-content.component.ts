@@ -37,7 +37,7 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
 export class BaseContentComponent {
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
-  iframed: boolean = false;
+  iframed: boolean;
   DEV_MODE = AppConstants.DEV_MODE;
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
@@ -122,13 +122,11 @@ export class BaseContentComponent {
   }
 
   skipToMainContent(): void {
-    // 'getElementById' can return null if the element provided as
-    // an argument is invalid.
-    let mainContentElement: HTMLElement | null = document.getElementById(
+    let mainContentElement: HTMLElement = document.getElementById(
       'oppia-main-content');
 
     if (!mainContentElement) {
-      throw new Error('Variable mainContentElement is null.');
+      throw new Error('Variable mainContentElement is undefined.');
     }
     mainContentElement.tabIndex = -1;
     mainContentElement.scrollIntoView();

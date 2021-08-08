@@ -64,8 +64,8 @@ export class PredictionAlgorithmRegistryService {
     if (!this.algorithmIdPredictionServiceMapping.get(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }
-    this.algorithmIdPredictionServiceMapping.get(
-      algorithmId)?.set(dataSchemaVersion, service);
+    this.algorithmIdPredictionServiceMapping.get(algorithmId)
+      .set(dataSchemaVersion, service);
   }
 }
 

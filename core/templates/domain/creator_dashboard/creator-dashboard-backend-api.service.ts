@@ -74,8 +74,7 @@ interface CreatorDashboardDataBackendDict {
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  // 'lastWeekStats' is null for a new creater.
-  lastWeekStats: CreatorDashboardStats | null;
+  lastWeekStats: CreatorDashboardStats;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
@@ -86,8 +85,7 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
-  // 'topicSummaryDicts' is null if no summary is provided for a topic.
-  topicSummaries: CreatorTopicSummary[] | null;
+  topicSummaries: CreatorTopicSummary[];
 }
 
 @Injectable({

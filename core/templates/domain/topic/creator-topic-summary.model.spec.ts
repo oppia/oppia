@@ -19,7 +19,7 @@
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 describe('Creator topic summary model', () => {
-  let _sampleCreatorTopicSummary: CreatorTopicSummary;
+  let _sampleCreatorTopicSummary: CreatorTopicSummary = null;
 
   beforeEach(() => {
     let sampleCreatorTopicSummaryBackendDict = {

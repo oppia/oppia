@@ -29,9 +29,9 @@ import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions.model';
 
 describe('User Exploration Permissions Service', () => {
-  let ueps: UserExplorationPermissionsService;
-  let contextService: ContextService;
-  let httpTestingController: HttpTestingController;
+  let ueps: UserExplorationPermissionsService = null;
+  let contextService: ContextService = null;
+  let httpTestingController: HttpTestingController = null;
 
   let sampleExplorationId = 'sample-exploration';
   let samplePermissionsData = {
@@ -52,9 +52,9 @@ describe('User Exploration Permissions Service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    httpTestingController = TestBed.inject(HttpTestingController);
-    ueps = TestBed.inject(UserExplorationPermissionsService);
-    contextService = TestBed.inject(ContextService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    ueps = TestBed.get(UserExplorationPermissionsService);
+    contextService = TestBed.get(ContextService);
     permissionsResponse =
       ExplorationPermissions.createFromBackendDict(samplePermissionsData);
     spyOn(contextService, 'getExplorationId').and.returnValue(
@@ -67,7 +67,7 @@ describe('User Exploration Permissions Service', () => {
   });
 
   it('should fetch the correct data', fakeAsync(() => {
-    ueps.getPermissionsAsync().then((response) => {
+    ueps.getPermissionsAsync().then(function(response) {
       expect(response).toEqual(permissionsResponse);
     });
 

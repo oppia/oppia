@@ -28,14 +28,12 @@ import {
   providedIn: 'root'
 })
 export class AdminDataService {
-  // This property is initialized using private methods
-  // and we need to do non-null assertion, for more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  dataPromise!: Promise<AdminPageData>;
+  dataPromise: Promise<AdminPageData>;
 
   constructor(
-    private adminBackendApiService: AdminBackendApiService
-  ) {}
+    private adminBackendApiService: AdminBackendApiService) {
+    this.dataPromise = null;
+  }
 
   async _getDataAsync(): Promise<AdminPageData> {
     if (this.dataPromise) {

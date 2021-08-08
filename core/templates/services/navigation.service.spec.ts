@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { EventToCodes, NavigationService } from './navigation.service';
+import { NavigationService } from './navigation.service';
 
 describe('Navigation Service', () => {
   let navigationService: NavigationService;
@@ -65,12 +65,11 @@ describe('Navigation Service', () => {
     } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
       enter: 'open'
-    } as EventToCodes;
+    };
 
     let openSubmenuSpy = spyOn(navigationService, 'openSubmenu')
       .and.callThrough();
-    navigationService.onMenuKeypress(
-      mockEvent, 'New menu', eventsTobeHandled);
+    navigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
     expect(openSubmenuSpy).toHaveBeenCalled();
   });
 
@@ -81,7 +80,7 @@ describe('Navigation Service', () => {
     } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
       shiftTab: 'close',
-    } as EventToCodes;
+    };
     let closeSubmenuSpy = spyOn(navigationService, 'closeSubmenu').and
       .callThrough();
     navigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
@@ -95,7 +94,7 @@ describe('Navigation Service', () => {
     } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
       shiftTab: 'invalid'
-    } as EventToCodes;
+    };
 
     expect(() => {
       navigationService.onMenuKeypress(

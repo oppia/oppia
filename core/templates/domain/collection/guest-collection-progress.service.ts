@@ -28,8 +28,10 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Collection } from 'domain/collection/collection.model';
-import { GuestCollectionProgress } from 'domain/collection/guest-collection-progress.model';
+import { Collection } from
+  'domain/collection/collection.model';
+import { GuestCollectionProgress } from
+  'domain/collection/guest-collection-progress.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
@@ -53,8 +55,8 @@ export class GuestCollectionProgressService {
 
   recordCompletedExploration(
       collectionId: string, explorationId: string): void {
-    let guestCollectionProgress = this.loadGuestCollectionProgress();
-    const completedExplorationIdHasBeenAdded = (
+    var guestCollectionProgress = this.loadGuestCollectionProgress();
+    var completedExplorationIdHasBeenAdded = (
       guestCollectionProgress.addCompletedExplorationId(
         collectionId, explorationId));
     if (completedExplorationIdHasBeenAdded) {
@@ -63,15 +65,10 @@ export class GuestCollectionProgressService {
   }
 
   getValidCompletedExplorationIds(collection: Collection): string[] {
-    const collectionId = collection.getId();
-    const guestCollectionProgress = this.loadGuestCollectionProgress();
-    let completedExplorationIds: string[];
-    if (collectionId) {
-      completedExplorationIds = (
-        guestCollectionProgress.getCompletedExplorationIds(collectionId));
-    } else {
-      throw new Error('Collection does not exist!');
-    }
+    var collectionId = collection.getId();
+    var guestCollectionProgress = this.loadGuestCollectionProgress();
+    var completedExplorationIds = (
+      guestCollectionProgress.getCompletedExplorationIds(collectionId));
     // Filter the exploration IDs by whether they are contained within the
     // specified collection structure.
     return completedExplorationIds.filter((expId) => {
@@ -80,10 +77,8 @@ export class GuestCollectionProgressService {
   }
 
   // This method corresponds to collection_domain.get_next_exploration_id.
-  // A null value will be returned if no explorationIds exist or all
-  // explorations are completed.
   _getNextExplorationId(
-      collection: Collection, completedIds: string[]): string | null {
+      collection: Collection, completedIds: string[]): string {
     var explorationIds = collection.getExplorationIds();
 
     for (var i = 0; i < explorationIds.length; i++) {
@@ -132,9 +127,7 @@ export class GuestCollectionProgressService {
    * guest has completed the collection.
    */
   getNextExplorationId(
-      collection: Collection,
-      completedExplorationIds: string[]
-  ): string | null {
+      collection: Collection, completedExplorationIds: string[]): string {
     return this._getNextExplorationId(collection, completedExplorationIds);
   }
 }

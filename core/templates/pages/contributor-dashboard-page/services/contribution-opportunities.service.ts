@@ -26,12 +26,12 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-export interface SkillOpportunitiesDict {
+export class SkillOpportunitiesDict {
   opportunities: SkillOpportunity[];
   more: boolean;
 }
 
-export interface ExplorationOpportunitiesDict {
+export class ExplorationOpportunitiesDict {
   opportunities: ExplorationOpportunitySummary[];
   more: boolean;
 }
@@ -47,15 +47,12 @@ export class ContributionOpportunitiesService {
 
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
-  // These properties are initialized using async methods
-  // and we need to do non-null assertion, for more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private _skillOpportunitiesCursor!: string;
-  private _translationOpportunitiesCursor!: string;
-  private _voiceoverOpportunitiesCursor!: string;
-  private _moreSkillOpportunitiesAvailable: boolean = true;
-  private _moreTranslationOpportunitiesAvailable: boolean = true;
-  private _moreVoiceoverOpportunitiesAvailable: boolean = true;
+  private _skillOpportunitiesCursor: string = null;
+  private _translationOpportunitiesCursor: string = null;
+  private _voiceoverOpportunitiesCursor: string = null;
+  private _moreSkillOpportunitiesAvailable = true;
+  private _moreTranslationOpportunitiesAvailable = true;
+  private _moreVoiceoverOpportunitiesAvailable = true;
 
   private async _getSkillOpportunitiesAsync(cursor: string):
   Promise<SkillOpportunitiesDict> {
@@ -70,7 +67,6 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-
   private async _getTranslationOpportunitiesAsync(
       languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
@@ -84,7 +80,6 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-
   private async _getVoiceoverOpportunitiesAsync(
       languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
@@ -98,7 +93,6 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-
   showRequiresLoginModal(): void {
     this.modalService.open(LoginRequiredModalContent);
   }
@@ -106,23 +100,19 @@ export class ContributionOpportunitiesService {
   async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
     return this._getSkillOpportunitiesAsync('');
   }
-
   async getTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     return this._getTranslationOpportunitiesAsync(languageCode, '');
   }
-
   async getVoiceoverOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     return this._getVoiceoverOpportunitiesAsync(languageCode, '');
   }
-
   async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
   }
-
   async getMoreTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
@@ -130,7 +120,6 @@ export class ContributionOpportunitiesService {
         languageCode, this._translationOpportunitiesCursor);
     }
   }
-
   async getMoreVoiceoverOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreVoiceoverOpportunitiesAvailable) {

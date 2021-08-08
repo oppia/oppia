@@ -30,7 +30,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('Admin Data Service', () => {
-  let adminDataService: AdminDataService;
+  let adminDataService: AdminDataService = null;
   let httpTestingController: HttpTestingController;
   var sampleAdminData: AdminPageDataBackendDict = {
     role_to_actions: {

@@ -37,9 +37,7 @@ export class UserExplorationPermissionsService {
     ExplorationPermissionsBackendApiService) {
   }
 
-  // 'permissionsPromise' will be null until populated by async function
-  // getPermissionsAsync().
-  static permissionsPromise: Promise<ExplorationPermissions> | null = null;
+  static permissionsPromise: Promise<ExplorationPermissions> = null;
 
   async getPermissionsAsync(): Promise<ExplorationPermissions> {
     if (!UserExplorationPermissionsService.permissionsPromise) {
@@ -50,11 +48,10 @@ export class UserExplorationPermissionsService {
   }
 
   async fetchPermissionsAsync(): Promise<ExplorationPermissions> {
-    let permissionPromise = (
+    UserExplorationPermissionsService.permissionsPromise = (
       this.explorationPermissionsBackendApiService.getPermissionsAsync());
-    UserExplorationPermissionsService.permissionsPromise = permissionPromise;
     return new Promise((resolve, reject) => {
-      permissionPromise.then(
+      UserExplorationPermissionsService.permissionsPromise.then(
         (response) => {
           this.userExplorationPermissionsFetched.emit();
           resolve(response);
