@@ -79,7 +79,8 @@ export class InteractionAttributesExtractorService {
     caKeys.forEach(caName => {
       const attr = <{ value: Object }> ca[caName];
       Object.defineProperty(caValues, caName, {
-        value: attr.value
+        value: attr.value,
+        enumerable: true
       });
     });
 
