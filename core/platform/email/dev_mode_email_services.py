@@ -35,7 +35,7 @@ def send_email_to_recipients(
         html_body, # type: Text
         bcc=None, # type: Optional[List[Text]]
         reply_to=None, # type: Optional[Text]
-        recipient_variables=None # type: Optional[Dict[Text, Dict[Text, Any]]]
+        recipient_variables=None # type: Optional[Dict[Text, Dict[Text, Union[Text, float]]]]]
 ):
     # type: (...) -> bool
     """Prints information about sent emails to the terminal console, in order
