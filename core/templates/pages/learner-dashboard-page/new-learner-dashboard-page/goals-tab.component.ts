@@ -67,7 +67,8 @@ export class GoalsTabComponent implements OnInit {
     this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
-    this.bookImageUrl = this.getStaticImageUrl('/learner_dashboard/book.svg');
+    this.bookImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/book_icon.png');
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
     let topic: LearnerTopicSummary;
     for (topic of this.currentGoals) {

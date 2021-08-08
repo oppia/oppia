@@ -109,6 +109,12 @@ describe('Practice tab component', function() {
         2: 'Second skill'
       })
     ];
+    component.subtopicIds = [1, 2, 3];
+    component.subtopicMastery = {
+      1: 0,
+      2: 1,
+      3: undefined
+    };
     fixture.detectChanges();
   });
 
@@ -140,7 +146,7 @@ describe('Practice tab component', function() {
     });
 
   it('should open a new practice session containing the selected subtopic' +
-    ' when start button is clicked', function() {
+    ' when start button is clicked for topicViewer display area', function() {
     component.selectedSubtopicIndices[0] = true;
     component.openNewPracticeSession();
 
@@ -157,4 +163,38 @@ describe('Practice tab component', function() {
       flushMicrotasks();
       expect(component.questionsAreAvailable).toBeFalse();
     }));
+
+  it('should open a new practice session containing the selected subtopic' +
+    ' when start button is clicked for progressTab display area', function() {
+    component.displayArea = 'progressTab';
+    component.topicUrlFragment = 'topic_1';
+    component.classroomUrlFragment = 'classroom_1';
+    component.selectedSubtopicIndices[0] = true;
+    component.openNewPracticeSession();
+
+    expect(windowRef.nativeWindow.location.href).toBe(
+      '/learn/classroom_1/topic_1/practice/session?selected_subtopic_ids=1');
+  });
+
+  it('should return background for progress of a subtopic', () => {
+    component.subtopicMasteryArray = [10, 20];
+    expect(component.getBackgroundForProgress(0)).toEqual(10);
+  });
+
+  it('should get subtopic mastery position for capsule', () => {
+    component.clientWidth = 700;
+    component.subtopicMasteryArray = [20, 99];
+    expect(component.subtopicMasteryPosition(0)).toEqual(175);
+    expect(component.subtopicMasteryPosition(1)).toEqual(12);
+
+    component.clientWidth = 400;
+    expect(component.subtopicMasteryPosition(0)).toEqual(150);
+    expect(component.subtopicMasteryPosition(1)).toEqual(7);
+  });
+
+  it('should get mastery text color', () => {
+    component.subtopicMasteryArray = [20, 99];
+    expect(component.masteryTextColor(0)).toEqual('black');
+    expect(component.masteryTextColor(1)).toEqual('white');
+  });
 });

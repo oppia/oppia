@@ -38,10 +38,17 @@ export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
   @Input() startButtonIsDisabled: boolean = false;
   @Input() subtopicsList: Subtopic[];
+  @Input() displayArea: string = 'topicViewer';
+  @Input() topicUrlFragment: string = '';
+  @Input() classroomUrlFragment: string = '';
+  @Input() subtopicMastery: Record<string, number> = {};
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
   questionsAreAvailable: boolean = false;
+  subtopicIds: number[] = [];
+  clientWidth: number;
+  subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(
@@ -58,8 +65,26 @@ export class PracticeTabComponent implements OnInit {
         return subtopic.getSkillSummaries().length > 0;
       }
     );
+    for (var subtopic of this.subtopicsList) {
+      this.subtopicIds.push(subtopic.getId());
+    }
+    for (let item of this.subtopicIds) {
+      if (this.subtopicMastery[item] !== undefined) {
+        this.subtopicMasteryArray.push(Math.floor(
+          this.subtopicMastery[item] * 100));
+      } else {
+        this.subtopicMasteryArray.push(0);
+      }
+    }
     this.selectedSubtopicIndices = Array(
       this.availableSubtopics.length).fill(false);
+    this.clientWidth = window.innerWidth;
+    if (this.displayArea === 'topicViewer') {
+      this.topicUrlFragment = (
+        this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      this.classroomUrlFragment = (
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    }
   }
 
   isStartButtonDisabled(): boolean {
@@ -102,12 +127,10 @@ export class PracticeTabComponent implements OnInit {
           this.availableSubtopics[idx].getId());
       }
     }
-    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+    let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
-        topic_url_fragment: (
-          this.urlService.getTopicUrlFragmentFromLearnerUrl()),
-        classroom_url_fragment: (
-          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment: this.classroomUrlFragment,
         comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
       });
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
@@ -115,6 +138,33 @@ export class PracticeTabComponent implements OnInit {
 
   isAtLeastOneSubtopicSelected(): boolean {
     return this.selectedSubtopicIndices.some(item => item);
+  }
+
+  getBackgroundForProgress(i: number): number {
+    return this.subtopicMasteryArray[i];
+  }
+
+  // This function is used to calculate the position of subtopic mastery
+  // percent in the capsule shaped progress bar.
+  subtopicMasteryPosition(i: number): number {
+    if (this.clientWidth > 510) {
+      if (this.subtopicMasteryArray[i] <= 89) {
+        return 225 - this.subtopicMasteryArray[i] * 2.5;
+      }
+      return 225 - (this.subtopicMasteryArray[i] * 2) - 15;
+    } else {
+      if (this.subtopicMasteryArray[i] <= 89) {
+        return 215 - (this.subtopicMasteryArray[i] * 2) - 25;
+      }
+      return 215 - (this.subtopicMasteryArray[i] * 2) - 10;
+    }
+  }
+
+  masteryTextColor(i: number): string {
+    if (this.subtopicMasteryArray[i] <= 89) {
+      return 'black';
+    }
+    return 'white';
   }
 }
 

@@ -432,6 +432,11 @@ describe('Learner Dashboard Backend API Service', () => {
     completed_to_incomplete_stories: [],
     learnt_to_partially_learnt_topics: []
   };
+  let sampleSubtopicMastery = {
+    topic_id: {
+      1: 0
+    }
+  };
 
   let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
   let ERROR_STATUS_CODE = 400;
@@ -467,6 +472,52 @@ describe('Learner Dashboard Backend API Service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should successfully fetch subtopic mastery data from the' +
+    ' backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    var topicIds = 'topic_id';
+
+    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleSubtopicMastery);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should use rejection handler if subtopic mastery data' +
+    ' backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    var topicIds = 'topic_id';
+
+    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 400
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
   }
   ));
 

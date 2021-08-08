@@ -32,8 +32,7 @@
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
     </p>
     <div class="empty-suggested-for-you-section" *ngIf="!isNonemptyObject(untrackedTopics)">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
-      </p>
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate"></p>
     </div>
     <div class="suggested-for-you-section" *ngIf="isNonemptyObject(untrackedTopics)">
       <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
