@@ -42,20 +42,20 @@ var LearnerDashboardPage = function() {
   var feedbackMessage =
     element.all(by.css('.protractor-test-feedback-message'));
   var addToLearnerGoalsButton =
-    element.all(by.css('.protractor-test-add-topic-to-current-goals-button'));
+    element(by.css('.protractor-test-add-topic-to-current-goals-button'));
   var currentGoalsTopic =
     element(by.css('.protractor-test-topic-name-in-current-goals'));
   var skillProficiencyTopic =
     element(by.css('.protractor-test-skill-proficiency-topic-title'));
   var completedGoalsTopic =
     element(by.css('.protractor-test-completed-goals-topic-name'));
-  var continueWhereYouLeftOffTopicName =
+  var topicNameInLearnerStorySummaryTiles =
     element.all(by.css(
       '.protractor-test-topic-name-in-learner-story-summary-tile'));
-  var completedStoriesName =
+  var storyNameInLearnerStorySummaryTiles =
       element.all(by.css(
         '.protractor-test-story-name-in-learner-story-summary-tile'));
-  var suggestedForYouTopicName =
+  var topicNameInLearnerTopicSummaryTiles =
       element.all(by.css('.protractor-test-learner-topic-summary-tile-title'));
 
   this.get = async function() {
@@ -112,7 +112,7 @@ var LearnerDashboardPage = function() {
   this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-edit-goals', name));
-    expect(await topicName.getText()).toMatch(name);
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInCurrentGoalsToMatch = async function(name) {
@@ -120,10 +120,11 @@ var LearnerDashboardPage = function() {
       currentGoalsTopic,
       'Topic in Current Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
-      currentGoalsTopic, name, 'No Current goals Text');
+      currentGoalsTopic, name,
+      `Text "${name}" taking too long to be present in currentGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-current-goals', name));
-    expect(await topicName.getText()).toMatch(name);
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInSkillProficiencyToMatch = async function(name) {
@@ -132,10 +133,11 @@ var LearnerDashboardPage = function() {
       'Topic in Skill Proficiency takes too long to appear'
     );
     await waitFor.textToBePresentInElement(
-      skillProficiencyTopic, name, 'No Skill Proficiency text');
+      skillProficiencyTopic, name,
+      `Text "${name}" taking too long to be present in skillProficiency`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-skill-proficiency-topic-title', name));
-    expect(await topicName.getText()).toMatch(name);
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInCompletedGoalsToMatch = async function(name) {
@@ -144,31 +146,32 @@ var LearnerDashboardPage = function() {
       'Topic in completed goals takes too long to appear'
     );
     await waitFor.textToBePresentInElement(
-      completedGoalsTopic, name, 'No Completed Goals text');
+      completedGoalsTopic, name,
+      `Text "${name}" taking too long to be present in completedGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-completed-goals-topic-name', name));
-    expect(await topicName.getText()).toMatch(name);
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
-  this.expectCountOfTopicInSuggestedForYou = async function(value) {
+  this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
     await waitFor.visibilityOf(
-      suggestedForYouTopicName.first(),
+      topicNameInLearnerTopicSummaryTiles.first(),
       'Learner Topic Name takes too long to appear');
-    expect(await suggestedForYouTopicName.count()).toEqual(value);
+    expect(await topicNameInLearnerTopicSummaryTiles.count()).toEqual(value);
   };
 
-  this.expectCountOfStoryInCompletedStory = async function(value) {
+  this.expectNumberOfStoriesInCompletedStory = async function(value) {
     await waitFor.visibilityOf(
-      completedStoriesName.first(),
+      storyNameInLearnerStorySummaryTiles.first(),
       'Story Name Card takes too long to appear');
-    expect(await completedStoriesName.count()).toEqual(value);
+    expect(await storyNameInLearnerStorySummaryTiles.count()).toEqual(value);
   };
 
-  this.expectCountOfTopicInContinueWhereYouLeftOff = async function(value) {
+  this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
     await waitFor.visibilityOf(
-      continueWhereYouLeftOffTopicName.first(),
+      topicNameInLearnerStorySummaryTiles.first(),
       'Topic Name Card takes too long to appear');
-    expect(await continueWhereYouLeftOffTopicName.count()).toEqual(value);
+    expect(await topicNameInLearnerStorySummaryTiles.count()).toEqual(value);
   };
 
   this.addTopicToLearnerGoals = async function() {
@@ -205,26 +208,27 @@ var LearnerDashboardPage = function() {
     expect(await feedbackMessage.first().getText()).toMatch(message);
   };
 
-  this.checkIncompleteExplorationInCommunityLessonsTab = async function(
-      explorationTitle) {
-    await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
-  };
+  this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
+    async function(
+        explorationTitle) {
+      await this.navigateToCommunityLessonsSection();
+      await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
+    });
 
-  this.checkCompleteExplorationInCommunityLessonsTab = async function(
+  this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
     await this.expectTitleOfExplorationSummaryTileToMatch(
       explorationTitle);
   };
 
-  this.checkIncompleteCollectionInCommunityLessonsTab = async function(
+  this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
     await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
   };
 
-  this.checkCompleteCollectionInCommunityLessonsTab = async function(
+  this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
     await this.expectTitleOfCollectionSummaryTileToMatch(

@@ -64,7 +64,7 @@ describe('Learner dashboard functionality', function() {
 
     for (var i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
-        `Exploration TASV1 - ${i}`,
+        `Exploration Learner Dashboard1 - ${i}`,
         EXPLORATION.category,
         EXPLORATION.objective,
         EXPLORATION.language,
@@ -94,7 +94,6 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display learners subscriptions', async function() {
-    var driver = browser.driver;
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
@@ -130,8 +129,6 @@ describe('Learner dashboard functionality', function() {
     // dashboard.
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
-    await driver.findElement(
-      by.css('.protractor-test-subscriptions-section'));
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
     await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
@@ -173,7 +170,6 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should add exploration to play later list', async function() {
-    var driver = browser.driver;
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -209,8 +205,6 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
-    await driver.findElement(
-      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
     await libraryPage.get();
@@ -218,8 +212,6 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
-    await driver.findElement(
-      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
     await users.logout();
@@ -227,7 +219,6 @@ describe('Learner dashboard functionality', function() {
 
   it('should display correct topics in edit goals, suggested for you section,' +
     ' current goals and continue where you left off section', async function() {
-    var driver = browser.driver;
     var TOPIC_NAME = 'Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';
@@ -247,7 +238,7 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
     await topicEditorPage.navigateToStoryWithIndex(0);
     await storyEditorPage.updateMetaTagContent('story meta tag');
-    await storyEditorPage.saveStory('Added thumbnail.');
+    await storyEditorPage.saveStory('Added meta tag.');
     await storyEditorPage.publishStory();
     await storyEditorPage.returnToTopic();
     await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
@@ -268,11 +259,11 @@ describe('Learner dashboard functionality', function() {
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false));
+        'Skill Learner Dashboard1', 'Concept card explanation', false));
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill 1', 'Topic 1');
+      'Skill Learner Dashboard1', 'Topic 1');
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     await topicEditorPage.addSubtopic(
@@ -283,34 +274,31 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Skill Learner Dashboard1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 
     await topicEditorPage.updateMetaTagContent('meta tag content');
     await topicEditorPage.updatePageTitleFragment('fragment');
-    await topicEditorPage.saveTopic('Added meta tag.');
+    await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
 
     await topicEditorPage.publishTopic();
     /**  There is one topic on the server named Topic 1 which is linked to a
      * subtopic named Subtopic 1 and a story called Story Title.
-     * Subtopic 1 has one skill in it named Skill 1.
+     * Subtopic 1 has one skill in it named Skill Learner Dashboard1.
      */
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToHomeSection();
-    await learnerDashboardPage.expectCountOfTopicInSuggestedForYou(1);
+    await learnerDashboardPage.expectNumberOfTopicsInSuggestedForYou(1);
     await learnerDashboardPage.navigateToGoalsSection();
-    await driver.findElement(
-      by.css('.protractor-test-edit-goals-section'));
     await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
       TOPIC_NAME);
-    await driver.findElement(By.css(
-      '.protractor-test-add-topic-to-current-goals-button')).click();
+    await learnerDashboardPage.addTopicToLearnerGoals();
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
       `Learn ${TOPIC_NAME}`);
     await learnerDashboardPage.navigateToHomeSection();
-    await learnerDashboardPage.expectCountOfTopicInContinueWhereYouLeftOff(1);
+    await learnerDashboardPage.expectNumberOfTopicsInContinueWhereYouLeftOff(1);
     await users.logout();
   });
 
@@ -323,7 +311,7 @@ describe('Learner dashboard functionality', function() {
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic TASV1', 'topic-tasv-one', 'Description', false);
+      'Topic 2', 'topic-two', 'Description', false);
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -339,7 +327,7 @@ describe('Learner dashboard functionality', function() {
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill TASV1', 'Concept card explanation', false);
+      'Skill Learner Dashboard2', 'Concept card explanation', false);
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
@@ -371,27 +359,27 @@ describe('Learner dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill TASV1', 'Topic TASV1');
+      'Skill Learner Dashboard2', 'Topic 2');
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicsAndSkillsDashboardPage.editTopic('Topic 2');
     await topicEditorPage.addSubtopic(
-      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
-      'Subtopic content');
+      'Subtopic Learner Dashboard1', 'subtopic-learner-dashboard-one',
+      Constants.TEST_SVG_PATH, 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
-    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Skill Learner Dashboard2', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
     await topicEditorPage.togglePracticeTab();
-    await topicEditorPage.saveTopic('Added thumbnail.');
+    await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
     await topicEditorPage.publishTopic();
-    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicsAndSkillsDashboardPage.editTopic('Topic 2');
     await topicEditorPage.createStory(
-      'Story TASV1', 'story-player-tasv-one', 'Story description',
-      Constants.TEST_SVG_PATH);
+      'Story 2', 'story-two',
+      'Story description', Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {
       await storyEditorPage.createNewChapter(
@@ -404,44 +392,42 @@ describe('Learner dashboard functionality', function() {
     }
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
-    await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(1);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.goToChapterIndex(2);
     await explorationPlayerPage.submitAnswer('Continue', null);
     /**  There are two topics on the server named Topic 1 which is linked to a
-     * subtopic named Subtopic 1 and a story called Story Title and Topic TASV1
-     * which is linked to a subtopic named Subtopic TASV1 and a story called
-     * Story TASV1. Subtopic 1 has one skill in it named Skill 1 and
-     * Subtopic TASV1 has one skill in it named Skill TASV1.
-     */
-    await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+     * subtopic named Subtopic 1 and a story called Story Title and
+     * Topic 2 which is linked to a subtopic named Subtopic Learner Dashboard1
+     * and a story called Story Learner Dashboard1.
+     * Subtopic 1 has one skill in it named Skill Learner Dashboard1 and
+     * Subtopic Learner Dashboard1 has one skill in it named
+     * Skill Learner Dashboard2.
+    */
+    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToProgressSection();
     await learnerDashboardPage.expectNameOfTopicInSkillProficiencyToMatch(
-      'Topic TASV1'
+      'Topic 2'
     );
     await learnerDashboardPage.navigateToProgressSection();
-    await learnerDashboardPage.expectCountOfStoryInCompletedStory(1);
+    await learnerDashboardPage.expectNumberOfStoriesInCompletedStory(1);
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCompletedGoalsToMatch(
-      'Topic TASV1');
+      'Topic 2');
     await users.logout();
   });
 
