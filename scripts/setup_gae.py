@@ -38,13 +38,10 @@ GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 def main(args=None):
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    coverage_home = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'coverage-%s' % common.COVERAGE_VERSION)
 
     sys.path.append('.')
-    sys.path.append(coverage_home)
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
+    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.35'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
