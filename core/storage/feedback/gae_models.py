@@ -25,6 +25,9 @@ from __future__ import unicode_literals
 # The following import is dangerous and should not be generally
 # used. We had to use this ignore as we need to import the domain layer
 # for type-annotation.
+# Here feedback_domain is imported outside the 'if MYPY:' block. If it is
+# imported inside the 'if MYPY:' block, during runtime feedback_domain
+# won't be accessible during runtime.
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 import feconf
