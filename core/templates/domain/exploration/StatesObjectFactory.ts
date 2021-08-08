@@ -58,7 +58,7 @@ export class States {
   constructor(
     private _stateObject: StateObjectFactory,
     private _states: StateObjectsDict
-  ) { }
+  ) {}
 
   getState(stateName: string): State {
     return this._states[stateName];

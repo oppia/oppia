@@ -42,6 +42,7 @@ import {
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 export interface StateBackendDict {
   // The classifier model ID associated with a state, if applicable
@@ -183,11 +184,8 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    if (newState.interaction.defaultOutcome) {
-      newState.interaction.defaultOutcome.dest = newStateName;
-    } else {
-      throw new Error('Default Outcome doesn\'t exist');
-    }
+    let defaultOutcome = <Outcome> newState.interaction.defaultOutcome;
+    defaultOutcome.dest = newStateName;
     return newState;
   }
 

@@ -30,7 +30,7 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import 'mathjaxConfig.ts';
 
-interface MathExpression { 
+interface MathExpression {
   'svg_filename': string;
   'raw_latex': string;
   mathExpressionSvgIsBeingProcessed: boolean;
