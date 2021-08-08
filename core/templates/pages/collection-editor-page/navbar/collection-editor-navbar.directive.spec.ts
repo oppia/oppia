@@ -20,6 +20,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+// ^^^ This block is to be removed.
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlService } from 'services/contextual/url.service';
@@ -32,7 +33,6 @@ import { Subscription } from 'rxjs';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
-// ^^^ This block is to be removed.
 
 describe('Collection Editor Navbar directive', function() {
   let $scope = null;
