@@ -418,7 +418,7 @@ export const AboutPageConstants = {
     'Sourav Singh',
     'Sreenivasulu Giritheja',
     'Srijan Reddy',
-    'Srikanth K B',
+    'Srikanth Kadaba',
     'Srikar Ch',
     'Stefanie Muroya Lei',
     'Stephanie Federwisch',
