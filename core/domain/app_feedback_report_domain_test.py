@@ -238,7 +238,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         self.android_report_obj.scrubbed_by = 'invalid_user'
         self._assert_validation_error(
             self.android_report_obj,
-            'The scrubbed_by user id u\'invalid_user\' is invalid')
+            'The scrubbed_by user id \'%s\' is invalid.' % (
+                self.android_report_obj.scrubbed_by))
 
     def test_report_scrubber_id_is_not_string_validation_fails(self):
         # type: () -> None

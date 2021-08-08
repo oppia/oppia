@@ -221,7 +221,7 @@ def calculate_new_stats_count_for_parameter(
     Returns:
         dict. The new stats values for the given parameter.
     """
-    if current_stats_map.has_key(current_value):
+    if current_value in current_stats_map:
         current_stats_map[current_value] += delta
     else:
         # The stats did not previously have this parameter value.
