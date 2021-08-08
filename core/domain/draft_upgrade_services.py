@@ -523,7 +523,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                if change.new_value.keys() == ['choices']:
+                if list(change.new_value.keys()) == ['choices']:
                     change.new_value['showChoicesInShuffledOrder'] = {
                         'value': False
                     }

@@ -24,9 +24,10 @@ in mypy checks not during runtime.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform.datastore import gae_datastore_services as datastore_services
+from core.platform.datastore import (
+    cloud_datastore_services as datastore_services)
 from core.platform.transactions import (
-    gae_transaction_services as transaction_services)
+    cloud_transaction_services as transaction_services)
 from core.storage.activity import gae_models as activity_models
 from core.storage.app_feedback_report import (
     gae_models as app_feedback_report_models)
@@ -44,20 +45,20 @@ from core.storage.subtopic import gae_models as subtopic_models
 from core.storage.user import gae_models as user_models
 
 __all__ = [
-    b'activity_models',
-    b'app_feedback_report_models',
-    b'audit_models',
-    b'auth_models',
-    b'base_models',
-    b'blog_models',
-    b'classifier_models',
-    b'collection_models',
-    b'config_models',
-    b'datastore_services',
-    b'exp_models',
-    b'skill_models',
-    b'story_models',
-    b'subtopic_models',
-    b'transaction_services',
-    b'user_models'
+    'activity_models',
+    'app_feedback_report_models',
+    'audit_models',
+    'auth_models',
+    'base_models',
+    'blog_models',
+    'classifier_models',
+    'collection_models',
+    'config_models',
+    'datastore_services',
+    'exp_models',
+    'skill_models',
+    'story_models',
+    'subtopic_models',
+    'transaction_services',
+    'user_models'
 ]

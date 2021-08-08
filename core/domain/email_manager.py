@@ -1487,7 +1487,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     '<li><b>%s</b></li><br>' % (
                         utils.get_supported_audio_language_description(
                             language_code)) for language_code in
-                    language_codes_that_need_reviewers
+                    sorted(language_codes_that_need_reviewers)
                 ]
             )
             suggestion_types_needing_reviewers_paragraphs.append(

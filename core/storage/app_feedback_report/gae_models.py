@@ -29,13 +29,12 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import ( # pylint: disable=unused-import
-        base_models, datastore_services, transaction_services)
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
-transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'

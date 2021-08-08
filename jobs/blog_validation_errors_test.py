@@ -26,13 +26,9 @@ import utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import blog_models, datastore_services # pylint: disable=unused-import
+    from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models(
-    [models.NAMES.blog, ])
-
-datastore_services = (
-    models.Registry.import_datastore_services())
+(blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 
 class DuplicateBlogTitleErrorTests(

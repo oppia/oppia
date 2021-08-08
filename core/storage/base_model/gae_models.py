@@ -27,26 +27,26 @@ import python_utils
 import utils
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, Iterable, List, Optional, Sequence, Text, Tuple, Type, Union,
+    Any, Dict, List, Optional, Sequence, Text, Tuple, Type, Union,
     TypeVar, cast)
 
-SELF_BASE_MODEL = TypeVar(
+SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')
-SELF_BASE_HUMAN_MAINTAINED_MODEL = TypeVar(
+SELF_BASE_HUMAN_MAINTAINED_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_HUMAN_MAINTAINED_MODEL', bound='BaseHumanMaintainedModel')
-SELF_BASE_COMMIT_LOG_ENTRY_MODEL = TypeVar(
+SELF_BASE_COMMIT_LOG_ENTRY_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_COMMIT_LOG_ENTRY_MODEL', bound='BaseCommitLogEntryModel')
-SELF_VERSIONED_MODEL = TypeVar(
+SELF_VERSIONED_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_VERSIONED_MODEL', bound='VersionedModel')
-SELF_BASE_SNAPSHOT_METADATA_MODEL = TypeVar(
+SELF_BASE_SNAPSHOT_METADATA_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_SNAPSHOT_METADATA_MODEL', bound='BaseSnapshotMetadataModel')
-SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
+SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_SNAPSHOT_CONTENT_MODEL', bound='BaseSnapshotContentModel')
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import (
-        datastore_services, transaction_services)
+    from mypy_imports import datastore_services
+    from mypy_imports import transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -160,7 +160,7 @@ class BaseModel(datastore_services.Model):
 
     @property
     def id(self):
-        # type: () -> Text
+        # type: () -> str
         """A unique id for this model instance."""
         return self.key.id()
 
@@ -439,7 +439,8 @@ class BaseModel(datastore_services.Model):
         for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
-                ID_LENGTH)
+                ID_LENGTH
+            )
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -482,13 +483,20 @@ class BaseModel(datastore_services.Model):
         else:
             start_cursor = None
 
-        result = query.order(-cls.last_updated).fetch_page(
+        last_updated_query = query.order(-cls.last_updated)
+        query_models, next_cursor, _ = last_updated_query.fetch_page(
             page_size, start_cursor=start_cursor)
-        base_model_results = cast(List[SELF_BASE_MODEL], result[0])
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = last_updated_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor)
+        base_model_results = cast(List[SELF_BASE_MODEL], query_models)
+        # The urlsafe returns bytes and we need to decode them to string.
         return (
             base_model_results,
-            (result[1].urlsafe() if result[1] else None),
-            result[2])
+            (next_cursor.urlsafe().decode('utf-8') if next_cursor else None),
+            len(plus_one_query_models) == page_size + 1
+        )
 
 
 class BaseHumanMaintainedModel(BaseModel):
