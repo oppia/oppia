@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the Feedback popup directive.
  */
@@ -28,11 +27,9 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 
-
-fdescribe('Feedback popup directive', function() {
+describe('Feedback popup directive', function() {
   let $scope = null;
   let ctrl = null;
-  let $compile = null;
   let $element: JQLite = null;
   let $log = null;
   let $http = null;
@@ -41,10 +38,6 @@ fdescribe('Feedback popup directive', function() {
   let $rootScope = null;
   let $timeout = null;
   let directive = null;
-  let UndoRedoService = null;
-  let $uibModal = null;
-  let SkillEditorRoutingService = null;
-  let SkillEditorStateService = null;
   let userService = null;
   let windowDimensionsService: WindowDimensionsService = null;
   let playerPositionService: PlayerPositionService = null;
@@ -84,20 +77,14 @@ fdescribe('Feedback popup directive', function() {
     });
   });
 
-
   beforeEach(angular.mock.inject(function($injector, $q) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
-    $compile = $injector.get('$compile');
     $scope = $rootScope.$new();
     $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
-    $uibModal = $injector.get('$uibModal');
-    UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('feedbackPopupDirective')[0];
-    SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     userService = $injector.get('UserService');
     windowDimensionsService = $injector.get('WindowDimensionsService');
     playerPositionService = $injector.get('PlayerPositionService');
@@ -136,14 +123,15 @@ fdescribe('Feedback popup directive', function() {
     tick();
 
     expect($scope.feedbackText).toBe('');
-    expect($scope.isSubmitterAnonymized).toBe(false)
+    expect($scope.isSubmitterAnonymized).toBe(false);
     expect($scope.feedbackTitle).toBe(
       'Feedback when the user was at card "stateName"');
   }));
 
   it('should deactivate mask when popover is closed', function() {
     $element.wrap('<div uib-popover-template></div>');
-    $element.wrap('<div uib-popover-template uib-popover-template-popup></div>');
+    $element.wrap(
+      '<div uib-popover-template uib-popover-template-popup></div>');
 
     let deactivateMaskSpy = spyOn(backgroundMaskService, 'deactivateMask')
       .and.returnValue(null);
@@ -154,10 +142,13 @@ fdescribe('Feedback popup directive', function() {
     expect(deactivateMaskSpy).toHaveBeenCalled();
   });
 
-  it('should save feedback', fakeAsync(function() {
+  it('should save feedback successfully when ' +
+    'clicking on save button', fakeAsync(function() {
     $scope.feedbackText = 'feedback';
     $element.wrap('<div uib-popover-template></div>');
-    $element.wrap('<div uib-popover-template="test" uib-popover-template-popup></div>');
+    $element.wrap(
+      '<div uib-popover-template="test"' +
+      'uib-popover-template-popup></div>');
 
     spyOn(backgroundMaskService, 'deactivateMask')
       .and.returnValue(null);
@@ -173,35 +164,7 @@ fdescribe('Feedback popup directive', function() {
   }));
 
   it('should show error message when there ' +
-    'is no popoverchild element', function() {
-    spyOn(backgroundMaskService, 'deactivateMask')
-      .and.returnValue(null);
-    let loggerSpy = spyOn($log, 'error')
-      .and.returnValue(null);
-
-    $scope.closePopover();
-    $timeout.flush();
-
-    expect(loggerSpy).toHaveBeenCalledWith(
-      'Could not close popover element.');
-  });
-
-  it('should show error message when there ' +
-    'is no popoverchild element', function() {
-    spyOn(backgroundMaskService, 'deactivateMask')
-      .and.returnValue(null);
-    let loggerSpy = spyOn($log, 'error')
-      .and.returnValue(null);
-
-    $scope.closePopover();
-    $timeout.flush();
-
-    expect(loggerSpy).toHaveBeenCalledWith(
-      'Could not close popover element.');
-  });
-
-  it('should show error message when there ' +
-    'is no popoverchild element', function() {
+    'is no popover child element', function() {
     spyOn(backgroundMaskService, 'deactivateMask')
       .and.returnValue(null);
     let loggerSpy = spyOn($log, 'error')
