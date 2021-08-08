@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-from typing import Dict, List, Optional, Text, Tuple # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover

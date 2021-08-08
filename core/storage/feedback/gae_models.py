@@ -598,6 +598,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         )
         return [thread_model.message_count for thread_model in thread_models]
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_messages(
             cls,

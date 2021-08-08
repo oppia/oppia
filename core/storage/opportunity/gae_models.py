@@ -86,6 +86,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_translation_opportunities(
             cls,
@@ -142,6 +144,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             more_results
         )
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_voiceover_opportunities(
             cls,
@@ -260,6 +264,8 @@ class SkillOpportunityModel(base_models.BaseModel):
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_skill_opportunities(
             cls,

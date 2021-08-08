@@ -2214,6 +2214,8 @@ class UserQueryModel(base_models.BaseModel):
         return cls.query(cls.submitter_id == user_id).get(
             keys_only=True) is not None
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def fetch_page(
             cls,

@@ -411,7 +411,7 @@ class BulkEmailModel(base_models.BaseModel):
     def create(
             cls,
             instance_id: str,
-            recipient_ids: Optional[List[str]],
+            recipient_ids: List[str],
             sender_id: str,
             sender_email: str,
             intent: str,
