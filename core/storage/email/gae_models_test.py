@@ -26,8 +26,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Text # isort:skip # pylint: disable=unused-import
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -46,10 +44,10 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
         def mock_generate_hash(
                 unused_cls: email_models.SentEmailModel,
-                unused_recipient_id: Text,
-                unused_email_subject: Text,
-                unused_email_body: Text
-        ) -> Text:
+                unused_recipient_id: str,
+                unused_email_subject: str,
+                unused_email_body: str
+        ) -> str:
             return 'Email Hash'
 
         self.generate_constant_hash_ctx = self.swap(

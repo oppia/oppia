@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Dict, List, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -318,7 +318,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         exploration_ids = (
             exp_models.ExplorationRightsModel.export_data(
                 self.USER_ID_3))
-        expected_exploration_ids: Dict[Text, List[Text]] = {
+        expected_exploration_ids: Dict[str, List[str]] = {
             'owned_exploration_ids': [],
             'editable_exploration_ids': [],
             'voiced_exploration_ids': [],
@@ -331,7 +331,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         exploration_ids = (
             exp_models.ExplorationRightsModel.export_data(
                 'fake_user'))
-        expected_exploration_ids: Dict[Text, List[Text]] = {
+        expected_exploration_ids: Dict[str, List[str]] = {
             'owned_exploration_ids': [],
             'editable_exploration_ids': [],
             'voiced_exploration_ids': [],
@@ -447,7 +447,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         # TODO(#13523): Use of Any in the type-annotation below will be
         # removed when the snapshot of ExplorationRightsModel
         # is converted to TypedDict/Domain Object.
-        broken_dict: Dict[Text, Any] = dict(**self.original_dict)
+        broken_dict: Dict[str, Any] = dict(**self.original_dict)
         broken_dict['all_viewer_ids'] = [
             self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
 
@@ -476,7 +476,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         # TODO(#13523): Use of Any in the type-annotation below will be
         # removed when the snapshot of ExplorationRightsModel
         # is converted to TypedDict/Domain Object.
-        broken_dict: Dict[Text, Any] = dict(**self.original_dict)
+        broken_dict: Dict[str, Any] = dict(**self.original_dict)
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (
