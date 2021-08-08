@@ -35,7 +35,6 @@ Miscellaneous
 * Added Mailchimp API integration for mailing lists (#12373)
 * Add back ngx-mat-select-scroll to package.json (#13364)
 
-
 Data handling
 * Fix wipeout on test and backup server (#13383)
 * hide logic Proof in front end (#13372)
@@ -206,7 +205,6 @@ Automated QA Team
 * Fixes failing typescript checks and FE tests on develop (#13266)
 * Fixing the 401 Error in the Moderator Page (users e2e suite) (#13124)
 * Resolving "Toast message takes too long to appear" e2e flake (#13123)
-
 
 
 v3.1.2 (10 Jul 2021)
