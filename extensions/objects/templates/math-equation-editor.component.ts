@@ -32,6 +32,7 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 interface FocusObj {
   focused: boolean;
  }
+
 @Component({
   selector: 'math-equation-editor',
   templateUrl: './math-equation-editor.component.html',
@@ -64,7 +65,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
-    if (this.value === null || this.value === undefined) {
+    if (this.value === undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }

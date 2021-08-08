@@ -54,7 +54,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   placeholderText = '\\frac{x}{y}';
   active: boolean = false;
-  localValue: { label: string } = {label: ''};
+  localValue: { label: string } = { label: '' };
 
   constructor(
     private alertsService: AlertsService,

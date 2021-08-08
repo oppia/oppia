@@ -68,7 +68,10 @@ describe('MathEquationEditor', () => {
   });
 
   afterEach(() => {
-    // This throws "...". We need to suppress this error because ...
+    // This throws "The operand of a 'delete' operator must be optional".
+    // We need to suppress this error because "Property Guppy is not an
+    // optional property in global interface Window. A property needs to
+    // be optional or have undefined as a union type in order to be deleted".
     // @ts-ignore
     delete window.Guppy;
   });
