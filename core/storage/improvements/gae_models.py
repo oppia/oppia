@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -114,8 +114,7 @@ class TaskEntryModel(base_models.BaseModel):
         default=None, required=False, indexed=True)
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        # type: (Text) -> bool
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether any TaskEntryModel references the given user.
 
         Args:
@@ -127,8 +126,7 @@ class TaskEntryModel(base_models.BaseModel):
         return cls.query(cls.resolver_id == user_id).get() is not None
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding to a user:
         resolver_id field.
 
@@ -139,8 +137,7 @@ class TaskEntryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
-    def apply_deletion_policy(cls, user_id):
-        # type: (Text) -> None
+    def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete instances of TaskEntryModel for the user.
 
         Args:
@@ -153,8 +150,8 @@ class TaskEntryModel(base_models.BaseModel):
         cls.delete_multi(task_entry_models)
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users resolve tasks.
         """
@@ -164,8 +161,7 @@ class TaskEntryModel(base_models.BaseModel):
             .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user:
         TaskEntryModel contains the ID of the user that acted on a task.
         """
@@ -184,8 +180,7 @@ class TaskEntryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_field_name_mapping_to_takeout_keys(cls):
-        # type: () -> Dict[Text, Text]
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
         """Defines the mapping of field names to takeout keys since this model
         is exported as one instance shared across users.
         """
@@ -197,8 +192,7 @@ class TaskEntryModel(base_models.BaseModel):
         }
 
     @staticmethod
-    def export_data(user_id):
-        # type: (Text) -> Dict[Text, List[Text]]
+    def export_data(user_id: str) -> Dict[str, List[str]]:
         """Returns the user-relevant properties of TaskEntryModels.
 
         Args:
@@ -224,9 +218,14 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_task_id(
-            cls, entity_type, entity_id, entity_version, task_type, target_type,
-            target_id):
-        # type: (Text, Text, int, Text, Text, Text) -> Text
+            cls,
+            entity_type: str,
+            entity_id: str,
+            entity_version: int,
+            task_type: str,
+            target_type: str,
+            target_id: str
+    ) -> str:
         """Generates a new task entry ID.
 
         Args:
@@ -247,8 +246,11 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_composite_entity_id(
-            cls, entity_type, entity_id, entity_version):
-        # type: (Text, Text, int) -> Text
+            cls,
+            entity_type: str,
+            entity_id: str,
+            entity_version: int
+    ) -> str:
         """Generates a new composite_entity_id value.
 
         Args:
@@ -265,18 +267,17 @@ class TaskEntryModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            entity_type, # type: Text
-            entity_id, # type: Text
-            entity_version, # type: int
-            task_type, # type: Text
-            target_type, # type: Text
-            target_id, # type: Text
-            issue_description=None, # type: Optional[Text]
-            status=TASK_STATUS_OBSOLETE, # type: Text
-            resolver_id=None, # type: Optional[Text]
-            resolved_on=None # type: Optional[Text]
-    ):
-        # type: (...) -> Text
+            entity_type: str,
+            entity_id: str,
+            entity_version: int,
+            task_type: str,
+            target_type: str,
+            target_id: str,
+            issue_description: Optional[str] = None,
+            status: str = TASK_STATUS_OBSOLETE,
+            resolver_id: Optional[str] = None,
+            resolved_on: Optional[str] = None
+    ) -> str:
         """Creates a new task entry and puts it in storage.
 
         Args:
