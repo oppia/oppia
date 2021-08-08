@@ -196,7 +196,31 @@ describe('Topic and Story viewer functionality', function() {
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.moveToPracticeTab();
       await topicViewerPage.selectSkillForPractice('Subtopic TASV1');
+
+      // Start practice performs client side redirection which is known to
+      // cause "both angularJS testability and angular testability are
+      // undefined" flake. As suggested protractor devs here
+      // (http://git.io/v4gXM), waiting for angular is disabled during client
+      // side redirects.
+      await browser.waitForAngularEnabled(false);
       await topicViewerPage.startPractice();
+
+      // The await action.click only waits until button is clicked, it doesnot
+      // wait for the redirection to trigger. So, manually waiting for
+      // redirection here.
+      await browser.driver.wait(async() => {
+        const URL = await browser.driver.getCurrentUrl();
+        return (/practice/.test(URL));
+      }, 10000);
+
+      // The above solution only waits until url is changed, so invoking
+      // pageToFullyLoad to wait for all async tasks on new page to finish
+      // before proceeding.
+      await waitFor.pageToFullyLoad();
+
+      // Client side redirection is complete, enabling wait for angular here.
+      await browser.waitForAngularEnabled(true);
+
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');
       await explorationPlayerPage.clickThroughToNextCard();
       await topicViewerPage.expectMessageAfterCompletion(
