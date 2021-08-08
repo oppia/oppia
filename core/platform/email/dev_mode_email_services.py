@@ -24,7 +24,7 @@ import textwrap
 
 import python_utils
 
-from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
 
 
 def send_email_to_recipients(
