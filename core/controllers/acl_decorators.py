@@ -161,8 +161,8 @@ def does_classroom_exist(handler):
                 # As this decorator is not expected to be used with other
                 # handler types, raising an error here.
                 raise Exception(
-                    'does_classroom_exist decorator is expected to '
-                    'be only used with json return type handlers.')
+                    'does_classroom_exist decorator is only expected to '
+                    'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
