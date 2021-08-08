@@ -44,7 +44,7 @@ export class UnicodeStringEditorComponent implements
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() initArgs!: UnicodeStringEditorArguments;
   @Input() value!: string;
-  @Input() alwaysEditable: false;
+  @Input() alwaysEditable: boolean = false;
   @Output() valueChanged = new EventEmitter();
   componentSubscriptions = new Subscription();
   active: boolean = false;
