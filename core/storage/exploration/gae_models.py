@@ -100,7 +100,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             cls,
             exp_id: str,
             exp_versions: List[int]
-    ) -> List[Optional[ExplorationCommitLogEntryModel]]:
+    ) -> List[Optional['ExplorationCommitLogEntryModel']]:
         """Gets the ExplorationCommitLogEntryModels for the given exploration
         id and exploration versions.
 
@@ -133,13 +133,15 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool)  to a domain object.
     @classmethod
     def get_all_non_private_commits(
             cls,
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             max_age: Optional[datetime.timedelta] = None
-    ) -> Tuple[List[ExplorationCommitLogEntryModel], Optional[str], bool]:
+    ) -> Tuple[List['ExplorationCommitLogEntryModel'], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their
         last updated attribute.
 
@@ -390,7 +392,7 @@ class ExplorationModel(base_models.VersionedModel):
     def _reconstitute(
             self,
             snapshot_dict: Dict[str, Any]
-    ) -> ExplorationModel:
+    ) -> 'ExplorationModel':
         """Populates the model instance with the snapshot.
         Some old ExplorationSnapshotContentModels can contain fields
         and field values that are no longer supported and would cause
@@ -674,7 +676,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def _reconstitute(
             self,
             snapshot_dict: Dict[str, Any]
-    ) -> ExplorationRightsModel:
+    ) -> 'ExplorationRightsModel':
         """Populates the model instance with the snapshot.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -914,7 +916,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> List[ExpSummaryModel]:
+    def get_non_private(cls) -> List['ExpSummaryModel']:
         """Returns an iterable with non-private ExpSummary models.
 
         Returns:
@@ -930,7 +932,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_top_rated(cls, limit: int) -> List[ExpSummaryModel]:
+    def get_top_rated(cls, limit: int) -> List['ExpSummaryModel']:
         """Fetches the top-rated exp summaries that are public in descending
         order of scaled_average_rating.
 
@@ -956,7 +958,7 @@ class ExpSummaryModel(base_models.BaseModel):
     def get_private_at_least_viewable(
             cls,
             user_id: str
-    ) -> List[ExpSummaryModel]:
+    ) -> List['ExpSummaryModel']:
         """Fetches private exp summaries that are at least viewable by the
         given user.
 
@@ -983,7 +985,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_at_least_editable(cls, user_id: str) -> List[ExpSummaryModel]:
+    def get_at_least_editable(cls, user_id: str) -> List['ExpSummaryModel']:
         """Fetches exp summaries that are at least editable by the given user.
 
         Args:
@@ -1005,7 +1007,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_recently_published(cls, limit: int) -> List[ExpSummaryModel]:
+    def get_recently_published(cls, limit: int) -> List['ExpSummaryModel']:
         """Fetches exp summaries that are recently published.
 
         Args:

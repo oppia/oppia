@@ -348,7 +348,7 @@ class UserSettingsModel(base_models.BaseModel):
     def get_by_normalized_username(
             cls,
             normalized_username: str
-    ) -> UserSettingsModel:
+    ) -> 'UserSettingsModel':
         """Returns a user model given a normalized username.
 
         Args:
@@ -365,7 +365,7 @@ class UserSettingsModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_by_email(cls, email: str) -> Optional[UserSettingsModel]:
+    def get_by_email(cls, email: str) -> Optional['UserSettingsModel']:
         """Returns a user model given an email.
 
         Args:
@@ -381,7 +381,7 @@ class UserSettingsModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_by_role(cls, role: str) -> List[UserSettingsModel]:
+    def get_by_role(cls, role: str) -> List['UserSettingsModel']:
         """Returns user models with given role.
 
         Args:
@@ -1612,7 +1612,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             cls,
             user_id: str,
             exploration_id: str
-    ) -> Optional[ExplorationUserDataModel]:
+    ) -> Optional['ExplorationUserDataModel']:
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 
@@ -1635,7 +1635,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             cls,
             user_ids: List[str],
             exploration_id: str
-    ) -> List[Optional[ExplorationUserDataModel]]:
+    ) -> List[Optional['ExplorationUserDataModel']]:
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 
@@ -2221,7 +2221,7 @@ class UserQueryModel(base_models.BaseModel):
             cls,
             page_size: int,
             cursor: Optional[str]
-    ) -> Tuple[List[UserQueryModel], Optional[str], bool]:
+    ) -> Tuple[List['UserQueryModel'], Optional[str], bool]:
         """Fetches a list of all query_models sorted by creation date.
 
         Args:
@@ -2529,7 +2529,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     def get_all_scores_of_user(
             cls,
             user_id: str
-    ) -> List[UserContributionProficiencyModel]:
+    ) -> List['UserContributionProficiencyModel']:
         """Gets all scores for a given user.
 
         Args:
@@ -2547,7 +2547,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     def get_all_users_with_score_above_minimum_for_category(
             cls,
             score_category: str
-    ) -> List[UserContributionProficiencyModel]:
+    ) -> List['UserContributionProficiencyModel']:
         """Gets all instances which have score above the
         MINIMUM_SCORE_REQUIRED_TO_REVIEW threshold for the given category.
 
@@ -2587,7 +2587,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             cls,
             user_id: str,
             score_category: str
-    ) -> Optional[UserContributionProficiencyModel]:
+    ) -> Optional['UserContributionProficiencyModel']:
         """Gets the user's scoring model corresponding to the score category.
 
         Args:
@@ -2609,7 +2609,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             score_category: str,
             score: float,
             onboarding_email_sent: bool = False
-    ) -> UserContributionProficiencyModel:
+    ) -> 'UserContributionProficiencyModel':
         """Creates a new UserContributionProficiencyModel entry.
 
         Args:

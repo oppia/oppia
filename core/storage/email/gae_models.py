@@ -221,7 +221,7 @@ class SentEmailModel(base_models.BaseModel):
             cls,
             email_hash: str,
             sent_datetime_lower_bound: Optional[datetime.datetime] = None
-    ) -> List[SentEmailModel]:
+    ) -> List['SentEmailModel']:
         """Returns all messages with a given email_hash.
 
         This also takes an optional sent_datetime_lower_bound argument,

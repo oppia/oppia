@@ -94,7 +94,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             language_code: str
-    ) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[str], bool]:
+    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -152,7 +152,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             language_code: str
-    ) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[str], bool]:
+    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -208,7 +208,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     def get_by_topic(
             cls,
             topic_id: str
-    ) -> List[ExplorationOpportunitySummaryModel]:
+    ) -> List['ExplorationOpportunitySummaryModel']:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
@@ -271,7 +271,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             cls,
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List[SkillOpportunityModel], Optional[str], bool]:
+    ) -> Tuple[List['SkillOpportunityModel'], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:

@@ -118,7 +118,7 @@ class JobModel(base_models.BaseModel):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
-    def get_all_unfinished_jobs(cls, limit: int) -> List[JobModel]:
+    def get_all_unfinished_jobs(cls, limit: int) -> List['JobModel']:
         """Gets at most `limit` unfinished jobs.
 
         Args:
