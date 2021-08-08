@@ -43,9 +43,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   statusMessage!: string;
   activeTab!: string;
   memoryCacheProfile!: MemoryCacheProfile;
-  memoryCacheDataFetched!: boolean;
   promoBarConfigForm!: FormGroup;
-  submitButtonDisabled!: boolean;
+  memoryCacheDataFetched: boolean = false;
+  submitButtonDisabled: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;

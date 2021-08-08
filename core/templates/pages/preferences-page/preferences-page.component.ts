@@ -32,45 +32,48 @@ import { UserService } from 'services/user.service';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
 
-type AudioLangaugeChoices = {
+interface AudioLangaugeChoice {
   id: string,
   text: string
-}[];
+}
 
 @Component({
   selector: 'oppia-preferences-page',
   templateUrl: './preferences-page.component.html'
 })
 export class PreferencesPageComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   subjectInterests!: string;
   preferredLanguageCodes!: string[];
   preferredSiteLanguageCode!: string;
   preferredAudioLanguageCode!: string;
   subjectInterestsChangeAtLeastOnce!: boolean;
-  exportingData = false;
   profilePictureDataUrl!: string;
+  AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
+  userBio!: string;
+  defaultDashboard!: string;
+  subscriptionList!: SubscriptionSummary[];
+  TAG_REGEX_STRING!: string;
+  LANGUAGE_CHOICES!: LanguageIdAndText[];
+  SITE_LANGUAGE_CHOICES!: typeof AppConstants.SUPPORTED_SITE_LANGUAGES;
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
   // The following two properties are set to null when the
   // user is not logged in.
   username: string | null= '';
   email!: string | null;
-  AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoices;
-  hasPageLoaded!: boolean;
-  userBio!: string;
-  defaultDashboard!: string;
-  canReceiveEmailUpdates!: boolean;
-  canReceiveEditorRoleEmail!: boolean;
-  canReceiveSubscriptionEmail!: boolean;
-  canReceiveFeedbackMessageEmail!: boolean;
-  subscriptionList!: SubscriptionSummary[];
-  userCanDeleteAccount!: boolean;
-  TAG_REGEX_STRING!: string;
-  LANGUAGE_CHOICES!: LanguageIdAndText[];
-  SITE_LANGUAGE_CHOICES!: typeof AppConstants.SUPPORTED_SITE_LANGUAGES;
+  exportingData = false;
+  hasPageLoaded: boolean = false;
+  canReceiveEmailUpdates: boolean = false;
+  canReceiveEditorRoleEmail: boolean = false;
+  canReceiveSubscriptionEmail: boolean = false;
+  canReceiveFeedbackMessageEmail: boolean = false;
+  userCanDeleteAccount: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
-  userCanExportAccount!: boolean;
+  userCanExportAccount: boolean = false;
 
   constructor(
     private ngbModal: NgbModal,

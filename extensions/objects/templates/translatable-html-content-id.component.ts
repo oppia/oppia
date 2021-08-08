@@ -20,7 +20,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-type TranslatableHtmlContentIdEditorChoices = {val: unknown}[];
+type TranslatableHtmlContentIdEditorChoices = {val: string}[];
 
 @Component({
   selector: 'translatable-html-content-id-editor',
@@ -31,12 +31,13 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() value: unknown;
+  @Input() value: string;
   @Input() initArgs!: {choices: TranslatableHtmlContentIdEditorChoices};
   @Output() valueChanged = new EventEmitter();
   name!: string;
-  currentValue!: unknown;
+  currentValue!: string;
   choices: TranslatableHtmlContentIdEditorChoices = [];
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -46,7 +47,7 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
     this.currentValue = this.value || this.choices[0].val;
   }
 
-  updateLocalValue(value: unknown): void {
+  updateLocalValue(value: string): void {
     if (this.value === value) {
       return;
     }
