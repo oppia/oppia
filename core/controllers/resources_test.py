@@ -103,9 +103,10 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             expected_status_int=400)
 
         error_msg = (
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({u\'regex_pattern\': u\'\\\\w+[.]\\\\w+\'}) for '
-            'object .png')
+            'Schema validation for \'filename\' failed: Validation'
+            ' failed: is_regex_matched ({\'regex_pattern\': '
+            '\'\\\w+[.]\\\w+\'}) for object .png'
+        )
         self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
@@ -404,7 +405,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({u\'regex_pattern\': u\'\\\\w+[.]\\\\w+\'}) '
+            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
             'for object test/a.png')
         self.assertIn(error_msg, response_dict['error'])
 
@@ -429,7 +430,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({u\'regex_pattern\': u\'\\\\w+[.]\\\\w+\'}) '
+            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
             'for object test')
         self.assertIn(error_msg, response_dict['error'])
 

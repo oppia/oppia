@@ -615,7 +615,7 @@ class ExplorationFileDownloader(EditorHandler):
         version = self.normalized_request.get('v')
         output_format = self.normalized_request.get('output_format')
 
-        if version > exploration.version or version is None:
+        if version is None:
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.

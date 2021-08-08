@@ -637,16 +637,6 @@ written_translations:
         response = self.get_json(download_url)
         self.assertEqual(['Introduction'], list(response.keys()))
 
-        # Check downloading an invalid version results in downloading the
-        # latest version.
-        download_url = (
-            '/createhandler/download/%s?output_format=%s&v=123' %
-            (exp_id, feconf.OUTPUT_FORMAT_JSON))
-        response = self.get_json(download_url)
-        self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
-        self.assertEqual(
-            ['Introduction', 'State A', 'State B'], list(response.keys()))
-
         self.logout()
 
     def test_exploration_download_handler_with_unicode_title(self):
@@ -772,7 +762,7 @@ written_translations:
         error_msg = (
             'Schema validation for \'output_format\' failed: Received '
             'invalid_output_format which is not in the allowed range of '
-            'choices: [u\'zip\', u\'json\']'
+            'choices: [\'zip\', \'json\']'
         )
         self.assertEqual(response['error'], error_msg)
 
@@ -1274,7 +1264,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
         error_msg = (
             'Schema validation for \'current_version\' failed: Could not '
-            'convert unicode to int: invalid_version'
+            'convert str to int: invalid_version'
         )
         self.assertEqual(response['error'], error_msg)
 
@@ -1761,7 +1751,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         error_msg = (
             'Schema validation for \'commit_message\' failed: Validation '
-            'failed: has_length_at_most ({u\'max_value\': 375}) for object %s'
+            'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_commit_message
         )
         self.assertEqual(response_dict['error'], error_msg)
@@ -1959,7 +1949,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         error_msg = (
             'Schema validation for \'message_type\' failed: Received '
             'invalid_message_type which is not in the allowed range '
-            'of choices: [u\'feedback\', u\'suggestion\']'
+            'of choices: [\'feedback\', \'suggestion\']'
         )
         self.assertEqual(response['error'], error_msg)
 
