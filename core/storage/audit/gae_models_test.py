@@ -25,7 +25,8 @@ import feconf
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import audit_models, base_models
+    from mypy_imports import audit_models
+    from mypy_imports import base_models
 
 (audit_models, base_models) = models.Registry.import_models(
     [models.NAMES.audit, models.NAMES.base_model])
