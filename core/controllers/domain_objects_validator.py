@@ -110,8 +110,8 @@ def validate_email_dashboard_data(data):
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
-    for key, _ in data.items():
-        if _ is None:
+    for key, value in data.items():
+        if value is None:
             continue
         if key not in possible_keys:
             # Raise exception if key is not one of the allowed keys.

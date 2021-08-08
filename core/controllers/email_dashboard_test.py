@@ -262,7 +262,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'email_body': 'body',
                     'max_recipients': None,
                     'email_intent': 'bulk_email_create_exploration'
-                    }, csrf_token=csrf_token)
+                }, csrf_token=csrf_token)
             self.logout()
 
             # Check that emails are sent to qualified users.
