@@ -162,7 +162,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevintab95 @krishnarao22 @U8NWXD
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
+/.circleci/ @kevintab95 @SAEb-ai @U8NWXD
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -659,17 +660,18 @@
 /data/ @nithusha21
 /core/controllers/android_e2e_config*.py @seanlip @BenHenning
 /core/templates/karma.module.ts @vojtechjelinek
-/core/tests/protractor_utils/ @kevintab95 @krishnarao22 @U8NWXD
-/core/tests/protractor_desktop/ @kevintab95 @krishnarao22 @U8NWXD
-/core/tests/protractor/ @kevintab95 @krishnarao22 @U8NWXD
-/core/tests/protractor.conf.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/interactions/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/objects/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/scripts/backend_test_shards.json @krishnarao22 @U8NWXD
-/.github/actions @krishnarao22 @U8NWXD
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01 
+/core/tests/protractor_utils/ @kevintab95 @SAEb-ai @U8NWXD
+/core/tests/protractor_desktop/ @kevintab95 @SAEb-ai @U8NWXD
+/core/tests/protractor/ @kevintab95 @SAEb-ai @U8NWXD
+/core/tests/protractor.conf.js @kevintab95 @SAEb-ai @U8NWXD
+/extensions/interactions/*/protractor.js @kevintab95 @U8NWXD
+/extensions/interactions/protractor.js @kevintab95 @U8NWXD
+/extensions/rich_text_components/*/protractor.js @kevintab95 @U8NWXD
+/extensions/rich_text_components/protractor.js @kevintab95 @U8NWXD
+/extensions/objects/protractor.js @kevintab95 @U8NWXD
+/scripts/backend_test_shards.json @U8NWXD
+/.github/actions @SAEb-ai @U8NWXD 
 
 
 # Python 3 Migration project.
@@ -708,4 +710,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @DubeySandeep @krishnarao22 @U8NWXD
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
+/.github/workflows/ @DubeySandeep @SAEb-ai @U8NWXD
