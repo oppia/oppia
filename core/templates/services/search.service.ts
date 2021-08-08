@@ -49,10 +49,13 @@ export interface SelectionDetails {
   providedIn: 'root'
 })
 export class SearchService {
+  // These properties are initialized using functions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _lastQuery!: string;
+  private _searchCursor!: string;
   private _lastSelectedCategories: SelectionList = {};
   private _lastSelectedLanguageCodes: SelectionList = {};
-  private _searchCursor!: string;
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
