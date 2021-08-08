@@ -17,7 +17,7 @@
  */
 
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { ImageWithRegionsEditorComponent, Region } from './image-with-regions-editor.component';
+import { ImageWithRegionsEditorComponent } from './image-with-regions-editor.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContextService } from 'services/context.service';
