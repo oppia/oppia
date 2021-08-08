@@ -68,7 +68,7 @@ export class TextInputValidationService {
     }
 
     let isInt = (n: number) => {
-      return angular.isNumber(n) && n % 1 === 0;
+      return ((typeof (n) === 'number') && (n % 1 === 0));
     };
 
     let rows = customizationArgs.rows.value;

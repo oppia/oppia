@@ -54,10 +54,17 @@ describe('TextInputValidationService', () => {
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
     let rowsSpecs = customizationArgSpecs[1];
-    if (rowsSpecs.schema.validators) {
-      minRows = rowsSpecs.schema.validators[0].min_value;
-      maxRows = rowsSpecs.schema.validators[1].max_value;
-    }
+    const validators = <({
+      'min_value': number;
+      id: string;
+      'max_value'?: undefined;
+    } | {
+      'max_value': number;
+      id: string;
+      'min_value'?: undefined;
+    })[]> rowsSpecs.schema.validators;
+    minRows = validators[0].min_value;
+    maxRows = validators[1].max_value;
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
