@@ -211,7 +211,8 @@ class Emulator(python_utils.OBJECT):
                 queue_name, url, payload, scheduled_for=scheduled_for_time,
                 task_name=task_name)
             queue.append(task)
-            queue.sort(key=lambda t: t.scheduled_for)
+            k = lambda t: t.scheduled_for
+            queue.sort(key=k)
 
     def get_number_of_tasks(self, queue_name=None):
         # type: (Optional[Text]) -> int

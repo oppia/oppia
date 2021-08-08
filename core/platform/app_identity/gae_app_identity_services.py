@@ -21,6 +21,8 @@ from __future__ import unicode_literals
 
 import os
 
+from typing import Text
+
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
 
@@ -35,7 +37,10 @@ def get_application_id():
     Returns:
         str. The application ID.
     """
-    return os.getenv('GOOGLE_CLOUD_PROJECT')
+    app_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    # Ruling out the possibility of None for mypy type checking.
+    assert app_id is not None
+    return app_id
 
 
 def get_gcs_resource_bucket_name():

@@ -99,7 +99,6 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     for user in self.users_data:
                         if user['email_hash'] == subscriber_hash:
                             user['status'] = data['status']
-                    return
 
                 def create(self, _list_id, data):
                     # type: (Text, Dict[Text, Text]) -> None
@@ -125,7 +124,6 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         raise mailchimpclient.MailChimpError({
                             'status': 404, 'title': 'Invalid email',
                             'detail': 'Server Issue'})
-                    return
 
                 def delete_permanent(self, _list_id, subscriber_hash):
                     # type: (Text, Text) -> None

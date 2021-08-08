@@ -54,8 +54,11 @@ def get_memory_cache_stats():
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
-    memory_stats = caching_domain.MemoryCacheStats(
+    # We have ignored [attr-defined] below because there is some error in
+    # the redis typeshed. Typestubs don't define the method memory_stats()
+    # for the redis.StrictRedis object.
+    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
+    memory_stats = caching_domain.MemoryCacheStats( # type: ignore[no-untyped-call]
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
         redis_full_profile.get('keys.count'))
@@ -84,7 +87,7 @@ def get_multi(keys):
     assert isinstance(keys, list)
     return cast(
         List[Optional[Text]],
-        OPPIA_REDIS_CLIENT.mget(keys))
+        OPPIA_REDIS_CLIENT.mget(keys)) # type: ignore[no-untyped-call]
 
 
 def set_multi(key_value_mapping):
@@ -100,7 +103,9 @@ def set_multi(key_value_mapping):
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    return cast(
+        bool,
+        OPPIA_REDIS_CLIENT.mset(key_value_mapping)) # type: ignore[no-untyped-call]
 
 
 def delete_multi(keys):

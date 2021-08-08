@@ -28,11 +28,13 @@ from core.tests import test_utils
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def test_get_application_id(self):
+        # type: () -> None
         with self.swap(os, 'getenv', lambda _: 'some_id'):
             self.assertEqual(
                 gae_app_identity_services.get_application_id(), 'some_id')
 
     def test_get_default_gcs_bucket_name(self):
+        # type: () -> None
         with self.swap(os, 'getenv', lambda _: 'some_id'):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
