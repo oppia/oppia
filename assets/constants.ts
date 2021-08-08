@@ -6144,27 +6144,27 @@ export default {
 
   "SCHEMA_FOR_TOPIC_URL_FRAGMENTS": {
     "schema": {
-        "type": "basestring",
-        "validators": [{
-            "id": "is_regex_matched",
-            "regex_pattern": "^[a-z]+(-[a-z]+)*$"
-        }, {
-            "id": "has_length_at_most",
-            "max_value": 20
-        }]
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
     }
   },
 
   "SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS": {
     "schema": {
-        "type": "basestring",
-        "validators": [{
-            "id": "is_regex_matched",
-            "regex_pattern": "^[a-z]+(-[a-z]+)*$"
-        }, {
-            "id": "has_length_at_most",
-            "max_value": 20
-        }]
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
     }
   },
 
