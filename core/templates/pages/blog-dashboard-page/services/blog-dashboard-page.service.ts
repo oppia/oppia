@@ -36,7 +36,7 @@ export class BlogDashboardPageService {
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
-  private _blogPostAction: string;
+  private _blogPostAction: string = '';
   private _updateViewEventEmitter = new EventEmitter<void>();
   private _updateNavTitleEventEmitter = new EventEmitter<string>();
   private _imageUploaderIsNarrow: boolean = false;

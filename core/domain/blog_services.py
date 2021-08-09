@@ -488,8 +488,11 @@ def generate_summary_of_blog_post(content):
     """
     raw_text = html_cleaner.strip_html_tags(content)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
-    summary = raw_text[:max_chars_in_summary] + '...'
-    return summary
+    if len(raw_text) > max_chars_in_summary:
+        summary = raw_text[:max_chars_in_summary] + '...'
+        return summary
+    else:
+        return raw_text
 
 
 def compute_summary_of_blog_post(blog_post):
