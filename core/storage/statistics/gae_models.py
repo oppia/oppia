@@ -444,8 +444,10 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
-    # This is due to lack of information and this type of 'params' can be
-    # incorrect and can be changed in future.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
             cls,
@@ -597,8 +599,10 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
-    # This is due to lack of information and this type of 'params' can be
-    # incorrect and can be changed in future.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
             cls,
@@ -741,8 +745,10 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
-    # This is due to lack of information and this type of 'params' can be
-    # incorrect and can be changed in future.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
             cls,
@@ -862,7 +868,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id: str,
             user_id: str,
             rating: int,
-            old_rating: Optional[str]
+            old_rating: Optional[int]
     ) -> None:
         """Creates a new rate exploration event and then writes it to the
         datastore.
@@ -967,8 +973,10 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
-    # This is due to lack of information and this type of 'params' can be
-    # incorrect and can be changed in future.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
             cls,
@@ -1804,6 +1812,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         })
 
 
+# TODO(#13614): Determine whether this model can be updated to use an
+# int version instead, and update existing datastore models if needed.
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
