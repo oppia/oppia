@@ -45,7 +45,7 @@ def create_http_task(
         payload: Optional[Dict[str, Any]] = None,
         scheduled_for: Optional[datetime.datetime] = None,
         task_name: Optional[str] = None
-) -> tasks_v2.Task:
+) -> tasks_v2.types.Task:
     """Creates an http task with the correct http headers/payload and sends
     that task to the Cloud Tasks API. An http task is an asynchronous task that
     consists of a post request to a specified url with the specified payload.

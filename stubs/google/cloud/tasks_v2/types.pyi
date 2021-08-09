@@ -1,0 +1,6 @@
+from typing import Any, Text
+
+class Task:
+    name: Text = ...
+
+target_pb2: Any = ...

@@ -1,11 +1,9 @@
-from typing import Any, Dict, Optional, Sequence, Text, Tuple, Union
-from google.api_core.retry import Retry
 from google import auth
+from google.api_core.retry import Retry
+from google.cloud.tasks_v2 import types
 
-types: Any = ...
+from typing import Any, Dict, Optional, Sequence, Text, Tuple, Union
 
-class Task:
-    name: Text = ...
 
 class CloudTasksClient(object):
     def __init__(
@@ -19,8 +17,14 @@ class CloudTasksClient(object):
     def create_task(
         self,
         parent: Text,
-        task: Union[Task, Dict[Text, Any]],
+        task: Union[types.Task, Dict[Text, Any]],
         retry: Retry,
         timeout: Optional[float] = ...,
         metadata: Optional[Sequence[Tuple[str, str]]] = ...
-    ) -> Task: ...
+    ) -> types.Task: ...
+
+
+__all__ = [
+    'CloudTasksClient',
+    'types'
+]
