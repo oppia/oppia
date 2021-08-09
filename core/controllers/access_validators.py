@@ -30,6 +30,9 @@ from typing import Dict # pylint: disable=unused-import
 from typing import Text # pylint: disable=unused-import
 
 
+# TODO(#13605): Refactor access validation handlers to follow a single handler
+# pattern.
+
 class SplashAccessValidationHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
