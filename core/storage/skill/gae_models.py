@@ -302,6 +302,8 @@ class SkillSummaryModel(base_models.BaseModel):
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def fetch_page(
             cls,
