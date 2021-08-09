@@ -830,7 +830,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
             r'(exploration|collection)\.\w+\.\w+'))
 
-    def is_gae_search_query_string(self):
+    def test_is_gae_search_query_string(self):
         # type: () -> None
 
         """Checks whether a given string is contained within parenthesis and
