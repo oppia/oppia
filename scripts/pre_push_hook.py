@@ -131,7 +131,7 @@ def get_remote_name():
                 stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
-                if remote_url.endswith('oppia/oppia.git\n'):
+                if remote_url.decode().endswith('oppia/oppia.git\n'):
                     remote_num += 1
                     remote_name = remote
             else:
