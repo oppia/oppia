@@ -405,7 +405,7 @@ describe('Exploration save and publish buttons component', function() {
       expect($scope.connectedToInternet).toBe(false);
       expect($scope.getSaveButtonTooltip()).toBe(
         'You can not save the exploration when offline.');
-      expect($scope.getPublishButtonTooltip()).toBe(
+      expect($scope.getPublishExplorationButtonTooltip()).toBe(
         'You can not publish the exploration when offline.');
     });
 });
