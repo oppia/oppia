@@ -32,6 +32,7 @@ describe('TextInputValidationService', () => {
   let validatorService: TextInputValidationService;
   let WARNING_TYPES = AppConstants.WARNING_TYPES;
   let INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
+  // Here 'minRows' and 'maxRows' are undefined in order to test validations.
   let minRows: number | undefined;
   let maxRows: number | undefined;
 
@@ -107,7 +108,7 @@ describe('TextInputValidationService', () => {
   it('should catch non-string value for placeholder', () => {
     // This throws "Type 'number' is not assignable to type 'SubtitledUnicode'".
     // We need to suppress this error because we need to test validations.
-    // @ts-ignore
+    // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -121,7 +122,7 @@ describe('TextInputValidationService', () => {
   it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = (
     // This throws "Argument of type 'undefined' is not assignable to
-    // parameter of type 'string''". We need to suppress this error
+    // parameter of type 'string'". We need to suppress this error
     // because we need to test validations.
     // @ts-ignore
       new SubtitledUnicode(undefined, undefined));

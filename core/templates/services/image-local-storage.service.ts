@@ -40,7 +40,9 @@ export class ImageLocalStorageService {
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
   MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
-  thumbnailBgColor!: string;
+  // 'null' value here represents that either image is not present in local
+  // storage or ImageData has been flushed.
+  thumbnailBgColor: string | null = null;
 
   constructor(
     private alertsService: AlertsService,
@@ -83,7 +85,7 @@ export class ImageLocalStorageService {
       returnData.push({
         filename: this.storedImageFilenames[idx],
         imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
-          this.windowRef.nativeWindow.sessionStorage.getItem(
+          <string> this.windowRef.nativeWindow.sessionStorage.getItem(
             this.storedImageFilenames[idx]))
       });
     }
@@ -98,14 +100,15 @@ export class ImageLocalStorageService {
     this.thumbnailBgColor = bgColor;
   }
 
-  getThumbnailBgColor(): string {
+  // Function returns null if no image is present in local storage.
+  getThumbnailBgColor(): string | null {
     return this.thumbnailBgColor;
   }
 
   flushStoredImagesData(): void {
     this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
-    this.thumbnailBgColor = '';
+    this.thumbnailBgColor = null;
   }
 }
 

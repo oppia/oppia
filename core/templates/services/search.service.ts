@@ -235,7 +235,8 @@ export class SearchService {
   loadMoreData(
       successCallback: (
         SearchResponseData: SearchResponseBackendDict,
-        boolean: boolean) => void,
+        boolean: boolean
+      ) => void,
       failureCallback?: (arg0: boolean) => void): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.

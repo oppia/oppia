@@ -723,8 +723,8 @@ describe('Learner Dashboard Icons Component', () => {
     const learnerPlaylistSpy =
       spyOn(
         learnerDashboardActivityBackendApiService,
-        'removeFromLearnerPlaylistModal')
-        .and.returnValue();
+        'removeFromLearnerPlaylistModal'
+      ).and.callThrough();
 
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
@@ -744,8 +744,8 @@ describe('Learner Dashboard Icons Component', () => {
     const learnerPlaylistSpy =
       spyOn(
         learnerDashboardActivityBackendApiService,
-        'removeFromLearnerPlaylistModal')
-        .and.returnValue();
+        'removeFromLearnerPlaylistModal'
+      ).and.callThrough();
 
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);

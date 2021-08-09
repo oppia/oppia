@@ -42,28 +42,26 @@ export class ImageUploadHelperService {
 
   // Image file returned will be null when blob is not of type
   // 'image', blob size is zero or dataURI does not exists.
-  // dataURI is null if filename is not present in local storage.
-  convertImageDataToImageFile(dataURI: string | null): Blob | null {
+  convertImageDataToImageFile(dataURI: string): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
-    if (dataURI) {
-      let byteString = atob(dataURI.split(',')[1]);
+    let byteString = atob(dataURI.split(',')[1]);
 
-      // Separate out the mime component.
-      let mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    // Separate out the mime component.
+    let mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
-      // Write the bytes of the string to a typed array.
-      let ia = new Uint8Array(byteString.length);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-
-      let blob = new Blob([ia], { type: mime });
-      if (blob.type.match('image') &&
-        blob.size > 0) {
-        return blob;
-      }
+    // Write the bytes of the string to a typed array.
+    let ia = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
     }
+
+    let blob = new Blob([ia], { type: mime });
+    if (blob.type.match('image') &&
+        blob.size > 0) {
+      return blob;
+    }
+
     return null;
   }
 
