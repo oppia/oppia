@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for blog post editor.
+ * @fileoverview Unit tests for blog post editor.
  */
 
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -102,9 +102,6 @@ describe('Blog Post Editor Component', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        {
-          provide: ChangeDetectorRef,
-        },
         BlogDashboardPageService,
         BlogPostUpdateService,
         BlogPostEditorBackendApiService,
@@ -155,13 +152,13 @@ describe('Blog Post Editor Component', () => {
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(component.blogPostData).toEqual(expectedBlogPost);
-    expect(component.blogPostId).toEqual(undefined);
+    expect(component.blogPostId).toEqual('');
     expect(component.MAX_CHARS_IN_BLOG_POST_TITLE).toBe(
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     expect(component.initEditor).toHaveBeenCalled;
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
-    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled();
+    expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
   });
 
@@ -171,7 +168,7 @@ describe('Blog Post Editor Component', () => {
   });
 
   it('should return true for header enabled callback', () => {
-    expect(component.headersAreEnabledCallBack()).toEqual(true);
+    expect(component.headersAreEnabledCallBack()).toBe(true);
   });
 
   it('should successfully fetch blog post editor data', fakeAsync(() => {
@@ -199,10 +196,11 @@ describe('Blog Post Editor Component', () => {
     expect(component.thumbnailDataUrl).toEqual(
       '/assetsdevhandler/blog_post/sampleBlogId/assets/thumbnail' +
       '/image.png');
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
     expect(component.dateTimeLastSaved).toEqual(
       'November 21, 2014 at 04:52 AM');
     expect(component.title).toEqual('sample_title');
-    expect(component.contentEditorIsActive).toEqual(false);
+    expect(component.contentEditorIsActive).toBe(false);
     expect(component.lastChangesWerePublished).toBe(true);
   }));
 
@@ -229,7 +227,7 @@ describe('Blog Post Editor Component', () => {
     component.updateLocalTitleValue();
 
     expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
-      component.blogPostData, component.title);
+      sampleBlogPostData, 'Sample title changed');
   });
 
   it('should update local edited content', () => {
@@ -240,7 +238,7 @@ describe('Blog Post Editor Component', () => {
     component.localEditedContent = '';
     component.updateLocalEditedContent('<p>Hello Worlds</p>');
 
-    expect(component.localEditedContent).toEqual(
+    expect(component.localEditedContent).toBe(
       '<p>Hello Worlds</p>');
     expect(detectChangesSpy).toHaveBeenCalled();
   });
@@ -254,7 +252,7 @@ describe('Blog Post Editor Component', () => {
     tick();
 
     expect(blogPostUpdateService.setBlogPostContent).toHaveBeenCalledWith(
-      component.blogPostData, component.localEditedContent);
+      sampleBlogPostData, '<p>Sample content changed</p>');
     expect(component.contentEditorIsActive).toBe(false);
   }));
 
@@ -511,6 +509,7 @@ describe('Blog Post Editor Component', () => {
 
       expect(blogPostEditorBackendApiService.postThumbnailDataAsync)
         .toHaveBeenCalled();
+      expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Thumbnail Saved Successfully.');
     }));

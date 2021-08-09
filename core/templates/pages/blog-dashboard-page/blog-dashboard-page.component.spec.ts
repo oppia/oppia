@@ -125,25 +125,48 @@ describe('Blog Dashboard Page Component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should initialize tab according to active tab', fakeAsync(() => {
-    spyOn(component, 'initMainTab');
-
+  it('should set correct activeTab value when update view ' +
+  'event is emitted.', fakeAsync(() => {
     component.ngOnInit();
-    expect(component.activeTab).toBe('main');
-    expect(component.initMainTab).toHaveBeenCalled();
 
+    expect(component.activeTab).toBe('main');
+
+    // Changing active tab to blog post editor.
     blogDashboardPageService.navigateToEditorTabWithId('123456sample');
     mockWindowRef.nativeWindow.onhashchange();
     tick();
 
     expect(component.activeTab).toBe('editor_tab');
 
+    // Changing active tab back to main tab.
     blogDashboardPageService.navigateToMainTab();
     mockWindowRef.nativeWindow.onhashchange();
     tick();
+
+    expect(component.activeTab).toBe('main');
+  }));
+
+  it('should call initMainTab if active tab is main', () => {
+    spyOn(component, 'initMainTab');
+    component.ngOnInit();
+
     expect(component.activeTab).toBe('main');
     expect(component.initMainTab).toHaveBeenCalled();
-  }));
+  });
+
+  it('should not call initMainTab if active tab is editor_tab',
+    fakeAsync(() => {
+      spyOn(component, 'initMainTab');
+      // Changing active tab to blog post editor.
+      blogDashboardPageService.navigateToEditorTabWithId('123456sample');
+      mockWindowRef.nativeWindow.onhashchange();
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.activeTab).toBe('editor_tab');
+      expect(component.initMainTab).not.toHaveBeenCalled();
+    }));
 
   it('should initialize main tab', fakeAsync(() => {
     let defaultImageUrl = 'banner_image_url';
@@ -163,7 +186,10 @@ describe('Blog Dashboard Page Component', () => {
       .and.returnValue(Promise.resolve(blogDashboardData));
 
     component.initMainTab();
+    // As loading screen should be shown irrespective of the response
+    // of the async call, expect statement is before tick().
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+
     tick();
 
     expect(component.blogDashboardData).toEqual(blogDashboardData);

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Blog Dashboard Page service.
+ * @fileoverview Unit Tests for Blog Dashboard Page service.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -92,6 +92,16 @@ describe('Blog Post Page service', () => {
     blogDashboardPageService.blogPostAction = 'delete';
 
     expect(blogDashboardPageService.blogPostAction).toEqual('delete');
+  });
+
+  it('should set and retrieve imageUploaderIsNarrow property', () => {
+    blogDashboardPageService.imageUploaderIsNarrow = true;
+
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toEqual(true);
+
+    blogDashboardPageService.imageUploaderIsNarrow = false;
+
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toEqual(false);
   });
 
   it('should display alert when unable to delete blog post data',

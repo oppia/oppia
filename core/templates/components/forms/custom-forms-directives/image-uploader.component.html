@@ -1,4 +1,6 @@
-<div class="image-uploader-drop-area" [ngClass]="{'image-uploader-is-active': backgroundWhileUploading}" #dropArea>
+<div class="image-uploader-drop-area"
+     [ngClass]="{'image-uploader-is-active': backgroundWhileUploading, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
+     #dropArea>
   <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
         class="image-uploader-error-message protractor-test-upload-error">
@@ -18,9 +20,12 @@
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
-         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow}"
+         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
          for="image-file-input">
-    <mat-icon class="mx-auto">insert_photo</mat-icon>
+    <mat-icon class="mx-auto"
+              [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
+      insert_photo
+    </mat-icon>
     <span class="font-weight-light">{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
   </label>
 </div>
@@ -160,6 +165,11 @@
 
     .narrow-image-uploader-area {
       width: 66.667vw
+    }
+
+    .blog-post-thumbnail-uploader.image-uploader-is-narrow,
+    .image-uploader-drop-area.image-uploader-is-narrow {
+      height: 35px
     }
   }
 </style>
