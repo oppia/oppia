@@ -4071,6 +4071,59 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
+class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
+    """Tests for decorator can_perform_tasks_in_taskqueue."""
+
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_perform_tasks_in_taskqueue
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(PerformTasksInTaskqueueTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_perform_tasks_in_taskqueue', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_super_admin_can_perform_tasks_in_taskqueue(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_perform_tasks_in_taskqueue')
+        self.logout()
+
+    def test_normal_user_cannot_perform_tasks_in_taskqueue(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_perform_tasks_in_taskqueue', expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have the credentials to access this page.')
+        self.logout()
+
+    def test_request_with_appropriate_header_can_perform_tasks_in_taskqueue(
+            self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_perform_tasks_in_taskqueue',
+                headers={'X-AppEngine-QueueName': 'name'})
+
+
 class PerformCronTaskTests(test_utils.GenericTestBase):
     """Tests for decorator can_perform_cron_tasks."""
 
@@ -4115,6 +4168,11 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
                 response['error'],
                 'You do not have the credentials to access this page.')
         self.logout()
+
+    def test_request_with_appropriate_header_can_perform_cron_tasks(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_perform_cron_task', headers={'X-AppEngine-Cron': 'true'})
 
 
 class EditSkillDecoratorTests(test_utils.GenericTestBase):

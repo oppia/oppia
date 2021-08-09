@@ -58,9 +58,9 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 'ATestFactory.ts': ['CTest.service.ts'],
                 'CTest.service.ts': ['ETestFactory.ts']}
 
-            expected_node_set = set([
+            expected_node_set = {
                 'DTest.service.ts', 'ETestFactory.ts', 'BTestService.ts',
-                'CTest.service.ts', 'ATestFactory.ts'])
+                'CTest.service.ts', 'ATestFactory.ts'}
 
             self.assertEqual(
                 sorted(adj_list.keys()), sorted(expected_adj_list.keys())) # pylint: disable=dict-keys-not-iterating
@@ -90,6 +90,4 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         expected_output_2 = [
             'DTest.service.ts', 'ATestFactory.ts', 'BTestService.ts',
             'CTest.service.ts', 'ETestFactory.ts']
-        self.assertTrue((
-            actual_output == expected_output_1) or (
-                actual_output == expected_output_2))
+        self.assertIn(actual_output, (expected_output_1, expected_output_2))

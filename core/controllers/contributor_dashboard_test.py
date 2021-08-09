@@ -201,7 +201,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -230,7 +229,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -245,7 +243,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -259,7 +256,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'],
                 [self.expected_skill_opportunity_dict_0])
-            self.assertTrue(response['more'])
+            self.assertFalse(response['more'])
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -268,7 +265,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'cursor': next_cursor})
 
-            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_skill_opportunity_dict_1])
@@ -289,12 +286,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
-            next_cursor = response['next_cursor']
             next_response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi', 'cursor': next_cursor})
-
-            self.assertEqual(len(response['opportunities']), 1)
+                params={
+                    'language_code': 'hi',
+                    'cursor': response['next_cursor']
+                }
+            )
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
@@ -320,7 +319,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en', 'cursor': next_cursor})
 
-            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])

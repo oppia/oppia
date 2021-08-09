@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import fnmatch
+import logging
 import os
 import re
 import sys
@@ -47,9 +48,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'change-list.service.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
-    'collection-editor-navbar.directive.ts',
     'collection-editor-page.directive.ts',
     'collection-editor-tab.directive.ts',
     'collection-footer.component.ts',
@@ -66,7 +65,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'convert-to-plain-text.pipe.ts',
     'current-interaction.service.ts',
     'exploration-footer.component.ts',
-    'exploration-save.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
@@ -237,9 +235,10 @@ def check_not_fully_covered_filenames_list_is_sorted():
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
-        sys.exit(
+        logging.error(
             'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
             ' kept in alphabetical order.')
+        sys.exit(1)
 
 
 def check_coverage_changes():
@@ -300,7 +299,8 @@ def check_coverage_changes():
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')
         python_utils.PRINT('------------------------------------')
-        sys.exit(errors)
+        logging.error(errors)
+        sys.exit(1)
     else:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('All Frontend Coverage Checks Passed.')

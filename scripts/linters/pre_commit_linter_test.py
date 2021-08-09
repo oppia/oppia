@@ -92,7 +92,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def test_main_with_no_files(self):
         def mock_get_all_filepaths(
-                unused_path, unused_files, unused_shard):
+                unused_path, unused_files, unused_shard, namespace):  # pylint: disable=unused-argument
             return []
 
         all_filepath_swap = self.swap(
@@ -121,7 +121,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ['No files to check'], self.linter_stdout)
 
     def test_main_with_non_other_shard(self):
-        def mock_get_filepaths_from_path(path):
+        def mock_get_filepaths_from_path(path, namespace):  # pylint: disable=unused-argument
             if path == pre_commit_linter.SHARDS['1'][0]:
                 return [VALID_PY_FILEPATH]
             return []
@@ -140,7 +140,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_invalid_shards(self):
-        def mock_get_filepaths_from_path(unused_path):
+        def mock_get_filepaths_from_path(unused_path, namespace):  # pylint: disable=unused-argument
             return ['mock_file', 'mock_file']
 
         def mock_install_third_party_main():
@@ -160,11 +160,12 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         with self.print_swap, self.sys_swap, install_swap:
             with get_filenames_from_path_swap:
                 with self.assertRaisesRegexp(
-                    RuntimeError, 'mock_file in multiple shards'):
+                    RuntimeError, 'mock_file in multiple shards'
+                ):
                     pre_commit_linter.main(args=['--shard', '1'])
 
     def test_main_with_other_shard(self):
-        def mock_get_filepaths_from_path(path):
+        def mock_get_filepaths_from_path(path, namespace):  # pylint: disable=unused-argument
             if os.path.abspath(path) == os.getcwd():
                 return [VALID_PY_FILEPATH, 'nonexistent_file']
             elif path == 'core/templates/':

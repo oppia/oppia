@@ -83,8 +83,7 @@ class BlogPostTitleUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostModel.query(), self.datastoreio_stub
-                ))
+                    blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
@@ -103,8 +102,7 @@ class BlogPostUrlUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Post Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostModel.query(), self.datastoreio_stub
-                ))
+                    blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('url_fragment')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
@@ -123,9 +121,7 @@ class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Summary Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostSummaryModel.query(),
-                    self.datastoreio_stub
-                ))
+                    blog_models.BlogPostSummaryModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
@@ -144,9 +140,7 @@ class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Post Summary Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostSummaryModel.query(),
-                    self.datastoreio_stub
-                ))
+                    blog_models.BlogPostSummaryModel.query()))
             | GetModelsWithDuplicatePropertyValues('url_fragment')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
