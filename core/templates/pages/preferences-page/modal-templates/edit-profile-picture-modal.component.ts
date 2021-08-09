@@ -35,8 +35,10 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  // 'cropper' will be undefined if it has not been initialized.
-  cropper: Cropper | undefined;
+  // 'cropper' is initialized before it is to be used, hence we need to do
+  // non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  cropper!: Cropper;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
   constructor(

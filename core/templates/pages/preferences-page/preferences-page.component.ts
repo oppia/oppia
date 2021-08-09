@@ -49,7 +49,6 @@ export class PreferencesPageComponent {
   preferredLanguageCodes!: string[];
   preferredSiteLanguageCode!: string;
   preferredAudioLanguageCode!: string;
-  subjectInterestsChangeAtLeastOnce!: boolean;
   profilePictureDataUrl!: string;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
   userBio!: string;
@@ -64,6 +63,7 @@ export class PreferencesPageComponent {
   // user is not logged in.
   username: string | null= '';
   email!: string | null;
+  subjectInterestsChangeAtLeastOnce: boolean = false;
   exportingData = false;
   hasPageLoaded: boolean = false;
   canReceiveEmailUpdates: boolean = false;

@@ -29,8 +29,7 @@ export class FilepathEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  // 'value' is undefined when filepath is empty.
-  @Input() value: string | undefined;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   svgEditorIsShown = false;
