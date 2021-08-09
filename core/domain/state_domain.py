@@ -3159,14 +3159,7 @@ class State(python_utils.OBJECT):
             if self.interaction.id not in ['TextInput', 'SetInput']:
                 continue
             for rule_spec in answer_group.rule_specs:
-                for param_name, input_value in rule_spec.inputs.items():
-                    param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            self.interaction.id
-                        ).get_rule_param_type(rule_spec.rule_type, param_name))
-                    if not issubclass(
-                            param_type, objects.BaseTranslatableObject):
-                        continue
+                for input_value in rule_spec.inputs.values():
                     if 'normalizedStrSet' in input_value:
                         content_id_to_translatable_item[
                             input_value['contentId']
