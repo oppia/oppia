@@ -119,7 +119,7 @@ def does_diff_include_package_lock_file():
     out, err = start_subprocess_for_result(git_cmd)
 
     if not err:
-        files_changed = out.split('\n')
+        files_changed = out.decode().split('\n')
         return 'package-lock.json' in files_changed
     else:
         raise ValueError(err)
@@ -154,7 +154,7 @@ def check_changes(filetype):
         return True
 
     diff_output = subprocess.check_output([
-        'git', 'diff', filepath])[:-1].split('\n')
+        'git', 'diff', filepath])[:-1].decode().split('\n')
     for line in diff_output:
         if (line.startswith('-') or line.startswith('+')) and any(
                 key in line for key in keys_to_check):
