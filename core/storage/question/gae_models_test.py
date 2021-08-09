@@ -715,6 +715,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
+
         def mock_random_sample(
                 alist: List[question_models.QuestionSkillLinkModel],
                 num: int
@@ -730,6 +731,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             return alist[:num]
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
+
         def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
         random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
