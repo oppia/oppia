@@ -24,7 +24,7 @@ import textwrap
 
 import python_utils
 
-from typing import Dict, List, Optional # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Union # isort:skip # pylint: disable=unused-import
 
 
 def send_email_to_recipients(
@@ -35,7 +35,8 @@ def send_email_to_recipients(
         html_body: str,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
 ) -> bool:
     """Prints information about sent emails to the terminal console, in order
     to model sending an email in development mode.

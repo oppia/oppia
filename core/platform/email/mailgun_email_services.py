@@ -24,7 +24,7 @@ import base64
 import feconf
 import python_utils
 
-from typing import Dict, List, Optional # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Union # isort:skip # pylint: disable=unused-import
 
 
 def send_email_to_recipients(
@@ -35,7 +35,8 @@ def send_email_to_recipients(
         html_body: str,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
 ) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.

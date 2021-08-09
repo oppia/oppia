@@ -32,10 +32,12 @@ from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-imp
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
-def _task_handler(url: str,
-                  payload: Dict[str, Any],
-                  queue_name: str,
-                  task_name: Optional[str] = None) -> None:
+def _task_handler(
+        url: str,
+        payload: Dict[str, Any],
+        queue_name: str,
+        task_name: Optional[str] = None
+) -> None:
     """Makes a POST request to the task URL.
 
     Args:

@@ -88,10 +88,12 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'X-AppEngine-Fake-Is-Admin': '1',
             'method': 'POST'
         }
-        def mock_post(url: str,
-                      json: Dict[str, Any],
-                      headers: Dict[str, str],
-                      timeout: int) -> None:
+        def mock_post(
+                url: str,
+                json: Dict[str, Any],
+                headers: Dict[str, str],
+                timeout: int
+        ) -> None:
             self.assertEqual(
                 url, 'http://localhost:%s%s' % (
                     correct_port, dummy_url))

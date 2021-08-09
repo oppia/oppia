@@ -86,9 +86,11 @@ class Emulator(python_utils.OBJECT):
            can be executed using process_and_flush_tasks().
     """
 
-    def __init__(self,
-                 task_handler: Callable[..., Any],
-                 automatic_task_handling: bool = True) -> None:
+    def __init__(
+            self,
+            task_handler: Callable[..., Any],
+            automatic_task_handling: bool = True
+    ) -> None:
         """Initializes the emulator with an empty task queue and the correct
         task_handler callback.
 
