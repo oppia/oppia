@@ -28,7 +28,7 @@ from core.tests import test_utils
 import feconf
 import utils
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -62,8 +62,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     SUMMARY = 'This is a great summary.'
     MESSAGE_COUNT = 0
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
         super(FeedbackThreadModelTest, self).setUp() # type: ignore[no-untyped-call]
 
@@ -90,14 +89,12 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.feedback_thread_model.update_timestamps()
         self.feedback_thread_model.put()
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             feedback_models.GeneralFeedbackThreadModel
             .has_reference_to_user_id(self.USER_ID))
@@ -105,8 +102,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
-    def test_raise_exception_by_mocking_collision(self):
-        # type: () -> None
+    def test_raise_exception_by_mocking_collision(self) -> None:
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -133,16 +129,14 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 feedback_thread_model_cls.generate_new_thread_id(
                     'exploration', 'exp_id')
 
-    def test_export_data_trivial(self):
-        # type: () -> None
+    def test_export_data_trivial(self) -> None:
         user_data = feedback_models.GeneralFeedbackThreadModel.export_data(
             'fake_user'
         )
-        test_data = {} # type: Dict[Text, Text]
+        test_data: Dict[str, str] = {}
         self.assertEqual(user_data, test_data)
 
-    def test_export_data_nontrivial(self):
-        # type: () -> None
+    def test_export_data_nontrivial(self) -> None:
         user_data = (
             feedback_models
             .GeneralFeedbackThreadModel.export_data(self.USER_ID))
@@ -162,8 +156,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, test_data)
 
-    def test_message_cache_supports_huge_text(self):
-        # type: () -> None
+    def test_message_cache_supports_huge_text(self) -> None:
         self.feedback_thread_model.last_nonempty_message_text = 'X' * 2000
         # Storing the model should not throw.
         self.feedback_thread_model.update_timestamps()
@@ -173,14 +166,12 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackMessageModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.GeneralFeedbackMessageModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         feedback_models.GeneralFeedbackMessageModel(
             id='id',
             thread_id='thread_id',
@@ -195,8 +186,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackMessageModel
             .has_reference_to_user_id('id_x'))
 
-    def test_raise_exception_by_mocking_collision(self):
-        # type: () -> None
+    def test_raise_exception_by_mocking_collision(self) -> None:
         thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', '0', 'test_author', 'subject 1', 'text 1')
         # Simulating the _generate_id function in the
@@ -213,8 +203,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
                     thread_id, '0')
             )
 
-    def test_get_all_messages(self):
-        # type: () -> None
+    def test_get_all_messages(self) -> None:
         thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', '0', None, 'subject 1', 'text 1')
 
@@ -245,8 +234,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(all_messages[0][1].text, 'text 1')
         self.assertEqual(all_messages[0][1].updated_subject, 'subject 1')
 
-    def test_get_most_recent_message(self):
-        # type: () -> None
+    def test_get_most_recent_message(self) -> None:
         thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
             'exploration', '0', None, 'subject 1', 'text 1')
 
@@ -269,16 +257,14 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(message.text, 'text 2')
         self.assertEqual(message.updated_subject, 'subject 2')
 
-    def test_export_data_trivial(self):
-        # type: () -> None
+    def test_export_data_trivial(self) -> None:
         user_data = (
             feedback_models.GeneralFeedbackMessageModel
             .export_data('non_existent_user'))
-        test_data = {} # type: Dict[Text, Text]
+        test_data: Dict[str, str] = {}
         self.assertEqual(user_data, test_data)
 
-    def test_export_data_nontrivial(self):
-        # type: () -> None
+    def test_export_data_nontrivial(self) -> None:
         # Setup test variables.
         test_export_thread_type = 'exploration'
         test_export_thread_id = 'export_thread_1'
@@ -345,8 +331,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     MESSAGE_IDS_READ_IN_THREAD_B = [3, 4]
     MESSAGE_IDS_READ_IN_THREAD_C = [5, 6, 7, 8, 9]
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(FeedbackThreadUserModelTest, self).setUp() # type: ignore[no-untyped-call]
         model = feedback_models.GeneralFeedbackThreadUserModel.create(
             self.USER_ID_A, self.THREAD_ID_A)
@@ -360,15 +345,13 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             self.USER_ID_A, self.THREAD_ID_C)
         model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_C
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadUserModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         feedback_models.GeneralFeedbackThreadUserModel(
             id='id',
             thread_id='thread_id',
@@ -381,8 +364,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel
             .has_reference_to_user_id('id_x'))
 
-    def test_put_function(self):
-        # type: () -> None
+    def test_put_function(self) -> None:
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id',
             user_id='user_id',
@@ -406,8 +388,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         feedback_thread_model.put()
         self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
 
-    def test_create_new_object(self):
-        # type: () -> None
+    def test_create_new_object(self) -> None:
         feedback_models.GeneralFeedbackThreadUserModel.create(
             'user_id', 'exploration.exp_id.thread_id')
         feedback_thread_user_model = (
@@ -426,8 +407,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_thread_user_model.message_ids_read_by_user, [])
 
-    def test_get_object(self):
-        # type: () -> None
+    def test_get_object(self) -> None:
         feedback_models.GeneralFeedbackThreadUserModel.create(
             'user_id', 'exploration.exp_id.thread_id')
         expected_model = feedback_models.GeneralFeedbackThreadUserModel(
@@ -450,8 +430,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             actual_model.message_ids_read_by_user,
             expected_model.message_ids_read_by_user)
 
-    def test_get_multi(self):
-        # type: () -> None
+    def test_get_multi(self) -> None:
         feedback_models.GeneralFeedbackThreadUserModel.create(
             'user_id', 'exploration.exp_id.thread_id_1')
         feedback_models.GeneralFeedbackThreadUserModel.create(
@@ -494,8 +473,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             actual_model_2.message_ids_read_by_user,
             expected_model_2.message_ids_read_by_user)
 
-    def test_export_data_general_case(self):
-        # type: () -> None
+    def test_export_data_general_case(self) -> None:
         """Ensure export_data returns well-formed data in general case."""
         user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
             self.USER_ID_A)
@@ -512,8 +490,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         }
         self.assertDictEqual(expected_data, user_data)
 
-    def test_export_data_nonexistent_case(self):
-        # type: () -> None
+    def test_export_data_nonexistent_case(self) -> None:
         """Ensure export data returns empty dict when data is not found."""
         user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
             self.USER_ID_B)
@@ -523,8 +500,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
 class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
     """Tests for the FeedbackAnalyticsModelTests class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -533,14 +509,12 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.UnsentFeedbackEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
         self.assertTrue(
             feedback_models.UnsentFeedbackEmailModel
@@ -549,8 +523,7 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('id_x'))
 
-    def test_new_instances_stores_correct_data(self):
-        # type: () -> None
+    def test_new_instances_stores_correct_data(self) -> None:
         user_id = 'A'
         message_reference_dict = {
             'exploration_id': 'ABC123',
