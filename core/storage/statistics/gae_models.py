@@ -1744,7 +1744,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             state_reference=state_reference,
             interaction_id=interaction_id,
             learner_answer_info_list=(
-                [learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                [learner_answer_info.to_dict()
                 for learner_answer_info in learner_answer_info_list]),
             learner_answer_info_schema_version=(
                 learner_answer_info_schema_version),
