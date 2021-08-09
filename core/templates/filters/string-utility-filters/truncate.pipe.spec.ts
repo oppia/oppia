@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 
-fdescribe('Testing filters', function() {
+describe('Testing filters', function() {
   let truncatePipe: TruncatePipe;
   beforeEach(() => {
     truncatePipe = new TruncatePipe(new ConvertToPlainTextPipe());
