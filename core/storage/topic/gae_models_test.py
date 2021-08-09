@@ -26,7 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -39,8 +39,7 @@ if MYPY: # pragma: no cover
 
 class TopicSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             topic_models.TopicSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -53,14 +52,14 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     TOPIC_CANONICAL_NAME = 'topic_name'
     TOPIC_ID = 'topic_id'
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
-        # type: () -> None
+    def test_that_subsidiary_models_are_created_when_new_model_is_saved(
+            self
+    ) -> None:
         """Tests the _trusted_commit() method."""
 
         topic_rights = topic_models.TopicRightsModel(
@@ -102,8 +101,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         )
 
-    def test_get_by_name(self):
-        # type: () -> None
+    def test_get_by_name(self) -> None:
         topic = topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
@@ -119,8 +117,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
 
-    def test_get_by_url_fragment(self):
-        # type: () -> None
+    def test_get_by_url_fragment(self) -> None:
         topic = topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.TOPIC_NAME, 'name-two', 'description')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
@@ -140,8 +137,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         commit = topic_models.TopicCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -155,8 +151,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.TopicCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
-    def test__get_instance_id(self):
-        # type: () -> None
+    def test__get_instance_id(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
         topic_commit_log_entry = (
@@ -180,8 +175,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSummaryModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -194,14 +188,12 @@ class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'id_2'
     USER_ID_COMMITTER = 'id_committer'
 
-    def test_get_deletion_policy_is_locally_pseudonymize(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
         self.assertEqual(
             topic_models.TopicRightsSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         topic_models.TopicRightsModel(
             id=self.TOPIC_ID_1,
             manager_ids=[self.USER_ID_1, self.USER_ID_2],
@@ -240,8 +232,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(TopicRightsModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
         topic_models.TopicRightsModel(
             id=self.TOPIC_4_ID,
@@ -260,14 +251,12 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             topic_rights = topic_models.TopicRightsModel(
                 id=self.TOPIC_1_ID, manager_ids=['manager_id'])
@@ -281,8 +270,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
 
-    def test_export_data_nontrivial(self):
-        # type: () -> None
+    def test_export_data_nontrivial(self) -> None:
         """Tests nontrivial export data on user with some managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_2)
         expected_data = {
@@ -290,11 +278,10 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, expected_data)
 
-    def test_export_data_trivial(self):
-        # type: () -> None
+    def test_export_data_trivial(self) -> None:
         """Tests trivial export data on user with no managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_1)
-        expected_data = {
+        expected_data: Dict[str, List[str]] = {
             'managed_topic_ids': []
-        } # type: Dict[Text, List[Text]]
+        }
         self.assertEqual(user_data, expected_data)

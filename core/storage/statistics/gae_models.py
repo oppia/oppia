@@ -23,14 +23,22 @@ import datetime
 import json
 import sys
 
+# TODO(#13594): After the domain layer is refactored to be independent of
+# the storage layer, the disable=invalid-import will
+# be removed.
+# The following import is dangerous and should not be generally
+# used. We had to use this ignore as we need to import the domain layer
+# for type-annotation.
+# Here exp_domain is imported outside the 'if MYPY:' block. If it is
+# imported inside the 'if MYPY:' block, during runtime exp_domain
+# won't be accessible.
 from core.domain import exp_domain # pylint: disable=invalid-import
-from core.domain import stats_domain # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -98,14 +106,16 @@ class StateCounterModel(base_models.BaseModel):
         datastore_services.IntegerProperty(default=0, indexed=False))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_or_create(cls, exploration_id, state_name):
-        # type: (Text, Text) -> StateCounterModel
+    def get_or_create(
+            cls,
+            exploration_id: str,
+            state_name: str
+    ) -> 'StateCounterModel':
         """Gets or creates an entity by exploration_id and state_name.
 
         Args:
@@ -122,14 +132,13 @@ class StateCounterModel(base_models.BaseModel):
         return counter
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user.."""
         return dict(super(cls, cls).get_export_policy(), **{
             'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -159,14 +168,12 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
@@ -178,9 +185,14 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs, is_feedback_useful):
-        # type: (Text, int, Text, Text, float, bool) -> Text
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            time_spent_in_state_secs: float,
+            is_feedback_useful: bool
+    ) -> str:
         """Creates a new answer submitted event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -198,14 +210,13 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -237,14 +248,12 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
@@ -255,8 +264,13 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id):
-        # type: (Text, int, Text, Text) -> Text
+    def create(
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str
+    ) -> str:
         """Creates a new actual exploration start event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -272,14 +286,13 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -307,14 +320,12 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
@@ -326,9 +337,13 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs):
-        # type: (Text, int, Text, Text, float) -> Text
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            time_spent_in_state_secs: float
+    ) -> str:
         """Creates a new solution hit event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -345,14 +360,13 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -407,14 +421,12 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -431,14 +443,20 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
-    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # In the type annotation below, Dict[str, str] is used for 'params'.
     # This is due to lack of information and this type of 'params' can be
     # incorrect and can be changed in future.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            params, play_type, unused_version=1):
-        # type: (Text, int, Text, Text, Dict[Text, Text], Text, int) -> Text
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            params: Dict[str, str],
+            play_type: str,
+            unused_version: int = 1
+    ) -> str:
         """Creates a new start exploration event and then writes it to
         the datastore.
 
@@ -476,14 +494,13 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -557,14 +574,12 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -581,14 +596,20 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
-    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # In the type annotation below, Dict[str, str] is used for 'params'.
     # This is due to lack of information and this type of 'params' can be
     # incorrect and can be changed in future.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs, params, play_type):
-        # type: (Text, int, Text, Text, float, Dict[Text, Text], Text) -> None
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            client_time_spent_in_secs: float,
+            params: Dict[str, str],
+            play_type: str
+    ) -> None:
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -623,14 +644,13 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         leave_event_entity.put()
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -698,14 +718,12 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -722,14 +740,20 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
-    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # In the type annotation below, Dict[str, str] is used for 'params'.
     # This is due to lack of information and this type of 'params' can be
     # incorrect and can be changed in future.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs, params, play_type):
-        # type: (Text, int, Text, Text, float, Dict[Text, Text], Text) -> Text
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            client_time_spent_in_secs: float,
+            params: Dict[str, str],
+            play_type: str
+    ) -> str:
         """Creates a new exploration completion event and then writes it
         to the datastore.
 
@@ -764,14 +788,13 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -811,14 +834,12 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, user_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, user_id: str) -> str:
         """Generates entity ID for a new rate exploration event based on its
         exploration_id and user_id of the learner.
 
@@ -836,8 +857,13 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id))
 
     @classmethod
-    def create(cls, exp_id, user_id, rating, old_rating):
-        # type: (Text, Text, int, Optional[Text]) -> None
+    def create(
+            cls,
+            exp_id: str,
+            user_id: str,
+            rating: int,
+            old_rating: Optional[str]
+    ) -> None:
         """Creates a new rate exploration event and then writes it to the
         datastore.
 
@@ -860,14 +886,13 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         ).put()
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -919,14 +944,12 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -943,14 +966,19 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
-    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # In the type annotation below, Dict[str, str] is used for 'params'.
     # This is due to lack of information and this type of 'params' can be
     # incorrect and can be changed in future.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id, params,
-            play_type):
-        # type: (Text, int, Text, Text, Dict[Text, Text], Text) -> Text
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            params: Dict[str, str],
+            play_type: str
+    ) -> str:
         """Creates a new state hit event entity and then writes
         it to the datastore.
 
@@ -985,14 +1013,13 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1023,14 +1050,12 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
@@ -1042,9 +1067,13 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs):
-        # type: (Text, int, Text, Text, float) -> Text
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            time_spent_in_state_secs: float
+    ) -> str:
         """Creates a new state complete event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -1061,14 +1090,13 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1100,14 +1128,12 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     event_schema_version = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        # type: (Text, Text) -> Text
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
@@ -1119,9 +1145,14 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, refresher_exp_id, exp_version, state_name,
-            session_id, time_spent_in_state_secs):
-        # type: (Text, Text, int, Text, Text, float) -> Text
+            cls,
+            exp_id: str,
+            refresher_exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            time_spent_in_state_secs: float
+    ) -> str:
         """Creates a new leave for refresher exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -1139,14 +1170,13 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1204,14 +1234,12 @@ class ExplorationStatsModel(base_models.BaseModel):
     state_stats_mapping = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_entity_id(cls, exp_id, exp_version):
-        # type: (Text, int) -> Text
+    def get_entity_id(cls, exp_id: str, exp_version: int) -> str:
         """Generates an ID for the instance of the form
         '[exp_id].[exp_version]'.
 
@@ -1225,8 +1253,11 @@ class ExplorationStatsModel(base_models.BaseModel):
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
-    def get_model(cls, exp_id, exp_version):
-        # type: (Text, int) -> Optional[ExplorationStatsModel]
+    def get_model(
+            cls,
+            exp_id: str,
+            exp_version: int
+    ) -> Optional['ExplorationStatsModel']:
         """Retrieves ExplorationStatsModel given exploration ID and version.
 
         Args:
@@ -1246,17 +1277,16 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            exp_id, # type: Text
-            exp_version, # type: int
-            num_starts_v1, # type: int
-            num_starts_v2, # type: int
-            num_actual_starts_v1, # type: int
-            num_actual_starts_v2, # type: int
-            num_completions_v1, # type: int
-            num_completions_v2, # type: int
-            state_stats_mapping # type: Dict[Text, Any]
-    ):
-        # type: (...) -> Text
+            exp_id: str,
+            exp_version: int,
+            num_starts_v1: int,
+            num_starts_v2: int,
+            num_actual_starts_v1: int,
+            num_actual_starts_v2: int,
+            num_completions_v1: int,
+            num_completions_v2: int,
+            state_stats_mapping: Dict[str, Any]
+    ) -> str:
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
@@ -1292,8 +1322,11 @@ class ExplorationStatsModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def get_multi_versions(cls, exp_id, version_numbers):
-        # type: (Text, List[int]) -> List[Optional[ExplorationStatsModel]]
+    def get_multi_versions(
+            cls,
+            exp_id: str,
+            version_numbers: List[int]
+    ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each version specified in
         version_numbers.
 
@@ -1313,9 +1346,8 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def get_multi_stats_models(
             cls,
-            exp_version_references # type: List[exp_domain.ExpVersionReference]
-    ):
-        # type: (...) -> List[Optional[ExplorationStatsModel]]
+            exp_version_references: List[exp_domain.ExpVersionReference]
+    ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
 
@@ -1336,14 +1368,13 @@ class ExplorationStatsModel(base_models.BaseModel):
         return exploration_stats_models
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1374,14 +1405,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
     unresolved_issues = datastore_services.JsonProperty(repeated=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_entity_id(cls, exp_id, exp_version):
-        # type: (Text, int) -> Text
+    def get_entity_id(cls, exp_id: str, exp_version: int) -> str:
         """Generates an ID for the instance of the form
         [exp_id].[exp_version].
 
@@ -1395,8 +1424,11 @@ class ExplorationIssuesModel(base_models.BaseModel):
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
-    def get_model(cls, exp_id, exp_version):
-        # type: (Text, int) -> Optional[ExplorationIssuesModel]
+    def get_model(
+            cls,
+            exp_id: str,
+            exp_version: int
+    ) -> Optional['ExplorationIssuesModel']:
         """Retrieves ExplorationIssuesModel given exploration ID and version.
 
         Args:
@@ -1414,8 +1446,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
     # TODO(#13523): Change 'unresolved_issues' to TypedDict/Domain Object
     # to remove Any used below.
     @classmethod
-    def create(cls, exp_id, exp_version, unresolved_issues):
-        # type: (Text, int, List[Dict[Text, Any]]) -> Text
+    def create(
+            cls,
+            exp_id: str,
+            exp_version: int,
+            unresolved_issues: List[Dict[str, Any]]
+    ) -> str:
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
 
@@ -1438,8 +1474,8 @@ class ExplorationIssuesModel(base_models.BaseModel):
         return instance_id
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """All playthrough issue data is anonymized and contains no data
         directly corresponding to users. For specifics on the data included in
         this model, see:
@@ -1448,8 +1484,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1481,14 +1516,13 @@ class PlaythroughModel(base_models.BaseModel):
     actions = datastore_services.JsonProperty(repeated=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """All playthrough data is anonymized and contains no data directly
         corresponding to users. For specifics on the data included in this
         model, see:
@@ -1497,8 +1531,7 @@ class PlaythroughModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def _generate_id(cls, exp_id):
-        # type: (Text) -> Text
+    def _generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the playthrough of the form
         '[exp_id].[random hash of 16 chars]'.
 
@@ -1532,13 +1565,12 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            exp_id, # type: Text
-            exp_version, # type: int
-            issue_type, # type: Text
-            issue_customization_args, # type: Dict[Text, Any]
-            actions # type: List[Dict[Text, Any]]
-    ):
-        # type: (...) -> Text
+            exp_id: str,
+            exp_version: int,
+            issue_type: str,
+            issue_customization_args: Dict[str, Any],
+            actions: List[Dict[str, Any]]
+    ) -> str:
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
 
@@ -1565,8 +1597,7 @@ class PlaythroughModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(PlaythroughModel, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1617,14 +1648,16 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             indexed=True, required=False, default=0))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_state_reference_for_exploration(cls, exp_id, state_name):
-        # type: (Text, Text) -> Text
+    def get_state_reference_for_exploration(
+            cls,
+            exp_id: str,
+            state_name: str
+    ) -> str:
         """Generate the state_reference for the state in an exploration.
 
         Args:
@@ -1637,8 +1670,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return '%s:%s' % (exp_id, state_name)
 
     @classmethod
-    def get_state_reference_for_question(cls, question_id):
-        # type: (Text) -> Text
+    def get_state_reference_for_question(cls, question_id: str) -> str:
         """Generate the state_reference for the state in the question.
 
         Args:
@@ -1650,8 +1682,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return question_id
 
     @classmethod
-    def get_instance_id(cls, entity_type, state_reference):
-        # type: (Text, Text) -> Text
+    def get_instance_id(cls, entity_type: str, state_reference: str) -> str:
         """Generates the id for the newly created model instance.
 
         Args:
@@ -1671,17 +1702,20 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     # TODO(#13523): Change 'learner_answer_info_list' to TypedDict/Domain Object
     # to remove Any used below.
+    # TODO(#13594): After the domain layer is refactored to be independent of
+    # the storage layer, 'learner_answer_info_list' will be changed to
+    # List[LearnerAnswerInfo]. We cannot use this type now because it leads
+    # to circular imports.
     @classmethod
     def create_model_instance(
             cls,
-            entity_type, # type: Text
-            state_reference, # type: Text
-            interaction_id, # type: Text
-            learner_answer_info_list, # type: List[stats_domain.LearnerAnswerInfo]
-            learner_answer_info_schema_version, # type: int
-            accumulated_answer_info_json_size_bytes # type: int
-    ):
-        # type: (...) -> None
+            entity_type: str,
+            state_reference: str,
+            interaction_id: str,
+            learner_answer_info_list: List[Any],
+            learner_answer_info_schema_version: int,
+            accumulated_answer_info_json_size_bytes: int
+    ) -> None:
         """Creates a new LearnerAnswerDetailsModel for the given entity type
         then writes it to the datastore.
 
@@ -1710,7 +1744,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             state_reference=state_reference,
             interaction_id=interaction_id,
             learner_answer_info_list=(
-                [learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                [learner_answer_info.to_dict()
                 for learner_answer_info in learner_answer_info_list]),
             learner_answer_info_schema_version=(
                 learner_answer_info_schema_version),
@@ -1721,8 +1755,10 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_model_instance(
-            cls, entity_type, state_reference):
-        # type: (Text, Text) -> Optional[LearnerAnswerDetailsModel]
+            cls,
+            entity_type: str,
+            state_reference: str
+    ) -> Optional['LearnerAnswerDetailsModel']:
         """Returns the model instance related to the entity type and
         state reference.
 
@@ -1747,14 +1783,13 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return None
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1791,14 +1826,16 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     state_hit_counts = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_entity_id(cls, exploration_id, exploration_version):
-        # type: (Text, int) -> Text
+    def get_entity_id(
+            cls,
+            exploration_id: str,
+            exploration_version: int
+    ) -> str:
         """Gets entity_id for a batch model based on given exploration state.
 
         Args:
@@ -1813,9 +1850,13 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def create(
-            cls, exp_id, version, num_starts, num_completions,
-            state_hit_counts):
-        # type: (Text, Text, int, int, Dict[Text, int]) -> None
+            cls,
+            exp_id: str,
+            version: str,
+            num_starts: int,
+            num_completions: int,
+            state_hit_counts: Dict[str, int]
+    ) -> None:
         """Creates a new ExplorationAnnotationsModel and
         then writes it to the datastore.
 
@@ -1838,8 +1879,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             state_hit_counts=state_hit_counts).put()
 
     @classmethod
-    def get_versions(cls, exploration_id):
-        # type: (Text) -> List[Text]
+    def get_versions(cls, exploration_id: str) -> List[str]:
         """This function returns a list containing versions of
         ExplorationAnnotationsModel for a specific exploration_id.
 
@@ -1859,14 +1899,13 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                 ).fetch(feconf.DEFAULT_QUERY_LIMIT))]
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1937,15 +1976,18 @@ class StateAnswersModel(base_models.BaseModel):
         indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
-            cls, exploration_id, exploration_version, state_name, shard_id):
-        # type: (Text, int, Text, int) -> Optional[StateAnswersModel]
+            cls,
+            exploration_id: str,
+            exploration_version: int,
+            state_name: str,
+            shard_id: int
+    ) -> Optional['StateAnswersModel']:
         """Gets model instance based on given exploration state and shard_id.
 
         Args:
@@ -1965,8 +2007,12 @@ class StateAnswersModel(base_models.BaseModel):
         return cls.get(entity_id, strict=False)
 
     @classmethod
-    def get_master_model(cls, exploration_id, exploration_version, state_name):
-        # type: (Text, int, Text) -> Optional[StateAnswersModel]
+    def get_master_model(
+            cls,
+            exploration_id: str,
+            exploration_version: int,
+            state_name: str
+    ) -> Optional['StateAnswersModel']:
         """Retrieves the master model associated with the specific exploration
         state. Returns None if no answers have yet been submitted to the
         specified exploration state.
@@ -1987,8 +2033,12 @@ class StateAnswersModel(base_models.BaseModel):
         return main_shard if main_shard else None
 
     @classmethod
-    def get_all_models(cls, exploration_id, exploration_version, state_name):
-        # type: (Text, int, Text) -> Optional[List[StateAnswersModel]]
+    def get_all_models(
+            cls,
+            exploration_id: str,
+            exploration_version: int,
+            state_name: str
+    ) -> Optional[List['StateAnswersModel']]:
         """Retrieves all models and shards associated with the specific
         exploration state.
 
@@ -2030,9 +2080,13 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def _insert_submitted_answers_unsafe_transactional(
-            cls, exploration_id, exploration_version, state_name,
-            interaction_id, new_submitted_answer_dict_list):
-        # type: (Text, int, Text, Text, List[Dict[Text, Text]]) -> None
+            cls,
+            exploration_id: str,
+            exploration_version: int,
+            state_name: str,
+            interaction_id: str,
+            new_submitted_answer_dict_list: List[Dict[str, str]]
+    ) -> None:
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
@@ -2132,9 +2186,13 @@ class StateAnswersModel(base_models.BaseModel):
     # to remove Any used below.
     @classmethod
     def insert_submitted_answers(
-            cls, exploration_id, exploration_version, state_name,
-            interaction_id, new_submitted_answer_dict_list):
-        # type: (Text, int, Text, Text, List[Dict[Text, Any]]) -> None
+            cls,
+            exploration_id: str,
+            exploration_version: int,
+            state_name: str,
+            interaction_id: str,
+            new_submitted_answer_dict_list: List[Dict[str, Any]]
+    ) -> None:
         """Given an exploration ID, version, state name, and interaction ID,
         attempt to insert a list of specified SubmittedAnswers into this model,
         performing sharding operations as necessary. This method automatically
@@ -2160,8 +2218,12 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def _get_entity_id(
-            cls, exploration_id, exploration_version, state_name, shard_id):
-        # type: (Text, int, Text, int) -> Text
+            cls,
+            exploration_id: str,
+            exploration_version: int,
+            state_name: str,
+            shard_id: int
+    ) -> str:
         """Returns the entity_id of a StateAnswersModel based on it's
         exp_id, state_name, exploration_version and shard_id.
 
@@ -2183,11 +2245,10 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def _shard_answers(
             cls,
-            current_answer_list, # type: List[Dict[Text, Any]]
-            current_answer_list_size, # type: int
-            new_answer_list # type: List[Dict[Text, Any]]
-    ):
-        # type: (...) -> Tuple[List[List[Dict[Text, Any]]], List[int]]
+            current_answer_list: List[Dict[str, Any]],
+            current_answer_list_size: int,
+            new_answer_list: List[Dict[str, Any]]
+    ) -> Tuple[List[List[Dict[str, Any]]], List[int]]:
         """Given a current answer list which can fit within one NDB entity and
         a list of new answers which need to try and fit in the current answer
         list, shard the answers such that a list of answer lists are returned.
@@ -2237,8 +2298,7 @@ class StateAnswersModel(base_models.BaseModel):
     # TODO(#13523): Change answer dict to TypedDict/Domain Object
     # to remove Any used below.
     @classmethod
-    def _get_answer_dict_size(cls, answer_dict):
-        # type: (Dict[Text, Any]) -> int
+    def _get_answer_dict_size(cls, answer_dict: Dict[str, Any]) -> int:
         """Returns a size overestimate (in bytes) of the given answer dict.
 
         Args:
@@ -2250,14 +2310,13 @@ class StateAnswersModel(base_models.BaseModel):
         return sys.getsizeof(json.dumps(answer_dict))
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2300,20 +2359,18 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     calculation_output = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,

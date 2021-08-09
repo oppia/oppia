@@ -35,8 +35,7 @@ if MYPY: # pragma: no cover
 
 class StorySnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             story_models.StorySnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -45,14 +44,12 @@ class StorySnapshotContentModelTests(test_utils.GenericTestBase):
 class StoryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story models."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             story_models.StoryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_story_model(self):
-        # type: () -> None
+    def test_story_model(self) -> None:
         """Method to test the StoryModel."""
 
         committer_id = 'test_committer_id'
@@ -79,8 +76,7 @@ class StoryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_by_id.title, 'title')
         self.assertEqual(story_by_id.url_fragment, 'title')
 
-    def test_get_by_url_fragment(self):
-        # type: () -> None
+    def test_get_by_url_fragment(self) -> None:
         committer_id = 'test_committer_id'
         commit_message = 'test_commit_message'
         commit_cmds = [{'cmd': 'test_command'}]
@@ -111,8 +107,7 @@ class StoryModelTest(test_utils.GenericTestBase):
 class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         commit = story_models.StoryCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -130,14 +125,12 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class StorySummaryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story summary models."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             story_models.StorySummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_story_summary_model(self):
-        # type: () -> None
+    def test_story_summary_model(self) -> None:
         """Method to test the StorySummaryModel."""
 
         story_summary_model = story_models.StorySummaryModel(

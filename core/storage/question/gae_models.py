@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -50,8 +50,7 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -69,16 +68,15 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     question_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
@@ -88,8 +86,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         })
 
     @classmethod
-    def get_instance_id(cls, question_id, question_version):
-        # type: (Text, int) -> Text
+    def get_instance_id(cls, question_id: str, question_version: int) -> str:
         """Returns ID of the question commit log entry model.
 
         Args:
@@ -138,20 +135,18 @@ class QuestionModel(base_models.VersionedModel):
         indexed=True, repeated=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -164,8 +159,7 @@ class QuestionModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def _get_new_id(cls):
-        # type: () -> Text
+    def _get_new_id(cls) -> str:
         """Generates a unique ID for the question in the form of random hash
         of 12 chars.
 
@@ -192,8 +186,12 @@ class QuestionModel(base_models.VersionedModel):
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
     def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
-        # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
+            self,
+            committer_id: str,
+            commit_type: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -226,13 +224,12 @@ class QuestionModel(base_models.VersionedModel):
     @classmethod
     def create(
             cls,
-            question_state_data, # type: Dict[Text, Any]
-            language_code, # type: Text
-            version, # type: int
-            linked_skill_ids, # type: List[Text]
-            inapplicable_skill_misconception_ids # type: List[Text]
-    ):
-        # type: (...) -> QuestionModel
+            question_state_data: Dict[str, Any],
+            language_code: str,
+            version: int,
+            linked_skill_ids: List[str],
+            inapplicable_skill_misconception_ids: List[str]
+    ) -> 'QuestionModel':
         """Creates a new QuestionModel entry.
 
         Args:
@@ -265,8 +262,7 @@ class QuestionModel(base_models.VersionedModel):
         return question_model_instance
 
     @classmethod
-    def put_multi_questions(cls, questions):
-        # type: (List[QuestionModel]) -> None
+    def put_multi_questions(cls, questions: List['QuestionModel']) -> None:
         """Puts multiple question models into the datastore.
 
         Args:
@@ -293,20 +289,18 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         datastore_services.FloatProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -315,8 +309,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_model_id(cls, question_id, skill_id):
-        # type: (Text, Text) -> Text
+    def get_model_id(cls, question_id: str, skill_id: str) -> str:
         """Returns the model id by combining the questions and skill id.
 
         Args:
@@ -329,8 +322,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return '%s:%s' % (question_id, skill_id)
 
     @classmethod
-    def create(cls, question_id, skill_id, skill_difficulty):
-        # type: (Text, Text, float) -> QuestionSkillLinkModel
+    def create(
+            cls,
+            question_id: str,
+            skill_id: str,
+            skill_difficulty: float
+    ) -> 'QuestionSkillLinkModel':
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
@@ -359,8 +356,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_total_question_count_for_skill_ids(cls, skill_ids):
-        # type: (List[Text]) -> int
+    def get_total_question_count_for_skill_ids(
+            cls,
+            skill_ids: List[str]
+    ) -> int:
         """Returns the number of questions assigned to the given skill_ids.
 
         Args:
@@ -377,8 +376,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_by_skill_ids(
-            cls, question_count, skill_ids, offset):
-        # type: (int, List[Text], int) -> List[QuestionSkillLinkModel]
+            cls,
+            question_count: int,
+            skill_ids: List[str],
+            offset: int
+    ) -> List['QuestionSkillLinkModel']:
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
 
@@ -405,8 +407,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
-            cls, total_question_count, skill_ids, difficulty_requested):
-        # type: (int, List[Text], float) -> List[QuestionSkillLinkModel]
+            cls,
+            total_question_count: int,
+            skill_ids: List[str],
+            difficulty_requested: float
+    ) -> List['QuestionSkillLinkModel']:
         """Fetches the list of constant number of random QuestionSkillLinkModels
         linked to the skills, sorted by the absolute value of the difference
         between skill difficulty and the requested difficulty.
@@ -449,8 +454,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809
         # for more details.
 
-        def get_offset(query):
-            # type: (datastore_services.Query) -> int
+        def get_offset(query: datastore_services.Query) -> int:
             """Helper function to get the offset."""
             question_count = query.count()
             if question_count > 2 * question_count_per_skill:
@@ -548,8 +552,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(
-            cls, total_question_count, skill_ids):
-        # type: (int, List[Text]) -> List[QuestionSkillLinkModel]
+            cls,
+            total_question_count: int,
+            skill_ids: List[str]
+    ) -> List['QuestionSkillLinkModel']:
         """Fetches the list of constant number of random
         QuestionSkillLinkModels linked to the skills.
 
@@ -579,8 +585,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_models = []
         existing_question_ids = []
 
-        def get_offset(query):
-            # type: (datastore_services.Query) -> int
+        def get_offset(query: datastore_services.Query) -> int:
             """Helper function to get the offset."""
             question_count = query.count()
             if question_count > 2 * question_count_per_skill:
@@ -622,8 +627,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models
 
     @classmethod
-    def get_all_question_ids_linked_to_skill_id(cls, skill_id):
-        # type: (Text) -> List[Text]
+    def get_all_question_ids_linked_to_skill_id(
+            cls,
+            skill_id: str
+    ) -> List[str]:
         """Returns a list of all question ids corresponding to the given skill
         id.
 
@@ -643,8 +650,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_ids
 
     @classmethod
-    def get_models_by_skill_id(cls, skill_id):
-        # type: (Text) -> Optional[List[QuestionSkillLinkModel]]
+    def get_models_by_skill_id(
+            cls,
+            skill_id: str
+    ) -> Optional[List['QuestionSkillLinkModel']]:
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
@@ -661,8 +670,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 cls.skill_id == skill_id).fetch())
 
     @classmethod
-    def get_models_by_question_id(cls, question_id):
-        # type: (Text) -> Optional[List[QuestionSkillLinkModel]]
+    def get_models_by_question_id(
+            cls,
+            question_id: str
+    ) -> Optional[List['QuestionSkillLinkModel']]:
         """Returns a list of QuestionSkillLinkModels of a particular
         question ID.
 
@@ -681,8 +692,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 cls.deleted == False).fetch()) #pylint: disable=singleton-comparison
 
     @classmethod
-    def put_multi_question_skill_links(cls, question_skill_links):
-        # type: (List[QuestionSkillLinkModel]) -> None
+    def put_multi_question_skill_links(
+            cls,
+            question_skill_links: List['QuestionSkillLinkModel']
+    ) -> None:
         """Puts multiple question skill link models into the datastore.
 
         Args:
@@ -693,8 +706,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         cls.put_multi(question_skill_links)
 
     @classmethod
-    def delete_multi_question_skill_links(cls, question_skill_links):
-        # type: (List[QuestionSkillLinkModel]) -> None
+    def delete_multi_question_skill_links(
+            cls,
+            question_skill_links: List['QuestionSkillLinkModel']
+    ) -> None:
         """Deletes multiple question skill links from the datastore.
 
         Args:
@@ -741,14 +756,13 @@ class QuestionSummaryModel(base_models.BaseModel):
         datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the QuestionModel
         export_data function, and thus a new export_data function does not
         need to be defined here.
@@ -756,8 +770,7 @@ class QuestionSummaryModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because because noteworthy details that belong to this model have
         already been exported as a part of the QuestionModel export_data

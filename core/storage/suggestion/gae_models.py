@@ -23,7 +23,7 @@ from core.platform import models
 import feconf
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, Text, List, Optional, Tuple, Union, cast)
+    Any, Dict, List, Optional, Tuple, Union, cast)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -164,24 +164,22 @@ class GeneralSuggestionModel(base_models.BaseModel):
         default=False, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
         author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple unshared instance since there
         are multiple suggestions per user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -201,8 +199,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        # type: (Text) -> bool
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralSuggestionModel exists for the user.
 
         Args:
@@ -220,19 +217,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            suggestion_type, # type: Text
-            target_type, # type: Text
-            target_id, # type: Text
-            target_version_at_submission, # type: int
-            status, # type: Text
-            author_id, # type: Text
-            final_reviewer_id, # type: Text
-            change_cmd, # type: Dict[Text, Any]
-            score_category, # type: Text
-            thread_id, # type: Text
-            language_code # type: Optional[Text]
-    ):
-        # type: (...) -> None
+            suggestion_type: str,
+            target_type: str,
+            target_id: str,
+            target_version_at_submission: int,
+            status: str,
+            author_id: str,
+            final_reviewer_id: str,
+            change_cmd: Dict[str, Any],
+            score_category: str,
+            thread_id: str,
+            language_code: Optional[str]
+    ) -> None:
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -272,8 +268,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category=score_category, language_code=language_code).put()
 
     @classmethod
-    def query_suggestions(cls, query_fields_and_values):
-        # type: (List[Tuple[Text, Text]]) -> List[GeneralSuggestionModel]
+    def query_suggestions(
+            cls,
+            query_fields_and_values: List[Tuple[str, str]]
+    ) -> List['GeneralSuggestionModel']:
         """Queries for suggestions.
 
         Args:
@@ -298,8 +296,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
-            cls, exp_id, language_code):
-        # type: (Text, Text) -> List[GeneralSuggestionModel]
+            cls,
+            exp_id: str,
+            language_code: str
+    ) -> List['GeneralSuggestionModel']:
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
@@ -325,8 +325,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
-        # type: (List[Text]) -> List[Text]
+    def get_translation_suggestion_ids_with_exp_ids(
+            cls,
+            exp_ids: List[str]
+    ) -> List[str]:
         """Gets the ids of translation suggestions corresponding to
         explorations with the given exploration ids.
 
@@ -359,8 +361,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
-    def get_all_stale_suggestion_ids(cls):
-        # type: () -> List[Text]
+    def get_all_stale_suggestion_ids(cls) -> List[str]:
         """Gets the ids of the suggestions which were last updated before the
         threshold time.
 
@@ -378,8 +379,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
-    def get_suggestions_waiting_too_long_for_review(cls):
-        # type: () -> List[GeneralSuggestionModel]
+    def get_suggestions_waiting_too_long_for_review(
+            cls
+    ) -> List['GeneralSuggestionModel']:
         """Returns a list of suggestions that have been waiting for a review
         longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
         Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
@@ -413,8 +415,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(
-            cls, score_categories, user_id):
-        # type: (List[Text], Text) -> List[GeneralSuggestionModel]
+            cls,
+            score_categories: List[str],
+            user_id: str
+    ) -> List['GeneralSuggestionModel']:
         """Gets all suggestions which are in review in the given
         score_categories.
 
@@ -440,8 +444,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
                         feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_in_review_translation_suggestions(cls, user_id, language_codes):
-        # type: (Text, List[Text]) -> List[GeneralSuggestionModel]
+    def get_in_review_translation_suggestions(
+            cls,
+            user_id: str,
+            language_codes: List[str]
+    ) -> List['GeneralSuggestionModel']:
         """Gets all translation suggestions which are in review.
 
         Args:
@@ -465,8 +472,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_in_review_question_suggestions(cls, user_id):
-        # type: (Text) -> List[GeneralSuggestionModel]
+    def get_in_review_question_suggestions(
+            cls,
+            user_id: str
+    ) -> List['GeneralSuggestionModel']:
         """Gets all question suggestions which are in review.
 
         Args:
@@ -487,8 +496,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_question_suggestions_waiting_longest_for_review(cls):
-        # type: () -> List[GeneralSuggestionModel]
+    def get_question_suggestions_waiting_longest_for_review(
+            cls
+    ) -> List['GeneralSuggestionModel']:
         """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
         of question suggestions, sorted in descending order by review wait
         time.
@@ -509,8 +519,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_waiting_longest_for_review(
-            cls, language_code):
-        # type: (Text) -> List[GeneralSuggestionModel]
+            cls,
+            language_code: str
+    ) -> List['GeneralSuggestionModel']:
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
         sorted in descending order by review wait time.
@@ -537,8 +548,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
-            cls, suggestion_type, user_id):
-        # type: (Text, Text) -> List[GeneralSuggestionModel]
+            cls,
+            suggestion_type: str,
+            user_id: str
+    ) -> List['GeneralSuggestionModel']:
         """Gets all suggestions of suggestion_type which the user has created.
 
         Args:
@@ -557,8 +570,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                         feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_all_score_categories(cls):
-        # type: () -> List[Text]
+    def get_all_score_categories(cls) -> List[str]:
         """Gets all the score categories for which suggestions have been
         created.
 
@@ -575,9 +587,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def export_data(
             cls,
-            user_id # type: Text
-    ):
-        # type: (...) -> Dict[Text, Dict[Text, Union[Text, int, bool, Dict[Text, Any], None]]]
+            user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, bool, Dict[str, Any], None]]]:
         """Exports the data from GeneralSuggestionModel
         into dict format for Takeout.
 
@@ -647,16 +658,14 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     rejection_message = datastore_services.TextProperty()
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
         author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        # type: (Text) -> bool
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralVoiceoverApplicationModel exists for the user.
 
         Args:
@@ -670,8 +679,11 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_user_voiceover_applications(cls, author_id, status=None):
-        # type: (Text, Optional[Text]) -> List[GeneralVoiceoverApplicationModel]
+    def get_user_voiceover_applications(
+            cls,
+            author_id: str,
+            status: Optional[str] = None
+    ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application submitted by the given user.
 
         Args:
@@ -696,8 +708,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 cls.query(cls.author_id == author_id).fetch())
 
     @classmethod
-    def get_reviewable_voiceover_applications(cls, user_id):
-        # type: (Text) -> List[GeneralVoiceoverApplicationModel]
+    def get_reviewable_voiceover_applications(
+            cls,
+            user_id: str
+    ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application which a given user can
         review.
 
@@ -717,8 +731,12 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 cls.status == STATUS_IN_REVIEW)).fetch())
 
     @classmethod
-    def get_voiceover_applications(cls, target_type, target_id, language_code):
-        # type: (Text, Text, Text) -> List[GeneralVoiceoverApplicationModel]
+    def get_voiceover_applications(
+            cls,
+            target_type: str,
+            target_id: str,
+            language_code: str
+    ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover applications submitted for a give entity
         in a given language.
 
@@ -739,16 +757,15 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 cls.language_code == language_code)).fetch())
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple voiceover applications relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -765,8 +782,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         })
 
     @classmethod
-    def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Dict[Text, Optional[Text]]]
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, Optional[str]]]:
         """(Takeout) Exports the data from GeneralVoiceoverApplicationModel
         into dict format.
 
@@ -827,8 +843,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls): # type: ignore[override]
-        # type: () -> Optional[CommunityContributionStatsModel]
+    def get(cls) -> Optional['CommunityContributionStatsModel']: # type: ignore[override]
         """Gets the CommunityContributionStatsModel instance. If the
         CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
@@ -859,14 +874,13 @@ class CommunityContributionStatsModel(base_models.BaseModel):
                     COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
 
     @classmethod
-    def get_deletion_policy(cls):
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """This model only contains general statistical information about the
         contributor dashboard and does not include any individual user
         information.
@@ -874,8 +888,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user
         because the data is aggregated.
         """
@@ -941,19 +954,18 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            language_code, # type: Text
-            contributor_user_id, # type: Text
-            topic_id, # type: Text
-            submitted_translations_count, # type: int
-            submitted_translation_word_count, # type: int
-            accepted_translations_count, # type: int
-            accepted_translations_without_reviewer_edits_count, # type: int
-            accepted_translation_word_count, # type: int
-            rejected_translations_count, # type: int
-            rejected_translation_word_count, # type: int
-            contribution_dates # type: List[datetime.date]
-    ):
-        # type: (...) -> Text
+            language_code: str,
+            contributor_user_id: str,
+            topic_id: str,
+            submitted_translations_count: int,
+            submitted_translation_word_count: int,
+            accepted_translations_count: int,
+            accepted_translations_without_reviewer_edits_count: int,
+            accepted_translation_word_count: int,
+            rejected_translations_count: int,
+            rejected_translation_word_count: int,
+            contribution_dates: List[datetime.date]
+    ) -> str:
         """Creates a new TranslationContributionStatsModel instance and returns
         its ID.
         """
@@ -979,8 +991,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code, contributor_user_id, topic_id):
-        # type: (Text, Text, Text) -> Text
+            language_code: str,
+            contributor_user_id: str,
+            topic_id: str
+    ) -> str:
         """Generates a unique ID for a TranslationContributionStatsModel
         instance.
 
@@ -1004,11 +1018,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     @classmethod
     def get( # type: ignore[override]
             cls,
-            language_code, # type: Text
-            contributor_user_id, # type: Text
-            topic_id # type: Text
-    ):
-        # type: (...) -> Optional[TranslationContributionStatsModel]
+            language_code: str,
+            contributor_user_id: str,
+            topic_id: str
+    ) -> Optional['TranslationContributionStatsModel']:
         """Gets the TranslationContributionStatsModel matching the supplied
         language_code, contributor_user_id, topic_id.
 
@@ -1021,8 +1034,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         return cls.get_by_id(entity_id)
 
     @classmethod
-    def get_all_by_user_id(cls, user_id):
-        # type: (Text) -> List[TranslationContributionStatsModel]
+    def get_all_by_user_id(
+            cls,
+            user_id: str
+    ) -> List['TranslationContributionStatsModel']:
         """Gets all TranslationContributionStatsModels matching the supplied
         user_id.
 
@@ -1038,8 +1053,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         )
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        # type: (Text) -> bool
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether TranslationContributionStatsModel references the
         supplied user.
 
@@ -1054,22 +1068,20 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         ).get(keys_only=True) is not None
 
     @classmethod
-    def get_deletion_policy(cls):
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model contains corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple languages and topics relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'language_code':
@@ -1098,8 +1110,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         })
 
     @classmethod
-    def apply_deletion_policy(cls, user_id):
-        # type: (Text) -> None
+    def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete instances of TranslationContributionStatsModel for the user.
 
         Args:
@@ -1112,8 +1123,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
                     cls.contributor_user_id == user_id).fetch(keys_only=True)))
 
     @classmethod
-    def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Dict[Text, Union[Text, int, List[Text]]]]
+    def export_data(
+            cls,
+            user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
         """Exports the data from TranslationContributionStatsModel into dict
         format for Takeout.
 

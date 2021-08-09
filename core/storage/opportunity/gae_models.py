@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -57,20 +57,18 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         repeated=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -88,14 +86,15 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_translation_opportunities(
             cls,
-            page_size, # type: int
-            urlsafe_start_cursor, # type: Optional[Text]
-            language_code # type: Text
-    ):
-        # type: (...) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[Text], bool]
+            page_size: int,
+            urlsafe_start_cursor: Optional[str],
+            language_code: str
+    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -145,14 +144,15 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             more_results
         )
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_voiceover_opportunities(
             cls,
-            page_size, # type: int
-            urlsafe_start_cursor, # type: Optional[Text]
-            language_code # type: Text
-    ):
-        # type: (...) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[Text], bool]
+            page_size: int,
+            urlsafe_start_cursor: Optional[str],
+            language_code: str
+    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -205,8 +205,10 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_by_topic(cls, topic_id):
-        # type: (Text) -> List[ExplorationOpportunitySummaryModel]
+    def get_by_topic(
+            cls,
+            topic_id: str
+    ) -> List['ExplorationOpportunitySummaryModel']:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
@@ -218,8 +220,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.query(cls.topic_id == topic_id).fetch())
 
     @classmethod
-    def delete_all(cls):
-        # type: () -> None
+    def delete_all(cls) -> None:
         """Deletes all entities of this class."""
         keys = cast(
             List[datastore_services.Key],
@@ -245,33 +246,32 @@ class SkillOpportunityModel(base_models.BaseModel):
         datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_skill_opportunities(
             cls,
-            page_size, # type: int
-            urlsafe_start_cursor # type: Optional[Text]
-    ):
-        # type: (...) -> Tuple[List[SkillOpportunityModel], Optional[Text], bool]
+            page_size: int,
+            urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[List['SkillOpportunityModel'], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -316,8 +316,7 @@ class SkillOpportunityModel(base_models.BaseModel):
         )
 
     @classmethod
-    def delete_all(cls):
-        # type: () -> None
+    def delete_all(cls) -> None:
         """Deletes all entities of this class."""
         keys = cast(
             List[datastore_services.Key],

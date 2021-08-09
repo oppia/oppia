@@ -37,8 +37,7 @@ if MYPY: # pragma: no cover
 
 class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             skill_models.SkillSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -47,8 +46,7 @@ class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
 class SkillModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -57,8 +55,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         commit = skill_models.SkillCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False
@@ -77,14 +74,12 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_fetch_page(self):
-        # type: () -> None
+    def test_fetch_page(self) -> None:
         skill_models.SkillSummaryModel(
             id='skill_id1',
             description='description1',

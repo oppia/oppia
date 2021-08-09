@@ -36,8 +36,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
     RECOMMENDATION_2_ID = 'rec_2_id'
     RECOMMENDATION_3_ID = 'rec_3_id'
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             recommendations_models.ExplorationRecommendationsModel
             .get_deletion_policy(),
@@ -47,8 +46,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSimilaritiesModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)

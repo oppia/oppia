@@ -32,14 +32,12 @@ if MYPY: # pragma: no cover
 class JobModelTest(test_utils.GenericTestBase):
     """Tests for Oppia job models."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             job_models.JobModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_is_cancelable(self):
-        # type: () -> None
+    def test_is_cancelable(self) -> None:
         """The job is cancelable if its status is either queued or started."""
         job = job_models.JobModel(
             id='MyJobId', status_code=job_models.STATUS_CODE_NEW)
@@ -57,8 +55,7 @@ class JobModelTest(test_utils.GenericTestBase):
 class JobModelSetUpJobsTest(test_utils.GenericTestBase):
     """Tests for Oppia job models with setUp."""
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(JobModelSetUpJobsTest, self).setUp() # type: ignore[no-untyped-call]
         job_models.JobModel(
             id='MyJobId1', job_type='JobType1',
@@ -70,22 +67,19 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
             id='MyJobId3', job_type='JobType2',
             status_code=job_models.STATUS_CODE_COMPLETED).put()
 
-    def test_get_all_unfinished_jobs(self):
-        # type: () -> None
+    def test_get_all_unfinished_jobs(self) -> None:
         self.assertEqual(
             job_models.JobModel.get_all_unfinished_jobs(3),
             [job_models.JobModel.get_by_id('MyJobId2')])
 
-    def test_get_unfinished_jobs(self):
-        # type: () -> None
+    def test_get_unfinished_jobs(self) -> None:
         self.assertEqual(
             job_models.JobModel.get_unfinished_jobs('JobType1').fetch(1), [])
         self.assertEqual(
             job_models.JobModel.get_unfinished_jobs('JobType2').fetch(1),
             [job_models.JobModel.get_by_id('MyJobId2')])
 
-    def test_do_unfinished_jobs_exist(self):
-        # type: () -> None
+    def test_do_unfinished_jobs_exist(self) -> None:
         self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType1'))
         self.assertTrue(job_models.JobModel.do_unfinished_jobs_exist(
