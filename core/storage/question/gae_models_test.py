@@ -41,8 +41,7 @@ if MYPY: # pragma: no cover
 
 class QuestionSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             question_models.QuestionSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -51,14 +50,12 @@ class QuestionSnapshotContentModelTests(test_utils.GenericTestBase):
 class QuestionModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             question_models.QuestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_question_empty_skill_id_list(self):
-        # type: () -> None
+    def test_create_question_empty_skill_id_list(self) -> None:
         state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         language_code = 'en'
@@ -71,8 +68,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_model.language_code, language_code)
         self.assertItemsEqual(question_model.linked_skill_ids, []) # type: ignore[no-untyped-call]
 
-    def test_create_question_with_skill_ids(self):
-        # type: () -> None
+    def test_create_question_with_skill_ids(self) -> None:
         state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
@@ -88,8 +84,9 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual( # type: ignore[no-untyped-call]
             question_model.linked_skill_ids, linked_skill_ids)
 
-    def test_create_question_with_inapplicable_skill_misconception_ids(self):
-        # type: () -> None
+    def test_create_question_with_inapplicable_skill_misconception_ids(
+            self
+    ) -> None:
         state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
@@ -104,8 +101,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_model.inapplicable_skill_misconception_ids,
             inapplicable_skill_misconception_ids)
 
-    def test_put_multi_questions(self):
-        # type: () -> None
+    def test_put_multi_questions(self) -> None:
         question_state_data = self._create_valid_question_data('ABC') # type: ignore[no-untyped-call]
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question( # type: ignore[no-untyped-call]
@@ -149,8 +145,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_question_model2.linked_skill_ids, ['skill_id3'])
 
-    def test_raise_exception_by_mocking_collision(self):
-        # type: () -> None
+    def test_raise_exception_by_mocking_collision(self) -> None:
         state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         language_code = 'en'
@@ -173,14 +168,12 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSkillLinkModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_question_skill_link(self):
-        # type: () -> None
+    def test_create_question_skill_link(self) -> None:
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
         skill_difficulty = 0.4
@@ -192,8 +185,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             questionskilllink_model.skill_difficulty, skill_difficulty)
 
-    def test_put_multi_question_skill_link(self):
-        # type: () -> None
+    def test_put_multi_question_skill_link(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -222,8 +214,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                         in question_skill_links]
         self.assertEqual(question_ids, ['question_id1', 'question_id2'])
 
-    def test_delete_multi_question_skill_link(self):
-        # type: () -> None
+    def test_delete_multi_question_skill_link(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -270,8 +261,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 1)
         self.assertEqual(question_skill_links[0].question_id, 'question_id3')
 
-    def test_get_models_by_question_id(self):
-        # type: () -> None
+    def test_get_models_by_question_id(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -304,8 +294,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 0)
 
-    def test_get_total_question_count_for_skill_ids(self):
-        # type: () -> None
+    def test_get_total_question_count_for_skill_ids(self) -> None:
         skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
         skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
@@ -358,8 +347,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(question_count, 3)
 
-    def test_get_question_skill_links_by_skill_ids(self):
-        # type: () -> None
+    def test_get_question_skill_links_by_skill_ids(self) -> None:
         skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
         skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
@@ -401,8 +389,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(
             question_skill_link_models[0], question_skill_link_models_2[0])
 
-    def test_get_question_skill_links_by_skill_ids_many_skills(self):
-        # type: () -> None
+    def test_get_question_skill_links_by_skill_ids_many_skills(self) -> None:
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
         skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
@@ -443,8 +430,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_link_models[1].skill_id, skill_id_3)
         self.assertEqual(question_skill_link_models[2].skill_id, skill_id_2)
 
-    def test_get_question_skill_links_based_on_difficulty(self):
-        # type: () -> None
+    def test_get_question_skill_links_based_on_difficulty(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.7)
@@ -483,8 +469,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model2 in question_skill_links)
         self.assertTrue(questionskilllink_model4 in question_skill_links)
 
-    def test_get_random_question_skill_links_based_on_difficulty(self):
-        # type: () -> None
+    def test_get_random_question_skill_links_based_on_difficulty(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.6)
@@ -523,10 +508,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
         def mock_random_sample(
-                alist, # type: List[question_models.QuestionSkillLinkModel]
-                num # type: int
-        ):
-            # type: (...) -> List[question_models.QuestionSkillLinkModel]
+                alist: List[question_models.QuestionSkillLinkModel],
+                num: int
+        ) -> List[question_models.QuestionSkillLinkModel]:
             if num >= len(alist):
                 return alist
             # The key for sorting is defined separately because of a mypy bug.
@@ -539,8 +523,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
 
-        def mock_random_int(upper_bound):
-            # type: (int) -> int
+        def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
         random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
         with sample_swap, random_int_swap:
@@ -557,8 +540,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model4])
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
-            self):
-        # type: () -> None
+            self) -> None:
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
@@ -568,8 +550,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                     3, skill_ids, 0.6
                 ))
 
-    def test_get_questions_with_no_skills(self):
-        # type: () -> None
+    def test_get_questions_with_no_skills(self) -> None:
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
@@ -583,8 +564,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             get_question_skill_links_equidistributed_by_skill(1, []))
         self.assertEqual(question_skill_links, [])
 
-    def test_get_questions_with_zero_count(self):
-        # type: () -> None
+    def test_get_questions_with_zero_count(self) -> None:
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
@@ -598,8 +578,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             get_question_skill_links_equidistributed_by_skill(1, []))
         self.assertEqual(question_skill_links, [])
 
-    def test_get_more_question_skill_links_than_available(self):
-        # type: () -> None
+    def test_get_more_question_skill_links_than_available(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -628,8 +607,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model2 in question_skill_links)
         self.assertTrue(questionskilllink_model3 in question_skill_links)
 
-    def test_get_question_skill_links_when_count_not_evenly_divisible(self):
-        # type: () -> None
+    def test_get_question_skill_links_when_count_not_evenly_divisible(
+            self
+    ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -659,8 +639,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model3 in question_skill_links)
 
     def test_get_question_skill_links_equidistributed_by_skill(
-            self):
-        # type: () -> None
+            self
+    ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -695,8 +675,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         question_ids = [link.question_id for link in question_skill_links]
         self.assertEqual(question_ids.count('question_id2'), 1)
 
-    def test_get_random_question_skill_links_equidistributed_by_skill(self):
-        # type: () -> None
+    def test_get_random_question_skill_links_equidistributed_by_skill(
+            self
+    ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -735,10 +716,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
         def mock_random_sample(
-                alist, # type: List[question_models.QuestionSkillLinkModel]
-                num # type: int
-        ):
-            # type: (...) -> List[question_models.QuestionSkillLinkModel]
+                alist: List[question_models.QuestionSkillLinkModel],
+                num: int
+        ) -> List[question_models.QuestionSkillLinkModel]:
             if num >= len(alist):
                 return alist
             # The key for sorting is defined separately because of a mypy bug.
@@ -750,8 +730,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             return alist[:num]
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
-        def mock_random_int(upper_bound):
-            # type: (int) -> int
+        def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
         random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
         with sample_swap, random_int_swap:
@@ -767,8 +746,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             [questionskilllink_model2, questionskilllink_model3,
              questionskilllink_model4])
 
-    def test_request_too_many_skills_raises_error(self):
-        # type: () -> None
+    def test_request_too_many_skills_raises_error(self) -> None:
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
@@ -781,8 +759,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionCommitLogEntryModel class."""
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         commit = question_models.QuestionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -800,8 +777,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSummaryModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             question_models.QuestionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)

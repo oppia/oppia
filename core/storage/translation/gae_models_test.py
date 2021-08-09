@@ -32,8 +32,7 @@ if MYPY: # pragma: no cover
 
 
 class MachineTranslationModelTests(test_utils.GenericTestBase):
-    def test_create_model(self):
-        # type: () -> None
+    def test_create_model(self) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='es',
@@ -49,8 +48,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
     def test_create_model_with_same_source_target_language_codes_returns_none(
-            self):
-        # type: () -> None
+            self) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='en',
@@ -59,8 +57,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(model_id)
 
-    def test_get_machine_translation_with_existing_translation(self):
-        # type: () -> None
+    def test_get_machine_translation_with_existing_translation(self) -> None:
         translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='es',
@@ -81,8 +78,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self.assertEqual(translation.translated_text, 'hola mundo')
 
     def test_get_machine_translation_with_no_existing_translation_returns_none(
-            self):
-        # type: () -> None
+            self) -> None:
         translation = (
             translation_models.MachineTranslationModel
             .get_machine_translation(
@@ -93,14 +89,14 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(translation)
 
-    def test_get_deletion_policy_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_not_applicable(self) -> None:
         self.assertEqual(
             translation_models.MachineTranslationModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_model_association_to_user_not_corresponding_to_user(self):
-        # type: () -> None
+    def test_get_model_association_to_user_not_corresponding_to_user(
+            self
+    ) -> None:
         self.assertEqual(
             (
                 translation_models.MachineTranslationModel
@@ -108,8 +104,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             ),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_get_export_policy_not_applicable(self):
-        # type: () -> None
+    def test_get_export_policy_not_applicable(self) -> None:
         self.assertEqual(
             translation_models.MachineTranslationModel.get_export_policy(),
             {
