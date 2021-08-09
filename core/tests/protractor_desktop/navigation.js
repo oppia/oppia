@@ -145,39 +145,23 @@ describe('Static Pages Tour', function() {
         element(by.css('.protractor-test-learner-dashboard-page')));
 
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
-      await browser.get('/login');
 
-      // Login page performs client side redirection which is known to cause
-      // "both angularJS testability and angular testability are undefined"
-      // flake.
-      // As suggested by protractor devs here (http://git.io/v4gXM), waiting for
-      // angular is disabled during client side redirects.
-      await browser.waitForAngularEnabled(false);
+      await waitFor.clientSideRedirection(() => {
+        // Login page will redirect user to login page if logged in.
+        await browser.get('/login');
 
-      // Waiting for first redirection (login page to splash page).
-      await browser.driver.wait(async() => {
-        const URL = await browser.driver.getCurrentUrl();
-        // As redirect url can be any url, so instead of testing for new url,
-        // checking whether the url is not /signup.
-        return !(/login/.test(URL));
-      }, 10000);
-
-      // Waiting for second redirection (splash page to preferred dashboard
-      // page).
-      await browser.driver.wait(async() => {
-        const URL = await browser.driver.getCurrentUrl();
-        // As redirect url can be any url, so instead of testing for new url,
-        // checking whether the url is not /.
+        // Waiting for first redirection (login page to splash page).
+        await browser.driver.wait(async() => {
+          const URL = await browser.driver.getCurrentUrl();
+          // Waiting for url to not be login anymore (that it is changed).
+          return !(/login/.test(URL));
+        }, 10000);
+      },
+      (URL) => {
+        // Waiting for second redirection (splash page to preferred dashboard
+        // page).
         return URL !== 'http://localhost:9001/';
-      }, 10000);
-
-      // The above solution only waits until url is changed, so invoking
-      // pageToFullyLoad to wait for all async tasks on the new page to
-      // finish before proceeding.
-      await waitFor.pageToFullyLoad();
-
-      // Client side redirection is complete, enabling wait for angular here.
-      await browser.waitForAngularEnabled(true);
+      });
 
       await waitFor.presenceOf(
         learnerDashboardPage, 'Learner dashboard page did not load');

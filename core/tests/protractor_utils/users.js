@@ -70,57 +70,25 @@ var login = async function(email, useManualNavigation = true) {
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
 
-  // Login page performs client side redirection which is known to cause
-  // "both angularJS testability and angular testability are undefined" flake.
-  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
-  // angular is disabled during client side redirects.
-  await browser.waitForAngularEnabled(false);
-  await action.click('Sign in button', signInButton);
-
-  // The await action.click only waits until button is clicked, it doesnot wait
-  // for the redirection to trigger. So, manually waiting for redirection here.
-  await browser.driver.wait(async() => {
-    const URL = await browser.driver.getCurrentUrl();
-    // As redirect url can be any url, so instead of testing for new url,
-    // checking whether the url is not /login.
+  await waitFor.clientSideRedirection(async() => {
+    // Clicking sign in button to trigger redirection.
+    await action.click('Sign in button', signInButton);
+  }, (URL) => {
+    // Waiting till url is not /login anymore (that is url is changed)
     return !(/login/.test(URL));
-  }, 10000);
-
-  // The above solution only waits until url is changed, so invoking
-  // pageToFullyLoad to wait for all async tasks on new page to finish before
-  // proceeding.
-  await waitFor.pageToFullyLoad();
-
-  // Client side redirection is complete, enabling wait for angular here.
-  await browser.waitForAngularEnabled(true);
+  });
 };
 
 var logout = async function() {
   await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
 
-  // Logout page performs client side redirection which is known to cause
-  // "both angularJS testability and angular testability are undefined" flake.
-  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
-  // angular is disabled during client side redirects.
-  await browser.waitForAngularEnabled(false);
-  // Wait for logout page to load.
-  await waitFor.pageToFullyLoad();
-
-  // Manually waiting for redirection here.
-  await browser.driver.wait(async() => {
-    const URL = await browser.driver.getCurrentUrl();
-    // As redirect url can be any url, so instead of testing for new url,
-    // checking whether the url is not /logout.
+  await waitFor.clientSideRedirection(async() => {
+    // Once logout page is reloaded, it triggers redirection.
+    await waitFor.pageToFullyLoad();
+  }, (URL) => {
+    // Waiting till url is not /logout anymore (that is url is changed)
     return !(/logout/.test(URL));
-  }, 10000);
-
-  // The above solution only waits until url is changed, so invoking
-  // pageToFullyLoad to wait for all async tasks on new page to finish before
-  // proceeding.
-  await waitFor.pageToFullyLoad();
-
-  // Client side redirection is complete, enabling wait for angular here.
-  await browser.waitForAngularEnabled(true);
+  });
 };
 
 // The user needs to log in immediately before this method is called. Note
@@ -145,29 +113,13 @@ var _completeSignup = async function(username) {
 
   var registerUser = element(by.css('.protractor-test-register-user'));
 
-  // Signup page performs client side redirection which is known to cause
-  // "both angularJS testability and angular testability are undefined" flake.
-  // As suggested by protractor devs here (http://git.io/v4gXM), waiting for
-  // angular is disabled during client side redirects.
-  await browser.waitForAngularEnabled(false);
-  await action.click('Register user button', registerUser);
-
-  // The await action.click only waits until button is clicked, it doesnot wait
-  // for the redirection to trigger. So, manually waiting for redirection here.
-  await browser.driver.wait(async() => {
-    const URL = await browser.driver.getCurrentUrl();
-    // As redirect url can be any url, so instead of testing for new url,
-    // checking whether the url is not /signup.
+  await waitFor.clientSideRedirection(() => {
+    // Clicking register user button to trigger redirection.
+    await action.click('Register user button', registerUser);
+  }, (URL) => {
+    // Waiting till url is not /signup anymore (that is url is changed)
     return !(/signup/.test(URL));
-  }, 10000);
-
-  // The above solution only waits until url is changed, so invoking
-  // pageToFullyLoad to wait for all async tasks on new page to finish before
-  // proceeding.
-  await waitFor.pageToFullyLoad();
-
-  // Client side redirection is complete, enabling wait for angular here.
-  await browser.waitForAngularEnabled(true);
+  });
 };
 
 var createAndLoginUser = async function(
