@@ -46,7 +46,7 @@ export class PreviewThumbnailComponent {
 
   ngOnInit(): void {
     let entityType = this.contextService.getEntityType();
-    if (entityType === null) {
+    if (entityType === undefined) {
       throw new Error('No image present for preview');
     }
     this.editableThumbnailDataUrl = (
