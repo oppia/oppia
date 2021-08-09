@@ -15,21 +15,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: '2.x'
+          python-version: '3.7'
           architecture: 'x64'
-      - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: pip install wheel==0.35.0
       - name: Install Third Party Dependencies
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run lighthouse checks
+      - name: Run Lighthouse accessibility checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode accessibility
+        run: python -m scripts.run_lighthouse_tests --mode accessibility --shard ${{ matrix.shard }}

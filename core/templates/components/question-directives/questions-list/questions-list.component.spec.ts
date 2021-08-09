@@ -987,7 +987,7 @@ describe('QuestionsListComponent', () => {
     spyOn(QuestionsListService, 'getQuestionSummariesAsync');
     spyOn(ctrl, 'saveAndPublishQuestion');
 
-    ctrl.updateSkillLinkage('commit');
+    ctrl.updateSkillLinkage('commit', true);
     $scope.$apply();
     $timeout.flush(500);
 
@@ -1011,7 +1011,7 @@ describe('QuestionsListComponent', () => {
     ctrl.saveQuestion();
     $scope.$apply();
 
-    expect(ctrl.updateSkillLinkage).toHaveBeenCalledWith('commit');
+    expect(ctrl.updateSkillLinkage).toHaveBeenCalledWith('commit', true);
 
     // If skillLinkageModificationsArray is not present.
     ctrl.skillLinkageModificationsArray = [];

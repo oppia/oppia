@@ -238,26 +238,35 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             }]
         }]
         invalid_items_with_error_messages = [
-            ({
-                'tab_contents-with-value': [{
-                    'content': 1234, 'title': 'hello'
-                }, {
-                    'content': '<p>oppia</p>', 'title': 'Savjet 1'
-                }]
-            }, 'Expected unicode HTML string, received 1234'),
-            ({
-                'tab_content-with-value': [{
-                    'content': '<p>hello</p>', 'title': 'hello'
-                }]
-            },
-             'Missing attributes: tab_contents-with-value, Extra attributes: '
-             'tab_content-with-value'),
-            ({
-                'tab_contents-with-value': [{
-                    'content': '<p>hello</p>', 'tab-title': 'hello'
-                }]
-            },
-             r'Missing keys: \[u\'title\'\], Extra keys: \[u\'tab-title\'\]')]
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': 1234, 'title': 'hello'
+                    }, {
+                        'content': '<p>oppia</p>', 'title': 'Savjet 1'
+                    }]
+                },
+                'Expected unicode HTML string, received 1234'
+            ),
+            (
+                {
+                    'tab_content-with-value': [{
+                        'content': '<p>hello</p>', 'title': 'hello'
+                    }]
+                },
+                 'Missing attributes: tab_contents-with-value, '
+                 'Extra attributes: tab_content-with-value'
+            ),
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': '<p>hello</p>', 'tab-title': 'hello'
+                    }]
+                },
+                re.escape(
+                    'Missing keys: [\'title\'], Extra keys: [\'tab-title\']')
+            )
+        ]
 
         self.check_validation(
             components.Tabs, valid_items, invalid_items_with_error_messages)
@@ -306,9 +315,11 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
         """Test that all components are defined."""
         rich_text_components_dir = (
             os.path.join(os.curdir, 'extensions', 'rich_text_components'))
-        actual_components = [name for name in os.listdir(
-            rich_text_components_dir) if os.path.isdir(os.path.join(
-                rich_text_components_dir, name))]
+        actual_components = [
+            name for name in os.listdir(rich_text_components_dir)
+            if name != '__pycache__' and
+               os.path.isdir(os.path.join(rich_text_components_dir, name))
+        ]
         defined_components = []
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
@@ -326,9 +337,11 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             'extensions', 'rich_text_components', 'protractor.js')
         rich_text_components_dir = (
             os.path.join(os.curdir, 'extensions', 'rich_text_components'))
-        actual_components = [name for name in os.listdir(
-            rich_text_components_dir) if os.path.isdir(os.path.join(
-                rich_text_components_dir, name))]
+        actual_components = [
+            name for name in os.listdir(rich_text_components_dir)
+            if name != '__pycache__' and
+               os.path.isdir(os.path.join(rich_text_components_dir, name))
+        ]
         with python_utils.open_file(test_file, 'r') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.
