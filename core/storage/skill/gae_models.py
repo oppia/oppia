@@ -149,7 +149,7 @@ class SkillModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_merged_skills(cls) -> List[SkillModel]:
+    def get_merged_skills(cls) -> List['SkillModel']:
         """Returns the skill models which have been merged.
 
         Returns:
