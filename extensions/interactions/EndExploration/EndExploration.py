@@ -55,7 +55,7 @@ class EndExploration(base.BaseInteraction):
             'items': {
                 'type': 'unicode',
             },
-            "validators": [{
+            'validators': [{
                 'id': 'has_length_at_most',
                 'max_value': 3,
             }],
