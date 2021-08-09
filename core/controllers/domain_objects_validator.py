@@ -100,7 +100,7 @@ def validate_collection_change(obj):
 
 
 def validate_email_dashboard_data(data):
-    # type: (Dict[String, Any]) -> None
+    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
     """Validates email dashboard data.
 
     Args:
