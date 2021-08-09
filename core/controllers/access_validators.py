@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the validating access."""
+"""Controllers for validating access."""
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -52,9 +52,12 @@ class SplashAccessValidationHandler(base.BaseHandler):
                 self.user_id):
             user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
             default_dashboard = user_settings.default_dashboard
+            # User's request request to visit splash page is not valid and they
+            # needs to be redirected to their preferred dashboard.
             self.render_json( # type: ignore[no-untyped-call]
                 {'valid': False, 'default_dashboard': default_dashboard})
         else:
+            # User's request to visit splash page is valid.
             self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
 

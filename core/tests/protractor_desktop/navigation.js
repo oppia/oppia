@@ -146,7 +146,7 @@ describe('Static Pages Tour', function() {
 
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
 
-      await waitFor.clientSideRedirection(() => {
+      await waitFor.clientSideRedirection(async() => {
         // Login page will redirect user to login page if logged in.
         await browser.get('/login');
 
