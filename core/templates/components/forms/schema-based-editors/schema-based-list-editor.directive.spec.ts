@@ -50,7 +50,7 @@ describe('Schema Based List Editor Directive', () => {
     $scope.itemSchema = () => {
       return {
         type: 'not_unicode'
-      }
+      };
     };
     $scope.validators = () => {
       return [
@@ -88,11 +88,11 @@ describe('Schema Based List Editor Directive', () => {
 
   it('should delete last element if user clicks outside the text input box' +
     ' without entering any text', () => {
-      $scope.localValue = ['item1', undefined];
+    $scope.localValue = ['item1', undefined];
 
-      $scope.lastElementOnBlur();
+    $scope.lastElementOnBlur();
 
-      expect($scope.localValue).toEqual(['item1']);
+    expect($scope.localValue).toEqual(['item1']);
   });
 
   it('should add element to the item list', () => {
@@ -144,7 +144,7 @@ describe('Schema Based List Editor Directive', () => {
         ui_config: {
           coding_mode: true
         }
-      }
+      };
     };
     ctrl.$onInit();
 
@@ -160,7 +160,7 @@ describe('Schema Based List Editor Directive', () => {
         ui_config: {
           rows: 3
         }
-      }
+      };
     };
     ctrl.$onInit();
 
@@ -169,14 +169,14 @@ describe('Schema Based List Editor Directive', () => {
 
   it('should fill item list with dummy elements if list length is less than' +
     ' minimum length', () => {
-      $scope.validators = () => {
-        return [
-          {
-            id: 'has_length_at_least',
-            min_value: 3
-          }
-        ];
-      };
+    $scope.validators = () => {
+      return [
+        {
+          id: 'has_length_at_least',
+          min_value: 3
+        }
+      ];
+    };
     $scope.localValue = ['item1'];
     ctrl.$onInit();
 
