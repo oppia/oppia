@@ -1338,7 +1338,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def get_multi_stats_models(
             cls,
-            exp_version_references: List[exp_domain.ExpVersionReference]
+            exp_version_references: List['exp_domain.ExpVersionReference']
     ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
@@ -1700,7 +1700,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entity_type: str,
             state_reference: str,
             interaction_id: str,
-            learner_answer_info_list: List[stats_domain.LearnerAnswerInfo],
+            learner_answer_info_list: List['stats_domain.LearnerAnswerInfo'],
             learner_answer_info_schema_version: int,
             accumulated_answer_info_json_size_bytes: int
     ) -> None:
