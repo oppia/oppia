@@ -61,6 +61,7 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     } else {
       this.value.push(this.choices[choiceListIndex].val);
     }
+    this.valueChanged.emit(this.value);
   }
 }
 angular.module('oppia').directive(
