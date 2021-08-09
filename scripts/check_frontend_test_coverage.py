@@ -115,7 +115,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-html-editor.directive.ts',
     'schema-based-html-viewer.directive.ts',
     'schema-based-int-editor.directive.ts',
-    'schema-based-list-editor.directive.ts',
     'schema-based-list-viewer.directive.ts',
     'schema-based-primitive-viewer.directive.ts',
     'schema-based-unicode-editor.directive.ts',
