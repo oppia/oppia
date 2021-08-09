@@ -26,12 +26,15 @@ import subprocess
 import sys
 
 import python_utils
-from scripts import common
 import utils
 
 import pkg_resources
 
-OPPIA_REQUIRED_PIP_VERSION = '20.3.4'
+from . import common
+
+
+# This is the version that is set in install_prerequisites.sh.
+OPPIA_REQUIRED_PIP_VERSION = '21.2.3'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -298,16 +301,19 @@ def _rectify_third_party_directory(mismatches):
         if not directory_version:
             _install_library(
                 normalized_library_name,
-                python_utils.convert_to_bytes(requirements_version))
+                python_utils.UNICODE(requirements_version)
+            )
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
             _install_library(
                 normalized_library_name,
-                python_utils.convert_to_bytes(requirements_version))
+                python_utils.UNICODE(requirements_version)
+            )
             _remove_metadata(
                 normalized_library_name,
-                python_utils.convert_to_bytes(directory_version))
+                python_utils.UNICODE(directory_version)
+            )
 
 
 def _is_git_url_mismatch(mismatch_item):
@@ -404,6 +410,11 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
         normalize_directory_name(
+            '%s-%s-py3.7.egg-info' % (library_name, version_string)),
+        normalize_directory_name(
+            '%s-%s-py3.7.egg-info' % (
+                library_name.replace('-', '_'), version_string)),
+        normalize_directory_name(
             '%s-%s-py2.7.egg-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s-py2.7.egg-info' % (
@@ -469,12 +480,13 @@ def _run_pip_command(cmd_parts):
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
+    elif b'can\'t combine user with prefix' in stderr:
         python_utils.PRINT('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
     else:
-        python_utils.PRINT(stderr)
+        # Error output is in bytes, we need to decode the line to print it.
+        python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')

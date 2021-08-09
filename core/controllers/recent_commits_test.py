@@ -115,8 +115,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             params={'query_type': 'all_non_private_commits'})
 
         self.assertEqual(
-            len(response_dict['results']),
-            feconf.COMMIT_LIST_PAGE_SIZE)
+            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE)
         self.assertTrue(response_dict['more'])
 
         cursor = response_dict['cursor']

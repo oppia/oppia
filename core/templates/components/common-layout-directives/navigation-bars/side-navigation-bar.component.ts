@@ -18,6 +18,7 @@
 
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -32,6 +33,8 @@ export class SideNavigationBarComponent {
    @Input() display!: boolean;
    currentUrl!: string;
    classroomSubmenuIsShown: boolean = false;
+   PAGES_REGISTERED_WITH_FRONTEND = (
+     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
    constructor(
      private windowRef: WindowRef,

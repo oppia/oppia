@@ -148,12 +148,14 @@ export const AppConstants = {
 
   DEFAULT_PROFILE_IMAGE_PATH: '/avatar/user_blue_72px.webp',
 
-  LOGOUT_URL: '/logout',
-
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (
     '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>'),
+  // This should be synchronized with SUBTOPIC_MASTERY_DATA_URL
+  // in feconf.
+  SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: (
+    '/subtopic_mastery_handler/data'),
   EDITABLE_TOPIC_DATA_URL_TEMPLATE: '/topic_editor_handler/data/<topic_id>',
 
   LABEL_FOR_CLEARING_FOCUS: 'labelForClearingFocus',
@@ -168,6 +170,7 @@ export const AppConstants = {
     SKILL: 'skill',
     STORY: 'story',
     QUESTION: 'question',
+    BLOG_POST: 'blog_post',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',

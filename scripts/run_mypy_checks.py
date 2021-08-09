@@ -22,13 +22,13 @@ from __future__ import unicode_literals
 
 import argparse
 import os
+import site
 import subprocess
 import sys
 
 import python_utils
 from scripts import common
 from scripts import install_third_party_libs
-
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
@@ -433,9 +433,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
-    'core/jobs.py',
-    'core/jobs_registry.py',
-    'core/jobs_test.py',
     'core/platform/app_identity/gae_app_identity_services.py',
     'core/platform/app_identity/gae_app_identity_services_test.py',
     'core/platform/auth/firebase_auth_services.py',
@@ -446,65 +443,37 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/bulk_email/mailchimp_bulk_email_services_test.py',
     'core/platform/cache/redis_cache_services.py',
     'core/platform/cache/redis_cache_services_test.py',
-    'core/platform/cloud_translate/cloud_translate_emulator.py',
-    'core/platform/cloud_translate/cloud_translate_emulator_test.py',
-    'core/platform/cloud_translate/cloud_translate_services.py',
-    'core/platform/cloud_translate/cloud_translate_services_test.py',
-    'core/platform/cloud_translate/dev_mode_cloud_translate_services.py',
-    'core/platform/cloud_translate/dev_mode_cloud_translate_services_test.py',
-    'core/platform/datastore/gae_datastore_services.py',
-    'core/platform/datastore/gae_datastore_services_test.py',
+    'core/platform/translate/cloud_translate_emulator.py',
+    'core/platform/translate/cloud_translate_emulator_test.py',
+    'core/platform/translate/cloud_translate_services.py',
+    'core/platform/translate/cloud_translate_services_test.py',
+    'core/platform/translate/dev_mode_translate_services.py',
+    'core/platform/translate/dev_mode_translate_services_test.py',
+    'core/platform/datastore/cloud_datastore_services.py',
+    'core/platform/datastore/cloud_datastore_services_test.py',
     'core/platform/email/dev_mode_email_services.py',
     'core/platform/email/dev_mode_email_services_test.py',
     'core/platform/email/mailgun_email_services.py',
     'core/platform/email/mailgun_email_services_test.py',
-    'core/platform/models.py',
-    'core/platform/models_test.py',
     'core/platform/search/elastic_search_services.py',
     'core/platform/search/elastic_search_services_test.py',
     'core/platform/search/gae_search_services.py',
     'core/platform/search/gae_search_services_test.py',
+    'core/platform/storage/cloud_storage_emulator.py',
+    'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform/taskqueue/cloud_taskqueue_services.py',
     'core/platform/taskqueue/cloud_taskqueue_services_test.py',
     'core/platform/taskqueue/cloud_tasks_emulator.py',
     'core/platform/taskqueue/cloud_tasks_emulator_test.py',
     'core/platform/taskqueue/dev_mode_taskqueue_services.py',
     'core/platform/taskqueue/dev_mode_taskqueue_services_test.py',
-    'core/platform/transactions/gae_transaction_services.py',
+    'core/platform/transactions/cloud_transaction_services.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
-    'core/storage/activity/gae_models.py',
-    'core/storage/activity/gae_models_test.py',
-    'core/storage/app_feedback_report/gae_models.py',
-    'core/storage/app_feedback_report/gae_models_test.py',
-    'core/storage/audit/gae_models.py',
-    'core/storage/audit/gae_models_test.py',
-    'core/storage/auth/gae_models.py',
-    'core/storage/auth/gae_models_test.py',
-    'core/storage/base_model/gae_models.py',
-    'core/storage/base_model/gae_models_test.py',
     'core/storage/beam_job/gae_models.py',
     'core/storage/beam_job/gae_models_test.py',
     'core/storage/blog/gae_models.py',
     'core/storage/blog/gae_models_test.py',
-    'core/storage/classifier/gae_models.py',
-    'core/storage/classifier/gae_models_test.py',
-    'core/storage/collection/gae_models.py',
-    'core/storage/collection/gae_models_test.py',
-    'core/storage/config/gae_models.py',
-    'core/storage/config/gae_models_test.py',
-    'core/storage/email/gae_models.py',
-    'core/storage/email/gae_models_test.py',
-    'core/storage/exploration/gae_models.py',
-    'core/storage/exploration/gae_models_test.py',
-    'core/storage/feedback/gae_models.py',
-    'core/storage/feedback/gae_models_test.py',
-    'core/storage/improvements/gae_models.py',
-    'core/storage/improvements/gae_models_test.py',
-    'core/storage/job/gae_models.py',
-    'core/storage/job/gae_models_test.py',
-    'core/storage/opportunity/gae_models.py',
-    'core/storage/opportunity/gae_models_test.py',
     'core/storage/question/gae_models.py',
     'core/storage/question/gae_models_test.py',
     'core/storage/recommendations/gae_models.py',
@@ -524,8 +493,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/storage/topic/gae_models_test.py',
     'core/storage/translation/gae_models.py',
     'core/storage/translation/gae_models_test.py',
-    'core/storage/user/gae_models.py',
-    'core/storage/user/gae_models_test.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
     'core/tests/build_sources/extensions/base.py',
@@ -597,8 +564,6 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/io/job_io_test.py',
     'jobs/io/ndb_io.py',
     'jobs/io/ndb_io_test.py',
-    'jobs/io/stub_io.py',
-    'jobs/io/stub_io_test.py',
     'jobs/job_options.py',
     'jobs/job_options_test.py',
     'jobs/job_test_utils.py',
@@ -741,6 +706,7 @@ MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
 MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
 PYTHON3_CMD = 'python3'
 
+_PATHS_TO_INSERT = [MYPY_TOOLS_DIR, ]
 
 _PARSER = argparse.ArgumentParser(
     description='Python type checking using mypy script.'
@@ -766,7 +732,7 @@ _PARSER.add_argument(
 )
 
 
-def install_third_party_libraries(skip_install):
+def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
@@ -776,11 +742,12 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, using_global_mypy):
+def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
+        mypy_exec_path: str. Path of mypy executable.
         using_global_mypy: bool. Whether generated command should run using
             global mypy.
 
@@ -790,8 +757,7 @@ def get_mypy_cmd(files, using_global_mypy):
     if using_global_mypy:
         mypy_cmd = 'mypy'
     else:
-        mypy_cmd = os.path.join(
-            os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
+        mypy_cmd = mypy_exec_path
     if files:
         cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
     else:
@@ -812,7 +778,8 @@ def install_mypy_prerequisites(install_globally):
             installed globally.
 
     Returns:
-        int. The return code from installing prerequisites.
+        tuple(int, str). The return code from installing prerequisites and the
+        path of the mypy executable.
     """
     # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
     # install packages globally for CI. In CI, pip installation is not in a way
@@ -831,13 +798,19 @@ def install_mypy_prerequisites(install_globally):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
-    if 'can\'t combine user with prefix' in output[1]:
+    if b'can\'t combine user with prefix' in output[1]:
         uextention_text = ['--user', '--prefix=', '--system']
-        process = subprocess.Popen(
+        new_process = subprocess.Popen(
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-
-    return process.returncode
+        new_process.communicate()
+        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
+        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
+        return (new_process.returncode, mypy_exec_path)
+    else:
+        _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
+        mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
+        return (process.returncode, mypy_exec_path)
 
 
 def main(args=None):
@@ -854,7 +827,8 @@ def main(args=None):
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
-    return_code = install_mypy_prerequisites(parsed_args.install_globally)
+    return_code, mypy_exec_path = install_mypy_prerequisites(
+        parsed_args.install_globally)
     if return_code != 0:
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
@@ -865,22 +839,20 @@ def main(args=None):
 
     python_utils.PRINT('Starting Mypy type checks.')
     cmd = get_mypy_cmd(
-        parsed_args.files, parsed_args.install_globally)
+        parsed_args.files, mypy_exec_path, parsed_args.install_globally)
 
-    _paths_to_insert = [
-        MYPY_TOOLS_DIR,
-        os.path.join(MYPY_TOOLS_DIR, 'bin'),
-    ]
     env = os.environ.copy()
-    for path in _paths_to_insert:
+    for path in _PATHS_TO_INSERT:
         env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
     env['PYTHONPATH'] = MYPY_TOOLS_DIR
 
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = process.communicate()
-    python_utils.PRINT(stdout)
-    python_utils.PRINT(stderr)
+    # Standard and error output is in bytes, we need to decode the line to
+    # print it.
+    python_utils.PRINT(stdout.decode('utf-8'))
+    python_utils.PRINT(stderr.decode('utf-8'))
     if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
@@ -888,7 +860,7 @@ def main(args=None):
             'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
             'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
-        sys.exit(1)
+        sys.exit(2)
     return process.returncode
 
 

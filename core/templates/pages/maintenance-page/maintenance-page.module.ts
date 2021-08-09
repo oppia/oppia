@@ -22,26 +22,24 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { MaintenancePageComponent } from
   'pages/maintenance-page/maintenance-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     MaintenancePageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     MaintenancePageComponent
   ],
   providers: [

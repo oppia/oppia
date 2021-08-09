@@ -33,6 +33,7 @@ import string
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -1055,9 +1056,8 @@ class Exploration(python_utils.OBJECT):
                 'Expected states to be a dict, received %s' % self.states)
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
-        for state_name in self.states:
+        for state_name, state in self.states.items():
             self._validate_state_name(state_name)
-            state = self.states[state_name]
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
@@ -1228,11 +1228,11 @@ class Exploration(python_utils.OBJECT):
                 interaction = state.interaction
                 if interaction.is_terminal:
                     if state_name != self.init_state_name:
-                        if self.states[state_name].card_is_checkpoint:
+                        if state.card_is_checkpoint:
                             raise utils.ValidationError(
                                 'Expected card_is_checkpoint of terminal state '
                                 'to be False but found it to be %s'
-                                % self.states[state_name].card_is_checkpoint
+                                % state.card_is_checkpoint
                             )
 
             # Check if checkpoint count is between 1 and 8, inclusive.
@@ -1686,8 +1686,7 @@ class Exploration(python_utils.OBJECT):
             self.update_init_state_name(new_state_name)
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
-        for other_state_name in self.states:
-            other_state = self.states[other_state_name]
+        for other_state in self.states.values():
             other_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in other_outcomes:
                 if outcome.dest == old_state_name:
@@ -1712,8 +1711,7 @@ class Exploration(python_utils.OBJECT):
 
         # Find all destinations in the exploration which equal the deleted
         # state, and change them to loop back to their containing state.
-        for other_state_name in self.states:
-            other_state = self.states[other_state_name]
+        for other_state_name, other_state in self.states.items():
             all_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in all_outcomes:
                 if outcome.dest == state_name:
@@ -1764,8 +1762,7 @@ class Exploration(python_utils.OBJECT):
         }
         new_states = self.states
 
-        for new_state_name in new_states:
-            new_state = new_states[new_state_name]
+        for new_state_name, new_state in new_states.items():
             if not new_state.can_undergo_classification():
                 continue
 
@@ -2120,6 +2117,27 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v46_dict_to_v47_dict(cls, states_dict):
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2156,7 +2174,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 51
+    CURRENT_EXP_SCHEMA_VERSION = 52
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2275,16 +2293,40 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v51_dict_to_v52_dict(cls, exploration_dict):
         """Converts a v51 exploration dict into a v52 exploration dict.
-        Version 52 contains exploration size.
+        Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
+        existing occurences of it to oppia-noninteractive-image tag.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v52.
+                with schema version v51.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v52.
         """
+
+        exploration_dict['schema_version'] = 52
+
+        exploration_dict['states'] = cls._convert_states_v46_dict_to_v47_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 47
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
+        """Converts a v52 exploration dict into a v53 exploration dict.
+        Version 53 contains exploration size.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v53.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v53.
+        """
+
         exploration_dict['proto_size_in_bytes'] = None
         return exploration_dict
 
@@ -2348,6 +2390,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v50_dict_to_v51_dict(
                 exploration_dict)
             exploration_schema_version = 51
+
+        if exploration_schema_version == 51:
+            exploration_dict = cls._convert_v51_dict_to_v52_dict(
+                exploration_dict)
+            exploration_schema_version = 52
 
         return exploration_dict
 
@@ -2418,8 +2465,8 @@ class Exploration(python_utils.OBJECT):
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         exploration_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -2440,21 +2487,21 @@ class Exploration(python_utils.OBJECT):
             exploration_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
-        return json.dumps(exploration_dict).encode('utf-8')
+        return json.dumps(exploration_dict)
 
     @classmethod
     def deserialize(cls, json_string):
         """Returns an Exploration domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
-                decoded into a dictionary representing an Exploration. Only call
-                on strings that were created using serialize().
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Exploration.
+                Only call on strings that were created using serialize().
 
         Returns:
             Exploration. The corresponding Exploration domain object.
         """
-        exploration_dict = json.loads(json_string.decode('utf-8'))
+        exploration_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 exploration_dict['created_on'])
