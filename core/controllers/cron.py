@@ -135,7 +135,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
             )
 
 
-class CronAppFeedbackReportsScrubberHandler(base.BaseHandler):
+class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
     """Handler for scrubbing app feedback reports that are expiring."""
 
     URL_PATH_ARGS_SCHEMAS = {}

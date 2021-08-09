@@ -900,7 +900,7 @@ URLS.extend((
         cron.CronMailReviewersContributorDashboardSuggestionsHandler),
     get_redirect_route(
         r'/cron/app_feedback_report/scrub_expiring_reports',
-        cron.CronAppFeedbackReportsScrubberHandler),
+        cron.CronAppFeedbackReportsScrubberHandlerPage),
 ))
 
 # Add tasks urls.
