@@ -74,7 +74,7 @@ var login = async function(email, useManualNavigation = true) {
     // Clicking sign in button to trigger redirection.
     await action.click('Sign in button', signInButton);
   }, (URL) => {
-    // Waiting till url is not /login anymore (that is url is changed)
+    // Waiting till url is not /login anymore (that is url is changed).
     return !(/login/.test(URL));
   });
 };
