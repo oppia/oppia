@@ -25,7 +25,7 @@ import python_utils
 
 import redis
 
-from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
@@ -43,8 +43,7 @@ CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
 )
 
 
-def get_memory_cache_stats():
-    # type: () -> caching_domain.MemoryCacheStats
+def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """Returns a memory profile of the redis cache. Visit
     https://redis.io/commands/memory-stats for more details on what exactly is
     returned.
@@ -66,15 +65,13 @@ def get_memory_cache_stats():
     return memory_stats
 
 
-def flush_caches():
-    # type: () -> None
+def flush_caches() -> None:
     """Wipes the Redis caches clean."""
     OPPIA_REDIS_CLIENT.flushdb()
     CLOUD_NDB_REDIS_CLIENT.flushdb()
 
 
-def get_multi(keys):
-    # type: (List[Text]) -> List[Optional[Text]]
+def get_multi(keys: List[str]) -> List[Optional[str]]:
     """Looks up a list of keys in Redis cache.
 
     Args:
@@ -86,12 +83,11 @@ def get_multi(keys):
     """
     assert isinstance(keys, list)
     return cast(
-        List[Optional[Text]],
+        List[Optional[str]],
         OPPIA_REDIS_CLIENT.mget(keys)) # type: ignore[no-untyped-call]
 
 
-def set_multi(key_value_mapping):
-    # type: (Dict[Text, Text]) -> bool
+def set_multi(key_value_mapping: Dict[str, str]) -> bool:
     """Sets multiple keys' values at once in the Redis cache.
 
     Args:
@@ -108,8 +104,7 @@ def set_multi(key_value_mapping):
         OPPIA_REDIS_CLIENT.mset(key_value_mapping)) # type: ignore[no-untyped-call]
 
 
-def delete_multi(keys):
-    # type: (List[Text]) -> int
+def delete_multi(keys: List[str]) -> int:
     """Deletes multiple keys in the Redis cache.
 
     Args:

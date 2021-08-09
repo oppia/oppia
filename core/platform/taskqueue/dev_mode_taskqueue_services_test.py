@@ -28,14 +28,15 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-import
 
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for dev_mode_taskqueue_services."""
 
-    def test_creating_dev_mode_task_will_create_the_correct_post_request(self):
-        # type: () -> None
+    def test_creating_dev_mode_task_will_create_the_correct_post_request(
+            self
+    ) -> None:
         correct_queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_payload = {
@@ -48,13 +49,12 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         correct_task_name = 'task1'
 
         def mock_create_task(
-                queue_name, # type: Text
-                url, # type: Text
-                payload=None, # type: Optional[Dict[Text, Any]]
-                scheduled_for=None, # type: Optional[datetime.datetime] # pylint: disable=unused-argument
-                task_name=None, # type: Optional[Text]
-        ):
-            # type: (...) -> None
+                queue_name: str,
+                url: str,
+                payload: Optional[Dict[str, Any]] = None,
+                scheduled_for: Optional[datetime.datetime] = None, # pylint: disable=unused-argument
+                task_name: Optional[str] = None,
+        ) -> None:
             self.assertEqual(queue_name, correct_queue_name)
             self.assertEqual(url, dummy_url)
             self.assertEqual(payload, correct_payload)
@@ -67,8 +67,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
                 correct_queue_name, dummy_url, payload=correct_payload,
                 task_name=correct_task_name)
 
-    def test_task_handler_will_create_the_correct_post_request(self):
-        # type: () -> None
+    def test_task_handler_will_create_the_correct_post_request(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
@@ -89,8 +88,10 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'X-AppEngine-Fake-Is-Admin': '1',
             'method': 'POST'
         }
-        def mock_post(url, json, headers, timeout):
-            # type: (Text, Dict[Text, Any], Dict[Text, Text], int) -> None
+        def mock_post(url: str,
+                      json: Dict[str, Any],
+                      headers: Dict[str, str],
+                      timeout: int) -> None:
             self.assertEqual(
                 url, 'http://localhost:%s%s' % (
                     correct_port, dummy_url))

@@ -24,20 +24,19 @@ import textwrap
 
 import python_utils
 
-from typing import Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional # isort:skip # pylint: disable=unused-import
 
 
 def send_email_to_recipients(
-        sender_email, # type: Text
-        recipient_emails, # type: List[Text]
-        subject, # type: Text
-        plaintext_body, # type: Text
-        html_body, # type: Text
-        bcc=None, # type: Optional[List[Text]]
-        reply_to=None, # type: Optional[Text]
-        recipient_variables=None # type: Optional[Dict[Text, Dict[Text, Union[Text, float]]]]]
-):
-    # type: (...) -> bool
+        sender_email: str,
+        recipient_emails: List[str],
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None
+) -> bool:
     """Prints information about sent emails to the terminal console, in order
     to model sending an email in development mode.
 

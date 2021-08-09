@@ -26,13 +26,16 @@ from __future__ import unicode_literals
 from core.platform.translate import cloud_translate_emulator
 from core.platform.translate import cloud_translate_services
 
-from typing import Text, cast # isort:skip # pylint: disable=unused-import
+from typing import cast # isort:skip # pylint: disable=unused-import
 
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
-def translate_text(text, source_language, target_language):
-    # type: (Text, Text, Text) -> Text
+def translate_text(
+        text: str,
+        source_language: str,
+        target_language: str
+) -> str:
     """Translates text into the target language.
 
     For more information on ISO 639-1 see:

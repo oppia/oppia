@@ -21,11 +21,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from typing import Text # isort:skip # pylint: disable=unused-import
 
-
-def permanently_delete_user_from_list(user_email):
-    # type: (Text) -> None
+def permanently_delete_user_from_list(user_email: str) -> None:
     """Logs that the delete request was sent.
 
     Args:
@@ -36,8 +33,10 @@ def permanently_delete_user_from_list(user_email):
         'Cannot access API, since this is a dev environment' % user_email)
 
 
-def add_or_update_user_status(user_email, can_receive_email_updates):
-    # type: (Text, bool) -> bool
+def add_or_update_user_status(
+        user_email: str,
+        can_receive_email_updates: bool
+) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
 

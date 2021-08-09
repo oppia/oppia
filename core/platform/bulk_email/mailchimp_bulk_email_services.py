@@ -28,11 +28,8 @@ import python_utils
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
-from typing import Text # isort:skip # pylint: disable=unused-import
 
-
-def _get_subscriber_hash(email):
-    # type: (Text) -> Text
+def _get_subscriber_hash(email: str) -> str:
     """Returns Mailchimp subscriber hash from email.
 
     Args:
@@ -53,8 +50,7 @@ def _get_subscriber_hash(email):
     return md5_hash.hexdigest()
 
 
-def _get_mailchimp_class():
-    # type: () -> mailchimp3.MailChimp
+def _get_mailchimp_class() -> mailchimp3.MailChimp:
     """Returns the mailchimp api class. This is separated into a separate
     function to facilitate testing.
 
@@ -81,8 +77,7 @@ def _get_mailchimp_class():
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
-def _create_user_in_mailchimp_db(user_email):
-    # type: (Text) -> bool
+def _create_user_in_mailchimp_db(user_email: str) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
 
@@ -122,8 +117,7 @@ def _create_user_in_mailchimp_db(user_email):
     return True
 
 
-def permanently_delete_user_from_list(user_email):
-    # type: (Text) -> None
+def permanently_delete_user_from_list(user_email: str) -> None:
     """Permanently deletes the user with the given email from the Mailchimp
     list.
 
@@ -161,8 +155,10 @@ def permanently_delete_user_from_list(user_email):
             raise Exception(error_message['detail'])
 
 
-def add_or_update_user_status(user_email, can_receive_email_updates):
-    # type: (Text, bool) -> bool
+def add_or_update_user_status(
+        user_email: str,
+        can_receive_email_updates: bool
+) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
 

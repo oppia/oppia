@@ -25,14 +25,19 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
 import python_utils
 
-from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional # isort:skip # pylint: disable=unused-import
 
 
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud tasks emulator."""
 
-    def mock_task_handler(self, url, payload, queue_name, task_name=None):
-        # type: (Text, Dict[Text, Any], Text, Optional[Text]) -> None
+    def mock_task_handler(
+            self,
+            url: str,
+            payload: Dict[str, Any],
+            queue_name: str,
+            task_name: Optional[str] = None
+    ) -> None:
         self.output.append(
             'Task %s in queue %s with payload %s is sent to %s.' % (
                 task_name if task_name else 'Default',
@@ -41,8 +46,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
                 url)
         )
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(CloudTasksEmulatorUnitTests, self).setUp()
         self.url = 'dummy_url'
         self.queue_name1 = 'queue_name1'
@@ -60,14 +64,13 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             },
             'param3': [1, 2, 3]
         }
-        self.output = [] # type: List[Text]
+        self.output: List[str] = []
         self.unit_test_emulator = cloud_tasks_emulator.Emulator(
             task_handler=self.mock_task_handler, automatic_task_handling=False)
         self.dev_mode_emulator = cloud_tasks_emulator.Emulator(
             task_handler=self.mock_task_handler)
 
-    def test_task_creation_is_handled_correctly(self):
-        # type: () -> None
+    def test_task_creation_is_handled_correctly(self) -> None:
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
@@ -87,8 +90,9 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         task_list = self.unit_test_emulator.get_tasks()
         self.assertEqual(len(task_list), 2)
 
-    def test_flushing_and_executing_tasks_produces_correct_behavior(self):
-        # type: () -> None
+    def test_flushing_and_executing_tasks_produces_correct_behavior(
+            self
+    ) -> None:
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
@@ -128,8 +132,8 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
     def test_tasks_scheduled_for_immediate_execution_are_handled_correctly(
-            self):
-        # type: () -> None
+            self
+    ) -> None:
         self.dev_mode_emulator.create_task(
             self.queue_name1, self.url, payload=self.payload1)
         self.dev_mode_emulator.create_task(

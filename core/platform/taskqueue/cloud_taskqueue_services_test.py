@@ -31,7 +31,7 @@ from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-import
 
 
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
@@ -42,12 +42,12 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         Tasks query.
         """
 
-        def __init__(self, name):
-            # type: (Text) -> None
+        def __init__(self, name: str) -> None:
             self.name = name
 
-    def test_http_task_scheduled_immediately_sends_correct_request(self):
-        # type: () -> None
+    def test_http_task_scheduled_immediately_sends_correct_request(
+            self
+    ) -> None:
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
@@ -59,11 +59,10 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         task_name = 'task1'
 
         def mock_create_task(
-                parent, # type: Text
-                task, # type: Dict[Text, Any]
-                retry=None # type: Optional[retry_lib.Retry]
-        ):
-            # type: (...) -> CloudTaskqueueServicesUnitTests.Response
+                parent: str,
+                task: Dict[str, Any],
+                retry: Optional[retry_lib.Retry] = None
+        ) -> CloudTaskqueueServicesUnitTests.Response:
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
@@ -90,8 +89,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             cloud_taskqueue_services.create_http_task(
                 queue_name, dummy_url, payload=payload, task_name=task_name)
 
-    def test_http_task_scheduled_for_later_sends_correct_request(self):
-        # type: () -> None
+    def test_http_task_scheduled_for_later_sends_correct_request(self) -> None:
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
@@ -108,11 +106,10 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         task_name = 'task1'
 
         def mock_create_task(
-                parent, # type: Text
-                task, # type: Dict[Text, Any]
-                retry=None # type: Optional[retry_lib.Retry]
-        ):
-            # type: (...) -> CloudTaskqueueServicesUnitTests.Response
+                parent: str,
+                task: Dict[str, Any],
+                retry: Optional[retry_lib.Retry] = None
+        ) -> CloudTaskqueueServicesUnitTests.Response:
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,

@@ -26,7 +26,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, Text, Tuple # isort:skip # pylint: disable=unused-import
+from typing import Dict, Tuple # isort:skip # pylint: disable=unused-import
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -37,15 +37,13 @@ class EmailTests(test_utils.GenericTestBase):
 
         def __init__(
                 self,
-                url, # type: Tuple[Text, Text, Dict[Text, Text]]
-                expected_url # type: Tuple[Text, Text, Dict[Text, Text]]
-        ):
-            # type: (...) -> None
+                url: Tuple[str, str, Dict[str, str]],
+                expected_url: Tuple[str, str, Dict[str, str]]
+        ) -> None:
             self.url = url
             self.expected_url = expected_url
 
-        def getcode(self):
-            # type: () -> int
+        def getcode(self) -> int:
             """Gets the status code of this url_open mock.
 
             Returns:
@@ -60,8 +58,7 @@ class EmailTests(test_utils.GenericTestBase):
                 self.url[1]['recipient_variables'][0])]
             return 200 if self.url == self.expected_url else 500
 
-    def test_send_email_to_mailgun(self):
-        # type: () -> None
+    def test_send_email_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
         expected_query_url = (
@@ -163,8 +160,7 @@ class EmailTests(test_utils.GenericTestBase):
                 recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
             self.assertTrue(resp)
 
-    def test_batch_send_to_mailgun(self):
-        # type: () -> None
+    def test_batch_send_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
@@ -194,8 +190,7 @@ class EmailTests(test_utils.GenericTestBase):
                 'Hi abc,<br> 😂')
             self.assertTrue(resp)
 
-    def test_mailgun_key_or_domain_name_not_set_raises_exception(self):
-        # type: () -> None
+    def test_mailgun_key_or_domain_name_not_set_raises_exception(self) -> None:
         """Test that exceptions are raised when API key or domain name are
         unset.
         """
@@ -222,8 +217,7 @@ class EmailTests(test_utils.GenericTestBase):
                 'plaintext_body 😂',
                 'Hi abc,<br> 😂')
 
-    def test_invalid_status_code_returns_false(self):
-        # type: () -> None
+    def test_invalid_status_code_returns_false(self) -> None:
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             {

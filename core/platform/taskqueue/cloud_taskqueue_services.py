@@ -31,7 +31,7 @@ from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-import
 
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
@@ -40,13 +40,12 @@ CLIENT = tasks_v2.CloudTasksClient(
 
 
 def create_http_task(
-        queue_name, # type: Text
-        url, # type: Text
-        payload=None, # type: Optional[Dict[Text, Any]]
-        scheduled_for=None, # type: Optional[datetime.datetime]
-        task_name=None # type: Optional[Text]
-):
-    # type: (...) -> tasks_v2.Task
+        queue_name: str,
+        url: str,
+        payload: Optional[Dict[str, Any]] = None,
+        scheduled_for: Optional[datetime.datetime] = None,
+        task_name: Optional[str] = None
+) -> tasks_v2.Task:
     """Creates an http task with the correct http headers/payload and sends
     that task to the Cloud Tasks API. An http task is an asynchronous task that
     consists of a post request to a specified url with the specified payload.
@@ -71,12 +70,12 @@ def create_http_task(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
     # Construct the request body.
-    task = {
+    task: Dict[str, Any] = {
         'app_engine_http_request': {  # Specify the type of request.
             'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
             'relative_uri': url,
         }
-    } # type: Dict[Text, Any]
+    }
 
     if payload is not None:
         if isinstance(payload, dict):

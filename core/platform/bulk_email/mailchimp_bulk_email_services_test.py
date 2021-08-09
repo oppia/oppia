@@ -22,15 +22,14 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict # isort:skip # pylint: disable=unused-import
 from mailchimp3 import mailchimpclient
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     """Tests for mailchimp services."""
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(MailchimpServicesUnitTests, self).setUp() # type: ignore[no-untyped-call]
         self.user_email_1 = 'test1@example.com'
         self.user_email_2 = 'test2@example.com'
@@ -39,7 +38,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     class MockMailchimpClass(python_utils.OBJECT):
         """Class to mock Mailchimp class."""
 
-        update_call_data = {} # type: Dict[Text, Text]
+        update_call_data: Dict[str, str] = {}
 
         class MailchimpLists(python_utils.OBJECT):
             """Class to mock Mailchimp lists object."""
@@ -47,8 +46,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             class MailchimpMembers(python_utils.OBJECT):
                 """Class to mock Mailchimp members object."""
 
-                def __init__(self):
-                    # type: () -> None
+                def __init__(self) -> None:
                     self.users_data = [{
                         # Email: test1@example.com.
                         'email_hash': 'aa99b351245441b8ca95d54a52d2998c',
@@ -59,8 +57,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         'status': 'subscribed'
                     }]
 
-                def get(self, _list_id, subscriber_hash):
-                    # type: (Text, Text) -> Dict[Text, Text]
+                def get(
+                        self,
+                        _list_id: str,
+                        subscriber_hash: str
+                ) -> Dict[str, str]:
                     """Mocks the get function of the mailchimp api.
 
                     Args:
@@ -84,8 +85,12 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
                     raise mailchimpclient.MailChimpError({'status': 404})
 
-                def update(self, _list_id, subscriber_hash, data):
-                    # type: (Text, Text, Dict[Text, Text]) -> None
+                def update(
+                        self,
+                        _list_id: str,
+                        subscriber_hash: str,
+                        data: Dict[str, str]
+                ) -> None:
                     """Mocks the update function of the mailchimp api. This
                     function just sets the payload data to a private variable
                     to test it.
@@ -100,8 +105,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         if user['email_hash'] == subscriber_hash:
                             user['status'] = data['status']
 
-                def create(self, _list_id, data):
-                    # type: (Text, Dict[Text, Text]) -> None
+                def create(self, _list_id: str, data: Dict[str, str]) -> None:
                     """Mocks the create function of the mailchimp api. This
                     function just sets the payload data to a private variable
                     to test it.
@@ -125,8 +129,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                             'status': 404, 'title': 'Invalid email',
                             'detail': 'Server Issue'})
 
-                def delete_permanent(self, _list_id, subscriber_hash):
-                    # type: (Text, Text) -> None
+                def delete_permanent(
+                        self,
+                        _list_id: str,
+                        subscriber_hash: str
+                ) -> None:
                     """Mocks the delete function of the mailchimp api. This
                     function just sets the deleted user to a private variable
                     to test it.
@@ -140,16 +147,13 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         user for user in self.users_data
                         if user['email_hash'] != subscriber_hash]
 
-            def __init__(self):
-                # type: () -> None
+            def __init__(self) -> None:
                 self.members = self.MailchimpMembers()
 
-        def __init__(self):
-            # type: () -> None
+        def __init__(self) -> None:
             self.lists = self.MailchimpLists()
 
-    def test_get_subscriber_hash(self):
-        # type: () -> None
+    def test_get_subscriber_hash(self) -> None:
         sample_email = 'test@example.com'
         subscriber_hash = '55502f40dc8b7c769880b10874abc9d0'
         self.assertEqual(
@@ -161,8 +165,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Invalid type for email. Expected string, received 5'):
             mailchimp_bulk_email_services._get_subscriber_hash(sample_email_2) # type: ignore[arg-type]  # pylint: disable=protected-access
 
-    def test_get_mailchimp_class_error(self):
-        # type: () -> None
+    def test_get_mailchimp_class_error(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailchimp API key is not available.'):
             mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
@@ -173,8 +176,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 Exception, 'Mailchimp username is not set.'):
                 mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
 
-    def test_add_or_update_mailchimp_user_status(self):
-        # type: () -> None
+    def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
         swap_mailchimp_context = self.swap(
@@ -219,8 +221,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_1, True)
 
-    def test_catch_or_raise_errors_when_creating_new_invalid_user(self):
-        # type: () -> None
+    def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
         swap_mailchimp_context = self.swap(
@@ -244,8 +245,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'test5@example.com', True)
 
-    def test_permanently_delete_user(self):
-        # type: () -> None
+    def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
         swap_mailchimp_context = self.swap(

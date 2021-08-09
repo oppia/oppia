@@ -27,13 +27,15 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-import
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
-def _task_handler(url, payload, queue_name, task_name=None):
-    # type: (Text, Dict[Text, Any], Text, Optional[Text]) -> None
+def _task_handler(url: str,
+                  payload: Dict[str, Any],
+                  queue_name: str,
+                  task_name: Optional[str] = None) -> None:
     """Makes a POST request to the task URL.
 
     Args:
@@ -43,7 +45,7 @@ def _task_handler(url, payload, queue_name, task_name=None):
         queue_name: str. The name of the queue to add the task to.
         task_name: str|None. Optional. The name of the task.
     """
-    headers = {} # type: Dict[Text, Optional[Text]]
+    headers: Dict[str, Optional[str]] = {}
     headers['X-Appengine-QueueName'] = queue_name
     headers['X-Appengine-TaskName'] = task_name
     headers['X-Appengine-TaskRetryCount'] = '0'
@@ -65,13 +67,12 @@ CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
 
 
 def create_http_task(
-        queue_name, # type: Text
-        url, # type: Text
-        payload=None, # type: Optional[Dict[Text, Any]]
-        scheduled_for=None, # type: Optional[datetime.datetime]
-        task_name=None # type: Optional[Text]
-):
-    # type: (...) -> None
+        queue_name: str,
+        url: str,
+        payload: Optional[Dict[str, Any]] = None,
+        scheduled_for: Optional[datetime.datetime] = None,
+        task_name: Optional[str] = None
+) -> None:
     """Creates a Task in the corresponding queue that will be executed when
     the 'scheduled_for' countdown expires using the cloud tasks emulator.
 

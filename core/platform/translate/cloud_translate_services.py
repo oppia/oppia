@@ -26,7 +26,7 @@ from constants import constants
 from google import auth
 from google.cloud import translate_v2 as translate
 
-from typing import Dict, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, cast # isort:skip # pylint: disable=unused-import
 
 CLIENT = translate.Client(
     credentials=(
@@ -37,8 +37,9 @@ CLIENT = translate.Client(
 LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 
 
-def translate_text(text, source_language, target_language):
-    # type: (Text, Text, Text) -> Text
+def translate_text(text: str,
+                   source_language: str,
+                   target_language: str) -> str:
     """Translates text into the target language.
 
     This method uses ISO 639-1 compliant language codes to specify languages.
@@ -67,7 +68,7 @@ def translate_text(text, source_language, target_language):
         return text
 
     result = cast(
-        Dict[Text, Text],
+        Dict[str, str],
         CLIENT.translate(
             text, target_language=target_language,
             source_language=source_language))
