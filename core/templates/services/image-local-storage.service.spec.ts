@@ -80,7 +80,7 @@ describe('ImageLocalStorageService', () => {
   );
 
   it('should set and clear the thumbnail background color', () => {
-    expect(imageLocalStorageService.getThumbnailBgColor()).toBeUndefined;
+    expect(imageLocalStorageService.getThumbnailBgColor()).toBeUndefined();
     let bgColor = '#e34d43';
     imageLocalStorageService.setThumbnailBgColor(bgColor);
     expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(bgColor);

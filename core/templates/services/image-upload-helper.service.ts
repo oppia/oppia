@@ -41,7 +41,7 @@ export class ImageUploadHelperService {
   }
 
   // Image file returned will be null when blob is not of type
-  // 'image', blob size is zero or dataURI does not exists.
+  // 'image' or blob size is zero.
   convertImageDataToImageFile(dataURI: string): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
@@ -58,7 +58,7 @@ export class ImageUploadHelperService {
 
     let blob = new Blob([ia], { type: mime });
     if (blob.type.match('image') &&
-        blob.size > 0) {
+      blob.size > 0) {
       return blob;
     }
 
