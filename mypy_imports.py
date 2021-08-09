@@ -72,11 +72,8 @@ __all__ = [
     'improvements_models',
     'job_models',
     'opportunity_models',
-<<<<<<< HEAD
     'question_models',
     'recommendations_models',
-=======
->>>>>>> f7a5746a80730753b32b555306f20c55d4023822
     'skill_models',
     'stats_models',
     'story_models',
