@@ -32,6 +32,7 @@ require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/connection-checker.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
    'user-exploration-permissions.service.ts');
@@ -43,7 +44,7 @@ angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
     '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ChangeListService',
-    'ContextService', 'EditabilityService',
+    'ConnectionCheckerService', 'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
@@ -53,7 +54,7 @@ angular.module('oppia').component('editorNavigation', {
     'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
-        ContextService, EditabilityService,
+        ConnectionCheckerService, ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
@@ -90,6 +91,7 @@ angular.module('oppia').component('editorNavigation', {
       $scope.saveIsInProcess = false;
       $scope.publishIsInProcess = false;
       $scope.loadingDotsAreShown = false;
+      $scope.connectedToInternet = true;
 
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
@@ -208,6 +210,13 @@ angular.module('oppia').component('editorNavigation', {
               }
             }
           )
+        );
+        this.directiveSubscriptions.add(
+          ConnectionCheckerService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              $scope.connectedToInternet = internetAccessible;
+              $scope.$applyAsync();
+            })
         );
 
         $scope.isPostTutorialHelpPopoverShown = (

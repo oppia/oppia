@@ -35,17 +35,17 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/editability.service.ts');
-require('services/connection-service.service.ts');
+require('services/connection-checker.service.ts');
 
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$scope', '$uibModal', 'ChangeListService', 'ConnectionService',
+    '$scope', '$uibModal', 'ChangeListService', 'ConnectionCheckerService',
     'EditabilityService', 'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationWarningsService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $uibModal, ChangeListService, ConnectionService,
+        $scope, $uibModal, ChangeListService, ConnectionCheckerService,
         EditabilityService, ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService,
         UserExplorationPermissionsService) {
@@ -104,7 +104,9 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       };
 
       $scope.getPublishExplorationButtonTooltip = function() {
-        if ($scope.countWarnings() > 0) {
+        if (!$scope.connectedToInternet) {
+          return 'You can not publish the exploration when offline.';
+        } else if ($scope.countWarnings() > 0) {
           return 'Please resolve the warnings before publishing.';
         } else if ($scope.isExplorationLockedForEditing()) {
           return 'Please save your changes before publishing.';
@@ -114,7 +116,9 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       };
 
       $scope.getSaveButtonTooltip = function() {
-        if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
+        if (!$scope.connectedToInternet) {
+          return 'You can not save the exploration when offline.';
+        } else if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
           return 'Please resolve the warnings.';
         } else if ($scope.isPrivate()) {
           return 'Save Draft';
@@ -168,7 +172,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
         $scope.explorationCanBePublished = false;
-        $scope.isOffline = false;
+        $scope.connectedToInternet = true;
 
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
@@ -187,15 +191,10 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
             )
         );
         ctrl.directiveSubscriptions.add(
-          ConnectionService.onInternetStateChange.subscribe(
+          ConnectionCheckerService.onInternetStateChange.subscribe(
             internetAccessible => {
-              if (internetAccessible) {
-                $scope.isOffline = false;
-                $scope.$applyAsync();
-              } else {
-                $scope.isOffline = true;
-                $scope.$applyAsync();
-              }
+              $scope.connectedToInternet = internetAccessible;
+              $scope.$applyAsync();
             })
         );
       };

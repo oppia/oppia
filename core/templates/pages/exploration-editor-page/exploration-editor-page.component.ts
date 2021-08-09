@@ -149,7 +149,7 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
-require('services/connection-service.service.ts');
+require('services/connection-checker.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 
@@ -161,7 +161,7 @@ angular.module('oppia').component('explorationEditorPage', {
   controller: [
     '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ConnectionService', 'ContextService',
+    'ChangeListService', 'ConnectionCheckerService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -184,7 +184,7 @@ angular.module('oppia').component('explorationEditorPage', {
     function(
         $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
-        ChangeListService, ConnectionService, ContextService,
+        ChangeListService, ConnectionCheckerService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -209,7 +209,6 @@ angular.module('oppia').component('explorationEditorPage', {
       var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
-      ctrl.connectionService = ConnectionService;
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -280,7 +279,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
 
-          ctrl.alertsService = AlertsService;
+
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
           ctrl.explorationObjectiveService = ExplorationObjectiveService;
@@ -499,8 +498,7 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        ctrl.connectionService.checkNetworkState();
-        ctrl.connectionService.checkInternetState();
+        ConnectionCheckerService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
@@ -510,7 +508,7 @@ angular.module('oppia').component('explorationEditorPage', {
           )
         );
         ctrl.directiveSubscriptions.add(
-          ConnectionService.onInternetStateChange.subscribe(
+          ConnectionCheckerService.onInternetStateChange.subscribe(
             internetAccessible => {
               if (internetAccessible) {
                 AlertsService.addSuccessMessage(

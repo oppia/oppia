@@ -37,7 +37,7 @@ import { UserExplorationPermissionsService } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { AlertsService } from 'services/alerts.service';
-import { ConnectionService } from 'services/connection-service.service';
+import { ConnectionCheckerService } from 'services/connection-checker.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -206,7 +206,7 @@ describe('Exploration editor page component', function() {
         AutosaveInfoModalsService,
         ChangeListService,
         ContextService,
-        ConnectionService,
+        ConnectionCheckerService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
@@ -253,7 +253,7 @@ describe('Exploration editor page component', function() {
     $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
-    cns = $injector.get('ConnectionService');
+    cns = $injector.get('ConnectionCheckerService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
@@ -500,6 +500,7 @@ describe('Exploration editor page component', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
   });
+
   describe('Checking internet Connection', () => {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
@@ -651,7 +652,7 @@ describe('Exploration editor page component', function() {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
-      spyOn(cns, 'checkInternetState');
+      spyOn(cns, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -752,7 +753,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
-      spyOn(cns, 'checkInternetState');
+      spyOn(cns, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(true));
 
@@ -764,7 +765,7 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
-      spyOn(cns, 'checkInternetState');
+      spyOn(cns, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(false));
 

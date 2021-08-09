@@ -295,7 +295,7 @@
 /core/templates/services/contextual/url.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-dimensions.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
-/core/templates/services/connection-service.service*.ts @srijanreddy98
+/core/templates/services/connection-checker.service*.ts @srijanreddy98
 
 
 # Global stylesheet.
