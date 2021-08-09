@@ -26,6 +26,12 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import email_models
+    from mypy_imports import user_models # pylint: disable=unused-import
+
 (base_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
 
@@ -33,24 +39,27 @@ import feconf
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
-    def setUp(self):
-        super(SentEmailModelUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super(SentEmailModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
 
         def mock_generate_hash(
-                unused_cls, unused_recipient_id, unused_email_subject,
-                unused_email_body):
+                unused_cls: email_models.SentEmailModel,
+                unused_recipient_id: str,
+                unused_email_subject: str,
+                unused_email_body: str
+        ) -> str:
             return 'Email Hash'
 
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             email_models.SentEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id(self) -> None:
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
@@ -66,7 +75,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 email_models.SentEmailModel.has_reference_to_user_id('id_x'))
 
-    def test_saved_model_can_be_retrieved_with_same_hash(self):
+    def test_saved_model_can_be_retrieved_with_same_hash(self) -> None:
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
@@ -89,7 +98,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
             self.assertEqual(len(results), 0)
 
-    def test_get_by_hash_works_correctly(self):
+    def test_get_by_hash_works_correctly(self) -> None:
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
@@ -104,7 +113,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
             self.assertEqual(len(results), 0)
 
-    def test_get_by_hash_returns_multiple_models_with_same_hash(self):
+    def test_get_by_hash_returns_multiple_models_with_same_hash(self) -> None:
         with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
@@ -120,7 +129,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
             self.assertEqual(len(results), 2)
 
-    def test_get_by_hash_behavior_with_sent_datetime_lower_bound(self):
+    def test_get_by_hash_behavior_with_sent_datetime_lower_bound(self) -> None:
         with self.generate_constant_hash_ctx:
             time_now = datetime.datetime.utcnow()
 
@@ -147,18 +156,21 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(results), 1)
 
             # Check that it accepts only DateTime objects.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
                 Exception,
                 'Expected datetime, received Not a datetime object of type '
                 '<class \'str\'>'
             ):
+                # TODO(#13528): Remove this test after the backend is fully
+                # type-annotated. Here ignore[arg-type] is used to test method
+                # get_by_hash() for invalid input type.
                 email_models.SentEmailModel.get_by_hash(
                     'Email Hash',
-                    sent_datetime_lower_bound='Not a datetime object')
+                    sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]
 
-    def test_raise_exception_by_mocking_collision(self):
+    def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The id generator for SentEmailModel is '
             'producing too many collisions.'
         ):
@@ -177,12 +189,12 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the BulkEmailModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             email_models.BulkEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id(self) -> None:
         email_models.BulkEmailModel.create(
             'instance_id', ['recipient_1_id', 'recipient_2_id'], 'sender_id',
             'sender@email.com', feconf.BULK_EMAIL_INTENT_MARKETING,
@@ -198,7 +210,7 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
 
-    def test_same_inputs_always_gives_same_hashes(self):
+    def test_same_inputs_always_gives_same_hashes(self) -> None:
         email_model_instance = email_models.SentEmailModel(
             id='exp_id.new_id',
             recipient_id='recipient_id',
@@ -216,7 +228,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
         email_hash2 = email_model_instance.email_hash
         self.assertEqual(email_hash1, email_hash2)
 
-    def test_different_inputs_give_different_hashes(self):
+    def test_different_inputs_give_different_hashes(self) -> None:
         email_model_instance = email_models.SentEmailModel(
             id='exp_id.new_id',
             recipient_id='recipient_id',

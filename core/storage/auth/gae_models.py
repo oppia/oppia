@@ -104,6 +104,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
         if user_auth_model and user_auth_model.parent_user_id:
             parent_data = user_models.UserSettingsModel.get(
                 user_auth_model.parent_user_id)
+            # Ruling out the possibility of None for mypy type checking.
+            assert parent_data is not None
             parent_username = parent_data.username
             return {'parent_username': parent_username}
         else:

@@ -21,6 +21,13 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
+from typing import Dict, List, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -74,17 +81,18 @@ class JobModel(base_models.BaseModel):
     additional_job_params = datastore_services.JsonProperty(default=None)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -100,7 +108,7 @@ class JobModel(base_models.BaseModel):
         })
 
     @property
-    def is_cancelable(self):
+    def is_cancelable(self) -> bool:
         """Checks if the job is cancelable.
 
         Returns:
@@ -110,7 +118,7 @@ class JobModel(base_models.BaseModel):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
-    def get_all_unfinished_jobs(cls, limit):
+    def get_all_unfinished_jobs(cls, limit: int) -> List['JobModel']:
         """Gets at most `limit` unfinished jobs.
 
         Args:
@@ -120,12 +128,16 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
-        return cls.query().filter(
-            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
-        ).order(-cls.time_queued_msec).fetch(limit)
+        return cast(
+            List[JobModel],
+            cls.query().filter(
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
+            ).order(-cls.time_queued_msec).fetch(limit)
+        )
 
     @classmethod
-    def get_unfinished_jobs(cls, job_type):
+    def get_unfinished_jobs(cls, job_type: str) -> datastore_services.Query:
         """Gets jobs that are unfinished.
 
         Args:
@@ -139,7 +151,7 @@ class JobModel(base_models.BaseModel):
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
 
     @classmethod
-    def do_unfinished_jobs_exist(cls, job_type):
+    def do_unfinished_jobs_exist(cls, job_type: str) -> bool:
         """Checks if unfinished jobs exist.
 
         Args:

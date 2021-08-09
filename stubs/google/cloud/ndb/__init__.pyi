@@ -37,7 +37,8 @@ class Property(object):
     def __init__(
         self, name: Optional[Text] = ..., indexed: Optional[bool] = ...,
         repeated: Optional[bool] = ..., required: Optional[bool] = ...,
-        default: Optional[Any] = ..., choices: Optional[List[Any]] = ...,
+        default: Optional[Any] = ...,
+        choices: Union[List[Any], Tuple[Any, ...], None] = ...,
         validator: Optional[Callable[..., Any]] = ...,
         verbose_name: Optional[Text] = ...
     ) -> None: ...

@@ -22,6 +22,13 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
+from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -107,7 +114,7 @@ class TaskEntryModel(base_models.BaseModel):
         default=None, required=False, indexed=True)
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether any TaskEntryModel references the given user.
 
         Args:
@@ -119,7 +126,7 @@ class TaskEntryModel(base_models.BaseModel):
         return cls.query(cls.resolver_id == user_id).get() is not None
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding to a user:
         resolver_id field.
 
@@ -130,16 +137,21 @@ class TaskEntryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
-    def apply_deletion_policy(cls, user_id):
+    def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete instances of TaskEntryModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(cls.query(cls.resolver_id == user_id))
+        task_entry_models = cast(
+            List[TaskEntryModel],
+            cls.query(cls.resolver_id == user_id).fetch()
+        )
+        cls.delete_multi(task_entry_models)
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users resolve tasks.
         """
@@ -149,7 +161,7 @@ class TaskEntryModel(base_models.BaseModel):
             .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user:
         TaskEntryModel contains the ID of the user that acted on a task.
         """
@@ -168,7 +180,7 @@ class TaskEntryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_field_name_mapping_to_takeout_keys(cls):
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
         """Defines the mapping of field names to takeout keys since this model
         is exported as one instance shared across users.
         """
@@ -180,7 +192,7 @@ class TaskEntryModel(base_models.BaseModel):
         }
 
     @staticmethod
-    def export_data(user_id):
+    def export_data(user_id: str) -> Dict[str, List[str]]:
         """Returns the user-relevant properties of TaskEntryModels.
 
         Args:
@@ -206,8 +218,14 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_task_id(
-            cls, entity_type, entity_id, entity_version, task_type, target_type,
-            target_id):
+            cls,
+            entity_type: str,
+            entity_id: str,
+            entity_version: int,
+            task_type: str,
+            target_type: str,
+            target_id: str
+    ) -> str:
         """Generates a new task entry ID.
 
         Args:
@@ -228,7 +246,11 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_composite_entity_id(
-            cls, entity_type, entity_id, entity_version):
+            cls,
+            entity_type: str,
+            entity_id: str,
+            entity_version: int
+    ) -> str:
         """Generates a new composite_entity_id value.
 
         Args:
@@ -245,16 +267,17 @@ class TaskEntryModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            entity_type,
-            entity_id,
-            entity_version,
-            task_type,
-            target_type,
-            target_id,
-            issue_description=None,
-            status=TASK_STATUS_OBSOLETE,
-            resolver_id=None,
-            resolved_on=None):
+            entity_type: str,
+            entity_id: str,
+            entity_version: int,
+            task_type: str,
+            target_type: str,
+            target_id: str,
+            issue_description: Optional[str] = None,
+            status: str = TASK_STATUS_OBSOLETE,
+            resolver_id: Optional[str] = None,
+            resolved_on: Optional[str] = None
+    ) -> str:
         """Creates a new task entry and puts it in storage.
 
         Args:

@@ -323,8 +323,8 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self):
             # type: (base_models.BaseHumanMaintainedModel) -> None
-            """Function to make changes in datastore entities used for
-            testing.
+            """Function to modify and save the entities used for testing
+            to the datastore.
             """
             self._last_updated_timestamp_is_fresh = True
             self.last_updated_by_human = datetime.datetime.utcnow()
@@ -337,10 +337,10 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             if self.last_updated is None:
                 self.last_updated = datetime.datetime.utcnow()
 
-            # We have not used BaseHumanMaintainedModel.put() because it is
-            # not implemented and throws error rather than saving the changes.
-            # We have used BaseModel.put() because we wanted the
-            # changes made above to be saved.
+            # We are using BaseModel.put() to save the changes to the datastore
+            # since the put() method which TestBaseHumanMaintainedModel class
+            # inherits from BaseHumanMaintainedModel raises NotImplementedError,
+            # and we do actually want to save the changes in this case.
             base_models.BaseModel.put(self)
 
         with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
