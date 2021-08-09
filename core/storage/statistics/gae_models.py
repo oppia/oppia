@@ -23,8 +23,16 @@ import datetime
 import json
 import sys
 
+# TODO(#13594): After the domain layer is refactored to be independent of
+# the storage layer, the disable=invalid-import will
+# be removed.
+# The following import is dangerous and should not be generally
+# used. We had to use this ignore as we need to import the domain layer
+# for type-annotation.
+# Here exp_domain is imported outside the 'if MYPY:' block. If it is
+# imported inside the 'if MYPY:' block, during runtime exp_domain
+# won't be accessible.
 from core.domain import exp_domain # pylint: disable=invalid-import
-from core.domain import stats_domain # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
@@ -1338,7 +1346,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def get_multi_stats_models(
             cls,
-            exp_version_references: List['exp_domain.ExpVersionReference']
+            exp_version_references: List[exp_domain.ExpVersionReference]
     ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
@@ -1694,13 +1702,17 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     # TODO(#13523): Change 'learner_answer_info_list' to TypedDict/Domain Object
     # to remove Any used below.
+    # TODO(#13594): After the domain layer is refactored to be independent of
+    # the storage layer, 'learner_answer_info_list' will be changed to
+    # List[LearnerAnswerInfo]. We cannot use this type now because it leads
+    # to circular imports.
     @classmethod
     def create_model_instance(
             cls,
             entity_type: str,
             state_reference: str,
             interaction_id: str,
-            learner_answer_info_list: List['stats_domain.LearnerAnswerInfo'],
+            learner_answer_info_list: List[Any],
             learner_answer_info_schema_version: int,
             accumulated_answer_info_json_size_bytes: int
     ) -> None:
