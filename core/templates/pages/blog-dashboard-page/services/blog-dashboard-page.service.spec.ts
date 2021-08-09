@@ -22,6 +22,7 @@ import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-ba
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageService } from './blog-dashboard-page.service';
+import { BlogPostData } from 'domain/blog/blog-post.model';
 
 describe('Blog Post Page service', () => {
   let alertsService: AlertsService;
@@ -134,4 +135,56 @@ describe('Blog Post Page service', () => {
         'Blog Post Deleted Successfully.', 5000);
       expect(blogDashboardPageService.activeTab).toBe('main');
     }));
+
+  it('should succesfully set the blog post title in navbar', fakeAsync(() => {
+    spyOn(blogDashboardPageService.updateNavTitleEventEmitter, 'emit');
+
+    blogDashboardPageService.setNavTitle(false, '');
+    tick();
+
+    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
+      .toHaveBeenCalledWith('New Post - Untitled');
+
+    blogDashboardPageService.setNavTitle(false, 'Sample Title');
+    tick();
+
+    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
+      .toHaveBeenCalledWith('Draft - Sample Title');
+
+    blogDashboardPageService.setNavTitle(true, 'Sample Title');
+    tick();
+
+    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
+      .toHaveBeenCalledWith('Published - Sample Title');
+  }));
+
+  it('should set and retrieve blogPostId correctly', () => {
+    blogDashboardPageService.blogPostId = 'abc123456abc';
+
+    expect(blogDashboardPageService.blogPostId).toEqual('abc123456abc');
+  });
+
+  it('should set and retrieve author picture url correctly', () => {
+    blogDashboardPageService.authorPictureUrl = 'sample.png';
+
+    expect(blogDashboardPageService.authorPictureUrl).toEqual('sample.png');
+  });
+
+  it('should set and retrieve blog post data correctly', () => {
+    let summaryObject = BlogPostData.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        content: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+
+    blogDashboardPageService.blogPostData = summaryObject;
+
+    expect(blogDashboardPageService.blogPostData).toEqual(summaryObject);
+  });
 });

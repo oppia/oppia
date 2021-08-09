@@ -268,6 +268,15 @@ describe('Blog Dashboard Page Component', () => {
         last_updated: '3232323',
         published_on: '3232323',
       });
+    let blogDashboardData = {
+      username: 'test_user',
+      profilePictureDataUrl: 'sample_url',
+      numOfPublishedBlogPosts: 0,
+      numOfDraftBlogPosts: 0,
+      publishedBlogPostSummaryDicts: [],
+      draftBlogPostSummaryDicts: [],
+    };
+    component.blogDashboardData = blogDashboardData;
     component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
     component.blogDashboardData.draftBlogPostSummaryDicts = [];
     component.blogDashboardData.numOfDraftBlogPosts = 0;
@@ -281,5 +290,63 @@ describe('Blog Dashboard Page Component', () => {
       .toEqual([]);
     expect(component.blogDashboardData.numOfPublishedBlogPosts).toEqual(0);
     expect(component.blogDashboardData.numOfDraftBlogPosts).toEqual(1);
+  });
+
+  it('should successfully remove blog post summary when blog post' +
+  'published blog post is deleted', () => {
+    let summaryObject = BlogPostSummary.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        summary: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+    let blogDashboardData = {
+      username: 'test_user',
+      profilePictureDataUrl: 'sample_url',
+      numOfPublishedBlogPosts: 0,
+      numOfDraftBlogPosts: 0,
+      publishedBlogPostSummaryDicts: [summaryObject],
+      draftBlogPostSummaryDicts: [],
+    };
+    component.blogDashboardData = blogDashboardData;
+    component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
+
+    component.removeBlogPost(summaryObject, true);
+    expect(component.blogDashboardData.publishedBlogPostSummaryDicts).toEqual(
+      []);
+  });
+
+  it('should successfully remove blog post summary when blog post' +
+  'draft blog post is deleted', () => {
+    let summaryObject = BlogPostSummary.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        summary: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+    let blogDashboardData = {
+      username: 'test_user',
+      profilePictureDataUrl: 'sample_url',
+      numOfPublishedBlogPosts: 0,
+      numOfDraftBlogPosts: 0,
+      publishedBlogPostSummaryDicts: [],
+      draftBlogPostSummaryDicts: [summaryObject],
+    };
+    component.blogDashboardData = blogDashboardData;
+    component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
+
+    component.removeBlogPost(summaryObject, false);
+    expect(component.blogDashboardData.draftBlogPostSummaryDicts).toEqual(
+      []);
   });
 });

@@ -36,8 +36,8 @@ describe('Blog Dashboard Tile Component', () => {
   let fixture: ComponentFixture<BlogDashboardTileComponent>;
   let ngbModal: NgbModal;
   let sampleBlogPostSummary: BlogPostSummaryBackendDict;
-  let blogDashboardPageService: BlogDashboardPageService;
   let blogPostEditorBackendApiService: BlogPostEditorBackendApiService;
+  let blogDashboardPageService: BlogDashboardPageService;
   let sampleBlogPostData: BlogPostData;
   let alertsService: AlertsService;
   let sampleBlogPostBackendDict = {
@@ -61,9 +61,6 @@ describe('Blog Dashboard Tile Component', () => {
       declarations: [
         BlogDashboardTileComponent,
         MockTranslatePipe,
-        BlogDashboardPageService,
-        BlogPostEditorBackendApiService,
-        AlertsService
       ],
       providers: [
         {
@@ -178,7 +175,7 @@ describe('Blog Dashboard Tile Component', () => {
       sampleBlogPostSummary);
     spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
       .and.returnValue(Promise.resolve({blogPostDict: sampleBlogPostData}));
-    spyOn(component, 'unpublisedBlogPost');
+    spyOn(component.unpublisedBlogPost, 'emit');
 
     component.unpublishBlogPost();
     tick();
@@ -188,7 +185,7 @@ describe('Blog Dashboard Tile Component', () => {
 
     tick();
 
-    expect(component.unpublisedBlogPost).toHaveBeenCalled();
+    expect(component.unpublisedBlogPost.emit).toHaveBeenCalled();
   }));
 
 
@@ -215,7 +212,7 @@ describe('Blog Dashboard Tile Component', () => {
 
     expect(component.unpublisedBlogPost).not.toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to save Blog Post. Internal Error: status: 500');
+      'Failed to unpublish Blog Post. Internal Error: status: 500');
   }));
 
   it('should not unpublish blog post data if cancelled.', fakeAsync(() => {

@@ -87,11 +87,11 @@ export class BlogDashboardTileComponent implements OnInit {
           this.alertsService.addWarning(
             `Failed to unpublish Blog Post. Internal Error: ${errorResponse}`);
         }
-      ), () => {
+      );
+    }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
-      };
     });
   }
 }
