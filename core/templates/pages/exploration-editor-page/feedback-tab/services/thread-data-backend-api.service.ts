@@ -163,8 +163,7 @@ export class ThreadDataBackendApiService {
       }
     );
 
-    let threads = this.http.get<ThreadData>(
-      this.getThreadListHandlerUrl());
+    let threads = this.http.get<ThreadData>(this.getThreadListHandlerUrl());
 
     return forkJoin([suggestions, threads])
       .toPromise()
@@ -215,11 +214,15 @@ export class ThreadDataBackendApiService {
   }
 
   async getOpenThreadsCountAsync(): Promise<number> {
-    return this.http.get<NumberOfOpenThreads>(
+    let threadsCount = this.http.get<NumberOfOpenThreads>(
       this.getFeedbackStatsHandlerUrl()
-    ).toPromise().then((response: NumberOfOpenThreads) => {
-      return this.openThreadsCount = response.num_open_threads;
-    });
+    ).toPromise().then(
+      (response: NumberOfOpenThreads) => {
+        this.openThreadsCount = response.num_open_threads;
+        return this.openThreadsCount;
+      }
+    );
+    return threadsCount;
   }
 
   getOpenThreadsCount(): number {
