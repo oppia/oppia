@@ -850,7 +850,8 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         of this model.
 
         Returns:
-            CommunityContributionStatsModel. The single model instance.
+            CommunityContributionStatsModel|None. The single model instance
+                or None.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID

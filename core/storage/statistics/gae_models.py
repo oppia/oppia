@@ -1273,8 +1273,8 @@ class ExplorationStatsModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            ExplorationStatsModel. Exploration analytics model instance in
-            datastore.
+            ExplorationStatsModel|None. Exploration analytics model instance in
+            datastore or None.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exploration_stats_model = cls.get(instance_id, strict=False)
@@ -1444,8 +1444,8 @@ class ExplorationIssuesModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            ExplorationIssuesModel. Exploration issues model instance in
-            datastore.
+            ExplorationIssuesModel|None. Exploration issues model instance in
+            datastore or None.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exp_issues_model = cls.get(instance_id, strict=False)
