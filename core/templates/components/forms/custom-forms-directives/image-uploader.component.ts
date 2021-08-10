@@ -19,6 +19,7 @@
 import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
@@ -49,8 +50,9 @@ export class ImageUploaderComponent {
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   constructor(
+    private blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
   ) { }
 
   ngOnInit(): void {

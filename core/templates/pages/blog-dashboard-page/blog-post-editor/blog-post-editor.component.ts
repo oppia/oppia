@@ -101,6 +101,9 @@ export class BlogPostEditorComponent implements OnInit {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+      if (this.windowIsNarrow && this.uploadedImageDataUrl) {
+        this.blogDashboardPageService.imageUploaderIsNarrow = true;
+      }
     });
   }
 
@@ -130,6 +133,9 @@ export class BlogPostEditorComponent implements OnInit {
               .getThumbnailUrlForPreview(
                 AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostId,
                 this.blogPostData.thumbnailFilename);
+            if (this.windowIsNarrow) {
+              this.blogDashboardPageService.imageUploaderIsNarrow = true;
+            }
           }
           if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
             this.lastChangesWerePublished = true;
@@ -248,6 +254,9 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogPostEditorBackendService.postThumbnailDataAsync(
       this.blogPostId, imagesData).then(
       () => {
+        if (this.windowIsNarrow) {
+          this.blogDashboardPageService.imageUploaderIsNarrow = true;
+        }
         this.alertsService.addSuccessMessage(
           'Thumbnail Saved Successfully.');
       }, (errorResponse) => {

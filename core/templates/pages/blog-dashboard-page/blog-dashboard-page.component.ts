@@ -114,7 +114,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     if (index > -1) {
       summaryDicts.splice(index, 1);
     }
-    this.blogDashboardData.draftBlogPostSummaryDicts.push(
+    this.blogDashboardData.draftBlogPostSummaryDicts.unshift(
       blogPostSummary);
     this.blogDashboardData.numOfDraftBlogPosts += 1;
     this.blogDashboardData.numOfPublishedBlogPosts -= 1;

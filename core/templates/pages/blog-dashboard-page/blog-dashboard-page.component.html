@@ -57,7 +57,7 @@
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
                                          [activeView]="activeView"
-                                         class="d-flex flex-grow-1">
+                                         class="d-flex flex-grow-1 blog-tiles-list">
               </oppia-blog-dashboard-tile>
             </mat-list-item>
           </mat-list>
@@ -90,7 +90,7 @@
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
                                          [activeView]="activeView"
-                                         class="d-flex flex-grow-1">
+                                         class="d-flex flex-grow-1 blog-tiles-list">
               </oppia-blog-dashboard-tile>
             </mat-list-item>
           </mat-list>
@@ -206,6 +206,10 @@
 
   .view-active {
     color: #00645C;
+  }
+
+  .blog-tiles-list {
+    cursor: pointer;
   }
 
   :host /deep/ .mat-tab-label {

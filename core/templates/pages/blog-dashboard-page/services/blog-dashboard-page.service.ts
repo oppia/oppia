@@ -30,15 +30,16 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
   providedIn: 'root'
 })
 export class BlogDashboardPageService {
-  private _blogPostId: string;
-  private _authorPictureUrl: string;
-  private _blogPostData: BlogPostData;
+  private _blogPostId: string = '';
+  private _authorPictureUrl: string = '';
+  private _blogPostData: null | BlogPostData = null;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
-  private _blogPostAction: string;
+  private _blogPostAction: string = '';
   private _updateViewEventEmitter = new EventEmitter<void>();
   private _updateNavTitleEventEmitter = new EventEmitter<string>();
+  private _imageUploaderIsNarrow: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -101,11 +102,11 @@ export class BlogDashboardPageService {
     this._blogPostId = id;
   }
 
-  set blogPostData(data: BlogPostData) {
+  set blogPostData(data: BlogPostData | null) {
     this._blogPostData = data;
   }
 
-  get blogPostData(): BlogPostData {
+  get blogPostData(): BlogPostData | null {
     return this._blogPostData;
   }
 
@@ -115,6 +116,14 @@ export class BlogDashboardPageService {
 
   set authorPictureUrl(url: string) {
     this._authorPictureUrl = url;
+  }
+
+  set imageUploaderIsNarrow(value: boolean) {
+    this._imageUploaderIsNarrow = value;
+  }
+
+  get imageUploaderIsNarrow(): boolean {
+    return this._imageUploaderIsNarrow;
   }
 
   get updateViewEventEmitter(): EventEmitter<void> {
