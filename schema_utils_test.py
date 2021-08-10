@@ -1148,16 +1148,16 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ({
                 'arg_a': 'arbitary_argument_a',
                 'arg_b': 'arbitary_argument_b'
-            }, {
-                'arg_a': 'arbitary_argument_a',
-                'arg_b': 'arbitary_argument_b'
             })
         ]
+        validate_schema(schema)
 
-        invalid_values_with_error_messages = [] # type: List[Tuple[Any, str]]
+        for raw_value in mappings:
+            normalized_obj = (
+                schema_utils.normalize_against_schema(raw_value, schema))
 
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
+            self.assertEqual(normalized_obj.arg_a, 'arbitary_argument_a')
+            self.assertEqual(normalized_obj.arg_b, 'arbitary_argument_b')
 
     def test_notification_user_ids_list_validator(self):
         # type: () -> None
@@ -1273,16 +1273,21 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
 
 def validation_method_for_testing(obj):
-    # type: (Dict[Any, Any]) -> None
+    # type: (Dict[Text, Text]) -> Dict[Text, Text]
     """Method to test 'validation_method' key of schema.
 
     Args:
         obj: dict. Dictionary form of the argument.
+
+    Returns:
+        dict(str, str). Returns object after validation.
     """
     if 'arg_a' not in obj:
         raise Exception('Missing arg_a in argument.')
     if 'arg_b' not in obj:
         raise Exception('Missing arg_b in argument.')
+
+    return obj
 
 
 class ValidateClassForTesting(python_utils.OBJECT):

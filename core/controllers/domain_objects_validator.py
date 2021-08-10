@@ -37,10 +37,15 @@ def validate_exploration_change(obj):
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns object after validation.
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
     exp_domain.ExplorationChange(obj)
+
+    return obj
 
 
 def validate_new_config_property_values(obj):
@@ -49,6 +54,9 @@ def validate_new_config_property_values(obj):
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns object after validation.
     """
     for (name, value) in obj.items():
         if not isinstance(name, python_utils.BASESTRING):
@@ -61,6 +69,8 @@ def validate_new_config_property_values(obj):
 
         config_property.normalize(value)
 
+    return obj
+
 
 def validate_change_dict_for_blog_post(change_dict):
     # type: (Dict[Any, Any]) -> None
@@ -68,6 +78,9 @@ def validate_change_dict_for_blog_post(change_dict):
 
     Args:
         change_dict: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns object after validation.
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(
@@ -86,6 +99,8 @@ def validate_change_dict_for_blog_post(change_dict):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
 
+    return change_dict
+
 
 def validate_collection_change(obj):
     # type: (Dict[String, Any]) -> None
@@ -93,10 +108,15 @@ def validate_collection_change(obj):
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns object after validation.
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
     collection_domain.CollectionChange(obj)
+
+    return obj
 
 
 def validate_task_entry_for_improvements(task_entry):
@@ -105,6 +125,9 @@ def validate_task_entry_for_improvements(task_entry):
 
     Args:
         task_entry: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns object after validation.
     """
     # There is no validate method in domain layer.
     entity_version = task_entry.get('entity_version', None)
@@ -120,3 +143,5 @@ def validate_task_entry_for_improvements(task_entry):
     status = task_entry.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
+
+    return task_entry
