@@ -644,7 +644,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.match(regex_pattern, obj))
 
     @staticmethod
-    def is_gae_search_query_string(obj):
+    def is_search_query_string(obj):
         # type: (Text) -> bool
         """Checks if the given obj (a string) is a gae search query string.
 

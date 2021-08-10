@@ -26,6 +26,8 @@ import schema_utils
 
 from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
+SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
+
 
 def validate(
         handler_args, handler_args_schemas, allowed_extra_args,
@@ -68,7 +70,7 @@ def validate(
         # but from API request they are received as string type.
         if (
                 allow_string_to_bool_conversion and
-                arg_schema['schema']['type'] == 'bool' and
+                arg_schema['schema']['type'] == SCHEMA_TYPE_BOOL and
                 isinstance(handler_args[arg_key], python_utils.BASESTRING)
         ):
             handler_args[arg_key] = (
@@ -107,7 +109,9 @@ def convert_string_to_bool(param):
     elif case_insensitive_param == 'false':
         return False
     else:
-        return False
+        # String values other than booleans should be returned as it is, so that
+        # schema validation will raise exceptions appropriately.
+        return param
 
 
 # Handlers which require schema validation, but currently they do
