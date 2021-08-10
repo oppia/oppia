@@ -21,13 +21,6 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -47,18 +40,17 @@ class ExplorationRecommendationsModel(
         repeated=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
+    def get_deletion_policy():
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user():
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+    def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'recommended_exploration_ids':
@@ -82,18 +74,17 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     content = datastore_services.JsonProperty(required=True)
 
     @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
+    def get_deletion_policy():
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user():
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+    def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
