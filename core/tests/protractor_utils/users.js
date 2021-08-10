@@ -71,11 +71,11 @@ var login = async function(email, useManualNavigation = true) {
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
 
   await waitFor.clientSideRedirection(async() => {
-    // Clicking sign in button to trigger redirection.
+    // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
-  }, (URL) => {
-    // Waiting till url is not /login anymore (that is url is changed).
-    return !(/login/.test(URL));
+  }, (url) => {
+    // Wait until the URL has changed to something that is not /login.
+    return !(/login/.test(url));
   });
 };
 
@@ -83,11 +83,11 @@ var logout = async function() {
   await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
 
   await waitFor.clientSideRedirection(async() => {
-    // Once logout page is reloaded, it triggers redirection.
+    // Once logout page is fully loaded, it will trigger redirection.
     await waitFor.pageToFullyLoad();
-  }, (URL) => {
-    // Waiting till url is not /logout anymore (that is url is changed)
-    return !(/logout/.test(URL));
+  }, (url) => {
+    // Wait until the URL has changed to something that is not /logout.
+    return !(/logout/.test(url));
   });
 };
 
@@ -114,11 +114,11 @@ var _completeSignup = async function(username) {
   var registerUser = element(by.css('.protractor-test-register-user'));
 
   await waitFor.clientSideRedirection(async() => {
-    // Clicking register user button to trigger redirection.
+    // Click the "register user" button to trigger redirection.
     await action.click('Register user button', registerUser);
-  }, (URL) => {
-    // Waiting till url is not /signup anymore (that is url is changed)
-    return !(/signup/.test(URL));
+  }, (url) => {
+    // Wait until the URL has changed to something that is not /signup.
+    return !(/signup/.test(url));
   });
 };
 

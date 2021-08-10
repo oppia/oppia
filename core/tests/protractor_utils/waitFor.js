@@ -182,22 +182,22 @@ var fileToBeDownloaded = async function(filename) {
 };
 
 var clientSideRedirection = async function(action, check) {
-  // Client side redirection which is known to cause "both angularJS testability
+  // Client side redirection is known to cause "both angularJS testability
   // and angular testability are undefined" flake.
-  // As suggested protractor devs here (http://git.io/v4gXM), waiting for
+  // As suggested by protractor devs here (http://git.io/v4gXM), waiting for
   // angular is disabled during client side redirects.
   await browser.waitForAngularEnabled(false);
 
   // Action triggering redirection.
   await action();
 
-  // The action only triggers the redirection but donot waits for it to
+  // The action only triggers the redirection but does not waits for it to
   // complete. Manually waiting for redirection here.
   await browser.driver.wait(async() => {
-    const URL = await browser.driver.getCurrentUrl();
+    var url = await browser.driver.getCurrentUrl();
     // Condition to wait on.
-    return check(URL);
-  }, 10000);
+    return check(url);
+  }, DEFAULT_WAIT_TIME_MSECS);
 
   // The above solution only waits until url is changed, so invoking
   // pageToFullyLoad to wait for all async tasks on new page to finish before

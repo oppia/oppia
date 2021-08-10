@@ -199,11 +199,11 @@ describe('Topic and Story viewer functionality', function() {
       await topicViewerPage.selectSkillForPractice('Subtopic TASV1');
 
       await waitFor.clientSideRedirection(async() => {
-        // Start practice button triggers redirection to practice session page.
+        // Start practice to trigger redirection to practice session page.
         await topicViewerPage.startPractice();
-      }, (URL) => {
-        // Waiting for url to change to /practice.
-        return (/practice/.test(URL));
+      }, (url) => {
+        // Wait until the URL has changed to /practice.
+        return (/practice/.test(url));
       });
 
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');

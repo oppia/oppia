@@ -150,17 +150,17 @@ describe('Static Pages Tour', function() {
         // Login page will redirect user to login page if logged in.
         await browser.get('/login');
 
-        // Waiting for first redirection (login page to splash page).
+        // Wait for first redirection (login page to splash page).
         await browser.driver.wait(async() => {
-          const URL = await browser.driver.getCurrentUrl();
-          // Waiting for url to not be login anymore (that it is changed).
-          return !(/login/.test(URL));
+          var url = await browser.driver.getCurrentUrl();
+          // Wait until the URL has changed to something that is not /login.
+          return !(/login/.test(url));
         }, 10000);
       },
-      (URL) => {
-        // Waiting for second redirection (splash page to preferred dashboard
+      (url) => {
+        // Wait for second redirection (splash page to preferred dashboard
         // page).
-        return URL !== 'http://localhost:9001/';
+        return url !== 'http://localhost:9001/';
       });
 
       await waitFor.presenceOf(
