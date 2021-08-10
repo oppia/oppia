@@ -21,6 +21,7 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import base
 from core.domain import blog_domain
 from core.domain import collection_domain
@@ -145,3 +146,25 @@ def validate_task_entry_for_improvements(task_entry):
         raise base.BaseHandler.InvalidInputException('No status provided')
 
     return task_entry
+
+def validate_email_dashboard_data(data):
+    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
+    """Validates email dashboard data.
+
+    Args:
+        data: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns object after validation.
+    """
+    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    possible_keys = [predicate['backend_attr'] for predicate in predicates]
+
+    for key, value in data.items():
+        if value is None:
+            continue
+        if key not in possible_keys:
+            # Raise exception if key is not one of the allowed keys.
+            raise Exception('400 Invalid input for query.')
+
+    return data
