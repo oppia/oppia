@@ -273,6 +273,8 @@ class AdminHandler(base.BaseHandler):
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
+                new_rule_dicts = [
+                    new_rule.to_dict() for new_rule in new_rules]
 
                 try:
                     feature_services.update_feature_flag_rules(
@@ -283,7 +285,7 @@ class AdminHandler(base.BaseHandler):
                     raise self.InvalidInputException(e)
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
-                    '%s.' % (self.user_id, feature_name, new_rules.from_dict()))
+                    '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
