@@ -1812,8 +1812,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         })
 
 
-# TODO(#13614): Determine whether this model can be updated to use an
-# int version instead, and update existing datastore models if needed.
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
@@ -1823,6 +1822,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     # ID of exploration.
     exploration_id = datastore_services.StringProperty(indexed=True)
+    # TODO(#13614): Determine whether ExplorationAnnotationsModel can be
+    # updated to use an int type for the 'version' instead,
+    # and update existing datastore models if needed.
     # Version of exploration.
     version = datastore_services.StringProperty(indexed=True)
     # Number of students who started the exploration.
