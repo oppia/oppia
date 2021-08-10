@@ -55,22 +55,25 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         self.prod_feature = registry.Registry.create_platform_parameter(
             PARAM_NAMES.parameter_b, 'parameter for test', DATA_TYPES.bool,
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [
+                            ['=', param_domain.SERVER_MODES.dev.value]
+                        ]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+        new_rules = [
+            param_domain.PlatformParameterRule.from_dict(
+                rule_dict) for rule_dict in new_rule_dicts
+        ]
         registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules',
-            [
-                {
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.SERVER_MODES.dev.value]
-                            ]
-                        }
-                    ],
-                    'value_when_matched': True
-                }
-            ]
-        )
+            self.prod_feature.name, self.user_id, 'edit rules', new_rules)
 
         feature_services.ALL_FEATURES_LIST = param_names
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
@@ -154,17 +157,22 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
         """Enables the dummy_feature for the dev environment."""
-        feature_services.update_feature_flag_rules(
-            param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
-            'update rule for testing purpose',
-            [{
+        new_rule_dicts = [
+            {
                 'value_when_matched': is_enabled,
                 'filters': [{
                     'type': 'server_mode',
                     'conditions': [['=', mode.value]]
                 }]
-            }]
-        )
+            }
+        ]
+        new_rules = [
+            param_domain.PlatformParameterRule.from_dict(
+                rule_dict) for rule_dict in new_rule_dicts
+        ]
+        feature_services.update_feature_flag_rules(
+            param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
+            'update rule for testing purpose', new_rules)
 
     def _mock_dummy_feature_stage(self, stage):
         """Creates a mock context in which the dummy_feature is at the
