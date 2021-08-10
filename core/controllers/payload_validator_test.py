@@ -142,5 +142,7 @@ class CheckConversionOfStringToBool(test_utils.GenericTestBase):
             payload_validator.convert_string_to_bool('true'))
         self.assertFalse(
             payload_validator.convert_string_to_bool('false'))
-        self.assertFalse(
-            payload_validator.convert_string_to_bool('any_other_value'))
+        self.assertEqual(
+            payload_validator.convert_string_to_bool('any_other_value'),
+            'any_other_value'
+        )

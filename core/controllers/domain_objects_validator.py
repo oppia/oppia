@@ -21,6 +21,7 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
@@ -108,3 +109,21 @@ def validate_state_dict(state_dict):
     """
     validation_class = state_domain.State.from_dict(state_dict)
     validation_class.validate(None, True)
+
+
+def validate_email_dashboard_data(data):
+    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
+    """Validates email dashboard data.
+
+    Args:
+        data: dict. Data that needs to be validated.
+    """
+    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    possible_keys = [predicate['backend_attr'] for predicate in predicates]
+
+    for key, value in data.items():
+        if value is None:
+            continue
+        if key not in possible_keys:
+            # Raise exception if key is not one of the allowed keys.
+            raise Exception('400 Invalid input for query.')
