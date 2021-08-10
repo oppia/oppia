@@ -28,6 +28,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SimpleChanges } from '@angular/core';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 let gifshot = require('gifshot');
 
 describe('ImageEditor', () => {
@@ -39,6 +40,7 @@ describe('ImageEditor', () => {
   let imageUploadHelperService: ImageUploadHelperService;
   let imageLocalStorageService: ImageLocalStorageService;
   let alertsService: AlertsService;
+  let svgSanitizerService: SvgSanitizerService;
   let dimensionsOfImage = {
     width: 450,
     height: 350
@@ -339,6 +341,9 @@ describe('ImageEditor', () => {
     set src(url) {
       this.onload();
     }
+    addEventListener(txt, func, bool) {
+      func();
+    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -358,6 +363,7 @@ describe('ImageEditor', () => {
   }));
 
   beforeEach(() => {
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     alertsService = TestBed.inject(AlertsService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
@@ -374,7 +380,9 @@ describe('ImageEditor', () => {
     // error because 'HTMLImageElement' has around 250 more properties.
     // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new MockImageObject());
+    spyOn(window, 'Image').and.returnValues(new MockImageObject(), {
+      src: null
+    });
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
@@ -1603,6 +1611,50 @@ describe('ImageEditor', () => {
   it('should return uploaded image dynamic style when called', () => {
     expect(component.getUploadedImageDynamicStyles())
       .toBe('width: 490px; height: 864px;');
+  });
+
+  it('should upload file when the user clicks \’Upload Image\’ image', () => {
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              },
+              getImageData: (x, y, width, height) => {
+                return 'data';
+              },
+              putImageData: (data, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    let dataSvg = component.data.metadata;
+    component.data = { mode: component.MODE_EMPTY, metadata: {}, crop: true };
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      dataSvg.uploadedImageData);
+
+    component.onFileChanged(dataSvg.uploadedFile);
+
+    expect(component.data).toEqual({
+      mode: 2,
+      metadata: {
+        uploadedFile: dataSvg.uploadedFile,
+        uploadedImageData: dataSvg.uploadedImageData,
+        originalWidth: 300,
+        originalHeight: 150
+      },
+      crop: false
+    });
   });
 
   it('should crop svg when user clicks the \'crop\' button', () => {

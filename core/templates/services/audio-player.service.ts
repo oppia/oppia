@@ -52,9 +52,6 @@ export class AudioPlayerService {
   ) {}
 
   private async _loadAsync(filename: string, successCallback, errorCallback) {
-    if (this._loadingTrack) {
-      throw new Error('Already loading a track... Please try again!');
-    }
     if (this._currentTrackFilename === filename) {
       return;
     }

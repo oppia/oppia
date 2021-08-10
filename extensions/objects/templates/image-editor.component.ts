@@ -861,8 +861,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       const img = new Image();
       img.onload = () => {
         // Check point 2 in the note before imports and after fileoverview.
-        this.imgData = (<FileReader>e.target).result;
-        let imageData: string | SafeResourceUrl = (<FileReader>e.target).result;
+        this.imgData = reader.result as string;
+        let imageData: string | SafeResourceUrl = reader.result as string;
         if (file.name.endsWith('.svg')) {
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
             imageData as string);
@@ -886,7 +886,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         };
         this.updateValidationWithLatestDimensions();
       };
-      img.src = <string>((<FileReader>e.target).result);
+      img.src = <string>(reader.result);
     };
     reader.readAsDataURL(file);
   }

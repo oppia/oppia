@@ -42,7 +42,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'App.ts',
-    'audio-player.service.ts',
     'audio-preloader.service.ts',
     'Base.ts',
     'change-list.service.ts',
