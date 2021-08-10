@@ -1274,7 +1274,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
         Returns:
             ExplorationStatsModel|None. Exploration analytics model instance in
-            datastore or None.
+            datastore, or None if no such model instance exists.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exploration_stats_model = cls.get(instance_id, strict=False)
@@ -1445,7 +1445,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
         Returns:
             ExplorationIssuesModel|None. Exploration issues model instance in
-            datastore or None.
+            datastore, or None if no such model instance exists.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exp_issues_model = cls.get(instance_id, strict=False)

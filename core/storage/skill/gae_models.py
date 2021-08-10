@@ -315,7 +315,9 @@ class SkillSummaryModel(base_models.BaseModel):
 
         Args:
             page_size: int. Number of skills to fetch.
-            urlsafe_start_cursor: str|None. The cursor to the next page.
+            urlsafe_start_cursor: str|None. The cursor to the next page or
+                None. If None, this means that the search should start from the
+                first page of results.
             sort_by: str|None. A string indicating how to sort the result.
 
         Returns:

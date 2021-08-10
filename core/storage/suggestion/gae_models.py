@@ -850,8 +850,8 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         of this model.
 
         Returns:
-            CommunityContributionStatsModel|None. The single model instance
-            or None.
+            CommunityContributionStatsModel|None. The single model instance,
+            or None if no such model instance exists.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
@@ -1028,7 +1028,8 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
         Returns:
             TranslationContributionStatsModel|None. The matching
-            TranslationContributionStatsModel.
+            TranslationContributionStatsModel, or None if no such model
+            instance exists.
         """
         entity_id = cls.generate_id(
             language_code, contributor_user_id, topic_id)
