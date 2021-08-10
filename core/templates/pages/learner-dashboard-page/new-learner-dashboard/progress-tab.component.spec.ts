@@ -25,12 +25,16 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ProgressTabComponent } from './progress-tab.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 describe('Progress tab Component', () => {
   let component: ProgressTabComponent;
   let fixture: ComponentFixture<ProgressTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
+  let learnerDashboardBackendApiService:
+    LearnerDashboardBackendApiService = null;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -44,7 +48,8 @@ describe('Progress tab Component', () => {
         ProgressTabComponent
       ],
       providers: [
-        UrlInterpolationService
+        UrlInterpolationService,
+        LearnerDashboardBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -54,6 +59,8 @@ describe('Progress tab Component', () => {
     fixture = TestBed.createComponent(ProgressTabComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    learnerDashboardBackendApiService =
+        TestBed.inject(LearnerDashboardBackendApiService);
     const sampleStorySummaryBackendDict = {
       id: '0',
       title: 'Story Title',
@@ -72,6 +79,70 @@ describe('Progress tab Component', () => {
     let storySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict);
     component.completedStoriesList = [storySummary];
+    let subtopic = {
+      skill_ids: ['skill_id_2'],
+      id: 1,
+      title: 'subtopic_name',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      url_fragment: 'subtopic-name'
+    };
+
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+    const learnerTopicSummaryBackendDict1 = {
+      id: 'BqXdwH8YOsGX',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      total_published_node_count: 0,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: true,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    };
+    component.partiallyLearntTopicsList =
+    [LearnerTopicSummary.createFromBackendDict(
+      learnerTopicSummaryBackendDict1)];
+    component.learntTopicsList = [];
+    spyOn(learnerDashboardBackendApiService, 'fetchSubtopicMastery')
+      .and.returnValue(Promise.resolve({}));
+    component.displaySkills = [false];
     fixture.detectChanges();
   });
 
@@ -96,5 +167,36 @@ describe('Progress tab Component', () => {
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should display skills', () => {
+    component.showSkills(0);
+    expect(component.displaySkills[0]).toEqual(true);
+  });
+
+  it('should get the topic Mastery', () => {
+    component.subtopicMastery = {
+      BqXdwH8YOsGX: {
+        1: 1,
+        2: 0
+      }
+    };
+    component.getTopicMastery();
+    expect(component.topicMastery).toEqual([100]);
+  });
+
+  it('should get circular progress', () => {
+    component.topicMastery = [20];
+    var cssStyle = component.calculateCircularProgress(0);
+    expect(cssStyle).toEqual(
+      'linear-gradient(162deg, transparent 50%, #CCCCCC 50%)' +
+      ', linear-gradient(90deg, #CCCCCC 50%, transparent 50%)');
+
+    component.topicMastery = [60];
+    cssStyle = component.calculateCircularProgress(0);
+    expect(cssStyle).toEqual(
+      'linear-gradient(270deg, #00645C 50%, transparent 50%), ' +
+      'linear-gradient(-54deg, #00645C 50%, #CCCCCC 50%)'
+    );
   });
 });
