@@ -56,6 +56,8 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     # We have ignored [attr-defined] below because there is some error in
     # the redis typeshed. Typestubs don't define the method memory_stats()
     # for the redis.StrictRedis object.
+    # TODO(#13617): Update our typeshed after redis stubs are improved in
+    # typeshed. Then the ignore[attr-defined] used below can be removed.
     redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
     memory_stats = caching_domain.MemoryCacheStats( # type: ignore[no-untyped-call]
         redis_full_profile.get('total.allocated'),
