@@ -36,8 +36,7 @@ base_models, improvements_models = models.Registry.import_models(
 class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
@@ -53,14 +52,12 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             improvements_models.TaskEntryModel.has_reference_to_user_id('xid'))
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             improvements_models.TaskEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy(self):
-        # type: () -> None
+    def test_apply_deletion_policy(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
@@ -78,8 +75,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
 
-    def test_export_data_without_any_tasks(self):
-        # type: () -> None
+    def test_export_data_without_any_tasks(self) -> None:
         self.assertEqual(
             improvements_models.TaskEntryModel.export_data('uid'),
             {
@@ -89,8 +85,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
                 'task_ids_resolved_by_user': []
             })
 
-    def test_export_data_with_task(self):
-        # type: () -> None
+    def test_export_data_with_task(self) -> None:
         task_id_1 = improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_1',
@@ -121,8 +116,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
                 'task_ids_resolved_by_user': [task_id_1, task_id_2]
             })
 
-    def test_generate_new_task_id(self):
-        # type: () -> None
+    def test_generate_new_task_id(self) -> None:
         self.assertEqual(
             improvements_models.TaskEntryModel.generate_task_id(
                 improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
@@ -133,8 +127,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
                 'tid'),
             'exploration.eid.1.high_bounce_rate.state.tid')
 
-    def test_can_create_task_with_unicode_identifiers(self):
-        # type: () -> None
+    def test_can_create_task_with_unicode_identifiers(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_\U0001F4C8',
@@ -143,8 +136,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             improvements_models.TASK_TARGET_TYPE_STATE,
             'tid_\U0001F4C8')
 
-    def test_can_create_new_high_bounce_rate_task(self):
-        # type: () -> None
+    def test_can_create_new_high_bounce_rate_task(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
@@ -155,8 +147,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=improvements_models.TASK_STATUS_OPEN)
 
-    def test_can_create_new_successive_incorrect_answers_task(self):
-        # type: () -> None
+    def test_can_create_new_successive_incorrect_answers_task(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
@@ -167,8 +158,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=improvements_models.TASK_STATUS_OPEN)
 
-    def test_can_create_new_needs_guiding_responses_task(self):
-        # type: () -> None
+    def test_can_create_new_needs_guiding_responses_task(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
@@ -179,8 +169,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=improvements_models.TASK_STATUS_OPEN)
 
-    def test_can_create_new_ineffective_feedback_loop_task(self):
-        # type: () -> None
+    def test_can_create_new_ineffective_feedback_loop_task(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
@@ -191,8 +180,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=improvements_models.TASK_STATUS_OPEN)
 
-    def test_can_not_create_duplicate_tasks(self):
-        # type: () -> None
+    def test_can_not_create_duplicate_tasks(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',

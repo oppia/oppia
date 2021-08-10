@@ -20,13 +20,6 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
 
@@ -44,7 +37,6 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -63,7 +55,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_instance_id(cls, skill_id, version):
-        # type: (Text, int) -> Text
         """This function returns the generated id for the get_commit function
         in the parent class.
 
@@ -78,7 +69,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -86,7 +76,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
@@ -148,13 +137,11 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_merged_skills(cls):
-        # type: () -> List[SkillModel]
         """Returns the skill models which have been merged.
 
         Returns:
@@ -165,11 +152,8 @@ class SkillModel(base_models.VersionedModel):
             skill.superseding_skill_id is not None and (
                 len(skill.superseding_skill_id) > 0))]
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
-        # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -199,13 +183,11 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -226,7 +208,6 @@ class SkillModel(base_models.VersionedModel):
 
     @classmethod
     def get_by_description(cls, description):
-        # type: (Text) -> Optional[SkillModel]
         """Gets SkillModel by description. Returns None if the skill with
         description doesn't exist.
 
@@ -237,11 +218,9 @@ class SkillModel(base_models.VersionedModel):
             SkillModel|None. The skill model of the skill or None if not
             found.
         """
-        return cast(
-            Optional[SkillModel],
-            SkillModel.query().filter(
-                cls.description == description).filter(
-                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return SkillModel.query().filter(
+            cls.description == description).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -282,19 +261,16 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -308,19 +284,13 @@ class SkillSummaryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def fetch_page(
-            cls,
-            page_size, # type: int
-            urlsafe_start_cursor, # type: Optional[Text]
-            sort_by # type: Optional[Text]
-    ):
-        # type: (...) -> Tuple[List[SkillSummaryModel], Optional[Text], bool]
+    def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):
         """Returns the models according to values specified.
 
         Args:
             page_size: int. Number of skills to fetch.
             urlsafe_start_cursor: str. The cursor to the next page.
-            sort_by: str|None. A string indicating how to sort the result.
+            sort_by: str. A string indicating how to sort the result.
 
         Returns:
             3-tuple(query_models, urlsafe_start_cursor, more). where:
@@ -362,6 +332,4 @@ class SkillSummaryModel(base_models.BaseModel):
             next_cursor.urlsafe().decode('utf-8')
             if (next_cursor and more_results) else None
         )
-        return (
-            cast(List[SkillSummaryModel], query_models),
-            new_urlsafe_start_cursor, more_results)
+        return query_models, new_urlsafe_start_cursor, more_results

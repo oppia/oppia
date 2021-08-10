@@ -911,6 +911,8 @@ STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+# This should be synchronized with SUBTOPIC_MASTERY_DATA_URL_TEMPLATE
+# in app.constants.ts.
 SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'

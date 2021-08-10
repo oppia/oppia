@@ -20,13 +20,6 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
 
@@ -44,7 +37,6 @@ class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -63,7 +55,6 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_instance_id(cls, story_id, version):
-        # type: (Text, int) -> Text
         """This function returns the generated id for the get_commit function
         in the parent class.
 
@@ -78,7 +69,6 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -86,7 +76,6 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
@@ -142,15 +131,11 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
-        # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -180,13 +165,11 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -206,7 +189,6 @@ class StoryModel(base_models.VersionedModel):
 
     @classmethod
     def get_by_url_fragment(cls, url_fragment):
-        # type: (Text) -> Optional[StoryModel]
         """Gets StoryModel by url_fragment. Returns None if the story with
         name url_fragment doesn't exist.
 
@@ -217,11 +199,9 @@ class StoryModel(base_models.VersionedModel):
             StoryModel|None. The story model of the story or None if not
             found.
         """
-        return cast(
-            Optional[StoryModel],
-            StoryModel.query().filter(
-                cls.url_fragment == url_fragment).filter(
-                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return StoryModel.query().filter(
+            cls.url_fragment == url_fragment).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -268,19 +248,16 @@ class StorySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,

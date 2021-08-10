@@ -24,11 +24,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import story_models
-
 (base_models, story_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.story])
 
@@ -36,7 +31,6 @@ if MYPY: # pragma: no cover
 class StorySnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
         self.assertEqual(
             story_models.StorySnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -46,13 +40,11 @@ class StoryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story models."""
 
     def test_get_deletion_policy(self):
-        # type: () -> None
         self.assertEqual(
             story_models.StoryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_story_model(self):
-        # type: () -> None
         """Method to test the StoryModel."""
 
         committer_id = 'test_committer_id'
@@ -80,7 +72,6 @@ class StoryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_by_id.url_fragment, 'title')
 
     def test_get_by_url_fragment(self):
-        # type: () -> None
         committer_id = 'test_committer_id'
         commit_message = 'test_commit_message'
         commit_cmds = [{'cmd': 'test_command'}]
@@ -98,8 +89,6 @@ class StoryModelTest(test_utils.GenericTestBase):
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_url_fragment('unique-url')
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert story_by_id is not None
         self.assertEqual(story_by_id.description, 'description')
         self.assertEqual(story_by_id.id, 'id')
         self.assertEqual(story_by_id.notes, 'notes')
@@ -112,7 +101,6 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
     def test_has_reference_to_user_id(self):
-        # type: () -> None
         commit = story_models.StoryCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -131,13 +119,11 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story summary models."""
 
     def test_get_deletion_policy(self):
-        # type: () -> None
         self.assertEqual(
             story_models.StorySummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_story_summary_model(self):
-        # type: () -> None
         """Method to test the StorySummaryModel."""
 
         story_summary_model = story_models.StorySummaryModel(
