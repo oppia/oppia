@@ -58,7 +58,6 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
             elif 'default_value' not in arg_schema:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
-
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
@@ -94,11 +93,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableTopicDataHandler',
     'EditorAutosaveHandler',
     'EditorHandler',
-    'EmailDashboardDataHandler',
-    'EmailDashboardPage',
-    'EmailDashboardResultPage',
-    'EmailDashboardTestBulkEmailHandler',
-    'EmailDashboardCancelEmailHandler',
     'ExplorationActualStartEventHandler',
     'ExplorationCompleteEventHandler',
     'ExplorationEmbedPage',
@@ -119,9 +113,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ExplorationStatusHandler',
     'ExplorationSummariesHandler',
     'ExportAccountHandler',
-    'FeedbackStatsHandler',
     'FeedbackThreadStatusChangeEmailHandler',
-    'FeedbackThreadViewEventHandler',
     'FetchIssuesHandler',
     'FetchPlaythroughHandler',
     'FetchSkillsHandler',
@@ -168,7 +160,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ProfilePictureHandlerByUsernameHandler',
     'PromoBarHandler',
     'QuebstionsListHandler',
-    'QueryStatusCheckHandler',
     'QuestionCountDataHandler',
     'QuestionCreationHandler',
     'QuestionPlayerHandler',
@@ -177,7 +168,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'RatingHandler',
     'ReaderFeedbackHandler',
     'RecentCommitsHandler',
-    'RecentFeedbackMessagesHandler',
     'RecommendationsHandler',
     'ReleaseCoordinatorPage',
     'ResolveIssueHandler',
@@ -220,9 +210,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
-    'ThreadHandler',
-    'ThreadListHandler',
-    'ThreadListHandlerForTopicsHandler',
     'TopUnresolvedAnswersHandler',
     'TopicAssignmentsHandler',
     'TopicEditorPage',
