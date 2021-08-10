@@ -20,7 +20,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-type TranslatableHtmlContentIdEditorChoices = {val: string}[];
+type TranslatableHtmlContentIdEditorChoices = { val: string }[];
 
 @Component({
   selector: 'translatable-html-content-id-editor',
@@ -32,7 +32,7 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: string;
-  @Input() initArgs!: {choices: TranslatableHtmlContentIdEditorChoices};
+  @Input() initArgs!: { choices: TranslatableHtmlContentIdEditorChoices };
   @Output() valueChanged = new EventEmitter();
   name!: string;
   currentValue!: string;

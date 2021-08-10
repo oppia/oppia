@@ -34,7 +34,7 @@ export interface EmailPreferencesBackendDict {
   'can_receive_subscription_email': boolean;
 }
 
-export type PreferencesBackendDict = {
+interface NonEmailPreferencesBackendDict {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
@@ -43,7 +43,15 @@ export type PreferencesBackendDict = {
   'user_bio': string;
   'subject_interests': string;
   'subscription_list': SubscriptionSummary[];
-} & EmailPreferencesBackendDict;
+}
+
+// The following type is an intersection of EmailPreferencesBackendDict
+// and NonEmailPreferencesbackendDict and hence will have all the properties
+// of both the interfaces.
+export type PreferencesBackendDict = (
+  NonEmailPreferencesBackendDict &
+  EmailPreferencesBackendDict
+);
 
 export interface UpdatePreferencesResponse {
   'bulk_email_signup_message_should_be_shown': boolean
@@ -128,8 +136,8 @@ export class UserBackendApiService {
 
   async updatePreferencesDataAsync(
       updateType: string,
-      data: boolean | string | string[] | EmailPreferencesBackendDict):
-      Promise<UpdatePreferencesResponse> {
+      data: boolean | string | string[] | EmailPreferencesBackendDict
+  ): Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
       update_type: updateType,
       data: data
