@@ -85,7 +85,8 @@ describe('Story Creation Service', () => {
     expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
   });
 
-  it('should ', () => {
+  it('should post story data to server and change window location' +
+    ' on success', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         isValid: () => true,
