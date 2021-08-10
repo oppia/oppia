@@ -260,7 +260,8 @@ export class ContentTranslationManagerService {
             const writtenTranslation = writtenTranslations.translationsMapping[
               <string>ruleInputValue.contentId][languageCode];
             // There must be at least one translation.
-            if (writtenTranslation.translation.length === 0) {
+            if (!writtenTranslation ||
+            writtenTranslation.translation.length === 0) {
               continue;
             }
 
