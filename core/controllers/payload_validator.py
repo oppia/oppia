@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, List, Text, Tuple, Optional, Union # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 
@@ -92,7 +92,7 @@ def validate(
 
 
 def convert_string_to_bool(param):
-    # type: (Text) -> bool
+    # type: (Text) -> Optional[Union[bool, Text]]
 
     """Converts a request param of type string into expected bool type.
 
