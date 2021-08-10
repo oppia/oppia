@@ -39,7 +39,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UploadBlogPostThumbnailComponent } from '../modal-templates/upload-blog-post-thumbnail.component';
 import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
@@ -58,7 +57,6 @@ describe('Blog Post Editor Component', () => {
   let sampleBlogPostData: BlogPostData;
   let imageLocalStorageService: ImageLocalStorageService;
   let windowDimensionsService: WindowDimensionsService;
-  let resizeEvent = new Event('resize');
 
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
@@ -99,7 +97,16 @@ describe('Blog Post Editor Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
+            getResizeEvent() {
+              return {
+                subscribe: (callb) => {
+                  callb();
+                  return {
+                    unsubscribe() {}
+                  };
+                }
+              };
+            }
           }
         },
         BlogDashboardPageService,
@@ -160,6 +167,15 @@ describe('Blog Post Editor Component', () => {
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
     expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
+  });
+
+  it('should set image uploader window size', () => {
+    component.uploadedImageDataUrl = 'image.png';
+
+    component.ngOnInit();
+    windowDimensionsService.getResizeEvent();
+
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
   });
 
   it('should get schema', () => {
