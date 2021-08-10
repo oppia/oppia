@@ -29,6 +29,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
 
 describe('Learner Dashboard Icons Component', () => {
   let component: LearnerDashboardIconsComponent;
@@ -48,6 +50,7 @@ describe('Learner Dashboard Icons Component', () => {
       ],
       declarations: [
         LearnerDashboardIconsComponent,
+        LearnerPlaylistModalComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -55,6 +58,10 @@ describe('Learner Dashboard Icons Component', () => {
         LearnerDashboardActivityBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [LearnerPlaylistModalComponent],
+      }
     }).compileComponents();
   }));
 
@@ -728,7 +735,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
-
+    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -749,7 +756,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
-
+    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
