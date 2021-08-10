@@ -155,7 +155,7 @@ export class AdminMiscTabComponent {
       .then(() => {
         this.setStatusMessage.emit(
           'Successfully updated blog post data');
-      }, errorResponse => {
+      }, (errorResponse) => {
         this.setStatusMessage.emit('Server error: ' + errorResponse);
       });
   }

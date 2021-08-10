@@ -367,7 +367,7 @@ describe('Admin misc tab component ', () => {
         adminBackendApiService, 'updateBlogPostDataAsync')
         .and.rejectWith('Internal Server Error.');
 
-      component.updateUsername();
+      component.updateBlogPostData();
       tick();
 
       expect(updateBlogPostSpy).toHaveBeenCalled();
