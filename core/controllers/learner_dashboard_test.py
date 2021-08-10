@@ -590,7 +590,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn('{"title": "Learner Dashboard | Oppia"})', response.body)
+        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
 
         self.logout()
 
@@ -612,7 +612,6 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
         ), {
-            'state_name': self._get_unicode_test_string('statename'),
             'subject': self._get_unicode_test_string('subject'),
             'text': 'a sample message',
         }, csrf_token=self.csrf_token)

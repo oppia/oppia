@@ -177,19 +177,23 @@ class AuditsExistingTests(test_utils.TestBase):
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
 
     def test_raises_value_error_when_given_no_args(self):
-        self.assertRaisesRegexp(
-            ValueError, 'Must target at least one model', MockAuditsExisting)
+        with self.assertRaisesRegexp(
+            ValueError, 'Must target at least one model'
+        ):
+            MockAuditsExisting()
 
     def test_raises_type_error_when_given_unregistered_model(self):
-        self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(
             TypeError, re.escape(
                 '%r is not a model registered in core.platform' % FooModel),
-            lambda: MockAuditsExisting(FooModel))
+        ):
+            MockAuditsExisting(FooModel)
 
     def test_raises_type_error_when_decorating_non_do_fn_class(self):
-        self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(
             TypeError, '%r is not a subclass of DoFn' % NotDoFn,
-            lambda: MockAuditsExisting(base_models.BaseModel)(NotDoFn))
+        ):
+            MockAuditsExisting(base_models.BaseModel)(NotDoFn)
 
 
 class MockRelationshipsOf(validation_decorators.RelationshipsOf):
@@ -241,8 +245,8 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertEqual(
             MockRelationshipsOf
             .get_id_referencing_properties_by_kind_of_possessor(), {
-                b'BarModel': (
-                    (self.get_property_of(BarModel, 'foo_id'), (b'FooModel',)),
+                'BarModel': (
+                    (self.get_property_of(BarModel, 'foo_id'), ('FooModel',)),
                 ),
             })
         self.assertEqual(
@@ -250,7 +254,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             {'FooModel'})
         self.assertEqual(
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
-            {b'FooModel'})
+            {'FooModel'})
 
     def test_accepts_id_as_property(self):
         @MockRelationshipsOf(BarModel)
@@ -261,8 +265,8 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertEqual(
             MockRelationshipsOf
             .get_id_referencing_properties_by_kind_of_possessor(), {
-                b'BarModel': (
-                    (self.get_property_of(BarModel, 'id'), (b'BazModel',)),
+                'BarModel': (
+                    (self.get_property_of(BarModel, 'id'), ('BazModel',)),
                 ),
             })
         self.assertEqual(
@@ -270,7 +274,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             {'BazModel'})
         self.assertEqual(
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
-            {b'BazModel'})
+            {'BazModel'})
 
     def test_rejects_values_that_are_not_types(self):
         foo_model = FooModel()

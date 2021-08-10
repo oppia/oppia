@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import re
+
 from constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
@@ -208,9 +210,12 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
-                'Expected voice_artist "needed" and "assigned" list of '
-                'languages to be disjoint, received: '
-                r'\[u\'hi\'\], \[u\'hi\', u\'en\'\]')
+                re.escape(
+                    'Expected voice_artist "needed" and "assigned" list of '
+                    'languages to be disjoint, received: '
+                    '[\'hi\'], [\'hi\', \'en\']'
+                )
+            )
 
     def test_translation_counts_with_invalid_language_code_fails_validation(
             self):
@@ -339,21 +344,25 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_all_languages_in_summary_equals_supported_languages(self):
         (
-            self.valid_exp_opp_summary.
-            language_codes_with_assigned_voice_artists) = [b'hi-en']
+            self.valid_exp_opp_summary
+            .language_codes_with_assigned_voice_artists
+        ) = ['hi-en']
         self.valid_exp_opp_summary.language_codes_needing_voice_artists = ['hi']
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
-            b'en']
+            'en']
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
-                b'en']
+                'en']
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
-                'Expected set of all languages available in '
-                'incomplete_translation, needs_voiceover and assigned_voiceover'
-                ' to be the same as the supported audio languages, '
-                r'received \[\'en\', \'hi-en\'\]')
+                re.escape(
+                    'Expected set of all languages available in '
+                    'incomplete_translation, needs_voiceover and '
+                    'assigned_voiceover to be the same as the supported audio '
+                    'languages, received [\'en\', \'hi-en\']'
+                )
+            )
 
 
 class SkillOpportunityDomainTest(test_utils.GenericTestBase):

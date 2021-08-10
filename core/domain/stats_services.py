@@ -278,7 +278,7 @@ def advance_version_of_exp_stats(
     unchanged_state_names = set(utils.compute_list_difference(
         exp_stats.state_stats_mapping,
         exp_versions_diff.deleted_state_names +
-        exp_versions_diff.new_to_old_state_names.values()))
+        list(exp_versions_diff.new_to_old_state_names.values())))
     for state_name in unchanged_state_names:
         new_state_name_stats_mapping[state_name] = (
             exp_stats.state_stats_mapping[state_name].clone())
