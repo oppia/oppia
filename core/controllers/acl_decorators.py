@@ -3615,8 +3615,6 @@ def is_from_oppia_android(handler):
                     android_validation_constants.ANDROID_APP_PACKAGE_NAME) or
                 not version_name_matches or
                 not version_code_is_positive_int):
-                # app_version_code not in (
-                #     android_validation_constants.ALLOWED_ANDROID_APP_VERSION_CODES)): # pylint: disable=line-too-long
             raise self.UnauthorizedUserException(
                 'The incoming request is not a valid Oppia Android request.')
         return handler(self, **kwargs)
