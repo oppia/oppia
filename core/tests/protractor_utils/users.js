@@ -61,7 +61,6 @@ var login = async function(email, useManualNavigation = true) {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-
   var loginPage = element(by.css('.protractor-test-login-page'));
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
