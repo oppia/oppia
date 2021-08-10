@@ -29,52 +29,59 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
+import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
-  @Input() getCollectionId: string;
-  @Input() getExplorationId: string;
-  @Input() getExplorationTitle: string;
-  @Input() getStoryNodeId: string;
-  @Input() getLastUpdatedMsec: number;
-  @Input() getNumViews: string;
-  @Input() getObjective: string;
-  @Input() getCategory: string;
-  @Input() getRatings: ExplorationRatings;
-  @Input() getContributorsSummary: string;
-  @Input() getThumbnailIconUrl: string;
-  @Input() getThumbnailBgColor: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() getCollectionId!: string;
+  @Input() getExplorationId!: string;
+  @Input() getExplorationTitle!: string;
+  @Input() getStoryNodeId!: string;
+  @Input() getLastUpdatedMsec!: number;
+  @Input() getNumViews!: string;
+  @Input() getObjective!: string;
+  @Input() getCategory!: string;
+  @Input() getRatings!: ExplorationRatings;
+  @Input() getContributorsSummary!: HumanReadableContributorsSummary;
+  @Input() getThumbnailIconUrl!: string;
+  @Input() getThumbnailBgColor!: string;
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
-  @Input() openInNewWindow: string;
-  @Input() isCommunityOwned: boolean;
-  // If this is true, collection preview tile for mobile
-  // will be displayed.
-  @Input() isCollectionPreviewTile: boolean;
+  @Input() openInNewWindow!: string;
+  @Input() getParentExplorationIds!: string;
   // If the screen width is below the threshold defined here, the mobile
   // version of the summary tile is displayed. This attribute is optional:
   // if it is not specified, it is treated as 0, which means that the
   // desktop version of the summary tile is always displayed.
-  @Input() mobileCutoffPx: number;
-  @Input() isPlaylistTile: boolean;
-  @Input() getParentExplorationIds: string;
-  @Input() showLearnerDashboardIconsIfPossible: string;
-  @Input() isContainerNarrow: boolean;
-  @Input() isOwnedByCurrentUser: boolean;
+  @Input() mobileCutoffPx!: number;
+  @Input() isCommunityOwned: boolean = false;
+  // If this is true, collection preview tile for mobile
+  // will be displayed.
+  @Input() isCollectionPreviewTile: boolean = false;
+  @Input() isPlaylistTile: boolean = false;
+  @Input() showLearnerDashboardIconsIfPossible!: string;
+  @Input() isContainerNarrow: boolean = false;
+  @Input() isOwnedByCurrentUser: boolean = false;
 
-  activityType: string;
-  resizeSubscription: Subscription;
-  explorationIsCurrentlyHoveredOver: boolean;
-  isWindowLarge: boolean;
-  userIsLoggedIn: boolean;
-  isRefresherExploration: boolean;
-  contributors: object;
-  lastUpdatedDateTime: string = '';
-  avgRating;
-  thumbnailIcon;
+  activityType!: string;
+  resizeSubscription!: Subscription;
+  explorationIsCurrentlyHoveredOver: boolean = false;
+  isWindowLarge: boolean = false;
+  userIsLoggedIn: boolean = false;
+  isRefresherExploration: boolean = false;
+  contributors!: object;
+  // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
+  // received after component interactions is empty or does not exist.
+  lastUpdatedDateTime: string | null = '';
+  // 'avgRating' will be null if the exploration has no ratings.
+  avgRating!: number | null;
+  thumbnailIcon!: string;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -91,7 +98,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.activityType = constants.ACTIVITY_TYPE_EXPLORATION;
-    let contributorsSummary = this.getContributorsSummary || {};
+    let contributorsSummary: HumanReadableContributorsSummary = (
+      this.getContributorsSummary || {});
     this.contributors = Object.keys(
       contributorsSummary).sort(
       (contributorUsername1, contributorUsername2) => {
@@ -139,20 +147,23 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.href = this.getExplorationLink();
   }
 
-  getAverageRating(): number {
-    if (!this.getRatings) {
-      return null;
+  // Function will return null when Exploration Ratings are not present.
+  getAverageRating(): number | null {
+    if (this.getRatings) {
+      return this.ratingComputationService.computeAverageRating(
+        this.getRatings);
     }
-    return this.ratingComputationService.computeAverageRating(
-      this.getRatings);
+    return null;
   }
 
-  getLastUpdatedDatetime(): string {
-    if (!this.getLastUpdatedMsec) {
-      return null;
+  // Function will return null when the property 'getLastUpdatedMsec' is null
+  // or undefined.
+  getLastUpdatedDatetime(): string | null {
+    if (this.getLastUpdatedMsec) {
+      return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+        this.getLastUpdatedMsec);
     }
-    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-      this.getLastUpdatedMsec);
+    return null;
   }
 
   getExplorationLink(): string {
