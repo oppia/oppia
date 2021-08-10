@@ -109,7 +109,7 @@ export class InteractiveNumericInput implements OnInit {
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
       ui_config: {
-        checkrequireNonnegativeInput: this.requireNonnegativeInput
+        checkRequireNonnegativeInput: this.requireNonnegativeInput
       }
     };
 

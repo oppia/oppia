@@ -99,7 +99,7 @@ export class NumericInputValidationService {
           'is greater than the first number.')
       });
     };
-    var raiseWarningForrequireNonnegativeInput = function(
+    var raiseWarningForRequireNonnegativeInput = function(
         ruleIndex: number, input: number) {
       if (input < 0 && customizationArgs.requireNonnegativeInput.value) {
         warningsList.push({
@@ -126,7 +126,7 @@ export class NumericInputValidationService {
           case 'Equals':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
-            raiseWarningForrequireNonnegativeInput(j, x);
+            raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsInclusivelyBetween':
             var a = <number> rule.inputs.a;
@@ -158,12 +158,12 @@ export class NumericInputValidationService {
           case 'IsLessThan':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
-            raiseWarningForrequireNonnegativeInput(j, x);
+            raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsLessThanOrEqualTo':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
-            raiseWarningForrequireNonnegativeInput(j, x);
+            raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsWithinTolerance':
             var x = (<number>rule.inputs.x);
