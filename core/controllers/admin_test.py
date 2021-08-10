@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
 import logging
 
 from constants import constants
@@ -51,7 +52,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import utils
-import datetime
+
 (
     audit_models, blog_models, exp_models, opportunity_models,
     user_models
@@ -2030,6 +2031,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(response['success'])
         self.assertIsNotNone(
             wipeout_service.get_pending_deletion_request(self.new_user_id))
+
 
 class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     """Tests UpdateBlogPostHandler."""
