@@ -64,7 +64,7 @@ describe('Learner dashboard functionality', function() {
 
     for (var i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
-        `Exploration Learner Dashboard1 - ${i}`,
+        `Learner Dashboard Exploration ${i}`,
         EXPLORATION.category,
         EXPLORATION.objective,
         EXPLORATION.language,
@@ -219,8 +219,8 @@ describe('Learner dashboard functionality', function() {
 
   it('should display correct topics in edit goals, suggested for you section,' +
     ' current goals and continue where you left off section', async function() {
-    var TOPIC_NAME = 'Topic 1';
-    var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
+    var TOPIC_NAME = 'Learner Dashboard Topic 1';
+    var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';
     await users.createAndLoginCurriculumAdminUser(
       'creator@learnerDashboard1.com', 'learnerDashboard1');
@@ -264,22 +264,22 @@ describe('Learner dashboard functionality', function() {
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill Learner Dashboard1', 'Concept card explanation', false));
+        'Learner Dashboard Skill 1', 'Concept card explanation', false));
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill Learner Dashboard1', 'Topic 1');
+      'Learner Dashboard Skill 1', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     await topicEditorPage.addSubtopic(
-      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
-      'Subtopic content');
+      'Learner Dashboard Subtopic 1', 'ld-subtopic-one',
+      '../data/test2_svg.svg', 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Skill Learner Dashboard1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 
@@ -288,9 +288,10 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
 
     await topicEditorPage.publishTopic();
-    /**  There is one topic on the server named Topic 1 which is linked to a
-     * subtopic named Subtopic 1 and a story called Story Title.
-     * Subtopic 1 has one skill in it named Skill Learner Dashboard1.
+    /**  There is one topic on the server named Learner Dashboard Topic 1
+     * which is linked to a subtopic named Learner Dashboard Subtopic 1
+     * and a story called Story Title. Learner Dashboard Subtopic 1 has one
+     * skill in it named Learner Dashboard Skill 1.
      */
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToHomeSection();
@@ -311,13 +312,16 @@ describe('Learner dashboard functionality', function() {
   it('should display all the topics that are partially learnt or learnt ' +
     'in skill proficiency section, learnt topics in completed goals section ' +
     'and completed stories in completed stories section', async function() {
+    var TOPIC_NAME = 'Learner Dashboard Topic 2';
+    var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-two';
+    var TOPIC_DESCRIPTION = 'Topic description';
     await users.createAndLoginCurriculumAdminUser(
       'creator@learnerDashboard2.com', 'learnerDashboard2');
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic 2', 'topic-two', 'Description', false);
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -333,7 +337,7 @@ describe('Learner dashboard functionality', function() {
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill Learner Dashboard2', 'Concept card explanation', false);
+      'Learner Dashboard Skill 2', 'Concept card explanation', false);
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
@@ -365,16 +369,16 @@ describe('Learner dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill Learner Dashboard2', 'Topic 2');
+      'Learner Dashboard Skill 2', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic('Topic 2');
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     await topicEditorPage.addSubtopic(
-      'Subtopic Learner Dashboard1', 'subtopic-learner-dashboard-one',
+      'Learner Dashboard Subtopic 2', 'ld-subtopic-two',
       Constants.TEST_SVG_PATH, 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
-    await topicEditorPage.dragSkillToSubtopic('Skill Learner Dashboard2', 0);
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 2', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.updateMetaTagContent('topic meta tag');
@@ -382,7 +386,7 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
     await topicEditorPage.publishTopic();
-    await topicsAndSkillsDashboardPage.editTopic('Topic 2');
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     await topicEditorPage.createStory(
       'Story 2', 'story-two',
       'Story description', Constants.TEST_SVG_PATH);
@@ -398,42 +402,46 @@ describe('Learner dashboard functionality', function() {
     }
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
-    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(1);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.goToChapterIndex(2);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    /**  There are two topics on the server named Topic 1 which is linked to a
-     * subtopic named Subtopic 1 and a story called Story Title and
-     * Topic 2 which is linked to a subtopic named Subtopic Learner Dashboard1
-     * and a story called Story Learner Dashboard1.
-     * Subtopic 1 has one skill in it named Skill Learner Dashboard1 and
-     * Subtopic Learner Dashboard1 has one skill in it named
-     * Skill Learner Dashboard2.
+    /**  There are two topics on the server named Learner Dashboard Topic 1
+     * which is linked to a subtopic named Learner Dashboard Subtopic 1 and
+     * a story called Story Title and Learner Dashboard Topic 2 which is linked
+     * to a subtopic named Learner Dashboard Subtopic 2 and a story called
+     * Story 2. Learner Dashboard Subtopic 1 has one skill in it named
+     * Learner Dashboard Skill 1 and Learner Dashboard Subtopic 2 has one
+     * skill in it named Learner Dashboard Skill 2.
     */
-    await topicAndStoryViewerPage.get('math', 'topic-two', 'story-two');
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToProgressSection();
     await learnerDashboardPage.expectNameOfTopicInSkillProficiencyToMatch(
-      'Topic 2'
+      TOPIC_NAME
     );
     await learnerDashboardPage.navigateToProgressSection();
     await learnerDashboardPage.expectNumberOfStoriesInCompletedStory(1);
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCompletedGoalsToMatch(
-      'Topic 2');
+      TOPIC_NAME);
     await users.logout();
   });
 

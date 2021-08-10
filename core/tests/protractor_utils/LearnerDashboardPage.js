@@ -19,7 +19,6 @@
 
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
-const { element } = require('protractor');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
@@ -49,13 +48,13 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-skill-proficiency-topic-title'));
   var completedGoalsTopic =
     element(by.css('.protractor-test-completed-goals-topic-name'));
-  var topicNameInLearnerStorySummaryTiles =
+  var topicNamesInLearnerStorySummaryTiles =
     element.all(by.css(
       '.protractor-test-topic-name-in-learner-story-summary-tile'));
-  var storyNameInLearnerStorySummaryTiles =
+  var storyNamesInLearnerStorySummaryTiles =
       element.all(by.css(
         '.protractor-test-story-name-in-learner-story-summary-tile'));
-  var topicNameInLearnerTopicSummaryTiles =
+  var topicNamesInLearnerTopicSummaryTiles =
       element.all(by.css('.protractor-test-learner-topic-summary-tile-title'));
 
   this.get = async function() {
@@ -134,7 +133,7 @@ var LearnerDashboardPage = function() {
     );
     await waitFor.textToBePresentInElement(
       skillProficiencyTopic, name,
-      `Text "${name}" taking too long to be present in skillProficiency`);
+      `Text "${name}" taking too long to be present in skillProficiencyTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-skill-proficiency-topic-title', name));
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
@@ -156,34 +155,28 @@ var LearnerDashboardPage = function() {
   this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
     if (value > 0) {
       await waitFor.visibilityOf(
-        topicNameInLearnerTopicSummaryTiles.first(),
+        topicNamesInLearnerTopicSummaryTiles.first(),
         'Learner Topic Name takes too long to appear');
-      expect(await topicNameInLearnerTopicSummaryTiles.count()).toEqual(value);
-    } else {
-      expect(await topicNameInLearnerTopicSummaryTiles.count()).toEqual(0);
     }
+    expect(await topicNamesInLearnerTopicSummaryTiles.count()).toEqual(value);
   };
 
   this.expectNumberOfStoriesInCompletedStory = async function(value) {
     if (value > 0) {
       await waitFor.visibilityOf(
-        storyNameInLearnerStorySummaryTiles.first(),
+        storyNamesInLearnerStorySummaryTiles.first(),
         'Story Name Card takes too long to appear');
-      expect(await storyNameInLearnerStorySummaryTiles.count()).toEqual(value);
-    } else {
-      expect(await storyNameInLearnerStorySummaryTiles.count()).toEqual(0);
     }
+    expect(await storyNamesInLearnerStorySummaryTiles.count()).toEqual(value);
   };
 
   this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
     if (value > 0) {
       await waitFor.visibilityOf(
-        topicNameInLearnerStorySummaryTiles.first(),
+        topicNamesInLearnerStorySummaryTiles.first(),
         'Topic Name Card takes too long to appear');
-      expect(await topicNameInLearnerStorySummaryTiles.count()).toEqual(value);
-    } else {
-      expect(await topicNameInLearnerStorySummaryTiles.count()).toEqual(0);
     }
+    expect(await topicNamesInLearnerStorySummaryTiles.count()).toEqual(value);
   };
 
   this.addTopicToLearnerGoals = async function() {
@@ -221,8 +214,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
-    async function(
-        explorationTitle) {
+    async function(explorationTitle) {
       await this.navigateToCommunityLessonsSection();
       await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
     });
