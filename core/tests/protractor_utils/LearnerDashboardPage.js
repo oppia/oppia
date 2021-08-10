@@ -42,11 +42,11 @@ var LearnerDashboardPage = function() {
     element.all(by.css('.protractor-test-feedback-message'));
   var addToLearnerGoalsButton =
     element(by.css('.protractor-test-add-topic-to-current-goals-button'));
-  var currentGoalsTopic =
+  var currentGoalsTopicName =
     element(by.css('.protractor-test-topic-name-in-current-goals'));
-  var skillProficiencyTopic =
+  var skillProficiencyTopicTitle =
     element(by.css('.protractor-test-skill-proficiency-topic-title'));
-  var completedGoalsTopic =
+  var completedGoalsTopicName =
     element(by.css('.protractor-test-completed-goals-topic-name'));
   var topicNamesInLearnerStorySummaryTiles =
     element.all(by.css(
@@ -116,10 +116,10 @@ var LearnerDashboardPage = function() {
 
   this.expectNameOfTopicInCurrentGoalsToMatch = async function(name) {
     await waitFor.visibilityOf(
-      currentGoalsTopic,
+      currentGoalsTopicName,
       'Topic in Current Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
-      currentGoalsTopic, name,
+      currentGoalsTopicName, name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-current-goals', name));
@@ -128,11 +128,11 @@ var LearnerDashboardPage = function() {
 
   this.expectNameOfTopicInSkillProficiencyToMatch = async function(name) {
     await waitFor.visibilityOf(
-      skillProficiencyTopic,
+      skillProficiencyTopicTitle,
       'Topic in Skill Proficiency takes too long to appear'
     );
     await waitFor.textToBePresentInElement(
-      skillProficiencyTopic, name,
+      skillProficiencyTopicTitle, name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-skill-proficiency-topic-title', name));
@@ -141,11 +141,11 @@ var LearnerDashboardPage = function() {
 
   this.expectNameOfTopicInCompletedGoalsToMatch = async function(name) {
     await waitFor.visibilityOf(
-      completedGoalsTopic,
+      completedGoalsTopicName,
       'Topic in completed goals takes too long to appear'
     );
     await waitFor.textToBePresentInElement(
-      completedGoalsTopic, name,
+      completedGoalsTopicName, name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-completed-goals-topic-name', name));
@@ -222,8 +222,7 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfExplorationSummaryTileToMatch(
-      explorationTitle);
+    await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
   };
 
   this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
@@ -235,8 +234,7 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfCollectionSummaryTileToMatch(
-      collectionTitle);
+    await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
   };
 };
 

@@ -35,7 +35,6 @@ var SubscriptionDashboardPage =
 var TopicAndStoryViewerPage = require(
   '../protractor_utils/TopicAndStoryViewerPage.js');
 var forms = require('../protractor_utils/forms.js');
-const { browser } = require('protractor');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var Constants = require('../protractor_utils/ProtractorConstants.js');
@@ -231,6 +230,7 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.navigateToProgressSection();
     await learnerDashboardPage.expectNumberOfStoriesInCompletedStory(0);
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
     await topicEditorPage.expectNumberOfStoriesToBe(0);
@@ -261,6 +261,7 @@ describe('Learner dashboard functionality', function() {
         await elem.setValue(topicId);
       });
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
@@ -320,6 +321,7 @@ describe('Learner dashboard functionality', function() {
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
     var url = await browser.getCurrentUrl();
@@ -336,6 +338,7 @@ describe('Learner dashboard functionality', function() {
       });
 
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Learner Dashboard Skill 2', 'Concept card explanation', false);
     await skillEditorPage.addRubricExplanationForDifficulty(
