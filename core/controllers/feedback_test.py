@@ -64,7 +64,6 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
         ), {
-            'state_name': self._get_unicode_test_string('statename'),
             'subject': self._get_unicode_test_string('subject'),
             'text': self._get_unicode_test_string('text'),
         }, csrf_token=self.csrf_token)
@@ -171,11 +170,11 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                'state_name': None,
                 'text': u'Thread Text ¡unicode!',
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response_dict['error'], 'A thread subject must be specified.')
+            response_dict['error'],
+            'Missing key in handler args: subject.')
         self.logout()
 
     def test_missing_thread_text_raises_400_error(self):
@@ -184,12 +183,10 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
             {
-                'state_name': None,
                 'subject': u'New Thread ¡unicode!',
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response_dict['error'],
-            'Text for the first message in the thread must be specified.')
+            response_dict['error'], 'Missing key in handler args: text.')
         self.logout()
 
     def test_post_message_to_existing_thread(self):
@@ -200,7 +197,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/%s' % (
                 feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                    'state_name': None,
                     'subject': u'New Thread ¡unicode!',
                     'text': u'Message 0 ¡unicode!',
                 }, csrf_token=csrf_token)
@@ -276,7 +272,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': 'Message 0',
             }, csrf_token=csrf_token)
@@ -412,7 +407,6 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
         ), {
-            'state_name': 'statename',
             'subject': 'subject',
             'text': 'a sample message',
         }, csrf_token=csrf_token)
@@ -565,7 +559,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
-            response['error'], 'Text for the message must be specified.')
+            response['error'], 'Missing key in handler args: text.')
 
         self.logout()
 

@@ -213,7 +213,6 @@ export class ThreadDataBackendApiService {
   async createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
     return this.http.post(this.getThreadListHandlerUrl(), {
-      state_name: null,
       subject: newSubject,
       text: newText
     }).toPromise().then(async() => {
@@ -233,9 +232,8 @@ export class ThreadDataBackendApiService {
     }
     let threadId = thread.threadId;
 
-    return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
-      thread_id: threadId
-    }).toPromise().then();
+    return this.http.post(
+      this.getFeedbackThreadViewEventUrl(threadId), {}).toPromise().then();
   }
 
   async addNewMessageAsync(

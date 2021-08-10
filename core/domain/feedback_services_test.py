@@ -1234,7 +1234,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
-                {'thread_id': thread_id}, csrf_token=csrf_token)
+                {}, csrf_token=csrf_token)
 
             self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
