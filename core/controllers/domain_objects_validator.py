@@ -147,6 +147,7 @@ def validate_task_entry_for_improvements(task_entry):
 
     return task_entry
 
+
 def validate_email_dashboard_data(data):
     # type: (Dict[String, Optional[Union[bool, int]]]) -> None
     """Validates email dashboard data.
