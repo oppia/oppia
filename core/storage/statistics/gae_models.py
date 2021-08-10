@@ -1812,7 +1812,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         })
 
 
-
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
