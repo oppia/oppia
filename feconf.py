@@ -42,9 +42,13 @@ DEBUG = False
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
-if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
-        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
-    raise Exception('DEV_MODE can\'t be true on production.')
+if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+    server_software = os.getenv('SERVER_SOFTWARE')
+    if (
+            server_software and
+            not server_software.startswith(('Development', 'gunicorn'))
+    ):
+        raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -413,7 +417,7 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 }
 
 # Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
+XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
@@ -475,6 +479,13 @@ ES_PASSWORD = None
 # redis.conf.
 REDISHOST = 'localhost'
 REDISPORT = 6379
+
+# The DB numbers for various Redis instances that Oppia uses. Do not reuse these
+# if you're creating a new Redis client.
+OPPIA_REDIS_DB_INDEX = 0
+CLOUD_NDB_REDIS_DB_INDEX = 1
+STORAGE_EMULATOR_REDIS_DB_INDEX = 2
+
 
 # NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
 # project id when switching to the prod server.
@@ -900,6 +911,8 @@ STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+# This should be synchronized with SUBTOPIC_MASTERY_DATA_URL_TEMPLATE
+# in app.constants.ts.
 SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
