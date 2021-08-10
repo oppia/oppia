@@ -100,6 +100,9 @@ module.exports = {
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
     oppia_root:
       commonPrefix + '/pages/oppia-root/index.ts',
+    practice_session:
+      commonPrefix +
+      '/pages/practice-session-page/practice-session-page.import.ts',
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.import.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.import.ts',
