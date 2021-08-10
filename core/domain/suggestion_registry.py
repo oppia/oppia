@@ -651,6 +651,19 @@ class SuggestionTranslateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
+        # If the translation is for a set of strings, we don't want to process
+        # the HTML strings for images.
+        if (
+                hasattr(self.change, 'data_format') and (
+                    self.change.data_format == 'set_of_normalized_string' or
+                    self.change.data_format == 'set_of_unicode_string'
+                )
+        ):
+            exp_services.update_exploration(
+                self.final_reviewer_id, self.target_id, [self.change],
+                commit_message, is_suggestion=True)
+            return
+
         self._copy_new_images_to_target_entity_storage()
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
@@ -662,7 +675,16 @@ class SuggestionTranslateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        return [self.change.translation_html, self.change.content_html]
+        content_strings = []
+        if isinstance(self.change.translation_html, list):
+            content_strings.extend(self.change.translation_html)
+        else:
+            content_strings.append(self.change.translation_html)
+        if isinstance(self.change.content_html, list):
+            content_strings.extend(self.change.content_html)
+        else:
+            content_strings.append(self.change.content_html)
+        return content_strings
 
     def get_target_entity_html_strings(self):
         """Gets all html content strings from target entity used in the

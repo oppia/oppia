@@ -410,7 +410,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 5)
+        self.assertEqual(translation_opportunities[0].content_count, 6)
 
     def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
             self):

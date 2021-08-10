@@ -1342,7 +1342,12 @@ def update_translation_suggestion(suggestion_id, translation_html):
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    # Clean the translation HTML if not a list of strings.
+    suggestion.change.translation_html = (
+        html_cleaner.clean(translation_html)
+        if isinstance(translation_html, python_utils.BASESTRING)
+        else translation_html
+    )
     suggestion.edited_by_reviewer = True
     suggestion.pre_update_validate(suggestion.change)
     _update_suggestion(suggestion)

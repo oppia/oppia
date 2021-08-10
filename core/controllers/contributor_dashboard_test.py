@@ -476,13 +476,19 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                     'content': {
                         'content': (
                             '<p>A content to translate.</p>'),
-                        'data_format': 'html'
+                        'data_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None
                     }
                 },
                 'End State': {
                     'content': {
                         'content': '',
-                        'data_format': 'html'
+                        'data_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None
                     }
                 }
             }
@@ -516,7 +522,10 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'End State': {
                     'content': {
                         'content': '',
-                        'data_format': 'html'
+                        'data_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None
                     }
                 }
             }

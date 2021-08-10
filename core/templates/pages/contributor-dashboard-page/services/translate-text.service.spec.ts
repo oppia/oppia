@@ -30,6 +30,9 @@ describe('TranslateTextService', () => {
     return {
       data_format: 'html',
       content: text,
+      content_type: 'content',
+      interaction_id: null,
+      rule_type: null
     };
   };
 
@@ -41,7 +44,7 @@ describe('TranslateTextService', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     stateContent = new StateAndContent(
       'stateName', 'contentId', 'contentText', 'pending', 'translation',
-      'html');
+      'html', 'content');
   });
 
   afterEach(() => {
@@ -73,7 +76,10 @@ describe('TranslateTextService', () => {
         more: false,
         status: 'pending',
         translation: '',
-        dataFormat: 'html'
+        dataFormat: 'html',
+        contentType: 'content',
+        interactionId: null,
+        ruleType: null
       };
 
       const expectedTextAndAvailability2 = {
@@ -81,7 +87,10 @@ describe('TranslateTextService', () => {
         more: true,
         status: 'pending',
         translation: '',
-        dataFormat: 'html'
+        dataFormat: 'html',
+        contentType: 'content',
+        interactionId: null,
+        ruleType: null
       };
 
       const expectedTextAndAvailability1 = {
@@ -89,7 +98,10 @@ describe('TranslateTextService', () => {
         more: true,
         status: 'pending',
         translation: '',
-        dataFormat: 'html'
+        dataFormat: 'html',
+        contentType: 'content',
+        interactionId: null,
+        ruleType: null
       };
 
       const expectedTextAndPreviousAvailability1 = {
@@ -97,7 +109,10 @@ describe('TranslateTextService', () => {
         more: false,
         status: 'pending',
         translation: '',
-        dataFormat: 'html'
+        dataFormat: 'html',
+        contentType: 'content',
+        interactionId: null,
+        ruleType: null
       };
 
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -128,7 +143,10 @@ describe('TranslateTextService', () => {
           more: false,
           status: 'pending',
           translation: '',
-          dataFormat: 'html'
+          dataFormat: 'html',
+          contentType: 'content',
+          interactionId: null,
+          ruleType: null
         };
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: getTranslatableItem('text1')},
@@ -149,14 +167,17 @@ describe('TranslateTextService', () => {
         expect(textAndAvailability).toEqual(expectedTextAndAvailability);
       }));
 
-    it('should return {null, False} for completely empty states',
+    it('should return no text or metadata for completely empty states',
       fakeAsync(() => {
         const expectedTextAndAvailability = {
           text: null,
           more: false,
           status: 'pending',
           translation: '',
-          dataFormat: undefined
+          dataFormat: undefined,
+          contentType: undefined,
+          interactionId: undefined,
+          ruleType: undefined
         };
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: getTranslatableItem('')},

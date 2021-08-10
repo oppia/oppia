@@ -53,7 +53,7 @@ interface FloatSchema {
   choices?: number[];
 }
 
-interface ListSchema {
+export interface ListSchema {
   type: 'list';
   items: Schema | Schema[] | string;
 }

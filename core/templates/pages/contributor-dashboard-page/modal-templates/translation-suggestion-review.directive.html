@@ -20,7 +20,13 @@
         <strong>Content to translate:</strong>
       </div>
       <div class="oppia-suggestion-review-panel">
-        <angular-html-bind html-data="contentHtml">
+        <ul ng-if="isSetOfStringsContent">
+          <li ng-repeat="item in contentHtml track by $index">
+            <[item]>
+          </li>
+        </ul>
+        <angular-html-bind ng-if="!isSetOfStringsContent"
+                           html-data="contentHtml">
         </angular-html-bind>
       </div>
     </div>
@@ -33,7 +39,16 @@
         <div>
           <angular-html-bind html-data="translationHtml" ng-if="!startedEditing">
           </angular-html-bind>
-          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent.html" ng-if="startedEditing">
+          <ul ng-if="isSetOfStringsContent">
+            <li ng-repeat="item in translationHtml track by $index">
+              <[item]>
+            </li>
+          </ul>
+          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent" ng-if="startedEditing && isHtmlContent">
+          </schema-based-editor>
+          <schema-based-editor schema="UNICODE_SCHEMA" local-value="editedContent" ng-if="startedEditing && isUnicodeContent">
+          </schema-based-editor>
+          <schema-based-editor schema="SET_OF_STRINGS_SCHEMA" local-value="editedContent" ng-if="startedEditing && isSetOfStringsContent">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
@@ -82,6 +97,7 @@
   .oppia-suggestion-review-panel {
     border: 1px solid #ccc;
     height: 88%;
+    padding-top: 10px;
   }
   .oppia-suggestion-review-message {
     margin-left: 10px;
