@@ -102,4 +102,19 @@ describe('Topic Creation Service', () => {
     // Creating a new topic while previous was in creation process.
     expect(TopicCreationService.createNewTopic()).toBe(undefined);
   });
+
+  it('should throw error if the newly created story is not valid', () => {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve({
+        isValid: () => false
+      })
+    });
+
+    try {
+      TopicCreationService.createNewTopic();
+      $rootScope.$apply();
+    } catch (e) {
+      expect(e).toBe(new Error('Topic fields cannot be empty'));
+    }
+  });
 });
