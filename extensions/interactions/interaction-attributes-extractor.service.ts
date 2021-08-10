@@ -65,8 +65,10 @@ export class InteractionAttributesExtractorService {
       const attributesKey = `${caName}WithValue` as keyof typeof attributes;
       Object.defineProperty(caBackendDict, caName, { value: {
         value: this.htmlEscaperService.escapedJsonToObj(
-          attributes[attributesKey].toString())
-      }});
+          attributes[attributesKey].toString()),
+      },
+      enumerable: true
+      });
     });
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
