@@ -85,7 +85,7 @@ describe('InteractiveNumericInput', () => {
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
       ui_config: {
-        checkrequireNonnegativeInput: false
+        checkRequireNonnegativeInput: false
       }
     });
     expect(currentInteractionService.registerCurrentInteraction)
@@ -108,7 +108,7 @@ describe('InteractiveNumericInput', () => {
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
       ui_config: {
-        checkrequireNonnegativeInput: false
+        checkRequireNonnegativeInput: false
       }
     });
     expect(currentInteractionService.registerCurrentInteraction)
@@ -128,7 +128,7 @@ describe('InteractiveNumericInput', () => {
     expect(component.getSchema()).toEqual({
       type: 'float',
       ui_config: {
-        checkrequireNonnegativeInput: false
+        checkRequireNonnegativeInput: false
       }
     });
   });
