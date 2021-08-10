@@ -19,10 +19,28 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+# TODO(#13594): After the domain layer is refactored to be independent of
+# the storage layer, the disable=invalid-import will
+# be removed.
+# The following import is dangerous and should not be generally
+# used. We had to use this ignore as we need to import the domain layer
+# for type-annotation.
+# Here feedback_domain is imported outside the 'if MYPY:' block. If it is
+# imported inside the 'if MYPY:' block, during runtime feedback_domain
+# won't be accessible.
+from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
 import utils
+
+from typing import Dict, List, Optional, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import user_models  # pylint: disable=unused-import
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -92,21 +110,22 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         datastore_services.StringProperty(indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
         original_author_id and last_nonempty_message_author_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there
         are multiple feedback threads relevant to a particular user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -127,7 +146,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_field_names_for_takeout(cls):
+    def get_field_names_for_takeout(cls) -> Dict[str, str]:
         """Indicates that the last_updated variable is exported under the
         name "last_updated_msec" in Takeout.
         """
@@ -136,7 +155,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralFeedbackThreadModel exists for user.
 
         Args:
@@ -151,7 +170,10 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(
+            cls,
+            user_id: str
+    ) -> Dict[str, Dict[str, Union[str, bool, None]]]:
         """Exports the data from GeneralFeedbackThreadModel
         into dict format for Takeout.
 
@@ -163,8 +185,10 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        feedback_models = cls.get_all().filter(
-            cls.original_author_id == user_id).fetch()
+        feedback_models = cast(
+            List[GeneralFeedbackThreadModel],
+            cls.get_all().filter(cls.original_author_id == user_id).fetch()
+        )
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
@@ -182,7 +206,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         return user_data
 
     @classmethod
-    def generate_new_thread_id(cls, entity_type, entity_id):
+    def generate_new_thread_id(cls, entity_type: str, entity_id: str) -> str:
         """Generates a new thread ID which is unique.
 
         Args:
@@ -213,7 +237,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             'New thread id generator is producing too many collisions.')
 
     @classmethod
-    def create(cls, thread_id):
+    def create(cls, thread_id: str) -> 'GeneralFeedbackThreadModel':
         """Creates a new FeedbackThreadModel entry.
 
         Args:
@@ -232,7 +256,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def get_threads(
-            cls, entity_type, entity_id, limit=feconf.DEFAULT_QUERY_LIMIT):
+            cls,
+            entity_type: str,
+            entity_id: str,
+            limit: int = feconf.DEFAULT_QUERY_LIMIT
+    ) -> List['GeneralFeedbackThreadModel']:
         """Returns a list of threads associated with the entity, ordered
         by their "last updated" field. The number of entities fetched is
         limited by the `limit` argument to this method, whose default
@@ -248,8 +276,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             list(GeneralFeedbackThreadModel). List of threads associated with
             the entity. Doesn't include deleted entries.
         """
-        return cls.get_all().filter(cls.entity_type == entity_type).filter(
-            cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
+        return cast(
+            List[GeneralFeedbackThreadModel],
+            cls.get_all().filter(cls.entity_type == entity_type).filter(
+                cls.entity_id == entity_id
+            ).order(-cls.last_updated).fetch(limit))
 
 
 class GeneralFeedbackMessageModel(base_models.BaseModel):
@@ -284,21 +315,22 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         default=False, indexed=True, required=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
         author_id field.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple feedback messages relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -313,7 +345,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralFeedbackMessageModel exists for user.
 
         Args:
@@ -327,7 +359,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         ).get(keys_only=True) is not None
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(
+            cls,
+            user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, bool, None]]]:
         """Exports the data from GeneralFeedbackMessageModel
         into dict format for Takeout.
 
@@ -339,7 +374,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
+        feedback_models = cast(
+            List[GeneralFeedbackMessageModel],
+            cls.get_all().filter(cls.author_id == user_id).fetch()
+        )
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
@@ -354,7 +392,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return user_data
 
     @classmethod
-    def _generate_id(cls, thread_id, message_id):
+    def _generate_id(cls, thread_id: str, message_id: int) -> str:
         """Generates full message ID given the thread ID and message ID.
 
         Args:
@@ -368,7 +406,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return '.'.join([thread_id, python_utils.UNICODE(message_id)])
 
     @property
-    def entity_id(self):
+    def entity_id(self) -> str:
         """Returns the entity_id corresponding to this thread instance.
 
         Returns:
@@ -377,7 +415,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return self.id.split('.')[1]
 
     @property
-    def entity_type(self):
+    def entity_type(self) -> str:
         """Returns the entity_type corresponding to this thread instance.
 
         Returns:
@@ -386,7 +424,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return self.id.split('.')[0]
 
     @classmethod
-    def create(cls, message_identifier):
+    def create(
+            cls,
+            message_identifier: feedback_domain.FullyQualifiedMessageIdentifier
+    ) -> 'GeneralFeedbackMessageModel':
         """Creates a new GeneralFeedbackMessageModel entry.
 
         Args:
@@ -406,7 +447,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return cls.create_multi([message_identifier])[0]
 
     @classmethod
-    def create_multi(cls, message_identifiers):
+    def create_multi(
+            cls,
+            message_identifiers: List[
+                feedback_domain.FullyQualifiedMessageIdentifier]
+    ) -> List['GeneralFeedbackMessageModel']:
         """Creates a new GeneralFeedbackMessageModel entry for each
         (thread_id, message_id) pair.
 
@@ -452,8 +497,15 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         return [cls(id=instance_id) for instance_id in instance_ids]
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
-    def get(cls, thread_id, message_id, strict=True):
+    def get( # type: ignore[override]
+            cls,
+            thread_id: str,
+            message_id: int,
+            strict: bool = True
+    ) -> Optional['GeneralFeedbackMessageModel']:
         """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
         an error if no undeleted message with the given ID is found and
         strict == True.
@@ -482,7 +534,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             instance_id, strict=strict)
 
     @classmethod
-    def get_messages(cls, thread_id):
+    def get_messages(
+            cls,
+            thread_id: str
+    ) -> List['GeneralFeedbackMessageModel']:
         """Returns a list of messages in the given thread. The number of
         messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
@@ -494,11 +549,17 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
             messages.
         """
-        return cls.get_all().filter(
-            cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return cast(
+            List[GeneralFeedbackMessageModel],
+            cls.get_all().filter(
+                cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
-    def get_most_recent_message(cls, thread_id):
+    def get_most_recent_message(
+            cls,
+            thread_id: str
+    ) -> 'GeneralFeedbackMessageModel':
         """Returns the last message in the thread.
 
         Args:
@@ -508,10 +569,13 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             GeneralFeedbackMessageModel. Last message in the thread.
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
-        return cls.get(thread_id, thread.message_count - 1)
+        message = cls.get(thread_id, thread.message_count - 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert message is not None
+        return message
 
     @classmethod
-    def get_message_count(cls, thread_id):
+    def get_message_count(cls, thread_id: str) -> int:
         """Returns the number of messages in the thread. Includes the
         deleted entries.
 
@@ -524,7 +588,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return cls.get_message_counts([thread_id])[0]
 
     @classmethod
-    def get_message_counts(cls, thread_ids):
+    def get_message_counts(cls, thread_ids: List[str]) -> List[int]:
         """Returns a list containing the number of messages in the threads.
         Includes the deleted entries.
 
@@ -534,12 +598,20 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             list(int). List of the message counts for the threads.
         """
-        thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
-
+        thread_models = cast(
+            List[GeneralFeedbackThreadModel],
+            GeneralFeedbackThreadModel.get_multi(thread_ids)
+        )
         return [thread_model.message_count for thread_model in thread_models]
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
-    def get_all_messages(cls, page_size, urlsafe_start_cursor):
+    def get_all_messages(
+            cls,
+            page_size: int,
+            urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[List['GeneralFeedbackMessageModel'], Optional[str], bool]:
         """Fetches a list of all the messages sorted by their last updated
         attribute.
 
@@ -577,21 +649,22 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         datastore_services.IntegerProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding to a user:
         user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple feedback threads relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -602,17 +675,19 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         })
 
     @classmethod
-    def apply_deletion_policy(cls, user_id):
+    def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete instance of GeneralFeedbackThreadUserModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        datastore_services.delete_multi(
+        keys = cast(
+            List[datastore_services.Key],
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralFeedbackThreadUserModel exists for user.
 
         Args:
@@ -624,7 +699,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def generate_full_id(cls, user_id, thread_id):
+    def generate_full_id(cls, user_id: str, thread_id: str) -> str:
         """Generates the full message id of the format:
             <user_id.thread_id>.
 
@@ -637,8 +712,14 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return '%s.%s' % (user_id, thread_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
-    def get(cls, user_id, thread_id):
+    def get( # type: ignore[override]
+            cls,
+            user_id: str,
+            thread_id: str
+    ) -> Optional['GeneralFeedbackThreadUserModel']:
         """Gets the FeedbackThreadUserModel corresponding to the given user and
         the thread.
 
@@ -655,7 +736,11 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             instance_id, strict=False)
 
     @classmethod
-    def create(cls, user_id, thread_id):
+    def create(
+            cls,
+            user_id: str,
+            thread_id: str
+    ) -> 'GeneralFeedbackThreadUserModel':
         """Creates a new FeedbackThreadUserModel instance and returns it.
 
         Args:
@@ -670,7 +755,11 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return cls.create_multi(user_id, [thread_id])[0]
 
     @classmethod
-    def create_multi(cls, user_id, thread_ids):
+    def create_multi(
+            cls,
+            user_id: str,
+            thread_ids: List[str]
+    ) -> List['GeneralFeedbackThreadUserModel']:
         """Creates new FeedbackThreadUserModel instances for user_id for each
         of the thread_ids.
 
@@ -693,8 +782,14 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
-    def get_multi(cls, user_id, thread_ids):
+    def get_multi( # type: ignore[override]
+            cls,
+            user_id: str,
+            thread_ids: List[str]
+    ) -> List[Optional['GeneralFeedbackThreadUserModel']]:
         """Gets the ExplorationUserDataModel corresponding to the given user and
         the thread ids.
 
@@ -714,7 +809,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             instance_ids)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, List[str]]]:
         """Takeout: Export GeneralFeedbackThreadUserModel user-based properties.
 
         Args:
@@ -752,17 +847,18 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         datastore_services.IntegerProperty(default=None, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -793,19 +889,20 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         default=0, required=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: id field but it isn't
         deleted because it is needed for auditing purposes.
         """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'feedback_message_references':
@@ -814,7 +911,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether UnsentFeedbackEmailModel exists for user.
 
         Args:

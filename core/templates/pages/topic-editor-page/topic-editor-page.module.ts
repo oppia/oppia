@@ -29,8 +29,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
@@ -50,7 +48,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -58,7 +55,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     TopicEditorNavbarBreadcrumbComponent,
   ],
   entryComponents: [
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,

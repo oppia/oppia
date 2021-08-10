@@ -50,6 +50,7 @@ import {
   ProfileSummary,
 } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
+import { AppConstants } from 'app.constants';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
@@ -99,6 +100,14 @@ export interface AddMessagePayload {
   'updated_status': boolean,
   'updated_subject': string,
   'text': string;
+}
+
+export interface SubtopicMasterySummaryBackendDict {
+  [mastery: string]: number;
+}
+
+export interface SubtopicMasteryDict {
+  'subtopic_mastery_dict': Record<string, SubtopicMasterySummaryBackendDict>;
 }
 
 interface MessageSummaryList {
@@ -227,6 +236,26 @@ export class LearnerDashboardBackendApiService {
         reject(errorResponse.error.error);
       });
     });
+  }
+
+  async _fetchSubtopicMastery(
+      topicIds: string): Promise<Record<string,
+    SubtopicMasterySummaryBackendDict>> {
+    return new Promise((resolve, reject) => {
+      this.http.get<SubtopicMasteryDict>(
+        AppConstants.SUBTOPIC_MASTERY_DATA_URL_TEMPLATE, {
+          params: { comma_separated_topic_ids: topicIds }}).toPromise()
+        .then(response => {
+          resolve(response.subtopic_mastery_dict);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
+    SubtopicMasterySummaryBackendDict>> {
+    return this._fetchSubtopicMastery(topicIds);
   }
 }
 
