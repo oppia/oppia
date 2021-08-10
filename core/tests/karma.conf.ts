@@ -103,7 +103,7 @@ module.exports = function(config) {
       terminal: argv.terminalEnabled
     },
     // Continue running in the background after running tests.
-    singleRun: false,
+    singleRun: true,
     customLaunchers: {
       CI_Chrome: {
         base: 'ChromeHeadless',
@@ -114,7 +114,7 @@ module.exports = function(config) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=4096'
+          '--js-flags=--max-old-space-size=2048'
         ]
       }
     },
