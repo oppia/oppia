@@ -52,7 +52,8 @@ COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
     'UpgradedServices', # We don't want this service to be present in the index.
-    'CanAccessSplashPageGuard'
+    # Route guards cannot be made injectables until migration is complete.
+    'CanAccessSplashPageGuard',
 ]
 
 
