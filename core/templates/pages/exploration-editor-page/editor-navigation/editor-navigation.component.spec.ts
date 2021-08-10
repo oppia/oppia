@@ -45,7 +45,7 @@ describe('Editor Navigation Component', function() {
   var threadDataBackendApiService = null;
   var userService = null;
   var windowDimensionsService = null;
-  var connectionCheckerService = null;
+  var internetConnectivityService = null;
 
   var mockOpenPostTutorialHelpPopover = new EventEmitter();
   var mockConnectionServiceEmitter = new EventEmitter<boolean>();
@@ -102,7 +102,8 @@ describe('Editor Navigation Component', function() {
         $injector.get('ThreadDataBackendApiService'));
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
-      connectionCheckerService = $injector.get('ConnectionCheckerService');
+      internetConnectivityService = $injector.get(
+        'InternetConnectivityService');
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -112,7 +113,7 @@ describe('Editor Navigation Component', function() {
       spyOn(userService, 'getUserInfoAsync').
         and.returnValue(userInfo);
       spyOnProperty(
-        connectionCheckerService, 'onInternetStateChange').and.returnValue(
+        internetConnectivityService, 'onInternetStateChange').and.returnValue(
         mockConnectionServiceEmitter);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
@@ -137,7 +138,7 @@ describe('Editor Navigation Component', function() {
       ctrl = $componentController('editorNavigation', {
         $scope: $scope,
         WindowDimensionsService: windowDimensionsService,
-        ConnectionCheckerService: connectionCheckerService,
+        InternetConnectivityService: internetConnectivityService,
         UserExplorationPermissionsService: MockUserExplorationPermissionsService
       });
       ctrl.$onInit();

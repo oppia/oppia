@@ -149,7 +149,7 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
-require('services/connection-checker.service.ts');
+require('services/internet-connectivity.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 
@@ -161,7 +161,7 @@ angular.module('oppia').component('explorationEditorPage', {
   controller: [
     '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ConnectionCheckerService', 'ContextService',
+    'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -172,7 +172,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'FocusManagerService', 'GraphDataService',
+    'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
@@ -184,7 +184,7 @@ angular.module('oppia').component('explorationEditorPage', {
     function(
         $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
-        ChangeListService, ConnectionCheckerService, ContextService,
+        ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -195,7 +195,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        FocusManagerService, GraphDataService,
+        FocusManagerService, GraphDataService, InternetConnectivityService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
@@ -498,7 +498,7 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        ConnectionCheckerService.startCheckingConnection();
+        InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
@@ -508,7 +508,7 @@ angular.module('oppia').component('explorationEditorPage', {
           )
         );
         ctrl.directiveSubscriptions.add(
-          ConnectionCheckerService.onInternetStateChange.subscribe(
+          InternetConnectivityService.onInternetStateChange.subscribe(
             internetAccessible => {
               if (internetAccessible) {
                 AlertsService.addSuccessMessage(

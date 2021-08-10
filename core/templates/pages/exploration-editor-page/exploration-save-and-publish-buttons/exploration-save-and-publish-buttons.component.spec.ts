@@ -60,7 +60,7 @@ describe('Exploration save and publish buttons component', function() {
   let changeListService: ChangeListService = null;
   var $uibModal = null;
   var contextService = null;
-  var cns = null;
+  var ics = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
   var explorationWarningsService = null;
@@ -128,7 +128,7 @@ describe('Exploration save and publish buttons component', function() {
     var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
-    cns = $injector.get('ConnectionCheckerService');
+    ics = $injector.get('InternetConnectivityService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
@@ -137,7 +137,7 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue($q.resolve({
         canPublish: true
       }));
-    spyOnProperty(cns, 'onInternetStateChange').and.returnValue(
+    spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
       mockConnectionServiceEmitter);
     spyOn(explorationSaveService, 'saveChanges').and
       .callFake((showCallback, hideCallback) => {
@@ -156,7 +156,7 @@ describe('Exploration save and publish buttons component', function() {
     ctrl = $componentController('explorationSaveAndPublishButtons', {
       $scope: $scope,
       $uibModal: $uibModal,
-      ConnectionCheckerService: cns,
+      InternetConnectivityService: ics,
       EditabilityService: editabilityService,
       UserExplorationPermissionsService: userExplorationPermissionsService
     });

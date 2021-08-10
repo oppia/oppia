@@ -32,7 +32,7 @@ require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/connection-checker.service.ts');
+require('services/internet-connectivity.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
    'user-exploration-permissions.service.ts');
@@ -44,20 +44,22 @@ angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
     '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ChangeListService',
-    'ConnectionCheckerService', 'ContextService', 'EditabilityService',
+    'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
-    'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+    'ExplorationWarningsService',
+    'InternetConnectivityService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
-        ConnectionCheckerService, ContextService, EditabilityService,
+        ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
-        ExplorationWarningsService, RouterService, SiteAnalyticsService,
+        ExplorationWarningsService,
+        InternetConnectivityService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
         ThreadDataBackendApiService,
         UserExplorationPermissionsService, UserService,
@@ -212,7 +214,7 @@ angular.module('oppia').component('editorNavigation', {
           )
         );
         this.directiveSubscriptions.add(
-          ConnectionCheckerService.onInternetStateChange.subscribe(
+          InternetConnectivityService.onInternetStateChange.subscribe(
             internetAccessible => {
               $scope.connectedToInternet = internetAccessible;
               $scope.$applyAsync();

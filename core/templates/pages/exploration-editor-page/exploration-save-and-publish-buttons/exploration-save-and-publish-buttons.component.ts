@@ -35,19 +35,19 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/editability.service.ts');
-require('services/connection-checker.service.ts');
+require('services/internet-connectivity.service.ts');
 
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$scope', '$uibModal', 'ChangeListService', 'ConnectionCheckerService',
+    '$scope', '$uibModal', 'ChangeListService',
     'EditabilityService', 'ExplorationRightsService', 'ExplorationSaveService',
-    'ExplorationWarningsService',
+    'ExplorationWarningsService', 'InternetConnectivityService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $uibModal, ChangeListService, ConnectionCheckerService,
+        $scope, $uibModal, ChangeListService,
         EditabilityService, ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService,
+        ExplorationWarningsService, InternetConnectivityService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -191,7 +191,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
             )
         );
         ctrl.directiveSubscriptions.add(
-          ConnectionCheckerService.onInternetStateChange.subscribe(
+          InternetConnectivityService.onInternetStateChange.subscribe(
             internetAccessible => {
               $scope.connectedToInternet = internetAccessible;
               $scope.$applyAsync();

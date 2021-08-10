@@ -29,7 +29,7 @@ import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConnectionCheckerService } from 'services/connection-checker.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
 @Injectable({
   providedIn: 'root'
@@ -91,9 +91,9 @@ export class ChangeListService implements OnInit {
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-    private connectionCheckerService: ConnectionCheckerService,
+    private internetConnectivityService: InternetConnectivityService,
   ) {
-    this.connectionCheckerService.onInternetStateChange.subscribe(
+    this.internetConnectivityService.onInternetStateChange.subscribe(
       internetAccessible => {
         if (internetAccessible && this.temporaryListOfChanges.length > 0) {
           for (let change of this.temporaryListOfChanges) {
@@ -150,7 +150,7 @@ export class ChangeListService implements OnInit {
     if (this.loadingMessage) {
       return;
     }
-    if (!this.connectionCheckerService.isOnline()) {
+    if (!this.internetConnectivityService.isOnline()) {
       this.temporaryListOfChanges.push(changeDict);
       return;
     }

@@ -22,7 +22,7 @@ import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
-import { ConnectionCheckerService } from 'services/connection-checker.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { Subscription } from 'rxjs';
 
 interface UiConfig {
@@ -65,7 +65,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private elementRef: ElementRef,
-    private connectionCheckerService: ConnectionCheckerService
+    private internetConnectivityService: InternetConnectivityService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
     this.subscriptions = new Subscription();
@@ -73,7 +73,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.connectionCheckerService.onInternetStateChange.subscribe(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
           if (internetAccessible) {
             this.enableRTEicons();
@@ -396,7 +396,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         $('.cke_combo_button')
           .css('display', 'none');
       }
-      if (!this.connectionCheckerService.isOnline()) {
+      if (!this.internetConnectivityService.isOnline()) {
         this.disableRTEicons();
       }
       ck.setData(this.wrapComponents(this.value));
