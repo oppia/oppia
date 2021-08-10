@@ -38,7 +38,12 @@ from core.storage.blog import gae_models as blog_models
 from core.storage.classifier import gae_models as classifier_models
 from core.storage.collection import gae_models as collection_models
 from core.storage.config import gae_models as config_models
+from core.storage.email import gae_models as email_models
 from core.storage.exploration import gae_models as exp_models
+from core.storage.feedback import gae_models as feedback_models
+from core.storage.improvements import gae_models as improvements_models
+from core.storage.job import gae_models as job_models
+from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.skill import gae_models as skill_models
 from core.storage.story import gae_models as story_models
 from core.storage.subtopic import gae_models as subtopic_models
@@ -55,7 +60,12 @@ __all__ = [
     'collection_models',
     'config_models',
     'datastore_services',
+    'email_models',
     'exp_models',
+    'feedback_models',
+    'improvements_models',
+    'job_models',
+    'opportunity_models',
     'skill_models',
     'story_models',
     'subtopic_models',

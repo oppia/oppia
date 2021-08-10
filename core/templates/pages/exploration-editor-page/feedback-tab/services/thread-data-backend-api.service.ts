@@ -233,7 +233,6 @@ export class ThreadDataBackendApiService {
     Promise<void | SuggestionAndFeedbackThreads> {
     return this.http.post<void | SuggestionAndFeedbackThreads>(
       this.getThreadListHandlerUrl(), {
-        state_name: null,
         subject: newSubject,
         text: newText
       }
@@ -255,9 +254,8 @@ export class ThreadDataBackendApiService {
     }
     let threadId = thread.threadId;
 
-    return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
-      thread_id: threadId
-    }).toPromise().then();
+    return this.http.post(
+      this.getFeedbackThreadViewEventUrl(threadId), {}).toPromise().then();
   }
 
   // A thread will be 'null' if threadId is invalid.
