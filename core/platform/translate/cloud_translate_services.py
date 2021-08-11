@@ -71,6 +71,7 @@ def translate_text(
         CLIENT.translate(
             text, target_language=target_language,
             source_language=source_language))
+    # Letting mypy know that result is a dict.
     assert isinstance(result, dict)
     translated_text = result['translatedText']
     return translated_text
