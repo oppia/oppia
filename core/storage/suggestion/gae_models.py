@@ -269,8 +269,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def query_suggestions(
-            cls,
-            query_fields_and_values: List[Tuple[str, str]]
+            cls, query_fields_and_values: List[Tuple[str, str]]
     ) -> List['GeneralSuggestionModel']:
         """Queries for suggestions.
 
@@ -296,9 +295,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
-            cls,
-            exp_id: str,
-            language_code: str
+            cls, exp_id: str, language_code: str
     ) -> List['GeneralSuggestionModel']:
         """Returns translation suggestions which are in review with target_id
         == exp_id.
@@ -326,8 +323,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestion_ids_with_exp_ids(
-            cls,
-            exp_ids: List[str]
+            cls, exp_ids: List[str]
     ) -> List[str]:
         """Gets the ids of translation suggestions corresponding to
         explorations with the given exploration ids.
@@ -415,9 +411,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(
-            cls,
-            score_categories: List[str],
-            user_id: str
+            cls, score_categories: List[str], user_id: str
     ) -> List['GeneralSuggestionModel']:
         """Gets all suggestions which are in review in the given
         score_categories.
@@ -445,9 +439,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_translation_suggestions(
-            cls,
-            user_id: str,
-            language_codes: List[str]
+            cls, user_id: str, language_codes: List[str]
     ) -> List['GeneralSuggestionModel']:
         """Gets all translation suggestions which are in review.
 
@@ -473,8 +465,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_question_suggestions(
-            cls,
-            user_id: str
+            cls, user_id: str
     ) -> List['GeneralSuggestionModel']:
         """Gets all question suggestions which are in review.
 
@@ -519,8 +510,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_waiting_longest_for_review(
-            cls,
-            language_code: str
+            cls, language_code: str
     ) -> List['GeneralSuggestionModel']:
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
@@ -548,9 +538,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
-            cls,
-            suggestion_type: str,
-            user_id: str
+            cls, suggestion_type: str, user_id: str
     ) -> List['GeneralSuggestionModel']:
         """Gets all suggestions of suggestion_type which the user has created.
 
@@ -586,8 +574,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # to remove Any used below.
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+            cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, bool, Dict[str, Any], None]]]:
         """Exports the data from GeneralSuggestionModel
         into dict format for Takeout.
@@ -680,9 +667,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @classmethod
     def get_user_voiceover_applications(
-            cls,
-            author_id: str,
-            status: Optional[str] = None
+            cls, author_id: str, status: Optional[str] = None
     ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application submitted by the given user.
 
@@ -709,8 +694,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @classmethod
     def get_reviewable_voiceover_applications(
-            cls,
-            user_id: str
+            cls, user_id: str
     ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application which a given user can
         review.
@@ -992,9 +976,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code: str,
-            contributor_user_id: str,
-            topic_id: str
+            language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a TranslationContributionStatsModel
         instance.
@@ -1018,10 +1000,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def get( # type: ignore[override]
-            cls,
-            language_code: str,
-            contributor_user_id: str,
-            topic_id: str
+            cls, language_code: str, contributor_user_id: str, topic_id: str
     ) -> Optional['TranslationContributionStatsModel']:
         """Gets the TranslationContributionStatsModel matching the supplied
         language_code, contributor_user_id, topic_id.
@@ -1037,8 +1016,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_all_by_user_id(
-            cls,
-            user_id: str
+            cls, user_id: str
     ) -> List['TranslationContributionStatsModel']:
         """Gets all TranslationContributionStatsModels matching the supplied
         user_id.
@@ -1126,8 +1104,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+            cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
         """Exports the data from TranslationContributionStatsModel into dict
         format for Takeout.

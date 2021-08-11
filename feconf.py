@@ -25,7 +25,10 @@ import os
 
 from constants import constants
 
-from typing import Dict, List, Text, Union # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, NewType, Union # isort:skip # pylint: disable=unused-import
+
+TYPE_COMMAND = (
+    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -337,14 +340,14 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: Dict[Text, Dict[Text, Dict[Text, Text]]] = {
+DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
 }
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: Dict[Text, Dict[Text, Dict[Text, Text]]] = {
+DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
@@ -427,7 +430,7 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
-def get_empty_ratings() -> Dict[Text, int]:
+def get_empty_ratings() -> Dict[str, int]:
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -1274,9 +1277,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[
-    Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]
-] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[TYPE_COMMAND] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1318,9 +1319,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[
     'user_id_attribute_names': []
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
-    Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]
-] = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[TYPE_COMMAND] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1363,9 +1362,7 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
-    Dict[Text, Union[Text, List[Text], Dict[Text, List[Text]]]]
-] = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[TYPE_COMMAND] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],

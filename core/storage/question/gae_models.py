@@ -357,8 +357,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_total_question_count_for_skill_ids(
-            cls,
-            skill_ids: List[str]
+            cls, skill_ids: List[str]
     ) -> int:
         """Returns the number of questions assigned to the given skill_ids.
 
@@ -628,8 +627,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(
-            cls,
-            skill_id: str
+            cls, skill_id: str
     ) -> List[str]:
         """Returns a list of all question ids corresponding to the given skill
         id.
@@ -651,9 +649,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_models_by_skill_id(
-            cls,
-            skill_id: str
-    ) -> Optional[List['QuestionSkillLinkModel']]:
+            cls, skill_id: str
+    ) -> List['QuestionSkillLinkModel']:
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
@@ -665,15 +662,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ID doesn't exist.
         """
         return cast(
-            Optional[List[QuestionSkillLinkModel]],
+            List[QuestionSkillLinkModel],
             QuestionSkillLinkModel.query().filter(
                 cls.skill_id == skill_id).fetch())
 
     @classmethod
     def get_models_by_question_id(
-            cls,
-            question_id: str
-    ) -> Optional[List['QuestionSkillLinkModel']]:
+            cls, question_id: str
+    ) -> List['QuestionSkillLinkModel']:
         """Returns a list of QuestionSkillLinkModels of a particular
         question ID.
 
@@ -686,15 +682,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question skill link models associated with the question ID.
         """
         return cast(
-            Optional[List[QuestionSkillLinkModel]],
+            List[QuestionSkillLinkModel],
             QuestionSkillLinkModel.query().filter(
                 cls.question_id == question_id,
                 cls.deleted == False).fetch()) #pylint: disable=singleton-comparison
 
     @classmethod
     def put_multi_question_skill_links(
-            cls,
-            question_skill_links: List['QuestionSkillLinkModel']
+            cls, question_skill_links: List['QuestionSkillLinkModel']
     ) -> None:
         """Puts multiple question skill link models into the datastore.
 
@@ -707,8 +702,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def delete_multi_question_skill_links(
-            cls,
-            question_skill_links: List['QuestionSkillLinkModel']
+            cls, question_skill_links: List['QuestionSkillLinkModel']
     ) -> None:
         """Deletes multiple question skill links from the datastore.
 

@@ -48,7 +48,8 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
     def test_create_model_with_same_source_target_language_codes_returns_none(
-            self) -> None:
+            self
+    ) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='en',
@@ -78,7 +79,8 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self.assertEqual(translation.translated_text, 'hola mundo')
 
     def test_get_machine_translation_with_no_existing_translation_returns_none(
-            self) -> None:
+            self
+    ) -> None:
         translation = (
             translation_models.MachineTranslationModel
             .get_machine_translation(

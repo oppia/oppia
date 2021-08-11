@@ -112,9 +112,7 @@ class StateCounterModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(
-            cls,
-            exploration_id: str,
-            state_name: str
+            cls, exploration_id: str, state_name: str
     ) -> 'StateCounterModel':
         """Gets or creates an entity by exploration_id and state_name.
 
@@ -1262,9 +1260,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_model(
-            cls,
-            exp_id: str,
-            exp_version: int
+            cls, exp_id: str, exp_version: int
     ) -> Optional['ExplorationStatsModel']:
         """Retrieves ExplorationStatsModel given exploration ID and version.
 
@@ -1331,9 +1327,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_versions(
-            cls,
-            exp_id: str,
-            version_numbers: List[int]
+            cls, exp_id: str, version_numbers: List[int]
     ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each version specified in
         version_numbers.
@@ -1353,8 +1347,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_stats_models(
-            cls,
-            exp_version_references: List[exp_domain.ExpVersionReference]
+            cls, exp_version_references: List[exp_domain.ExpVersionReference]
     ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
@@ -1433,9 +1426,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @classmethod
     def get_model(
-            cls,
-            exp_id: str,
-            exp_version: int
+            cls, exp_id: str, exp_version: int
     ) -> Optional['ExplorationIssuesModel']:
         """Retrieves ExplorationIssuesModel given exploration ID and version.
 
@@ -1751,9 +1742,10 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entity_type=entity_type,
             state_reference=state_reference,
             interaction_id=interaction_id,
-            learner_answer_info_list=(
-                [learner_answer_info.to_dict()
-                for learner_answer_info in learner_answer_info_list]),
+            learner_answer_info_list=[
+                learner_answer_info.to_dict()
+                for learner_answer_info in learner_answer_info_list
+            ],
             learner_answer_info_schema_version=(
                 learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(
@@ -1763,9 +1755,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_model_instance(
-            cls,
-            entity_type: str,
-            state_reference: str
+            cls, entity_type: str, state_reference: str
     ) -> Optional['LearnerAnswerDetailsModel']:
         """Returns the model instance related to the entity type and
         state reference.
@@ -1785,10 +1775,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entries.
         """
         instance_id = cls.get_instance_id(entity_type, state_reference)
-        model_instance = cls.get(instance_id, strict=False)
-        if model_instance:
-            return model_instance
-        return None
+        return cls.get(instance_id, strict=False)
+
 
     @staticmethod
     def get_model_association_to_user(
@@ -1843,9 +1831,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_entity_id(
-            cls,
-            exploration_id: str,
-            exploration_version: int
+            cls, exploration_id: str, exploration_version: int
     ) -> str:
         """Gets entity_id for a batch model based on given exploration state.
 
@@ -1907,7 +1893,8 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                 List[ExplorationAnnotationsModel],
                 cls.get_all().filter(
                     cls.exploration_id == exploration_id
-                ).fetch(feconf.DEFAULT_QUERY_LIMIT))]
+                ).fetch(feconf.DEFAULT_QUERY_LIMIT))
+        ]
 
     @staticmethod
     def get_model_association_to_user(

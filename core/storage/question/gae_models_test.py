@@ -207,8 +207,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_models_by_skill_id(
                 'skill_id1')
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
@@ -236,8 +234,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_models_by_skill_id(
                 'skill_id1')
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
@@ -249,15 +245,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_models_by_skill_id(
                 'skill_id1')
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 0)
         question_skill_links = (
             question_models.QuestionSkillLinkModel.get_models_by_skill_id(
                 'skill_id3')
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 1)
         self.assertEqual(question_skill_links[0].question_id, 'question_id3')
 
@@ -283,15 +275,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_models_by_question_id(
                 'question_id2')
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 2)
         question_skill_links = (
             question_models.QuestionSkillLinkModel.get_models_by_question_id(
                 'question_id3')
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_skill_links is not None
         self.assertEqual(len(question_skill_links), 0)
 
     def test_get_total_question_count_for_skill_ids(self) -> None:
@@ -540,7 +528,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model4])
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
-            self) -> None:
+            self
+    ) -> None:
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):

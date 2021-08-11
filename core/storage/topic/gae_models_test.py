@@ -151,7 +151,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.TopicCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
-    def test__get_instance_id(self) -> None:
+    def test__get_instance(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
         topic_commit_log_entry = (

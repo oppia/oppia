@@ -368,7 +368,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
 
     def test_get_translation_suggestions_in_review_with_exp_id_with_invalid_exp(
-            self) -> None:
+            self
+    ) -> None:
         suggestions = (
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_in_review_with_exp_id(
@@ -394,7 +395,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 ['exp1'])), 1)
 
     def test_get_exp_translation_suggestions_in_review_returns_limited_values(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -419,7 +421,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 1)
 
     def test_get_exp_translation_suggestions_in_review_for_resolved_suggestion_returns_no_items( # pylint: disable=line-too-long
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -443,7 +446,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 0)
 
     def test_get_exp_translation_suggestions_in_review_for_non_translation_suggestion_returns_no_items( # pylint: disable=line-too-long
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -467,7 +471,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 0)
 
     def test_get_exp_translation_suggestions_in_review_for_different_language_code_returns_no_items( # pylint: disable=line-too-long
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -483,7 +488,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 0)
 
     def test_get_translation_suggestion_ids_with_exp_ids_with_multiple_exps(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -507,7 +513,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 ['exp2', 'exp3'])), 2)
 
     def test_get_translation_suggestion_ids_with_exp_ids_with_invalid_exp(
-            self) -> None:
+            self
+    ) -> None:
         # Assert that there are no translation suggestions with an invalid
         # exploration id found.
         self.assertEqual(len(
@@ -516,7 +523,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 ['invalid_exp'])), 0)
 
     def test_get_translation_suggestion_ids_with_exp_ids_past_default_query(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -559,7 +567,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 .get_all_stale_suggestion_ids()), 0)
 
     def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
-            self) -> None:
+            self
+    ) -> None:
         with self.swap(
             feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
             with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -572,7 +581,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 )
 
     def test_get_suggestions_waiting_too_long_if_not_contributor_suggestion(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -598,7 +608,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
     def test_get_suggestions_waiting_too_long_returns_empty_if_neg_timedelta(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -619,7 +630,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
     def test_get_suggestions_waiting_too_long_if_suggestions_waited_less_limit(
-            self) -> None:
+            self
+    ) -> None:
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -646,7 +658,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
     def test_get_suggestions_waiting_too_long_if_suggestion_waited_limit(
-            self) -> None:
+            self
+    ) -> None:
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -674,7 +687,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
     def test_get_suggestions_waiting_too_long_if_suggestion_waited_past_limit(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -694,7 +708,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 1)
 
     def test_get_suggestions_waiting_too_long_with_diff_review_wait_times(
-            self) -> None:
+            self
+    ) -> None:
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -736,7 +751,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread1')
 
     def test_get_suggestions_waiting_too_long_returns_in_correct_wait_order(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -907,7 +923,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_suggestion_models[2].id, 'skill3.thread1')
 
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -970,7 +987,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp4.thread1')
 
     def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
-            self) -> None:
+            self
+    ) -> None:
         translation_suggestion_models = (
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_waiting_longest_for_review(
@@ -981,7 +999,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(translation_suggestion_models), 0)
 
     def test_get_translation_suggestions_waiting_longest_for_review_max_fetch(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -1013,7 +1032,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             translation_suggestion_models[0].id, 'exploration.exp1.thread1')
 
     def test_get_question_suggestions_waiting_longest_for_review_max_fetch(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -1320,7 +1340,8 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
     question_suggestion_count = 4
 
     def test_get_returns_community_contribution_stats_model_when_it_exists(
-            self) -> None:
+            self
+    ) -> None:
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
@@ -1365,7 +1386,8 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_returns_new_community_contribution_stats_model_if_not_found(
-            self) -> None:
+            self
+    ) -> None:
         """If the model has not been created yet, get should create the model
         with default values.
         """
