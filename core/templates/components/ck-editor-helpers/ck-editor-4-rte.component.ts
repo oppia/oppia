@@ -75,10 +75,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         internetAccessible => {
           if (internetAccessible) {
             this.enableRTEicons();
-            this.connectedToInternet = true;
+            this.connectedToInternet = internetAccessible;
           } else {
             this.disableRTEicons();
-            this.connectedToInternet = false;
+            this.connectedToInternet = internetAccessible;
           }
         }));
   }
