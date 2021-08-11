@@ -1712,15 +1712,17 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
 
 class ConvertCommaSepearatedToProperList(BaseObject):
+    """Converts comma seperated values into proper list of strings."""
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
+
         Args:
-            raw: *. A Python object to be validated against the schema,
-                normalizing if necessary.
+            raw: *. String representing comma seperated values.
+
         Returns:
-            unicode. The normalized object containing string in unicode format.
+            list(str). Normalizes the comma seperated values to list of strings.
         """
         if not isinstance(raw, python_utils.BASESTRING):
             raise Exception('Expected string received %s' % raw)
