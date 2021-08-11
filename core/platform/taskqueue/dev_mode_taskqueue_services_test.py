@@ -49,7 +49,8 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         correct_task_name = 'task1'
 
         # In the type annotation below, payload is of type Dict[str, Any]
-        # because the payload here has no constraints.
+        # because it mocks the behaviour of
+        # dev_mode_taskqueue_services.CLIENT.create_task.
         def mock_create_task(
                 queue_name: str,
                 url: str,

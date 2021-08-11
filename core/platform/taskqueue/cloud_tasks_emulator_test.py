@@ -31,8 +31,9 @@ from typing import Any, Dict, List, Optional # isort:skip # pylint: disable=unus
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud tasks emulator."""
 
-    # In the type annotation below, payload is of type Dict[str, Any] because
-    # the payload here has no constraints.
+    # In the type annotation below, payload is of type Dict[str, Any]
+    # because it emulates the behaviour of
+    # dev_mode_taskqueue_services._task_handler.
     def mock_task_handler(
             self,
             url: str,
