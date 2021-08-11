@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core import platform_feature_list
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -40,13 +41,22 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
             },
             'browser_type': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': (
+                        constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES)
                 },
                 'default_value': None
             },
             'app_version': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': (
+                            constants.
+                            PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+                        )
+                    }]
                 },
                 'default_value': None
             }

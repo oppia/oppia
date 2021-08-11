@@ -56,7 +56,8 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         'GET': {
             'selected_subtopic_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'ConvertStringifiedListToProperList'
                 }
             }
         }
