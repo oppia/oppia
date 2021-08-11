@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Schema Based Unicode Editor  Directive
  */
 
- import { EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Schema Based Unicode Editor Directive', () => {
