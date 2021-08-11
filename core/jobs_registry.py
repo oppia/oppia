@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import exp_jobs_one_off
+from core.domain import interaction_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import skill_jobs_one_off
@@ -36,6 +37,7 @@ ONE_OFF_JOB_MANAGERS = [
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExpSnapshotsMigrationJob,
+    interaction_jobs_one_off.LogicProofInteractionOneOffJob,
     question_jobs_one_off.FixQuestionImagesStorageOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.QuestionSnapshotsMigrationJob,
