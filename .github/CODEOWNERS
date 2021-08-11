@@ -422,7 +422,7 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/story-creation.service*.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
 /core/templates/pages/story-editor-page/ @kevintab95
@@ -435,7 +435,7 @@
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
-/core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/topic-creation.service*.ts @kevintab95
 /core/templates/domain/classroom/ @kevintab95
 /core/templates/domain/subtopic_viewer/ @kevintab95
 /core/templates/domain/topic/ @kevintab95
