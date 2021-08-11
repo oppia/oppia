@@ -26,8 +26,13 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, Tuple # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
 
+QueryType = Tuple[
+    str,
+    Dict[str, List[Union[str, Dict[str, Dict[str, Union[int, str]]]]]],
+    Dict[str, str]
+]
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
@@ -35,10 +40,11 @@ class EmailTests(test_utils.GenericTestBase):
     class Response(python_utils.OBJECT):
         """Class to mock python_utils.url_open responses."""
 
+        #
         def __init__(
                 self,
-                url: Tuple[str, str, Dict[str, str]],
-                expected_url: Tuple[str, str, Dict[str, str]]
+                url: QueryType,
+                expected_url: QueryType
         ) -> None:
             self.url = url
             self.expected_url = expected_url
@@ -51,17 +57,20 @@ class EmailTests(test_utils.GenericTestBase):
             """
             self.url = (
                 self.url[0],
-                python_utils.parse_query_string(self.url[1]),
+                python_utils.parse_query_string(self.url[1]), # type: ignore[no-untyped-call]
                 self.url[2],
             )
+            recipient_variable_0 = self.url[1]['recipient_variables'][0]
+            # Letting mypy know that the variable is of type str.
+            assert isinstance(recipient_variable_0, str)
             self.url[1]['recipient_variables'] = [ast.literal_eval(
-                self.url[1]['recipient_variables'][0])]
+                recipient_variable_0)]
             return 200 if self.url == self.expected_url else 500
 
     def test_send_email_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
-        expected_query_url = (
+        expected_query_url: QueryType = (
             'https://api.mailgun.net/v3/domain/messages',
             {
                 'from': ['a@a.com'],
@@ -162,7 +171,7 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_batch_send_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
-        expected_query_url = (
+        expected_query_url: QueryType = (
             'https://api.mailgun.net/v3/domain/messages',
             {
                 'from': ['a@a.com'],
@@ -218,7 +227,7 @@ class EmailTests(test_utils.GenericTestBase):
                 'Hi abc,<br> 😂')
 
     def test_invalid_status_code_returns_false(self) -> None:
-        expected_query_url = (
+        expected_query_url: QueryType = (
             'https://api.mailgun.net/v3/domain/messages',
             {
                 'from': ['a@a.com'],

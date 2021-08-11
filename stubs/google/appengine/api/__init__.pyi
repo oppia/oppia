@@ -1,3 +1,0 @@
-from typing import Any
-
-datastore_types: Any = ...

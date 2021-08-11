@@ -26,7 +26,7 @@ from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 import feconf
 
-from typing import Any # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Union # isort:skip # pylint: disable=unused-import
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -91,7 +91,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
         bcc_email_list_str = 'e@e.com f@f.com g@g.com... Total: 4 emails.'
-        recipient_variables = (
+        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = (
             {
                 'a@a.com': {'first': 'Bob', 'id': 1},
                 'b@b.com': {'first': 'Jane', 'id': 2},

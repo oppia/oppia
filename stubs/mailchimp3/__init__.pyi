@@ -10,7 +10,7 @@ class ListMembers:
     def create(
             self,
             list_id: Optional[Text],
-            data: Dict[Text, Any]
+            data: Dict[Text, Text]
     ) -> Dict[Text, Any]: ...
 
     def get(

@@ -35,6 +35,8 @@ def get_application_id() -> str:
         str. The application ID.
     """
     app_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    if app_id is None:
+        raise ValueError('Value None for application id is invalid.')
     # Ruling out the possibility of None for mypy type checking.
     assert app_id is not None
     return app_id

@@ -24,7 +24,7 @@ import python_utils
 
 from mailchimp3 import mailchimpclient
 
-from typing import Any, Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict # isort:skip # pylint: disable=unused-import
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
@@ -59,9 +59,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     }]
 
                 def get(
-                        self,
-                        _list_id: str,
-                        subscriber_hash: str
+                        self, _list_id: str, subscriber_hash: str
                 ) -> Dict[str, str]:
                     """Mocks the get function of the mailchimp api.
 
@@ -131,9 +129,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                             'detail': 'Server Issue'})
 
                 def delete_permanent(
-                        self,
-                        _list_id: str,
-                        subscriber_hash: str
+                        self, _list_id: str, subscriber_hash: str
                 ) -> None:
                     """Mocks the delete function of the mailchimp api. This
                     function just sets the deleted user to a private variable

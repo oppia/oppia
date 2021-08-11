@@ -12,6 +12,6 @@ class Client(object):
         target_language: Optional[Text] = ...,
         format_: Optional[Text] = ...,
         source_language: Optional[Text] = ...,
-        customization_ids: Union[Text, List[Text], None] = ...,
+        customization_ids: Optional[Union[Text, List[Text]]] = ...,
         model: Optional[Text] = ...,
     ) -> Union[Dict[Text, Text], List[Dict[Text, Text]]]: ...

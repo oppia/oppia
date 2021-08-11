@@ -208,6 +208,10 @@ class Emulator(python_utils.OBJECT):
                 queue_name, url, payload, scheduled_for=scheduled_for_time,
                 task_name=task_name)
             queue.append(task)
+            # The key for sorting is defined separately because of a mypy bug.
+            # A [no-any-return] is thrown if key is defined in the sort()
+            # method instead.
+            # https://github.com/python/mypy/issues/9590
             k = lambda t: t.scheduled_for
             queue.sort(key=k)
 
@@ -228,8 +232,9 @@ class Emulator(python_utils.OBJECT):
         else:
             return self._total_enqueued_tasks()
 
-    def process_and_flush_tasks(self,
-                                queue_name: Optional[str] = None) -> None:
+    def process_and_flush_tasks(
+            self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
