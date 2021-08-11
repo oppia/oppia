@@ -40,10 +40,7 @@ interface RteConfig extends CKEDITOR.config {
 
 @Component({
   selector: 'ck-editor-4-rte',
-  template: '<div><div></div>' +
-            '<div contenteditable="true" ' +
-            'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
-            '</div></div>',
+  templateUrl: './ck-editor-4-rte.component.html',
   styleUrls: []
 })
 export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
@@ -348,13 +345,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           .css('width', '24px')
           .css('padding', '0px 0px');
       });
-      let offline = document.createElement('span');
-      offline.innerText = (
-        '* Tools with dark background can not be used when offline.');
-      offline.className = 'cke-offline-warning';
-      offline.style.display = 'none';
-      // eslint-disable-next-line max-len
-      this.elementRef.nativeElement.children[0].children[0].children[0].appendChild(offline);
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')
