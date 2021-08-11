@@ -6149,6 +6149,45 @@ export default {
     "math": ["fractions", "negative-numbers", "ratios"]
   },
 
+  "SCHEMA_FOR_TOPIC_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
+    }
+  },
+
+  "SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
+    }
+  },
+
+  "SCHEMA_FOR_STORY_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+          "id": "is_regex_matched",
+          "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+          "id": "has_length_at_most",
+          "max_value": 30
+      }]
+    }
+  },
+
   "DEV_MODE": true,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
