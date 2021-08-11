@@ -410,7 +410,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 5)
+        self.assertEqual(translation_opportunities[0].content_count, 6)
 
     def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
             self):
@@ -878,8 +878,9 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
                 observed_log_messages[0],
-                'Missing language codes [u\'new_lang\'] in exploration '
-                'opportunity model with id 0')
+                'Missing language codes [\'new_lang\'] in exploration '
+                'opportunity model with id 0'
+            )
 
     def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
             self):

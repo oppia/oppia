@@ -5686,6 +5686,10 @@ export default {
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
 
+  // A regular expression for allowed characters in URL fragment for Blog Post.
+  // eslint-disable-next-line max-len
+  "VALID_THREAD_ID_REGEX": "(exploration|collection|skill).[a-zA-Z0-9]+.[a-zA-Z0-9=]+",
+
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
 
