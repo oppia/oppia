@@ -53,10 +53,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         new_rule_dicts = [{
             'filters': [{
                 'type': 'server_mode',
-                'conditions': [
-                    ['=', SERVER_MODES.dev.value]
-                ]}
-            ],
+                'conditions': [['=', SERVER_MODES.dev.value]]
+            }],
             'value_when_matched': True
         }]
         new_rules = [
@@ -74,15 +72,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.dev_feature.name, self.user_id, 'edit rules', new_rules)
 
         new_rule_dicts = [{
-                'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [
-                        ['=', SERVER_MODES.dev.value],
-                        ['=', SERVER_MODES.test.value],
-                        ['=', SERVER_MODES.prod.value]
-                    ]}
-                ],
-                'value_when_matched': True
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [
+                    ['=', SERVER_MODES.dev.value],
+                    ['=', SERVER_MODES.test.value],
+                    ['=', SERVER_MODES.prod.value]
+            ]}],
+            'value_when_matched': True
         }]
         new_rules = [
             platform_parameter_domain.PlatformParameterRule.from_dict(
@@ -184,14 +181,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
             self):
         new_rule_dicts = [{
-                'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [['=', SERVER_MODES.prod.value]],
-                }, {
-                    'type': 'platform_type',
-                    'conditions': [['=', 'Backend']],
-                }],
-                'value_when_matched': True
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [['=', SERVER_MODES.prod.value]],
+            }, {
+                'type': 'platform_type',
+                'conditions': [['=', 'Backend']],
+            }],
+            'value_when_matched': True
         }]
         new_rules = [
             platform_parameter_domain.PlatformParameterRule.from_dict(
@@ -210,14 +207,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_update_feature_flag_rules_successfully_updates_rules(self):
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [
-                        ['=', FEATURE_STAGES.dev.value]
-                    ]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [['=', FEATURE_STAGES.dev.value]]
+            }],
             'value_when_matched': False
         }]
         new_rules = [
@@ -247,17 +240,15 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             utils.ValidationError, 'must have a server_mode filter'):
 
             new_rule_dicts = [{
-                    'filters': [
-                        {
-                            'type': 'app_version',
-                            'conditions': [['=', '1.2.3']]
-                    }],
-                    'value_when_matched': True
-                }, {
-                    'filters': [],
-                    'value_when_matched': False
-                }
-            ]
+                'filters': [{
+                    'type': 'app_version',
+                    'conditions': [['=', '1.2.3']]
+                }],
+                'value_when_matched': True
+            }, {
+                'filters': [],
+                'value_when_matched': False
+            }]
             new_rules = [
                 platform_parameter_domain.PlatformParameterRule.from_dict(
                     rule_dict) for rule_dict in new_rule_dicts

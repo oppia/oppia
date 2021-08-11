@@ -1186,11 +1186,14 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Add two explorations to the previously saved collection and publish
         # it.
         for exp_id in [self.EXP_ID_1_0, self.EXP_ID_1_1]:
+            change_list = [collection_domain.CollectionChange({
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': exp_id
+            })]
             collection_services.update_collection(
-                self.owner_id, self.COL_ID_1, [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': exp_id
-                }], 'Added new exploration')
+                self.owner_id, self.COL_ID_1, change_list,
+                'Added new exploration'
+            )
 
         # Publish the collections.
         rights_manager.publish_collection(self.owner, self.COL_ID_0)

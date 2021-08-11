@@ -64,12 +64,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'description': 'for test',
             'data_type': DATA_TYPES.string.value,
             'rules': [{
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [('=', FEATURE_STAGES.dev.value)]
-                    }
-                ],
+                'filters': [{
+                    'type': 'server_mode',
+                    'conditions': [('=', FEATURE_STAGES.dev.value)]
+                }],
                 'value_when_matched': '222'
             }],
             'rule_schema_version': (
@@ -161,12 +159,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self._create_example_parameter_with_name(parameter_name)
 
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.dev.value)]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.dev.value)]
+            }],
             'value_when_matched': 'updated'
         }]
         new_rules = [
@@ -193,12 +189,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self._create_example_parameter_with_name(parameter_name)
 
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.dev.value)]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.dev.value)]
+            }],
             'value_when_matched': 'updated'
         }]
         new_rules = [
@@ -224,12 +218,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         param.validate()
 
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.dev.value)]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.dev.value)]
+            }],
             'value_when_matched': True
         }]
         new_rules = [
@@ -253,12 +245,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
 
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.test.value)]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.test.value)]
+            }],
             'value_when_matched': True
         }]
         new_rules = [
@@ -284,12 +274,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
 
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.prod.value)]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.prod.value)]
+            }],
             'value_when_matched': True
         }]
         new_rules = [
@@ -315,12 +303,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.test)
 
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.prod.value)]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.prod.value)]
+            }],
             'value_when_matched': True
         }]
         new_rules = [
@@ -348,10 +334,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         new_rule_dicts = [{
             'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.dev.value)]
-                }
-            ],
+                'type': 'server_mode',
+                'conditions': [('=', FEATURE_STAGES.dev.value)]
+            }],
             'value_when_matched': 'updated'
         }]
         new_rules = [

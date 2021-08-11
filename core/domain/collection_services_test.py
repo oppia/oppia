@@ -537,12 +537,10 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # Create another two explorations and add them to the collection.
         for exp_id in [self.EXP_ID_1, self.EXP_ID_2]:
             self.save_new_valid_exploration(exp_id, self.owner_id)
-            change_list = convert_change_list_dict_to_object(
-                [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': exp_id
-                }]
-            )
+            change_list = convert_change_list_dict_to_object([{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': exp_id
+            }])
             collection_services.update_collection(
                 self.owner_id, self.COL_ID_0, change_list,
                 'Added new exploration')

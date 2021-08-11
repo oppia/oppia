@@ -56,14 +56,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
             PARAM_NAMES.parameter_b, 'parameter for test', DATA_TYPES.bool,
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
         new_rule_dicts = [{
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': [
-                        ['=', param_domain.SERVER_MODES.dev.value]
-                    ]
-                }
-            ],
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [['=', param_domain.SERVER_MODES.dev.value]]
+            }],
             'value_when_matched': True
         }]
         new_rules = [
