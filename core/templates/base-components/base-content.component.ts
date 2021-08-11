@@ -147,14 +147,9 @@ export class BaseContentComponent {
     // This cookie should support cross-site context so secure=true and
     // sameSite='none' is set explicitly. Not setting this can cause
     // inconsistent behaviour in different browsers in third-party contexts
-    // e.g. In Firefox, the cookie is accepted with the following warning:
-    // "Cookie “OPPIA_COOKIES_ACKNOWLEDGED” will be soon rejected because it
-    // has the “SameSite” attribute set to “None” or an invalid value, without
-    // the “secure” attribute. To know more about the “SameSite“ attribute,
-    // read
-    // https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie/SameSite"
-    // In Chrome, the cookie gets rejected because when sameSite='none', it is
-    // required that secure=true be set in third-party context.
+    // e.g. In Firefox, the cookie is accepted with a warning when
+    // sameSite='none' but secure=true is not set. For the same scenario in
+    // Chrome, the cookie gets rejected.
     // See https://caniuse.com/same-site-cookie-attribute
     // See https://www.chromium.org/updates/same-site/faq
     let cookieOptions = {
