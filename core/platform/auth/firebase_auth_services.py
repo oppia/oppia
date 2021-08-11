@@ -67,11 +67,12 @@ from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 import webapp2
 
-from typing import Any, Dict, List, Optional, Text
+from typing import Any, Dict, List, Optional, Text # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models, translation_models, user_models
+    from mypy_imports import auth_models
+    from mypy_imports import transaction_services
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))

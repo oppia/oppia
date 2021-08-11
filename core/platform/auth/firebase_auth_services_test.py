@@ -40,11 +40,11 @@ from firebase_admin import exceptions as firebase_exceptions
 import mock
 import webapp2
 
-from typing import Any, Dict, Iterator, List, Optional, Text, Tuple, Generator, cast
+from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models, user_models
+    from mypy_imports import auth_models
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -212,7 +212,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self,
             uids: List[Text],
             force_delete: bool = False
-    ) -> firebase_auth._user_mgt.BatchDeleteAccountsResponse:
+    ) -> 'firebase_auth.BatchDeleteAccountsResponse':
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -245,7 +245,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             disabled_uids, enabled_uids = cast(
                 Tuple[List[Tuple[int, Text]], List[Tuple[int, Text]]],
                 utils.partition(
-                    uids, predicate=lambda uid: self._users_by_uid[uid].disabled,
+                    uids,
+                    predicate=lambda uid: self._users_by_uid[uid].disabled,
                     enumerated=True))
             uids_to_delete = {uid for _, uid in disabled_uids}
             errors = [(i, 'uid=%r must be disabled first' % uid)
@@ -608,19 +609,23 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             Context manager. The context manager with the mocked implementation.
         """
         updated_batch_error_pattern = itertools.cycle(batch_error_pattern)
-        updated_individual_error_pattern = itertools.cycle(individual_error_pattern)
+        updated_individual_error_pattern = (
+            itertools.cycle(individual_error_pattern))
 
         def mock_delete_users(
                 uids: List[Text],
                 force_delete: bool = False
-        ) -> firebase_auth._user_mgt.BatchDeleteAccountsResponse:
+        ) -> 'firebase_auth.BatchDeleteAccountsResponse':
             """Mock function that fails according to the input patterns."""
             error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
             if error_to_raise is not None:
                 raise error_to_raise
 
             uids_to_delete, uids_to_fail = cast(
-                Tuple[List[Tuple[int, Tuple[Text, Text]]], List[Tuple[int, Tuple[Text, Text]]]],
+                Tuple[
+                    List[Tuple[int, Tuple[Text, Text]]],
+                    List[Tuple[int, Tuple[Text, Text]]]
+                ],
                 utils.partition(
                     python_utils.ZIP(uids, updated_individual_error_pattern),
                     predicate=lambda uid_and_error: uid_and_error[1] is None,
@@ -666,7 +671,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             Context manager. The context manager with the mocked implementation.
         """
         updated_batch_error_pattern = itertools.cycle(batch_error_pattern)
-        updated_individual_error_pattern = itertools.cycle(individual_error_pattern)
+        updated_individual_error_pattern = (
+            itertools.cycle(individual_error_pattern))
 
         def mock_import_users(
                 records: List[firebase_admin.auth.ImportUserRecord]
@@ -677,7 +683,12 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 raise error_to_raise
 
             records_to_import, records_to_fail = cast(
-                Tuple[List[Tuple[int, Tuple[firebase_admin.auth.ImportUserRecord, Text]]], List[Tuple[int, Tuple[firebase_admin.auth.ImportUserRecord, Text]]]],
+                Tuple[
+                    List[Tuple[
+                        int, Tuple[firebase_auth.ImportUserRecord, Text]]],
+                    List[Tuple[
+                        int, Tuple[firebase_auth.ImportUserRecord, Text]]]
+                ],
                 utils.partition(
                     python_utils.ZIP(records, updated_individual_error_pattern),
                     predicate=lambda record_and_error: record_and_error[1] is None,
@@ -796,7 +807,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def _create_delete_users_result_fragile(
             self,
             errors: List[Tuple[int, Text]]
-    ) -> firebase_auth._user_mgt.BatchDeleteAccountsResponse:
+    ) -> 'firebase_auth.BatchDeleteAccountsResponse':
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
 
@@ -907,8 +918,10 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         self.firebase_sdk_stub.uninstall()
         super(FirebaseAuthServicesTestBase, self).tearDown() # type: ignore[no-untyped-call]
 
-    def capture_logging(self,
-                        min_level: int = logging.INFO) -> 'contextlib._GeneratorContextManager[Text]':
+    def capture_logging(
+            self,
+            min_level: int = logging.INFO
+    ) -> 'contextlib._GeneratorContextManager[Text]':
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.
@@ -925,9 +938,11 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         return super(FirebaseAuthServicesTestBase, self).capture_logging(
             min_level=min_level)
 
-    def create_request(self,
-                       id_token: Optional[str] = None,
-                       session_cookie: Optional[str] = None) -> webapp2.Request:
+    def create_request(
+            self,
+            id_token: Optional[str] = None,
+            session_cookie: Optional[str] = None
+    ) -> webapp2.Request:
         """Returns a new request with the given auth values.
 
         Args:
@@ -946,8 +961,10 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
             req.cookies[feconf.FIREBASE_SESSION_COOKIE_NAME] = session_cookie
         return req
 
-    def create_response(self,
-                        session_cookie: Optional[str] = None) -> webapp2.Response:
+    def create_response(
+            self,
+            session_cookie: Optional[str] = None
+    ) -> webapp2.Response:
         """Returns a new response with the given session cookie.
 
         Args:
@@ -1357,7 +1374,8 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         with self.capture_logging() as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
-        self.assert_matches_regexps(logs, [ # type: ignore[no-untyped-call]
+        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+            logs, [
             r'\[WIPEOUT\] User with user_id=uid has no Firebase account'
         ])
 
@@ -1442,7 +1460,8 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.delete_external_auth_associations(
                 self.user_id)
 
-        self.assert_matches_regexps(logs, [ # type: ignore[no-untyped-call]
+        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+            logs, [
             r'\[WIPEOUT\] Firebase account already deleted',
         ])
 
