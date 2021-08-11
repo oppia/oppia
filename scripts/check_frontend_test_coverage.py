@@ -114,7 +114,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-int-editor.directive.ts',
     'schema-based-list-viewer.directive.ts',
     'schema-based-primitive-viewer.directive.ts',
-    'schema-based-unicode-editor.directive.ts',
     'schema-based-unicode-viewer.directive.ts',
     'schema-based-viewer.directive.ts',
     'score-ring.directive.ts',
