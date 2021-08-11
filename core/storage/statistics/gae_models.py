@@ -1777,7 +1777,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         instance_id = cls.get_instance_id(entity_type, state_reference)
         return cls.get(instance_id, strict=False)
 
-
     @staticmethod
     def get_model_association_to_user(
         ) -> base_models.MODEL_ASSOCIATION_TO_USER:

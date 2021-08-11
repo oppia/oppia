@@ -27,7 +27,7 @@ from constants import constants
 
 from typing import Dict, List, NewType, Union # isort:skip # pylint: disable=unused-import
 
-TYPE_COMMAND = (
+TypeCommand = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
 
 # The datastore model ID for the list of featured activity references. This
@@ -1277,7 +1277,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[TYPE_COMMAND] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[TypeCommand] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1319,7 +1319,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[TYPE_COMMAND] = [{
     'user_id_attribute_names': []
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[TYPE_COMMAND] = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[TypeCommand] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1362,7 +1362,7 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[TYPE_COMMAND] = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[TypeCommand] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
