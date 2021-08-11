@@ -1387,7 +1387,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Input1', 'Input2']
                             }
                     })
             ],
@@ -1471,6 +1471,63 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content,
             'Placeholder'
         )
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Contains')
+
+    def test_get_content_id_mapping_needing_translations_for_set_input_rule(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('SetInput')
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'unicodeStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        init_state.update_interaction_answer_groups(
+            [state_answer_group])
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'feedback_1': {},
+                'rule_input_4': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'SetInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Equals')
 
     def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
