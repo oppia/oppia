@@ -38,6 +38,8 @@ class Task(python_utils.OBJECT):
     the cloud tasks emulator.
     """
 
+    # In the type annotation below, payload is of type Dict[str, Any] because
+    # the payload here has no constraints.
     def __init__(
             self,
             queue_name: str,
@@ -171,6 +173,8 @@ class Emulator(python_utils.OBJECT):
         """
         return sum(len(q) for q in self._queues.values())
 
+    # In the type annotation below, payload is of type Dict[str, Any] because
+    # the payload here has no constraints.
     def create_task(
             self,
             queue_name: str,

@@ -39,6 +39,8 @@ CLIENT = tasks_v2.CloudTasksClient(
         if constants.EMULATOR_MODE else auth.default()[0]))
 
 
+# In the type annotation below, payload is of type Dict[str, Any] because
+# the payload here has no constraints.
 def create_http_task(
         queue_name: str,
         url: str,
@@ -69,6 +71,8 @@ def create_http_task(
     parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
+    # In the type annotation below, task is of type Dict[str, Any] because
+    # its structure can vary a lot.
     # Construct the request body.
     task: Dict[str, Any] = {
         'app_engine_http_request': {  # Specify the type of request.
