@@ -13,40 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the selection dropdown with HTML content.
+ * @fileoverview Component for the selection dropdown with HTML content.
  */
 
 require('directives/angular-html-bind.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-// This directive allows user to put html into select's options.
+// This component allows user to put html into select's options.
 // 'options' should be an array of objects containing attributes 'id' and 'val'
 // Attribute 'val' is presented to the user. After user selection, the
 // corresponding attribute 'id' is assigned to 'selection'.
 
-angular.module('oppia').directive('htmlSelect', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        options: '=',
-        selection: '='
-      },
-      template: require(
-        'components/forms/custom-forms-directives/html-select.directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.select = function(id) {
-          $scope.selection = id;
-        };
-
-        $scope.getSelectionIndex = function() {
-          for (var index = 0; index < $scope.options.length; index++) {
-            if ($scope.options[index].id === $scope.selection) {
-              return index;
-            }
-          }
-        };
-      }]
+angular.module('oppia').component('htmlSelect', {
+  bindings: {
+    options: '=',
+    selection: '='
+  },
+  template: require(
+    'components/forms/custom-forms-directives/html-select.component.html'),
+  controller: ['$scope', function($scope) {
+    let ctrl = this;
+    $scope.select = function(id) {
+      ctrl.selection = id;
     };
-  }
-]);
+
+    $scope.getSelectionIndex = function() {
+      for (var index = 0; index < ctrl.options.length; index++) {
+        if (ctrl.options[index].id === ctrl.selection) {
+          return index;
+        }
+      }
+    };
+  }]
+});
