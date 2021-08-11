@@ -2,7 +2,6 @@ import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from . import App
-from firebase_admin import _user_mgt
 
 class UserRecord:
     def __init__(
@@ -45,7 +44,11 @@ class UserImportResult:
 
 class ListUsersPage: ...
 
-BatchDeleteAccountsResponse = _user_mgt.BatchDeleteAccountsResponse
+class BatchDeleteAccountsResponse:
+    def __init__(
+            self,
+            errors: List[Dict[str, Union[int, str]]] = ...
+    ) -> None: ...
 
 def create_session_cookie(
         id_token: Optional[str],

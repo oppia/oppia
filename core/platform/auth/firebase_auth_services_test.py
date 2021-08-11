@@ -19,7 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import contextlib
+import contextlib  # pylint: disable=unused-import
 import datetime
 import itertools
 import json
@@ -691,7 +691,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 ],
                 utils.partition(
                     python_utils.ZIP(records, updated_individual_error_pattern),
-                    predicate=lambda record_and_error: record_and_error[1] is None,
+                    predicate=(
+                        lambda record_and_error: record_and_error[1] is None),
                     enumerated=True))
 
             self.import_users([record for _, (record, _) in records_to_import])
@@ -1453,7 +1454,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             firebase_auth_services
             .verify_external_auth_associations_are_deleted(self.user_id))
 
-    def test_delete_external_auth_associations_when_user_not_found(self) -> None:
+    def test_delete_external_auth_associations_when_user_not_found(
+            self
+    ) -> None:
         firebase_auth.delete_user(self.AUTH_ID)
 
         with self.capture_logging() as logs:
