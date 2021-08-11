@@ -58,7 +58,6 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
             elif 'default_value' not in arg_schema:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
-
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
@@ -79,13 +78,11 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
-    'AboutRedirectPage',
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
     'BulkEmailWebhookEndpoint',
     'CollectionSummariesHandler',
-    'ConsoleErrorPage',
     'DeferredTasksHandler',
     'DeleteAccountHandler',
     'DeleteAccountPage',
@@ -96,11 +93,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableTopicDataHandler',
     'EditorAutosaveHandler',
     'EditorHandler',
-    'EmailDashboardDataHandler',
-    'EmailDashboardPage',
-    'EmailDashboardResultPage',
-    'EmailDashboardTestBulkEmailHandler',
-    'EmailDashboardCancelEmailHandler',
     'ExplorationActualStartEventHandler',
     'ExplorationCompleteEventHandler',
     'ExplorationEmbedPage',
@@ -121,17 +113,12 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ExplorationStatusHandler',
     'ExplorationSummariesHandler',
     'ExportAccountHandler',
-    'FeedbackStatsHandler',
     'FeedbackThreadStatusChangeEmailHandler',
-    'FeedbackThreadViewEventHandler',
     'FetchIssuesHandler',
     'FetchPlaythroughHandler',
     'FetchSkillsHandler',
     'FlagExplorationEmailHandler',
     'FlagExplorationHandler',
-    'ForumRedirectPage',
-    'FoundationRedirectPage',
-    'FractionLandingRedirectPage',
     'ImageUploadHandler',
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
@@ -173,7 +160,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ProfilePictureHandlerByUsernameHandler',
     'PromoBarHandler',
     'QuebstionsListHandler',
-    'QueryStatusCheckHandler',
     'QuestionCountDataHandler',
     'QuestionCreationHandler',
     'QuestionPlayerHandler',
@@ -182,7 +168,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'RatingHandler',
     'ReaderFeedbackHandler',
     'RecentCommitsHandler',
-    'RecentFeedbackMessagesHandler',
     'RecommendationsHandler',
     'ReleaseCoordinatorPage',
     'ResolveIssueHandler',
@@ -209,7 +194,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StateYamlHandler',
     'StateInteractionStatsHandler',
     'StatsEventsHandler',
-    'StewardsLandingPage',
     'StorePlaythroughHandler',
     'StoryEditorPage',
     'StoryPage',
@@ -226,16 +210,10 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
-    'TeachRedirectPage',
-    'ThreadHandler',
-    'ThreadListHandler',
-    'ThreadListHandlerForTopicsHandler',
     'TopUnresolvedAnswersHandler',
     'TopicAssignmentsHandler',
     'TopicEditorPage',
     'TopicEditorStoryHandler',
-    'TopicLandingPage',
-    'TopicLandingRedirectPage',
     'TopicNameHandler',
     'TopicPageDataHandler',
     'TopicPublishHandler',

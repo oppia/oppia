@@ -40,42 +40,36 @@ var ExplorationPlayerPage = require(
 
 var ExplorationEditorPage = function() {
   /*
-   * Components
-   */
-  this.getImprovementsTab = function() {
-    return (
-      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
-  };
-  this.getFeedbackTab = function() {
-    return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
-  };
-  this.getHistoryTab = function() {
-    return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
-  };
-  this.getMainTab = function() {
-    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
-  };
-  this.getSettingsTab = function() {
-    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
-  };
-  this.getStatsTab = function() {
-    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
-  };
-  this.getTranslationTab = function() {
-    return new ExplorationEditorTranslationTab
-      .ExplorationEditorTranslationTab();
-  };
-  this.getPreviewTab = function() {
-    return new ExplorationPlayerPage.ExplorationPlayerPage();
-  };
-
-  /*
-   * Interactive elements
-   */
+  * Interactive elements
+  */
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
     .first();
+  var expTitle = element(by.css(
+    '.protractor-test-exploration-title-input'));
+  var expObjective = element(by.css(
+    '.protractor-test-exploration-objective-input'));
+  var expTags = element(by.css('.protractor-test-tags'));
+  var expInput = expTags.element(by.tagName('input'));
+  var expCategoryDropdownElement = element(
+    by.css('.protractor-test-exploration-category-dropdown'));
+  var expLanguageSelectorElement = element(
+    by.css('.protractor-test-exploration-language-select'));
+  var explorationMetadataModalHeaderElement = element(
+    by.css('.protractor-test-metadata-modal-header'));
+  var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
+  var expTagsSelectionChoiceElements = element.all(
+    by.css('.select2-selection__choice'));
+  var modalContentElement = element(by.css('.modal-content'));
+  var sharePublishModalElement = element(
+    by.css('.protractor-test-share-publish-modal'));
+  var selectionRenderedElement = element(
+    by.css('.select2-selection__rendered'));
+  var promptModalElement = element(
+    by.css('.protractor-test-save-prompt-modal'));
+  var explorationSaveModalElement = element(
+    by.css('.protractor-test-exploration-save-modal'));
 
   /*
    * Non-Interactive elements
@@ -120,6 +114,39 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
+  var prePublicationConfirmButton = element(by.css(
+    '.protractor-test-confirm-pre-publication'));
+  var closeButton = element(by.css('.protractor-test-share-publish-close'));
+
+  /*
+   * Components
+   */
+  this.getImprovementsTab = function() {
+    return (
+      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
+  };
+  this.getFeedbackTab = function() {
+    return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
+  };
+  this.getHistoryTab = function() {
+    return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
+  };
+  this.getMainTab = function() {
+    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
+  };
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+  this.getStatsTab = function() {
+    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
+  };
+  this.getTranslationTab = function() {
+    return new ExplorationEditorTranslationTab
+      .ExplorationEditorTranslationTab();
+  };
+  this.getPreviewTab = function() {
+    return new ExplorationPlayerPage.ExplorationPlayerPage();
+  };
 
   /*
    * Workflows
@@ -131,66 +158,61 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
-    var expTitle = element(by.css(
-      '.protractor-test-exploration-title-input'));
-    var expObjective = element(by.css(
-      '.protractor-test-exploration-objective-input'));
-    var expTags = element(by.css('.protractor-test-tags'));
-    var expInput = expTags.element(by.tagName('input'));
-    var expCategory = element(
-      by.css('.protractor-test-exploration-category-dropdown'));
-    var expLanguage = element(
-      by.css('.protractor-test-exploration-language-select'));
-    var neutralElement = element(
-      by.css('.protractor-test-metadata-modal-header'));
-
     await action.sendKeys('Exploration title', expTitle, title);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     await action.sendKeys('Exploration objective', expObjective, objective);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     await waitFor.presenceOf(
-      expCategory, 'Category input takes too long to be visible.');
+      expCategoryDropdownElement,
+      'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(expCategory)
+      await forms.AutocompleteDropdownEditor(expCategoryDropdownElement)
     ).setValue(category);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.select('Exploration Language', expLanguage, language);
-    await action.click('Neutral Element', neutralElement);
+    await action.select(
+      'Exploration Language', expLanguageSelectorElement,
+      language);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     for (var elem of tags) {
       await action.click('Exploration input', expInput);
       await action.sendKeys('Exploration input', expInput, elem + '\n');
-      await action.click('Neutral Element', neutralElement);
+      await action.click(
+        'Exploration metadata modal header',
+        explorationMetadataModalHeaderElement);
       await action.waitForAutosave();
     }
 
-    var saveChangesButton = element(by.css(
-      '.protractor-test-confirm-pre-publication'));
-    await action.click('Save Changes', saveChangesButton);
+    await action.click(
+      'Publish confirmation button', prePublicationConfirmButton);
     await waitFor.invisibilityOf(
-      saveChangesButton,
+      prePublicationConfirmButton,
       'Exploration metadata modal takes too long to disappear.');
     await waitFor.visibilityOf(
-      element(by.css('.modal-content')),
-      'Modal Content taking too long to appear');
+      modalContentElement, 'Modal Content taking too long to appear');
 
-    var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
     await action.click('Confirm Publish', confirmPublish);
     await waitFor.invisibilityOf(
       confirmPublish,
       'Confirm publish modal takes too long to disappear.');
-    await waitFor.visibilityOf(element(by.css(
-      '.protractor-test-share-publish-modal')),
-    'Awesome modal taking too long to appear');
+    await waitFor.visibilityOf(
+      sharePublishModalElement, 'Awesome modal taking too long to appear');
 
-    var closeButton = element(by.css('.protractor-test-share-publish-close'));
     await action.click('Share publish button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
@@ -198,28 +220,18 @@ var ExplorationEditorPage = function() {
 
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
-    var explorationTitle = element(by.css(
-      '.protractor-test-exploration-title-input'));
-    var explorationObjective = element(by.css(
-      '.protractor-test-exploration-objective-input'
-    ));
-    var explorationCategory = await element(by.css(
-      '.select2-selection__rendered')).getText();
-    var explorationLanguage = await element(by.css(
-      '.protractor-test-exploration-language-select'
-    )).$('option:checked').getText();
-    var explorationTags = element.all(by.css(
-      '.select2-selection__choice'
-    ));
+    var explorationCategory = await selectionRenderedElement.getText();
+    var explorationLanguage = await expLanguageSelectorElement.$(
+      'option:checked').getText();
     await waitFor.visibilityOf(
-      explorationTitle, 'Exploration Goal taking too long to appear');
-    expect(await explorationTitle.getAttribute('value')).toMatch(title);
+      expTitle, 'Exploration Goal taking too long to appear');
+    expect(await expTitle.getAttribute('value')).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    expect(await explorationObjective.getAttribute('value')).toMatch(objective);
+    expect(await expObjective.getAttribute('value')).toMatch(objective);
     expect(explorationLanguage).toMatch(language);
-    for (var i = 0; i < await explorationTags.count(); i++) {
+    for (var i = 0; i < await expTagsSelectionChoiceElements.count(); i++) {
       expect(
-        await explorationTags.get(i).getText()
+        await expTagsSelectionChoiceElements.get(i).getText()
       ).toMatch(tags[i]);
     }
   };
@@ -306,10 +318,10 @@ var ExplorationEditorPage = function() {
     await action.click(
       'Recommendation prompt Save button', recommendationPromptSaveButton);
     await waitFor.invisibilityOf(
-      element(by.css('.protractor-test-save-prompt-modal')),
+      promptModalElement,
       'Save Recommendation Prompt modal does not disappear.');
     await waitFor.visibilityOf(
-      element(by.css('.protractor-test-exploration-save-modal')),
+      explorationSaveModalElement,
       'Exploration Save Modal taking too long to appear');
     if (commitMessage) {
       await action.sendKeys(
