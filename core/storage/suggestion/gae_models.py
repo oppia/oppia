@@ -683,16 +683,15 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
-            voiceover_application_query = cast(
-                List[GeneralVoiceoverApplicationModel],
-                cls.query(datastore_services.all_of(
-                    cls.author_id == author_id, cls.status == status)).fetch())
+            voiceover_application_query = cls.query(
+                datastore_services.all_of(
+                    cls.author_id == author_id, cls.status == status))
         else:
-            voiceover_application_query = cast(
-                List[GeneralVoiceoverApplicationModel],
-                cls.query(cls.author_id == author_id).fetch())
+            voiceover_application_query = cls.query(cls.author_id == author_id)
 
-        return voiceover_application_query
+        return cast(
+            List[GeneralVoiceoverApplicationModel],
+            voiceover_application_query.fetch())
 
     @classmethod
     def get_reviewable_voiceover_applications(
