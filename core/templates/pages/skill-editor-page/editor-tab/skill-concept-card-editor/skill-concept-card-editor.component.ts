@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/review-material-editor/review-material-editor.directive.ts');
+  'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');

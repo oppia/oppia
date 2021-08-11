@@ -21,7 +21,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/state-directives/response-header/response-header.directive.ts');
+  'components/state-directives/response-header/response-header.component.ts');
 require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
 require(

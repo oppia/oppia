@@ -23,7 +23,7 @@ require(
   'components/common-layout-directives/common-elements/' +
     'background-banner.component.ts');
 require(
-  'components/review-material-editor/review-material-editor.directive.ts');
+  'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
