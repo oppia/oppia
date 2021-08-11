@@ -68,24 +68,22 @@ export interface LostChangeBackendDict {
 // they can be undefined.
 export class LostChange {
   cmd: string;
-  stateName: string | undefined;
-  newStateName: string | undefined;
-  oldStateName: string | undefined;
-  newValue: LostChangeValue | undefined;
-  oldValue: LostChangeValue | undefined;
-  propertyName: string | undefined;
-  contentId: string | undefined;
-  languageCode: string | undefined;
-  translationHTML: string | undefined;
+  stateName?: string;
+  newStateName?: string;
+  oldStateName?: string;
+  newValue?: LostChangeValue;
+  oldValue?: LostChangeValue;
+  propertyName?: string;
+  contentId?: string;
+  languageCode?: string;
+  translationHTML?: string;
   utilsService: UtilsService;
 
   constructor(
-      utilsService: UtilsService, cmd: string, newStateName: string | undefined,
-      oldStateName: string | undefined, stateName: string | undefined,
-      newValue: LostChangeValue | undefined,
-      oldValue: LostChangeValue | undefined, propertyName: string | undefined,
-      contentId: string | undefined, languageCode: string | undefined,
-      translationHTML: string | undefined) {
+      utilsService: UtilsService, cmd: string, newStateName?: string,
+      oldStateName?: string, stateName?: string, newValue?: LostChangeValue,
+      oldValue?: LostChangeValue, propertyName?: string, contentId?: string,
+      languageCode?: string, translationHTML?: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;

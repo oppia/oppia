@@ -47,6 +47,12 @@ export interface WrittenTranslationObjectsDict {
   [stateName: string]: WrittenTranslation[];
 }
 
+interface InteractionSpecs {
+  [interaction: string]: {
+    'is_terminal': boolean;
+ }
+}
+
 const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
 
 const WRITTEN_TRANSLATIONS_KEY = 'writtenTranslations';
@@ -126,11 +132,7 @@ export class States {
   }
   getFinalStateNames(): string[] {
     let finalStateNames = [];
-    let interactionSpecs: {
-      [interaction: string]: {
-        'is_terminal': boolean;
-     }
-   } = INTERACTION_SPECS;
+    let interactionSpecs: InteractionSpecs = INTERACTION_SPECS;
     for (let stateName in this._states) {
       let interaction = this._states[stateName].interaction;
       if (interaction.id && interactionSpecs[interaction.id].is_terminal) {

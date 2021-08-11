@@ -59,6 +59,13 @@ export interface StateBackendDict {
   'next_content_id_index': number;
 }
 
+interface InteractionSpecs {
+  [interaction: string]: {
+    'is_linear': boolean;
+    'is_terminal': boolean;
+  };
+}
+
 export class State {
   name: string;
   classifierModelId: string | null;
@@ -125,12 +132,7 @@ export class State {
 
   getRequiredWrittenTranslationContentIds(): Set<string> {
     let interactionId = this.interaction.id;
-    let interactionSpecs: {
-      [interaction: string]: {
-        'is_linear': boolean;
-        'is_terminal': boolean;
-      };
-    } = INTERACTION_SPECS;
+    let interactionSpecs: InteractionSpecs = INTERACTION_SPECS;
 
     let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
 
