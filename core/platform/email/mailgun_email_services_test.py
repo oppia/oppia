@@ -34,13 +34,13 @@ QueryType = Tuple[
     Dict[str, str]
 ]
 
+
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     class Response(python_utils.OBJECT):
         """Class to mock python_utils.url_open responses."""
 
-        #
         def __init__(
                 self,
                 url: QueryType,

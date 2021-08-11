@@ -48,8 +48,8 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
 
         correct_task_name = 'task1'
 
-        # In the type annotation below, payload is of type Dict[str, Any] because
-        # the payload here has no constraints.
+        # In the type annotation below, payload is of type Dict[str, Any]
+        # because the payload here has no constraints.
         def mock_create_task(
                 queue_name: str,
                 url: str,
@@ -91,10 +91,9 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'method': 'POST'
         }
         # In the type annotation below, we have used Dict[str, Any] for json.
-        # This is because this is a method to mock the functionality of
-        # the method requests.post() and its type stubs define the type
-        # Any for json.
-        # https://github.com/python/typeshed/blob/master/stubs/requests/requests/api.pyi#L78
+        # This is because this function mocks requests.post function where the
+        # type of json has been defined Any, hence using Dict[str, Any] here.
+        # https://github.com/python/typeshed/blob/master/stubs/requests/requests/api.pyi#L78.
 
         def mock_post(
                 url: str,
