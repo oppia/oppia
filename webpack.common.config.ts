@@ -141,8 +141,6 @@ module.exports = {
     ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
-    volunteer:
-      commonPrefix + '/pages/volunteer-page/volunteer-page.import.ts',
   },
 
   /**
