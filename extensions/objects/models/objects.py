@@ -1713,21 +1713,19 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
 
 class ConvertStringifiedListToProperList(BaseObject):
+    """Converts stringified list to proper list of strings."""
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
 
         Args:
-            raw: *. A Python object to be validated against the schema,
-                normalizing if necessary.
+            raw: str. Strings to be validated and normalized.
 
         Returns:
-            unicode. The normalized object containing string in unicode format.
+            list(str). The normalized list of strings.
         """
         if not isinstance(raw, python_utils.BASESTRING):
-            print('mniklndscjk')
-            print(raw)
             raise Exception('Expected string received %s' % raw)
 
         return json.loads(raw)

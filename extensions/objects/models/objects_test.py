@@ -1326,8 +1326,8 @@ class ConvertStringifiedListToProperListTests(test_utils.GenericTestBase):
     def test_normalization(self):
         list_of_ids = ['0', '1']
         with self.assertRaisesRegexp(
-            Exception, 'Expected string received %s' % list_of_ids):
-            objects.ConvertStringifiedListToProperList.normalize(list_of_ids)
+            Exception, 'Expected string received 2'):
+            objects.ConvertStringifiedListToProperList.normalize(2)
 
         self.assertEqual(
             objects.ConvertStringifiedListToProperList.normalize(
