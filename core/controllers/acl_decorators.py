@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import functools
 import logging
+import re
 
 from constants import constants
 from core.controllers import base
@@ -1297,8 +1298,12 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         entity_type = feedback_services.get_thread(thread_id).entity_type
         entity_types_with_unrestricted_view_suggestion_access = (
@@ -1355,8 +1360,12 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
