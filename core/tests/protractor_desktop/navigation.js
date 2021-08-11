@@ -20,7 +20,6 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
-const { browser } = require('protractor');
 
 describe('Oppia landing pages tour', function() {
   it('should visit the Fractions landing page', async function() {
