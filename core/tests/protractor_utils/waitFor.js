@@ -191,7 +191,7 @@ var clientSideRedirection = async function(action, check) {
   // Action triggering redirection.
   await action();
 
-  // The action only triggers the redirection but does not waits for it to
+  // The action only triggers the redirection but does not wait for it to
   // complete. Manually waiting for redirection here.
   await browser.driver.wait(async() => {
     var url = await browser.driver.getCurrentUrl();
