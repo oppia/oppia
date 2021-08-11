@@ -1711,7 +1711,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
 
-class ConvertCommaSepearatedToProperList(BaseObject):
+class ConvertCommaSepearatedStringsToProperList(BaseObject):
     """Converts comma seperated values into proper list of strings."""
 
     @classmethod
