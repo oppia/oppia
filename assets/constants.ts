@@ -6179,11 +6179,11 @@ export default {
     "schema": {
       "type": "basestring",
       "validators": [{
-          "id": "is_regex_matched",
-          "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
       }, {
-          "id": "has_length_at_most",
-          "max_value": 30
+        "id": "has_length_at_most",
+        "max_value": 30
       }]
     }
   },
