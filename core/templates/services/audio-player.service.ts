@@ -55,7 +55,7 @@ export class AudioPlayerService {
 
   private async _loadAsync(
       filename: string,
-      successCallback: (value: void | PromiseLike<void>) => void,
+      successCallback: () => void,
       errorCallback: (reason?: string[]) => void
   ) {
     if (this._loadingTrack) {
