@@ -223,10 +223,14 @@ describe('Skill object factory', () => {
     expect(skill.toBackendDict()).toEqual(skillDict);
   });
 
-  it('should return null when there are no rubrics' +
+  it('should throw error when there are no rubrics' +
     ' for the given difficulty', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getRubricExplanations('difficult')).toBe(null);
+    expect(() => {
+      skill.getRubricExplanations('difficult');
+    }).toThrowError(
+      'Unable to get explanation: The given difficulty does ' +
+      'not match any difficulty in the rubrcs');
   });
 
   it('should be able to create an interstitial skill', () => {

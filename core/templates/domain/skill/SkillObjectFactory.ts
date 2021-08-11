@@ -187,15 +187,16 @@ export class Skill {
     return this._misconceptions[idx];
   }
 
-  // This will return 'null' if the passed difficulty
-  // does not match any difficulty in the rubrics.
-  getRubricExplanations(difficulty: string): string[] | null {
+  getRubricExplanations(difficulty: string): string[] {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
         return this._rubrics[idx].getExplanations();
       }
     }
-    return null;
+    throw new Error(
+      'Unable to get explanation: The given difficulty does ' +
+      'not match any difficulty in the rubrcs'
+    );
   }
 
   getMisconceptionId(index: number): string {
