@@ -55,7 +55,8 @@ export interface StateBackendDict {
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
-  'linked_skill_id': string;
+  // This property is null if no skills are linked to an interaction.
+  'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
 
@@ -69,7 +70,7 @@ interface InteractionSpecs {
 export class State {
   name: string;
   classifierModelId: string | null;
-  linkedSkillId: string;
+  linkedSkillId: string | null;
   content: SubtitledHtml;
   interaction: Interaction;
   paramChanges: ParamChange[];
@@ -79,7 +80,8 @@ export class State {
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
   constructor(
-      name: string, classifierModelId: string | null, linkedSkillId: string,
+      name: string, classifierModelId: string | null,
+      linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
       solicitAnswerDetails: boolean, cardIsCheckpoint: boolean,
@@ -166,7 +168,7 @@ export class StateObjectFactory {
     private paramchangesObject: ParamChangesObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
-  // Type of Constanst here doesn't match with the type StateBackendDict,
+  // Type of Constant here doesn't match with the type StateBackendDict,
   // so we will have to typecast it as unknown first.
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as unknown as StateBackendDict;

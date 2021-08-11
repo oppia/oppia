@@ -35,8 +35,8 @@ interface MathExpression {
   'raw_latex': string;
   mathExpressionSvgIsBeingProcessed: boolean;
   svgFile: string;
-
 }
+
 @Component({
   selector: 'math-expression-content-editor',
   templateUrl: './math-expression-content-editor.component.html',
