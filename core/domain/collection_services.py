@@ -627,9 +627,9 @@ def apply_change_list(collection_id, change_list):
 
     Args:
         collection_id: str. ID of the given collection.
-        change_list: list(dict). A change list to be applied to the given
-            collection. Each entry is a dict that represents a CollectionChange
-            object.
+        change_list: list(CollectionChange). A change list to be applied to
+            the given collection. Each entry is a dict that represents a
+            CollectionChange object.
 
     Returns:
         Collection. The resulting collection domain object.
@@ -637,11 +637,7 @@ def apply_change_list(collection_id, change_list):
     collection = get_collection_by_id(collection_id)
 
     try:
-        changes = [
-            collection_domain.CollectionChange(change_dict)
-            for change_dict in change_list
-        ]
-        for change in changes:
+        for change in change_list:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
                 collection.add_node(change.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
@@ -708,8 +704,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
         committer_id: str. ID of the given committer.
         collection: Collection. The collection domain object to be saved.
         commit_message: str. The commit message.
-        change_list: list(dict). List of changes applied to a collection. Each
-            entry in change_list is a dict that represents a CollectionChange.
+        change_list: list(CollectionChange). List of changes applied to a
+            collection. Each entry in change_list is a CollectionChange.
 
     Raises:
         ValidationError. An invalid exploration was referenced in the
@@ -780,7 +776,9 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     }
     collection_model.node_count = len(
         collection_model.collection_contents['nodes'])
-    collection_model.commit(committer_id, commit_message, change_list)
+
+    change_list_dict = [change.to_dict() for change in change_list]
+    collection_model.commit(committer_id, commit_message, change_list_dict)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
     index_collections_given_ids([collection.id])
@@ -948,9 +946,9 @@ def update_collection(
         committer_id: str. The id of the user who is performing the update
             action.
         collection_id: str. The collection id.
-        change_list: list(dict). Each entry represents a CollectionChange
-            object. These changes are applied in sequence to produce the
-            resulting collection.
+        change_list: list(CollectionChange). Each entry represents a
+            CollectionChange object. These changes are applied in sequence
+            to produce the resulting collection.
         commit_message: str or None. A description of changes made to the
             collection. For published collections, this must be present; for
             unpublished collections, it may be equal to None.

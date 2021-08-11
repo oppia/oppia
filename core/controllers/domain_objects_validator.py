@@ -40,13 +40,11 @@ def validate_exploration_change(obj):
         obj: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns object after validation.
+        ExplorationChange. Returns ExplorationChange object after validation.
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj)
-
-    return obj
+    return exp_domain.ExplorationChange(obj)
 
 
 def validate_new_config_property_values(obj):
@@ -111,13 +109,11 @@ def validate_collection_change(obj):
         obj: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns object after validation.
+        CollectionChange. Returns CollectionChange object after validation.
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    collection_domain.CollectionChange(obj)
-
-    return obj
+    return collection_domain.CollectionChange(obj)
 
 
 def validate_task_entry_for_improvements(task_entry):
