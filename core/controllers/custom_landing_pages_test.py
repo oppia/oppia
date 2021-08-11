@@ -57,34 +57,32 @@ class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
 
 
 class OldStewardsRedirectPageTest(test_utils.GenericTestBase):
-    """Test for showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
+    """Test for redirecting the old stewards pages to the volunteer page."""
 
     def test_nonprofits_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
         response.mustcontain(
-            '<oppia-stewards-landing-page-root>' +
-            '</oppia-stewards-landing-page-root>')
+            '<oppia-volunteer-page-root>' +
+            '</oppia-volunteer-page-root>')
 
     def test_parents_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
         response.mustcontain(
-            '<oppia-stewards-landing-page-root>' +
-            '</oppia-stewards-landing-page-root>')
+            '<oppia-volunteer-page-root>' +
+            '</oppia-volunteer-page-root>')
 
     def test_teachers_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
         response.mustcontain(
-            '<oppia-stewards-landing-page-root>' +
-            '</oppia-stewards-landing-page-root>')
+            '<oppia-volunteer-page-root>' +
+            '</oppia-volunteer-page-root>')
 
     def test_volunteers_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
         response.mustcontain(
-            '<oppia-stewards-landing-page-root>' +
-            '</oppia-stewards-landing-page-root>')
+            '<oppia-volunteer-page-root>' +
+            '</oppia-volunteer-page-root>')
