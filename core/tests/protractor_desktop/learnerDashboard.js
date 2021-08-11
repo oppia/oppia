@@ -350,7 +350,6 @@ describe('Learner dashboard functionality', function() {
     await skillEditorPage.get(skillId);
 
     await skillEditorPage.moveToQuestionsTab();
-    await skillEditorPage.expectNumberOfQuestionsToBe(0);
     await skillEditorPage.clickCreateQuestionButton();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
