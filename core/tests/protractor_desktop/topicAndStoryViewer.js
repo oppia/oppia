@@ -204,6 +204,10 @@ describe('Topic and Story viewer functionality', function() {
       }, (url) => {
         // Wait until the URL has changed to /practice.
         return (/practice/.test(url));
+      }, async() => {
+        var practiceSessionContainer = element(
+          by.css('.protractor-test-practice-session-container'));
+        await waitFor.presenceOf(practiceSessionContainer);
       });
 
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');

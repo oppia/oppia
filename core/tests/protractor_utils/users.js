@@ -75,6 +75,9 @@ var login = async function(email, useManualNavigation = true) {
   }, (url) => {
     // Wait until the URL has changed to something that is not /login.
     return !(/login/.test(url));
+  }, () => {
+    // Cannot predict the new page, so waiting for loading message to disappear.
+    await waitFor.pageToFullyLoad();
   });
 };
 
@@ -87,6 +90,9 @@ var logout = async function() {
   }, (url) => {
     // Wait until the URL has changed to something that is not /logout.
     return !(/logout/.test(url));
+  }, () => {
+    // Cannot predict the new page, so waiting for loading message to disappear.
+    await waitFor.pageToFullyLoad();
   });
 };
 
@@ -118,6 +124,9 @@ var _completeSignup = async function(username) {
   }, (url) => {
     // Wait until the URL has changed to something that is not /signup.
     return !(/signup/.test(url));
+  }, () => {
+    // Cannot predict the new page, so waiting for loading message to disappear.
+    await waitFor.pageToFullyLoad();
   });
 };
 

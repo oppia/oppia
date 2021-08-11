@@ -20,6 +20,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
+const { browser } = require('protractor');
 
 describe('Oppia landing pages tour', function() {
   it('should visit the Fractions landing page', async function() {
@@ -147,7 +148,7 @@ describe('Static Pages Tour', function() {
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
 
       await waitFor.clientSideRedirection(async() => {
-        // Login page will redirect user to login page if logged in.
+        // Login page will redirect user away if logged in.
         await browser.get('/login');
 
         // Wait for first redirection (login page to splash page).
@@ -161,10 +162,12 @@ describe('Static Pages Tour', function() {
         // Wait for second redirection (splash page to preferred dashboard
         // page).
         return url !== 'http://localhost:9001/';
+      },
+      async() => {
+        await waitFor.presenceOf(
+          learnerDashboardPage, 'Learner dashboard page did not load');
       });
 
-      await waitFor.presenceOf(
-        learnerDashboardPage, 'Learner dashboard page did not load');
       expect(await loginPage.isPresent()).toBe(false);
 
       await users.logout();
