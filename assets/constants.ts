@@ -5976,6 +5976,11 @@ export default {
         }
       ]
     },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About foundation | Oppia",
+      "META": []
+    },
     "CONTACT": {
       "ROUTE": "contact",
       "TITLE": "Contact | Oppia",

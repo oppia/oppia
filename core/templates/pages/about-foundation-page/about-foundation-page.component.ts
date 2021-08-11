@@ -40,5 +40,5 @@ export class AboutFoundationPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'partnershipsPage',
+  'aboutFoundationPage',
   downgradeComponent({component: AboutFoundationPageComponent}));
