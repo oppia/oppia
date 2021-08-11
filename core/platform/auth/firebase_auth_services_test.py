@@ -212,7 +212,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self,
             uids: List[Text],
             force_delete: bool = False
-    ) -> firebase_auth.BatchDeleteAccountsResponse:
+    ) -> firebase_auth._user_mgt.BatchDeleteAccountsResponse:
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -583,7 +583,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self,
             batch_error_pattern: Tuple[Optional[Exception]] = (None,),
             individual_error_pattern: Tuple[Optional[bool]] = (None,)
-    ) -> contextlib._GeneratorContextManager[None]:
+    ) -> 'contextlib._GeneratorContextManager[None]':
         """Returns a context in which `delete_users` fails according to the
         given patterns.
 
@@ -613,7 +613,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         def mock_delete_users(
                 uids: List[Text],
                 force_delete: bool = False
-        ) -> firebase_auth.BatchDeleteAccountsResponse:
+        ) -> firebase_auth._user_mgt.BatchDeleteAccountsResponse:
             """Mock function that fails according to the input patterns."""
             error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
             if error_to_raise is not None:
@@ -640,7 +640,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self,
             batch_error_pattern: Tuple[Optional[Exception]] = (None,),
             individual_error_pattern: Tuple[Optional[Text]] = (None,)
-    ) -> contextlib._GeneratorContextManager[None]:
+    ) -> 'contextlib._GeneratorContextManager[None]':
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
@@ -796,7 +796,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def _create_delete_users_result_fragile(
             self,
             errors: List[Tuple[int, Text]]
-    ) -> firebase_auth.BatchDeleteAccountsResponse:
+    ) -> firebase_auth._user_mgt.BatchDeleteAccountsResponse:
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
 
@@ -908,7 +908,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         super(FirebaseAuthServicesTestBase, self).tearDown() # type: ignore[no-untyped-call]
 
     def capture_logging(self,
-                        min_level: int = logging.INFO) -> contextlib._GeneratorContextManager[Text]:
+                        min_level: int = logging.INFO) -> 'contextlib._GeneratorContextManager[Text]':
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.
@@ -1415,14 +1415,14 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def swap_get_user_to_always_fail(
             self
-    ) -> contextlib._GeneratorContextManager[None]:
+    ) -> 'contextlib._GeneratorContextManager[None]':
         """Swaps the get_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth, 'get_user', error=self.UNKNOWN_ERROR)
 
     def swap_delete_user_to_always_fail(
             self
-    ) -> contextlib._GeneratorContextManager[None]:
+    ) -> 'contextlib._GeneratorContextManager[None]':
         """Swaps the delete_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR)
