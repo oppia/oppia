@@ -30,7 +30,7 @@ class ReviewTestsPage(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TPOIC_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -52,7 +52,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TPOIC_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS = {
