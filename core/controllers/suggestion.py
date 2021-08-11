@@ -110,6 +110,21 @@ class SuggestionHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        suggestion_change = suggestion.change
+        if (
+                suggestion_change.cmd == 'add_written_translation' and
+                (
+                    suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
+                    suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                )
+        ):
+            self.render_json(self.values)
+            return
+
         # TODO(#10513) : Find a way to save the images before the suggestion is
         # created.
         suggestion_image_context = suggestion.image_context
@@ -403,10 +418,18 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 'The parameter \'translation_html\' is missing.'
             )
 
-        if not isinstance(
-                self.payload.get('translation_html'), python_utils.BASESTRING):
+        if (
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    python_utils.BASESTRING)
+                and
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    list)
+        ):
             raise self.InvalidInputException(
-                'The parameter \'translation_html\' should be a string.'
+                'The parameter \'translation_html\' should be a string or a' +
+                ' list.'
             )
 
         suggestion_services.update_translation_suggestion(
