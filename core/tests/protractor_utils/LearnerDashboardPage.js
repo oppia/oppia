@@ -44,6 +44,8 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-add-topic-to-current-goals-button'));
   var currentGoalsTopicName =
     element(by.css('.protractor-test-topic-name-in-current-goals'));
+  var editGoalsTopicName =
+    element(by.css('.protractor-test-topic-name-in-edit-goals'));
   var skillProficiencyTopicTitle =
     element(by.css('.protractor-test-skill-proficiency-topic-title'));
   var completedGoalsTopicName =
@@ -109,6 +111,12 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      editGoalsTopicName,
+      'Topic in Edit Goals takes too long to appear');
+    await waitFor.textToBePresentInElement(
+      editGoalsTopicName, name,
+      `Text "${name}" taking too long to be present in editGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-edit-goals', name));
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
@@ -180,9 +188,6 @@ var LearnerDashboardPage = function() {
   };
 
   this.addTopicToLearnerGoals = async function() {
-    await waitFor.visibilityOf(
-      addToLearnerGoalsButton,
-      'Add to learner goals button takes too long to appear');
     await action.click('Add to learner goals button', addToLearnerGoalsButton);
   };
 

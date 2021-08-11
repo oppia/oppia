@@ -268,6 +268,7 @@ describe('Learner dashboard functionality', function() {
         'Learner Dashboard Skill 1', 'Concept card explanation', false));
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
       'Learner Dashboard Skill 1', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
@@ -349,6 +350,7 @@ describe('Learner dashboard functionality', function() {
     await skillEditorPage.get(skillId);
 
     await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.expectNumberOfQuestionsToBe(0);
     await skillEditorPage.clickCreateQuestionButton();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
@@ -368,9 +370,13 @@ describe('Learner dashboard functionality', function() {
       explanation: 'It is correct'
     });
     await skillEditorPage.saveQuestion();
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.expectNumberOfQuestionsToBe(1);
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(2);
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
       'Learner Dashboard Skill 2', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
@@ -381,7 +387,12 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.saveTopic('Added subtopic.');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
+    await topicEditorPage.expectUncategorizedSkillsToBe(
+      ['Learner Dashboard Skill 2']);
+    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
     await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 2', 0);
+    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, [
+      'Learner Dashboard Skill 2']);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.updateMetaTagContent('topic meta tag');
@@ -390,6 +401,7 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
     await topicEditorPage.publishTopic();
     await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
       'Story 2', 'story-two',
       'Story description', Constants.TEST_SVG_PATH);
@@ -403,8 +415,11 @@ describe('Learner dashboard functionality', function() {
         await forms.toRichText(`outline ${i}`));
       await storyEditorPage.navigateToStoryEditorTab();
     }
+    await storyEditorPage.expectNumberOfChaptersToBe(3);
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
     await topicAndStoryViewerPage.get(
       'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
