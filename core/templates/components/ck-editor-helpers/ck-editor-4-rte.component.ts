@@ -52,6 +52,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
+  connectedToInternet = true;
   componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
@@ -74,8 +75,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         internetAccessible => {
           if (internetAccessible) {
             this.enableRTEicons();
+            this.connectedToInternet = true;
           } else {
             this.disableRTEicons();
+            this.connectedToInternet = false;
           }
         }));
   }
@@ -387,6 +390,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           .css('display', 'none');
       }
       if (!this.internetConnectivityService.isOnline()) {
+        this.connectedToInternet = false;
         this.disableRTEicons();
       }
       ck.setData(this.wrapComponents(this.value));
@@ -452,11 +456,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         buttons[i].style.pointerEvents = 'none';
       }
     });
-    let offline = this.elementRef.nativeElement.getElementsByClassName(
-      'cke-offline-warning');
-    for (let i = 0; i < offline.length; i++) {
-      offline[i].style.display = 'block';
-    }
   }
   enableRTEicons(): void {
     this.componentsThatRequireInternet.forEach((name) => {
@@ -467,11 +466,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         buttons[i].style.pointerEvents = '';
       }
     });
-    let offline = this.elementRef.nativeElement.getElementsByClassName(
-      'cke-offline-warning');
-    for (let i = 0; i < offline.length; i++) {
-      offline[i].style.display = 'none';
-    }
   }
 
   ngOnDestroy(): void {
