@@ -200,8 +200,7 @@ var clientSideRedirection = async function(action, check) {
   }, DEFAULT_WAIT_TIME_MSECS);
 
   // The above solution only waits until url is changed, so invoking
-  // pageToFullyLoad to wait for all async tasks on new page to finish before
-  // proceeding.
+  // pageToFullyLoad to wait for the new page to load compeletly.
   await pageToFullyLoad();
 
   // Client side redirection is complete, enabling wait for angular here.
