@@ -1,10 +1,10 @@
-from typing import Any, Optional, Sequence, Text, Tuple
+from typing import Any, Optional, Sequence, Tuple
 from . import credentials
 from . import transport
 
 def default(
-        scopes: Sequence[Text] = ...,
+        scopes: Sequence[str] = ...,
         request: transport.Request = ...,
-        quota_project_id: Optional[Text] = ...,
-        default_scopes: Optional[Sequence[Text]] = ...,
-) -> Tuple[credentials.Credentials, Optional[Text]]: ...
+        quota_project_id: Optional[str] = ...,
+        default_scopes: Optional[Sequence[str]] = ...,
+) -> Tuple[credentials.Credentials, Optional[str]]: ...

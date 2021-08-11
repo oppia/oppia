@@ -2,7 +2,7 @@ from google import auth
 from google.api_core.retry import Retry
 from google.cloud.tasks_v2 import types
 
-from typing import Any, Dict, Optional, Sequence, Text, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 
 class CloudTasksClient(object):
@@ -12,12 +12,12 @@ class CloudTasksClient(object):
     ) -> None: ...
 
     @classmethod
-    def queue_path(cls, project: Text, location: Text, queue: Text) -> Text: ...
+    def queue_path(cls, project: str, location: str, queue: str) -> str: ...
 
     def create_task(
         self,
-        parent: Text,
-        task: Union[types.Task, Dict[Text, Any]],
+        parent: str,
+        task: Union[types.Task, Dict[str, Any]],
         retry: Retry,
         timeout: Optional[float] = ...,
         metadata: Optional[Sequence[Tuple[str, str]]] = ...

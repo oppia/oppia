@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Text, Union
+from typing import Dict, List, Optional, Union
 from google import auth
 
 class Client(object):
@@ -8,10 +8,10 @@ class Client(object):
     ) -> None: ...
     def translate(
         self,
-        values: Union[Text, List[Text]],
-        target_language: Optional[Text] = ...,
-        format_: Optional[Text] = ...,
-        source_language: Optional[Text] = ...,
-        customization_ids: Optional[Union[Text, List[Text]]] = ...,
-        model: Optional[Text] = ...,
-    ) -> Union[Dict[Text, Text], List[Dict[Text, Text]]]: ...
+        values: Union[str, List[str]],
+        target_language: Optional[str] = ...,
+        format_: Optional[str] = ...,
+        source_language: Optional[str] = ...,
+        customization_ids: Optional[Union[str, List[str]]] = ...,
+        model: Optional[str] = ...,
+    ) -> Union[Dict[str, str], List[Dict[str, str]]]: ...
