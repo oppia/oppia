@@ -68,7 +68,7 @@ export class TextInputValidationService {
     }
 
     let isInt = (n: number) => {
-      return ((typeof (n) === 'number') && (n % 1 === 0));
+      return ((typeof n === 'number') && (n % 1 === 0));
     };
 
     let rows = customizationArgs.rows.value;
@@ -77,7 +77,7 @@ export class TextInputValidationService {
       let customizationArgSpecs = textSpecs.customization_arg_specs;
       let rowsSpecs = customizationArgSpecs[1];
       let validators = rowsSpecs.schema.validators;
-      if (validators) {
+      if (validators.length === 2) {
         let minRows = validators[0].min_value;
         let maxRows = validators[1].max_value;
         if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {

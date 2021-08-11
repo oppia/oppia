@@ -232,12 +232,15 @@ export class SearchService {
     );
   }
 
+  // Here failure callback is optional so that it gets invoked
+  // only when the end of page has reached and return void otherwise.
   loadMoreData(
       successCallback: (
         SearchResponseData: SearchResponseBackendDict,
         boolean: boolean
       ) => void,
-      failureCallback?: (arg0: boolean) => void): void {
+      failureCallback?: (arg0: boolean) => void
+  ): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
