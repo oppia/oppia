@@ -21,6 +21,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 describe('HTML Select Component', () => {
   let $scope = null;
   let $rootScope = null;
+  let ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -29,20 +30,20 @@ describe('HTML Select Component', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    $componentController('htmlSelect', {
+    ctrl = $componentController('htmlSelect', {
       $scope: $scope
     });
   }));
 
   it('should set selection ID', () => {
-    expect($scope.selection).toBe(undefined);
+    expect(ctrl.selection).toBe(undefined);
     $scope.select('12');
-    expect($scope.selection).toBe('12');
+    expect(ctrl.selection).toBe('12');
   });
 
   it('should get selection index', () => {
-    $scope.options = [{id: '12'}, {id: '21'}];
-    $scope.selection = '21';
+    ctrl.options = [{id: '12'}, {id: '21'}];
+    ctrl.selection = '21';
 
     expect($scope.getSelectionIndex()).toBe(1);
   });
