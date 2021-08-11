@@ -187,7 +187,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 'filters': [{
                     'type': 'server_mode',
                     'conditions': [['=', SERVER_MODES.prod.value]],
-                },{
+                }, {
                     'type': 'platform_type',
                     'conditions': [['=', 'Backend']],
                 }],
@@ -253,7 +253,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             'conditions': [['=', '1.2.3']]
                     }],
                     'value_when_matched': True
-                },{
+                }, {
                     'filters': [],
                     'value_when_matched': False
                 }
