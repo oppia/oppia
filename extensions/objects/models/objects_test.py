@@ -1318,3 +1318,20 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
         self.assertEqual(
             objects.TranslatableSetOfUnicodeString.normalize_value(['1', '2']),
             ['1', '2'])
+
+
+class ConvertCommaSepearatedToProperListTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        comma_sepreated_ids = '1,2,3'
+        invalid_type_id = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected string received %s' % invalid_type_id):
+            objects.ConvertCommaSepearatedToProperList.normalize(
+                invalid_type_id)
+
+        self.assertEqual(
+            objects.ConvertCommaSepearatedToProperList.normalize(
+                comma_sepreated_ids),
+            ['1', '2', '3']
+        )

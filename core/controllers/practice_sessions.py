@@ -57,7 +57,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             'selected_subtopic_ids': {
                 'schema': {
                     'type': 'custom',
-                    'obj_type': 'ConvertStringifiedListToProperList'
+                    'obj_type': 'ConvertCommaSepearatedToProperList'
                 }
             }
         }
@@ -69,9 +69,8 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        comma_separated_subtopic_ids = (
+        selected_subtopic_ids = (
             self.normalized_request.get('selected_subtopic_ids'))
-        selected_subtopic_ids = comma_separated_subtopic_ids.split(',')
 
         selected_skill_ids = []
         for subtopic in topic.subtopics:

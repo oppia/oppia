@@ -1709,3 +1709,20 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         'contentId': None,
         'unicodeStrSet': [],
     }
+
+
+class ConvertCommaSepearatedToProperList(BaseObject):
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+        Returns:
+            unicode. The normalized object containing string in unicode format.
+        """
+        if not isinstance(raw, python_utils.BASESTRING):
+            raise Exception('Expected string received %s' % raw)
+
+        return raw.split(',')
