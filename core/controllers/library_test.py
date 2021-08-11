@@ -252,7 +252,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'category\' failed: Validation '
-            'failed: is_gae_search_query_string ({}) for '
+            'failed: is_search_query_string ({}) for '
             'object missing-outer-parens'
         )
         self.assertEqual(response_1['error'], error_msg)
@@ -264,7 +264,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'category\' failed: Validation '
-            'failed: is_gae_search_query_string ({}) for '
+            'failed: is_search_query_string ({}) for '
             'object (missing-inner-quotes)'
         )
         self.assertEqual(response_2['error'], error_msg)
@@ -277,7 +277,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'language_code\' failed: Validation '
-            'failed: is_gae_search_query_string ({}) for '
+            'failed: is_search_query_string ({}) for '
             'object missing-outer-parens'
         )
         self.assertEqual(response_1['error'], error_msg)
@@ -289,7 +289,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'language_code\' failed: Validation '
-            'failed: is_gae_search_query_string ({}) for '
+            'failed: is_search_query_string ({}) for '
             'object (missing-inner-quotes)'
         )
         self.assertEqual(response_2['error'], error_msg)

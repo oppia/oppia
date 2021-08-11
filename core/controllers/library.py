@@ -360,7 +360,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
         'GET': {
             'stringified_exp_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'ConvertStringifiedListToProperList'
                 },
                 'default_value': None
             },
@@ -376,11 +377,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        try:
-            exp_ids = json.loads(self.normalized_request.get(
-                'stringified_exp_ids'))
-        except Exception:
-            raise self.PageNotFoundException
+        exp_ids = self.normalized_request.get('stringified_exp_ids')
         include_private_exps = self.normalized_request.get(
             'include_private_explorations')
 
@@ -416,7 +413,8 @@ class CollectionSummariesHandler(base.BaseHandler):
         'GET': {
             'stringified_collection_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'ConvertStringifiedListToProperList'
                 },
                 'default_value': None
             }
@@ -426,11 +424,9 @@ class CollectionSummariesHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        try:
-            collection_ids = json.loads(
-                self.normalized_request.get('stringified_collection_ids'))
-        except Exception:
-            raise self.PageNotFoundException
+        collection_ids = (
+            self.normalized_request.get('stringified_collection_ids'))
+
         summaries = (
             summary_services.get_displayable_collection_summary_dicts_matching_ids( # pylint: disable=line-too-long
                 collection_ids))

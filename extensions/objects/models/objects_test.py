@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import json
 import inspect
 import re
 
@@ -1318,3 +1319,18 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
         self.assertEqual(
             objects.TranslatableSetOfUnicodeString.normalize_value(['1', '2']),
             ['1', '2'])
+
+
+class ConvertStringifiedListToProperListTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        list_of_ids = ['0', '1']
+        with self.assertRaisesRegexp(
+            Exception, 'Expected string received %s' % list_of_ids):
+            objects.ConvertStringifiedListToProperList.normalize(list_of_ids)
+
+        self.assertEqual(
+            objects.ConvertStringifiedListToProperList.normalize(
+                json.dumps(list_of_ids)),
+            list_of_ids
+        )
