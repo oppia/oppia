@@ -22,8 +22,7 @@ import { LostChangeObjectFactory } from
 import { OutcomeObjectFactory } from './OutcomeObjectFactory';
 import { SubtitledHtml } from './subtitled-html.model';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Lost Change Object Factory', () => {
+describe('Lost Change Object Factory', () => {
   let lcof: LostChangeObjectFactory;
   let oof: OutcomeObjectFactory;
   beforeEach(() => {

@@ -18,8 +18,7 @@
 
 import { ExplorationSnapshot, VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Versions tree service', () => {
+describe('Versions tree service', () => {
   describe('versions tree service', () => {
     let vts: VersionTreeService;
     var snapshots: ExplorationSnapshot[] = [{

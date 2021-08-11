@@ -23,8 +23,7 @@ import { LostChangeBackendDict, LostChangeObjectFactory, LostChangeValue } from 
 import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Changes in Human Readable Form Directive', () => {
+describe('Changes in Human Readable Form Directive', () => {
   let component: ChangesInHumanReadableFormComponent;
   let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
   let lostChangeObjectFactory: LostChangeObjectFactory;
