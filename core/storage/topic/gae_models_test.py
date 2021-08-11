@@ -108,14 +108,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
-        self.assertEqual(
-            topic_model.name,
-            self.TOPIC_NAME
-        )
-        self.assertEqual(
-            topic_model.id,
-            self.TOPIC_ID
-        )
+        self.assertEqual(topic_model.name,self.TOPIC_NAME)
+        self.assertEqual(topic_model.id,self.TOPIC_ID)
 
     def test_get_by_url_fragment(self) -> None:
         topic = topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]

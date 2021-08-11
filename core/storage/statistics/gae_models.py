@@ -23,16 +23,6 @@ import datetime
 import json
 import sys
 
-# TODO(#13594): After the domain layer is refactored to be independent of
-# the storage layer, the disable=invalid-import will
-# be removed.
-# The following import is dangerous and should not be generally
-# used. We had to use this ignore as we need to import the domain layer
-# for type-annotation.
-# Here exp_domain is imported outside the 'if MYPY:' block. If it is
-# imported inside the 'if MYPY:' block, during runtime exp_domain
-# won't be accessible.
-from core.domain import exp_domain # pylint: disable=invalid-import
 from core.platform import models
 import feconf
 import python_utils
@@ -42,6 +32,15 @@ from typing import Any, Dict, List, Optional, Tuple, cast # isort:skip # pylint:
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # TODO(#13594): After the domain layer is refactored to be independent of
+    # the storage layer, the disable=invalid-import will
+    # be removed.
+    # The following import is dangerous and should not be generally
+    # used. We had to use this ignore as we need to import the domain layer
+    # for type-annotation and we have not imported them globally but inside
+    # this if block to prevent circular imports.
+    from core.domain import exp_domain # isort:skip # pylint: disable=invalid-import,unused-import,ungrouped-imports
+    from core.domain import stats_domain # isort:skip # pylint: disable=invalid-import,unused-import,ungrouped-imports
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
@@ -1347,7 +1346,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_stats_models(
-            cls, exp_version_references: List[exp_domain.ExpVersionReference]
+            cls, exp_version_references: 'List[exp_domain.ExpVersionReference]'
     ) -> List[Optional['ExplorationStatsModel']]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
@@ -1439,8 +1438,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
             datastore, or None if no such model instance exists.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        exp_issues_model = cls.get(instance_id, strict=False)
-        return exp_issues_model
+        return cls.get(instance_id, strict=False)
 
     # TODO(#13523): Change 'unresolved_issues' to TypedDict/Domain Object
     # to remove Any used below.
@@ -1653,9 +1651,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_state_reference_for_exploration(
-            cls,
-            exp_id: str,
-            state_name: str
+            cls, exp_id: str, state_name: str
     ) -> str:
         """Generate the state_reference for the state in an exploration.
 
@@ -1701,17 +1697,13 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     # TODO(#13523): Change 'learner_answer_info_list' to TypedDict/Domain Object
     # to remove Any used below.
-    # TODO(#13594): After the domain layer is refactored to be independent of
-    # the storage layer, 'learner_answer_info_list' will be changed to
-    # List[LearnerAnswerInfo]. We cannot use this type now because it leads
-    # to circular imports.
     @classmethod
     def create_model_instance(
             cls,
             entity_type: str,
             state_reference: str,
             interaction_id: str,
-            learner_answer_info_list: List[Any],
+            learner_answer_info_list: 'List[stats_domain.LearnerAnswerInfo]',
             learner_answer_info_schema_version: int,
             accumulated_answer_info_json_size_bytes: int
     ) -> None:
@@ -1743,7 +1735,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             state_reference=state_reference,
             interaction_id=interaction_id,
             learner_answer_info_list=[
-                learner_answer_info.to_dict()
+                learner_answer_info.to_dict() # type: ignore[no-untyped-call]
                 for learner_answer_info in learner_answer_info_list
             ],
             learner_answer_info_schema_version=(
