@@ -55,19 +55,17 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         self.prod_feature = registry.Registry.create_platform_parameter(
             PARAM_NAMES.parameter_b, 'parameter for test', DATA_TYPES.bool,
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
-        new_rule_dicts = [
-            {
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [
-                            ['=', param_domain.SERVER_MODES.dev.value]
-                        ]
-                    }
-                ],
-                'value_when_matched': True
-            }
-        ]
+        new_rule_dicts = [{
+            'filters': [
+                {
+                    'type': 'server_mode',
+                    'conditions': [
+                        ['=', param_domain.SERVER_MODES.dev.value]
+                    ]
+                }
+            ],
+            'value_when_matched': True
+        }]
         new_rules = [
             param_domain.PlatformParameterRule.from_dict(
                 rule_dict) for rule_dict in new_rule_dicts
@@ -157,15 +155,13 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
         """Enables the dummy_feature for the dev environment."""
-        new_rule_dicts = [
-            {
-                'value_when_matched': is_enabled,
-                'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [['=', mode.value]]
-                }]
-            }
-        ]
+        new_rule_dicts = [{
+            'value_when_matched': is_enabled,
+            'filters': [{
+                'type': 'server_mode',
+                'conditions': [['=', mode.value]]
+            }]
+        }]
         new_rules = [
             param_domain.PlatformParameterRule.from_dict(
                 rule_dict) for rule_dict in new_rule_dicts

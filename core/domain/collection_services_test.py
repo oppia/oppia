@@ -251,8 +251,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     def test_get_different_collections_by_version(self):
         self.save_new_valid_collection('collection_id', self.owner_id)
 
-        change_list = convert_change_list_dict_to_object([
-            {
+        change_list = convert_change_list_dict_to_object([{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
                 'property_name': 'objective',
                 'new_value': 'Some new objective'
@@ -326,13 +325,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             Exception,
             'Unexpected error: trying to update version 0 of collection '
             'from version 1. Please reload the page and try again.'):
-            change_list = convert_change_list_dict_to_object([
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'objective',
-                    'new_value': 'Some new objective'
-                }
-            ])
+            change_list = convert_change_list_dict_to_object([{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'objective',
+                'new_value': 'Some new objective'
+            }])
             collection_services.update_collection(
                 self.owner_id, 'collection_id', change_list,
                 'changed objective')
@@ -438,12 +435,10 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         self.save_new_valid_exploration('exp_id_2', self.owner_id)
 
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': 'exp_id_2'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+            'exploration_id': 'exp_id_2'
+        }])
         collection_services.update_collection(
             self.owner_id, 'collection_id', change_list,
             'Added new exploration')
@@ -453,13 +448,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.nodes[0].exploration_id, 'exp_id_1')
         self.assertEqual(collection.nodes[1].exploration_id, 'exp_id_2')
 
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_SWAP_COLLECTION_NODES,
-                'first_index': 0,
-                'second_index': 1
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_SWAP_COLLECTION_NODES,
+            'first_index': 0,
+            'second_index': 1
+        }])
         collection_services.update_collection(
             self.owner_id, 'collection_id', change_list,
             'Swapped collection nodes')
@@ -1233,8 +1226,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             _get_collection_change_list('title', ''))
 
         # Change the collection's title and category properties.
-        change_list = convert_change_list_dict_to_object(
-            [{
+        change_list = convert_change_list_dict_to_object([{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
                 'new_value': 'A new title'
@@ -1242,8 +1234,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
                 'cmd': 'edit_collection_property',
                 'property_name': 'category',
                 'new_value': 'A new category'
-            }]
-        )
+            }
+        ])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID,
             change_list,
@@ -1268,13 +1260,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         # This should not give an error.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': 'edit_collection_property',
-                'property_name': 'title',
-                'new_value': 'New title'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': 'edit_collection_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }])
         collection_services.update_collection(
             feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, change_list,
             'Did migration.')
@@ -1292,13 +1282,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         # This should not give an error.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-                'from_version': 2,
-                'to_version': 3,
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+            'from_version': 2,
+            'to_version': 3,
+        }])
         collection_services.update_collection(
             feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, change_list,
             'Did migration.')
@@ -1379,12 +1367,10 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         new_exp_id = 'new_exploration_id'
         self.save_new_valid_exploration(new_exp_id, self.owner_id)
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': new_exp_id
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+            'exploration_id': new_exp_id
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Added new exploration')
@@ -1400,12 +1386,10 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected collection to only reference valid explorations'):
-            change_list = convert_change_list_dict_to_object(
-                [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': non_existent_exp_id
-                }]
-            )
+            change_list = convert_change_list_dict_to_object([{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': non_existent_exp_id
+            }])
             collection_services.update_collection(
                 self.owner_id, self.COLLECTION_0_ID, change_list,
                 'Added non-existent exploration')
@@ -1424,12 +1408,10 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
             'collection'):
-            change_list = convert_change_list_dict_to_object(
-                [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': private_exp_id
-                }]
-            )
+            change_list = convert_change_list_dict_to_object([{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': private_exp_id
+            }])
             collection_services.update_collection(
                 self.owner_id, self.COLLECTION_0_ID, change_list,
                 'Added private exploration')
@@ -1450,15 +1432,14 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
 
         # No exception should be raised for either insertion.
-        change_list = convert_change_list_dict_to_object(
-            [{
+        change_list = convert_change_list_dict_to_object([{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': public_exp_id
             }, {
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': private_exp_id
-            }]
-        )
+            }
+        ])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Added public and private explorations')
@@ -1469,12 +1450,10 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID)
         self.assertEqual(collection.exploration_ids, [self.EXPLORATION_ID])
 
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
-                'exploration_id': self.EXPLORATION_ID,
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
+            'exploration_id': self.EXPLORATION_ID,
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Deleted exploration')
@@ -1491,13 +1470,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.title, self.COLLECTION_TITLE)
 
         # Update the title.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Some new title'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Some new title'
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Changed the title')
@@ -1514,13 +1491,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.category, self.COLLECTION_CATEGORY)
 
         # Update the category.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'category',
-                'new_value': 'Some new category'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'category',
+            'new_value': 'Some new category'
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Changed the category')
@@ -1537,13 +1512,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.objective, self.COLLECTION_OBJECTIVE)
 
         # Update the objective.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'objective',
-                'new_value': 'Some new objective'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'objective',
+            'new_value': 'Some new objective'
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Changed the objective')
@@ -1560,13 +1533,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.language_code, 'en')
 
         # Update the language code.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'language_code',
-                'new_value': 'fi'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'language_code',
+            'new_value': 'fi'
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list,
             'Changed the language to Finnish')
@@ -1583,13 +1554,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.tags, [])
 
         # Update the tags.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'tags',
-                'new_value': ['test']
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'tags',
+            'new_value': ['test']
+        }])
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list, 'Add a new tag')
 
@@ -1602,13 +1571,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
-            change_list = convert_change_list_dict_to_object(
-                [{
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'tags',
-                    'new_value': ['duplicate', 'duplicate']
-                }]
-            )
+            change_list = convert_change_list_dict_to_object([{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': ['duplicate', 'duplicate']
+            }])
             collection_services.update_collection(
                 self.owner_id, self.COLLECTION_0_ID, change_list,
                 'Add a new tag')
@@ -1754,13 +1721,11 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Modify the collection. This affects the collection version history.
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': 'edit_collection_property',
-                'property_name': 'title',
-                'new_value': 'First title'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': 'edit_collection_property',
+            'property_name': 'title',
+            'new_value': 'First title'
+        }])
         change_list_dict = [
             change_obj.to_dict() for change_obj in change_list]
         collection_services.update_collection(
@@ -1801,13 +1766,11 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 _get_collection_change_list('title', ''))
 
         # Another person modifies the collection.
-        new_change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': 'edit_collection_property',
-                'property_name': 'title',
-                'new_value': 'New title'
-            }]
-        )
+        new_change_list = convert_change_list_dict_to_object([{
+            'cmd': 'edit_collection_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }])
         new_change_list_dict = [
             change_obj.to_dict() for change_obj in new_change_list]
         collection_services.update_collection(
@@ -2032,13 +1995,11 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
         # Have Bob edit the collection.
-        changelist_cmds = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Collection Bob title'
-            }]
-        )
+        changelist_cmds = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }])
         collection_services.update_collection(
             self.bob_id, self.COLLECTION_0_ID, changelist_cmds,
             'Changed title to Bob title.')
@@ -2068,13 +2029,11 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
         self._check_contributors_summary(
             self.COLLECTION_0_ID, {self.albert_id: 1})
-        changelist_cmds = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Collection Bob title'
-            }]
-        )
+        changelist_cmds = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }])
         # Have Bob update that collection. Version 2.
         collection_services.update_collection(
             self.bob_id,
@@ -2114,13 +2073,11 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     def test_create_collection_summary_with_contributor_to_remove(self):
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.albert_id)
-        change_list = convert_change_list_dict_to_object(
-            [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Collection Bob title'
-            }]
-        )
+        change_list = convert_change_list_dict_to_object([{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }])
         collection_services.update_collection(
             self.bob_id,
             self.COLLECTION_0_ID,

@@ -474,11 +474,13 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
+        change_list = [collection_domain.CollectionChange({
+            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+            'exploration_id': self.EXP_ID
+        })]
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': self.EXP_ID
-            }], 'Added another creator\'s private exploration')
+            self.owner_id, self.COLLECTION_ID, change_list,
+            'Added another creator\'s private exploration')
 
         # A collection cannot access someone else's private exploration.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
@@ -522,11 +524,13 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
+        change_list = [collection_domain.CollectionChange({
+            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+            'exploration_id': self.EXP_ID_1
+        })]
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': self.EXP_ID_1
-            }], 'Added another creator\'s private exploration')
+            self.owner_id, self.COLLECTION_ID, change_list,
+            'Added another creator\'s private exploration')
 
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
