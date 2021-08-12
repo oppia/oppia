@@ -25,8 +25,8 @@ from constants import constants
 import feconf
 import python_utils
 
-from types import ModuleType # isort:skip # pylint: disable=import-only-modules,unused-import
-from typing import Text, List, Tuple, Optional, Type # isort:skip # pylint: disable=unused-import
+from types import ModuleType # isort:skip
+from typing import List, Tuple, Optional, Type # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -59,8 +59,8 @@ class Platform(python_utils.OBJECT):
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
-    def import_models(cls,
-                      unused_model_names: List[Text]) -> Tuple[ModuleType,...]:
+    def import_models(
+            cls, unused_model_names: List[str]) -> Tuple[ModuleType,...]:
         """An abstract method that should be implemented on inherited
         classes.
 
@@ -81,7 +81,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[Text]) -> Tuple[ModuleType,...]:
+    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType,...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -192,8 +192,8 @@ class _Gae(Platform):
         return tuple(returned_models)
 
     @classmethod
-    def get_storage_model_classes(cls,
-                                  model_names: List[Text]) -> List[base_models.BaseModel]:
+    def get_storage_model_classes(
+            cls, model_names: List[str]) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -410,7 +410,7 @@ class Registry(python_utils.OBJECT):
         return klass
 
     @classmethod
-    def import_models(cls, model_names: List[Text]) -> Tuple[ModuleType,...]:
+    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType,...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -422,8 +422,8 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_models(model_names)
 
     @classmethod
-    def get_storage_model_classes(cls,
-                                  model_names: List[Text]) -> List[base_models.BaseModel]:
+    def get_storage_model_classes(
+            cls, model_names: List[str]) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 

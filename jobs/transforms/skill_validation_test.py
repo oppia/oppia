@@ -199,7 +199,8 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                     'invalid is not allowed')
             ])
 
-    def test_skill_change_object_with_invalid_skill_misconceptions(self) -> None:
+    def test_skill_change_object_with_invalid_skill_misconceptions(
+            self) -> None:
         commit_dict = {
             'cmd': 'update_skill_misconceptions_property',
             'misconception_id': 'id',
@@ -235,7 +236,8 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                     'allowed')
             ])
 
-    def test_skill_change_object_with_invalid_skill_contents_property(self) -> None:
+    def test_skill_change_object_with_invalid_skill_contents_property(
+            self) -> None:
         commit_dict = {
             'cmd': 'update_skill_contents_property',
             'property_name': 'invalid',

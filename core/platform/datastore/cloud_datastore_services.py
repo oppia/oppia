@@ -25,7 +25,7 @@ from core.platform import models
 
 from google.cloud import ndb
 
-from typing import ( # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip
     Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
 
 MYPY = False
@@ -57,8 +57,9 @@ TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)  # pylint: dis
 CLIENT = ndb.Client()
 
 
-def get_ndb_context(namespace: Optional[str] = None,
-                    global_cache: Optional[RedisCache] = None) -> ndb.context.Context:
+def get_ndb_context(
+        namespace: Optional[str] = None,
+        global_cache: Optional[RedisCache] = None) -> ndb.context.Context:
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
@@ -173,7 +174,8 @@ def any_of(*nodes: ndb.Node) -> ndb.Node:
     return ndb.OR(*nodes)
 
 
-def make_cursor(urlsafe_cursor: Optional[Text] = None) -> datastore_query.Cursor:
+def make_cursor(
+        urlsafe_cursor: Optional[Text] = None) -> datastore_query.Cursor:
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
@@ -200,7 +202,7 @@ def make_cursor(urlsafe_cursor: Optional[Text] = None) -> datastore_query.Cursor
 
 def fetch_multiple_entities_by_ids_and_models(
         ids_and_models: List[Tuple[Text, List[Text]]]
-) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]:
+    ) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]:
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
 
@@ -221,7 +223,8 @@ def fetch_multiple_entities_by_ids_and_models(
             [ndb.Key(model_name, entity_id) for entity_id in entity_ids])
 
     all_models: List[Optional[TYPE_MODEL_SUBCLASS]] = ndb.get_multi(entity_keys)
-    all_models_grouped_by_model_type: List[List[Optional[TYPE_MODEL_SUBCLASS]]] = []
+    all_models_grouped_by_model_type: (
+        List[List[Optional[TYPE_MODEL_SUBCLASS]]]) = []
 
     start_index = 0
     for (_, entity_ids) in ids_and_models:

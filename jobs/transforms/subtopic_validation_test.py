@@ -110,7 +110,8 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                     'Command invalid is not allowed')
             ])
 
-    def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self) -> None:
+    def test_subtopic_page_change_object_with_missing_attribute_in_cmd(
+            self) -> None:
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -145,7 +146,8 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                     'new_value, old_value')
             ])
 
-    def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self) -> None:
+    def test_subtopic_page_change_object_with_extra_attribute_in_cmd(
+            self) -> None:
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',

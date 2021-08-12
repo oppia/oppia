@@ -27,7 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import List, cast # isort:skip # pylint: disable=unused-import
+from typing import List, cast # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -121,7 +121,8 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
         self.assertEqual(offset, 2)
 
-    def test_query_new_and_pending_training_jobs_with_non_zero_offset(self) -> None:
+    def test_query_new_and_pending_training_jobs_with_non_zero_offset(
+            self) -> None:
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
             next_scheduled_check_time = (
@@ -379,7 +380,8 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             mappings[0].algorithm_ids_to_job_ids, {'algorithm_id': job_id})
 
     def test_create_multi_mappings(self) -> None:
-        state_training_jobs_mappings: List[classifier_domain.StateTrainingJobsMapping] = []
+        state_training_jobs_mappings: (
+            List[classifier_domain.StateTrainingJobsMapping]) = []
         state_training_jobs_mappings.append(
             classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
                 u'1', 1, 'Home', {'algorithm_id': 'job_id1'}))

@@ -29,16 +29,22 @@ from core.domain import user_services
 import feconf
 import utils
 
+from typing import Any, Dict, List # isort:skip
 
-def _get_blog_card_summary_dicts_for_dashboard(summaries: list[BlogPostSummaries]) -> list[BlogPostSummayDicts]:
+
+# Here we are using Dict[str, Any] for the return value `summary_dicts` since
+# we have to return a list with each element being domain object converted to
+# a dictionary.
+def _get_blog_card_summary_dicts_for_dashboard(
+        summaries: List[blog_domain.BlogPostSummary]) -> List[Dict[str, Any]]:
     """Creates summary dicts for use in blog dashboard.
 
     Args:
-        summaries: BlogPostSummaries. List of blog post summary
+        summaries: list(BlogPostSummary). List of blog post summary
             domain objects.
 
     Returns:
-        BlogPostSummaryDicts. The list of blog post summary dicts.
+        list(Dict(str, *)). The list of blog post summary dicts.
     """
     summary_dicts = []
     for summary in summaries:
@@ -57,7 +63,7 @@ class BlogDashboardPage(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
 
         self.render_template('blog-dashboard-page.mainpage.html')

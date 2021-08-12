@@ -451,7 +451,8 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-    def test_revert_to_version_with_translator_ids_field_is_successful(self) -> None:
+    def test_revert_to_version_with_translator_ids_field_is_successful(
+            self) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
         broken_dict: Dict[Text, Any] = dict(**self.original_dict)

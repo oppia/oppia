@@ -26,9 +26,10 @@ import schema_utils
 from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
-def validate(handler_args: Any,
-             handler_args_schemas: Any,
-             allowed_extra_args: bool) -> Tuple[Dict[Any, Any], List[Text]]:
+def validate(
+        handler_args: Any,
+        handler_args_schemas: Any,
+        allowed_extra_args: bool) -> Tuple[Dict[Any, Any], List[Text]]:
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.

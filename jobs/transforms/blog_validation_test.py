@@ -70,7 +70,8 @@ class RelationshipsOfTests(test_utils.TestBase):
 
 class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
 
-    def test_reports_model_created_on_timestamp_relationship_error(self) -> None:
+    def test_reports_model_created_on_timestamp_relationship_error(
+            self) -> None:
         invalid_timestamp = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -94,7 +95,8 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             ]
         )
 
-    def test_reports_model_last_updated_timestamp_relationship_error(self) -> None:
+    def test_reports_model_last_updated_timestamp_relationship_error(
+            self) -> None:
         invalid_timestamp = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',

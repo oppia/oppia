@@ -24,8 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, List, Optional, Text, Tuple, Union, cast)
+from typing import Any, Dict, List, Optional, Tuple, Union, cast # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -83,12 +82,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+            base_models.MODEL_ASSOCIATION_TO_USER):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls) -> Dict[Text, base_models.EXPORT_POLICY]:
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -104,7 +104,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(cls, exp_id: Text) -> Text:
+    def _generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the training job of the form
         '[exp_id].[random hash of 16 chars]'.
 
@@ -136,16 +136,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            algorithm_id: Text,
-            interaction_id: Text,
-            exp_id: Text,
+            algorithm_id: str,
+            interaction_id: str,
+            exp_id: str,
             exp_version: int,
             next_scheduled_check_time: datetime.datetime,
-            training_data: Union[Dict[Text, Union[int, List[Text]]], List[Dict[Text, Union[int, List[Text]]]]],
-            state_name: Text,
-            status: Text,
-            algorithm_version: int
-    ) -> Text:
+            training_data: Union[
+                Dict[str, Union[int, List[str]]],
+                List[Dict[str, Union[int, List[str]]]]],
+            state_name: str,
+            status: str,
+            algorithm_version: int) -> str:
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -188,8 +189,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_new_and_pending_training_jobs(cls,
-                                            offset: int) -> Tuple[List[ClassifierTrainingJobModel], int]:
+    def query_new_and_pending_training_jobs(
+            cls, offset: int) -> Tuple[List[ClassifierTrainingJobModel], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -226,7 +227,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # TODO(#13523): Change 'job_dict' to domain object/TypedDict to
     # remove Any from type-annotation below.
     @classmethod
-    def create_multi(cls, job_dicts_list: List[Dict[Text, Any]]) -> List[Text]:
+    def create_multi(cls, job_dicts_list: List[Dict[str, Any]]) -> List[str]:
         """Creates multiple new  ClassifierTrainingJobModel entries.
 
         Args:
@@ -284,12 +285,13 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+            base_models.MODEL_ASSOCIATION_TO_USER):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls) -> Dict[Text, base_models.EXPORT_POLICY]:
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -299,10 +301,11 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(cls,
-                     exp_id: Text,
-                     exp_version: int,
-                     state_name: Text) -> str:
+    def _generate_id(
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str) -> str:
         """Generates a unique ID for the Classifier Exploration Mapping of the
         form [exp_id].[exp_version].[state_name].
 
@@ -321,9 +324,9 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     @classmethod
     def get_models(
             cls,
-            exp_id: Text,
+            exp_id: str,
             exp_version: int,
-            state_names: List[Text]
+            state_names: List[str]
     ) -> List[Optional[StateTrainingJobsMappingModel]]:
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
@@ -347,10 +350,11 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         return mapping_instances
 
     @classmethod
-    def get_model(cls,
-                  exp_id: Text,
-                  exp_version: int,
-                  state_name: Text) -> Optional[StateTrainingJobsMappingModel]:
+    def get_model(
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str) -> Optional[StateTrainingJobsMappingModel]:
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -372,7 +376,11 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id: Text, exp_version: int, state_name: Text, algorithm_ids_to_job_ids: Dict[Text, Text]) -> Text:
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            algorithm_ids_to_job_ids: Dict[str, str]) -> str:
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -405,8 +413,10 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         raise Exception('A model with the same ID already exists.')
 
     @classmethod
-    def create_multi(cls,
-                     state_training_jobs_mappings: List[StateTrainingJobsMappingModel]) -> List[Text]:
+    def create_multi(
+            cls,
+            state_training_jobs_mappings: List[StateTrainingJobsMappingModel]
+        ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 
         Args:

@@ -28,10 +28,10 @@ from core.domain import config_domain
 from core.domain import exp_domain
 import python_utils
 
-from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, Optional, Union # isort:skip
 
 
-def validate_exploration_change(obj: Dict[String, Any]) -> None:
+def validate_exploration_change(obj: Dict[str, Any]) -> None:
     """Validates exploration change.
 
     Args:
@@ -42,7 +42,7 @@ def validate_exploration_change(obj: Dict[String, Any]) -> None:
     exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values(obj: Dict[String, Any]) -> None:
+def validate_new_config_property_values(obj: Dict[str, Any]) -> None:
     """Validates new config property values.
 
     Args:
@@ -84,7 +84,7 @@ def validate_change_dict_for_blog_post(change_dict: Dict[Any, Any]) -> None:
                 'Invalid tags provided. Tags not in default tags list.')
 
 
-def validate_collection_change(obj: Dict[String, Any]) -> None:
+def validate_collection_change(obj: Dict[str, Any]) -> None:
     """Validates collection change.
 
     Args:
@@ -95,7 +95,8 @@ def validate_collection_change(obj: Dict[String, Any]) -> None:
     collection_domain.CollectionChange(obj)
 
 
-def validate_email_dashboard_data(data: Dict[String, Optional[Union[bool, int]]]) -> None:
+def validate_email_dashboard_data(
+        data: Dict[str, Optional[Union[bool, int]]]) -> None:
     """Validates email dashboard data.
 
     Args:

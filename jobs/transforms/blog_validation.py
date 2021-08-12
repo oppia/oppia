@@ -30,7 +30,7 @@ from jobs.transforms import base_validation
 
 import apache_beam as beam
 
-from typing import Any # pylint: disable=unused-import
+from typing import Any
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -47,8 +47,8 @@ class ValidateBlogPostModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
 
-    def _get_model_domain_object_instance(self,
-                                          blog_post_model: Any) -> blog_domain.BlogPost:
+    def _get_model_domain_object_instance(
+            self, blog_post_model: Any) -> blog_domain.BlogPost:
         """Returns blog post domain object instance created from the model.
 
         Args:
@@ -132,8 +132,8 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
 
-    def _get_model_domain_object_instance(self,
-                                          summary_model: Any) -> blog_domain.BlogPostSummary:
+    def _get_model_domain_object_instance(
+            self, summary_model: Any) -> blog_domain.BlogPostSummary:
         """Returns blog post domain object instance created from the model.
 
         Args:

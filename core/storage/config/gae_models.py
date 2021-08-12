@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -65,12 +65,13 @@ class ConfigPropertyModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+            base_models.MODEL_ASSOCIATION_TO_USER):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls) -> Dict[Text, base_models.EXPORT_POLICY]:
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -83,8 +84,8 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit(# type: ignore[override]
             self,
-            committer_id: Text,
-            commit_cmds: List[Dict[Text, Any]]) -> None:
+            committer_id: str,
+            commit_cmds: List[Dict[str, Any]]) -> None:
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
 
 
@@ -125,12 +126,13 @@ class PlatformParameterModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+            base_models.MODEL_ASSOCIATION_TO_USER):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls) -> Dict[Text, base_models.EXPORT_POLICY]:
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -140,10 +142,11 @@ class PlatformParameterModel(base_models.VersionedModel):
     # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
     # remove Any from type-annotation below.
     @classmethod
-    def create(cls,
-               param_name: Text,
-               rule_dicts: List[Dict[Text, Any]],
-               rule_schema_version: int) -> PlatformParameterModel:
+    def create(
+            cls,
+            param_name: str,
+            rule_dicts: List[Dict[str, Any]],
+            rule_schema_version: int) -> 'PlatformParameterModel':
         """Creates a PlatformParameterModel instance.
 
         Args:

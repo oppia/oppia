@@ -88,7 +88,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
                 'derived class.')):
             base_models.BaseModel.export_data('')
 
-    def test_get_model_association_to_user_raises_not_implemented_error(self) -> None:
+    def test_get_model_association_to_user_raises_not_implemented_error(
+            self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
             re.escape(
@@ -402,9 +403,10 @@ class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Model that inherits the BaseCommitLogEntryModel for testing."""
 
     @classmethod
-    def get_instance_id(cls,
-                        target_entity_id: Text,
-                        version: Union[int, Text]) -> Text:
+    def get_instance_id(
+            cls,
+            target_entity_id: Text,
+            version: Union[int, Text]) -> Text:
         """A function that returns the id of the log in BaseCommitLogEntryModel.
 
         Args:
@@ -432,12 +434,14 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
             base_models.BaseCommitLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_get_model_association_to_user_is_not_corresponding_to_user(self) -> None:
+    def test_get_model_association_to_user_is_not_corresponding_to_user(
+            self) -> None:
         self.assertEqual(
             base_models.BaseCommitLogEntryModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_base_class_get_instance_id_raises_not_implemented_error(self) -> None:
+    def test_base_class_get_instance_id_raises_not_implemented_error(
+            self) -> None:
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -607,7 +611,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             Exception, 'This model instance has been deleted.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
-    def test_trusted_commit_with_no_snapshot_metadata_raises_error(self) -> None:
+    def test_trusted_commit_with_no_snapshot_metadata_raises_error(
+            self) -> None:
         model1 = TestVersionedModel(id='model_id1')
         # TODO(#13528): Remove this test after the backend is fully
         # type-annotated. Here ignore[assignment] is used to test method
@@ -642,7 +647,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             # commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
-    def test_put_raises_not_implemented_error_for_versioned_models(self) -> None:
+    def test_put_raises_not_implemented_error_for_versioned_models(
+            self) -> None:
         model1 = TestVersionedModel(id='model_id1')
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -736,7 +742,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'Reverting objects of type TestVersionedModel is not allowed.'):
             model1.revert(model1, feconf.SYSTEM_COMMITTER_ID, '', 1)
 
-    def test_get_snapshots_metadata_with_invalid_model_raises_error(self) -> None:
+    def test_get_snapshots_metadata_with_invalid_model_raises_error(
+            self) -> None:
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
