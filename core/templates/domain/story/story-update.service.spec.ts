@@ -713,11 +713,11 @@ describe('Story update service', () => {
     '\'setStoryNodeThumbnailBgColor\'', () => {
     storyUpdateService.setStoryNodeThumbnailBgColor(
       _sampleStory, 'node_1', 'red');
-    expect( _sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
+    expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
       .toBe('red');
 
     undoRedoService.undoChange(_sampleStory);
-    expect( _sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
+    expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
       .toBe('blue');
   });
 
