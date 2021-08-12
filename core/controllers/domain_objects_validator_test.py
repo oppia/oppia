@@ -84,21 +84,21 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
         config_properties = {'some_config_property': 20, }
         with self.assertRaisesRegexp(
             Exception, 'some_config_property do not have any schema.'):
-            domain_objects_validator.validate_new_config_property_values(
+            domain_objects_validator.validate_new_config_property_values_dict(
                 config_properties)
 
         config_properties = {1234: 20, }
         with self.assertRaisesRegexp(
             Exception, 'config property name should be a string, received'
             ': %s' % 1234):
-            domain_objects_validator.validate_new_config_property_values(
+            domain_objects_validator.validate_new_config_property_values_dict(
                 config_properties)
 
     def test_valid_object_raises_no_exception(self):
         config_properties = {
             'max_number_of_tags_assigned_to_blog_post': 20,
         }
-        domain_objects_validator.validate_new_config_property_values(
+        domain_objects_validator.validate_new_config_property_values_dict(
             config_properties)
 
 

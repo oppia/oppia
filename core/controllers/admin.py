@@ -124,11 +124,12 @@ class AdminHandler(base.BaseHandler):
                 },
                 'default_value': None
             },
-            'new_config_property_values': {
+            'new_config_property_values_dict': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        validation_method.validate_new_config_property_values)
+                        validation_method.
+                        validate_new_config_property_values_dict)
                 },
                 'default_value': None
             },
@@ -242,12 +243,12 @@ class AdminHandler(base.BaseHandler):
             elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
             elif action == 'save_config_properties':
-                new_config_property_value_dicts = self.normalized_payload.get(
-                    'new_config_property_values')
+                new_config_property_values_dict = self.normalized_payload.get(
+                    'new_config_property_values_dict')
                 logging.info(
                     '[ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_value_dicts))
-                for (name, value) in new_config_property_value_dicts.items():
+                    (self.user_id, new_config_property_values_dict))
+                for (name, value) in new_config_property_values_dict.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
                 config_property_id = self.normalized_payload.get(
@@ -273,8 +274,6 @@ class AdminHandler(base.BaseHandler):
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
-                new_rule_dicts = [
-                    new_rule.to_dict() for new_rule in new_rules]
 
                 try:
                     feature_services.update_feature_flag_rules(
@@ -283,6 +282,9 @@ class AdminHandler(base.BaseHandler):
                         utils.ValidationError,
                         feature_services.FeatureFlagNotFoundException) as e:
                     raise self.InvalidInputException(e)
+
+                new_rule_dicts = [
+                    new_rule.to_dict() for new_rule in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))

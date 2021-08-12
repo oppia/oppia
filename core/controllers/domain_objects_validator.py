@@ -32,33 +32,36 @@ import python_utils
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
-def validate_exploration_change(obj):
+def validate_exploration_change(change_dict):
     # type: (Dict[String, Any]) -> None
     """Validates exploration change.
 
     Args:
-        obj: dict. Data that needs to be validated.
+        change_dict: dict. Data that needs to be validated.
 
     Returns:
         ExplorationChange. Returns ExplorationChange object after validation.
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    return exp_domain.ExplorationChange(obj)
+    return exp_domain.ExplorationChange(change_dict)
 
 
-def validate_new_config_property_values(new_config_property_value_dicts):
+def validate_new_config_property_values_dict(new_config_property_values_dict):
     # type: (Dict[String, Any]) -> None
-    """Validates new config property values.
+    """Validates the new config property values dict.
 
     Args:
-        new_config_property_value_dicts: dict. Data that needs to be validated.
+        new_config_property_values_dict: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns new_config_property_value_dicts
+        dict(str, any). Returns new_config_property_values_dict
         after validation.
     """
-    for (name, value) in new_config_property_value_dicts.items():
+    # The method returns a dict containing config property values which are
+    # used by domain layer of the codebase, this dict does not have any direct
+    # representation of domain objects.
+    for (name, value) in new_config_property_values_dict.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
                 'config property name should be a string, received'
@@ -69,7 +72,7 @@ def validate_new_config_property_values(new_config_property_value_dicts):
 
         config_property.normalize(value)
 
-    return new_config_property_value_dicts
+    return new_config_property_values_dict
 
 
 def validate_change_dict_for_blog_post(change_dict):
@@ -80,8 +83,11 @@ def validate_change_dict_for_blog_post(change_dict):
         change_dict: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns object after validation.
+        dict(str, any). Returns change_dict after validation.
     """
+    # The method returns a dict containing blog post properties which are
+    # used by domain layer of the codebase, this dict does not have any direct
+    # representation of domain objects.
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(
             change_dict['title'], True)
@@ -102,24 +108,49 @@ def validate_change_dict_for_blog_post(change_dict):
     return change_dict
 
 
-def validate_collection_change(obj):
+def validate_collection_change(change_dict):
     # type: (Dict[String, Any]) -> None
     """Validates collection change.
 
     Args:
-        obj: dict. Data that needs to be validated.
+        change_dict: dict. Data that needs to be validated.
 
     Returns:
         CollectionChange. Returns CollectionChange object after validation.
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    return collection_domain.CollectionChange(obj)
+    return collection_domain.CollectionChange(change_dict)
 
 
-def validate_task_entry_for_improvements(task_entry_dict):
+def validate_email_dashboard_data(email_dashboard_data_dict):
+    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
+    """Validates the email dashboard data dict.
+
+    Args:
+        email_dashboard_data_dict: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, any). Returns email dashboard data dict after validation.
+    """
+    # The method returns a dict containing email dashboard data properties.
+    # This dict does not have any direct representation of domain objects.
+    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    possible_keys = [predicate['backend_attr'] for predicate in predicates]
+
+    for key, value in email_dashboard_data_dict.items():
+        if value is None:
+            continue
+        if key not in possible_keys:
+            # Raise exception if key is not one of the allowed keys.
+            raise Exception('400 Invalid input for query.')
+
+    return email_dashboard_data_dict
+
+
+def validate_task_entry_dict(task_entry_dict):
     # type: (Dict[String, Any]) -> None
-    """Validates collection change.
+    """Validates the task entry dict.
 
     Args:
         task_entry_dict: dict. Data that needs to be validated.
@@ -127,7 +158,9 @@ def validate_task_entry_for_improvements(task_entry_dict):
     Returns:
         dict(str, any). Returns task_entry_dict after validation.
     """
-    # There is no validate method in domain layer.
+    # The method returns a dict containing task entry properties which are
+    # used by domain layer of the codebase, this dict does not have any direct
+    # representation of domain objects.
     entity_version = task_entry_dict.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(
@@ -143,26 +176,3 @@ def validate_task_entry_for_improvements(task_entry_dict):
         raise base.BaseHandler.InvalidInputException('No status provided')
 
     return task_entry_dict
-
-
-def validate_email_dashboard_data(data):
-    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
-    """Validates email dashboard data.
-
-    Args:
-        data: dict. Data that needs to be validated.
-
-    Returns:
-        dict(str, any). Returns data dict after validation.
-    """
-    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-    possible_keys = [predicate['backend_attr'] for predicate in predicates]
-
-    for key, value in data.items():
-        if value is None:
-            continue
-        if key not in possible_keys:
-            # Raise exception if key is not one of the allowed keys.
-            raise Exception('400 Invalid input for query.')
-
-    return data

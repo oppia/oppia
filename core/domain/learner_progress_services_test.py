@@ -1517,7 +1517,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values': {
+            'new_config_property_values_dict': {
                 config_domain.CLASSROOM_PAGES_DATA.name: (
                     new_config_value),
             }
@@ -2011,7 +2011,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values': {
+            'new_config_property_values_dict': {
                 config_domain.CLASSROOM_PAGES_DATA.name: (
                     new_config_value),
             }

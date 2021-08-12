@@ -99,7 +99,7 @@ describe('Admin backend api service', () => {
     }]
   };
   let adminDataObject: AdminPageData;
-  let configPropertyValues = {
+  let configPropertyValuesDict = {
     always_ask_learners_for_answer_details: false,
     classroom_pages_data: {
       course_details: 'fds',
@@ -997,11 +997,11 @@ describe('Admin backend api service', () => {
     let action = 'save_config_properties';
     let payload = {
       action: action,
-      new_config_property_values: configPropertyValues
+      new_config_property_values_dict: configPropertyValuesDict
     };
 
     abas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
+      configPropertyValuesDict).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
@@ -1021,10 +1021,10 @@ describe('Admin backend api service', () => {
     let action = 'save_config_properties';
     let payload = {
       action: action,
-      new_config_property_values: configPropertyValues
+      new_config_property_values_dict: configPropertyValuesDict
     };
     abas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
+      configPropertyValuesDict).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');

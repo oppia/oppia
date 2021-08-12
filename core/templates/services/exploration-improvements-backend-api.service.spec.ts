@@ -182,7 +182,7 @@ describe('Exploration stats back-end API service', () => {
       httpTestingController.expectOne('/improvements/exploration/eid'));
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual({
-      task_entries: [task.toPayloadDict()]
+      task_entry_dicts: [task.toPayloadDict()]
     });
     req.flush({});
     flushMicrotasks();

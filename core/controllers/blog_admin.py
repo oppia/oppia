@@ -63,11 +63,12 @@ class BlogAdminHandler(base.BaseHandler):
                         'save_config_properties', 'revert_config_property']
                 }
             },
-            'new_config_property_values': {
+            'new_config_property_values_dict': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        validation_method.validate_new_config_property_values),
+                        validation_method.
+                        validate_new_config_property_values_dict)
                 },
                 'default_value': None
             },
@@ -112,13 +113,13 @@ class BlogAdminHandler(base.BaseHandler):
         result = {}
         if self.normalized_payload.get(
                 'action') == 'save_config_properties':
-            new_config_property_value_dicts = self.normalized_payload.get(
-                'new_config_property_values')
-            for (name, value) in new_config_property_value_dicts.items():
+            new_config_property_values_dict = self.normalized_payload.get(
+                'new_config_property_values_dict')
+            for (name, value) in new_config_property_values_dict.items():
                 config_services.set_property(self.user_id, name, value)
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
-                (self.user_id, new_config_property_value_dicts))
+                (self.user_id, new_config_property_values_dict))
         elif self.normalized_payload.get(
                 'action') == 'revert_config_property':
             config_property_id = (

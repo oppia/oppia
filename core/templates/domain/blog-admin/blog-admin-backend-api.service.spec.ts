@@ -51,7 +51,7 @@ describe('Blog Admin backend api service', () => {
     }
   };
   let blogAdminDataObject: BlogAdminPageData;
-  let configPropertyValues = {
+  let configPropertyValuesDict = {
     list_of_default_tags_for_blog_post: ['News', 'Learners'],
     max_number_of_tags_assigned_to_blog_post: 5
   };
@@ -272,11 +272,11 @@ describe('Blog Admin backend api service', () => {
     let action = 'save_config_properties';
     let payload = {
       action: action,
-      new_config_property_values: configPropertyValues
+      new_config_property_values_dict: configPropertyValuesDict
     };
 
     babas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
+      configPropertyValuesDict).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/blogadminhandler');
     expect(req.request.method).toEqual('POST');
@@ -296,10 +296,10 @@ describe('Blog Admin backend api service', () => {
     let action = 'save_config_properties';
     let payload = {
       action: action,
-      new_config_property_values: configPropertyValues
+      new_config_property_values_dict: configPropertyValuesDict
     };
     babas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
+      configPropertyValuesDict).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/blogadminhandler');
     expect(req.request.method).toEqual('POST');

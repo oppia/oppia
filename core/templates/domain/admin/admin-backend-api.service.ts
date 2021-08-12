@@ -420,11 +420,11 @@ export class AdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues):
+    newConfigPropertyValuesDict: ConfigPropertyValues):
       Promise<void> {
     let action = 'save_config_properties';
     let payload = {
-      new_config_property_values: newConfigPropertyValues
+      new_config_property_values_dict: newConfigPropertyValuesDict
     };
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);

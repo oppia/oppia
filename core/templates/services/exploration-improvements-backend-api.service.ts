@@ -92,7 +92,7 @@ export class ExplorationImprovementsBackendApiService {
           exploration_id: expId
         }));
     return this.http.post<void>(explorationImprovementsUrl, {
-      task_entries: tasks.map(t => t.toPayloadDict())
+      task_entry_dicts: tasks.map(t => t.toPayloadDict())
     }).toPromise();
   }
 

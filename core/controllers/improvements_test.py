@@ -196,7 +196,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_with_non_creator_returns_401_error(self):
         with self.login_context(self.VIEWER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
@@ -208,7 +208,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_invalid_exploration_returns_invalid_input_page(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(exp_id='bad_exp_id'), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
@@ -220,7 +220,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_without_csrf_token_returns_401_error(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': self.exp.version,
                     'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
                     'target_id': feconf.DEFAULT_INIT_STATE_NAME,
@@ -237,7 +237,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_with_missing_entity_version_returns_401_error(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     # 'entity_version': 1.
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
@@ -249,7 +249,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_with_missing_task_type_returns_401_error(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': 1,
                     # 'task_type': 'high_bounce_rate'.
                     'target_id': 'Introduction',
@@ -261,7 +261,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_with_missing_target_id_returns_401_error(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
                     # 'target_id': 'Introduction'.
@@ -273,7 +273,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_with_missing_issue_description_is_allowed(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
@@ -297,7 +297,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_with_missing_status_returns_401_error(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
@@ -309,7 +309,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_can_create_new_open_task_in_storage(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': self.exp.version,
                     'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
                     'target_id': feconf.DEFAULT_INIT_STATE_NAME,
@@ -352,7 +352,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_post_can_create_new_obsolete_task_in_storage(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': self.exp.version,
                     'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
                     'target_id': feconf.DEFAULT_INIT_STATE_NAME,
@@ -397,7 +397,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         mock_datetime_utcnow = self.mock_datetime_utcnow(self.MOCK_DATE)
         with login_context, mock_datetime_utcnow:
             self.post_json(self.get_url(), {
-                'task_entries': [{
+                'task_entry_dicts': [{
                     'entity_version': self.exp.version,
                     'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
                     'target_id': feconf.DEFAULT_INIT_STATE_NAME,

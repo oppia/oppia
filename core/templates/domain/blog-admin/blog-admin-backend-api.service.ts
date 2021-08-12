@@ -102,10 +102,10 @@ export class BlogAdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
+    newConfigPropertyValuesDict: ConfigPropertyValues): Promise<void> {
     let action = 'save_config_properties';
     let payload = {
-      new_config_property_values: newConfigPropertyValues
+      new_config_property_values_dict: newConfigPropertyValuesDict
     };
     return this._postRequestAsync('/blogadminhandler', payload, action);
   }

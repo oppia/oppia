@@ -51,14 +51,13 @@ class ExplorationImprovementsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
-            'task_entries': {
+            'task_entry_dicts': {
                 'schema': {
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
                         'validation_method': (
-                            domain_objects_validator
-                            .validate_task_entry_for_improvements
+                            domain_objects_validator.validate_task_entry_dict
                         )
                     }
                 }
@@ -79,7 +78,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
-        task_entry_dicts = self.normalized_payload.get('task_entries')
+        task_entry_dicts = self.normalized_payload.get('task_entry_dicts')
         task_entries_to_put = []
         for task_entry in task_entry_dicts:
             entity_version = task_entry['entity_version']
