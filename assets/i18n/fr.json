@@ -728,5 +728,6 @@
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Tableau de bord des sujets et des compétences",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Vous avez un total de <[totalSubscribers]> abonnés.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner",
+	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "Bénévole",
 	"I18N_WORKED_EXAMPLE": "Exemple travaillé"
 }
