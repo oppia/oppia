@@ -23,7 +23,7 @@ import { LostChangeBackendDict, LostChangeObjectFactory, LostChangeValue } from 
 import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
-describe('Changes in Human Readable Form Directive', () => {
+describe('Changes in Human Readable Form Component', () => {
   let component: ChangesInHumanReadableFormComponent;
   let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
   let lostChangeObjectFactory: LostChangeObjectFactory;
@@ -31,7 +31,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
-  const removeComments = (HTML) => {
+  const removeComments = (HTML: { toString: () => string; }) => {
     return HTML
       .toString()
       // Removes Unecessary white spaces and new lines.
@@ -145,13 +145,11 @@ describe('Changes in Human Readable Form Directive', () => {
       component.lostChanges = [lostChangeObjectFactory.createNew({
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
-        new_value: {
+        new_value: <LostChangeValue>{
           html: 'newValue',
-          content_id: ''
         },
-        old_value: {
+        old_value: <LostChangeValue>{
           html: 'oldValue',
-          content_id: ''
         },
         property_name: 'content'
       })];
