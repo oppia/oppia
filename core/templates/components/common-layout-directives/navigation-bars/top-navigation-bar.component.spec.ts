@@ -22,7 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { NavigationService } from 'services/navigation.service';
+import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
@@ -261,7 +261,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.onMenuKeypress(keydownEvent, 'aboutMenu', {
       shiftTab: 'open',
-    });
+    } as EventToCodes);
 
     expect(component.activeMenuName).toBe('aboutMenu');
   });

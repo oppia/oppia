@@ -29,7 +29,7 @@ import { Collection } from
 
 describe('Read only collection backend API service', () => {
   let readOnlyCollectionBackendApiService:
-    ReadOnlyCollectionBackendApiService = null;
+    ReadOnlyCollectionBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: ReadOnlyCollectionBackendResponse = {
     meta_name: 'meta_name',
