@@ -421,7 +421,7 @@ describe('Core exploration functionality', function() {
       await forms.toRichText('some content'));
 
     // NumberWithUnits input does not have any customization arguments.
-    // Therefore the customization modal and the save interaction button does
+    // Therefore the customization modal and the save interaction button do
     // not appear.
     await explorationEditorMainTab.setInteraction('NumberWithUnits');
     await explorationEditorMainTab.deleteInteraction();

@@ -44,6 +44,18 @@ var testSuite = [{
   expectedInteractionDetails: [],
   wrongAnswers: [146, 130],
   correctAnswers: [142]
+}, {
+  interactionArguments: [true],
+  ruleArguments: ['IsLessThan', 143],
+  expectedInteractionDetails: [],
+  wrongAnswers: [146, -3],
+  correctAnswers: [142]
+}, {
+  interactionArguments: [true],
+  ruleArguments: ['IsGreaterThan', -2],
+  expectedInteractionDetails: [],
+  wrongAnswers: [-3, -1],
+  correctAnswers: [3]
 }];
 
 exports.customizeInteraction = customizeInteraction;
