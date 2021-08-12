@@ -242,12 +242,12 @@ class AdminHandler(base.BaseHandler):
             elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
             elif action == 'save_config_properties':
-                new_config_property_values = self.normalized_payload.get(
+                new_config_property_value_dicts = self.normalized_payload.get(
                     'new_config_property_values')
                 logging.info(
                     '[ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.items():
+                    (self.user_id, new_config_property_value_dicts))
+                for (name, value) in new_config_property_value_dicts.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
                 config_property_id = self.normalized_payload.get(

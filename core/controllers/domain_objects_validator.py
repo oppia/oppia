@@ -47,17 +47,18 @@ def validate_exploration_change(obj):
     return exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values(obj):
+def validate_new_config_property_values(new_config_property_value_dicts):
     # type: (Dict[String, Any]) -> None
     """Validates new config property values.
 
     Args:
-        obj: dict. Data that needs to be validated.
+        new_config_property_value_dicts: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns object after validation.
+        dict(str, any). Returns new_config_property_value_dicts
+            after validation.
     """
-    for (name, value) in obj.items():
+    for (name, value) in new_config_property_value_dicts.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
                 'config property name should be a string, received'
@@ -68,7 +69,7 @@ def validate_new_config_property_values(obj):
 
         config_property.normalize(value)
 
-    return obj
+    return new_config_property_value_dicts
 
 
 def validate_change_dict_for_blog_post(change_dict):
@@ -116,32 +117,32 @@ def validate_collection_change(obj):
     return collection_domain.CollectionChange(obj)
 
 
-def validate_task_entry_for_improvements(task_entry):
+def validate_task_entry_for_improvements(task_entry_dict):
     # type: (Dict[String, Any]) -> None
     """Validates collection change.
 
     Args:
-        task_entry: dict. Data that needs to be validated.
+        task_entry_dict: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns object after validation.
+        dict(str, any). Returns task_entry_dict after validation.
     """
     # There is no validate method in domain layer.
-    entity_version = task_entry.get('entity_version', None)
+    entity_version = task_entry_dict.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(
             'No entity_version provided')
-    task_type = task_entry.get('task_type', None)
+    task_type = task_entry_dict.get('task_type', None)
     if task_type is None:
         raise base.BaseHandler.InvalidInputException('No task_type provided')
-    target_id = task_entry.get('target_id', None)
+    target_id = task_entry_dict.get('target_id', None)
     if target_id is None:
         raise base.BaseHandler.InvalidInputException('No target_id provided')
-    status = task_entry.get('status', None)
+    status = task_entry_dict.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
 
-    return task_entry
+    return task_entry_dict
 
 
 def validate_email_dashboard_data(data):
@@ -152,7 +153,7 @@ def validate_email_dashboard_data(data):
         data: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, any). Returns object after validation.
+        dict(str, any). Returns data dict after validation.
     """
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]

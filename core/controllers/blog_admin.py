@@ -112,13 +112,13 @@ class BlogAdminHandler(base.BaseHandler):
         result = {}
         if self.normalized_payload.get(
                 'action') == 'save_config_properties':
-            new_config_property_values = self.normalized_payload.get(
+            new_config_property_value_dicts = self.normalized_payload.get(
                 'new_config_property_values')
-            for (name, value) in new_config_property_values.items():
+            for (name, value) in new_config_property_value_dicts.items():
                 config_services.set_property(self.user_id, name, value)
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
-                (self.user_id, new_config_property_values))
+                (self.user_id, new_config_property_value_dicts))
         elif self.normalized_payload.get(
                 'action') == 'revert_config_property':
             config_property_id = (

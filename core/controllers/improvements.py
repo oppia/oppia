@@ -79,9 +79,9 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
-        task_entries = self.normalized_payload.get('task_entries')
+        task_entry_dicts = self.normalized_payload.get('task_entries')
         task_entries_to_put = []
-        for task_entry in task_entries:
+        for task_entry in task_entry_dicts:
             entity_version = task_entry['entity_version']
             task_type = task_entry['task_type']
             target_id = task_entry['target_id']
