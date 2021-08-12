@@ -30,6 +30,9 @@ describe('TranslateTextBackendApiService', () => {
     return {
       data_format: 'html',
       content: text,
+      content_type: 'content',
+      interaction_id: null,
+      rule_type: null
     };
   };
 

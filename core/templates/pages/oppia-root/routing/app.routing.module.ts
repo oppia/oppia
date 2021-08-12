@@ -76,6 +76,11 @@ const routes: Route[] = [
       .then(m => m.PrivacyPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.ROUTE,
+    loadChildren: () => import('pages/signup-page/signup-page.module')
+      .then(m => m.SignupPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE,
     loadChildren: () => import('pages/teach-page/teach-page.module')
       .then(m => m.TeachPageModule)
@@ -89,6 +94,12 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.THANKS.ROUTE,
     loadChildren: () => import('pages/thanks-page/thanks-page.module')
       .then(m => m.ThanksPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE,
+    loadChildren: () => import(
+      'pages/volunteer-page/volunteer-page.module')
+      .then(m => m.VolunteerPageModule)
   },
   {
     path: '**',
