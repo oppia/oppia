@@ -50,6 +50,7 @@ export class ContentTranslationLanguageService {
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string
   ): void {
+    this.currentContentLanguageCode = '';
     this.languageOptions = [];
     // Set the content language that is chosen initially.
     // Use the following priority (highest to lowest):
