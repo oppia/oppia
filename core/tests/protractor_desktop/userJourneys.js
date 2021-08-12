@@ -114,6 +114,11 @@ describe('Site language', function() {
     var EDITOR_USERNAME = 'langCollections';
 
     await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    let session = await browser.getSession();
+    console.error(
+      `broswer session id after signup is: ${session.getId()}`);
+    console.error(
+      `cookie: ${await browser.manage().getCookie('OPPIA_COOKIES_ACKNOWLEDGED')}`);
     await users.createCollectionEditor('lang@collections.com', EDITOR_USERNAME);
 
     await users.login('langCreator@explorations.com');
@@ -168,6 +173,11 @@ describe('Site language', function() {
   });
 
   beforeEach(async function() {
+    let session = await browser.getSession();
+    console.error(
+      `broswer session id in beforeEach: ${session.getId()}`);
+    console.error(
+      `cookie: ${await browser.manage().getCookie('OPPIA_COOKIES_ACKNOWLEDGED')}`);
     // Starting language is English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
@@ -177,7 +187,12 @@ describe('Site language', function() {
       'Imagine what you could learn today...');
   });
 
-  it('should change after selecting a different language', async function() {
+  fit('should change after selecting a different language', async function() {
+    let session = await browser.getSession();
+    console.error(
+      `broswer session id in fit: ${session.getId()}`);
+    console.error(
+      `cookie: ${await browser.manage().getCookie('OPPIA_COOKIES_ACKNOWLEDGED')}`);
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('es');
