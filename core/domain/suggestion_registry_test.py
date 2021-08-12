@@ -1459,25 +1459,51 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion_adds_translation_in_exploration(self):
         self.save_new_default_exploration('exp1', self.author_id)
-
         exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {})
-
-        expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
 
+    def test_accept_suggestion_with_set_of_string_adds_translation(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
@@ -1518,8 +1544,34 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
+
         expected_outcome_list = [
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_all_html_content_strings_for_content_lists(self):
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+
+        expected_outcome_list = [
+            'translated text1', 'translated text2', 'text1', 'text2']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_target_entity_html_strings_returns_expected_strings(self):
