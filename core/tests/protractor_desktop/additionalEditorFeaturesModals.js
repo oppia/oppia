@@ -487,7 +487,7 @@ describe('Full exploration editor', function() {
           download_throughput: 0,
           upload_throughput: 0});
 
-      // Check that the save changes button is clickable when offline.
+      // Check that the save changes button is not clickable when offline.
       expect(await saveChangesButton.isEnabled()).toEqual(false);
 
       // Set network connection to online.
