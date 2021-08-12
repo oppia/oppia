@@ -106,7 +106,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
-    def test_get_translation_opportunities_by_topic(self):
+    def test_get_translation_opportunities_by_topic(self) -> None:
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(5, None, 'hi', 'A topic'))
