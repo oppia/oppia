@@ -67,7 +67,7 @@ describe('Practice session page', function() {
 
     $httpBackend.expectGET(
       '/practice_session/data/math/abbrev-topic?' +
-      'selected_subtopic_ids='+ encodeURIComponent(
+      'selected_subtopic_ids=' + encodeURIComponent(
         '["1","2","3","4","5"]')).respond({
       skill_ids_to_descriptions_map: {
         skill_1: 'Description 1',

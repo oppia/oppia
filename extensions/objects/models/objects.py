@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import json
 import copy
+import json
 
 from constants import constants
 import python_utils
@@ -1718,8 +1718,10 @@ class ConvertStringifiedListToProperList(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
+
         Args:
             raw: str. Strings to be validated and normalized.
+
         Returns:
             list(str). The normalized list of strings.
         """

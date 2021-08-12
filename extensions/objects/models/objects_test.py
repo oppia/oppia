@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import json
 import inspect
+import json
 import re
 
 from core.tests import test_utils

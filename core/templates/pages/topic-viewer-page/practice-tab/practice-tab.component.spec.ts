@@ -57,7 +57,7 @@ class MockQuestionBackendApiService {
   }
 }
 
-fdescribe('Practice tab component', function() {
+describe('Practice tab component', function() {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
