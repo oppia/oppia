@@ -29,10 +29,6 @@ module.exports = {
       'assertMatrix': [
         baseConfig['basePerformanceAssertMatrix'],
         {
-          'matchingUrlPattern': 'http://[^/]+/partners$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        },
-        {
           'matchingUrlPattern': 'http://[^/]+/preferences$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
@@ -53,10 +49,6 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/teachers$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        },
-        {
           'matchingUrlPattern': 'http://[^/]+/terms$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
@@ -65,7 +57,7 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/volunteers$',
+          'matchingUrlPattern': 'http://[^/]+/volunteer$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
