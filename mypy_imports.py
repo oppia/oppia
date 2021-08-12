@@ -44,9 +44,15 @@ from core.storage.feedback import gae_models as feedback_models
 from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
 from core.storage.opportunity import gae_models as opportunity_models
+from core.storage.question import gae_models as question_models
+from core.storage.recommendations import gae_models as recommendations_models
 from core.storage.skill import gae_models as skill_models
+from core.storage.statistics import gae_models as stats_models
 from core.storage.story import gae_models as story_models
 from core.storage.subtopic import gae_models as subtopic_models
+from core.storage.suggestion import gae_models as suggestion_models
+from core.storage.topic import gae_models as topic_models
+from core.storage.translation import gae_models as translation_models # pylint: disable=line-too-long
 from core.storage.user import gae_models as user_models
 
 __all__ = [
@@ -66,9 +72,15 @@ __all__ = [
     'improvements_models',
     'job_models',
     'opportunity_models',
+    'question_models',
+    'recommendations_models',
     'skill_models',
+    'stats_models',
     'story_models',
     'subtopic_models',
+    'suggestion_models',
+    'topic_models',
+    'translation_models',
     'transaction_services',
     'user_models'
 ]

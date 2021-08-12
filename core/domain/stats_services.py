@@ -975,8 +975,7 @@ def create_learner_answer_details_model_instance(learner_answer_details):
         learner_answer_details.entity_type,
         learner_answer_details.state_reference,
         learner_answer_details.interaction_id,
-        [learner_answer_info.to_dict() for learner_answer_info
-         in learner_answer_details.learner_answer_info_list],
+        learner_answer_details.learner_answer_info_list,
         learner_answer_details.learner_answer_info_schema_version,
         learner_answer_details.accumulated_answer_info_json_size_bytes)
 

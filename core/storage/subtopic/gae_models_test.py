@@ -25,13 +25,20 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+from typing import Dict, List # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import subtopic_models
+
 (base_models, subtopic_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.subtopic])
 
 
 class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             subtopic_models.SubtopicPageSnapshotContentModel
             .get_deletion_policy(),
@@ -43,12 +50,14 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             subtopic_models.SubtopicPageModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
+    def test_that_subsidiary_models_are_created_when_new_model_is_saved(
+            self
+    ) -> None:
         """Tests the _trusted_commit() method."""
 
         # SubtopicPage is created but not committed/saved.
@@ -88,7 +97,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageCommitLogEntryModel class."""
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id(self) -> None:
         commit = subtopic_models.SubtopicPageCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -102,7 +111,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             subtopic_models.SubtopicPageCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
-    def test__get_instance_id(self):
+    def test__get_instance_id(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
         subtopic_page_commit_log_entry = (
