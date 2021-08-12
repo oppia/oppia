@@ -222,12 +222,9 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
     async function(explorationTitle) {
       await this.navigateToCommunityLessonsSection();
-      var parent = await driver.findElement(by.css(
-        '.protractor-test-incomplete-community-lessons-section'));
-      var child = await parent.findElement(
-        by.cssContainingText(
-          '.protractor-test-exp-summary-tile-title', explorationTitle));
-      expect(await child.getText()).toMatch(explorationTitle);
+      await (await driver.findElement(by.css(
+        '.protractor-test-incomplete-community-lessons-section')));
+      await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
     });
 
   this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
