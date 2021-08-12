@@ -26,6 +26,11 @@ interface InvalidTagsAndAttributes {
   attrs: string[];
 }
 
+interface Dimensions {
+  height: number;
+  width: number;
+}
+
 @Component({
   selector: 'edit-thumbnail-modal',
   templateUrl: './edit-thumbnail-modal.component.html',
@@ -53,9 +58,9 @@ export class EditThumbnailModalComponent implements OnInit {
   @Input() previewTitle!: string;
   @Input() allowedBgColors!: string[];
   @Input() tempBgColor!: string;
-  @Input() dimensions!: { height: number; width: number; };
-  @Input() openInUploadMode!: boolean;
+  @Input() dimensions!: Dimensions;
   @Input() uploadedImageMimeType!: string;
+  @Input() openInUploadMode: boolean = false;
   tags!: string[];
   attrs!: string[];
   imgSrc!: string;
