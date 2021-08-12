@@ -19,7 +19,7 @@
 import { SkillRights } from
   'domain/skill/skill-rights.model';
 
-fdescribe('Skill rights model', () => {
+describe('Skill rights model', () => {
   it('should make a copy from another skill rights object', () => {
     const sampleSkillRightsObject1 = {
       skill_id: '1',
