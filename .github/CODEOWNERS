@@ -54,6 +54,7 @@
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
 /core/templates/modules/ @srijanreddy98 @darksun27
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
+/core/templates/pages/common-imports.ts @srijanreddy98 @darksun27
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
 /core/templates/pages/oppia-root/ @srijanreddy98 @darksun27
 /core/templates/i18n/ @srijanreddy98 @darksun27
@@ -664,7 +665,7 @@
 /data/ @nithusha21
 /core/controllers/android_e2e_config*.py @seanlip @BenHenning
 /core/templates/karma.module.ts @vojtechjelinek
-# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01 
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
 /core/tests/protractor_utils/ @kevintab95 @SAEb-ai @U8NWXD
 /core/tests/protractor_desktop/ @kevintab95 @SAEb-ai @U8NWXD
 /core/tests/protractor/ @kevintab95 @SAEb-ai @U8NWXD
@@ -675,7 +676,7 @@
 /extensions/rich_text_components/protractor.js @kevintab95 @U8NWXD
 /extensions/objects/protractor.js @kevintab95 @U8NWXD
 /scripts/backend_test_shards.json @U8NWXD
-/.github/actions @SAEb-ai @U8NWXD 
+/.github/actions @SAEb-ai @U8NWXD
 
 
 # Python 3 Migration project.
