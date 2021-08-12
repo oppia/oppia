@@ -46,8 +46,10 @@ export class HintsAndSolutionManagerService {
   solutionReleased: boolean = false;
   solutionConsumed: boolean = false;
   hintsForLatestCard: Hint[] = [];
-  // 'solutionForLatestCard' is null initially until the solution is released.
-  solutionForLatestCard: Solution | null = null;
+  // This in initialized using the the class methods
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  solutionForLatestCard!: Solution;
   wrongAnswersSinceLastHintConsumed: number = 0;
   correctAnswerSubmitted: boolean = false;
 
@@ -174,7 +176,7 @@ export class HintsAndSolutionManagerService {
     return null;
   }
 
-  displaySolution(): Solution | null {
+  displaySolution(): Solution {
     this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();

@@ -27,9 +27,7 @@ import { ExplorationLanguageInfo } from
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
 
-import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -41,8 +39,10 @@ export class ContentTranslationLanguageService {
     private urlService: UrlService
   ) {}
 
-  // The 'currentContentLanguageCode' is set to null initially.
-  private currentContentLanguageCode: string | null = null;
+  // The 'currentContentLanguageCode' is initialized using private methods.
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private currentContentLanguageCode!: string;
   private languageOptions: ExplorationLanguageInfo[] = [];
 
   _init(
@@ -50,7 +50,6 @@ export class ContentTranslationLanguageService {
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string
   ): void {
-    this.currentContentLanguageCode = null;
     this.languageOptions = [];
     // Set the content language that is chosen initially.
     // Use the following priority (highest to lowest):
@@ -69,7 +68,7 @@ export class ContentTranslationLanguageService {
     }
 
     if (
-      this.currentContentLanguageCode === null &&
+      !this.currentContentLanguageCode &&
       preferredContentLanguageCodes !== null
     ) {
       for (const languageCode of preferredContentLanguageCodes) {
@@ -81,7 +80,7 @@ export class ContentTranslationLanguageService {
     }
 
     if (
-      this.currentContentLanguageCode === null &&
+      !this.currentContentLanguageCode &&
       explorationLanguageCode !== null
     ) {
       this.currentContentLanguageCode = explorationLanguageCode;
@@ -118,7 +117,7 @@ export class ContentTranslationLanguageService {
   /**
    * @return {string} The current audio language code (eg. en).
    */
-  getCurrentContentLanguageCode(): string | null {
+  getCurrentContentLanguageCode(): string {
     return this.currentContentLanguageCode;
   }
 

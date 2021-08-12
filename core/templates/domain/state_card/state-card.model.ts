@@ -158,7 +158,7 @@ export class StateCard {
     let interactionId = this.getInteractionId();
     return (
         interactionId ? INTERACTION_SPECS[
-          <InteractionSpecsKey>interactionId].instructions : '');
+          <InteractionSpecsKey>interactionId].instructions : null);
   }
 
   // This returns 'null' when no interaction is set for the card.
@@ -186,6 +186,8 @@ export class StateCard {
     return this._interactionHtml;
   }
 
+  // This will return null when the response for the input has
+  // not been received yet.
   getOppiaResponse(index: number): string | null {
     return this._inputResponsePairs[index].oppiaResponse;
   }
@@ -211,6 +213,8 @@ export class StateCard {
     return lastInputResponsePair.learnerInput;
   }
 
+
+  // This will return null when no previous response exists.
   getLastOppiaResponse(): string | null {
     const lastInputResponsePair = this.getLastInputResponsePair();
     if (lastInputResponsePair === null) {

@@ -49,7 +49,10 @@ type InteractionSpecKey = (
   providedIn: 'root'
 })
 export class ContentTranslationManagerService {
-  private explorationLanguageCode: string | undefined;
+  // This is initialized using the class initialization method.
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
   // The 'originalTranscript' is a copy of the transcript in the exploration

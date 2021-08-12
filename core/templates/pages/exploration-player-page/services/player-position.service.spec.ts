@@ -75,19 +75,6 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(4);
   });
 
-  it('should throw error if card index is not defined on getting state name',
-    () => {
-      pts.addNewCard(StateCard.createNewCard(
-        'First state', 'Content HTML',
-        '<oppia-text-input-html></oppia-text-input-html>',
-      {} as Interaction, {} as RecordedVoiceovers,
-      {} as WrittenTranslations, '', atls));
-
-      expect(() => {
-        pps.getCurrentStateName();
-      }).toThrowError('Displayed Card Index has not been set');
-    });
-
   it('should get current state name', () => {
     pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
