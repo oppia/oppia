@@ -48,6 +48,11 @@ interface NonEmailPreferencesBackendDict {
 // The following type is an intersection of EmailPreferencesBackendDict
 // and NonEmailPreferencesbackendDict and hence will have all the properties
 // of both the interfaces.
+// Note: Intersection in typescript is used differently than in set theory,
+// the latter implies that the type will include only the properties that are
+// are same in both the interfaces whereas the former includes all the
+// properties from both the interfaces. For more information, check
+// https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#intersection-types
 export type PreferencesBackendDict = (
   NonEmailPreferencesBackendDict &
   EmailPreferencesBackendDict
