@@ -103,17 +103,9 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/nonprofits$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        },
-        {
           'matchingUrlPattern': 'http://[^/]+/moderator$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
-        {
-          'matchingUrlPattern': 'http://[^/]+/parents$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        }
       ]
     },
     'upload': {

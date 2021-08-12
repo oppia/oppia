@@ -167,7 +167,10 @@
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
-                 href="https://oppiafoundation.org/volunteer"
+                 href="/volunteer"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                 target="_blank"
+                 rel="noopener"
                  [innerHTML]="'I18N_HEADING_VOLUNTEER'| translate">
               </a>
             </li>

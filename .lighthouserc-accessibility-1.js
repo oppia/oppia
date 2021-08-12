@@ -80,15 +80,7 @@ module.exports = {
           'assertions': baseConfig['baseAccessibilityAssertions']
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/nonprofits$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
-        },
-        {
           'matchingUrlPattern': '^http://127.0.0.1:8181/moderator$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
-        },
-        {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/parents$',
           'assertions': baseConfig['baseAccessibilityAssertions']
         }
       ]

@@ -456,17 +456,6 @@ describe('Site Analytics Service', () => {
     });
   });
 
-  it('should register stewards landing page event', () => {
-    const viewerType = 'user';
-    const buttonText = 'Button Text';
-    sas.registerStewardsLandingPageEvent(viewerType, buttonText);
-
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-      event_category: 'ClickButtonOnStewardsPage',
-      event_label: viewerType + ':' + buttonText
-    });
-  });
-
   it('should register save recorded audio event', () => {
     const explorationId = 'abc1';
     sas.registerSaveRecordedAudioEvent(explorationId);

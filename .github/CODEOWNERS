@@ -592,6 +592,7 @@
 /core/templates/pages/teach-page/ @vojtechjelinek
 /core/templates/pages/thanks-page/ @vojtechjelinek
 /core/templates/pages/participation-playbook/ @vojtechjelinek
+/core/templates/pages/volunteer-page/ @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @nithusha21 @vojtechjelinek

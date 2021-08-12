@@ -91,6 +91,12 @@ const routes: Route[] = [
       .then(m => m.ThanksPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE,
+    loadChildren: () => import(
+      'pages/volunteer-page/volunteer-page.module')
+      .then(m => m.VolunteerPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import(
       'pages/error-pages/error-404/error-404-page.module').then(

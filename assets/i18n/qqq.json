@@ -728,5 +728,6 @@
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Text displayed in the dropdown on the navbar for reaching the topics and skills dashboard.",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Text displayed under the subscribers tab in creator dashboard. Tells the creator the total number of subscribers he/she has.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}",
+	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "Text displayed in the Volunteer page. - Text shown in the top left corner of the nav bar.",
 	"I18N_WORKED_EXAMPLE": "The text that is displayed on the button to view another worked example when a skill concept card is displayed in the exploration player."
 }
