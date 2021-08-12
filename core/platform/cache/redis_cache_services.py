@@ -25,7 +25,7 @@ import python_utils
 
 import redis
 
-from typing import Dict, List, Mapping, Optional, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
@@ -84,7 +84,9 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
-    return OPPIA_REDIS_CLIENT.mget(keys)
+    return cast(
+        List[Optional[str]],
+        OPPIA_REDIS_CLIENT.mget(keys)) # type: ignore[no-untyped-call]
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -99,13 +101,9 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-
-    # Casting the 'key_value_mapping' because mset() expects value of type
-    # 'Mapping[Union[str, bytes], Union[bytes, float, int, str]]'.
-    return OPPIA_REDIS_CLIENT.mset(
-        cast(
-            Mapping[Union[str, bytes], str],
-            key_value_mapping))
+    return cast(
+        bool,
+        OPPIA_REDIS_CLIENT.mset(key_value_mapping)) # type: ignore[no-untyped-call]
 
 
 def delete_multi(keys: List[str]) -> int:
