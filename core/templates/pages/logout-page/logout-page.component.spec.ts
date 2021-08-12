@@ -106,7 +106,7 @@ describe('Logout Page', function() {
   it('should call to signOutAsync and then redirect', fakeAsync(() => {
     const signOutPromise = spyOnSignOutAsync();
 
-    expect(windowRef.location).toBe(null);
+    expect(windowRef.location).toBeNull();
 
     component.ngOnInit();
 
@@ -131,7 +131,7 @@ describe('Logout Page', function() {
   it('should add warning on error and redirect anyway', fakeAsync(() => {
     const signOutPromise = spyOnSignOutAsync();
 
-    expect(windowRef.location).toBe(null);
+    expect(windowRef.location).toBeNull();
 
     component.ngOnInit();
 
@@ -144,7 +144,7 @@ describe('Logout Page', function() {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith('uh-oh!');
     // We should still be on the same page for an opportunity to read the error.
-    expect(windowRef.location).toBe(null);
+    expect(windowRef.location).toBeNull();
 
     tick(3000);
 
