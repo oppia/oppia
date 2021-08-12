@@ -71,7 +71,7 @@ describe('Skill Description Editor Component', () => {
       skillRightsDict);
 
     sampleSkill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
+      'id1', 'Skill description loading', [], [], {} as ConceptCard, 'en',
       1, 0, 'id1', false, []);
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);

@@ -26,6 +26,9 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { EventEmitter } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -62,9 +65,21 @@ describe('Skill Editor Navbar Directive', function() {
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     undoRedoService = $injector.get('UndoRedoService');
 
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict(
+        {
+          voiceovers_mapping: {
+            COMPONENT_NAME_EXPLANATION: {}
+          }
+        }
+      )
+    );
     sampleSkill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+    );
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);

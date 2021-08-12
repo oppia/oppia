@@ -21,6 +21,8 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillObjectFactory, SkillBackendDict, Skill } from 'domain/skill/SkillObjectFactory';
 import { ConceptCard } from './ConceptCardObjectFactory';
@@ -100,9 +102,20 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict(
+        {
+          voiceovers_mapping: {
+            COMPONENT_NAME_EXPLANATION: {}
+          }
+        }
+      )
+    );
     const skill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []);
     skills.push(skill.toBackendDict());
     skillBackendApiService.fetchAllSkills().toPromise().then(
       res => {

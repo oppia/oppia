@@ -69,6 +69,29 @@ const skillDict: SkillBackendDict = {
   next_misconception_id: 3,
 };
 
+const skillDict2: SkillBackendDict = {
+  id: 'skill_id_2',
+  description: 'Description 2',
+  misconceptions: [{
+    id: '2',
+    name: 'test name',
+    notes: 'test notes',
+    feedback: 'test feedback',
+    must_be_addressed: true,
+  }],
+  rubrics: [{
+    difficulty: 'Easy',
+    explanations: ['explanation'],
+  }],
+  skill_contents: skillContentsDict,
+  language_code: 'en',
+  version: 3,
+  prerequisite_skill_ids: [],
+  all_questions_merged: true,
+  superseding_skill_id: '2',
+  next_misconception_id: 3,
+};
+
 class FakeSkillBackendApiService {
   skillDictProp = {
     ...skillDict,
@@ -240,6 +263,9 @@ describe('Skill editor state service', () => {
 
   it('should return the last skill loaded as the same object',
     fakeAsync(() => {
+      // eslint-disable-next-line dot-notation
+      skillEditorStateService['_skill'] = (
+        skillObjectFactory.createFromBackendDict(skillDict2));
       const previousSkill = skillEditorStateService.getSkill();
       const expectedSkill = skillObjectFactory.createFromBackendDict(
         fakeSkillBackendApiService.newBackendSkillObject
@@ -275,6 +301,8 @@ describe('Skill editor state service', () => {
       spyOn(fakeSkillBackendApiService, 'updateSkillAsync').and.callThrough();
 
       skillEditorStateService.loadSkill('skill_id_1');
+      tick(1000);
+      expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
       skillUpdateService.setSkillDescription(
         skillEditorStateService.getSkill(),
         'new description'
@@ -296,7 +324,7 @@ describe('Skill editor state service', () => {
           {
             property_name: 'description',
             new_value: 'new description',
-            old_value: 'Skill description loading',
+            old_value: 'Description',
             cmd: 'update_skill_property',
           },
         ]
@@ -305,6 +333,8 @@ describe('Skill editor state service', () => {
 
   it('should track whether it is currently saving the skill', fakeAsync(() => {
     skillEditorStateService.loadSkill('skill_id_1');
+    tick(1000);
+    expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
     skillUpdateService.setSkillDescription(
       skillEditorStateService.getSkill(),
       'new description'
@@ -321,6 +351,8 @@ describe('Skill editor state service', () => {
   it('should indicate a skill is no longer saving after an error',
     fakeAsync(() => {
       skillEditorStateService.loadSkill('skill_id_1');
+      tick(1000);
+      expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
       skillUpdateService.setSkillDescription(
         skillEditorStateService.getSkill(),
         'new description'
@@ -350,13 +382,14 @@ describe('Skill editor state service', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should initially return an interstitial skill rights object', () => {
-    const skillRights = skillEditorStateService.getSkillRights();
-    expect(skillRights.getSkillId()).toEqual(null);
-    expect(skillRights.canEditSkillDescription()).toEqual(false);
-  });
 
   it('should be able to set a new skill rights with an in-place copy', () => {
+    skillEditorStateService.setSkillRights(SkillRights.createFromBackendDict(
+      {
+        skill_id: 'skill_id',
+        can_edit_skill_description: true,
+      }
+    ));
     const previousSkillRights = skillEditorStateService.getSkillRights();
     const expectedSkillRights = SkillRights.createFromBackendDict(
       skillRightsObject

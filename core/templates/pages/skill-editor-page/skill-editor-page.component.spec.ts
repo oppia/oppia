@@ -17,6 +17,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 
@@ -126,9 +129,21 @@ describe('Skill editor page', function() {
     });
 
   it('should return warnings count for the skill', function() {
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict(
+        {
+          voiceovers_mapping: {
+            COMPONENT_NAME_EXPLANATION: {}
+          }
+        }
+      )
+    );
     ctrl.skill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+    );
     expect(ctrl.getWarningsCount()).toEqual(1);
   });
 });
