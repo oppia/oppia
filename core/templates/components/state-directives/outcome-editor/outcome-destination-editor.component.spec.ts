@@ -88,10 +88,10 @@ describe('OutcomeDestinationEditor', () => {
     $timeout.flush(10);
 
     expect(ctrl.canAddPrerequisiteSkill).toBe(false);
-    expect(ctrl.canEditRefresherExplorationId).toBeUndefined();
+    expect(ctrl.canEditRefresherExplorationId).toBeNull();
     expect(ctrl.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
     expect(ctrl.destChoices).toEqual([{
-      id: null,
+      id: undefined,
       text: '(try again)'
     }, {
       id: 'Introduction',
