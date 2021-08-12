@@ -348,13 +348,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           .css('width', '24px')
           .css('padding', '0px 0px');
       });
-      let offline = document.createElement('span');
-      offline.innerText = (
-        '* Tools with dark background can not be used when offline.');
-      offline.className = 'cke-offline-warning';
-      offline.style.display = 'none';
-      // eslint-disable-next-line max-len
-      this.elementRef.nativeElement.children[0].children[0].children[0].appendChild(offline);
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')

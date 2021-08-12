@@ -500,53 +500,6 @@ describe('Exploration editor page component', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
   });
-  describe('Checking internet Connection', () => {
-    beforeEach(() => {
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue($q.resolve({}));
-      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
-      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
-        mockOpenEditorTutorialEmitter);
-      spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
-        mockConnectionServiceEmitter);
-      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
-        mockOpenTranslationTutorialEmitter);
-      spyOn(as, 'addInfoMessage');
-      spyOn(as, 'addSuccessMessage');
-      explorationData.is_version_of_draft_valid = false;
-
-      ctrl.$onInit();
-    });
-
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    it('should change status to ONLINE when internet is connected', () => {
-      mockConnectionServiceEmitter.emit(true);
-      $scope.$apply();
-      expect(as.addSuccessMessage).toHaveBeenCalled();
-    });
-
-    it('should change status to OFFLINE when internet disconnects', () => {
-      mockConnectionServiceEmitter.emit(false);
-      $scope.$apply();
-      expect(as.addInfoMessage).toHaveBeenCalled();
-    });
-  });
 
   describe('Checking internet Connection', () => {
     beforeEach(() => {

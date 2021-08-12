@@ -160,6 +160,9 @@ export class ChangeListService implements OnInit {
     if (this.changeListAddedTimeoutId) {
       clearTimeout(this.changeListAddedTimeoutId);
     }
+    this.changeListAddedTimeoutId = setTimeout(() => {
+      this.autosaveChangeListOnChange(this.explorationChangeList);
+    }, this.DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
   }
 
   /**

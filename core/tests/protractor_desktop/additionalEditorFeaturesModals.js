@@ -477,9 +477,7 @@ describe('Full exploration editor', function() {
 
       // Check that the save changes button is clickable when online.
       var saveChangesButton = element(by.css('.protractor-test-save-changes'));
-      await waitFor.elementToBeClickable(
-        saveChangesButton,
-        'Save changes button taking too long to be clickable.');
+      expect(await saveChangesButton.isEnabled()).toEqual(true);
 
       // Set network connection to offline.
       await browser.driver.setNetworkConditions(
@@ -504,9 +502,7 @@ describe('Full exploration editor', function() {
         'Online warning toast message taking too long to appear.');
 
       // Check that the save changes button is clickable when reconnected.
-      await waitFor.elementToBeClickable(
-        saveChangesButton,
-        'Save changes button taking too long to be clickable.');
+      expect(await saveChangesButton.isEnabled()).toEqual(true);
 
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
