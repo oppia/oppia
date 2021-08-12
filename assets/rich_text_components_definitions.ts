@@ -26,6 +26,7 @@ export default {
     "tooltip": "Insert collapsible block",
     "icon_data_url": "/rich_text_components/Collapsible/Collapsible.png",
     "is_complex": true,
+    "requires_internet": false,
     "requires_fs": false,
     "is_block_element": true,
     "customization_arg_specs": [{
@@ -55,6 +56,7 @@ export default {
     "tooltip": "Insert image",
     "icon_data_url": "/rich_text_components/Image/Image.png",
     "is_complex": false,
+    "requires_internet": true,
     "requires_fs": true,
     "is_block_element": true,
     "customization_arg_specs": [{
@@ -96,6 +98,7 @@ export default {
     "tooltip": "Insert link",
     "icon_data_url": "/rich_text_components/Link/Link.png",
     "is_complex": false,
+    "requires_internet": false,
     "requires_fs": false,
     "is_block_element": false,
     "customization_arg_specs": [{
@@ -123,6 +126,7 @@ export default {
     "tooltip": "Insert mathematical formula",
     "icon_data_url": "/rich_text_components/Math/Math.png",
     "is_complex": false,
+    "requires_internet": true,
     "requires_fs": false,
     "is_block_element": false,
     "customization_arg_specs": [{
@@ -146,6 +150,7 @@ export default {
     "tooltip": "Insert Concept Card Link",
     "icon_data_url": "/rich_text_components/Skillreview/Skillreview.png",
     "is_complex": false,
+    "requires_internet": true,
     "requires_fs": false,
     "is_block_element": false,
     "customization_arg_specs": [{
@@ -165,39 +170,6 @@ export default {
       "default_value": ""
     }]
   },
-  "Svgdiagram": {
-    "backend_id": "svgdiagram",
-    "category": "Basic Input",
-    "description": "A custom SVG diagram.",
-    "frontend_id": "svgdiagram",
-    "tooltip": "Insert diagram",
-    "icon_data_url": "/rich_text_components/Svgdiagram/Svgdiagram.png",
-    "is_complex": false,
-    "requires_fs": true,
-    "is_block_element": true,
-    "customization_arg_specs": [{
-      "name": "svg_filename",
-      "description": "The SVG Diagram Editor",
-      "schema": {
-        "type": "custom",
-        "obj_type": "SvgFilename"
-      },
-      "default_value": ""
-    }, {
-      "name": "alt",
-      "description": "Briefly explain this diagram to a visually impaired learner",
-      "schema": {
-        "type": "unicode",
-        "validators": [{
-          "id": "is_nonempty"
-        }],
-        "ui_config": {
-          "placeholder": "Description of the diagram"
-        }
-      },
-      "default_value": ""
-    }]
-  },
   "Tabs": {
     "backend_id": "Tabs",
     "category": "Basic Input",
@@ -206,6 +178,7 @@ export default {
     "tooltip": "Insert tabs (e.g. for hints)",
     "icon_data_url": "/rich_text_components/Tabs/Tabs.png",
     "is_complex": true,
+    "requires_internet": false,
     "requires_fs": false,
     "is_block_element": true,
     "customization_arg_specs": [{
@@ -232,6 +205,7 @@ export default {
     "tooltip": "Insert video",
     "icon_data_url": "/rich_text_components/Video/Video.png",
     "is_complex": false,
+    "requires_internet": true,
     "requires_fs": false,
     "is_block_element": true,
     "customization_arg_specs": [{

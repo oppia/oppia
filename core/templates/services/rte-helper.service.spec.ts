@@ -69,7 +69,8 @@ describe('Rte Helper Service', function() {
       isComplex: true,
       isBlockElement: true,
       requiresFs: false,
-      tooltip: 'Insert collapsible block'
+      tooltip: 'Insert collapsible block',
+      requiresInternet: false
     }, {
       backendId: 'Image',
       customizationArgSpecs: [{
@@ -109,7 +110,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: true,
       requiresFs: true,
-      tooltip: 'Insert image'
+      tooltip: 'Insert image',
+      requiresInternet: true
     }, {
       backendId: 'Link',
       customizationArgSpecs: [{
@@ -134,7 +136,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: false,
       requiresFs: false,
-      tooltip: 'Insert link'
+      tooltip: 'Insert link',
+      requiresInternet: false
     }, {
       backendId: 'Math',
       customizationArgSpecs: [{
@@ -154,7 +157,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: false,
       requiresFs: false,
-      tooltip: 'Insert mathematical formula'
+      tooltip: 'Insert mathematical formula',
+      requiresInternet: true
     }, {
       backendId: 'skillreview',
       customizationArgSpecs: [{
@@ -178,38 +182,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: false,
       requiresFs: false,
-      tooltip: 'Insert Concept Card Link'
-    }, {
-      backendId: 'svgdiagram',
-      customizationArgSpecs: [{
-        name: 'svg_filename',
-        description: 'The SVG Diagram Editor',
-        schema: {
-          type: 'custom',
-          obj_type: 'SvgFilename'
-        },
-        default_value: ''
-      }, {
-        name: 'alt',
-        description: 'Briefly explain this diagram to a visually impaired' +
-        ' learner',
-        schema: {
-          type: 'unicode',
-          validators: [{
-            id: 'is_nonempty'
-          }],
-          ui_config: {
-            placeholder: 'Description of the diagram'
-          }
-        },
-        default_value: ''
-      }],
-      id: 'svgdiagram',
-      iconDataUrl: '/rich_text_components/Svgdiagram/Svgdiagram.png',
-      isComplex: false,
-      isBlockElement: true,
-      requiresFs: true,
-      tooltip: 'Insert diagram'
+      tooltip: 'Insert Concept Card Link',
+      requiresInternet: true
     }, {
       backendId: 'Tabs',
       customizationArgSpecs: [{
@@ -234,7 +208,8 @@ describe('Rte Helper Service', function() {
       isComplex: true,
       isBlockElement: true,
       requiresFs: false,
-      tooltip: 'Insert tabs (e.g. for hints)'
+      tooltip: 'Insert tabs (e.g. for hints)',
+      requiresInternet: false
     }, {
       backendId: 'Video',
       customizationArgSpecs: [{
@@ -283,7 +258,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: true,
       requiresFs: false,
-      tooltip: 'Insert video'
+      tooltip: 'Insert video',
+      requiresInternet: true
     }]);
   });
 
@@ -297,7 +273,6 @@ describe('Rte Helper Service', function() {
     expect(RteHelperService.isInlineComponent('video')).toBe(false);
     expect(RteHelperService.isInlineComponent('tabs')).toBe(false);
     expect(RteHelperService.isInlineComponent('image')).toBe(false);
-    expect(RteHelperService.isInlineComponent('svgdiagram')).toBe(false);
   });
 
   it('should create customization arg dict from attributes', function() {
