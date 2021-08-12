@@ -69,7 +69,7 @@ describe('Player position service', () => {
 
   it('should set displayed index card to given value', () => {
     let callBack = () => {};
-    expect(pps.getDisplayedCardIndex()).toBe(null);
+    expect(pps.getDisplayedCardIndex()).toBeUndefined();
     pps.init(callBack);
     pps.setDisplayedCardIndex(4);
     expect(pps.getDisplayedCardIndex()).toBe(4);
@@ -102,10 +102,10 @@ describe('Player position service', () => {
       }).toThrowError('The callback function has not been initialized');
     });
 
-  it('should not change displayed card index if it is the same as the' +
+  it('should not change displayed card index if it is the same as the ' +
      'previously displayed card index', () => {
     let callBack = () => {};
-    expect(pps.getDisplayedCardIndex()).toBe(null);
+    expect(pps.getDisplayedCardIndex()).toBeUndefined();
     pps.init(callBack);
     pps.setDisplayedCardIndex(4);
     pps.setDisplayedCardIndex(4);
