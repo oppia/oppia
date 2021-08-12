@@ -26,7 +26,7 @@ import feconf
 import python_utils
 
 from types import ModuleType # isort:skip
-from typing import List, Tuple, Optional, Type # isort:skip
+from typing import List, Tuple, Type # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -60,7 +60,7 @@ class Platform(python_utils.OBJECT):
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[str]) -> Tuple[ModuleType,...]:
+            cls, unused_model_names: List[str]) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
 
@@ -81,7 +81,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType,...]:
+    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -410,7 +410,7 @@ class Registry(python_utils.OBJECT):
         return klass
 
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType,...]:
+    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
