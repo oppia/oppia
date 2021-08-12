@@ -66,7 +66,7 @@ describe('ExplorationFooterComponent', () => {
     component.ngOnDestroy();
   });
 
-  it('should initialise component when user open exploration ' +
+  it('should initialise component when user opens exploration ' +
   'player', fakeAsync(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(urlService, 'isIframed').and.returnValue(true);
