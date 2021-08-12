@@ -243,7 +243,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS && newLearnerDashboardPageIsDisplayed">
           <oppia-goals-tab [currentGoals]="topicsToLearn"
                            [editGoals]="allTopics"
-                           [completedGoals]="learntTopics"
+                           [completedGoals]="learntTopicsList"
                            [untrackedTopics]="untrackedTopics"
                            [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                            [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
@@ -251,7 +251,8 @@
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && newLearnerDashboardPageIsDisplayed">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
-                              [partiallyLearntTopicsList]="partiallyLearntTopicsList">
+                              [partiallyLearntTopicsList]="partiallyLearntTopicsList"
+                              [learntTopicsList]="learntTopicsList">
           </oppia-progress-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS && newLearnerDashboardPageIsDisplayed">

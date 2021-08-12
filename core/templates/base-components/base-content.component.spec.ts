@@ -217,11 +217,11 @@ describe('Base Content Component', () => {
     let document = TestBed.inject(DOCUMENT);
     spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError(
-      'Variable mainContentElement is undefined.');
+      'Variable mainContentElement is null.');
   });
 
   it('should show the cookie banner if there is no cookie set', () => {
-    spyOn(cookieService, 'get').and.returnValue(null);
+    spyOn(cookieService, 'get').and.returnValue('');
     expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
   });
 
