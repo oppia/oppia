@@ -172,16 +172,23 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.THANKS.ROUTE,
     loadChildren: () => import('pages/thanks-page/thanks-page.module')
       .then(m => m.ThanksPageModule)
-  }
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE,
+    loadChildren: () => import(
+      'pages/volunteer-page/volunteer-page.module')
+      .then(m => m.VolunteerPageModule)
+  },
 ];
 
 // Register stewards landing pages.
 for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
+  // Redirect old stewards landing pages to volunteer page.
   routes.push({
     path: AppConstants.STEWARDS_LANDING_PAGE.ROUTES[i],
     loadChildren: () => import(
-      'pages/landing-pages/stewards-landing-page/stewards-landing-page.module')
-      .then(m => m.StewardsLandingPageModule)
+      'pages/volunteer-page/volunteer-page.module').then(
+      m => m.VolunteerPageModule)
   });
 }
 
