@@ -381,7 +381,7 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should show toast message to inform when offline and online',
+    'should show a toast message to inform when the user is offline or online',
     async function() {
       await users.createUser('user16@editor.com', 'user16Editor');
 
