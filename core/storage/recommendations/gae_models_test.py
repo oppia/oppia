@@ -20,6 +20,11 @@ from __future__ import unicode_literals
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import recommendations_models
+
 (base_models, recommendations_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.recommendations])
 
@@ -31,7 +36,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
     RECOMMENDATION_2_ID = 'rec_2_id'
     RECOMMENDATION_3_ID = 'rec_3_id'
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             recommendations_models.ExplorationRecommendationsModel
             .get_deletion_policy(),
@@ -41,7 +46,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSimilaritiesModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)

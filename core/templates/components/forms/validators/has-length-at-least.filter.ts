@@ -13,24 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Signup Page.
+ * @fileoverview Validator to check if input has length at
+ * least some value.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-
-@Component({
-  selector: 'oppia-signup-page-root',
-  templateUrl: './signup-page-root.component.html'
-})
-export class SignupPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
-
-  ngOnInit(): void {
-    this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP);
-  }
-}
+angular.module('oppia').filter('hasLengthAtLeast', [function() {
+  return function(input, args) {
+    return (input.length >= args.minValue);
+  };
+}]);
