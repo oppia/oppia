@@ -39,8 +39,8 @@ class ValidateSkillSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for SkillSnapshotMetadataModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        # type: (Any) -> Type[skill_domain.SkillChange]
+    def _get_change_domain_class(self,
+                                 input_model: Any) -> Type[skill_domain.SkillChange]: # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
@@ -58,8 +58,8 @@ class ValidateSkillCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for SkillCommitLogEntryModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        # type: (Any) -> Optional[Type[skill_domain.SkillChange]]
+    def _get_change_domain_class(self,
+                                 input_model: Any) -> Optional[Type[skill_domain.SkillChange]]: # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:

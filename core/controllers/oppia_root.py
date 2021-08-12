@@ -30,14 +30,13 @@ class OppiaRootPage(base.BaseHandler):
        with angular router.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[Text, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[Text, Any] = {
         'GET': {}
-    } # type: Dict[Text, Any]
+    }
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_template( # type: ignore[no-untyped-call]
             'oppia-root.mainpage.html')

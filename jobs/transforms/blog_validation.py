@@ -47,8 +47,8 @@ class ValidateBlogPostModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
 
-    def _get_model_domain_object_instance(self, blog_post_model):
-        # type: (Any) -> blog_domain.BlogPost
+    def _get_model_domain_object_instance(self,
+                                          blog_post_model: Any) -> blog_domain.BlogPost:
         """Returns blog post domain object instance created from the model.
 
         Args:
@@ -69,8 +69,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
             blog_post_model.published_on
         )
 
-    def _get_domain_object_validation_type(self, unused_item):
-        # type: (Any) -> Any
+    def _get_domain_object_validation_type(self, unused_item: Any) -> Any:
         """Returns the type of domain object validation to be performed.
 
         Args:
@@ -93,8 +92,7 @@ class ValidateModelPublishTimestamps(beam.DoFn): # type: ignore[misc]
     """DoFn to check whether created_on and last_updated timestamps are valid.
     """
 
-    def process(self, input_model):
-        # type: (Any) -> Any
+    def process(self, input_model: Any) -> Any:
         """Function that validates that the published timestamp of the blog post
         models is either None or is greater than created on time, is less than
         current datetime and is equal to or greater than the last updated
@@ -134,8 +132,8 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
 
-    def _get_model_domain_object_instance(self, summary_model):
-        # type: (Any) -> blog_domain.BlogPostSummary
+    def _get_model_domain_object_instance(self,
+                                          summary_model: Any) -> blog_domain.BlogPostSummary:
         """Returns blog post domain object instance created from the model.
 
         Args:
@@ -156,8 +154,7 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
             summary_model.published_on
         )
 
-    def _get_domain_object_validation_type(self, unused_item):
-        # type: (Any) -> Any
+    def _get_domain_object_validation_type(self, unused_item: Any) -> Any:
         """Returns the type of domain object validation to be performed.
 
         Args:
@@ -175,8 +172,7 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     blog_models.BlogPostModel)
-def blog_post_model_relationships(model):
-    # type: (Any) -> None
+def blog_post_model_relationships(model: Any) -> None:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostSummaryModel]
     yield model.id, [blog_models.BlogPostRightsModel]
@@ -185,8 +181,7 @@ def blog_post_model_relationships(model):
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     blog_models.BlogPostSummaryModel)
-def blog_post_summary_model_relationships(model):
-    # type: (Any) -> None
+def blog_post_summary_model_relationships(model: Any) -> None:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostRightsModel]
@@ -195,8 +190,7 @@ def blog_post_summary_model_relationships(model):
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     blog_models.BlogPostRightsModel)
-def blog_post_rights_model_relationships(model):
-    # type: (Any) -> None
+def blog_post_rights_model_relationships(model: Any) -> None:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostSummaryModel]

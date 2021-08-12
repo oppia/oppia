@@ -31,8 +31,7 @@ import python_utils
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
-def validate_exploration_change(obj):
-    # type: (Dict[String, Any]) -> None
+def validate_exploration_change(obj: Dict[String, Any]) -> None:
     """Validates exploration change.
 
     Args:
@@ -43,8 +42,7 @@ def validate_exploration_change(obj):
     exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values(obj):
-    # type: (Dict[String, Any]) -> None
+def validate_new_config_property_values(obj: Dict[String, Any]) -> None:
     """Validates new config property values.
 
     Args:
@@ -62,8 +60,7 @@ def validate_new_config_property_values(obj):
         config_property.normalize(value)
 
 
-def validate_change_dict_for_blog_post(change_dict):
-    # type: (Dict[Any, Any]) -> None
+def validate_change_dict_for_blog_post(change_dict: Dict[Any, Any]) -> None:
     """Validates change_dict required for updating values of blog post.
 
     Args:
@@ -87,8 +84,7 @@ def validate_change_dict_for_blog_post(change_dict):
                 'Invalid tags provided. Tags not in default tags list.')
 
 
-def validate_collection_change(obj):
-    # type: (Dict[String, Any]) -> None
+def validate_collection_change(obj: Dict[String, Any]) -> None:
     """Validates collection change.
 
     Args:
@@ -99,8 +95,7 @@ def validate_collection_change(obj):
     collection_domain.CollectionChange(obj)
 
 
-def validate_email_dashboard_data(data):
-    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
+def validate_email_dashboard_data(data: Dict[String, Optional[Union[bool, int]]]) -> None:
     """Validates email dashboard data.
 
     Args:

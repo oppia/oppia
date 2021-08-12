@@ -1913,8 +1913,7 @@ title: Title
             """Always returns mocked_now as the current UTC time."""
 
             @classmethod
-            def utcnow(cls):
-                # type: () -> datetime.datetime
+            def utcnow(cls) -> datetime.datetime:
                 """Returns the mocked datetime."""
                 return mocked_now
 

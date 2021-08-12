@@ -30,8 +30,7 @@ import feconf
 import utils
 
 
-def _get_blog_card_summary_dicts_for_dashboard(summaries):
-    # type: (list[BlogPostSummaries]) -> list[BlogPostSummayDicts]
+def _get_blog_card_summary_dicts_for_dashboard(summaries: list[BlogPostSummaries]) -> list[BlogPostSummayDicts]:
     """Creates summary dicts for use in blog dashboard.
 
     Args:
@@ -75,8 +74,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
 
@@ -114,8 +112,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_blog_dashboard
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Handles POST requests to create a new blog post draft."""
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
@@ -165,8 +162,7 @@ class BlogPostHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self, blog_post_id):
-        # type: (str) -> None
+    def get(self, blog_post_id: str) -> None:
         """Populates the data on the blog dashboard editor page."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
@@ -199,8 +195,7 @@ class BlogPostHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def put(self, blog_post_id):
-        # type: (str) -> None
+    def put(self, blog_post_id: str) -> None:
         """Updates properties of the given blog post."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
@@ -224,8 +219,7 @@ class BlogPostHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def post(self, blog_post_id):
-        # type: (str) -> None
+    def post(self, blog_post_id: str) -> None:
         """Stores thumbnail of the blog post in the datastore."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         raw_image = self.normalized_request.get('image')
@@ -248,8 +242,7 @@ class BlogPostHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_blog_post
-    def delete(self, blog_post_id):
-        # type: (str) -> None
+    def delete(self, blog_post_id: str) -> None:
         """Handles Delete requests."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_services.delete_blog_post(blog_post_id)

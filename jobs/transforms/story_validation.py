@@ -39,8 +39,8 @@ class ValidateStorySnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        # type: (Any) -> Type[story_domain.StoryChange]
+    def _get_change_domain_class(self,
+                                 input_model: Any) -> Type[story_domain.StoryChange]: # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
@@ -58,8 +58,8 @@ class ValidateStoryCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        # type: (Any) -> Optional[Type[story_domain.StoryChange]]
+    def _get_change_domain_class(self,
+                                 input_model: Any) -> Optional[Type[story_domain.StoryChange]]: # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:

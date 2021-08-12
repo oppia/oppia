@@ -28,8 +28,7 @@ from typing import Any, Callable # isort:skip # pylint: disable=unused-import
 CLIENT = datastore.Client()
 
 
-def run_in_transaction_wrapper(fn):
-    # type: (Callable[..., Any]) -> Callable[..., Any]
+def run_in_transaction_wrapper(fn: Callable[..., Any]) -> Callable[..., Any]:
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
 
@@ -44,8 +43,7 @@ def run_in_transaction_wrapper(fn):
         datastore_errors.TransactionFailedError. The transaction failed.
     """
     @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        # type: (*Any, **Any) -> Any
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         """Wrapper for the transaction."""
         with CLIENT.transaction():
             return fn(*args, **kwargs)
