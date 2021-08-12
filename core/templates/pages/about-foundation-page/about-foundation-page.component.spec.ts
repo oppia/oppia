@@ -39,7 +39,7 @@ describe('About foundation page', () => {
   beforeEach(() => {
     const aboutFoundationPageComponent = TestBed.createComponent(
       AboutFoundationPageComponent);
-    component = AboutFoundationPageComponent.componentInstance;
+    component = aboutFoundationPageComponent.componentInstance;
   });
 
   it('should successfully instantiate the component from beforeEach block',
