@@ -113,12 +113,12 @@ def get_filepath_from_filename(filename, rootdir):
     the function returns the complete path of the filename by using
     os.path.join(root, filename).
 
-    For example signup-page.mainpage.html is present in
-    core/templates/pages/signup-page and error-page.mainpage.html is present in
-    core/templates/pages/error-pages. So we walk through core/templates/pages
-    and a match for signup-page.component.html is found in signup-page
-    subdirectory and a match for error-page.directive.html is found in
-    error-pages subdirectory.
+    For example exploration-editor-page.mainpage.html is present in
+    core/templates/pages/exploration-editor-page and error-page.mainpage.html
+    is present in core/templates/pages/error-pages. So we walk through
+    core/templates/pages and a match for exploration-editor-page.component.html
+    is found in exploration-editor-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
 
     Args:
         filename: str. The name of the file.

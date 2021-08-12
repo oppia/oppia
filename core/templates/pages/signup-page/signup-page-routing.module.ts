@@ -13,24 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Signup Page.
+ * @fileoverview Routing module for signup page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { SignupPageRootComponent } from './signup-page-root.component';
 
-@Component({
-  selector: 'oppia-signup-page-root',
-  templateUrl: './signup-page-root.component.html'
-})
-export class SignupPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
 
-  ngOnInit(): void {
-    this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP);
+const routes: Route[] = [
+  {
+    path: '',
+    component: SignupPageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class SignupPageRoutingModule {}

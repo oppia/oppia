@@ -121,7 +121,6 @@ module.exports = {
       '/pages/release-coordinator-page/release-coordinator-page.import.ts'),
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.import.ts',
-    signup: commonPrefix + '/pages/signup-page/signup-page.import.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.import.ts',
@@ -495,17 +494,6 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['signup'],
-      filename: 'signup-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Sign up for Oppia and begin exploring a new subject.'
-      },
-      template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

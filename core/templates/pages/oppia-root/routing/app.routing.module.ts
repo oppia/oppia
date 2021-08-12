@@ -76,6 +76,11 @@ const routes: Route[] = [
       .then(m => m.PrivacyPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.ROUTE,
+    loadChildren: () => import('pages/signup-page/signup-page.module')
+      .then(m => m.SignupPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE,
     loadChildren: () => import('pages/teach-page/teach-page.module')
       .then(m => m.TeachPageModule)
