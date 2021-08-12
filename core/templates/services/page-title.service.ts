@@ -70,11 +70,11 @@ export class PageTitleService {
     this.pageSubtitleForMobile = subtitle;
   }
 
-  getPageTitleForMobileView(): string | null {
+  getPageTitleForMobileView(): string {
     return this.pageTitleForMobile;
   }
 
-  getPageSubtitleForMobileView(): string | null {
+  getPageSubtitleForMobileView(): string {
     return this.pageSubtitleForMobile;
   }
 }
