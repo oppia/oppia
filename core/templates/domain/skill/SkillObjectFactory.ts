@@ -43,6 +43,7 @@ import { ValidatorsService } from 'services/validators.service';
 import constants from 'assets/constants';
 
 export class Skill {
+  // TODO(#13637): Remove the use of interstitial skill object
   // 'SkillId' and 'supersedingSkillId' will be null when creating
   // interstitial Skill.
   _id: string | null;
