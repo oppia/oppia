@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Mock angular object for pages that don't use AngularJS.
+ * @fileoverview Common imports reqired in all oppia pages.
  */
 
 import 'core-js/es7/reflect';
@@ -23,4 +23,4 @@ import 'zone.js';
 import 'pages/mock-ajs';
 import 'Polyfills.ts';
 
-
+require('google-analytics.initializer.ts');
