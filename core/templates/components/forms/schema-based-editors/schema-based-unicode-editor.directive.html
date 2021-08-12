@@ -1,25 +1,28 @@
 <span>
   <textarea ng-if="!$ctrl.getCodingMode() && $ctrl.getRows()"
+            class="form-control"
             ng-model="$ctrl.localValue"
-            rows="<[$ctrl.getRows()]>"
-            placeholder="<[$ctrl.getPlaceholder()]>"
             ng-disabled="$ctrl.isDisabled()"
-            class="form-control" focus-on="<[$ctrl.labelForFocusTarget()]>"
             ng-blur="$ctrl.onInputBlur()"
-            ng-focus="$ctrl.onInputFocus()">
+            ng-focus="$ctrl.onInputFocus()"
+            focus-on="<[$ctrl.labelForFocusTarget()]>"
+            placeholder="<[$ctrl.getPlaceholder()]>"
+            apply-validation validators="$ctrl.validators()"
+            ng-keypress="$ctrl.onKeypress($event)"
+            rows="<[$ctrl.getRows()]>">
   </textarea>
 
   <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
     <input type="text"
-           ng-disabled="$ctrl.isDisabled()"
            class="form-control display-inline"
            ng-model="$ctrl.localValue"
+           ng-disabled="$ctrl.isDisabled()"
            ng-blur="$ctrl.onInputBlur()"
            ng-focus="$ctrl.onInputFocus()"
            focus-on="<[$ctrl.labelForFocusTarget()]>"
-           ng-keypress="$ctrl.onKeypress($event)"
            placeholder="<[$ctrl.getPlaceholder()]>"
            apply-validation validators="$ctrl.validators()"
+           ng-keypress="$ctrl.onKeypress($event)"
            aria-label="text input">
   </span>
 
