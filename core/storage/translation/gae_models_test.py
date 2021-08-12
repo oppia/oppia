@@ -22,24 +22,34 @@ from __future__ import unicode_literals
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import translation_models
+
 (base_models, translation_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.translation])
 
 
 class MachineTranslationModelTests(test_utils.GenericTestBase):
-    def test_create_model(self):
+    def test_create_model(self) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='es',
             source_text='hello world',
             translated_text='hola mundo'
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_id is not None
         translation_model = (
             translation_models.MachineTranslationModel.get(model_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_model is not None
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
     def test_create_model_with_same_source_target_language_codes_returns_none(
-            self):
+            self
+    ) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='en',
@@ -48,7 +58,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(model_id)
 
-    def test_get_machine_translation_with_existing_translation(self):
+    def test_get_machine_translation_with_existing_translation(self) -> None:
         translation_models.MachineTranslationModel.create(
             source_language_code='en',
             target_language_code='es',
@@ -64,10 +74,13 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNotNone(translation)
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation is not None
         self.assertEqual(translation.translated_text, 'hola mundo')
 
     def test_get_machine_translation_with_no_existing_translation_returns_none(
-            self):
+            self
+    ) -> None:
         translation = (
             translation_models.MachineTranslationModel
             .get_machine_translation(
@@ -78,12 +91,14 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(translation)
 
-    def test_get_deletion_policy_not_applicable(self):
+    def test_get_deletion_policy_not_applicable(self) -> None:
         self.assertEqual(
             translation_models.MachineTranslationModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_model_association_to_user_not_corresponding_to_user(self):
+    def test_get_model_association_to_user_not_corresponding_to_user(
+            self
+    ) -> None:
         self.assertEqual(
             (
                 translation_models.MachineTranslationModel
@@ -91,7 +106,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             ),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_get_export_policy_not_applicable(self):
+    def test_get_export_policy_not_applicable(self) -> None:
         self.assertEqual(
             translation_models.MachineTranslationModel.get_export_policy(),
             {

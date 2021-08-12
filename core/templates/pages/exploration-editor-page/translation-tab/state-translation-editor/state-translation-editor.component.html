@@ -1,6 +1,6 @@
 <div class="oppia-translated-content-header">Translated content</div>
 <div class="oppia-state-translation-editor-section oppia-editor-card-section">
-  <div ng-if="!translationEditorIsOpen" class="clearfix">
+  <div ng-if="!translationEditorIsOpen">
     <button class="btn oppia-translation-needs-update-button" ng-if="activeWrittenTranslation.needsUpdate">
       <i class="material-icons md-18"
          uib-tooltip="Translation needs update"
@@ -41,12 +41,6 @@
       <div class="oppia-translation-editable-mask oppia-editable-section-mask">
       </div>
     </div>
-    <button ng-if="activeWrittenTranslation.needsUpdate === false"
-            type="button"
-            class="btn btn-secondary mt-4 float-right"
-            ng-click="markAsNeedingUpdate()">
-      Mark translation as needing update
-    </button>
   </div>
 
   <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
