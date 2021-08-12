@@ -53,11 +53,6 @@ describe('Oppia landing pages tour', function() {
     await waitFor.pageToFullyLoad();
   });
 
-  it('should visit the Volunteers landing page', async function() {
-    await browser.get('/volunteers');
-    await waitFor.pageToFullyLoad();
-  });
-
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
@@ -218,6 +213,14 @@ describe('Static Pages Tour', function() {
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
+  });
+
+  it('should visit the Volunteer page', async function() {
+    await browser.get('/volunteer');
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-volunteer-page')),
+      'Volunteer page taking too long to appear');
   });
 
   it('should show the error page when an incorrect url is given',

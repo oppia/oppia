@@ -2343,16 +2343,33 @@ class TranslatableItem(python_utils.OBJECT):
     DATA_FORMAT_UNICODE_STRING = 'unicode'
     DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
     DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+    CONTENT_TYPE_CONTENT = 'content'
+    CONTENT_TYPE_INTERACTION = 'interaction'
+    CONTENT_TYPE_RULE = 'rule'
+    CONTENT_TYPE_FEEDBACK = 'feedback'
+    CONTENT_TYPE_HINT = 'hint'
+    CONTENT_TYPE_SOLUTION = 'solution'
 
-    def __init__(self, content, data_format):
+    def __init__(
+            self, content, data_format, content_type, interaction_id=None,
+            rule_type=None):
         """Initializes a TranslatableItem domain object.
 
         Args:
             content: str|list(str). The translatable content text.
             data_format: str. The data format of the translatable content.
+            content_type: str. One of `Content`, `Interaction`, ‘Rule`,
+                `Feedback`, `Hint`, `Solution`.
+            interaction_id: str|None. Interaction ID, e.g. `TextInput`, if the
+                content corresponds to an InteractionInstance, else None.
+            rule_type: str|None. Rule type if content_type == `Rule`, e.g.
+                “Equals”, “IsSubsetOf”, “Contains” else None.
         """
         self.content = content
         self.data_format = data_format
+        self.content_type = content_type
+        self.interaction_id = interaction_id
+        self.rule_type = rule_type
 
     def to_dict(self):
         """Returns a dict representing this TranslatableItem domain object.
@@ -2362,7 +2379,10 @@ class TranslatableItem(python_utils.OBJECT):
         """
         return {
             'content': self.content,
-            'data_format': self.data_format
+            'data_format': self.data_format,
+            'content_type': self.content_type,
+            'interaction_id': self.interaction_id,
+            'rule_type': self.rule_type
         }
 
 
@@ -2761,7 +2781,7 @@ class State(python_utils.OBJECT):
         Args:
             content_id: str. The id of the content.
             language_code: str. The language code of the translated html.
-            translation: str. The translated content.
+            translation: str|list(str). The translated content.
             data_format: str. The data format of the translated content.
         """
         written_translation = WrittenTranslation(
@@ -3102,10 +3122,6 @@ class State(python_utils.OBJECT):
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
-        Note: Currently, we don't support interaction translation through
-        contributor dashboard, this method only returns content which are
-        translatable through the contributor dashboard.
-
         Returns:
             dict(str, TranslatableItem). Returns a dict with key as content
             id and TranslatableItem as value with the appropriate data
@@ -3115,7 +3131,9 @@ class State(python_utils.OBJECT):
 
         content_id_to_translatable_item[self.content.content_id] = (
             TranslatableItem(
-                self.content.html, TranslatableItem.DATA_FORMAT_HTML))
+                self.content.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_CONTENT))
 
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
@@ -3125,7 +3143,8 @@ class State(python_utils.OBJECT):
                 default_outcome.feedback.content_id
             ] = TranslatableItem(
                 default_outcome.feedback.html,
-                TranslatableItem.DATA_FORMAT_HTML)
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_FEEDBACK)
 
         for answer_group in self.interaction.answer_groups:
             if answer_group.outcome.feedback.html != '':
@@ -3133,7 +3152,34 @@ class State(python_utils.OBJECT):
                     answer_group.outcome.feedback.content_id
                 ] = TranslatableItem(
                     answer_group.outcome.feedback.html,
-                    TranslatableItem.DATA_FORMAT_HTML)
+                    TranslatableItem.DATA_FORMAT_HTML,
+                    TranslatableItem.CONTENT_TYPE_FEEDBACK)
+            # As of Aug 2021, only TextInput and SetInput have translatable rule
+            # inputs.
+            if self.interaction.id not in ['TextInput', 'SetInput']:
+                continue
+            for rule_spec in answer_group.rule_specs:
+                for input_value in rule_spec.inputs.values():
+                    if 'normalizedStrSet' in input_value:
+                        content_id_to_translatable_item[
+                            input_value['contentId']
+                        ] = TranslatableItem(
+                            input_value['normalizedStrSet'],
+                            TranslatableItem
+                            .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+                            TranslatableItem.CONTENT_TYPE_RULE,
+                            self.interaction.id,
+                            rule_spec.rule_type)
+                    if 'unicodeStrSet' in input_value:
+                        content_id_to_translatable_item[
+                            input_value['contentId']
+                        ] = TranslatableItem(
+                            input_value['unicodeStrSet'],
+                            TranslatableItem
+                            .DATA_FORMAT_SET_OF_UNICODE_STRING,
+                            TranslatableItem.CONTENT_TYPE_RULE,
+                            self.interaction.id,
+                            rule_spec.rule_type)
 
         for hint in self.interaction.hints:
             if hint.hint_content.html != '':
@@ -3141,7 +3187,8 @@ class State(python_utils.OBJECT):
                     hint.hint_content.content_id
                 ] = TranslatableItem(
                     hint.hint_content.html,
-                    TranslatableItem.DATA_FORMAT_HTML)
+                    TranslatableItem.DATA_FORMAT_HTML,
+                    TranslatableItem.CONTENT_TYPE_HINT)
 
         solution = self.interaction.solution
         if solution is not None and solution.explanation.html != '':
@@ -3149,7 +3196,8 @@ class State(python_utils.OBJECT):
                 solution.explanation.content_id
             ] = TranslatableItem(
                 solution.explanation.html,
-                TranslatableItem.DATA_FORMAT_HTML)
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_SOLUTION)
 
         for ca_dict in self.interaction.customization_args.values():
             subtitled_htmls = ca_dict.get_subtitled_html()
@@ -3162,7 +3210,9 @@ class State(python_utils.OBJECT):
                         subtitled_html.content_id
                     ] = TranslatableItem(
                         html_string,
-                        TranslatableItem.DATA_FORMAT_HTML)
+                        TranslatableItem.DATA_FORMAT_HTML,
+                        TranslatableItem.CONTENT_TYPE_INTERACTION,
+                        self.interaction.id)
 
             subtitled_unicodes = ca_dict.get_subtitled_unicode()
             for subtitled_unicode in subtitled_unicodes:
@@ -3171,7 +3221,9 @@ class State(python_utils.OBJECT):
                         subtitled_unicode.content_id
                     ] = TranslatableItem(
                         subtitled_unicode.unicode_str,
-                        TranslatableItem.DATA_FORMAT_UNICODE_STRING)
+                        TranslatableItem.DATA_FORMAT_UNICODE_STRING,
+                        TranslatableItem.CONTENT_TYPE_INTERACTION,
+                        self.interaction.id)
 
         return content_id_to_translatable_item
 

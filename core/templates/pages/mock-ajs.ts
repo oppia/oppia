@@ -26,6 +26,9 @@
  * that don't use AngularJS.
  */
 
+// TODO(#13619): Move this Google Analytics require elsewhere.
+require('google-analytics.initializer.ts');
+
 // TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 
 import { VERSION } from '@angular/core';
