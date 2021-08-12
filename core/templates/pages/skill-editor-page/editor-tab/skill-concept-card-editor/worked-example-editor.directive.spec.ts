@@ -24,8 +24,9 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WorkedExample, WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 
-describe('Worked example editor directive', function() {
+fdescribe('Worked example editor directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -33,6 +34,10 @@ describe('Worked example editor directive', function() {
   let directive = null;
   let UndoRedoService = null;
   let $uibModal = null;
+  let workedExampleObjectFactory: WorkedExampleObjectFactory = null;
+
+  let example1: WorkedExampleBackendDict = null;
+  let workedExample1: WorkedExample = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -51,15 +56,33 @@ describe('Worked example editor directive', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('workedExampleEditorDirective')[0];
 
+    workedExampleObjectFactory = $injector.get('WorkedExampleObjectFactory');
+    UndoRedoService = $injector.get('UndoRedoService');
+    UndoRedoService = $injector.get('UndoRedoService');
+    UndoRedoService = $injector.get('UndoRedoService');
+    UndoRedoService = $injector.get('UndoRedoService');
+
+    example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1',
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1',
+      },
+    };
+
+    workedExample1 = workedExampleObjectFactory.createFromBackendDict(example1);
+
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope
     });
-    ctrl.$onInit();
   }));
 
-  it('should initialize the letiables', function() {
-    expect($scope.selectedTopic).toEqual(null);
-    expect($scope.subtopicName).toEqual(null);
+  it('should set properties when initialized', function() {
+    $scope.workedExample = workedExample1;
+    ctrl.$onInit();
   });
 });
