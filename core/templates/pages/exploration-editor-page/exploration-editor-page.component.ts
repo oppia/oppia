@@ -149,7 +149,7 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
-require('services/connection-service.service.ts');
+require('services/internet-connectivity.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 
@@ -172,7 +172,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'FocusManagerService', 'GraphDataService',
+    'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
@@ -195,7 +195,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        FocusManagerService, GraphDataService,
+        FocusManagerService, GraphDataService, InternetConnectivityService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
@@ -280,7 +280,6 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
 
-          ctrl.alertsService = AlertsService;
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
           ctrl.explorationObjectiveService = ExplorationObjectiveService;
@@ -499,8 +498,7 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        ctrl.connectionService.checkNetworkState();
-        ctrl.connectionService.checkInternetState();
+        InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
@@ -510,7 +508,7 @@ angular.module('oppia').component('explorationEditorPage', {
           )
         );
         ctrl.directiveSubscriptions.add(
-          ConnectionService.onInternetStateChange.subscribe(
+          InternetConnectivityService.onInternetStateChange.subscribe(
             internetAccessible => {
               if (internetAccessible) {
                 AlertsService.addSuccessMessage(

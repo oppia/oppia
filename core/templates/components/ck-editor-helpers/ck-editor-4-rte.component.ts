@@ -22,7 +22,7 @@ import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
-import { ConnectionService } from 'services/connection-service.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { Subscription } from 'rxjs';
 
 interface UiConfig {
@@ -40,10 +40,7 @@ interface RteConfig extends CKEDITOR.config {
 
 @Component({
   selector: 'ck-editor-4-rte',
-  template: '<div><div></div>' +
-            '<div contenteditable="true" ' +
-            'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
-            '</div></div>',
+  templateUrl: './ck-editor-4-rte.component.html',
   styleUrls: []
 })
 export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
@@ -55,7 +52,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
-  internetRequiringComponents: string[] = [];
+  connectedToInternet = true;
+  componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
   componentRe = (
@@ -65,7 +63,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private elementRef: ElementRef,
-    private connectionService: ConnectionService
+    private internetConnectivityService: InternetConnectivityService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
     this.subscriptions = new Subscription();
@@ -73,12 +71,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.connectionService.onInternetStateChange.subscribe(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
           if (internetAccessible) {
             this.enableRTEicons();
+            this.connectedToInternet = internetAccessible;
           } else {
             this.disableRTEicons();
+            this.connectedToInternet = internetAccessible;
           }
         }));
   }
@@ -217,7 +217,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
-    this.internetRequiringComponents = [];
+    this.componentsThatRequireInternet = [];
 
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
@@ -233,7 +233,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         icons.push(componentDefn.iconDataUrl);
       }
       if (componentDefn.requiresInternet) {
-        this.internetRequiringComponents.push(componentDefn.id);
+        this.componentsThatRequireInternet.push(componentDefn.id);
       }
     });
 
@@ -396,7 +396,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         $('.cke_combo_button')
           .css('display', 'none');
       }
-      if (!this.connectionService.isOnline()) {
+      if (!this.internetConnectivityService.isOnline()) {
+        this.connectedToInternet = false;
         this.disableRTEicons();
       }
       ck.setData(this.wrapComponents(this.value));
@@ -454,30 +455,24 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
   disableRTEicons(): void {
     // Add disabled cursor pointer to the icons.
-    // TODO(#12882): Remove the use of jQuery.
-    this.internetRequiringComponents.forEach((name) => {
-      $('.cke_button__oppia' + name)
-        .css('background-color', '#cccccc')
-        .css('pointer-events', 'none');
+    this.componentsThatRequireInternet.forEach((name) => {
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '#cccccc';
+        buttons[i].style.pointerEvents = 'none';
+      }
     });
-    let offline = this.elementRef.nativeElement.getElementsByClassName(
-      'cke-offline-warning');
-    for (let i = 0; i < offline.length; i++) {
-      offline[i].style.display = 'block';
-    }
   }
   enableRTEicons(): void {
-    // TODO(#12882): Remove the use of jQuery.
-    this.internetRequiringComponents.forEach((name) => {
-      $('.cke_button__oppia' + name)
-        .css('background-color', '')
-        .css('pointer-events', '');
+    this.componentsThatRequireInternet.forEach((name) => {
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '';
+        buttons[i].style.pointerEvents = '';
+      }
     });
-    let offline = this.elementRef.nativeElement.getElementsByClassName(
-      'cke-offline-warning');
-    for (let i = 0; i < offline.length; i++) {
-      offline[i].style.display = 'none';
-    }
   }
 
   ngOnDestroy(): void {

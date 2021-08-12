@@ -60,7 +60,7 @@ describe('Exploration save and publish buttons component', function() {
   let changeListService: ChangeListService = null;
   var $uibModal = null;
   var contextService = null;
-  var cns = null;
+  var ics = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
   var explorationWarningsService = null;
@@ -128,7 +128,7 @@ describe('Exploration save and publish buttons component', function() {
     var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
-    cns = $injector.get('ConnectionService');
+    ics = $injector.get('InternetConnectivityService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
@@ -137,7 +137,7 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue($q.resolve({
         canPublish: true
       }));
-    spyOnProperty(cns, 'onInternetStateChange').and.returnValue(
+    spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
       mockConnectionServiceEmitter);
     spyOn(explorationSaveService, 'saveChanges').and
       .callFake((showCallback, hideCallback) => {
@@ -156,7 +156,7 @@ describe('Exploration save and publish buttons component', function() {
     ctrl = $componentController('explorationSaveAndPublishButtons', {
       $scope: $scope,
       $uibModal: $uibModal,
-      ConnectionService: cns,
+      InternetConnectivityService: ics,
       EditabilityService: editabilityService,
       UserExplorationPermissionsService: userExplorationPermissionsService
     });
@@ -391,16 +391,21 @@ describe('Exploration save and publish buttons component', function() {
 
   it('should change connnection status to ONLINE when internet is connected',
     () => {
-      $scope.isOffline = true;
+      $scope.connectedToInternet = false;
       mockConnectionServiceEmitter.emit(true);
       $scope.$apply();
-      expect($scope.isOffline).toBe(false);
+      expect($scope.connectedToInternet).toBe(true);
     });
+
   it('should change connnection status to OFFLINE when internet disconnects',
     () => {
-      $scope.isOffline = false;
+      $scope.connectedToInternet = true;
       mockConnectionServiceEmitter.emit(false);
       $scope.$apply();
-      expect($scope.isOffline).toBe(true);
+      expect($scope.connectedToInternet).toBe(false);
+      expect($scope.getSaveButtonTooltip()).toBe(
+        'You can not save the exploration when offline.');
+      expect($scope.getPublishExplorationButtonTooltip()).toBe(
+        'You can not publish the exploration when offline.');
     });
 });

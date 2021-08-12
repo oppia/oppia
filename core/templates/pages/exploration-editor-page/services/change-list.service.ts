@@ -29,7 +29,7 @@ import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConnectionService } from 'services/connection-service.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
 @Injectable({
   providedIn: 'root'
@@ -91,17 +91,15 @@ export class ChangeListService implements OnInit {
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-    private connectionService: ConnectionService,
+    private internetConnectivityService: InternetConnectivityService,
   ) {
-    this.connectionService.onInternetStateChange.subscribe(
+    this.internetConnectivityService.onInternetStateChange.subscribe(
       internetAccessible => {
-        if (internetAccessible) {
-          if (this.temporaryListOfChanges.length > 0) {
-            for (let change of this.temporaryListOfChanges) {
-              this.addChange(change);
-            }
-            this.temporaryListOfChanges = [];
+        if (internetAccessible && this.temporaryListOfChanges.length > 0) {
+          for (let change of this.temporaryListOfChanges) {
+            this.addChange(change);
           }
+          this.temporaryListOfChanges = [];
         }
       });
   }
@@ -152,18 +150,15 @@ export class ChangeListService implements OnInit {
     if (this.loadingMessage) {
       return;
     }
-    if (!this.connectionService.isOnline()) {
+    if (!this.internetConnectivityService.isOnline()) {
       this.temporaryListOfChanges.push(changeDict);
-    } else {
-      this.explorationChangeList.push(changeDict);
-      this.undoneChangeStack = [];
-      this.autosaveInProgressEventEmitter.emit(true);
-      if (this.changeListAddedTimeoutId) {
-        clearTimeout(this.changeListAddedTimeoutId);
-      }
-      this.changeListAddedTimeoutId = setTimeout(() => {
-        this.autosaveChangeListOnChange(this.explorationChangeList);
-      }, this.DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
+      return;
+    }
+    this.explorationChangeList.push(changeDict);
+    this.undoneChangeStack = [];
+    this.autosaveInProgressEventEmitter.emit(true);
+    if (this.changeListAddedTimeoutId) {
+      clearTimeout(this.changeListAddedTimeoutId);
     }
   }
 
