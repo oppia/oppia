@@ -22,6 +22,14 @@ import datetime
 from core.platform import models
 import feconf
 
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Tuple, Union, cast)
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 
@@ -156,21 +164,22 @@ class GeneralSuggestionModel(base_models.BaseModel):
         default=False, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
         author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple unshared instance since there
         are multiple suggestions per user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -190,7 +199,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralSuggestionModel exists for the user.
 
         Args:
@@ -203,11 +212,23 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.author_id == user_id, cls.final_reviewer_id == user_id
         )).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create(
-            cls, suggestion_type, target_type, target_id,
-            target_version_at_submission, status, author_id, final_reviewer_id,
-            change_cmd, score_category, thread_id, language_code):
+            cls,
+            suggestion_type: str,
+            target_type: str,
+            target_id: str,
+            target_version_at_submission: int,
+            status: str,
+            author_id: str,
+            final_reviewer_id: str,
+            change_cmd: Dict[str, Any],
+            score_category: str,
+            thread_id: str,
+            language_code: Optional[str]
+    ) -> None:
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -247,7 +268,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category=score_category, language_code=language_code).put()
 
     @classmethod
-    def query_suggestions(cls, query_fields_and_values):
+    def query_suggestions(
+            cls, query_fields_and_values: List[Tuple[str, str]]
+    ) -> List['GeneralSuggestionModel']:
         """Queries for suggestions.
 
         Args:
@@ -266,11 +289,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 raise Exception('Not allowed to query on field %s' % field)
             query = query.filter(getattr(cls, field) == value)
 
-        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return cast(
+            List[GeneralSuggestionModel],
+            query.fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
-            cls, exp_id, language_code):
+            cls, exp_id: str, language_code: str
+    ) -> List['GeneralSuggestionModel']:
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
@@ -284,7 +310,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             with target_id of exp_id. The number of returned results is capped
             by feconf.DEFAULT_QUERY_LIMIT.
         """
-        return (
+        return cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.language_code == language_code)
@@ -295,7 +322,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
+    def get_translation_suggestion_ids_with_exp_ids(
+            cls, exp_ids: List[str]
+    ) -> List[str]:
         """Gets the ids of translation suggestions corresponding to
         explorations with the given exploration ids.
 
@@ -317,7 +346,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_models = []
         offset, more = (0, True)
         while more:
-            results = query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset)
+            results = cast(
+                List[GeneralSuggestionModel],
+                query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset))
             if len(results):
                 offset = offset + len(results)
                 suggestion_models.extend(results)
@@ -326,7 +357,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
-    def get_all_stale_suggestion_ids(cls):
+    def get_all_stale_suggestion_ids(cls) -> List[str]:
         """Gets the ids of the suggestions which were last updated before the
         threshold time.
 
@@ -336,13 +367,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
-        suggestion_models = cls.get_all().filter(
-            cls.status == STATUS_IN_REVIEW).filter(
-                cls.last_updated < threshold_time).fetch()
+        suggestion_models = cast(
+            List[GeneralSuggestionModel],
+            cls.get_all().filter(
+                cls.status == STATUS_IN_REVIEW).filter(
+                    cls.last_updated < threshold_time).fetch())
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
-    def get_suggestions_waiting_too_long_for_review(cls):
+    def get_suggestions_waiting_too_long_for_review(
+            cls
+    ) -> List['GeneralSuggestionModel']:
         """Returns a list of suggestions that have been waiting for a review
         longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
         Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
@@ -364,7 +399,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
-        return (
+        return cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.last_updated < threshold_time)
@@ -375,13 +411,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(
-            cls, score_categories, user_id):
+            cls, score_categories: List[str], user_id: str
+    ) -> List['GeneralSuggestionModel']:
         """Gets all suggestions which are in review in the given
         score_categories.
 
         Args:
             score_categories: list(str). List of score categories to query for.
-            user_id: list(str). The id of the user trying to make this query.
+            user_id: str. The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
 
@@ -393,13 +430,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
 
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
-            cls.score_category.IN(score_categories)).filter(
-                cls.author_id != user_id).fetch(
-                    feconf.DEFAULT_QUERY_LIMIT)
+        return cast(
+            List[GeneralSuggestionModel],
+            cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+                cls.score_category.IN(score_categories)).filter(
+                    cls.author_id != user_id).fetch(
+                        feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_in_review_translation_suggestions(cls, user_id, language_codes):
+    def get_in_review_translation_suggestions(
+            cls, user_id: str, language_codes: List[str]
+    ) -> List['GeneralSuggestionModel']:
         """Gets all translation suggestions which are in review.
 
         Args:
@@ -412,7 +453,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which are in review, but not created by the given user.
         """
-        return (
+        return cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(
@@ -422,7 +464,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_in_review_question_suggestions(cls, user_id):
+    def get_in_review_question_suggestions(
+            cls, user_id: str
+    ) -> List['GeneralSuggestionModel']:
         """Gets all question suggestions which are in review.
 
         Args:
@@ -434,7 +478,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which are in review, but not created by the given user.
         """
-        return (
+        return cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
@@ -442,7 +487,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_question_suggestions_waiting_longest_for_review(cls):
+    def get_question_suggestions_waiting_longest_for_review(
+            cls
+    ) -> List['GeneralSuggestionModel']:
         """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
         of question suggestions, sorted in descending order by review wait
         time.
@@ -452,7 +499,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sorted in descending order based on how long the suggestions have
             been waiting for review.
         """
-        return (
+        return cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
@@ -462,7 +510,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_waiting_longest_for_review(
-            cls, language_code):
+            cls, language_code: str
+    ) -> List['GeneralSuggestionModel']:
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
         sorted in descending order by review wait time.
@@ -476,7 +525,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sorted in descending order based on how long the suggestions have
             been waiting for review.
         """
-        return (
+        return cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(
@@ -488,7 +538,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
-            cls, suggestion_type, user_id):
+            cls, suggestion_type: str, user_id: str
+    ) -> List['GeneralSuggestionModel']:
         """Gets all suggestions of suggestion_type which the user has created.
 
         Args:
@@ -499,24 +550,32 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which the given user has created.
         """
-        return cls.get_all().filter(
-            cls.suggestion_type == suggestion_type).filter(
-                cls.author_id == user_id).order(-cls.created_on).fetch(
-                    feconf.DEFAULT_QUERY_LIMIT)
+        return cast(
+            List[GeneralSuggestionModel],
+            cls.get_all().filter(
+                cls.suggestion_type == suggestion_type).filter(
+                    cls.author_id == user_id).order(-cls.created_on).fetch(
+                        feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
-    def get_all_score_categories(cls):
+    def get_all_score_categories(cls) -> List[str]:
         """Gets all the score categories for which suggestions have been
         created.
 
         Returns:
             list(str). A list of all the score categories.
         """
-        query_set = cls.query(projection=['score_category'], distinct=True)
+        query_set = cast(
+            List[GeneralSuggestionModel],
+            cls.query(projection=['score_category'], distinct=True))
         return [data.score_category for data in query_set]
 
+    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(
+            cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, bool, Dict[str, Any], None]]]:
         """Exports the data from GeneralSuggestionModel
         into dict format for Takeout.
 
@@ -528,7 +587,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        suggestion_models = (
+        suggestion_models = cast(
+            List[GeneralSuggestionModel],
             cls.get_all()
             .filter(cls.author_id == user_id).fetch())
 
@@ -585,14 +645,14 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     rejection_message = datastore_services.TextProperty()
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
         author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether GeneralVoiceoverApplicationModel exists for the user.
 
         Args:
@@ -606,7 +666,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_user_voiceover_applications(cls, author_id, status=None):
+    def get_user_voiceover_applications(
+            cls, author_id: str, status: Optional[str] = None
+    ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application submitted by the given user.
 
         Args:
@@ -621,13 +683,20 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
-            return cls.query(datastore_services.all_of(
-                cls.author_id == author_id, cls.status == status)).fetch()
+            voiceover_application_query = cls.query(
+                datastore_services.all_of(
+                    cls.author_id == author_id, cls.status == status))
         else:
-            return cls.query(cls.author_id == author_id).fetch()
+            voiceover_application_query = cls.query(cls.author_id == author_id)
+
+        return cast(
+            List[GeneralVoiceoverApplicationModel],
+            voiceover_application_query.fetch())
 
     @classmethod
-    def get_reviewable_voiceover_applications(cls, user_id):
+    def get_reviewable_voiceover_applications(
+            cls, user_id: str
+    ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application which a given user can
         review.
 
@@ -640,12 +709,19 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             applications which the given user can review.
         """
-        return cls.query(datastore_services.all_of(
-            cls.author_id != user_id,
-            cls.status == STATUS_IN_REVIEW)).fetch()
+        return cast(
+            List[GeneralVoiceoverApplicationModel],
+            cls.query(datastore_services.all_of(
+                cls.author_id != user_id,
+                cls.status == STATUS_IN_REVIEW)).fetch())
 
     @classmethod
-    def get_voiceover_applications(cls, target_type, target_id, language_code):
+    def get_voiceover_applications(
+            cls,
+            target_type: str,
+            target_id: str,
+            language_code: str
+    ) -> List['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover applications submitted for a give entity
         in a given language.
 
@@ -659,19 +735,22 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             application which is submitted to a give entity in a given language.
         """
-        return cls.query(datastore_services.all_of(
-            cls.target_type == target_type, cls.target_id == target_id,
-            cls.language_code == language_code)).fetch()
+        return cast(
+            List[GeneralVoiceoverApplicationModel],
+            cls.query(datastore_services.all_of(
+                cls.target_type == target_type, cls.target_id == target_id,
+                cls.language_code == language_code)).fetch())
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple voiceover applications relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -688,7 +767,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         })
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, Optional[str]]]:
         """(Takeout) Exports the data from GeneralVoiceoverApplicationModel
         into dict format.
 
@@ -700,7 +779,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         user_data = dict()
 
-        voiceover_models = (
+        voiceover_models = cast(
+            List[GeneralVoiceoverApplicationModel],
             cls.query(cls.author_id == user_id).fetch())
 
         for voiceover_model in voiceover_models:
@@ -744,15 +824,19 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     question_suggestion_count = (
         datastore_services.IntegerProperty(required=True))
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls):
+    def get(cls) -> Optional['CommunityContributionStatsModel']: # type: ignore[override]
         """Gets the CommunityContributionStatsModel instance. If the
         CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            CommunityContributionStatsModel. The single model instance.
+            CommunityContributionStatsModel|None. The single model instance,
+            or None if no such model instance exists.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
@@ -776,12 +860,13 @@ class CommunityContributionStatsModel(base_models.BaseModel):
                     COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
 
     @classmethod
-    def get_deletion_policy(cls):
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """This model only contains general statistical information about the
         contributor dashboard and does not include any individual user
         information.
@@ -789,7 +874,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user
         because the data is aggregated.
         """
@@ -854,12 +939,19 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, language_code, contributor_user_id, topic_id,
-            submitted_translations_count, submitted_translation_word_count,
-            accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count,
-            accepted_translation_word_count, rejected_translations_count,
-            rejected_translation_word_count, contribution_dates):
+            cls,
+            language_code: str,
+            contributor_user_id: str,
+            topic_id: str,
+            submitted_translations_count: int,
+            submitted_translation_word_count: int,
+            accepted_translations_count: int,
+            accepted_translations_without_reviewer_edits_count: int,
+            accepted_translation_word_count: int,
+            rejected_translations_count: int,
+            rejected_translation_word_count: int,
+            contribution_dates: List[datetime.date]
+    ) -> str:
         """Creates a new TranslationContributionStatsModel instance and returns
         its ID.
         """
@@ -885,7 +977,8 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code, contributor_user_id, topic_id):
+            language_code: str, contributor_user_id: str, topic_id: str
+    ) -> str:
         """Generates a unique ID for a TranslationContributionStatsModel
         instance.
 
@@ -903,21 +996,29 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             '%s.%s.%s' % (language_code, contributor_user_id, topic_id)
         )
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls, language_code, contributor_user_id, topic_id):
+    def get( # type: ignore[override]
+            cls, language_code: str, contributor_user_id: str, topic_id: str
+    ) -> Optional['TranslationContributionStatsModel']:
         """Gets the TranslationContributionStatsModel matching the supplied
         language_code, contributor_user_id, topic_id.
 
         Returns:
-            TranslationContributionStatsModel. The matching
-            TranslationContributionStatsModel.
+            TranslationContributionStatsModel|None. The matching
+            TranslationContributionStatsModel, or None if no such model
+            instance exists.
         """
         entity_id = cls.generate_id(
             language_code, contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
     @classmethod
-    def get_all_by_user_id(cls, user_id):
+    def get_all_by_user_id(
+            cls, user_id: str
+    ) -> List['TranslationContributionStatsModel']:
         """Gets all TranslationContributionStatsModels matching the supplied
         user_id.
 
@@ -925,14 +1026,15 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             list(TranslationContributionStatsModel). The matching
             TranslationContributionStatsModels.
         """
-        return (
+        return cast(
+            List[TranslationContributionStatsModel],
             cls.get_all()
             .filter(cls.contributor_user_id == user_id)
             .fetch(feconf.DEFAULT_QUERY_LIMIT)
         )
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether TranslationContributionStatsModel references the
         supplied user.
 
@@ -947,19 +1049,20 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         ).get(keys_only=True) is not None
 
     @classmethod
-    def get_deletion_policy(cls):
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model contains corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple languages and topics relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'language_code':
@@ -988,17 +1091,22 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         })
 
     @classmethod
-    def apply_deletion_policy(cls, user_id):
+    def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete instances of TranslationContributionStatsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
         datastore_services.delete_multi(
-            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
+            cast(
+                List[datastore_services.Key],
+                cls.query(
+                    cls.contributor_user_id == user_id).fetch(keys_only=True)))
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(
+            cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
         """Exports the data from TranslationContributionStatsModel into dict
         format for Takeout.
 
@@ -1009,7 +1117,8 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             dict. Dictionary of the data from TranslationContributionStatsModel.
         """
         user_data = dict()
-        stats_models = (
+        stats_models = cast(
+            List[TranslationContributionStatsModel],
             cls.get_all()
             .filter(cls.contributor_user_id == user_id).fetch())
         for model in stats_models:
