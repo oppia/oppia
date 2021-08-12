@@ -149,6 +149,8 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/internet-connectivity.service.ts');
+require('services/alerts.service.ts');
 require('services/user.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
@@ -157,7 +159,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$uibModal',
+    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -170,7 +172,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'FocusManagerService', 'GraphDataService',
+    'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
@@ -180,7 +182,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $uibModal,
+        $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -193,7 +195,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        FocusManagerService, GraphDataService,
+        FocusManagerService, GraphDataService, InternetConnectivityService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
@@ -203,6 +205,8 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         UserService, WindowDimensionsService) {
       var ctrl = this;
+      var reconnectedMessageTimeoutMilliseconds = 4000;
+      var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
 
@@ -274,6 +278,7 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+
 
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
@@ -493,6 +498,7 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
+        InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
@@ -500,6 +506,22 @@ angular.module('oppia').component('explorationEditorPage', {
               $rootScope.$applyAsync();
             }
           )
+        );
+        ctrl.directiveSubscriptions.add(
+          InternetConnectivityService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              if (internetAccessible) {
+                AlertsService.addSuccessMessage(
+                  'Reconnected. Checking whether your changes are mergeable.',
+                  reconnectedMessageTimeoutMilliseconds);
+              } else {
+                AlertsService.addInfoMessage(
+                  'Looks like you are offline. ' +
+                  'You can continue working, and can save ' +
+                  'your changes once reconnected.',
+                  disconnectedMessageTimeoutMilliseconds);
+              }
+            })
         );
         ctrl.directiveSubscriptions.add(
           ChangeListService.autosaveIsInProgress$.subscribe(

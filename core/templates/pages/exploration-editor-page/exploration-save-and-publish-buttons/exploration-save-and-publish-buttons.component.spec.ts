@@ -60,6 +60,7 @@ describe('Exploration save and publish buttons component', function() {
   let changeListService: ChangeListService = null;
   var $uibModal = null;
   var contextService = null;
+  var ics = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
   var explorationWarningsService = null;
@@ -67,6 +68,7 @@ describe('Exploration save and publish buttons component', function() {
   var userExplorationPermissionsService = null;
 
   var mockExternalSaveEventEmitter = null;
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -126,6 +128,7 @@ describe('Exploration save and publish buttons component', function() {
     var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
+    ics = $injector.get('InternetConnectivityService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
@@ -134,6 +137,8 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue($q.resolve({
         canPublish: true
       }));
+    spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
+      mockConnectionServiceEmitter);
     spyOn(explorationSaveService, 'saveChanges').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
@@ -151,6 +156,7 @@ describe('Exploration save and publish buttons component', function() {
     ctrl = $componentController('explorationSaveAndPublishButtons', {
       $scope: $scope,
       $uibModal: $uibModal,
+      InternetConnectivityService: ics,
       EditabilityService: editabilityService,
       UserExplorationPermissionsService: userExplorationPermissionsService
     });
@@ -382,4 +388,24 @@ describe('Exploration save and publish buttons component', function() {
     expect($uibModal.open).not.toHaveBeenCalled();
     expect($scope.saveChanges).not.toHaveBeenCalled();
   });
+
+  it('should change connnection status to ONLINE when internet is connected',
+    () => {
+      $scope.connectedToInternet = false;
+      mockConnectionServiceEmitter.emit(true);
+      $scope.$apply();
+      expect($scope.connectedToInternet).toBe(true);
+    });
+
+  it('should change connnection status to OFFLINE when internet disconnects',
+    () => {
+      $scope.connectedToInternet = true;
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect($scope.connectedToInternet).toBe(false);
+      expect($scope.getSaveButtonTooltip()).toBe(
+        'You can not save the exploration when offline.');
+      expect($scope.getPublishExplorationButtonTooltip()).toBe(
+        'You can not publish the exploration when offline.');
+    });
 });

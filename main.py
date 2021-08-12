@@ -96,6 +96,21 @@ datastore_services = models.Registry.import_datastore_services()
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
+class InternetConnectivityHandler(base.BaseHandler):
+    """Handles the get request to the server from the
+    frontend to check for internet connection."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
+
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self):
+        # type: () -> None
+        """Handles GET requests."""
+        self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
+
+
 class FrontendErrorHandler(base.BaseHandler):
     """Handles errors arising from the frontend."""
 
@@ -175,7 +190,8 @@ URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
-
+    get_redirect_route(
+        r'/internetconnectivityhandler', InternetConnectivityHandler),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),

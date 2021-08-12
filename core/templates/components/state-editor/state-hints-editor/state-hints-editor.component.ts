@@ -131,8 +131,8 @@ angular.module('oppia').component('stateHintsEditor', {
         ExternalSaveService.onExternalSave.emit();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/add-hint-modal.template.html'),
           backdrop: 'static',
           resolve: {},
@@ -154,8 +154,8 @@ angular.module('oppia').component('stateHintsEditor', {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/delete-last-hint-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
@@ -179,8 +179,8 @@ angular.module('oppia').component('stateHintsEditor', {
 
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/delete-hint-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'

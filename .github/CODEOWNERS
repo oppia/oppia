@@ -296,6 +296,8 @@
 /core/templates/services/contextual/url.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-dimensions.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
+/core/templates/services/internet-connectivity.service*.ts @srijanreddy98
+/core/templates/services/server-connection-backend-api.service*.ts @srijanreddy98
 
 
 # Global stylesheet.
@@ -530,6 +532,7 @@
 
 
 # Rich text editor team.
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @aks681
 /core/templates/components/ck-editor-helpers/ckeditor4.module.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681

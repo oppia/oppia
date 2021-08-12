@@ -29,6 +29,7 @@ import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,8 @@ export class ChangeListService implements OnInit {
   // undone change.
   ndoneChangeStack = [];
   loadingMessage: string = '';
+  // Temporary list of the changes made to the exploration when offline.
+  temporaryListOfChanges: ExplorationChange[] = [];
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -88,7 +91,18 @@ export class ChangeListService implements OnInit {
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-  ) {}
+    private internetConnectivityService: InternetConnectivityService,
+  ) {
+    this.internetConnectivityService.onInternetStateChange.subscribe(
+      internetAccessible => {
+        if (internetAccessible && this.temporaryListOfChanges.length > 0) {
+          for (let change of this.temporaryListOfChanges) {
+            this.addChange(change);
+          }
+          this.temporaryListOfChanges = [];
+        }
+      });
+  }
 
   ngOnInit(): void {
     this.loaderService.onLoadingMessageChange.subscribe(
@@ -134,6 +148,10 @@ export class ChangeListService implements OnInit {
 
   private addChange(changeDict: ExplorationChange) {
     if (this.loadingMessage) {
+      return;
+    }
+    if (!this.internetConnectivityService.isOnline()) {
+      this.temporaryListOfChanges.push(changeDict);
       return;
     }
     this.explorationChangeList.push(changeDict);
