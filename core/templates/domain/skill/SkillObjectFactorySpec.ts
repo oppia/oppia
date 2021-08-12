@@ -229,21 +229,6 @@ describe('Skill object factory', () => {
     expect(skill.getRubricExplanations('difficult')).toBe(null);
   });
 
-  it('should be able to create an interstitial skill', () => {
-    let skill = skillObjectFactory.createInterstitialSkill();
-    expect(skill.getId()).toEqual(null);
-    expect(skill.getDescription()).toEqual('Skill description loading');
-    expect(skill.getMisconceptions()).toEqual([]);
-    expect(skill.getRubrics()).toEqual([]);
-    expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactory.createInterstitialConceptCard());
-    expect(skill.getLanguageCode()).toEqual('en');
-    expect(skill.getVersion()).toEqual(1);
-    expect(skill.getSupersedingSkillId()).toEqual(null);
-    expect(skill.getAllQuestionsMerged()).toEqual(false);
-    expect(skill.getPrerequisiteSkillIds()).toEqual([]);
-  });
-
   it('should get misconception id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getMisconceptionId(0)).toBe('2');

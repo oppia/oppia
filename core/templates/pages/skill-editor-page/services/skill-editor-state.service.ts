@@ -27,7 +27,7 @@ import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillRights } from 'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
@@ -47,7 +47,6 @@ export class SkillEditorStateService {
     private alertsService: AlertsService,
     private questionsListService: QuestionsListService,
     private skillBackendApiService: SkillBackendApiService,
-    private skillObjectFactory: SkillObjectFactory,
     private skillRightsBackendApiService: SkillRightsBackendApiService,
     private loaderService: LoaderService,
     private undoRedoService: UndoRedoService,
@@ -70,10 +69,12 @@ export class SkillEditorStateService {
   private _skillChangedEventEmitter = new EventEmitter();
 
   private _setSkill = (skill: Skill) => {
-    if (this._skill) {
-      this._skill.copyFromSkill(skill);
-    } else {
+    if (!this._skill) {
+      // The skill is set directly for the first load.
       this._skill = skill;
+    } else {
+      // For every other load.
+      this._skill.copyFromSkill(skill);
     }
     this._skillIsInitialized = true;
     this._skillChangedEventEmitter.emit();
@@ -116,10 +117,12 @@ export class SkillEditorStateService {
   };
 
   private _setSkillRights = (skillRights: SkillRights) => {
-    if (this._skillRights) {
-      this._skillRights.copyFromSkillRights(skillRights);
-    } else {
+    if (!this._skillRights) {
+      // The skillRights is set directly for the first load.
       this._skillRights = skillRights;
+    } else {
+      // For every other load.
+      this._skillRights.copyFromSkillRights(skillRights);
     }
   };
 

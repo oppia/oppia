@@ -22,7 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillObjectFactory, SkillBackendDict } from 'domain/skill/SkillObjectFactory';
+import { SkillObjectFactory, SkillBackendDict, Skill } from 'domain/skill/SkillObjectFactory';
+import { ConceptCard } from './ConceptCardObjectFactory';
 
 describe('Skill backend API service', () => {
   let httpTestingController: HttpTestingController;
@@ -99,7 +100,10 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
-    skills.push(skillObjectFactory.createInterstitialSkill().toBackendDict());
+    const skill = new Skill(
+      'id1', 'description', [], [], {} as ConceptCard, 'en',
+      1, 0, 'id1', false, []);
+    skills.push(skill.toBackendDict());
     skillBackendApiService.fetchAllSkills().toPromise().then(
       res => {
         expect(res).toEqual(skills);

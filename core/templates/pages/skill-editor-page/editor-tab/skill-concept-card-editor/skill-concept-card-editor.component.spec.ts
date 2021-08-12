@@ -23,11 +23,12 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { EventEmitter } from '@angular/core';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('Skill editor main tab Component', function() {
@@ -38,7 +39,6 @@ describe('Skill editor main tab Component', function() {
   let $uibModal = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillUpdateService: SkillUpdateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
   let windowDimensionsService: WindowDimensionsService = null;
   let urlInterpolationService: UrlInterpolationService;
   let mockEventEmitter = new EventEmitter();
@@ -74,12 +74,13 @@ describe('Skill editor main tab Component', function() {
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     skillEditorStateService = $injector.get('SkillEditorStateService');
-    skillObjectFactory = $injector.get('SkillObjectFactory');
     skillUpdateService = $injector.get('SkillUpdateService');
     windowDimensionsService = $injector.get('WindowDimensionsService');
     urlInterpolationService = $injector.get('UrlInterpolationService');
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    sampleSkill = new Skill(
+      'id1', 'description', [], [], {} as ConceptCard, 'en',
+      1, 0, 'id1', false, []);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);

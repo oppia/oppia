@@ -247,12 +247,6 @@ export class SkillObjectFactory {
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private validatorService: ValidatorsService) {
   }
-  createInterstitialSkill(): Skill {
-    return new Skill(
-      null, 'Skill description loading',
-      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
-      'en', 1, 0, null, false, []);
-  }
 
   hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
