@@ -138,7 +138,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-editor.directive.ts',
     'story-node-editor.directive.ts',
     'story-node.model.ts',
-    'story-update.service.ts',
     'student.ts',
     'subtopic-summary-tile.component.ts',
     'subtopic.model.ts',
