@@ -19,6 +19,7 @@
 
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
+var driver = browser.driver;
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
@@ -58,22 +59,6 @@ var LearnerDashboardPage = function() {
         '.protractor-test-story-name-in-learner-story-summary-tile'));
   var topicNamesInLearnerTopicSummaryTiles =
       element.all(by.css('.protractor-test-learner-topic-summary-tile-title'));
-  var explorationTileInIncompleteSection = (
-    element(by.css(
-      '.protractor-test-incomplete-community-lessons-section')).$(
-      '.protractor-test-exp-summary-tile-title'));
-  var explorationTileInCompleteSection = (
-    element(by.css(
-      '.protractor-test-completed-community-lessons-section')).$(
-      '.protractor-test-exp-summary-tile-title'));
-  var collectionTileInIncompleteSection = (
-    element(by.css(
-      '.protractor-test-incomplete-community-lessons-section')).$(
-      '.protractor-test-collection-summary-tile-title'));
-  var collectionTileInCompleteSection = (
-    element(by.css(
-      '.protractor-test-completed-community-lessons-section')).$(
-      '.protractor-test-collection-summary-tile-title'));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
@@ -237,29 +222,33 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
     async function(explorationTitle) {
       await this.navigateToCommunityLessonsSection();
-      expect(explorationTileInIncompleteSection.getText()).toMatch(
-        explorationTitle);
+      await (await driver.findElement(by.css(
+        '.protractor-test-incomplete-community-lessons-section')));
+      await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
     });
 
   this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
-    expect(explorationTileInCompleteSection.getText()).toMatch(
-      explorationTitle);
+    await (await driver.findElement(by.css(
+      '.protractor-test-completed-community-lessons-section')));
+    await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
   };
 
   this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    expect(collectionTileInIncompleteSection.getText()).toMatch(
-      collectionTitle);
+    await (await driver.findElement(by.css(
+      '.protractor-test-incomplete-community-lessons-section')));
+    await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
   };
 
   this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    expect(collectionTileInCompleteSection.getText()).toMatch(
-      collectionTitle);
+    await (await driver.findElement(by.css(
+      '.protractor-test-completed-community-lessons-section')));
+    await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
   };
 };
 
