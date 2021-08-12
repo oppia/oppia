@@ -56,7 +56,7 @@ def validate_new_config_property_values(new_config_property_value_dicts):
 
     Returns:
         dict(str, any). Returns new_config_property_value_dicts
-            after validation.
+        after validation.
     """
     for (name, value) in new_config_property_value_dicts.items():
         if not isinstance(name, python_utils.BASESTRING):
