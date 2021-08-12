@@ -434,6 +434,10 @@ describe('Full exploration editor', function() {
           download_throughput: 0,
           upload_throughput: 0});
 
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Offline warning toast message taking too long to appear.');
+
       // Add a content change to check changes can be done when offline.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
@@ -461,7 +465,8 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should disable save changes buttons when offline',
+    'should disable and enable save changes buttons when ' +
+    'offline and online respectively',
     async function() {
       await users.createUser('user18@editor.com', 'user18Editor');
 
@@ -487,6 +492,10 @@ describe('Full exploration editor', function() {
           download_throughput: 0,
           upload_throughput: 0});
 
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Offline warning toast message taking too long to appear.');
+
       // Check that the save changes button is not clickable when offline.
       expect(await saveChangesButton.isEnabled()).toEqual(false);
 
@@ -502,7 +511,9 @@ describe('Full exploration editor', function() {
         'Online warning toast message taking too long to appear.');
 
       // Check that the save changes button is clickable when reconnected.
-      expect(await saveChangesButton.isEnabled()).toEqual(true);
+      await waitFor.elementToBeClickable(
+        saveChangesButton,
+        'Save changes button taking too long to be clickable.');
 
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
