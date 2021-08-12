@@ -170,7 +170,7 @@
     "core/templates/domain/exploration/answer-stats.model.ts",
     "core/templates/domain/exploration/answer-stats.model.spec.ts",
     "core/templates/domain/exploration/exploration-draft.model.ts",
-    "core/templates/domain/exploration/exploration-draft.model.spec.ts",    
+    "core/templates/domain/exploration/exploration-draft.model.spec.ts",
     "core/templates/domain/exploration/exploration-id-validation.service.ts",
     "core/templates/domain/exploration/exploration-id-validation.service.spec.ts",
     "core/templates/domain/exploration/exploration-metadata.model.ts",
@@ -470,15 +470,11 @@
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/messenger.service.ts",
-<<<<<<< HEAD
     "core/templates/services/messenger.service.spec.ts",
-    "core/templates/services/page-title.service.ts",
-    "core/templates/services/page-title.service.spec.ts",
-=======
-    "core/templates/services/messenger.service.spec.ts",    
     "core/templates/services/navigation.service.ts",
     "core/templates/services/navigation.service.spec.ts",
->>>>>>> upstream/develop
+    "core/templates/services/page-title.service.ts",
+    "core/templates/services/page-title.service.spec.ts",
     "core/templates/services/platform-feature.service.ts",
     "core/templates/services/platform-feature.service.spec.ts",
     "core/templates/services/playthrough-issues-backend-api.service.ts",
