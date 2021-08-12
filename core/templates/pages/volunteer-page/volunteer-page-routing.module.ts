@@ -13,13 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root Component for stewards landing page.
+ * @fileoverview Routing module for volunteer page.
  */
 
-import { Component } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { VolunteerPageRootComponent } from './volunteer-page-root.component';
 
-@Component({
-  selector: 'oppia-stewards-landing-page-root',
-  templateUrl: './stewards-landing-page-root.component.html'
+const routes: Route[] = [
+  {
+    path: '',
+    component: VolunteerPageRootComponent
+  }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
 })
-export class StewardsLandingPageRootComponent {}
+
+export class VolunteerPageRoutingModule {}

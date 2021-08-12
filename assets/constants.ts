@@ -6138,6 +6138,11 @@ export default {
           "CONTENT": "Thank you for donating to The Oppia Foundation!"
         }
       ]
+    },
+    "VOLUNTEER": {
+      "ROUTE": "volunteer",
+      "TITLE": "Volunteer | Oppia",
+      "META": []
     }
   },
 
