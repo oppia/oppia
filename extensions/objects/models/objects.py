@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import json
 import copy
 
 from constants import constants
@@ -1711,20 +1712,18 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
 
-class ConvertCommaSepearatedStringsToProperList(BaseObject):
-    """Converts comma seperated values into proper list of strings."""
+class ConvertStringifiedListToProperList(BaseObject):
+    """Converts stringified list to proper list of strings."""
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
-
         Args:
-            raw: *. String representing comma seperated values.
-
+            raw: str. Strings to be validated and normalized.
         Returns:
-            list(str). Normalizes the comma seperated values to list of strings.
+            list(str). The normalized list of strings.
         """
         if not isinstance(raw, python_utils.BASESTRING):
             raise Exception('Expected string received %s' % raw)
 
-        return raw.split(',')
+        return json.loads(raw)

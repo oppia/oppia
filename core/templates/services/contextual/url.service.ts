@@ -182,7 +182,7 @@ export class UrlService {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
     if (pathname.match(/\/practice/g) && queryStrings.length === 2) {
-      return decodeURIComponent(queryStrings[1]);
+      return JSON.stringify(decodeURIComponent(queryStrings[1]).split(','));
     }
     throw new Error('Invalid URL for practice session');
   }

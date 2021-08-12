@@ -57,7 +57,7 @@ class MockQuestionBackendApiService {
   }
 }
 
-describe('Practice tab component', function() {
+fdescribe('Practice tab component', function() {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
@@ -151,7 +151,9 @@ describe('Practice tab component', function() {
     component.openNewPracticeSession();
 
     expect(windowRef.nativeWindow.location.href).toBe(
-      '/learn/classroom_1/topic_1/practice/session?selected_subtopic_ids=1');
+      '/learn/classroom_1/topic_1/practice/session?' +
+      'selected_subtopic_ids=%5B1%5D'
+    );
   });
 
   it('should check if questions exist for the selected subtopics',
@@ -173,7 +175,9 @@ describe('Practice tab component', function() {
     component.openNewPracticeSession();
 
     expect(windowRef.nativeWindow.location.href).toBe(
-      '/learn/classroom_1/topic_1/practice/session?selected_subtopic_ids=1');
+      '/learn/classroom_1/topic_1/practice/session?' +
+      'selected_subtopic_ids=%5B1%5D'
+    );
   });
 
   it('should return background for progress of a subtopic', () => {

@@ -214,7 +214,7 @@ describe('Url Service', () => {
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(
       urlService.getSelectedSubtopicsFromUrl()
-    ).toBe('abcdefgijklm');
+    ).toBe('["abcdefgijklm"]');
     mockLocation.pathname = '/topic/abcdefgijklm';
     expect(function() {
       urlService.getSelectedSubtopicsFromUrl();

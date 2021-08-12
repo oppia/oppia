@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import json
 import inspect
 import re
 
@@ -1320,20 +1321,16 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
             ['1', '2'])
 
 
-class ConvertCommaSepearatedStringsToProperListTests(
-    test_utils.GenericTestBase):
+class ConvertStringifiedListToProperListTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
-        comma_sepreated_ids = '1,2,3'
-        invalid_type_id = 1
+        list_of_ids = ['0', '1']
         with self.assertRaisesRegexp(
-            Exception, 'Expected string received %s' % invalid_type_id
-        ):
-            objects.ConvertCommaSepearatedStringsToProperList.normalize(
-                invalid_type_id)
+            Exception, 'Expected string received 2'):
+            objects.ConvertStringifiedListToProperList.normalize(2)
 
         self.assertEqual(
-            objects.ConvertCommaSepearatedStringsToProperList.normalize(
-                comma_sepreated_ids),
-            ['1', '2', '3']
+            objects.ConvertStringifiedListToProperList.normalize(
+                json.dumps(list_of_ids)),
+            list_of_ids
         )
