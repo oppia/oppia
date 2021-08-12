@@ -185,7 +185,7 @@ def main():
             'but it is missing.'
             .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
-    if protractor_test_suites != ci_suite_names:
+    if set(protractor_test_suites) != set(ci_suite_names):
         raise Exception(
             'Protractor test suites and CI test suites are not in sync. '
             'Following suites are not in sync: {}'.format(

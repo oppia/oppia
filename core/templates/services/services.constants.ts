@@ -73,4 +73,13 @@ export const ServicesConstants = {
     '/createhandler/state_answer_stats/<exploration_id>',
 
   RTE_COMPONENT_SPECS: RTE_COMPONENT_SPECS,
+
+  MESSENGER_PAYLOAD: {
+    HEIGHT_CHANGE: 'heightChange',
+    EXPLORATION_LOADED: 'explorationLoaded',
+    STATE_TRANSITION: 'stateTransition',
+    EXPLORATION_RESET: 'explorationReset',
+    EXPLORATION_COMPLETED: 'explorationCompleted'
+  },
+
 } as const;

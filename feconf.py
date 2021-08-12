@@ -25,7 +25,10 @@ import os
 
 from constants import constants
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, NewType, Union # isort:skip # pylint: disable=unused-import
+
+CommandType = (
+    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -42,9 +45,13 @@ DEBUG = False
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
-if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
-        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
-    raise Exception('DEV_MODE can\'t be true on production.')
+if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+    server_software = os.getenv('SERVER_SOFTWARE')
+    if (
+            server_software and
+            not server_software.startswith(('Development', 'gunicorn'))
+    ):
+        raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -333,19 +340,19 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS = {
+DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
-} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
+}
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS = {
+DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
     }
-} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -413,7 +420,7 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 }
 
 # Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
+XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
@@ -423,8 +430,7 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
-def get_empty_ratings():
-    # type: () -> Dict[Text, int]
+def get_empty_ratings() -> Dict[str, int]:
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -475,6 +481,13 @@ ES_PASSWORD = None
 # redis.conf.
 REDISHOST = 'localhost'
 REDISPORT = 6379
+
+# The DB numbers for various Redis instances that Oppia uses. Do not reuse these
+# if you're creating a new Redis client.
+OPPIA_REDIS_DB_INDEX = 0
+CLOUD_NDB_REDIS_DB_INDEX = 1
+STORAGE_EMULATOR_REDIS_DB_INDEX = 2
+
 
 # NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
 # project id when switching to the prod server.
@@ -900,6 +913,8 @@ STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+# This should be synchronized with SUBTOPIC_MASTERY_DATA_URL_TEMPLATE
+# in app.constants.ts.
 SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
@@ -1180,15 +1195,6 @@ RTE_CONTENT_SPEC = {
     }
 }
 
-# A dict representing available landing pages, having subject as a key and list
-# of topics as the value.
-# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
-# oppia constant defined in
-# core/templates/pages/landing-pages/TopicLandingPage.js file.
-AVAILABLE_LANDING_PAGES = {
-    'math': ['fractions', 'negative-numbers', 'ratios']
-}
-
 # Classroom page names for generating URLs. These need to be kept in sync with
 # CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
@@ -1271,7 +1277,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1313,8 +1319,9 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'user_id_attribute_names': []
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS)
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
+    COMMON_RIGHTS_ALLOWED_COMMANDS
+)
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
@@ -1355,7 +1362,7 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],

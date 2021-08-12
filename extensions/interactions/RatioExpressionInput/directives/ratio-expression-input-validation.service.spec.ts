@@ -108,7 +108,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     }, 'RatioExpressionInput');
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -252,18 +252,6 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch non-integer value for # terms', () => {
     customizationArgs.numberOfTerms.value = 1.5;
-    warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'The number of terms should be a non-negative integer other than 1.')
-    }]);
-  });
-
-  it('should catch undefined value for # terms', () => {
-    customizationArgs.numberOfTerms.value = undefined;
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
