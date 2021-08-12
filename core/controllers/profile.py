@@ -310,7 +310,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.render_template('signup-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):

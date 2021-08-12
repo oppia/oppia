@@ -90,20 +90,20 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        exploration = (
+        self.exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['State 1'].update_content(
+        self.exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exploration.states['State 2'].update_content(
+        self.exploration.states['State 2'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exploration.states['State 3'].update_content(
+        self.exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
+        exp_services._save_exploration(self.editor_id, self.exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
@@ -121,7 +121,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # Create some suggestions in the backend.
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            self.exploration.version,
             self.author_id, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -132,7 +133,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'change to state 1')
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            self.exploration.version,
             self.author_id_2, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -143,7 +145,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'change to state 2')
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            self.exploration.version,
             self.author_id_2, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -160,8 +163,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': 'exp1',
-                'target_version_at_submission': exploration.version,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 3',
@@ -776,6 +779,36 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
 
+    def test_set_of_strings_translation_suggestion_creation(self):
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': ['test1', 'test2'],
+                    'data_format': 'set_of_normalized_string',
+                },
+                'description': 'description',
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        suggestions = self.get_json(
+            '%s?author_id=%s&target_type=%s&target_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.translator_id,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            )['suggestions']
+        self.assertEqual(len(suggestions), 2)
+
     def test_update_suggestion_updates_translation_html(self):
         self.login(self.TRANSLATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -885,7 +918,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'The parameter \'translation_html\' should be a string.')
+            'The parameter \'translation_html\' should be a string or a list.')
         self.logout()
 
     def test_update_suggestion_updates_question_suggestion_content(self):
