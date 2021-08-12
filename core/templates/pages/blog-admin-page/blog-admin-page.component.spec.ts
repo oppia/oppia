@@ -106,10 +106,8 @@ describe('Blog Admin Page component ', () => {
     blogAdminBackendApiService = TestBed.inject(BlogAdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
-    startTaskSpy = spyOn(adminTaskManagerService, 'startTask')
-      .and.returnValue();
-    finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask')
-      .and.returnValue();
+    startTaskSpy = spyOn(adminTaskManagerService, 'startTask');
+    finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask');
     spyOn(blogAdminBackendApiService, 'getDataAsync')
       .and.resolveTo(blogAdminPageData);
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');

@@ -110,6 +110,8 @@ export class BlogAdminPageComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.backendApiService.updateUserRoleAsync(
       // Update role button will not be enabled if 'newRole' is 'null'.
+      // hence whenever this method is called 'newRole' will exist and
+      // we can safely typecast it to a 'string'.
       <string>formResponse.newRole, formResponse.username,
     ).then(() => {
       this.statusMessage = (

@@ -30,6 +30,7 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
+  // TODO(#13637): Remove the use of interstitial blog post
   // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
   // blog post that is displayed in the editor until the actual
   // is fetched from the backend.

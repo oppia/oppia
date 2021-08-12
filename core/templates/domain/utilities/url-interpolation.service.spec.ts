@@ -82,7 +82,7 @@ describe('URL Interpolation Service', () => {
       // This throws "Type 'string' is not assignable to type
       // 'InterpolationValuesType'." We need to suppress this error
       // because of the need to test validations.
-      // @ts-ignore
+      // @ts-expect-error
       uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', 'value')
     ).toThrowError(
       'Expected an object of interpolation values to be passed into ' +
@@ -91,7 +91,7 @@ describe('URL Interpolation Service', () => {
       // This throws "Type 'string[]' is not assignable to type
       // 'InterpolationValuesType'." We need to suppress this error
       // because of the need to test validations.
-      // @ts-ignore
+      // @ts-expect-error
       uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', ['value'])
     ).toThrowError(
       'Expected an object of interpolation values to be passed into ' +
@@ -231,7 +231,7 @@ describe('URL Interpolation Service', () => {
     // This throws "Type 'number' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
     // validations on invalid parameters.
-    // @ts-ignore
+    // @ts-expect-error
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: 0
     })).toThrowError(
@@ -240,7 +240,7 @@ describe('URL Interpolation Service', () => {
     // This throws "Type '{}' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
     // validations on invalid parameters.
-    // @ts-ignore
+    // @ts-expect-error
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: {}
     })).toThrowError(
@@ -249,7 +249,7 @@ describe('URL Interpolation Service', () => {
     // This throws "Type '[]' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
     // validations on invalid parameters.
-    // @ts-ignore
+    // @ts-expect-error
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: []
     })).toThrowError(
@@ -258,7 +258,7 @@ describe('URL Interpolation Service', () => {
     // This throws "Type 'RegExp' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
     // validations on invalid parameters.
-    // @ts-ignore
+    // @ts-expect-error
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: /abc/
     })).toThrowError(
