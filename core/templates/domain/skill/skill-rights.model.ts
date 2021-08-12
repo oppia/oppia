@@ -38,7 +38,7 @@ export class SkillRights {
       skillRightsBackendDict.can_edit_skill_description);
   }
 
-  getSkillId(): string | null {
+  getSkillId(): string {
     return this._skillId;
   }
 
