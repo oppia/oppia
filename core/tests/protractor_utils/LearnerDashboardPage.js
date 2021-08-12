@@ -58,6 +58,22 @@ var LearnerDashboardPage = function() {
         '.protractor-test-story-name-in-learner-story-summary-tile'));
   var topicNamesInLearnerTopicSummaryTiles =
       element.all(by.css('.protractor-test-learner-topic-summary-tile-title'));
+  var explorationTileInIncompleteSection = (
+    element(by.css(
+      '.protractor-test-incomplete-community-lessons-section')).$(
+      '.protractor-test-exp-summary-tile-title'));
+  var explorationTileInCompleteSection = (
+    element(by.css(
+      '.protractor-test-completed-community-lessons-section')).$(
+      '.protractor-test-exp-summary-tile-title'));
+  var collectionTileInIncompleteSection = (
+    element(by.css(
+      '.protractor-test-incomplete-community-lessons-section')).$(
+      '.protractor-test-collection-summary-tile-title'));
+  var collectionTileInCompleteSection = (
+    element(by.css(
+      '.protractor-test-completed-community-lessons-section')).$(
+      '.protractor-test-collection-summary-tile-title'));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
@@ -221,25 +237,29 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
     async function(explorationTitle) {
       await this.navigateToCommunityLessonsSection();
-      await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
+      expect(explorationTileInIncompleteSection.getText()).toMatch(
+        explorationTitle);
     });
 
   this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
+    expect(explorationTileInCompleteSection.getText()).toMatch(
+      explorationTitle);
   };
 
   this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
+    expect(collectionTileInIncompleteSection.getText()).toMatch(
+      collectionTitle);
   };
 
   this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
+    expect(collectionTileInCompleteSection.getText()).toMatch(
+      collectionTitle);
   };
 };
 
