@@ -420,7 +420,7 @@ export class AdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-    newConfigPropertyValuesDict: ConfigPropertyValues):
+      newConfigPropertyValuesDict: ConfigPropertyValues):
       Promise<void> {
     let action = 'save_config_properties';
     let payload = {
