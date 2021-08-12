@@ -37,7 +37,7 @@ export interface AutoPlayAudioEvent {
 })
 export class AudioPlayerService {
   // 'currentTrackFilename','currentTrack' and 'lastPauseOrSeekPos'
-  // will be 'null' when the track ends.
+  // will be 'null' when the track is not selected or ended.
   private _currentTrackFilename: string | null = null;
   private _currentTrack: Howl | null = null;
   private _lastPauseOrSeekPos: number | null = null;
