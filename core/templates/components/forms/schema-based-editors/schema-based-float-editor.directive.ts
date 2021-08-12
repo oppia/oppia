@@ -135,8 +135,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.checkRequireNonnegativeInputValue =
             checkRequireNonnegativeInput === undefined ? false :
             checkRequireNonnegativeInput;
-            // If customization argument of numeric input interaction is true set
-            // Min value as 0 to not let down key go below 0.
+            // If customization argument of numeric input interaction is true
+            // Set Min value as 0 to not let down key go below 0.
             ctrl.minValue = checkRequireNonnegativeInput && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.
