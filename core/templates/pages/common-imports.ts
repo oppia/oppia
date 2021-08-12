@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Common imports reqired in all oppia pages.
+ * @fileoverview Common imports required in all oppia pages.
  */
 
 import 'core-js/es7/reflect';
