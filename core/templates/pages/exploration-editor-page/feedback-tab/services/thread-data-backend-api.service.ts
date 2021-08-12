@@ -39,7 +39,7 @@ export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 // Key values for this property will be 'null' if the thread is
 // not found or threadId is invalid.
 type SuggestionBackendDictsByThreadId = (
-  Map<string | null, SuggestionBackendDict>);
+  Map<string, SuggestionBackendDict>);
 
 interface NumberOfOpenThreads {
   'num_open_threads': number;
@@ -189,14 +189,13 @@ export class ThreadDataBackendApiService {
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
               dict, <SuggestionBackendDict>suggestionBackendDictsByThreadId.get(
-                (dict === null ? null : dict.thread_id))))
+                dict.thread_id)))
         };
       },
       async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  // A thread will be 'null' if threadId is invalid.
-  async getMessagesAsync(thread: SuggestionAndFeedbackThread | null):
+  async getMessagesAsync(thread: SuggestionAndFeedbackThread):
   Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -248,7 +247,7 @@ export class ThreadDataBackendApiService {
 
   // A thread will be 'null' if threadId is invalid.
   async markThreadAsSeenAsync(
-      thread: SuggestionAndFeedbackThread | null): Promise<void> {
+      thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -258,9 +257,8 @@ export class ThreadDataBackendApiService {
       this.getFeedbackThreadViewEventUrl(threadId), {}).toPromise().then();
   }
 
-  // A thread will be 'null' if threadId is invalid.
   async addNewMessageAsync(
-      thread: SuggestionAndFeedbackThread | null, newMessage: string,
+      thread: SuggestionAndFeedbackThread, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -290,9 +288,8 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  // A thread will be 'null' if threadId is invalid.
   async resolveSuggestionAsync(
-      thread: SuggestionAndFeedbackThread | null,
+      thread: SuggestionAndFeedbackThread,
       action: string,
       commitMsg: string,
       reviewMsg: string): Promise<ThreadMessage[]> {
