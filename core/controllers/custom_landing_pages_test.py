@@ -54,4 +54,3 @@ class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
             '/learn/maths/fractions', expected_status_int=302)
         self.assertEqual(
             'http://localhost/math/fractions', response.headers['location'])
-
