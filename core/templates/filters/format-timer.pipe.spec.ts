@@ -13,13 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root Component for stewards landing page.
+ * @fileoverview Tests for FormatTime pipe for Oppia.
  */
 
-import { Component } from '@angular/core';
+import { FormatTimePipe } from './format-timer.pipe';
 
-@Component({
-  selector: 'oppia-stewards-landing-page-root',
-  templateUrl: './stewards-landing-page-root.component.html'
-})
-export class StewardsLandingPageRootComponent {}
+describe('Testing FormatTimePipe', () => {
+  let pipe: FormatTimePipe;
+  beforeEach(() => {
+    pipe = new FormatTimePipe();
+  });
+
+  it('should have all expected filters', () => {
+    expect(pipe).not.toEqual(null);
+  });
+
+  it('should correctly format time', () =>{
+    expect(pipe.transform(200)).toEqual('03:20');
+    expect(pipe.transform(474)).toEqual('07:54');
+    expect(pipe.transform(556)).toEqual('09:16');
+    expect(pipe.transform(243)).toEqual('04:03');
+  });
+});

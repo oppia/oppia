@@ -434,7 +434,7 @@ a:focus {
 }
 
 /* Change all the borders of an input to red when there is validation errors. */
-input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-invalid {
+input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-default-theme {
   border-color: #F44336;
 }
 
@@ -2578,6 +2578,13 @@ oppia-parameter {
   }
 }
 
+@media(max-width:540px) {
+  .modal-dialog {
+    margin-left: auto;
+    margin-right: auto;
+    width: 320px;
+  }
+}
 @media(min-width: 1024px) {
   .modal-lg {
     width: 900px;
