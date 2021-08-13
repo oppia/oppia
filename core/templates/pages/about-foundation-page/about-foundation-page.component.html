@@ -22,7 +22,7 @@
   </div>
 
   <div class="row oppia-about-foundation-info-card-white">
-    <div class="col-8">
+    <div class="col-lg-8">
       <div class="row">
         <h1>
           Millions of children are not receiving the education they deserve.
@@ -42,7 +42,7 @@
         </p>
       </div>
     </div>
-    <div class="col-4 oppia-about-foundation-image-with-caption">
+    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
       <picture>
         <source type="image/webp"
                 [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
@@ -59,7 +59,7 @@
   </div>
 
   <div class="row oppia-about-foundation-info-card-white">
-    <div class="col-4 oppia-about-foundation-image-with-caption">
+    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
       <picture>
         <source type="image/webp"
                 [srcset]="'/assets/images/about_foundation/20180826_161603.webp'">
@@ -70,7 +70,7 @@
              src="/assets/images/about_foundation/20180826_161603.jpg">
       </picture>
     </div>
-    <div class="col-8">
+    <div class="col-lg-8">
       <div class="row">
         <h1>
           We cannot ignore the potential quality education has to improve people's lives.
@@ -91,7 +91,7 @@
   </div>
 
   <div class="row oppia-about-foundation-info-card-gray">
-    <div class="col-8">
+    <div class="col-lg-8">
       <div class="row">
         <h1>
           Creating fun and effective learning for the world’s underserved students
@@ -114,7 +114,7 @@
         </button>
       </div>
     </div>
-    <div class="col-4 oppia-about-foundation-image-with-caption">
+    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
       <picture>
         <source type="image/webp"
                 [srcset]="'/assets/images/about_foundation/home_partner.webp'">
@@ -128,7 +128,7 @@
   </div>
 
   <div class="row oppia-about-foundation-info-card-white">
-    <div class="col-4 oppia-about-foundation-image-with-caption">
+    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
       <picture>
         <source type="image/webp"
                 [srcset]="'/assets/images/about_foundation/home_get_involved.webp'">
@@ -139,7 +139,7 @@
              src="/assets/images/about_foundation/home_get_involved.png">
       </picture>
     </div>
-    <div class="col-8">
+    <div class="col-lg-8">
       <div class="row">
         <h1>
           Built from a unified passion for educational equality
@@ -229,6 +229,17 @@
     width: 45%;
   }
 
+  @media screen and (max-width: 500px) {
+    .oppia-about-foundation-hero-content h1 {
+      font-size: 25px;
+    }
+
+    .oppia-about-foundation-hero-content h3 {
+      font-size: 18px;
+      width: auto;
+    }
+  }
+
   .oppia-about-foundation-page-oppia-logo {
     margin-bottom: 2em;
     width: 10em;
@@ -239,11 +250,11 @@
     padding: 5em 10em;
   }
 
-  .oppia-about-foundation-info-card-gray .col-8,
-  .oppia-about-foundation-info-card-white .col-8 {
+  .oppia-about-foundation-info-card-gray .col-lg-8,
+  .oppia-about-foundation-info-card-white .col-lg-8 {
     padding: 0 6em;
   }
-
+  
   .oppia-about-foundation-info-card-gray p,
   .oppia-about-foundation-info-card-white p {
     font-size: 17px;
@@ -251,7 +262,7 @@
     padding-top: 1em;
   }
 
-  .oppia-about-foundation-info-card-gray,
+  .oppia-about-foundation-info-card-gray a,
   .oppia-about-foundation-info-card-white a {
     color: #009688;
     text-decoration: none;
@@ -310,5 +321,36 @@
     font-size: 25px;
     line-height: 1.5em;
     padding-top: 0;
+  }
+
+  @media screen and (max-width: 500px) {
+    .oppia-about-foundation-hero-content p {
+      font-size: 18px;
+      width: auto;
+    }
+
+    .oppia-about-foundation-info-card-white,
+    .oppia-about-foundation-info-card-gray {
+      padding: 5em 5em;
+    }
+
+    .oppia-about-foundation-info-card-gray h1,
+    .oppia-about-foundation-info-card-white h1 {
+      font-size: 1.5em;
+    }
+
+    .oppia-about-foundation-image-with-caption {
+      padding: 2em 0;
+      margin-left: -2em;
+    }
+
+    .oppia-about-foundation-info-card-gray .col-lg-8,
+    .oppia-about-foundation-info-card-white .col-lg-8 {
+      padding: 0;
+    }
+
+    .oppia-about-foundation-cta p {
+      font-size: 18px;
+    }
   }
 </style>
