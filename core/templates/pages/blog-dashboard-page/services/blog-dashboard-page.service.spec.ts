@@ -33,7 +33,8 @@ describe('Blog Post Page service', () => {
     nativeWindow = {
       location: {
         href: '',
-        hash: '/'
+        hash: '/',
+        reload: () => {}
       },
       open: (url) => {},
       onhashchange() {},
@@ -67,7 +68,7 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.activeTab).toEqual('main');
   });
 
-  it('should navigate to different tabs', function() {
+  it('should navigate to different tabs', () => {
     expect(blogDashboardPageService.activeTab).toEqual('main');
 
     blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
@@ -76,9 +77,8 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.activeTab).toEqual('editor_tab');
 
     blogDashboardPageService.navigateToMainTab();
-    mockWindowRef.nativeWindow.onhashchange();
 
-    expect(blogDashboardPageService.activeTab).toEqual('main');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/blog-dashboard');
   });
 
 

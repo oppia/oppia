@@ -161,7 +161,9 @@ def get_blog_post_summary_models_list_by_user_id(
     blog_post_summaries = [
         get_blog_post_summary_from_model(model) if model is not None else None
         for model in blog_post_summary_models]
-    return blog_post_summaries if len(blog_post_summaries) != 0 else None
+    return (
+        sorted(blog_post_summaries, key=lambda k: k.last_updated, reverse=True)
+            if len(blog_post_summaries) != 0 else None)
 
 
 def filter_blog_post_ids(user_id, blog_post_is_published):
@@ -176,10 +178,14 @@ def filter_blog_post_ids(user_id, blog_post_is_published):
         list(str). The blog post IDs of the blog posts for which the user is an
         editor corresponding to the status(draft/published).
     """
-    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
-        blog_models.BlogPostRightsModel.editor_ids == user_id,
-        blog_models.BlogPostRightsModel.blog_post_is_published == (
-            blog_post_is_published)).fetch()
+    if blog_post_is_published:
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                user_id))
+    else:
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
+                user_id))
     model_ids = []
     if blog_post_rights_models:
         for model in blog_post_rights_models:
@@ -632,7 +638,7 @@ def update_blog_models_author_and_published_on_date(
         author_id: str. User ID of the author.
         date: str. The date of publishing the blog post.
     """
-    blog_post = get_blog_post_by_id(blog_post_id)
+    blog_post = get_blog_post_by_id(blog_post_id, True)
     blog_post.author_id = author_id
     supported_date_string = date + ', 00:00:00:00'
     blog_post.published_on = utils.convert_string_to_naive_datetime_object(

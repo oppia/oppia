@@ -61,10 +61,8 @@ class TopicLandingRedirectPage(base.BaseHandler):
         self.redirect('/math/%s' % topic)
 
 
-class StewardsLandingPage(base.BaseHandler):
-    """Page showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
+class OldStewardsRedirectPage(base.BaseHandler):
+    """Redirects the old stewards page to the volunteer page."""
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -74,5 +72,4 @@ class StewardsLandingPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template(
-            'stewards-landing-page.mainpage.html')
+        self.redirect('/volunteer', permanent=True)
