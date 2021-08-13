@@ -55,8 +55,8 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import 'third-party-imports/gif-frames.import';
 
-const gifFrames = require('gif-frames');
 const gifshot = require('gifshot');
 
 interface FilepathData {
@@ -1012,7 +1012,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    gifFrames({
+    window.GifFrames({
       url: imageDataURI,
       frames: 'all',
       outputType: 'canvas',

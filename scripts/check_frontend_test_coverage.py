@@ -77,7 +77,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-input-validation.service.ts',
     'hint-editor.directive.ts',
     'html-select.directive.ts',
-    'image-editor.component.ts',
     'input-response-pair.component.ts',
     'language-util.service.ts',
     'learner-answer-info-card.component.ts',
