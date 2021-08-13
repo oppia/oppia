@@ -245,7 +245,6 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  // A thread will be 'null' if threadId is invalid.
   async markThreadAsSeenAsync(
       thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
