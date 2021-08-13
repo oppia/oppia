@@ -229,12 +229,14 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
-    await learnerDashboardPage.checkIncompleteExplorationInCommunityLessonsTab(
-      'Dummy Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckIncompleteExplorations(
+        'Dummy Exploration');
     // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
-    await learnerDashboardPage.checkCompleteExplorationInCommunityLessonsTab(
-      'Test Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Test Exploration');
 
     await libraryPage.get();
     await libraryPage.findExploration('Dummy Exploration');
@@ -254,10 +256,12 @@ describe('Learner dashboard functionality', function() {
     }
     // Both should be added to the completed section.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteExplorationInCommunityLessonsTab(
-      'Dummy Exploration');
-    await learnerDashboardPage.checkCompleteExplorationInCommunityLessonsTab(
-      'Test Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Dummy Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Test Exploration');
     await users.logout();
 
     // For desktop, go to the exploration editor page and
@@ -360,8 +364,9 @@ describe('Learner dashboard functionality', function() {
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
-    await learnerDashboardPage.checkIncompleteCollectionInCommunityLessonsTab(
-      'Test Collection');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckIncompleteCollections(
+        'Test Collection');
     // Now find and play 'Test Collection' completely.
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
@@ -394,8 +399,9 @@ describe('Learner dashboard functionality', function() {
     // Learner Dashboard should display
     // 'Test Collection' as complete.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteCollectionInCommunityLessonsTab(
-      'Test Collection');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteCollections(
+        'Test Collection');
     await users.logout();
 
     // This part of the test is desktop-only for the following reasons:
@@ -431,8 +437,9 @@ describe('Learner dashboard functionality', function() {
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.checkIncompleteCollectionInCommunityLessonsTab(
-        'Test Collection');
+      await learnerDashboardPage
+        .navigateToCommunityLessonsAndCheckIncompleteCollections(
+          'Test Collection');
     }
   });
 

@@ -32,7 +32,8 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
-const { browser } = require('protractor');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -49,6 +50,7 @@ describe('Learner dashboard functionality', function() {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     adminPage = new AdminPage.AdminPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
@@ -58,7 +60,6 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display learners subscriptions', async function() {
-    var driver = browser.driver;
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
@@ -94,8 +95,6 @@ describe('Learner dashboard functionality', function() {
     // dashboard.
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
-    await driver.findElement(
-      by.css('.protractor-test-subscriptions-section'));
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
     await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
@@ -137,7 +136,6 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should add exploration to play later list', async function() {
-    var driver = browser.driver;
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -173,8 +171,6 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
-    await driver.findElement(
-      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
     await libraryPage.get();
@@ -182,23 +178,21 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
-    await driver.findElement(
-      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
     await users.logout();
   });
 
-  it('should display all the topics on server in edit goals and ' +
-    'selected topic in current goals', async function() {
-    var driver = browser.driver;
-    var TOPIC_NAME = 'Topic 1';
-    var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
+  it('should display correct topics in edit goals and current goals' +
+    ' section', async function() {
+    var TOPIC_NAME = 'Learner Dashboard Topic 1';
+    var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';
     await users.createAndLoginCurriculumAdminUser(
       'creator@learnerDashboard1.com', 'learnerDashboard1');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
     await topicEditorPage.expectNumberOfStoriesToBe(0);
@@ -211,7 +205,7 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
     await topicEditorPage.navigateToStoryWithIndex(0);
     await storyEditorPage.updateMetaTagContent('story meta tag');
-    await storyEditorPage.saveStory('Added thumbnail.');
+    await storyEditorPage.saveStory('Added meta tag.');
     await storyEditorPage.publishStory();
     await storyEditorPage.returnToTopic();
     await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
@@ -229,41 +223,45 @@ describe('Learner dashboard functionality', function() {
         await elem.setValue(topicId);
       });
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false));
+        'Learner Dashboard Skill 1', 'Concept card explanation', false));
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill 1', 'Topic 1');
+      'Learner Dashboard Skill 1', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     await topicEditorPage.addSubtopic(
-      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
-      'Subtopic content');
+      'Learner Dashboard Subtopic 1', 'ld-subtopic-one',
+      '../data/test2_svg.svg', 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 
     await topicEditorPage.updateMetaTagContent('meta tag content');
     await topicEditorPage.updatePageTitleFragment('fragment');
-    await topicEditorPage.saveTopic('Added meta tag.');
+    await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
 
     await topicEditorPage.publishTopic();
+    /**  There is one topic on the server named Learner Dashboard Topic 1
+     * which is linked to a subtopic named Learner Dashboard Subtopic 1
+     * and a story called Story Title. Learner Dashboard Subtopic 1 has one
+     * skill in it named Learner Dashboard Skill 1.
+     */
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToGoalsSection();
-    await driver.findElement(
-      by.css('.protractor-test-edit-goals-section'));
     await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
       TOPIC_NAME);
-    await driver.findElement(By.css(
-      '.protractor-test-add-topic-to-current-goals-button')).click();
+    await learnerDashboardPage.addTopicToLearnerGoals();
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
       `Learn ${TOPIC_NAME}`);

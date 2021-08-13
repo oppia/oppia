@@ -19,7 +19,6 @@
 
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
-const { element } = require('protractor');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
@@ -42,12 +41,11 @@ var LearnerDashboardPage = function() {
   var feedbackMessage =
     element.all(by.css('.protractor-test-feedback-message'));
   var addToLearnerGoalsButton =
-    element.all(by.css('.protractor-test-add-topic-to-current-goals-button'));
-  var currentGoalsTopic =
+    element(by.css('.protractor-test-add-topic-to-current-goals-button'));
+  var currentGoalsTopicName =
     element(by.css('.protractor-test-topic-name-in-current-goals'));
-  var continueWhereYouLeftOffTopicName =
-    element(by.css(
-      '.protractor-test-topic-name-continue-where-you-left-off'));
+  var editGoalsTopicName =
+    element(by.css('.protractor-test-topic-name-in-edit-goals'));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
@@ -100,47 +98,31 @@ var LearnerDashboardPage = function() {
     expect(await explorationTitle.getText()).toMatch(title);
   };
 
-  this.expectTitleOfLearnerTopicSummaryTileToMatch = async function(title) {
-    var explorationTitle = element(
-      by.cssContainingText(
-        '.protractor-test-learner-topic-summary-tile-title', title));
-    expect(await explorationTitle.getText()).toMatch(title);
-  };
-
   this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      editGoalsTopicName,
+      'Topic in Edit Goals takes too long to appear');
+    await waitFor.textToBePresentInElement(
+      editGoalsTopicName, name,
+      `Text "${name}" taking too long to be present in editGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-edit-goals', name));
-    expect(await topicName.getText()).toMatch(name);
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInCurrentGoalsToMatch = async function(name) {
     await waitFor.visibilityOf(
-      currentGoalsTopic,
+      currentGoalsTopicName,
       'Topic in Current Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
-      currentGoalsTopic, name, 'No Current goals Text');
+      currentGoalsTopicName, name,
+      `Text "${name}" taking too long to be present in currentGoalsTopic`);
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-current-goals', name));
-    expect(await topicName.getText()).toMatch(name);
-  };
-
-  this.expectNameOfTopicInContinueWhereYouLeftOff = async function(name) {
-    await waitFor.visibilityOf(
-      continueWhereYouLeftOffTopicName,
-      'Topic in Continue where you left off takes too long to appear');
-    await waitFor.textToBePresentInElement(
-      continueWhereYouLeftOffTopicName, name,
-      'No topic in Continue where you left off section');
-    var topicName = element(by.cssContainingText(
-      '.protractor-test-topic-name-continue-where-you-left-off'
-    ));
-    expect(await topicName.getText()).toMatch(name);
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.addTopicToLearnerGoals = async function() {
-    await waitFor.visibilityOf(
-      addToLearnerGoalsButton,
-      'Add to learner goals button takes too long to appear');
     await action.click('Add to learner goals button', addToLearnerGoalsButton);
   };
 
@@ -171,30 +153,36 @@ var LearnerDashboardPage = function() {
     expect(await feedbackMessage.first().getText()).toMatch(message);
   };
 
-  this.checkIncompleteExplorationInCommunityLessonsTab = async function(
+  this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
+    async function(explorationTitle) {
+      await this.navigateToCommunityLessonsSection();
+      await (await driver.findElement(by.css(
+        '.protractor-test-incomplete-community-lessons-section')));
+      await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
+    });
+
+  this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
+    await (await driver.findElement(by.css(
+      '.protractor-test-completed-community-lessons-section')));
     await this.expectTitleOfExplorationSummaryTileToMatch(explorationTitle);
   };
 
-  this.checkCompleteExplorationInCommunityLessonsTab = async function(
-      explorationTitle) {
-    await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfExplorationSummaryTileToMatch(
-      explorationTitle);
-  };
-
-  this.checkIncompleteCollectionInCommunityLessonsTab = async function(
+  this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
+    await (await driver.findElement(by.css(
+      '.protractor-test-incomplete-community-lessons-section')));
     await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
   };
 
-  this.checkCompleteCollectionInCommunityLessonsTab = async function(
+  this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    await this.expectTitleOfCollectionSummaryTileToMatch(
-      collectionTitle);
+    await (await driver.findElement(by.css(
+      '.protractor-test-completed-community-lessons-section')));
+    await this.expectTitleOfCollectionSummaryTileToMatch(collectionTitle);
   };
 };
 
