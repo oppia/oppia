@@ -456,7 +456,8 @@ def verify_pip_is_installed():
             common.print_each_string_after_two_new_lines([
                 'Oppia requires pip==%s, but you have pip==%s installed.' % (
                     OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
-                'Upgrading pip on your behalf...',
+                'Upgrading pip to %s on your behalf...' % (
+                    OPPIA_REQUIRED_PIP_VERSION),
             ])
             _run_pip_command(
                 ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])

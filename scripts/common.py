@@ -44,7 +44,7 @@ ISORT_VERSION = '5.8.0'
 PYCODESTYLE_VERSION = '2.6.0'
 PSUTIL_VERSION = '5.8.0'
 PYLINT_VERSION = '2.8.3'
-PYLINT_QUOTES_VERSION = '0.1.8'
+PYLINT_QUOTES_VERSION = '0.1.9'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
 PIP_TOOLS_VERSION = '6.0.1'
@@ -97,6 +97,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+ISORT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'isort-%s' % ISORT_VERSION)
 WEBPACK_BIN_PATH = (
     os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
 DEV_APPSERVER_PATH = (
@@ -194,7 +195,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
