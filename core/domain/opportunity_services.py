@@ -361,23 +361,6 @@ def delete_exploration_opportunities_corresponding_to_topic(topic_id):
         exp_opportunity_models)
 
 
-def get_exploration_opportunity_ids_corresponding_to_topic(topic_id):
-    """Returns the exploration IDs corresponding to the
-    ExplorationOpportunitySummaryModels that are associated with the supplied
-    topic ID.
-
-    Args:
-        topic_id: str. The ID of the topic.
-
-    Returns:
-        list(str). The exploration IDs.
-    """
-    exp_opportunity_models = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
-            topic_id))
-    return [model.id for model in exp_opportunity_models if model is not None]
-
-
 def update_exploration_opportunities(old_story, new_story):
     """Updates the opportunities models according to the changes made in the
     story.
