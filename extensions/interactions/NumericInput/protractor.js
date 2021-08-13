@@ -47,14 +47,14 @@ var testSuite = [{
 }, {
   interactionArguments: [true],
   ruleArguments: ['IsLessThan', 143],
-  expectedInteractionDetails: [],
-  wrongAnswers: [146, -3],
+  expectedInteractionDetails: [true],
+  wrongAnswers: [146, 152],
   correctAnswers: [142]
 }, {
   interactionArguments: [true],
-  ruleArguments: ['IsGreaterThan', -2],
-  expectedInteractionDetails: [],
-  wrongAnswers: [-3, -1],
+  ruleArguments: ['IsGreaterThan', 2],
+  expectedInteractionDetails: [true],
+  wrongAnswers: [0, 1],
   correctAnswers: [3]
 }];
 
