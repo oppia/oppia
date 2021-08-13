@@ -288,6 +288,9 @@ var offlineAlert = async function() {
     by.css('.protractor-test-toast-message')).getText()).toMatch(
     'Looks like you are offline. You can continue working, and can save ' +
     'your changes once reconnected.');
+  await waitFor.invisibilityOf(
+    element(by.css('.protractor-test-toast-message')),
+    'Offline warning toast message taking too long to appear.');
 };
 
 var onlineAlert = async function() {
