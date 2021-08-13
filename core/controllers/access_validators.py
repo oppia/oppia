@@ -52,8 +52,8 @@ class SplashAccessValidationHandler(base.BaseHandler):
                 self.user_id):
             user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
             default_dashboard = user_settings.default_dashboard
-            # User's request request to visit splash page is not valid and they
-            # needs to be redirected to their preferred dashboard.
+            # User's request to visit splash page is not valid and they
+            # need to be redirected to their preferred dashboard.
             self.render_json( # type: ignore[no-untyped-call]
                 {'valid': False, 'default_dashboard': default_dashboard})
         else:
