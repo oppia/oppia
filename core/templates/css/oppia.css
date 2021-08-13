@@ -2572,6 +2572,13 @@ oppia-parameter {
   }
 }
 
+@media(max-width:540px) {
+  .modal-dialog {
+    margin-left: auto;
+    margin-right: auto;
+    width: 320px;
+  }
+}
 @media(min-width: 1024px) {
   .modal-lg {
     width: 900px;
