@@ -201,4 +201,80 @@ describe('GraphInputValidationService', () => {
         'The learner cannot edit vertex labels for an unlabeled graph.')
     }]);
   });
+
+  it('should not verify vertex graph that has \'HasGraphProperty\'' +
+  ' rule type', () => {
+    var answerGroup = agof.createNew(
+      [rof.createNew('HasGraphProperty', {
+        g: {
+          vertices: new Array(10)
+        }
+      }, { g: ''})],
+      goodDefaultOutcome,
+      [],
+      null);
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should validate the maximum number of vertices in the graph', () => {
+    var answerGroup = agof.createNew(
+      [rof.createNew('rule', {
+        g: {
+          vertices: new Array(52)
+        }
+      }, { g: ''})],
+      goodDefaultOutcome,
+      [],
+      null);
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.CRITICAL,
+      message: (
+        'The graph used in the rule 1 in group 1 ' +
+        'exceeds supported maximum number of vertices of 50.')
+    }, {
+      type: AppConstants.WARNING_TYPES.CRITICAL,
+      message: (
+        'The graph used in the rule 1 in group 2 ' +
+        'exceeds supported maximum number of vertices of 50.')
+    }]);
+  });
+
+  it('should throw error when rule is invalid', () => {
+    var answerGroup = agof.createNew(
+      [{
+        type: new Error('Error') as unknown as string,
+        inputs: {},
+        inputTypes: {},
+        toBackendDict: () => {
+          return {
+            rule_type: 'type',
+            inputs: {}
+          };
+        }
+      }],
+      goodDefaultOutcome,
+      [],
+      null);
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.CRITICAL,
+      message: (
+        'The rule 1 in group 1 is invalid.')
+    }, {
+      type: AppConstants.WARNING_TYPES.CRITICAL,
+      message: (
+        'The rule 1 in group 2 is invalid.')
+    }]);
+  });
 });
