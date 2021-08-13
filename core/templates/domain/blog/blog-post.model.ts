@@ -126,11 +126,10 @@ export class BlogPostData {
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
-    }
-    if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
+    } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
-        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+        `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (this._content === '') {
@@ -145,17 +144,15 @@ export class BlogPostData {
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
-    }
-    if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+    } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +
         `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
-    }
-    if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
+    } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
-        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+        `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (!this._thumbnailFilename) {

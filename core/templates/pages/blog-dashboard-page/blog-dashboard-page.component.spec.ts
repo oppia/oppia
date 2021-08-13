@@ -49,7 +49,8 @@ describe('Blog Dashboard Page Component', () => {
     nativeWindow = {
       location: {
         href: '',
-        hash: '/'
+        hash: '/',
+        reload: () => {}
       },
       open: (url) => {},
       onhashchange() {
@@ -140,10 +141,8 @@ describe('Blog Dashboard Page Component', () => {
 
     // Changing active tab back to main tab.
     blogDashboardPageService.navigateToMainTab();
-    mockWindowRef.nativeWindow.onhashchange();
-    tick();
 
-    expect(component.activeTab).toBe('main');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/blog-dashboard');
   }));
 
   it('should call initMainTab if active tab is main', () => {
