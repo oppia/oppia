@@ -95,7 +95,8 @@ describe('Rte Helper Service', function() {
         schema: {
           type: 'unicode',
           validators: [{
-            id: 'is_nonempty'
+            id: 'has_length_at_least',
+            min_value: 5
           }],
           ui_config: {
             placeholder: 'Description of Image (Example : George Handel,' +

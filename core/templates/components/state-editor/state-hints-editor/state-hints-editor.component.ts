@@ -20,7 +20,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('components/state-directives/hint-editor/hint-editor.directive.ts');
+require('components/state-directives/hint-editor/hint-editor.component.ts');
 require(
   'components/state-directives/response-header/response-header.component.ts');
 require(
