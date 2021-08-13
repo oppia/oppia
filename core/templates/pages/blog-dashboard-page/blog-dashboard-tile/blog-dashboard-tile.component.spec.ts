@@ -23,6 +23,8 @@ import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
 import { BlogDashboardTileComponent } from './blog-dashboard-tile.component';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
 
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogDashboardTileComponent;
@@ -32,7 +34,9 @@ describe('Blog Dashboard Tile Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        MatCardModule,
+        MatMenuModule
       ],
       declarations: [
         BlogDashboardTileComponent,
