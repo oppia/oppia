@@ -443,6 +443,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.admin_ids = []
         self.suggestion_types_needing_reviewers = {}
         self.reviewable_suggestion_email_infos = []
+        self.translation_admin_ids = []
+        self.question_admin_ids = []
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
