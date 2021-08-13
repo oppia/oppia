@@ -143,7 +143,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'tutor-card.directive.ts',
     'unit-test-utils.ajs.ts', # Please don't try to cover this file.
     'voiceover-recording.service.ts',
-    'worked-example-editor.directive.ts',
 ]
 
 
