@@ -163,7 +163,7 @@ def get_blog_post_summary_models_list_by_user_id(
         for model in blog_post_summary_models]
     return (
         sorted(blog_post_summaries, key=lambda k: k.last_updated, reverse=True)
-            if len(blog_post_summaries) != 0 else None)
+            if len(blog_post_summaries) != 0 else [])
 
 
 def filter_blog_post_ids(user_id, blog_post_is_published):
@@ -497,8 +497,7 @@ def generate_summary_of_blog_post(content):
     if len(raw_text) > max_chars_in_summary:
         summary = raw_text[:max_chars_in_summary] + '...'
         return summary
-    else:
-        return raw_text
+    return raw_text
 
 
 def compute_summary_of_blog_post(blog_post):

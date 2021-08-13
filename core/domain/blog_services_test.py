@@ -72,7 +72,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_posts = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id_a, True))
-        self.assertIsNone(blog_posts)
+        self.assertEqual(blog_posts, [])
         blog_posts = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id_a, False))

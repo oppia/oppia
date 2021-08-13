@@ -120,8 +120,11 @@ describe('Blog Post Page service', () => {
         'Failed to delete blog post.');
     }));
 
-  it('should successfully delete blog post data',
+  it('should successfully delete blog post data from blog post editor',
     fakeAsync(() => {
+      // Setting active tab as blog post editor.
+      blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
+      mockWindowRef.nativeWindow.onhashchange();
       spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
         .and.returnValue(Promise.resolve(200));
       spyOn(alertsService, 'addSuccessMessage');
@@ -133,7 +136,24 @@ describe('Blog Post Page service', () => {
         .toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Blog Post Deleted Successfully.', 5000);
-      expect(blogDashboardPageService.activeTab).toBe('main');
+      expect(blogDashboardPageService.activeTab).toBe('editor_tab');
+    }));
+
+  it('should successfully delete blog post data from dashboard',
+    fakeAsync(() => {
+      spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
+        .and.returnValue(Promise.resolve(200));
+      spyOn(blogDashboardPageService, 'navigateToMainTab');
+      spyOn(alertsService, 'addSuccessMessage');
+
+      blogDashboardPageService.deleteBlogPost();
+      tick();
+
+      expect(blogPostEditorBackendApiService.deleteBlogPostAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Blog Post Deleted Successfully.', 5000);
+      expect(blogDashboardPageService.navigateToMainTab).not.toHaveBeenCalled();
     }));
 
   it('should succesfully set the blog post title in navbar', fakeAsync(() => {
