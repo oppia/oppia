@@ -49,9 +49,9 @@ def _task_handler(
         queue_name: str. The name of the queue to add the task to.
         task_name: str|None. Optional. The name of the task.
     """
-    headers: Dict[str, Optional[str]] = {}
+    headers: Dict[str, str] = {}
     headers['X-Appengine-QueueName'] = queue_name
-    headers['X-Appengine-TaskName'] = task_name
+    headers['X-Appengine-TaskName'] = task_name or 'Task_without_name'
     headers['X-Appengine-TaskRetryCount'] = '0'
     headers['X-Appengine-TaskExecutionCount'] = '0'
     headers['X-Appengine-TaskETA'] = '0'

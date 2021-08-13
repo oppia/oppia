@@ -84,6 +84,9 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
+    # TODO(#13663): After we install mypy in virtual environment and upgrade
+    # our mypy, we will have latest stubs of redis available. After this
+    # the cast and type ignore used below can be removed.
     return cast(
         List[Optional[str]],
         OPPIA_REDIS_CLIENT.mget(keys)) # type: ignore[no-untyped-call]
@@ -101,6 +104,9 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
+    # TODO(#13663): After we install mypy in virtual environment and upgrade
+    # our mypy, we will have latest stubs of redis available. After this
+    # the cast and type ignore used below can be removed.
     return cast(
         bool,
         OPPIA_REDIS_CLIENT.mset(key_value_mapping)) # type: ignore[no-untyped-call]

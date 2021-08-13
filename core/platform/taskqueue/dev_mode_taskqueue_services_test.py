@@ -91,11 +91,10 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'X-AppEngine-Fake-Is-Admin': '1',
             'method': 'POST'
         }
-        # In the type annotation below, we have used Dict[str, Any] for json.
+        # In the type annotation below, we have used Dict[str, Any] for JSON.
         # This is because this function mocks requests.post function where the
-        # type of json has been defined Any, hence using Dict[str, Any] here.
-        # https://github.com/python/typeshed/blob/master/stubs/requests/requests/api.pyi#L78.
-
+        # type of JSON has been defined Any, hence using Dict[str, Any] here.
+        # https://github.com/python/typeshed/blob/5e0fc4607323a4657b587bf70e3c26becf1c88d0/stubs/requests/requests/api.pyi#L78
         def mock_post(
                 url: str,
                 json: Dict[str, Any],

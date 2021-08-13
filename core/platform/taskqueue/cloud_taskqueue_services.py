@@ -73,6 +73,11 @@ def create_http_task(
 
     # In the type annotation below, task is of type Dict[str, Any] because
     # its structure can vary a lot.
+    # We can see how the proto message for Task is defined. See the link:
+    # https://github.com/googleapis/python-tasks/blob/2f6ae8318e9a6fc2963d4a7825ee96e41f330043/google/cloud/tasks_v2/types/task.py#L29
+    # Create_task either expects this protobuf message or a dictionary having
+    # a similar structure.
+    # This clearly points to the fact that the task is of type Dict[str, Any].
     # Construct the request body.
     task: Dict[str, Any] = {
         'app_engine_http_request': {  # Specify the type of request.

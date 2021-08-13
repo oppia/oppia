@@ -1,6 +1,10 @@
 from typing import Any
+from google import protobuf
+
 
 class Task:
     name: str = ...
 
-target_pb2: Any = ...
+class target_pb2(protobuf.message.Message):
+    class HttpMethod(protobuf.message.Message):
+        POST: str = ...
