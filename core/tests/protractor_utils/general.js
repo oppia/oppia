@@ -267,6 +267,10 @@ var goOffline = async function() {
 };
 
 var goOnline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
   await browser.driver.setNetworkConditions(
     {
       offline: false,
@@ -282,7 +286,8 @@ var offlineAlert = async function() {
     'Offline warning toast message taking too long to appear.');
   expect(await element(
     by.css('.protractor-test-toast-message')).getText()).toMatch(
-    'Reconnected. Checking whether your changes are mergeable.');
+    'Looks like you are offline. You can continue working, and can save ' +
+    'your changes once reconnected.');
 };
 
 var onlineAlert = async function() {
@@ -291,8 +296,7 @@ var onlineAlert = async function() {
     'Offline warning toast message taking too long to appear.');
   expect(await element(
     by.css('.protractor-test-toast-message')).getText()).toMatch(
-    'Looks like you are offline. You can continue working, and can save ' +
-    'your changes once reconnected.');
+    'Reconnected. Checking whether your changes are mergeable.');
 };
 
 exports.acceptAlert = acceptAlert;
