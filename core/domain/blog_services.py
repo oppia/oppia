@@ -161,7 +161,9 @@ def get_blog_post_summary_models_list_by_user_id(
     blog_post_summaries = [
         get_blog_post_summary_from_model(model) if model is not None else None
         for model in blog_post_summary_models]
-    return blog_post_summaries if len(blog_post_summaries) != 0 else None
+    return (
+        sorted(blog_post_summaries, key=lambda k: k.last_updated, reverse=True)
+            if len(blog_post_summaries) != 0 else None)
 
 
 def filter_blog_post_ids(user_id, blog_post_is_published):
@@ -176,10 +178,14 @@ def filter_blog_post_ids(user_id, blog_post_is_published):
         list(str). The blog post IDs of the blog posts for which the user is an
         editor corresponding to the status(draft/published).
     """
-    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
-        blog_models.BlogPostRightsModel.editor_ids == user_id,
-        blog_models.BlogPostRightsModel.blog_post_is_published == (
-            blog_post_is_published)).fetch()
+    if blog_post_is_published:
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                user_id))
+    else:
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
+                user_id))
     model_ids = []
     if blog_post_rights_models:
         for model in blog_post_rights_models:
