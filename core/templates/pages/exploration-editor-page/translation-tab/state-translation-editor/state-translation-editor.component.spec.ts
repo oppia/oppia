@@ -445,21 +445,6 @@ describe('State Translation Editor Component', function() {
         writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
     });
 
-    it('should mark translation as needing update', function() {
-      spyOn(
-        explorationStatesService, 'markWrittenTranslationsAsNeedingUpdate');
-      $scope.activeWrittenTranslation = (
-        writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
-      expect($scope.activeWrittenTranslation.needsUpdate).toBeFalse();
-
-      $scope.markAsNeedingUpdate();
-
-      expect(
-        explorationStatesService.markWrittenTranslationsAsNeedingUpdate
-      ).toHaveBeenCalled();
-      expect($scope.activeWrittenTranslation.needsUpdate).toBeTrue();
-    });
-
     it('should add written translation html when clicking on save' +
       ' translation button', function() {
       $scope.openTranslationEditor();
