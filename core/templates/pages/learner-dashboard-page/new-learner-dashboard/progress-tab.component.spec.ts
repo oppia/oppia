@@ -179,6 +179,10 @@ describe('Progress tab Component', () => {
       BqXdwH8YOsGX: {
         1: 1,
         2: 0
+      },
+      QqXdwH8YOsGX: {
+        1: 0,
+        2: 0
       }
     };
     let subtopic = {
@@ -237,13 +241,59 @@ describe('Progress tab Component', () => {
         skill_id_2: 'Skill Description 2'
       }
     };
+    let subtopic1 = {
+      skill_ids: ['skill_id_2'],
+      id: 1,
+      title: 'subtopic_name',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      url_fragment: 'subtopic-name'
+    };
+    const learnerTopicSummaryBackendDict1 = {
+      id: 'QqXdwH8YOsGX',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 2,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic1],
+      degrees_of_mastery: {
+        skill_id_1: 0,
+        skill_id_2: 0
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    };
     component.topicsInSkillProficiency = [
       LearnerTopicSummary.createFromBackendDict(
-        learnerTopicSummaryBackendDict)
+        learnerTopicSummaryBackendDict),
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1)
     ];
     component.getTopicMastery();
     expect(component.topicMastery).toEqual(
-      [[100, component.topicsInSkillProficiency[0]]]);
+      [[100, component.topicsInSkillProficiency[0]],
+        [0, component.topicsInSkillProficiency[1]]]);
   });
 
   it('should get circular progress', () => {
