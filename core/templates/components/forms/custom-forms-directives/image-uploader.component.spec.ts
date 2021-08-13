@@ -17,10 +17,14 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
@@ -34,11 +38,17 @@ describe('ImageUploaderComponent', () => {
   beforeEach(waitForAsync(() => {
     windowRef = new WindowRef();
     TestBed.configureTestingModule({
+      imports: [
+        MatIconModule,
+        MockRouterModule,
+        HttpClientTestingModule
+      ],
       declarations: [
         ImageUploaderComponent,
-        MockTranslatePipe,
+        MockTranslatePipe
       ],
       providers: [
+        BlogDashboardPageService,
         {provide: WindowRef, useValue: windowRef}
       ]
     }).compileComponents();

@@ -468,8 +468,7 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
 
-    for subtopic_page_id in updated_subtopic_pages_dict:
-        subtopic_page = updated_subtopic_pages_dict[subtopic_page_id]
+    for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
             subtopic_page_id]
         subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()

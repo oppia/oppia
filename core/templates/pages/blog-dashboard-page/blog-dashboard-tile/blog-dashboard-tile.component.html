@@ -3,9 +3,20 @@
     <mat-card-content>
       <div class="blog-dashboard-tile-header">
         <mat-card-title class="blog-dashboard-tile-title">{{ blogPostSummary.title }}</mat-card-title>
-        <button mat-icon-button>
-          <mat-icon class="align-text-bottom pl-4">more_vert</mat-icon>
+        <button mat-icon-button class="drop-down-button" [matMenuTriggerFor]="blogCardOptions">
+          <mat-icon class="align-text-bottom">more_vert</mat-icon>
         </button>
+        <mat-menu #blogCardOptions="matMenu">
+          <button mat-menu-item>
+            <span>Edit</span>
+          </button>
+          <button *ngIf="blogPostIsPublished" mat-menu-item>
+            <span>Unpublish</span>
+          </button>
+          <button mat-menu-item>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
       </div>
       <mat-card-subtitle class="blog-dashboard-tile-subtitle">
         {{ lastUpdatedDateString }}
@@ -43,7 +54,6 @@
       font-size: 1.2rem;
       line-height: 10px;
       margin-bottom: 8px;
-      margin-top: -10px;
     }
 
   .blog-post-summary {
@@ -51,6 +61,33 @@
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.6rem;
     text-align: left;
+  }
+
+  .drop-down-button {
+    height: 30px
+  }
+
+  .mat-icon-button {
+    margin-right: -20px;
+  }
+
+  .mat-menu-item {
+    background: #FFF 0% 0% no-repeat padding-box;
+    border: 1px solid #707070;
+    height: 24px;
+    line-height: unset;
+    padding: 0 8px;
+    width: 128px;
+  }
+
+  :host /deep/ .mat-menu-content:not(:empty) {
+    padding-bottom: unset;
+    padding-top: unset;
+  }
+
+  :host /deep/ .cdk-overlay-pane .mat-menu-panel {
+    border-radius: 1px;
+    min-height: unset;
   }
 
   @media(max-width: 820px) {
@@ -72,7 +109,7 @@
     }
 
     .blog-dashboard-tile-subtitle {
-      margin-top: -20px;
+      margin-top: -10px;
     }
 
     @media(max-width: 420px) {

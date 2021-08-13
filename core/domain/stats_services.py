@@ -278,7 +278,7 @@ def advance_version_of_exp_stats(
     unchanged_state_names = set(utils.compute_list_difference(
         exp_stats.state_stats_mapping,
         exp_versions_diff.deleted_state_names +
-        exp_versions_diff.new_to_old_state_names.values()))
+        list(exp_versions_diff.new_to_old_state_names.values())))
     for state_name in unchanged_state_names:
         new_state_name_stats_mapping[state_name] = (
             exp_stats.state_stats_mapping[state_name].clone())
@@ -975,8 +975,7 @@ def create_learner_answer_details_model_instance(learner_answer_details):
         learner_answer_details.entity_type,
         learner_answer_details.state_reference,
         learner_answer_details.interaction_id,
-        [learner_answer_info.to_dict() for learner_answer_info
-         in learner_answer_details.learner_answer_info_list],
+        learner_answer_details.learner_answer_info_list,
         learner_answer_details.learner_answer_info_schema_version,
         learner_answer_details.accumulated_answer_info_json_size_bytes)
 
