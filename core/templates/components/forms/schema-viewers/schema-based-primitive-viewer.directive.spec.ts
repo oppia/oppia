@@ -19,7 +19,6 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Schema Based Primitive Viewer Directive', () => {
-  let ctrl = null;
   let $rootScope = null;
   let $scope = null;
   let directive = null;
@@ -32,7 +31,7 @@ describe('Schema Based Primitive Viewer Directive', () => {
     $scope = $rootScope.$new();
 
     directive = $injector.get('schemaBasedPrimitiveViewerDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+    $injector.instantiate(directive.controller, {
       $scope: $scope
     });
   }));
