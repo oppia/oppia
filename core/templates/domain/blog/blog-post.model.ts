@@ -85,7 +85,11 @@ export class BlogPostData {
   }
 
   get tags(): string[] {
-    return this._tags.slice();
+    return this._tags;
+  }
+
+  set tags(tags: string[]) {
+    this._tags = tags;
   }
 
   addTag(tag: string): void {
@@ -101,7 +105,7 @@ export class BlogPostData {
     return this._urlFragment;
   }
 
-  set thumbnailFilename(thumbnailFilename: string) {
+  set thumbnailFilename(thumbnailFilename: string | null) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
