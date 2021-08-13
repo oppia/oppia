@@ -59,8 +59,8 @@ def validate_new_config_property_values_dict(new_config_property_values_dict):
         after validation.
     """
     # The method returns a dict containing config properties and its values.
-    # These items are used individually to set config properties.
-    # Hence they need not be converted into domain objects.
+    # These items are used individually to set config properties in the
+    # handlers. Hence they need not be converted into domain objects.
     for (name, value) in new_config_property_values_dict.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
@@ -134,10 +134,10 @@ def validate_email_dashboard_data(email_dashboard_data_dict):
     Returns:
         dict(str, any). Returns email dashboard data dict after validation.
     """
-    # The method returns a dict containing fields of email_dashboard query
-    # params. This dict represents a domain class namedtuple. Hence the fields
-    # are validating as a part of schema validation before saving new
-    # user queries in the handler.
+    # The method returns a dict containing fields of email dashboard
+    # query params. This dict represents the UserQueryParams class, which is a
+    # namedtuple. Hence the fields are validating as a part of schema validation
+    # before saving new user queries in the handler.
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
@@ -161,10 +161,11 @@ def validate_task_entry_dict(task_entry_dict):
     Returns:
         dict(str, any). Returns task_entry_dict after validation.
     """
-    # The method returns a dict which contains several fields for task entries.
-    # Creation of TaskEntry objects require some additional data like
-    # entity_id, user_id, etc. which are provided by handlers.
-    # Thus here we are only validating data coming from task_entry_dict.
+    # For creating the TaskEntry domain object, we have to include the
+    # exploration_id and the user_id which are not included in the
+    # task_entry_dict thus it might not be possible to create the domain object.
+    # Hence the fields of task_entry_dict are validating as a part of schema
+    # validation.
     entity_version = task_entry_dict.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(
