@@ -86,7 +86,7 @@ def validate_change_dict_for_blog_post(change_dict):
         dict(str, any). Returns change_dict after validation.
     """
     # The method returns a dict containing blog post properties, they are used
-    # to update blog posts in the domain layer. This dicts does not correspond
+    # to update blog posts in the domain layer. This dict does not correspond
     # to any domain class so we are validating the fields of change_dict
     # as a part of schema validation.
     if 'title' in change_dict:
