@@ -30,6 +30,7 @@ export const ServicesConstants = {
     TOPIC_EDITOR: 'topic_editor',
     TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
     CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
+    BLOG_DASHBOARD: 'blog_dashboard',
     OTHER: 'other'
   },
 
