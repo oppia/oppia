@@ -935,9 +935,10 @@ URLS.extend((
 
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-    URLS.append(
-        get_redirect_route(
-            r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+    if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+        URLS.append(
+            get_redirect_route(
+                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))

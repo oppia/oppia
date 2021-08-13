@@ -779,6 +779,37 @@ def require_valid_thumbnail_filename(thumbnail_filename):
                 thumbnail_filename)
 
 
+def require_valid_image_filename(image_filename):
+     # type: (Text) -> None
+    """Generic image filename validation.
+
+        Args:
+            image_filename: str. The image filename to validate.
+
+        Raises:
+            ValidationError. Image filename is not a string.
+            ValidationError. Image filename does start with a dot.
+            ValidationError. Image filename includes slashes
+                or consecutive dots.
+            ValidationError. Image filename does not include an extension.
+        """
+    if image_filename is not None:
+        if not isinstance(image_filename, python_utils.BASESTRING):
+            raise ValidationError(
+                'Expected image filename to be a string, received %s'
+                % image_filename)
+        if image_filename.rfind('.') == 0:
+            raise ValidationError(
+                'Image filename should not start with a dot.')
+        if '/' in image_filename or '..' in image_filename:
+            raise ValidationError(
+                'Image filename should not include slashes or '
+                'consecutive dot characters.')
+        if '.' not in image_filename:
+            raise ValidationError(
+                'Image filename should include an extension.')
+
+
 def require_valid_meta_tag_content(meta_tag_content):
     # type: (Text) -> None
     """Generic meta tag content validation.
