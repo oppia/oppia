@@ -58,9 +58,9 @@ def validate_new_config_property_values_dict(new_config_property_values_dict):
         dict(str, any). Returns new_config_property_values_dict
         after validation.
     """
-    # The method returns a dict containing config property values which are
-    # used by domain layer of the codebase, this dict does not have any direct
-    # representation of domain objects.
+    # The method returns a dict containing config properties and its values.
+    # These items are used individually to set config properties.
+    # Hence they need not be converted into domain objects.
     for (name, value) in new_config_property_values_dict.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
@@ -85,9 +85,10 @@ def validate_change_dict_for_blog_post(change_dict):
     Returns:
         dict(str, any). Returns change_dict after validation.
     """
-    # The method returns a dict containing blog post properties which are
-    # used by domain layer of the codebase, this dict does not have any direct
-    # representation of domain objects.
+    # The method returns a dict containing blog post properties, they are used
+    # to update blog posts in the domain layer. This dicts does not correspond
+    # to any domain class so we are validating the fields of change_dict
+    # as a part of schema validation.
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(
             change_dict['title'], True)
@@ -133,8 +134,10 @@ def validate_email_dashboard_data(email_dashboard_data_dict):
     Returns:
         dict(str, any). Returns email dashboard data dict after validation.
     """
-    # The method returns a dict containing email dashboard data properties.
-    # This dict does not have any direct representation of domain objects.
+    # The method returns a dict containing fields of email_dashboard query
+    # params. This dict represents a domain class namedtuple. Hence the fields
+    # are validating as a part of schema validation before saving new
+    # user queries in the handler.
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
@@ -158,9 +161,10 @@ def validate_task_entry_dict(task_entry_dict):
     Returns:
         dict(str, any). Returns task_entry_dict after validation.
     """
-    # The method returns a dict containing task entry properties which are
-    # used by domain layer of the codebase, this dict does not have any direct
-    # representation of domain objects.
+    # The method returns a dict which contains several fields for task entries.
+    # Creation of TaskEntry objects require some additional data like
+    # entity_id, user_id, etc. which are provided by handlers.
+    # Thus here we are only validating data coming from task_entry_dict.
     entity_version = task_entry_dict.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(
