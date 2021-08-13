@@ -22,7 +22,6 @@ describe('Schema Based Dict Editor Directive', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let $timeout = null;
   let directive = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -30,7 +29,6 @@ describe('Schema Based Dict Editor Directive', () => {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
 
     directive = $injector.get('schemaBasedDictEditorDirective')[0];

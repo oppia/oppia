@@ -53,8 +53,8 @@ describe('Schema Based Float Editor Directive', () => {
           id: 'is_at_most',
           max_value: 3.5
         }
-      ]
-    }
+      ];
+    };
   }));
 
   it('should set directive properties on initialization', () => {
