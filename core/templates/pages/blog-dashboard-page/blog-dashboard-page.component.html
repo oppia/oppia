@@ -1,42 +1,49 @@
-<mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
-  <mat-card-header class="blog-dashboard-header">
-    <img mat-card-avatar
-         [src]="authorProfilePictureUrl">
-    <mat-card-title class="blog-dashboard-card-title">{{blogDashboardData.username}}</mat-card-title>
-    <mat-card-subtitle>
-      <button mat-button class="new-post-button">
-        <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-        <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
-      </button>
-    </mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-    <mat-tab-group>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{blogDashboardData.numOfDraftBlogPosts}})
-        </ng-template>
-        <div class="blog-dashboard-tiles-container">
-          <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
-            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-            </oppia-blog-dashboard-tile>
+<div *ngIf="activeTab === 'main'">
+  <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
+    <mat-card-header class="blog-dashboard-header">
+      <img mat-card-avatar
+           [src]="authorProfilePictureUrl"
+           alt="Profile image of the author of the blog post">
+      <mat-card-title class="blog-dashboard-card-title">{{ blogDashboardData.username }}</mat-card-title>
+      <mat-card-subtitle>
+        <button mat-button class="new-post-button" (click)="createNewBlogPost()">
+          <mat-icon class="new-post-icon position-absolute">+</mat-icon>
+          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
+        </button>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{ blogDashboardData.numOfDraftBlogPosts }})
+          </ng-template>
+          <div class="blog-dashboard-tiles-container">
+            <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
+              <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
+                                         [blogPostIsPublished]="false">
+              </oppia-blog-dashboard-tile>
+            </div>
           </div>
-        </div>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{blogDashboardData.numOfPublishedBlogPosts}})
-        </ng-template>
-        <div class="blog-dashboard-tiles-container">
-          <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
-            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-            </oppia-blog-dashboard-tile>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{ blogDashboardData.numOfPublishedBlogPosts }})
+          </ng-template>
+          <div class="blog-dashboard-tiles-container">
+            <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
+              <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
+                                         [blogPostIsPublished]="true">
+              </oppia-blog-dashboard-tile>
+            </div>
           </div>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-content>
-</mat-card>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>
+<oppia-blog-post-editor *ngIf="activeTab === 'editor_tab'">
+</oppia-blog-post-editor>
 <style>
   .blog-dashboard-card {
     max-width: 835px;
