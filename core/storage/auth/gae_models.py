@@ -26,8 +26,9 @@ from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disab
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import (
-        base_models, datastore_services, user_models)
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import user_models
 
 base_models, user_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -103,6 +104,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
         if user_auth_model and user_auth_model.parent_user_id:
             parent_data = user_models.UserSettingsModel.get(
                 user_auth_model.parent_user_id)
+            # Ruling out the possibility of None for mypy type checking.
+            assert parent_data is not None
             parent_username = parent_data.username
             return {'parent_username': parent_username}
         else:
