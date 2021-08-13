@@ -19,6 +19,7 @@
 
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
+var driver = browser.driver;
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
