@@ -418,7 +418,7 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should be able to save changes when offline',
+    'should be able to save the changes when the user is offline',
     async function() {
       await users.createUser('user17@editor.com', 'user17Editor');
 
