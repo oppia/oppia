@@ -26,6 +26,10 @@ import itertools
 import os
 import sys
 
+from typing import Any
+from typing import Callable
+from typing import List
+
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
@@ -574,6 +578,7 @@ def is_string(value):
 
 
 def get_args_of_function(func):
+    # type: (Callable[..., Any]) -> List[str]
     """Returns the argument names of the function.
 
     Args:

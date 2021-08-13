@@ -8,7 +8,7 @@
 #
 #    pip-compile
 #
-apache-beam[gcp]==2.24.0
+apache-beam[gcp]==2.30.0
     # via -r requirements.in
 attrs==20.3.0
     # via pytest
@@ -189,8 +189,6 @@ iniconfig==1.1.1
     # via pytest
 mailchimp3==3.0.14
     # via -r requirements.in
-mock==2.0.0
-    # via apache-beam
 msgpack==1.0.2
     # via cachecontrol
 mutagen==1.43.0
@@ -210,8 +208,6 @@ packaging==20.4
     #   -r requirements.in
     #   bleach
     #   pytest
-pbr==5.5.1
-    # via mock
 pillow==8.2.0
     # via -r requirements.in
 pluggy==0.13.1
@@ -306,7 +302,6 @@ six==1.15.0
     #   grpcio
     #   hdfs
     #   html5lib
-    #   mock
     #   oauth2client
     #   packaging
     #   protobuf

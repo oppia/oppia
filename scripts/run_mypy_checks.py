@@ -47,6 +47,7 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/android_e2e_config_test.py',
     'core/controllers/base.py',
     'core/controllers/base_test.py',
+    'core/controllers/beam_jobs.py',
     'core/controllers/blog_admin.py',
     'core/controllers/blog_admin_test.py',
     'core/controllers/blog_dashboard.py',

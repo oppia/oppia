@@ -81,6 +81,7 @@ BeamJobState = python_utils.create_enum( # pylint: disable=invalid-name
 
 
 def _get_new_model_id(model_class):
+    # type: (base_models.BaseModel) -> str
     """Generates an ID for a new model.
 
     Returns:
@@ -130,6 +131,7 @@ class BeamJobRunModel(base_models.BaseModel):
 
     @classmethod
     def get_new_id(cls):
+        # type: () -> str
         """Generates an ID for a new BeamJobRunModel.
 
         Returns:
@@ -180,6 +182,7 @@ class BeamJobRunResultModel(base_models.BaseModel):
 
     @classmethod
     def get_new_id(cls):
+        # type: () -> str
         """Generates an ID for a new BeamJobRunResultModel.
 
         Returns:

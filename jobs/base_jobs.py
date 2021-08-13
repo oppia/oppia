@@ -57,7 +57,15 @@ Dataflow service: https://cloud.google.com/dataflow.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import python_utils
+from jobs.types import job_run_result
+
+import apache_beam as beam
+
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
+from typing import Type
 
 
 class JobMetaclass(type):
@@ -70,9 +78,10 @@ class JobMetaclass(type):
     code should simply inherit from the JobBase class, found below.
     """
 
-    _JOB_REGISTRY = {}
+    _JOB_REGISTRY = {} # type: Dict[str, JobMetaclass]
 
     def __new__(cls, name, bases, namespace):
+        # type: (Type[JobMetaclass], str, Tuple[type, ...], Dict[str, Any]) -> JobMetaclass
         """Creates a new job class with type `JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
@@ -95,17 +104,21 @@ class JobMetaclass(type):
         Returns:
             class. The new class instance.
         """
-        job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
         if name in cls._JOB_REGISTRY:
             collision = cls._JOB_REGISTRY[name]
             raise TypeError('%s name is already used by %s.%s' % (
                 name, collision.__module__, name))
+
+        job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
+
         if not name.endswith('Base'):
-            cls._JOB_REGISTRY[job_cls.__name__] = job_cls
+            cls._JOB_REGISTRY[name] = job_cls
+
         return job_cls
 
     @classmethod
     def get_all_jobs(cls):
+        # type: () -> List[JobMetaclass]
         """Returns all jobs that have inherited from the JobBase class.
 
         Returns:
@@ -115,6 +128,7 @@ class JobMetaclass(type):
 
     @classmethod
     def get_all_job_names(cls):
+        # type: () -> List[str]
         """Returns the names of all jobs that have inherited from the JobBase
         class.
 
@@ -123,8 +137,23 @@ class JobMetaclass(type):
         """
         return list(cls._JOB_REGISTRY.keys())
 
+    @classmethod
+    def get_job_by_name(cls, job_name):
+        # type: (str) -> JobMetaclass
+        """Returns the class associated with the given job name.
 
-class JobBase(python_utils.with_metaclass(JobMetaclass)):
+        Args:
+            job_name: str. The name of the job to return.
+
+        Returns:
+            class. The class associated to the given job name.
+        """
+        if job_name not in cls._JOB_REGISTRY:
+            raise ValueError('%s is not registered as a job' % job_name)
+        return cls._JOB_REGISTRY[job_name]
+
+
+class JobBase(metaclass=JobMetaclass):
     """The base class for all of Oppia's Apache Beam jobs.
 
     Example:
@@ -148,6 +177,7 @@ class JobBase(python_utils.with_metaclass(JobMetaclass)):
     """
 
     def __init__(self, pipeline):
+        # type: (beam.Pipeline) -> None
         """Initializes a new job.
 
         Args:
@@ -156,6 +186,7 @@ class JobBase(python_utils.with_metaclass(JobMetaclass)):
         self.pipeline = pipeline
 
     def run(self):
+        # type: (...) -> beam.PCollection[job_run_result.JobRunResult]
         """Runs PTransforms with self.pipeline to compute/process PValues.
 
         Raises:

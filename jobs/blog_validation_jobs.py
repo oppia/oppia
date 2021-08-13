@@ -55,7 +55,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
                 beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
             | 'Group pairs by their %s' % self._property_name >> (
                 beam.GroupByKey())
-            | 'Discard %s key' % self._property_name >> beam.Values()
+            | 'Discard %s key' % self._property_name >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self._property_name >> (
                 beam.Filter(lambda models: len(models) > 1))
         )
