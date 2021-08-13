@@ -4973,6 +4973,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.CURRICULUM_ADMIN_2_EMAIL)
 
+
 class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     """Test that email is send to submitter when query has completed
     or failed.

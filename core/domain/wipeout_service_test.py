@@ -5022,7 +5022,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         pending_deletion_request_models = (
             user_models.PendingDeletionRequestModel.query().fetch())
         for pending_deletion_request_model in pending_deletion_request_models:
-            pending_deletion_request_model.delete() 
+            pending_deletion_request_model.delete()
         with self.send_mail_to_admin_swap, self.can_send_email_swap:
             # When there are no pending deletion models, expect no emails.
             wipeout_service.delete_users_pending_to_be_deleted()
