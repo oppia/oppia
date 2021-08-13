@@ -16,12 +16,14 @@
  * @fileoverview Directive for CK Editor.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { Subscription } from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
@@ -38,14 +40,11 @@ interface RteConfig extends CKEDITOR.config {
 
 @Component({
   selector: 'ck-editor-4-rte',
-  template: '<div><div></div>' +
-            '<div contenteditable="true" ' +
-            'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
-            '</div></div>',
+  templateUrl: './ck-editor-4-rte.component.html',
   styleUrls: []
 })
 export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
-    OnDestroy {
+    OnDestroy, OnInit {
   @Input() uiConfig: UiConfig;
   @Input() value;
   @Input() headersEnabled = false;
@@ -53,6 +52,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
+  connectedToInternet = true;
+  componentsThatRequireInternet: string[] = [];
+  subscriptions: Subscription;
   // A RegExp for matching rich text components.
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
@@ -60,11 +62,26 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private internetConnectivityService: InternetConnectivityService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+    this.subscriptions = new Subscription();
   }
 
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
+        internetAccessible => {
+          if (internetAccessible) {
+            this.enableRTEicons();
+            this.connectedToInternet = internetAccessible;
+          } else {
+            this.disableRTEicons();
+            this.connectedToInternet = internetAccessible;
+          }
+        }));
+  }
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -200,6 +217,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
+    this.componentsThatRequireInternet = [];
 
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
@@ -213,6 +231,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
+      }
+      if (componentDefn.requiresInternet) {
+        this.componentsThatRequireInternet.push(componentDefn.id);
       }
     });
 
@@ -368,7 +389,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         $('.cke_combo_button')
           .css('display', 'none');
       }
-
+      if (!this.internetConnectivityService.isOnline()) {
+        this.connectedToInternet = false;
+        this.disableRTEicons();
+      }
       ck.setData(this.wrapComponents(this.value));
     });
 
@@ -422,8 +446,31 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     this.ckEditorCopyContentService.bindPasteHandler(ck);
   }
 
+  disableRTEicons(): void {
+    // Add disabled cursor pointer to the icons.
+    this.componentsThatRequireInternet.forEach((name) => {
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '#cccccc';
+        buttons[i].style.pointerEvents = 'none';
+      }
+    });
+  }
+  enableRTEicons(): void {
+    this.componentsThatRequireInternet.forEach((name) => {
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '';
+        buttons[i].style.pointerEvents = '';
+      }
+    });
+  }
+
   ngOnDestroy(): void {
     this.ck.destroy();
+    this.subscriptions.unsubscribe();
   }
 }
 

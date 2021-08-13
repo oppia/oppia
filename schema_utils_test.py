@@ -196,6 +196,11 @@ VALIDATOR_SPECS = {
         'is_valid_math_equation': {},
         'is_supported_audio_language_code': {},
         'is_url_fragment': {},
+        'has_length_at_least': {
+            'min_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        },
         'has_length_at_most': {
             'max_value': {
                 'type': SCHEMA_TYPE_INT

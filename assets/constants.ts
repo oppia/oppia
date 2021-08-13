@@ -6069,6 +6069,23 @@ export default {
       "TITLE": "Privacy Policy | Oppia",
       "META": []
     },
+    "SIGNUP": {
+      "ROUTE": "signup",
+      "TITLE": "Join the community - Oppia",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        }
+      ]
+    },
     "TEACH": {
       "ROUTE": "teach",
       "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
@@ -6120,6 +6137,11 @@ export default {
           "CONTENT": "Thank you for donating to The Oppia Foundation!"
         }
       ]
+    },
+    "VOLUNTEER": {
+      "ROUTE": "volunteer",
+      "TITLE": "Volunteer | Oppia",
+      "META": []
     }
   },
 
