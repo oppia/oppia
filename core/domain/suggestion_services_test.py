@@ -225,12 +225,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>The invalid content html</p>',
-            'translation_html': '<p>Translation for invalid content.</p>'
+            'translation_html': '<p>Translation for invalid content.</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp(
             Exception,
@@ -783,12 +784,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -913,12 +915,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,

@@ -212,6 +212,7 @@ import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service';
@@ -286,6 +287,7 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -334,6 +336,7 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SearchService } from 'services/search.service';
+import { ServerConnectionBackendApiService } from 'services/server-connection-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SpeechSynthesisChunkerService } from 'services/speech-synthesis-chunker.service';
@@ -405,6 +408,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostEditorBackendApiService', BlogPostEditorBackendApiService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
@@ -424,6 +428,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
+  ['InternetConnectivityService', InternetConnectivityService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
@@ -657,6 +662,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
   ['SearchBackendApiService', SearchBackendApiService],
   ['SearchService', SearchService],
+  ['ServerConnectionBackendApiService', ServerConnectionBackendApiService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
   ['SidebarStatusService', SidebarStatusService],
