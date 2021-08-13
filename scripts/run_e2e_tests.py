@@ -335,8 +335,16 @@ def main(args=None):
             test_is_flaky = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
             if policy == RERUN_POLICY_NEVER:
+                python_utils.PRINT(
+                    'Not rerunning because the policy is to never '
+                    'rerun the {} suite'.format(parsed_args.suite))
                 break
             if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                python_utils.PRINT((
+                    'Not rerunning because the policy is to only '
+                    'rerun the %s suite on known flakes, and this '
+                    'failure did not match any known flakes')
+                    % parsed_args.suite)
                 break
 
     sys.exit(return_code)
