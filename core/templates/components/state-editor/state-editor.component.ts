@@ -32,7 +32,7 @@ require(
   'state-responses.component.ts');
 require(
   'components/state-editor/state-solution-editor/' +
-  'state-solution-editor.directive.ts');
+  'state-solution-editor.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
