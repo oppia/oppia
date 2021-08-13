@@ -32,7 +32,6 @@ describe('Worked example editor directive', function() {
   let ctrl = null;
   let $rootScope = null;
   let directive = null;
-  let UndoRedoService = null;
   let workedExampleObjectFactory: WorkedExampleObjectFactory = null;
   let skillUpdateService: SkillUpdateService = null;
 
@@ -51,7 +50,6 @@ describe('Worked example editor directive', function() {
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('workedExampleEditorDirective')[0];
     workedExampleObjectFactory = $injector.get('WorkedExampleObjectFactory');
     skillUpdateService = $injector.get('SkillUpdateService');
