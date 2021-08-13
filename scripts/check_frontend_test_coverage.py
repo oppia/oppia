@@ -69,8 +69,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'feedback-popup.component.ts',
     'feedback-popup.directive.ts',
     'focus-on.directive.ts',
-    'format-timer.pipe.ts',
-    'generatedParser.ts',
     'google-analytics.initializer.ts',
     'image-editor.component.ts',
     'input-response-pair.component.ts',
