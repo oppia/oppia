@@ -115,14 +115,14 @@ export class LostChange {
   }
 
   isOldValueEmpty(): boolean {
-    if (this.oldValue) {
+    if (!this.oldValue) {
       return this.utilsService.isEmpty(this.oldValue);
     }
     return false;
   }
 
   isNewValueEmpty(): boolean {
-    if (this.newValue) {
+    if (!this.newValue) {
       return this.utilsService.isEmpty(this.newValue);
     }
     return false;
