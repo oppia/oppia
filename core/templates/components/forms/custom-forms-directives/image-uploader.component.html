@@ -1,21 +1,33 @@
-<div class="image-uploader-drop-area" [ngClass]="{'image-uploader-is-active': backgroundWhileUploading}" #dropArea>
-  <div class="image-uploader-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+<div class="image-uploader-drop-area"
+     [ngClass]="{'image-uploader-is-active': backgroundWhileUploading, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
+     #dropArea>
+  <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
         class="image-uploader-error-message protractor-test-upload-error">
     <i class="material-icons">&#xE002;</i>
     {{ errorMessage }}
   </span>
-  <span class="image-uploader-license-warning">
+  <span class="image-uploader-license-warning" *ngIf="!isBlogPostThumbnailUploader">
     Before uploading images, please ensure that they are<br>
     compatible with the <a href="/license" [routerLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site.<br>
     Please do not upload watermarked images.
   </span>
-  <label for="image-file-input" class="image-uploader-upload-label-button">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
+  <label for="image-file-input" class="image-uploader-upload-label-button" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
   <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
   <input type="file" id="image-file-input" (click)="this.value = null"
          (change)="handleFile()"
          class="image-uploader-file-input protractor-test-photo-upload-input"
          [ngClass]="fileInputClassName" #imageInput>
+  <label *ngIf="isBlogPostThumbnailUploader"
+         class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
+         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
+         for="image-file-input">
+    <mat-icon class="mx-auto"
+              [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
+      insert_photo
+    </mat-icon>
+    <span class="font-weight-light">{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
+  </label>
 </div>
 <style>
   .image-uploader-license-warning {
@@ -117,5 +129,47 @@
   .image-uploader-error-message i {
     font-size: 16px;
     margin-right: 4px;
+  }
+
+  .blog-post-thumbnail-uploader {
+    height: 200px;
+    width: 100%;
+  }
+
+  .mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+  }
+
+  @media(max-width:768px) {
+    .blog-post-thumbnail-uploader {
+      height: 80px;
+      width: 100%;
+    }
+
+    .mat-icon {
+      font-size: 30px;
+      height: 30px;
+      width: 30px;
+    }
+
+    .font-weight-light {
+      font-size: 12px;
+      font-weight: 300 !important;
+    }
+
+    .blog-post-narrow-thumbnail-uploader {
+      height: 40px;
+    }
+
+    .narrow-image-uploader-area {
+      width: 66.667vw
+    }
+
+    .blog-post-thumbnail-uploader.image-uploader-is-narrow,
+    .image-uploader-drop-area.image-uploader-is-narrow {
+      height: 35px
+    }
   }
 </style>

@@ -1,0 +1,28 @@
+<button class="btn btn-secondary float-right" (click)="cancel()">
+  <mat-icon>close</mat-icon>
+</button>
+<div class="oppia-thumbnail-picture-container">
+  <div class="my-5 mx-3">
+    <h3>{{ 'I18N_BLOG_CARD_PREVIEW_HEADING' | translate }}</h3>
+    <h5>{{ 'I18N_BLOG_CARD_PREVIEW_CONTEXT' | translate }}</h5>
+  </div>
+
+  <div class="modal-body oppia-blog-post-thumbnail">
+    <oppia-blog-card [blogPostSummary]="blogPostSummary"
+                     [authorProfilePicDataUrl]="profilePicUrl">
+    </oppia-blog-card>
+  </div>
+</div>
+
+<style>
+  .oppia-blog-post-thumbnail /deep/ .blog-card {
+    width: unset;
+  }
+
+  @media (max-width: 680px) {
+    .oppia-blog-post-thumbnail /deep/ .blog-card {
+      margin: auto;
+      width: unset;
+    }
+  }
+</style>

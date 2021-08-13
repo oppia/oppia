@@ -186,6 +186,7 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
+        blog_post_dict['author_username'] = username
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
@@ -237,7 +238,7 @@ class BlogPostHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         entity_id = blog_post_id
-        filename_prefix = 'blog_post_thumbnail'
+        filename_prefix = 'thumbnail'
 
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)

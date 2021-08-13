@@ -77,7 +77,7 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
         blog_domain.BlogPost.require_valid_tags(
-            change_dict['tags'], True)
+            change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
         list_of_default_tags = config_domain.Registry.get_config_property(

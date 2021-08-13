@@ -48,13 +48,8 @@ export class BlogPostUpdateService {
     this.changeDict.thumbnail_filename = filename;
   }
 
-  addBlogPostTag(blogPost: BlogPostData, tag: string): void {
-    blogPost.addTag(tag);
-    this.changeDict.tags = blogPost.tags;
-  }
-
-  removeBlogPostTag(blogPost: BlogPostData, tag: string): void {
-    blogPost.removeTag(tag);
+  setBlogPostTags(blogPost: BlogPostData, tags: string[]): void {
+    blogPost.tags = tags;
     this.changeDict.tags = blogPost.tags;
   }
 
@@ -65,6 +60,10 @@ export class BlogPostUpdateService {
 
   getBlogPostChangeDict(): BlogPostChangeDict {
     return this.changeDict;
+  }
+
+  setBlogPostChangeDictToDefault(): void {
+    this.changeDict = {};
   }
 }
 

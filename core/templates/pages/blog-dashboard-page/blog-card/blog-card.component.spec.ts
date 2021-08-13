@@ -101,7 +101,8 @@ describe('Blog Dashboard Tile Component', () => {
     expect(component.authorProfilePictureUrl).toEqual('data_image_url');
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample_url');
     expect(component.thumbnailUrl).toBe(
-      '/assetsdevhandler/blog_post/sampleId/assets/thumbnail/image.png');
+      '/assetsdevhandler/blog_post/sampleId/assets/' +
+      'thumbnail/image.png');
     expect(component.publishedDateString).toBe('November 21, 2014');
   });
 

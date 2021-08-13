@@ -260,6 +260,20 @@ export class UrlService {
   }
 
   /**
+   * This function is used to find the blog id from the url.
+   * @return {string} the blog post id.
+   * @throws Will throw an error if the blog post Id is invalid.
+   */
+  getBlogPostIdFromUrl(): string {
+    let pathname = this.getHash();
+    let blogPostId = pathname.split('/')[2];
+    if (blogPostId.length !== 12) {
+      throw new Error('Invalid Blog Post Id.');
+    }
+    return blogPostId;
+  }
+
+  /**
    * This function is used to find the query values as a list.
    * @param {string} fieldName - the name of the field.
    * @return {string[]} the list of query field values.

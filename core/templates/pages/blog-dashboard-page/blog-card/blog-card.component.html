@@ -1,10 +1,12 @@
 <mat-card class="blog-card">
-  <picture>
-    <img mat-card-image
-         class="blog-card-thumbnail"
-         [src]="thumbnailUrl"
-         alt="Thumbnail image of the blog card">
-  </picture>
+  <div mat-card-image class="blog-card-thumbnail-container">
+    <picture>
+      <img mat-card-image
+           class="blog-card-thumbnail"
+           [src]="thumbnailUrl"
+           alt="Thumbnail image of the blog card">
+    </picture>
+  </div>
   <div class="blog-card-content">
     <mat-card-title class="blog-card-title">{{ blogPostSummary.title }}</mat-card-title>
     <mat-card-header class="mt-2">
@@ -35,9 +37,20 @@
 
   .mat-card-image.blog-card-thumbnail {
     height: 144px;
+    margin: 0;
     max-width: unset;
     object-fit: cover;
     object-position: top;
+    width: 100%;
+  }
+
+  .blog-card-thumbnail-container {
+    background-color: #AAA9;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    height: 144px;
+    margin: -16px -16px 16px -16px;
+    width: calc(100% + 32px);
   }
 
   .blog-card-content {
@@ -83,6 +96,10 @@
   }
 
   .mat-card-image.blog-card-thumbnail {
+    height: 78px;
+  }
+
+  .blog-card-thumbnail-container {
     height: 78px;
   }
 

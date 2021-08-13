@@ -85,7 +85,7 @@ class BlogPost(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Thumbnail filename should not be empty.')
 
-        utils.require_valid_thumbnail_filename(thumbnail_filename)
+        utils.require_valid_image_filename(thumbnail_filename)
 
     def validate(self, strict=False):
         """Validates various properties of the blog post object.
@@ -313,7 +313,7 @@ class BlogPost(python_utils.OBJECT):
         Args:
             tags: list(str). New list of tags for the blog post.
         """
-        self.require_valid_tags(tags, True)
+        self.require_valid_tags(tags, False)
         self.tags = tags
 
     @classmethod
@@ -386,7 +386,7 @@ class BlogPostSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Thumbnail filename should not be empty')
 
-        utils.require_valid_thumbnail_filename(thumbnail_filename)
+        utils.require_valid_image_filename(thumbnail_filename)
 
     def validate(self, strict=False):
         """Validates various properties of the blog post summary object.

@@ -85,7 +85,7 @@ export class BlogPostEditorBackendApiService {
             listOfDefaulTags: response.list_of_default_tags,
           });
         }, (errorResponse) => {
-          reject(errorResponse.error.error);
+          reject(errorResponse.status);
         });
     });
   }
