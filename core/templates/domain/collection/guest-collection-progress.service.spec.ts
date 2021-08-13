@@ -26,16 +26,16 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 
 describe('Guest collection progress service', () => {
-  let guestCollectionProgressService = null;
-  let _collectionId0: string = null;
-  let _collectionId1: string = null;
-  let _expId0: string = null;
-  let _expTitle0: string = null;
-  let _expId1: string = null;
-  let _expTitle1: string = null;
-  let _expId2: string = null;
-  let _expTitle2: string = null;
-  let _collection0: Collection = null;
+  let guestCollectionProgressService: GuestCollectionProgressService;
+  let _collectionId0: string;
+  let _collectionId1: string;
+  let _expId0: string;
+  let _expTitle0: string;
+  let _expId1: string;
+  let _expTitle1: string;
+  let _expId2: string;
+  let _expTitle2: string;
+  let _collection0: Collection;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -63,7 +63,7 @@ describe('Guest collection progress service', () => {
     window.localStorage.clear();
   });
 
-  var _createCollection = function(collectionId, title) {
+  var _createCollection = (collectionId: string | null, title: string) => {
     var collectionBackendObject = {
       id: collectionId,
       title: title,
@@ -82,7 +82,7 @@ describe('Guest collection progress service', () => {
     return Collection.create(collectionBackendObject);
   };
 
-  var _createCollectionNode = function(expId, expTitle) {
+  var _createCollectionNode = (expId: string, expTitle: string) => {
     var collectionNodeBackendObject = {
       exploration_id: expId,
       exploration_summary: {
@@ -117,7 +117,7 @@ describe('Guest collection progress service', () => {
   // TODO(bhenning): Find a way to de-duplicate & share this with
   // CollectionLinearizerServiceSpec.
   // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
-  var _createLinearCollection = function(collectionId) {
+  var _createLinearCollection = (collectionId: string) => {
     var collection = _createCollection(collectionId, 'Collection title');
 
     var collectionNode0 = _createCollectionNode(_expId0, _expTitle0);
@@ -194,6 +194,13 @@ describe('Guest collection progress service', () => {
       var completedIds = (
         guestCollectionProgressService.getCompletedExplorationIds(collection));
       expect(completedIds).toEqual([_expId0, _expId2]);
+    });
+
+    it('should throw error if collection id is invalid', () => {
+      var collection = _createCollection(null, '');
+      expect(() => {
+        guestCollectionProgressService.getCompletedExplorationIds(collection);
+      }).toThrowError('Collection does not exist!');
     });
   });
 
