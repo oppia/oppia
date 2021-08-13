@@ -36,6 +36,8 @@ import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { AlertsService } from 'services/alerts.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -71,6 +73,7 @@ describe('Exploration editor page component', function() {
   var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
+  let as: AlertsService = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -92,6 +95,7 @@ describe('Exploration editor page component', function() {
   var tds = null;
   var userService = null;
   var ueps = null;
+  var ics = null;
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
@@ -100,7 +104,7 @@ describe('Exploration editor page component', function() {
   var refreshGraphEmitter = new EventEmitter();
 
   var autosaveIsInProgress = new EventEmitter();
-
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
   var mockOpenEditorTutorialEmitter = new EventEmitter();
   var mockOpenTranslationTutorialEmitter = new EventEmitter();
 
@@ -198,12 +202,14 @@ describe('Exploration editor page component', function() {
         LostChangesModalComponent
       ],
       providers: [
+        AlertsService,
         AutosaveInfoModalsService,
         ChangeListService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
+        InternetConnectivityService,
         PageTitleService,
         LoaderService,
         ParamChangesObjectFactory,
@@ -238,6 +244,7 @@ describe('Exploration editor page component', function() {
 
     aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
+    as = TestBed.inject(AlertsService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -246,6 +253,7 @@ describe('Exploration editor page component', function() {
     $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
+    ics = $injector.get('InternetConnectivityService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
@@ -493,6 +501,54 @@ describe('Exploration editor page component', function() {
     });
   });
 
+  describe('Checking internet Connection', () => {
+    beforeEach(() => {
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
+      spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
+        mockConnectionServiceEmitter);
+      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
+        mockOpenTranslationTutorialEmitter);
+      spyOn(as, 'addInfoMessage');
+      spyOn(as, 'addSuccessMessage');
+      explorationData.is_version_of_draft_valid = false;
+
+      ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should change status to ONLINE when internet is connected', () => {
+      mockConnectionServiceEmitter.emit(true);
+      $scope.$apply();
+      expect(as.addSuccessMessage).toHaveBeenCalled();
+    });
+
+    it('should change status to OFFLINE when internet disconnects', () => {
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect(as.addInfoMessage).toHaveBeenCalled();
+    });
+  });
+
   describe('when user permission is false and draft changes are true', () => {
     var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
@@ -596,7 +652,7 @@ describe('Exploration editor page component', function() {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
-
+      spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -697,6 +753,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
+      spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(true));
 
@@ -708,6 +765,7 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
+      spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(false));
 
