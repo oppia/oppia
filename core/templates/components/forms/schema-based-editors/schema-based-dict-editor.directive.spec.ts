@@ -23,12 +23,14 @@ describe('Schema Based Dict Editor Directive', () => {
   let $rootScope = null;
   let $scope = null;
   let directive = null;
+  let IdGenerationService = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
+    IdGenerationService = $injector.get('IdGenerationService');
     $scope = $rootScope.$new();
 
     directive = $injector.get('schemaBasedDictEditorDirective')[0];
@@ -49,13 +51,15 @@ describe('Schema Based Dict Editor Directive', () => {
   }));
 
   it('should set directive properties on initialization', () => {
+    spyOn(IdGenerationService, 'generateNewId')
+      .and.returnValues('id1', 'id2');
     expect($scope.fieldIds).toBe(undefined);
 
     ctrl.$onInit();
 
     expect($scope.fieldIds).toEqual({
-      Name1: 'svvgpsd1ic',
-      Name2: 'yxmmvwff5z'
+      Name1: 'id1',
+      Name2: 'id2'
     });
   });
 
