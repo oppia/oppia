@@ -225,12 +225,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>The invalid content html</p>',
-            'translation_html': '<p>Translation for invalid content.</p>'
+            'translation_html': '<p>Translation for invalid content.</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp(
             Exception,
@@ -783,12 +784,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -913,12 +915,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1046,7 +1049,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
             with self.swap(
                 exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
+                self.MockExploration.get_content_html
+            ):
                 translation_suggestion = suggestion_services.create_suggestion(
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     feconf.ENTITY_TYPE_EXPLORATION,
@@ -1355,7 +1359,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
         for i in python_utils.RANGE(len(suggestions) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
     def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
@@ -1386,7 +1390,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_id, suggestion_1.suggestion_id)
         self.assertEqual(
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
-        self.assertLess(
+        self.assertLessEqual(
             suggestions[0].last_updated, suggestions[1].last_updated)
 
         # Reject the suggestion that was created first since it is the one that
@@ -1426,7 +1430,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_id, suggestion_2.suggestion_id)
         self.assertEqual(
             suggestions[1].suggestion_id, suggestion_1.suggestion_id)
-        self.assertLess(
+        self.assertLessEqual(
             suggestions[0].last_updated, suggestions[1].last_updated)
 
     def test_get_question_suggestions_waiting_longest_for_review(self):
@@ -1448,7 +1452,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
         for i in python_utils.RANGE(len(suggestions) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
@@ -2684,7 +2688,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                     index].submission_datetime)
         for index in python_utils.RANGE(
                 len(reviewable_suggestion_email_infos) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
                     index + 1].submission_datetime
@@ -3795,7 +3799,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                     index].submission_datetime)
         for index in python_utils.RANGE(
                 len(reviewable_suggestion_email_infos) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
                     index + 1].submission_datetime

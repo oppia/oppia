@@ -27,6 +27,7 @@ import re
 from core.platform import models
 from core.tests import test_utils
 from jobs import base_jobs
+from jobs import job_options
 import python_utils
 
 from apache_beam import runners
@@ -53,8 +54,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         super(PipelinedTestBase, self).__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
-            options=test_pipeline.PipelineOptions(
-                runtime_type_check=self.RUNTIME_TYPE_CHECK))
+            options=job_options.JobOptions(namespace=self.namespace))
         self._pipeline_context_stack = None
 
     def setUp(self):
@@ -72,7 +72,6 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
 
     def assert_pcoll_equal(self, actual, expected):
         """Asserts that the given PCollections are equal.
-
         NOTE: At most one PCollection assertion can be called in a test. This is
         because running assertions on pipelines requires flushing it and waiting
         for it to run to completion. If another assertion needs to be run, then
@@ -93,7 +92,6 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
 
     def assert_pcoll_empty(self, actual):
         """Asserts that the given PCollection is empty.
-
         NOTE: At most one PCollection assertion can be called in a test. This is
         because running assertions on pipelines requires flushing it and waiting
         for it to run to completion. If another assertion needs to be run, then
@@ -165,7 +163,6 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
 
 class JobTestBase(PipelinedTestBase):
     """Base class with helpful methods for testing Oppia's jobs.
-
     Subclasses must add the class constant JOB_CLASS to use the helper methods.
     """
 
@@ -175,22 +172,13 @@ class JobTestBase(PipelinedTestBase):
         super(JobTestBase, self).__init__(*args, **kwargs)
         self.job = self.JOB_CLASS(self.pipeline)
 
-    def setUp(self):
-        super(JobTestBase, self).setUp()
-        with self._pipeline_context_stack as stack:
-            stack.enter_context(self.job.datastoreio_stub.context())
-            self._pipeline_context_stack = stack.pop_all()
-
     def run_job(self):
         """Runs a new instance of self.JOB_CLASS and returns its output.
-
         Test authors should override this method if their jobs need arguments
         for their run() method, for example:
-
             class FooJob(JobBase):
                 def run(self, model_kind):
                     pass
-
         Should override this method to provide a value for `model_kind`.
 
         Returns:
@@ -224,12 +212,10 @@ class JobTestBase(PipelinedTestBase):
 @contextlib.contextmanager
 def decorate_beam_errors():
     """Context manager to improve the readability of beam_testing_util errors.
-
     The beam_testing_util module raises exceptions with a single string of
     repr()'d lists as the message. The items end up appearing on one long line,
     making it difficult to read when the elements of the lists are very long
     (which they tend to be, especially for Oppia's audit errors).
-
     This context manager tries to split the list elements into lines so that
     it's easier to understand which errors occurred and why. If it cannot parse
     the message successfully, it will raise the error unchanged.

@@ -19,7 +19,7 @@
 import { EventBusGroup } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
-require('components/forms/custom-forms-directives/html-select.directive.ts');
+require('components/forms/custom-forms-directives/html-select.component.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/state-directives/rule-editor/rule-type-selector.directive.ts');
@@ -147,7 +147,7 @@ angular.module('oppia').component('ruleEditor', {
                   function(choice) {
                     return {
                       id: choice.label,
-                      val: choice.label
+                      val: choice.val
                     };
                   }
                 );
