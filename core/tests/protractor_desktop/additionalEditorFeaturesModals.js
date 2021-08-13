@@ -465,8 +465,8 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should disable and enable save changes buttons when ' +
-    'offline and online respectively',
+    'should disable and enable the save draft button when the user is' +
+    'offline or online respectively',
     async function() {
       await users.createUser('user18@editor.com', 'user18Editor');
 
