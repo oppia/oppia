@@ -35,11 +35,11 @@ import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFacto
 import constants from 'assets/constants';
 
 interface LostChangeValues {
-  'outcome': Outcome;
-  'dest': string;
-  'feedback': SubtitledHtml;
-  'rules': Object;
-  'html': string;
+  'outcome'?: Outcome;
+  'dest'?: string;
+  'feedback'?: SubtitledHtml;
+  'rules'?: Object;
+  'html'?: string;
 }
 
 export type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
@@ -129,23 +129,24 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual(): boolean {
-    if ((<LostChangeValues> this.newValue).outcome &&
-      (<LostChangeValues> this.newValue).outcome.feedback &&
-      (<LostChangeValues> this.oldValue).outcome &&
-      (<LostChangeValues> this.oldValue).outcome.feedback) {
+    let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
+    let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
+    if (newValueOutcome && newValueOutcome?.feedback &&
+      oldValueOutcome && oldValueOutcome?.feedback) {
       return (
-        (<LostChangeValues> this.newValue).outcome.feedback.html ===
-        (<LostChangeValues> this.oldValue).outcome.feedback.html);
+        newValueOutcome.feedback.html === oldValueOutcome.feedback.html
+      );
     }
     return false;
   }
 
   isOutcomeDestEqual(): boolean {
-    if ((<LostChangeValues> this.newValue).outcome &&
-      (<LostChangeValues> this.oldValue).outcome) {
+    let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
+    let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
+    if (newValueOutcome && oldValueOutcome) {
       return (
-        (<LostChangeValues> this.oldValue).outcome.dest ===
-        (<LostChangeValues> this.newValue).outcome.dest);
+        newValueOutcome?.dest === oldValueOutcome?.dest
+      );
     }
     return false;
   }
@@ -159,8 +160,8 @@ export class LostChange {
     if ((<LostChangeValues> this.newValue).feedback &&
     (<LostChangeValues> this.oldValue).feedback) {
       return (
-        (<LostChangeValues> this.newValue).feedback.html ===
-        (<LostChangeValues> this.oldValue).feedback.html);
+        (<LostChangeValues> this.newValue).feedback?.html ===
+        (<LostChangeValues> this.oldValue).feedback?.html);
     }
     return false;
   }

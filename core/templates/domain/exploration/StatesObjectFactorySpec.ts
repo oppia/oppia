@@ -27,6 +27,7 @@ import { SubtitledUnicode } from
 import { Voiceover } from './voiceover.model';
 import { OutcomeBackendDict } from './OutcomeObjectFactory';
 import { SolutionBackendDict } from './SolutionObjectFactory';
+import { SubtitledHtmlBackendDict } from './subtitled-html.model';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory;
@@ -97,7 +98,7 @@ describe('States Object Factory', () => {
     newState = {
       classifier_model_id: null,
       card_is_checkpoint: false,
-      content: {
+      content: <SubtitledHtmlBackendDict>{
         content_id: 'content',
         html: ''
       },
@@ -128,7 +129,7 @@ describe('States Object Factory', () => {
         hints: [],
         solution: <SolutionBackendDict>{}
       },
-      linked_skill_id: '',
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -179,7 +180,7 @@ describe('States Object Factory', () => {
         hints: [],
         id: 'TextInput'
       },
-      linked_skill_id: '',
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -253,7 +254,7 @@ describe('States Object Factory', () => {
         },
         id: 'TextInput'
       },
-      linked_skill_id: '',
+      linked_skill_id: null,
       next_content_id_index: 1,
       param_changes: [],
       solicit_answer_details: false,
@@ -274,7 +275,7 @@ describe('States Object Factory', () => {
       'first state': {
         classifier_model_id: '',
         card_is_checkpoint: false,
-        linked_skill_id: '',
+        linked_skill_id: null,
         next_content_id_index: 0,
         content: {
           content_id: 'content',
@@ -340,7 +341,7 @@ describe('States Object Factory', () => {
       'second state': {
         classifier_model_id: '',
         card_is_checkpoint: false,
-        linked_skill_id: '',
+        linked_skill_id: null,
         next_content_id_index: 0,
         content: {
           content_id: 'content',
@@ -530,7 +531,7 @@ describe('States Object Factory', () => {
           }],
           id: 'TextInput'
         },
-        linked_skill_id: '',
+        linked_skill_id: null,
         next_content_id_index: 4,
         param_changes: [],
         solicit_answer_details: false,
@@ -632,7 +633,7 @@ describe('States Object Factory', () => {
       'third state': {
         classifier_model_id: '',
         card_is_checkpoint: false,
-        linked_skill_id: '',
+        linked_skill_id: null,
         next_content_id_index: 0,
         content: {
           content_id: 'content',
@@ -841,7 +842,7 @@ describe('States Object Factory', () => {
             }
           },
           interaction: {
-            solution: <SolutionBackendDict>{},
+            solution: null,
             answer_groups: [{
               outcome: {
                 dest: 'END',
@@ -889,7 +890,7 @@ describe('States Object Factory', () => {
             hints: [],
             id: 'TextInput'
           },
-          linked_skill_id: '',
+          linked_skill_id: null,
           next_content_id_index: 0,
           param_changes: [],
           solicit_answer_details: false,

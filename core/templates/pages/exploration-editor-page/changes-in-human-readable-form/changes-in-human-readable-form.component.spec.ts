@@ -146,10 +146,10 @@ describe('Changes in Human Readable Form Component', () => {
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: <LostChangeValue>{
-          html: 'newValue',
+          html: 'newValue'
         },
         old_value: <LostChangeValue>{
-          html: 'oldValue',
+          html: 'oldValue'
         },
         property_name: 'content'
       })];
@@ -575,14 +575,14 @@ describe('Changes in Human Readable Form Component', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: <LostChangeValue>{},
-      old_value: <LostChangeValue><unknown>{
+      old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict),
+        } as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -590,7 +590,7 @@ describe('Changes in Human Readable Form Component', () => {
             input2: 'input2'
           }
         }]
-      },
+      } as unknown as LostChangeValue,
       property_name: 'answer_groups'
     })];
 
