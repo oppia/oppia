@@ -256,6 +256,45 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await waitFor.pageToFullyLoad();
 };
 
+var goOffline = async function() {
+  await browser.driver.setNetworkConditions(
+    {
+      offline: true,
+      latency: 0,
+      download_throughput: 0,
+      upload_throughput: 0
+    });
+};
+
+var goOnline = async function() {
+  await browser.driver.setNetworkConditions(
+    {
+      offline: false,
+      latency: 150,
+      download_throughput: 450 * 1024,
+      upload_throughput: 150 * 1024
+    });
+};
+
+var offlineAlert = async function() {
+  await waitFor.visibilityOf(
+    element(by.css('.protractor-test-toast-message')),
+    'Offline warning toast message taking too long to appear.');
+  expect(await element(
+    by.css('.protractor-test-toast-message')).getText()).toMatch(
+    'Reconnected. Checking whether your changes are mergeable.');
+};
+
+var onlineAlert = async function() {
+  await waitFor.visibilityOf(
+    element(by.css('.protractor-test-toast-message')),
+    'Offline warning toast message taking too long to appear.');
+  expect(await element(
+    by.css('.protractor-test-toast-message')).getText()).toMatch(
+    'Looks like you are offline. You can continue working, and can save ' +
+    'your changes once reconnected.');
+};
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -289,3 +328,8 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
+
+exports.goOffline = goOffline;
+exports.goOnline = goOnline;
+exports.offlineAlert = offlineAlert;
+exports.onlineAlert = onlineAlert;

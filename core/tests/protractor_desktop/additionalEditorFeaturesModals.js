@@ -29,6 +29,7 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
+var saveChangesButton = element(by.css('.protractor-test-save-changes'));
 
 describe('Full exploration editor', function() {
   var explorationEditorPage = null;
@@ -381,96 +382,11 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should show a toast message to inform when the user is offline or online',
+    'should be able to save changes when offline',
     async function() {
       await users.createUser('user16@editor.com', 'user16Editor');
 
       await users.login('user16@editor.com');
-      await workflow.createExploration(true);
-      await explorationEditorPage.navigateToMainTab();
-
-      // Set network connection to offline.
-      await browser.driver.setNetworkConditions(
-        {
-          offline: true,
-          latency: 1000,
-          download_throughput: 0,
-          upload_throughput: 0});
-
-      // Check that toast message appeared when offline.
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-toast-message')),
-        'Offline warning toast message taking too long to appear.');
-
-      // Set network connection to online.
-      await browser.driver.setNetworkConditions(
-        {
-          offline: false,
-          latency: 150,
-          download_throughput: 450 * 1024,
-          upload_throughput: 150 * 1024});
-
-      // Check that toast message appeared when reconnected.
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-toast-message')),
-        'Online warning toast message taking too long to appear.');
-      await users.logout();
-    });
-
-  it(
-    'should be able to save changes when offline',
-    async function() {
-      await users.createUser('user17@editor.com', 'user17Editor');
-
-      await users.login('user17@editor.com');
-      await workflow.createExploration(true);
-      await explorationEditorPage.navigateToMainTab();
-
-      // Set network connection to offline.
-      await browser.driver.setNetworkConditions(
-        {
-          offline: true,
-          latency: 1000,
-          download_throughput: 0,
-          upload_throughput: 0});
-
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-toast-message')),
-        'Offline warning toast message taking too long to appear.');
-
-      // Add a content change to check changes can be done when offline.
-      await explorationEditorMainTab.setContent(async function(richTextEditor) {
-        await richTextEditor.appendPlainText('How are you feeling?');
-      });
-
-      // Set network connection to online.
-      await browser.driver.setNetworkConditions(
-        {
-          offline: false,
-          latency: 150,
-          download_throughput: 450 * 1024,
-          upload_throughput: 150 * 1024});
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-toast-message')),
-        'Online warning toast message taking too long to appear.');
-
-      // Check that the changes are auto-saved when reconnected.
-      await action.waitForAutosave();
-      await explorationEditorMainTab.expectContentToMatch(
-        async function(richTextChecker) {
-          await richTextChecker.readPlainText('How are you feeling?');
-        }
-      );
-      await users.logout();
-    });
-
-  it(
-    'should disable and enable save changes buttons when ' +
-    'offline and online respectively',
-    async function() {
-      await users.createUser('user18@editor.com', 'user18Editor');
-
-      await users.login('user18@editor.com');
       await workflow.createExploration(true);
       await explorationEditorPage.navigateToMainTab();
 
@@ -481,47 +397,38 @@ describe('Full exploration editor', function() {
       await action.waitForAutosave();
 
       // Check that the save changes button is clickable when online.
-      var saveChangesButton = element(by.css('.protractor-test-save-changes'));
       expect(await saveChangesButton.isEnabled()).toEqual(true);
 
       // Set network connection to offline.
-      await browser.driver.setNetworkConditions(
-        {
-          offline: true,
-          latency: 1000,
-          download_throughput: 0,
-          upload_throughput: 0});
+      await general.goOffline();
 
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-toast-message')),
-        'Offline warning toast message taking too long to appear.');
+      // Check that toast message appeared when offline.
+      await general.offlineAlert();
 
-      // Check that the save changes button is not clickable when offline.
-      expect(await saveChangesButton.isEnabled()).toEqual(false);
+      // Add a content change to check changes can be done when offline.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Hello Oppia?');
+      });
 
       // Set network connection to online.
-      await browser.driver.setNetworkConditions(
-        {
-          offline: false,
-          latency: 150,
-          download_throughput: 450 * 1024,
-          upload_throughput: 150 * 1024});
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-toast-message')),
-        'Online warning toast message taking too long to appear.');
+      await general.goOnline();
+
+      // Check that toast message appeared when reconnected.
+      await general.onlineAlert();
+
+      await action.waitForAutosave();
 
       // Check that the save changes button is clickable when reconnected.
-      await waitFor.elementToBeClickable(
-        saveChangesButton,
-        'Save changes button taking too long to be clickable.');
+      expect(await saveChangesButton.isEnabled()).toEqual(true);
 
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
-          await richTextChecker.readPlainText('How are you feeling?');
+          await richTextChecker.readPlainText('Hello Oppia?');
         }
       );
       await users.logout();
     });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
