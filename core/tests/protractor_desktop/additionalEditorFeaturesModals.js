@@ -398,7 +398,7 @@ describe('Full exploration editor', function() {
 
       // Check that the save changes button is enabled when online.
       expect(
-        await exploratoinEditorPage.saveChangesButton.isEnabled()
+        await explorationEditorPage.saveChangesButton.isEnabled()
       ).toEqual(true);
 
       // Set network connection to offline.
@@ -414,7 +414,7 @@ describe('Full exploration editor', function() {
 
       // Check that the save changes button is disabled when offline.
       expect(
-        await exploratoinEditorPage.saveChangesButton.isEnabled()
+        await explorationEditorPage.saveChangesButton.isEnabled()
       ).toEqual(false);
 
       // Set network connection to online.
@@ -427,7 +427,7 @@ describe('Full exploration editor', function() {
 
       // Check that the save changes button is enabled when reconnected.
       expect(
-        await saveChangesButton.isEnabled()
+        await explorationEditorPage.saveChangesButton.isEnabled()
       ).toEqual(true);
 
       await explorationEditorMainTab.expectContentToMatch(
