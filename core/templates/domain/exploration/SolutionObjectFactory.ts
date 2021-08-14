@@ -141,10 +141,13 @@ export class Solution {
 
   getOppiaShortAnswerResponseHtml(interaction: Interaction):
   ShortAnswerResponse {
+    if (interaction.id === null) {
+      throw new Error('Interaction id is possibly null.');
+    }
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(
-        this.correctAnswer, <string>interaction.id,
+        this.correctAnswer, interaction.id,
         interaction.customizationArgs
       )
     };
