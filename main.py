@@ -79,7 +79,7 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
+from typing import Any, Dict, Optional, Type, TypeVar  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -101,12 +101,11 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
 
@@ -160,10 +159,9 @@ class SplashRedirectPage(base.BaseHandler):
 
 
 def get_redirect_route(
-        regex_route: Text,
+        regex_route: str,
         handler: Type[base.BaseHandler],
-        defaults: Optional[Dict[Any, Any]] = None
-) -> routes.RedirectRoute:
+        defaults: Optional[Dict[Any, Any]] = None) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs
