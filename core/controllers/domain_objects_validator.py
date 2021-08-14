@@ -40,7 +40,7 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj)
+    return exp_domain.ExplorationChange(obj)
 
 
 def validate_new_config_property_values(obj):
@@ -60,6 +60,8 @@ def validate_new_config_property_values(obj):
             raise Exception('%s do not have any schema.' % name)
 
         config_property.normalize(value)
+
+    return obj
 
 
 def validate_change_dict_for_blog_post(change_dict):
@@ -86,6 +88,8 @@ def validate_change_dict_for_blog_post(change_dict):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
 
+    return change_dict
+
 
 def validate_collection_change(obj):
     # type: (Dict[String, Any]) -> None
@@ -96,7 +100,7 @@ def validate_collection_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    collection_domain.CollectionChange(obj)
+    return collection_domain.CollectionChange(obj)
 
 
 def validate_email_dashboard_data(data):
@@ -115,3 +119,5 @@ def validate_email_dashboard_data(data):
         if key not in possible_keys:
             # Raise exception if key is not one of the allowed keys.
             raise Exception('400 Invalid input for query.')
+
+    return data
