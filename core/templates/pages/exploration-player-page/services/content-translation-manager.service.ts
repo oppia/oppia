@@ -103,9 +103,11 @@ export class ContentTranslationManagerService {
       languageCode: string,
       content: SubtitledHtml
   ): string {
-    const writtenTranslation = (
-      content.contentId ? writtenTranslations.translationsMapping[
-        content.contentId][languageCode] : null);
+    if (!content.contentId) {
+      throw new Error('content id does not exist');
+    }
+    const writtenTranslation = writtenTranslations.translationsMapping[
+      content.contentId][languageCode];
     if (!writtenTranslation) {
       return content.html;
     }
@@ -128,9 +130,11 @@ export class ContentTranslationManagerService {
       languageCode: string,
       content: SubtitledHtml|SubtitledUnicode
   ): void {
-    const writtenTranslation: WrittenTranslation | null = (
-      content.contentId ? writtenTranslations.translationsMapping[
-        content.contentId][languageCode] : null);
+    if (!content.contentId) {
+      throw new Error('content id does not exist');
+    }
+    const writtenTranslation: WrittenTranslation | null =
+      writtenTranslations.translationsMapping[content.contentId][languageCode];
 
     if (!writtenTranslation ||
       !this._isValidStringTranslation(writtenTranslation)

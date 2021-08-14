@@ -68,7 +68,9 @@ import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
+export type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
 
 export interface InteractionBackendDict {
   // A null 'default_outcome' indicates that this interaction is

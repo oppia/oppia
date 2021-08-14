@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionSpecsKey } from 'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
 import { InteractionCustomizationArgs } from
@@ -33,8 +33,6 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-
-type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
 
 export interface InputResponsePair {
   learnerInput: string,
@@ -117,8 +115,8 @@ export class StateCard {
   isTerminal(): boolean {
     let interactionId = this.getInteractionId();
     return (
-      Boolean(interactionId) && INTERACTION_SPECS[
-        <InteractionSpecsKey>interactionId].is_terminal);
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal);
   }
 
   getHints(): Hint[] {
@@ -133,12 +131,13 @@ export class StateCard {
 
   doesInteractionSupportHints(): boolean {
     let interactionId = this.getInteractionId();
-    return (
-      interactionId ? (
+    if (interactionId) {
+      return (
         !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal &&
-        !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear
-      ) : false
-    );
+          !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear
+      );
+    }
+    return false;
   }
 
   isCompleted(): boolean {
@@ -153,12 +152,16 @@ export class StateCard {
     this._completed = false;
   }
 
-  // Some interaction specifications do not have instructions.
+  // Some interaction specifications do not have instructions, thus we return
+  // 'null' in that case.
   getInteractionInstructions(): string | null {
     let interactionId = this.getInteractionId();
-    return (
-        interactionId ? INTERACTION_SPECS[
-          <InteractionSpecsKey>interactionId].instructions : null);
+    if (interactionId) {
+      return (
+        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].instructions
+      );
+    }
+    return null;
   }
 
   // This returns 'null' when no interaction is set for the card.

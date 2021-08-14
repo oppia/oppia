@@ -23,11 +23,9 @@ import { Injectable } from '@angular/core';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from
   'extensions/interactions/customization-args-defs';
-import { InteractionObjectFactory } from
+import { InteractionObjectFactory, InteractionSpecsKey } from
   'domain/exploration/InteractionObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-
-type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
 
 @Injectable({
   providedIn: 'root'
