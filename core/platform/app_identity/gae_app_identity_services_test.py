@@ -36,7 +36,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
         with self.swap(os, 'getenv', lambda _: None):
             with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
                 ValueError, 'Value None for application id is invalid.'):
-                 gae_app_identity_services.get_application_id()
+                gae_app_identity_services.get_application_id()
 
     def test_get_default_gcs_bucket_name(self) -> None:
         with self.swap(os, 'getenv', lambda _: 'some_id'):
