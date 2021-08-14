@@ -102,7 +102,7 @@ describe('Blog Post Editor Component', () => {
         AngularHtmlBindWrapperDirective,
         UploadBlogPostThumbnailComponent,
         ImageUploaderComponent,
-        MockTranslatePipe,
+        MockTranslatePipe
       ],
       providers: [
         {
