@@ -71,7 +71,7 @@ var BlogDashboardPage = function() {
   var blogPostContentDisplay = element(
     by.css('.protractor-test-content-display'));
   var confirmButton = element(
-    by.css('.mat-button-wrapper .protractor-test-confirm-button'));
+    by.css('.protractor-test-confirm-button'));
   var currUsername = element(
     by.css('.protractor-test-username-visible'));
   var cancelThumbnailUploadButton = element(
