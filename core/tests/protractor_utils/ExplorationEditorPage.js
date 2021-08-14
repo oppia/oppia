@@ -331,6 +331,16 @@ var ExplorationEditorPage = function() {
     await action.click('Save draft button', commitChangesButton);
   };
 
+  this.expectSaveChangesButtonEnabled = async function() {
+    await action.waitForAutosave();
+    expect(await saveChangesButton.isEnabled()).toBeTrue();
+  };
+
+  this.expectSaveChangesButtonDisabled = async function() {
+    await action.waitForAutosave();
+    expect(await saveChangesButton.isEnabled()).toBeFalse();
+  };
+
   // ---- NAVIGATION ----
 
   this.navigateToImprovementsTab = async function() {

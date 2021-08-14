@@ -397,9 +397,7 @@ describe('Full exploration editor', function() {
       await action.waitForAutosave();
 
       // Check that the save changes button is enabled when online.
-      expect(
-        await explorationEditorPage.saveChangesButton.isEnabled()
-      ).toEqual(true);
+      await explorationEditorPage.expectSaveChangesButtonEnabled();
 
       // Set network connection to offline.
       await general.goOffline();
@@ -413,9 +411,7 @@ describe('Full exploration editor', function() {
       });
 
       // Check that the save changes button is disabled when offline.
-      expect(
-        await explorationEditorPage.saveChangesButton.isEnabled()
-      ).toEqual(false);
+      await explorationEditorPage.expectSaveChangesButtonDisabled();
 
       // Set network connection to online.
       await general.goOnline();
@@ -426,9 +422,7 @@ describe('Full exploration editor', function() {
       await action.waitForAutosave();
 
       // Check that the save changes button is enabled when reconnected.
-      expect(
-        await explorationEditorPage.saveChangesButton.isEnabled()
-      ).toEqual(true);
+      await explorationEditorPage.expectSaveChangesButtonEnabled();
 
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
