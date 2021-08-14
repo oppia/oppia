@@ -240,7 +240,8 @@ export class StateEditorService {
       interactionId === 'DragAndDropSortInput'
     ) {
       return <AnswerChoice[]>(
-        <CustomizationArgs>customizationArgs).choices.value.map(
+        <CustomizationArgs>customizationArgs
+      ).choices.value.map(
         val => ({
           val: val.contentId, label: val.html}
         )

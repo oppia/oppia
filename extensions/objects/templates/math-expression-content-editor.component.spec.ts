@@ -34,9 +34,9 @@ describe('MathExpressionContentEditorComponent', () => {
   let alertsService: AlertsService;
   let mockOnExternalRteSaveEventEmitter = new EventEmitter();
   let svgElement: {
-     setAttribute: (txt: string, temp: string) => void;
-     outerHTML: string;
-    };
+    setAttribute: (txt: string, temp: string) => void;
+    outerHTML: string;
+  };
 
   const mockMathJaxHub = {
     Queue: (func: () => void) => {

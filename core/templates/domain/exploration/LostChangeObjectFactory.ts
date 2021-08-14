@@ -135,9 +135,7 @@ export class LostChange {
       newValueOutcome && newValueOutcome?.feedback &&
       oldValueOutcome && oldValueOutcome?.feedback
     ) {
-      return (
-        newValueOutcome.feedback.html === oldValueOutcome.feedback.html
-      );
+      return newValueOutcome.feedback.html === oldValueOutcome.feedback.html;
     }
     return false;
   }
@@ -146,9 +144,7 @@ export class LostChange {
     let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
     let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
     if (newValueOutcome && oldValueOutcome) {
-      return (
-        newValueOutcome?.dest === oldValueOutcome?.dest
-      );
+      return newValueOutcome?.dest === oldValueOutcome?.dest;
     }
     return false;
   }
@@ -162,9 +158,7 @@ export class LostChange {
     let newValueFeedback = (<LostChangeValues> this.newValue).feedback;
     let oldValueFeedback = (<LostChangeValues> this.oldValue).feedback;
     if (newValueFeedback && oldValueFeedback) {
-      return (
-        newValueFeedback?.html === oldValueFeedback?.html
-      );
+      return newValueFeedback?.html === oldValueFeedback?.html;
     }
     return false;
   }

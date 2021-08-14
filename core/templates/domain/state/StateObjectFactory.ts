@@ -45,7 +45,7 @@ import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 export interface StateBackendDict {
-  // The classifier model ID associated with a state, if applicable
+  // The classifier model ID associated with a state, if applicable,
   // null otherwise.
   'classifier_model_id': string | null;
   'content': SubtitledHtmlBackendDict;
@@ -74,6 +74,7 @@ export class State {
   cardIsCheckpoint: boolean;
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
+
   constructor(
       name: string, classifierModelId: string | null,
       linkedSkillId: string | null,

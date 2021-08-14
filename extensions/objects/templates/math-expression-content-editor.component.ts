@@ -61,7 +61,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
     private externalRteSaveService: ExternalRteSaveService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     // Reset the component each time the value changes (e.g. if this is
