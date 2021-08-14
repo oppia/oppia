@@ -102,6 +102,10 @@ module.exports = {
           'matchingUrlPattern': '^http://[^/]+/story_editor/.*$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
+        {
+          'matchingUrlPattern': '^http://[^/]+/blog-dashboard$',
+          'assertions': baseConfig['basePerformanceAssertions']
+        },
       ]
     },
     'upload': {
