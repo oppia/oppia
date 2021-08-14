@@ -32,17 +32,17 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   class MockImageObject {
     source = null;
-    onload = null;
+    onload!: () => string;
     width = 0;
     height = 0;
-    constructor(_width?: 0, _height?: 0) {
+    constructor(_width: 0, _height: 0) {
       this.width = _width;
       this.height = _height;
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url) {
+    set src(url: string) {
       this.onload();
     }
   }
@@ -362,7 +362,6 @@ describe('ImageWithRegionsEditorComponent', () => {
         ]
       ]
     });
-
     component.onSvgMouseMove(evt);
 
     expect(component.value.labeledRegions[0].region).toEqual({
