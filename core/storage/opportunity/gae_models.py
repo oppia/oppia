@@ -107,8 +107,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 of the full list of entities.
             language_code: str. The language for which translation opportunities
                 are to be fetched.
-            topic_name: str. The topic for which translation opportunities
-                should be fetched.
+            topic_name: str or None. The topic for which translation
+                opportunities should be fetched. When it is None, fetch 
+                translation opportunities from all topics.
 
         Returns:
             3-tuple of (results, cursor, more). As described in fetch_page() at:

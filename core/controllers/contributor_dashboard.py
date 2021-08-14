@@ -177,8 +177,9 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         Args:
             language_code: str. The language for which translation opportunities
                 should be fetched.
-            topic_name: str. The topic for which translation opportunities
-                should be fetched.
+            topic_name: str or None. The topic for which translation
+                opportunities should be fetched. When it is None, fetch 
+                translation opportunities from all topics.
             search_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise, the
                 returned entities start from the beginning of the full list of
