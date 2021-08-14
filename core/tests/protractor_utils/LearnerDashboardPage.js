@@ -46,24 +46,6 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-topic-name-in-current-goals'));
   var editGoalsTopicName =
     element(by.css('.protractor-test-topic-name-in-edit-goals'));
-  var explorationTitleInIncompleteSection = element(
-    by.css(
-      '.protractor-test-incomplete-community-lessons-section')).element(
-    by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-  var explorationTitleInCompleteSection = element(
-    by.css(
-      '.protractor-test-completed-community-lessons-section')).element(
-    by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-  var collectionTitleInIncompleteSection = element(
-    by.css(
-      '.protractor-test-incomplete-community-lessons-section')).element(
-    by.cssContainingText(
-      '.protractor-test-collection-summary-tile-title', title));
-  var collectionTitleInCompleteSection = element(
-    by.css(
-      '.protractor-test-completed-community-lessons-section')).element(
-    by.cssContainingText(
-      '.protractor-test-collection-summary-tile-title', title));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
@@ -174,6 +156,12 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
     async function(explorationTitle) {
       await this.navigateToCommunityLessonsSection();
+      // eslint-disable-next-line oppia/check-element-selector-at-top
+      var explorationTitleInIncompleteSection = element(
+        by.css(
+          '.protractor-test-incomplete-community-lessons-section')).element(
+        by.cssContainingText(
+          '.protractor-test-exp-summary-tile-title', explorationTitle));
       expect(
         await explorationTitleInIncompleteSection.getText()).toMatch(
         explorationTitle);
@@ -182,6 +170,12 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
+    // eslint-disable-next-line oppia/check-element-selector-at-top
+    var explorationTitleInCompleteSection = element(
+      by.css(
+        '.protractor-test-completed-community-lessons-section')).element(
+      by.cssContainingText(
+        '.protractor-test-exp-summary-tile-title', explorationTitle));
     expect(
       await explorationTitleInCompleteSection.getText()).toMatch(
       explorationTitle);
@@ -190,6 +184,12 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
+    // eslint-disable-next-line oppia/check-element-selector-at-top
+    var collectionTitleInIncompleteSection = element(
+      by.css(
+        '.protractor-test-incomplete-community-lessons-section')).element(
+      by.cssContainingText(
+        '.protractor-test-collection-summary-tile-title', collectionTitle));
     expect(
       await collectionTitleInIncompleteSection.getText()).toMatch(
       collectionTitle);
@@ -198,6 +198,12 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
+    // eslint-disable-next-line oppia/check-element-selector-at-top
+    var collectionTitleInCompleteSection = element(
+      by.css(
+        '.protractor-test-completed-community-lessons-section')).element(
+      by.cssContainingText(
+        '.protractor-test-collection-summary-tile-title', collectionTitle));
     expect(
       await collectionTitleInCompleteSection.getText()).toMatch(
       collectionTitle);
