@@ -24,8 +24,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SearchService } from 'services/search.service';
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import { SearchService, SelectionDetails } from 'services/search.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
@@ -40,26 +40,6 @@ interface SearchDropDownCategories {
 interface LanguageIdAndText {
   id: string;
   text: string;
-}
-
-interface SelectionDetails {
-  categories: {
-    description: string,
-    itemsName: string,
-    masterList: SearchDropDownCategories[],
-    numSelections: number,
-    selections: {},
-    summary: string,
-  },
-
-  languageCodes: {
-    description: string,
-    itemsName: string,
-    masterList: LanguageIdAndText[],
-    numSelections: number,
-    selections: {},
-    summary: string,
-  }
 }
 
 @Component({

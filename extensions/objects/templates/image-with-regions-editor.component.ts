@@ -29,6 +29,15 @@ import { CustomSchema } from 'services/schema-default-value.service';
 import { UtilsService } from 'services/utils.service';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 
+export interface Region {
+  region: {
+    regionType: string;
+    area: number[][];
+  };
+  // 'label' is null until a valid label is found.
+  label: string | null;
+}
+
 // TODO(czx): Uniquify the labels of image regions.
 @Component({
   selector: 'image-with-regions-editor',
@@ -36,34 +45,40 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-re
   styleUrls: []
 })
 export class ImageWithRegionsEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: { labeledRegions: Region[]; imagePath: string; };
   @Output() valueChanged = new EventEmitter();
-  selectedRegion: number;
-  mouseX: number;
-  mouseY: number;
-  originalMouseX: number;
-  originalMouseY: number;
-  originalRectArea: { x: number; y: number; width: number; height: number; };
-  rectX: number;
-  rectY: number;
-  rectWidth: number;
-  rectHeight: number;
-  userIsCurrentlyDrawing: boolean;
-  userIsCurrentlyDragging: boolean;
-  userIsCurrentlyResizing: boolean;
-  xDirection: number;
-  yDirection: number;
-  yDirectionToggled: boolean;
-  xDirectionToggled: boolean;
-  movedOutOfRegion: boolean;
-  resizableBorderWidthPx: number;
-  originalImageWidth: number;
-  originalImageHeight: number;
-  hoveredRegion: null | number;
-  errorText: string;
-  alwaysEditable: boolean;
-  SCHEMA: { type: string; 'obj_type': string; };
+  errorText!: string;
+  SCHEMA!: { type: string; 'obj_type': string; };
+  mouseX!: number;
+  mouseY!: number;
+  originalMouseX!: number;
+  originalMouseY!: number;
+  originalRectArea!: { x: number; y: number; width: number; height: number; };
+  rectX!: number;
+  rectY!: number;
+  rectWidth!: number;
+  rectHeight!: number;
+  xDirection!: number;
+  yDirection!: number;
+  resizableBorderWidthPx!: number;
+  originalImageWidth!: number;
+  originalImageHeight!: number;
+  yDirectionToggled: boolean = false;
+  xDirectionToggled: boolean = false;
+  movedOutOfRegion: boolean = false;
+  userIsCurrentlyDrawing: boolean = false;
+  userIsCurrentlyDragging: boolean = false;
+  userIsCurrentlyResizing: boolean = false;
+  alwaysEditable: boolean = false;
+  // Hovered Region will be the index of region that the mouse is currently in.
+  // It will be null if the mouse is not in a region.
+  hoveredRegion: number | null = null;
+  // Selected Region will be null if no region is selected.
+  selectedRegion: number | null = null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -93,7 +108,8 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     };
   }
 
-  private hasDuplicates(originalArray: unknown[]): boolean {
+  // 'originalArray' will be null[] when the regions have invalid labels.
+  private hasDuplicates(originalArray: (string | null)[]): boolean {
     const array = originalArray.slice(0).sort();
     for (let i = 1; i < array.length; i++) {
       if (array[i - 1] === array[i]) {
@@ -103,12 +119,13 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     return false;
   }
 
-  private convertCoordsToFraction(coords, dimensions) {
+  private convertCoordsToFraction(coords: number[], dimensions: number[]) {
     return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
   }
   // Convert to and from region area (which is stored as a fraction of
   // image width and height) and actual width and height.
-  private regionAreaFromCornerAndDimensions(x, y, width, height) {
+  private regionAreaFromCornerAndDimensions(
+      x: number, y: number, width: number, height: number) {
     return [
       this.convertCoordsToFraction(
         [x, y],
@@ -121,7 +138,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     ];
   }
 
-  private cornerAndDimensionsFromRegionArea(area) {
+  private cornerAndDimensionsFromRegionArea(area: number[][]) {
     return {
       x: area[0][0] * this.getImageWidth(),
       y: area[0][1] * this.getImageHeight(),
@@ -132,7 +149,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   private resizeRegion() {
     const labeledRegions = this.value.labeledRegions;
-    const resizedRegion = labeledRegions[this.selectedRegion].region;
+    const resizedRegion = labeledRegions[<number> this.selectedRegion].region;
     const deltaX = this.mouseX - this.originalMouseX;
     const deltaY = this.mouseY - this.originalMouseY;
     let x = this.originalRectArea.x;
@@ -300,7 +317,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   regionLabelSetter(label: string): void {
     if (this.utilsService.isDefined(label)) {
-      this.value.labeledRegions[this.selectedRegion].label = label;
+      this.value.labeledRegions[<number> this.selectedRegion].label = label;
       this.valueChanged.emit(this.value);
       const labels = this.value.labeledRegions.map(
         region => {
@@ -330,7 +347,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
         this.originalMouseY - this.mouseY);
     } else if (this.userIsCurrentlyDragging) {
       const labeledRegions = this.value.labeledRegions;
-      const draggedRegion = labeledRegions[this.selectedRegion].region;
+      const draggedRegion = labeledRegions[<number> this.selectedRegion].region;
       const deltaX = this.mouseX - this.originalMouseX;
       const deltaY = this.mouseY - this.originalMouseY;
       let newX1 = this.originalRectArea.x + deltaX;
@@ -491,8 +508,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     }
     this.selectedRegion = this.hoveredRegion;
     this.originalRectArea = this.cornerAndDimensionsFromRegionArea(
-      this.value.labeledRegions[
-        this.hoveredRegion].region.area
+      this.value.labeledRegions[<number> this.hoveredRegion].region.area
     );
   }
 
@@ -555,12 +571,12 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   deleteRegion(index: number): void {
     if (this.selectedRegion === index) {
       this.selectedRegion = null;
-    } else if (this.selectedRegion > index) {
+    } else if (this.selectedRegion && this.selectedRegion > index) {
       this.selectedRegion--;
     }
     if (this.hoveredRegion === index) {
       this.hoveredRegion = null;
-    } else if (this.hoveredRegion > index) {
+    } else if (this.hoveredRegion && this.hoveredRegion > index) {
       this.hoveredRegion--;
     }
     this.value.labeledRegions.splice(index, 1);

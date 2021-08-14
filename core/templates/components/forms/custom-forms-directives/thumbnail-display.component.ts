@@ -17,6 +17,7 @@
  */
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
@@ -27,14 +28,20 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
   styleUrls: []
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
-  constructor(private svgSanitizerService: SvgSanitizerService) {}
-  @Input() imgSrc: string;
-  @Input() aspectRatio: string;
-  @Input() classes: string[];
-  @Input() background: string;
-  imageSourceInView = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() imgSrc!: string;
+  @Input() aspectRatio!: string;
+  @Input() classes!: string[];
+  @Input() background!: string;
+  // This property will be null when the SVG uploaded is not a valid.
+  imageSourceInView: SafeResourceUrl | null = null;
   height = '180px';
   width = '320px';
+
+  constructor(private svgSanitizerService: SvgSanitizerService) {}
+
   ngOnInit(): void {
     if (this.imgSrc !== undefined) {
       this.updateSvgInViewIfSafe();

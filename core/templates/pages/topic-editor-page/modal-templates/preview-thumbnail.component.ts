@@ -26,15 +26,18 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
   templateUrl: './preview-thumbnail.component.html'
 })
 export class PreviewThumbnailComponent {
-  @Input() bgColor: string;
-  @Input() filename: string;
-  @Input() name: string;
-  @Input() aspectRatio: string;
-  @Input() description: string;
-  @Input() previewFooter: string;
-  @Input() thumbnailBgColor: string;
-  @Input() previewTitle: string;
-  editableThumbnailDataUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() bgColor!: string;
+  @Input() filename!: string;
+  @Input() name!: string;
+  @Input() aspectRatio!: string;
+  @Input() description!: string;
+  @Input() previewFooter!: string;
+  @Input() thumbnailBgColor!: string;
+  @Input() previewTitle!: string;
+  editableThumbnailDataUrl!: string;
 
   constructor(
     private contextService: ContextService,
@@ -42,11 +45,17 @@ export class PreviewThumbnailComponent {
   ) {}
 
   ngOnInit(): void {
+    let entityType = this.contextService.getEntityType();
+    if (entityType === undefined) {
+      throw new Error('No image present for preview');
+    }
     this.editableThumbnailDataUrl = (
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.filename,
-        this.contextService.getEntityType(),
-        this.contextService.getEntityId()));
+        <string> entityType,
+        this.contextService.getEntityId()
+      )
+    );
   }
 }
 

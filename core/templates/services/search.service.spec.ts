@@ -38,7 +38,7 @@ describe('Search Service', () => {
   });
 
   describe('updateSearchFieldsBasedOnUrlQuery', () => {
-    let urlComponent;
+    let urlComponent: string;
     beforeEach(() => {
       results = {
         categories: {
@@ -223,12 +223,12 @@ describe('Search Service', () => {
   });
 
   describe('executeSearchQuery', () => {
-    let successHandler;
-    let errorHandler;
-    let searchQuery;
-    let categories;
-    let languageCodes;
-    let initialSearchResultsLoadedSpy;
+    let successHandler: jasmine.Spy<jasmine.Func>;
+    let errorHandler: jasmine.Spy<jasmine.Func>;
+    let searchQuery: string;
+    let categories: SelectionList;
+    let languageCodes: SelectionList;
+    let initialSearchResultsLoadedSpy: jasmine.Spy<jasmine.Func>;
     let testSubscriptions: Subscription;
     const SAMPLE_RESULTS = {
       search_cursor: 'notempty',

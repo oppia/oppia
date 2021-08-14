@@ -67,8 +67,8 @@ export class TextInputValidationService {
       });
     }
 
-    let isInt = function(n) {
-      return angular.isNumber(n) && n % 1 === 0;
+    let isInt = (n: number) => {
+      return ((typeof n === 'number') && (n % 1 === 0));
     };
 
     let rows = customizationArgs.rows.value;
@@ -76,15 +76,18 @@ export class TextInputValidationService {
       let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
       let customizationArgSpecs = textSpecs.customization_arg_specs;
       let rowsSpecs = customizationArgSpecs[1];
-      let minRows = rowsSpecs.schema.validators[0].min_value;
-      let maxRows = rowsSpecs.schema.validators[1].max_value;
-      if (rows < minRows || rows > maxRows) {
-        warningsList.push({
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'Number of rows must be between ' + minRows + ' and ' +
-            maxRows + '.')
-        });
+      let validators = rowsSpecs.schema.validators;
+      if (validators && validators.length === 2) {
+        let minRows = validators[0].min_value;
+        let maxRows = validators[1].max_value;
+        if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'Number of rows must be between ' + minRows + ' and ' +
+              maxRows + '.')
+          });
+        }
       }
     } else {
       warningsList.push({

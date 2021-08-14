@@ -25,7 +25,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 export interface ImagesData {
   filename: string;
-  imageBlob: Blob;
+  // 'imageBlob' will be null when filenames
+  // are not present in localStorage.
+  imageBlob: Blob | null;
 }
 
 @Injectable({
@@ -38,14 +40,17 @@ export class ImageLocalStorageService {
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
   MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
-  thumbnailBgColor: string = null;
+  // 'null' value here represents that either image is not present in local
+  // storage or ImageData has been flushed.
+  thumbnailBgColor: string | null = null;
 
   constructor(
     private alertsService: AlertsService,
     private imageUploadHelperService: ImageUploadHelperService,
     private windowRef: WindowRef) {}
 
-  getRawImageData(filename: string): string {
+  // Function returns null if filename doesn't exist in local storage.
+  getRawImageData(filename: string): string | null {
     return this.windowRef.nativeWindow.sessionStorage.getItem(filename);
   }
 
@@ -80,7 +85,7 @@ export class ImageLocalStorageService {
       returnData.push({
         filename: this.storedImageFilenames[idx],
         imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
-          this.windowRef.nativeWindow.sessionStorage.getItem(
+          <string> this.windowRef.nativeWindow.sessionStorage.getItem(
             this.storedImageFilenames[idx]))
       });
     }
@@ -95,7 +100,8 @@ export class ImageLocalStorageService {
     this.thumbnailBgColor = bgColor;
   }
 
-  getThumbnailBgColor(): string {
+  // Function returns null if no image is present in local storage.
+  getThumbnailBgColor(): string | null {
     return this.thumbnailBgColor;
   }
 

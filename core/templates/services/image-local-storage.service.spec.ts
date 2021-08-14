@@ -23,8 +23,8 @@ import { ImageLocalStorageService } from './image-local-storage.service';
 
 
 describe('ImageLocalStorageService', () => {
-  let alertsService: AlertsService = null;
-  let imageLocalStorageService: ImageLocalStorageService = null;
+  let alertsService: AlertsService;
+  let imageLocalStorageService: ImageLocalStorageService;
   let sampleImageData = 'data:image/png;base64,xyz';
   let imageFilename = 'filename';
 
@@ -80,7 +80,7 @@ describe('ImageLocalStorageService', () => {
   );
 
   it('should set and clear the thumbnail background color', () => {
-    expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(null);
+    expect(imageLocalStorageService.getThumbnailBgColor()).toBeNull();
     let bgColor = '#e34d43';
     imageLocalStorageService.setThumbnailBgColor(bgColor);
     expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(bgColor);
