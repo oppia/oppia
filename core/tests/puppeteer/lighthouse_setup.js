@@ -97,7 +97,7 @@ const login = async function(browser, page) {
     try {
       let cookies = await page.cookies();
       if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
-        await page.waitForSelector(cookieBannerAcceptButton);
+        await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
         await page.click(cookieBannerAcceptButton);
       }
       await page.waitForSelector(usernameInput, {visible: true});
