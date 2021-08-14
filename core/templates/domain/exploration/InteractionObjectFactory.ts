@@ -99,7 +99,7 @@ export class Interaction {
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome | null,
-      hints: Hint[], id: string, solution: Solution | null) {
+      hints: Hint[], id: string | null, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -381,7 +381,7 @@ export class InteractionObjectFactory {
   }
 
   convertFromCustomizationArgsBackendDict(
-      interactionId: string,
+      interactionId: string | null,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
     if (interactionId === null) {
@@ -449,9 +449,6 @@ export class InteractionObjectFactory {
   }
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
-    if (interactionDict.id === null) {
-      throw new Error('Interaction Id is possibly null!');
-    }
     return new Interaction(
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
@@ -469,7 +466,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string
+      interactionId: string | null
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
