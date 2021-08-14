@@ -539,6 +539,7 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/base_jobs_test.py',
     'jobs/batch_jobs/validation_jobs.py',
     'jobs/batch_jobs/validation_jobs_test.py',
+    'jobs/blog_validation_jobs.py',
     'jobs/decorators/validation_decorators.py',
     'jobs/decorators/validation_decorators_test.py',
     'jobs/io/job_io.py',
