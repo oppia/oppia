@@ -79,12 +79,9 @@
     "core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.ts",
     "core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.spec.ts",
     "core/templates/components/forms/custom-forms-directives/image-uploader.component.ts",
-<<<<<<< HEAD
     "core/templates/components/forms/custom-forms-directives/image-uploader.component.spec.ts",
-=======
     "core/templates/components/forms/custom-forms-directives/thumbnail-display.component.ts",
     "core/templates/components/forms/custom-forms-directives/thumbnail-display.component.spec.ts",
->>>>>>> upstream/develop
     "core/templates/components/forms/schema-based-editors/schema.constants.ts",
     "core/templates/components/skills-mastery-list/skills-mastery-list.constants.ts",
     "core/templates/components/state-directives/answer-group-editor/summary-list-header.component.ts",
@@ -177,7 +174,7 @@
     "core/templates/domain/exploration/answer-stats.model.ts",
     "core/templates/domain/exploration/answer-stats.model.spec.ts",
     "core/templates/domain/exploration/exploration-draft.model.ts",
-    "core/templates/domain/exploration/exploration-draft.model.spec.ts",    
+    "core/templates/domain/exploration/exploration-draft.model.spec.ts",
     "core/templates/domain/exploration/exploration-id-validation.service.ts",
     "core/templates/domain/exploration/exploration-id-validation.service.spec.ts",
     "core/templates/domain/exploration/exploration-metadata.model.ts",
@@ -502,7 +499,7 @@
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/messenger.service.ts",
-    "core/templates/services/messenger.service.spec.ts",    
+    "core/templates/services/messenger.service.spec.ts",
     "core/templates/services/navigation.service.ts",
     "core/templates/services/navigation.service.spec.ts",
     "core/templates/services/platform-feature.service.ts",
