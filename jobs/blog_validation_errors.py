@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from jobs.types import base_validation_errors
 import utils
 
-from typing import Any # pylint: disable=unused-import
+from typing import Any
 
 
 class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):

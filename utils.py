@@ -55,11 +55,6 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 
-# TODO(#13059): Every use of constants is followed by
-# 'type: ignore[attr-defined]' because mypy is not able to identify the
-# attributes of constants but this will be fixed after introduction of protobuf
-# for constants.
-
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
 # because python_utils is untyped and will be removed in python3.
 # These will be removed after python3 migration and adding stubs for new python3

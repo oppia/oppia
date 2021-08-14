@@ -20,9 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 
-from typing import Any # pylint: disable=unused-import
-from typing import Dict # pylint: disable=unused-import
-from typing import Text # pylint: disable=unused-import
+from typing import Any, Dict # isort:ignore
 
 
 class OppiaRootPage(base.BaseHandler):
@@ -30,8 +28,8 @@ class OppiaRootPage(base.BaseHandler):
        with angular router.
     """
 
-    URL_PATH_ARGS_SCHEMAS: Dict[Text, Any] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[Text, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {}
     }
 

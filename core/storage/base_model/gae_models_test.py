@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import cast, Dict, List, Set, Text, Union  # isort:skip # pylint: disable=unused-import
+from typing import cast, Dict, List, Set, Union  # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -284,7 +284,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [None, None, None])
 
     def test_get_new_id_method_returns_unique_ids(self) -> None:
-        ids: Set[Text] = set([])
+        ids: Set[str] = set([])
         for _ in python_utils.RANGE(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
@@ -405,8 +405,8 @@ class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @classmethod
     def get_instance_id(
             cls,
-            target_entity_id: Text,
-            version: Union[int, Text]) -> Text:
+            target_entity_id: str,
+            version: Union[int, str]) -> str:
         """A function that returns the id of the log in BaseCommitLogEntryModel.
 
         Args:
@@ -500,7 +500,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         user_data = (
             base_models.BaseSnapshotMetadataModel.export_data('trivial_user'))
-        expected_data: Dict[Text, Text] = {}
+        expected_data: Dict[str, str] = {}
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_nontrivial(self) -> None:

@@ -27,7 +27,7 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import
+from typing import Any
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -40,11 +40,11 @@ if MYPY: # pragma: no cover
 class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc]
     """Helper class to retrive models with duplicate properties."""
 
-    def __init__(self, property_name: Text) -> None:
+    def __init__(self, property_name):
         super(GetModelsWithDuplicatePropertyValues, self).__init__()
         self._property_name = property_name
 
-    def expand(self, blog_model_pcoll: Any) -> Any:
+    def expand(self, blog_model_pcoll):
         return (
             blog_model_pcoll
             | 'Discard models with empty property value' >> (
@@ -58,7 +58,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
                 beam.Filter(lambda models: len(models) > 1))
         )
 
-    def get_property_value(self, model: Any) -> Any:
+    def get_property_value(self, model):
         """Returns value of the given property of model
 
         Args:
@@ -74,7 +74,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
 class BlogPostTitleUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique title."""
 
-    def run(self) -> base_jobs.JobBase.pipeline:
+    def run(self):
         return (
             self.pipeline
             | 'Get every Blog Model' >> (
@@ -92,7 +92,7 @@ class BlogPostTitleUniquenessJob(base_jobs.JobBase):
 class BlogPostUrlUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique url."""
 
-    def run(self) -> base_jobs.JobBase.pipeline:
+    def run(self):
         return (
             self.pipeline
             | 'Get every Blog Post Model' >> (
@@ -110,7 +110,7 @@ class BlogPostUrlUniquenessJob(base_jobs.JobBase):
 class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique title."""
 
-    def run(self) -> base_jobs.JobBase.pipeline:
+    def run(self):
         return (
             self.pipeline
             | 'Get every Blog Summary Model' >> (
@@ -128,7 +128,7 @@ class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
 class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique url."""
 
-    def run(self) -> base_jobs.JobBase.pipeline:
+    def run(self):
         return (
             self.pipeline
             | 'Get every Blog Post Summary Model' >> (

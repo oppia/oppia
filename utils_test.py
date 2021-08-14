@@ -32,9 +32,6 @@ import utils
 
 from typing import Any, Dict, List # isort:skip
 
-# TODO(#13059): Remove #type: ignore[attr-defined] from constants after
-# introduction of protobuf for constants.
-
 
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""

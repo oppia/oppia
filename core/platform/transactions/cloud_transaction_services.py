@@ -23,7 +23,7 @@ import functools
 
 from google.cloud import datastore
 
-from typing import Any, Callable # isort:skip # pylint: disable=unused-import
+from typing import Any, Callable # isort:skip
 
 CLIENT = datastore.Client()
 

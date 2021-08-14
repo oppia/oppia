@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -299,7 +299,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 self.USER_ID_3))
-        expected_collection_ids: Dict[Text, List[Text]] = {
+        expected_collection_ids: Dict[str, List[str]] = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
             'voiced_collection_ids': [],
@@ -312,7 +312,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 'fake_user'))
-        expected_collection_ids: Dict[Text, List[Text]] = {
+        expected_collection_ids: Dict[str, List[str]] = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
             'voiced_collection_ids': [],
@@ -427,7 +427,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     def test_revert_to_version_with_invalid_status_is_successful(self) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
-        broken_dict: Dict[Text, Any] = dict(**self.original_dict)
+        broken_dict: Dict[str, Any] = dict(**self.original_dict)
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (
@@ -455,7 +455,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             self) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
-        broken_dict: Dict[Text, Any] = dict(**self.original_dict)
+        broken_dict: Dict[str, Any] = dict(**self.original_dict)
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]
 
