@@ -5018,6 +5018,16 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
+    def test_no_email_is_sent_when_there_are_no_users_pending_deletion(self):
+        pending_deletion_request_models = (
+            user_models.PendingDeletionRequestModel.query().fetch())
+        for pending_deletion_request_model in pending_deletion_request_models:
+            pending_deletion_request_model.delete()
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+            # When there are no pending deletion models, expect no emails.
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+
     def test_regular_deletion_is_successful(self):
         with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()

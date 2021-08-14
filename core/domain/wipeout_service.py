@@ -202,6 +202,8 @@ def delete_users_pending_to_be_deleted():
     """
     pending_deletion_request_models = (
         user_models.PendingDeletionRequestModel.query().fetch())
+    if len(pending_deletion_request_models) == 0:
+        return
 
     email_message = 'Results of the User Deletion Cron Job'
     for request_model in pending_deletion_request_models:
