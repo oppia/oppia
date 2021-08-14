@@ -49,7 +49,8 @@ describe('Blog Dashboard Page Component', () => {
     nativeWindow = {
       location: {
         href: '',
-        hash: '/'
+        hash: '/',
+        reload: () => {}
       },
       open: (url) => {},
       onhashchange() {
@@ -139,7 +140,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(component.activeTab).toBe('editor_tab');
 
     // Changing active tab back to main tab.
-    blogDashboardPageService.navigateToMainTab();
+    mockWindowRef.nativeWindow.location.hash = '/';
     mockWindowRef.nativeWindow.onhashchange();
     tick();
 
@@ -271,19 +272,17 @@ describe('Blog Dashboard Page Component', () => {
     let blogDashboardData = {
       username: 'test_user',
       profilePictureDataUrl: 'sample_url',
-      numOfPublishedBlogPosts: 0,
+      numOfPublishedBlogPosts: 1,
       numOfDraftBlogPosts: 0,
-      publishedBlogPostSummaryDicts: [],
+      publishedBlogPostSummaryDicts: [summaryObject],
       draftBlogPostSummaryDicts: [],
     };
     component.blogDashboardData = blogDashboardData;
-    component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
-    component.blogDashboardData.draftBlogPostSummaryDicts = [];
-    component.blogDashboardData.numOfDraftBlogPosts = 0;
-    component.blogDashboardData.numOfPublishedBlogPosts = 1;
 
     component.unpublishedBlogPost(summaryObject);
 
+    // BlogPostSummary should now be a part of draft list whereas
+    // publish blogPostSummary list should be empty.
     expect(component.blogDashboardData.draftBlogPostSummaryDicts)
       .toEqual([summaryObject]);
     expect(component.blogDashboardData.publishedBlogPostSummaryDicts)
@@ -317,6 +316,7 @@ describe('Blog Dashboard Page Component', () => {
     component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
 
     component.removeBlogPost(summaryObject, true);
+
     expect(component.blogDashboardData.publishedBlogPostSummaryDicts).toEqual(
       []);
   });
@@ -343,9 +343,9 @@ describe('Blog Dashboard Page Component', () => {
       draftBlogPostSummaryDicts: [summaryObject],
     };
     component.blogDashboardData = blogDashboardData;
-    component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
 
     component.removeBlogPost(summaryObject, false);
+
     expect(component.blogDashboardData.draftBlogPostSummaryDicts).toEqual(
       []);
   });

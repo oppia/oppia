@@ -5588,6 +5588,7 @@ export default {
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
@@ -6082,6 +6083,23 @@ export default {
       "TITLE": "Privacy Policy | Oppia",
       "META": []
     },
+    "SIGNUP": {
+      "ROUTE": "signup",
+      "TITLE": "Join the community - Oppia",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        }
+      ]
+    },
     "TEACH": {
       "ROUTE": "teach",
       "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
@@ -6133,6 +6151,11 @@ export default {
           "CONTENT": "Thank you for donating to The Oppia Foundation!"
         }
       ]
+    },
+    "VOLUNTEER": {
+      "ROUTE": "volunteer",
+      "TITLE": "Volunteer | Oppia",
+      "META": []
     }
   },
 

@@ -24,6 +24,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { BlogPostData } from 'domain/blog/blog-post.model';
 
 @Injectable({
@@ -47,6 +48,7 @@ export class BlogDashboardPageService {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
   ) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._setActiveTab(currentHash);
@@ -59,6 +61,7 @@ export class BlogDashboardPageService {
       this._blogPostId = this.urlService.getBlogPostIdFromUrl();
     } else {
       this._activeTab = 'main';
+      this.preventPageUnloadEventService.removeListener();
     }
     this.updateViewEventEmitter.emit();
   }
@@ -79,7 +82,7 @@ export class BlogDashboardPageService {
   }
 
   navigateToMainTab(): void {
-    this.windowRef.nativeWindow.location.hash = '/';
+    this.windowRef.nativeWindow.location.href = '/blog-dashboard';
   }
 
   set blogPostAction(action: string) {
@@ -140,7 +143,9 @@ export class BlogDashboardPageService {
         () => {
           this.alertsService.addSuccessMessage(
             'Blog Post Deleted Successfully.', 5000);
-          this.navigateToMainTab();
+          if (this.activeTab === 'editor_tab') {
+            this.navigateToMainTab();
+          }
         }, (errorResponse) => {
           this.alertsService.addWarning('Failed to delete blog post.');
         }
