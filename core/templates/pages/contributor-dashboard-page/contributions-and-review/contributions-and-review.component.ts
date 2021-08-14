@@ -160,8 +160,6 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var getTranslationSuggestionHeading = function(suggestion) {
         const changeTranslation = suggestion.change.translation_html;
-        console.log(changeTranslation)
-        console.log(Array.isArray(changeTranslation))
         if (Array.isArray(changeTranslation)) {
           return $filter('formatRtePreview')(changeTranslation.join(', '));
         }
