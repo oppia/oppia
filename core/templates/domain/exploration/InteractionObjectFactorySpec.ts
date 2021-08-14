@@ -35,7 +35,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'domain/state/StateObjectFactory';
+import { InteractionSpecsKeys } from 'domain/state/StateObjectFactory';
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
@@ -782,7 +782,7 @@ describe('Interaction object factory', () => {
 
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
-    const keys = <InteractionSpecsKey[]> Object.keys(INTERACTION_SPECS);
+    const keys = <InteractionSpecsKeys[]> Object.keys(INTERACTION_SPECS);
     keys.forEach(interactionId => {
       expect(() => {
         const defaultCa: Record<string, Object> = {};

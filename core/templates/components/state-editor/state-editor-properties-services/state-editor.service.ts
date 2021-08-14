@@ -207,14 +207,15 @@ export class StateEditorService {
     return cloneDeep(this.interaction);
   }
 
-  // Function will return null if interactionId is not
-  // 'MultipleChoiceInput', 'ItemSelectionInput', 'DragAndDropSortInput' .
+  // Function will return null if interactionId does not exist or is not
+  // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
+  // 'DragAndDropSortInput'.
   getAnswerChoices(
       interactionId: string,
       customizationArgs: InteractionCustomizationArgs
   ): AnswerChoice[] | null {
     if (!interactionId) {
-      throw new Error('Interaction Id does not exist');
+      return null;
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {

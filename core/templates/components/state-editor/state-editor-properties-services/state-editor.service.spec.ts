@@ -287,7 +287,7 @@ describe('Editor state service', () => {
     ).toEqual(null);
   });
 
-  it('should throw error when getting answer choices' +
+  it('should return null when getting answer choices' +
     ' if interactionID is empty', () => {
     expect(ecs.getAnswerChoices('', {
       choices: {
@@ -296,7 +296,7 @@ describe('Editor state service', () => {
           new SubtitledHtml('Choice 2', '')
         ]
       }
-    })).toThrowError('Interaction Id does not exist');
+    })).toBeNull();
   });
 
   it('should return if exploration is whitelisted or not', () => {

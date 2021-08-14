@@ -60,7 +60,7 @@ export interface StateBackendDict {
   'next_content_id_index': number;
 }
 
-export type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
+export type InteractionSpecsKeys = keyof typeof INTERACTION_SPECS;
 
 export class State {
   name: string;
@@ -137,8 +137,8 @@ export class State {
     // checking status of a state.
     if (
       !interactionId ||
-      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear ||
-      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal
+      INTERACTION_SPECS[<InteractionSpecsKeys>interactionId].is_linear ||
+      INTERACTION_SPECS[<InteractionSpecsKeys>interactionId].is_terminal
     ) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {

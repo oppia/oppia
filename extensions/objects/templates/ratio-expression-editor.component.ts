@@ -37,6 +37,7 @@ export class RatioExpressionEditorComponent implements OnInit {
   localValue!: { label: string; };
   warningText: string = '';
   eventBusGroup: EventBusGroup;
+
   constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
