@@ -41,9 +41,8 @@ import { SubtitledUnicode } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionSpecsKey } from 'domain/exploration/InteractionObjectFactory';
 
-type InteractionSpecKey = (
-  keyof typeof InteractionSpecsConstants.INTERACTION_SPECS);
 
 @Injectable({
   providedIn: 'root'
@@ -238,7 +237,7 @@ export class ContentTranslationManagerService {
     };
 
     const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
-      <InteractionSpecKey>interactionId
+      <InteractionSpecsKey>interactionId
     ].customization_arg_specs;
     for (const caSpec of caSpecs) {
       const name = <keyof InteractionCustomizationArgs>caSpec.name;
