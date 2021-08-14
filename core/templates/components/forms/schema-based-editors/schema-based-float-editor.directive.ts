@@ -56,9 +56,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           var labelForFocus = $scope.labelForFocusTarget();
           ctrl.validate = function(localValue, customizationArg) {
             let { checkRequireNonnegativeInput } = customizationArg || {};
-            let checkRequireNonnegativeInputValue =
+            let checkRequireNonnegativeInputValue = (
             checkRequireNonnegativeInput === undefined ? false :
-            checkRequireNonnegativeInput;
+            checkRequireNonnegativeInput);
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
@@ -132,9 +132,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             // To check checkRequireNonnegativeInput customization argument
             // Value of numeric input interaction.
             let { checkRequireNonnegativeInput } = ctrl.uiConfig() || {};
-            ctrl.checkRequireNonnegativeInputValue =
+            ctrl.checkRequireNonnegativeInputValue = (
             checkRequireNonnegativeInput === undefined ? false :
-            checkRequireNonnegativeInput;
+            checkRequireNonnegativeInput);
             // If customization argument of numeric input interaction is true
             // Set Min value as 0 to not let down key go below 0.
             ctrl.minValue = checkRequireNonnegativeInput && 0;
