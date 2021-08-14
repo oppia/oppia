@@ -36,10 +36,7 @@ import { SuggestionsService } from 'services/suggestions.service';
 
 export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
-// Key values for this property will be 'null' if the thread is
-// not found or threadId is invalid.
-type SuggestionBackendDictsByThreadId = (
-  Map<string, SuggestionBackendDict>);
+type SuggestionBackendDictsByThreadId = Map<string, SuggestionBackendDict>;
 
 interface NumberOfOpenThreads {
   'num_open_threads': number;
@@ -174,13 +171,15 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-        let suggestionBackendDictsByThreadId: SuggestionBackendDictsByThreadId =
-          new Map(
-            suggestionBackendDicts.map(dict => [
-              this.suggestionsService
-                .getThreadIdFromSuggestionBackendDict(dict),
-              dict
-            ])
+        let suggestionBackendDictsByThreadId:
+          SuggestionBackendDictsByThreadId = (
+            new Map(
+              suggestionBackendDicts.map(dict => [
+                this.suggestionsService
+                  .getThreadIdFromSuggestionBackendDict(dict),
+                dict
+              ])
+            )
           );
 
         return {
@@ -195,8 +194,9 @@ export class ThreadDataBackendApiService {
       async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  async getMessagesAsync(thread: SuggestionAndFeedbackThread):
-  Promise<ThreadMessage[]> {
+  async getMessagesAsync(
+      thread: SuggestionAndFeedbackThread
+  ): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -291,7 +291,8 @@ export class ThreadDataBackendApiService {
       thread: SuggestionAndFeedbackThread,
       action: string,
       commitMsg: string,
-      reviewMsg: string): Promise<ThreadMessage[]> {
+      reviewMsg: string
+  ): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -307,7 +308,7 @@ export class ThreadDataBackendApiService {
       thread.status = (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
         ExplorationEditorPageConstants.STATUS_FIXED :
-          ExplorationEditorPageConstants.STATUS_IGNORED
+        ExplorationEditorPageConstants.STATUS_IGNORED
       );
       this.openThreadsCount -= 1;
 

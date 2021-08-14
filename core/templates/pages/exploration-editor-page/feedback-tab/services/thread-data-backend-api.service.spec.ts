@@ -294,7 +294,7 @@ describe('retrieving threads service', () => {
 
   it('should throw error if trying to fetch messages of' +
     'null thread', async() => {
-    // This throws " Argument of type 'null' is not assignable to parameter of
+    // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'SuggestionAndFeedbackThread'". We need to suppress this
     // error because we are testing validations here.
     // @ts-ignore
@@ -437,7 +437,7 @@ describe('retrieving threads service', () => {
   }));
 
   it('should throw error if trying to mark null thread as seen', async() => {
-    // This throws " Argument of type 'null' is not assignable to parameter of
+    // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'SuggestionAndFeedbackThread'". We need to suppress this
     // error because we are testing validations here.
     // @ts-ignore
@@ -469,10 +469,10 @@ describe('retrieving threads service', () => {
 
   it('should use reject handler when passing a null thread', async() => {
     await expectAsync(threadDataBackendApiService.addNewMessageAsync(
-    // This throws " Argument of type 'null' is not assignable to parameter of
-    // type 'SuggestionAndFeedbackThread'". We need to suppress this
-    // error because we are testing validations here.
-    // @ts-ignore
+      // This throws "Argument of type 'null' is not assignable to parameter of
+      // type 'SuggestionAndFeedbackThread'". We need to suppress this
+      // error because we are testing validations here.
+      // @ts-ignore
       null, 'Message', 'open')).toBeRejectedWithError(
       'Trying to update a non-existent thread');
   });
@@ -623,10 +623,10 @@ describe('retrieving threads service', () => {
 
   it('should throw an error if trying to resolve a null thread', async() => {
     await expectAsync(
-    // This throws " Argument of type 'null' is not assignable to parameter of
-    // type 'SuggestionAndFeedbackThread'". We need to suppress this
-    // error because we are testing validations here.
-    // @ts-ignore
+      // This throws "Argument of type 'null' is not assignable to parameter of
+      // type 'SuggestionAndFeedbackThread'". We need to suppress this
+      // error because we are testing validations here.
+      // @ts-ignore
       threadDataBackendApiService.resolveSuggestionAsync(null, '', '', ''))
       .toBeRejectedWithError('Trying to update a non-existent thread');
   });
