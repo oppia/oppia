@@ -41,6 +41,8 @@ import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
+// import { WindowRef } from 'services/contextual/window-ref.service';
+
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html'
@@ -84,6 +86,7 @@ export class BlogPostEditorComponent implements OnInit {
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
+    // private windowRef: WindowRef,
   ) {}
 
   ngOnInit(): void {
@@ -105,6 +108,16 @@ export class BlogPostEditorComponent implements OnInit {
         this.blogDashboardPageService.imageUploaderIsNarrow = true;
       }
     });
+
+    // this.windowRef.nativeWindow.addEventListener(
+    //   'mouseleave', (e: MouseEvent) => {
+    //     e.preventDefault();
+    //   }, {passive: false});
+
+    // this.windowRef.nativeWindow.addEventListener(
+    //   'mouseenter', (e: MouseEvent) => {
+    //     e.preventDefault();
+    //   }, {passive: false});
   }
 
   getSchema(): EditorSchema {
