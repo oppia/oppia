@@ -16,28 +16,27 @@
  * @fileoverview Unit Tests for ExplorationIdValidationService
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ExplorationIdValidationService } from
-  'domain/exploration/exploration-id-validation.service';
+import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
+import { ExplorationSummaryBackendDict, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 
-describe('Exploration id validation service', function() {
+describe('Exploration id validation service', () => {
   let explorationIdValidationService:
-    ExplorationIdValidationService = null;
+    ExplorationIdValidationService;
   let httpTestingController: HttpTestingController;
-  let validExpResults = null;
-  let successHandler = null;
-  let failHandler = null;
+  let validExpResults: ExplorationSummaryBackendDict;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
     explorationIdValidationService =
-      TestBed.get(ExplorationIdValidationService);
-    httpTestingController = TestBed.get(HttpTestingController);
+      TestBed.inject(ExplorationIdValidationService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   beforeEach(() => {
@@ -69,8 +68,10 @@ describe('Exploration id validation service', function() {
         tags: [],
         thumbnail_icon_url: '/subjects/Lightbulb.svg',
         community_owned: true,
-        title: 'Test of all interactions'
-      }]
+        title: 'Test of all interactions',
+        num_total_threads: 0,
+        num_open_threads: 0
+      } as ExplorationSummaryDict]
     };
   });
 

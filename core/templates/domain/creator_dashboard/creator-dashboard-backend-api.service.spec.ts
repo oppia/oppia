@@ -25,7 +25,7 @@ import { CreatorDashboardBackendApiService } from
 
 describe('Creator Dashboard backend API service', () => {
   let creatorDashboardBackendApiService:
-    CreatorDashboardBackendApiService = null;
+    CreatorDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {
