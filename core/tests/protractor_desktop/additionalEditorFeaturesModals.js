@@ -382,7 +382,7 @@ describe('Full exploration editor', function() {
 
   it(
     'should be able to make changes offline and the changes ' +
-    'shoudld be saved when online.',
+    'should be saved when online.',
     async function() {
       await users.createUser('user16@editor.com', 'user16Editor');
 
