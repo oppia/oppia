@@ -190,7 +190,6 @@ describe('Suggestion Modal For Exploration Editor', () => {
   }));
 
   it('should open suggestion modal', () => {
-    spyOn(ExplorationStatesService, 'setState');
     spyOn($uibModal, 'open').and.callFake((options) => {
       options.resolve.currentContent();
       options.resolve.newContent();
