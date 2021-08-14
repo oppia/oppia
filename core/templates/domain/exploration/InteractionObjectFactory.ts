@@ -449,20 +449,17 @@ export class InteractionObjectFactory {
   }
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
-    if (interactionDict.id === null) {
-      throw new Error('Interaction Id is invalid!');
-    }
     return new Interaction(
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
-        interactionDict.id),
+        <string>interactionDict.id),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
-        interactionDict.id, interactionDict.customization_args),
+        <string>interactionDict.id, interactionDict.customization_args),
       interactionDict.default_outcome ? this.createOutcomeFromBackendDict(
         interactionDict.default_outcome) : null,
       this.createHintsFromBackendDict(interactionDict.hints),
-      interactionDict.id,
+      <string>interactionDict.id,
       interactionDict.solution ? this.createSolutionFromBackendDict(
         interactionDict.solution) : null);
   }
