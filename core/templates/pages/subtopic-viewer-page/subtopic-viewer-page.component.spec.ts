@@ -108,7 +108,7 @@ describe('Subtopic viewer page', function() {
         $q.resolve(subtopicDataObject));
     spyOn(
       OppiaAngularRootComponent.pageTitleService,
-      'setPageTitle').and.callThrough();
+      'setDocumentTitle').and.callThrough();
     spyOn(
       OppiaAngularRootComponent.pageTitleService,
       'updateMetaTag').and.callThrough();
@@ -123,7 +123,7 @@ describe('Subtopic viewer page', function() {
     expect(ctrl.pageContents.getHtml()).toBe('This is a html');
     expect(ctrl.subtopicTitle).toBe(subtopicTitle);
     expect(
-      OppiaAngularRootComponent.pageTitleService.setPageTitle
+      OppiaAngularRootComponent.pageTitleService.setDocumentTitle
     ).toHaveBeenCalledWith(`Review ${subtopicTitle} | Oppia`);
     expect(
       OppiaAngularRootComponent.pageTitleService.updateMetaTag

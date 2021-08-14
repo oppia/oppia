@@ -35,7 +35,7 @@ export class PageTitleService {
     private titleService: Title
   ) {}
 
-  setPageTitle(title: string): void {
+  setDocumentTitle(title: string): void {
     this.titleService.setTitle(title);
   }
 

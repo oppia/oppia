@@ -106,7 +106,7 @@ describe('Classroom Page Component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue(bannerImageUrl);
     spyOn(loaderService, 'showLoadingScreen');
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(classroomBackendApiService.onInitializeTranslation, 'emit');
     spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
@@ -124,7 +124,7 @@ describe('Classroom Page Component', () => {
       .toHaveBeenCalled();
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)
       .toHaveBeenCalled();

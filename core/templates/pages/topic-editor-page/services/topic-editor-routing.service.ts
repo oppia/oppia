@@ -77,31 +77,31 @@ export class TopicEditorRoutingService {
 
   navigateToMainTab(): void {
     this._lastTabVisited = 'topic';
-    this.pageTitleService.setPageTitleForMobileView('Topic Editor');
+    this.pageTitleService.setNavbarTitle('Topic Editor');
     this._changeTab('/');
   }
 
   navigateToSubtopicPreviewTab(subtopicId: number): void {
     this._lastTabVisited = 'subtopic';
-    this.pageTitleService.setPageTitleForMobileView('Subtopic Preview');
+    this.pageTitleService.setNavbarTitle('Subtopic Preview');
     this._changeTab('/subtopic_preview/' + subtopicId);
   }
 
   navigateToTopicPreviewTab(): void {
     this._lastTabVisited = 'topic';
-    this.pageTitleService.setPageTitleForMobileView('Topic Preview');
+    this.pageTitleService.setNavbarTitle('Topic Preview');
     this._changeTab('/topic_preview');
   }
 
   navigateToSubtopicEditorWithId(subtopicId: number): void {
     this._lastTabVisited = 'subtopic';
-    this.pageTitleService.setPageTitleForMobileView('Subtopic Editor');
+    this.pageTitleService.setNavbarTitle('Subtopic Editor');
     this._changeTab('/subtopic_editor/' + subtopicId);
   }
 
   navigateToQuestionsTab(): void {
     this._lastSubtopicId = this.getSubtopicIdFromUrl();
-    this.pageTitleService.setPageTitleForMobileView('Question Editor');
+    this.pageTitleService.setNavbarTitle('Question Editor');
     this._changeTab('/questions');
   }
 

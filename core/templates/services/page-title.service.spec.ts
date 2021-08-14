@@ -33,10 +33,10 @@ describe('Page title service', () => {
   });
 
   it('should correctly set the page title', () => {
-    pts.setPageTitle('First Title');
+    pts.setDocumentTitle('First Title');
     expect(titleService.getTitle()).toEqual('First Title');
 
-    pts.setPageTitle('Second Title');
+    pts.setDocumentTitle('Second Title');
     expect(titleService.getTitle()).toEqual('Second Title');
   });
 

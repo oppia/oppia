@@ -93,8 +93,8 @@ angular.module('oppia').component('storyEditorPage', {
             ), '_self');
         }
       };
-      var setPageTitle = function() {
-        PageTitleService.setPageTitle(
+      var setDocumentTitle = function() {
+        PageTitleService.setDocumentTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
         PageTitleService.setPageSubtitleForMobileView(
           StoryEditorStateService.getStory().getTitle());
@@ -189,7 +189,7 @@ angular.module('oppia').component('storyEditorPage', {
 
       var _initPage = function() {
         ctrl.story = StoryEditorStateService.getStory();
-        setPageTitle();
+        setDocumentTitle();
         _validateStory();
       };
 

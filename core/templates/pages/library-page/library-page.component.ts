@@ -241,7 +241,7 @@ export class LibraryPageComponent {
       title = 'Find explorations to learn from - Oppia';
     }
 
-    this.pageTitleService.setPageTitle(title);
+    this.pageTitleService.setDocumentTitle(title);
 
     // Keeps track of the index of the left-most visible card of each
     // group.

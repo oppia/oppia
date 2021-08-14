@@ -75,9 +75,9 @@ angular.module('oppia').directive('topicEditorPage', [
             return ContextService.getEntityType();
           };
 
-          var setPageTitle = function() {
+          var setDocumentTitle = function() {
             let topicName = TopicEditorStateService.getTopic().getName();
-            PageTitleService.setPageTitle(
+            PageTitleService.setDocumentTitle(
               topicName + ' - Oppia');
             PageTitleService.setPageSubtitleForMobileView(topicName);
             ctrl.topic = TopicEditorStateService.getTopic();
@@ -184,14 +184,14 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicInitialized.subscribe(
                 () => {
                   LoaderService.hideLoadingScreen();
-                  setPageTitle();
+                  setDocumentTitle();
                   $rootScope.$applyAsync();
                 }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => {
-                  setPageTitle();
+                  setDocumentTitle();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -213,7 +213,7 @@ angular.module('oppia').directive('topicEditorPage', [
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
               UndoRedoService.onUndoRedoChangeApplied$().subscribe(
-                () => setPageTitle()
+                () => setDocumentTitle()
               )
             );
           };

@@ -71,7 +71,7 @@ angular.module('oppia').component('subtopicViewerPage', {
             ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
             ContextService.setCustomEntityContext(
               ENTITY_TYPE.TOPIC, ctrl.parentTopicId);
-            ctrl.pageTitleService.setPageTitle(
+            ctrl.pageTitleService.setDocumentTitle(
               `Review ${ctrl.subtopicTitle} | Oppia`);
             ctrl.pageTitleService.updateMetaTag(
               `Review the skill of ${ctrl.subtopicTitle.toLowerCase()}.`);
