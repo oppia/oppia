@@ -40,9 +40,8 @@ class SplashPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_redirection_if_user_is_not_fully_registered(self):
         # type: () -> None
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
-        self.assertTrue(response['valid'])
         self.logout() # type: ignore[no-untyped-call]
 
     def test_redirection_to_default_dashboard_if_user_is_fully_registered(self):
@@ -59,18 +58,16 @@ class SplashPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         # Set the default dashboard as creator dashboard.
         user_services.update_user_default_dashboard( # type: ignore[no-untyped-call]
             self.editor_id, constants.DASHBOARD_TYPE_LEARNER)
-        response = self.get_json( # type: ignore[no-untyped-call]
-            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
-        self.assertFalse(response['valid'])
-        self.assertEqual(response['default_dashboard'], 'learner')
+        self.get_json( # type: ignore[no-untyped-call]
+            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=404)
 
         # Set the default dashboard as creator dashboard.
         user_services.update_user_default_dashboard( # type: ignore[no-untyped-call]
             self.editor_id, constants.DASHBOARD_TYPE_CREATOR)
-        response = self.get_json( # type: ignore[no-untyped-call]
-            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX,)
-        self.assertFalse(response['valid'])
-        self.assertEqual(response['default_dashboard'], 'creator')
+        self.get_json( # type: ignore[no-untyped-call]
+            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=404)
 
 
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
@@ -97,22 +94,17 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_validation_returns_true_if_classroom_is_available(self):
         # type: () -> None
         self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'math'))
-        self.assertTrue(response['valid'])
-        self.assertIsNone(response['redirect_url'])
 
     def test_validation_returns_false_if_classroom_doesnot_exists(self):
         # type: () -> None
         self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_json( # type: ignore[no-untyped-call]
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
-            (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'))
-        self.assertFalse(response['valid'])
-        self.assertEqual(
-            response['redirect_url'], '/learn/%s' %
-            constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
+            expected_status_int=404)
 
 
 class ReleaseCoordinatorAccessValidationHandlerTests(
@@ -148,10 +140,9 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
         # type: () -> None
         self.login(self.RELEASE_COORDINATOR_EMAIL) # type: ignore[no-untyped-call]
 
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_access_release_coordinator_page' %
             ACCESS_VALIDATION_HANDLER_PREFIX)
-        self.assertTrue(response['valid'])
 
 
 class AccountDeletionIsEnabledValidationHandlerTests(
@@ -166,18 +157,16 @@ class AccountDeletionIsEnabledValidationHandlerTests(
     def test_delete_account_validation_returns_true_if_enabled(self):
         # type: () -> None
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            response = self.get_json( # type: ignore[no-untyped-call]
+            self.get_html_response( # type: ignore[no-untyped-call]
                 '%s/account_deletion_is_enabled' %
                 ACCESS_VALIDATION_HANDLER_PREFIX)
-            self.assertTrue(response['valid'])
 
     def test_delete_account_validation_returns_false_if_disabled(self):
         # type: () -> None
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            response = self.get_json( # type: ignore[no-untyped-call]
+            self.get_json( # type: ignore[no-untyped-call]
                 '%s/account_deletion_is_enabled' %
-                ACCESS_VALIDATION_HANDLER_PREFIX)
-            self.assertFalse(response['valid'])
+                ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=404)
 
 
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
@@ -192,30 +181,28 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
         # type: () -> None
         # Viewer looks at editor's profile page.
         self.login(self.VIEWER_EMAIL) # type: ignore[no-untyped-call]
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_html_response( # type: ignore[no-untyped-call]
             '%s/does_profile_exist/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME))
-        self.assertTrue(response['valid'])
         self.logout() # type: ignore[no-untyped-call]
 
     def test_profile_validation_returns_true_if_user_views_own_profile(self):
         # type: () -> None
         # Editor looks at their own profile page.
         self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_html_response( # type: ignore[no-untyped-call]
             '%s/does_profile_exist/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME))
-        self.assertTrue(response['valid'])
         self.logout() # type: ignore[no-untyped-call]
 
     def test_profile_validation_returns_false_if_profile_doesnot_exist(self):
         # type: () -> None
         # Editor looks at non-existing profile page.
         self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_json( # type: ignore[no-untyped-call]
             '%s/does_profile_exist/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME))
-        self.assertFalse(response['valid'])
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
+                expected_status_int=404)
         self.logout() # type: ignore[no-untyped-call]
 
 
@@ -243,7 +230,6 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
     def test_normal_user_can_manage_account(self):
         # type: () -> None
         self.login(self.user_email) # type: ignore[no-untyped-call]
-        response = self.get_json( # type: ignore[no-untyped-call]
+        self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_manage_own_account' % ACCESS_VALIDATION_HANDLER_PREFIX)
-        self.assertTrue(response['valid'])
         self.logout() # type: ignore[no-untyped-call]
