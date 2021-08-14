@@ -21,12 +21,6 @@ Also contains a list of handler class names which does not contain the schema.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
-from core.domain import blog_domain
-from core.domain import collection_domain
-from core.domain import config_domain
-from core.domain import exp_domain
-from core.domain import state_domain
 import python_utils
 import schema_utils
 

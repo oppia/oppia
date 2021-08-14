@@ -1618,7 +1618,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(exp_id, self.owner_id)
         response = self.delete_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            params={'username': 'random_username'}, expected_status_int=400)
+            params={'username': 'any_username'}, expected_status_int=400)
         self.assertEqual(
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
