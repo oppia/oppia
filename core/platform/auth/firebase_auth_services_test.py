@@ -49,6 +49,24 @@ if MYPY: # pragma: no cover
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
+UidsPartitionTupleType = (
+    Tuple[
+        List[Tuple[int, str]],
+        List[Tuple[int, str]]
+    ])
+
+UidsZipPartitionTupleType = (
+    Tuple[
+        List[Tuple[int, Tuple[str, str]]],
+        List[Tuple[int, Tuple[str, str]]]
+    ])
+
+RecordsPartitionTupleType = (
+    Tuple[
+        List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]],
+        List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]]
+    ])
+
 
 class FirebaseAdminSdkStub(python_utils.OBJECT):
     """Helper class for swapping the Firebase Admin SDK with a stateful stub.
@@ -246,7 +264,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             errors = []
         else:
             disabled_uids, enabled_uids = cast(
-                Tuple[List[Tuple[int, str]], List[Tuple[int, str]]],
+                UidsPartitionTupleType,
                 utils.partition(
                     uids,
                     predicate=lambda uid: self._users_by_uid[uid].disabled,
@@ -628,10 +646,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 raise error_to_raise
 
             uids_to_delete, uids_to_fail = cast(
-                Tuple[
-                    List[Tuple[int, Tuple[str, str]]],
-                    List[Tuple[int, Tuple[str, str]]]
-                ],
+                UidsZipPartitionTupleType,
                 utils.partition(
                     python_utils.ZIP(uids, updated_individual_error_pattern),
                     predicate=lambda uid_and_error: uid_and_error[1] is None,
@@ -689,12 +704,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 raise error_to_raise
 
             records_to_import, records_to_fail = cast(
-                Tuple[
-                    List[Tuple[
-                        int, Tuple[firebase_auth.ImportUserRecord, str]]],
-                    List[Tuple[
-                        int, Tuple[firebase_auth.ImportUserRecord, str]]]
-                ],
+                RecordsPartitionTupleType,
                 utils.partition(
                     python_utils.ZIP(records, updated_individual_error_pattern),
                     predicate=(
