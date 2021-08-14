@@ -19,7 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import datetime # pylint: disable=unused-import
+import datetime
 import json
 import logging
 
@@ -31,7 +31,7 @@ from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional # isort:skip
 
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
@@ -75,9 +75,6 @@ def create_http_task(
     # its structure can vary a lot.
     # We can see how the proto message for Task is defined. See the link:
     # https://github.com/googleapis/python-tasks/blob/2f6ae8318e9a6fc2963d4a7825ee96e41f330043/google/cloud/tasks_v2/types/task.py#L29
-    # Create_task either expects this protobuf message or a dictionary having
-    # a similar structure.
-    # This clearly points to the fact that the task is of type Dict[str, Any].
     # Construct the request body.
     task: Dict[str, Any] = {
         'app_engine_http_request': {  # Specify the type of request.

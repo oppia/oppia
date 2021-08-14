@@ -25,7 +25,7 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
 import python_utils
 
-from typing import Any, Dict, List, Optional # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional # isort:skip
 
 
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):

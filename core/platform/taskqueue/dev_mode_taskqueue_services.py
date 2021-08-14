@@ -27,7 +27,7 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional # isort:skip
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
@@ -51,7 +51,7 @@ def _task_handler(
     """
     headers: Dict[str, str] = {}
     headers['X-Appengine-QueueName'] = queue_name
-    headers['X-Appengine-TaskName'] = task_name or 'Task_without_name'
+    headers['X-Appengine-TaskName'] = task_name or 'task_without_name'
     headers['X-Appengine-TaskRetryCount'] = '0'
     headers['X-Appengine-TaskExecutionCount'] = '0'
     headers['X-Appengine-TaskETA'] = '0'

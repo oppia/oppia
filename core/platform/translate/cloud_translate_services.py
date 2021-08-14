@@ -26,7 +26,7 @@ from constants import constants
 from google import auth
 from google.cloud import translate_v2 as translate
 
-from typing import Dict, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, cast # isort:skip
 
 CLIENT = translate.Client(
     credentials=(

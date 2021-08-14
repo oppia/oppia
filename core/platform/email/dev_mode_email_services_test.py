@@ -26,7 +26,7 @@ from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Dict, Union # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Union # isort:skip
 
 
 class EmailTests(test_utils.GenericTestBase):
