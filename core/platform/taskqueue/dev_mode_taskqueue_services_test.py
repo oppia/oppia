@@ -54,7 +54,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         def mock_create_task(
                 queue_name: str,
                 url: str,
-                payload: Optional[Dict[str, Any]] = None,
+                payload: Dict[str, Any],
                 scheduled_for: Optional[datetime.datetime] = None, # pylint: disable=unused-argument
                 task_name: Optional[str] = None,
         ) -> None:
@@ -67,7 +67,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task)
         with swap_create_task:
             dev_mode_taskqueue_services.create_http_task(
-                correct_queue_name, dummy_url, payload=correct_payload,
+                correct_queue_name, dummy_url, correct_payload,
                 task_name=correct_task_name)
 
     def test_task_handler_will_create_the_correct_post_request(self) -> None:
