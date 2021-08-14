@@ -34,11 +34,7 @@ export class CanAccessSplashPageGuard implements CanLoad {
     private windowRef: WindowRef
   ) {}
 
-  canLoad(
-      route: Route,
-      segments: UrlSegment[]
-  ): boolean | UrlTree | Observable<boolean | UrlTree>
-  | Promise<boolean | UrlTree> {
+  canLoad(route: Route,segments: UrlSegment[]): Promise<boolean> {
     return this.accessValidationBackendApiService.validateAccessToSplashPage()
       .then(() => {
         return true;

@@ -55,18 +55,13 @@ describe('Access validation backend api service', () => {
   it('should validate access to splash page', fakeAsync(() => {
     avbas.validateAccessToSplashPage().then(successSpy, failSpy);
 
-    const resp: SplashPageValidatorResponse = {
-      valid: true,
-      default_dashboard: ''
-    };
-
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_splash_page');
     expect(req.request.method).toEqual('GET');
-    req.flush(resp);
+    req.flush({});
 
     flushMicrotasks();
-    expect(successSpy).toHaveBeenCalledWith(resp);
+    expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
@@ -74,45 +69,32 @@ describe('Access validation backend api service', () => {
     let fragment = 'invalid';
     avbas.validateAccessToClassroomPage(fragment).then(successSpy, failSpy);
 
-    const resp = {
-      valid: true,
-      redirect_url: ''
-    };
-
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_classroom_page?' +
       'classroom_url_fragment=' + fragment);
     expect(req.request.method).toEqual('GET');
-    req.flush(resp);
+    req.flush({});
 
     flushMicrotasks();
-    expect(successSpy).toHaveBeenCalledWith(resp);
+    expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
   it('should validate access to manage user account page', fakeAsync(() => {
     avbas.validateCanManageOwnAccount().then(successSpy, failSpy);
 
-    const resp = {
-      valid: true
-    };
-
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_manage_own_account');
     expect(req.request.method).toEqual('GET');
-    req.flush(resp);
+    req.flush({});
 
     flushMicrotasks();
-    expect(successSpy).toHaveBeenCalledWith(resp);
+    expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
   it('should validate whether user profile exists', fakeAsync(() => {
     let username = 'test_username';
-
-    const resp = {
-      valid: true
-    };
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/access_validation_handler/does_profile_exist/' + username
@@ -123,44 +105,36 @@ describe('Access validation backend api service', () => {
     const req = httpTestingController.expectOne(
       '/access_validation_handler/does_profile_exist/' + username);
     expect(req.request.method).toEqual('GET');
-    req.flush(resp);
+    req.flush({});
 
     flushMicrotasks();
-    expect(successSpy).toHaveBeenCalledWith(resp);
+    expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
   it('should validate whether account deletion is enabled', fakeAsync(() => {
     avbas.accountDeletionIsEnabled().then(successSpy, failSpy);
 
-    const resp = {
-      valid: true
-    };
-
     const req = httpTestingController.expectOne(
       '/access_validation_handler/account_deletion_is_enabled');
     expect(req.request.method).toEqual('GET');
-    req.flush(resp);
+    req.flush({});
 
     flushMicrotasks();
-    expect(successSpy).toHaveBeenCalledWith(resp);
+    expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
   it('should validate access to release coordinator page', fakeAsync(() => {
     avbas.validateAccessToReleaseCoordinatorPage().then(successSpy, failSpy);
 
-    const resp = {
-      valid: true
-    };
-
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_release_coordinator_page');
     expect(req.request.method).toEqual('GET');
-    req.flush(resp);
+    req.flush({});
 
     flushMicrotasks();
-    expect(successSpy).toHaveBeenCalledWith(resp);
+    expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
 });
