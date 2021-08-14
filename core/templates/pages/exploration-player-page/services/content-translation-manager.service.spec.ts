@@ -320,6 +320,27 @@ describe('Content translation manager service', () => {
     expect(translatedHtml).toEqual('<p>en content</p>');
   });
 
+  it('should throw error if content id is not defined', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', null);
+    expect(() => {
+      ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
+    }).toThrowError('content id does not exist');
+    expect(() => {
+      ctms._swapContent(writtenTranslations, 'fr', content);
+    }).toThrowError('content id does not exist');
+  });
+
   it('should return default content HTML if translation is nonexistent', () => {
     let writtenTranslations = wtof.createFromBackendDict({
       translations_mapping: {
