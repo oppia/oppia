@@ -39,7 +39,7 @@ export class PageTitleService {
     this.titleService.setTitle(title);
   }
 
-  getPageTitle(): string {
+  getDocumentTitle(): string {
     return this.titleService.getTitle();
   }
 
