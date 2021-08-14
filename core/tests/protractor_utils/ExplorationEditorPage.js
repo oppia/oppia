@@ -333,12 +333,12 @@ var ExplorationEditorPage = function() {
 
   this.expectSaveChangesButtonEnabled = async function() {
     await action.waitForAutosave();
-    expect(await saveChangesButton.isEnabled()).toBeTrue();
+    expect(await saveChangesButton.isEnabled()).toBe(true);
   };
 
   this.expectSaveChangesButtonDisabled = async function() {
     await action.waitForAutosave();
-    expect(await saveChangesButton.isEnabled()).toBeFalse();
+    expect(await saveChangesButton.isEnabled()).toBe(false);
   };
 
   // ---- NAVIGATION ----
