@@ -30,7 +30,7 @@ export class ImprovementsService {
 
   isStateForcedToResolveOutstandingUnaddressedAnswers(state: State): boolean {
     return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
-      state.interaction.id) !== -1;
+      <string>state.interaction.id) !== -1;
   }
 }
 

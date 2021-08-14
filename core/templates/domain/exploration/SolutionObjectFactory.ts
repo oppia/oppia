@@ -144,7 +144,10 @@ export class Solution {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(
-        this.correctAnswer, interaction.id, interaction.customizationArgs)};
+        this.correctAnswer, <string>interaction.id,
+        interaction.customizationArgs
+      )
+    };
   }
 
   getOppiaSolutionExplanationResponseHtml(): string {

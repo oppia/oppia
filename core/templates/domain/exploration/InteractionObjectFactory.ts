@@ -78,7 +78,8 @@ export interface InteractionBackendDict {
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
-  'id': string;
+  // Id is null until populated from the backend,
+  'id': string | null;
   // A null 'solution' indicates that this Interaction does not have a hint
   // or there is a hint, but no solution. A new interaction is initialised with
   // null 'solution' and stays null until the first hint with solution is added.
@@ -91,7 +92,7 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string;
+  id: string | null;
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
@@ -448,6 +449,9 @@ export class InteractionObjectFactory {
   }
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
+    if (interactionDict.id === null) {
+      throw new Error('Interaction Id is invalid!');
+    }
     return new Interaction(
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
