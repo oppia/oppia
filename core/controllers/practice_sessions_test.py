@@ -143,3 +143,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'invalid'),
             expected_status_int=404)
+
+    def test_get_fails_when_json_loads_fails(self):
+        response = self.get_json(
+            '%s/staging/%s?selected_subtopic_ids=1,2' % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'invalid'),
+            expected_status_int=400)
+        error_msg = (
+            'Schema validation for \'selected_subtopic_ids\' failed: '
+            'Extra data: line 1 column 2 (char 1)'
+        )
+        self.assertEqual(response['error'], error_msg)

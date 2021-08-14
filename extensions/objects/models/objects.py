@@ -1712,8 +1712,8 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
 
-class ConvertStringifiedListToProperList(BaseObject):
-    """Converts stringified list to proper list of strings."""
+class ValidateAndNormalizeJsonStrings(BaseObject):
+    """Converts stringified value to its actual data type."""
 
     @classmethod
     def normalize(cls, raw):
@@ -1723,7 +1723,8 @@ class ConvertStringifiedListToProperList(BaseObject):
             raw: str. Strings to be validated and normalized.
 
         Returns:
-            list(str). The normalized list of strings.
+            *. The normalized value of any type, it depends on the raw value
+            which we want to load from json.
         """
         if not isinstance(raw, python_utils.BASESTRING):
             raise Exception('Expected string received %s' % raw)
