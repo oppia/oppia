@@ -108,7 +108,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             language_code: str. The language for which translation opportunities
                 are to be fetched.
             topic_name: str or None. The topic for which translation
-                opportunities should be fetched. When it is None, fetch 
+                opportunities should be fetched. When it is None, fetch
                 translation opportunities from all topics.
 
         Returns:
