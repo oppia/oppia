@@ -175,10 +175,16 @@ export class StateCard {
 
   isInteractionInline(): boolean {
     let interactionId = this.getInteractionId();
+    let interactionDisplayMode;
+    if (interactionId) {
+      interactionDisplayMode = (
+        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode);
+    } else {
+      interactionDisplayMode = null;
+    }
     return (
       !interactionId ||
-        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode ===
-        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+      interactionDisplayMode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
 
   getContentHtml(): string {

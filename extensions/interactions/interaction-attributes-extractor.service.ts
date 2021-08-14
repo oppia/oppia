@@ -61,11 +61,13 @@ export class InteractionAttributesExtractorService {
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
       const attributesKey = `${caName}WithValue` as keyof typeof attributes;
-      Object.defineProperty(caBackendDict, caName, { value: {
-        value: this.htmlEscaperService.escapedJsonToObj(
-          attributes[attributesKey].toString()),
-      },
-      enumerable: true
+      Object.defineProperty(caBackendDict, caName, {
+        value: {
+          value: this.htmlEscaperService.escapedJsonToObj(
+            attributes[attributesKey].toString()
+          ),
+        },
+        enumerable: true
       });
     });
 

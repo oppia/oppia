@@ -136,7 +136,8 @@ export class ContentTranslationManagerService {
     const writtenTranslation: WrittenTranslation | null =
       writtenTranslations.translationsMapping[content.contentId][languageCode];
 
-    if (!writtenTranslation ||
+    if (
+      !writtenTranslation ||
       !this._isValidStringTranslation(writtenTranslation)
     ) {
       return;
@@ -237,7 +238,8 @@ export class ContentTranslationManagerService {
     };
 
     const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
-      <InteractionSpecKey>interactionId].customization_arg_specs;
+      <InteractionSpecKey>interactionId
+    ].customization_arg_specs;
     for (const caSpec of caSpecs) {
       const name = <keyof InteractionCustomizationArgs>caSpec.name;
       if (caValues.hasOwnProperty(name)) {
@@ -265,10 +267,13 @@ export class ContentTranslationManagerService {
           let ruleInputValue = rule.inputs[key];
           if (this._isTranslatableObject(ruleInputValue)) {
             const writtenTranslation = writtenTranslations.translationsMapping[
-              <string>ruleInputValue.contentId][languageCode];
+              <string>ruleInputValue.contentId
+            ][languageCode];
             // There must be at least one translation.
-            if (!writtenTranslation ||
-            writtenTranslation.translation.length === 0) {
+            if (
+              !writtenTranslation ||
+              writtenTranslation.translation.length === 0
+            ) {
               continue;
             }
 
