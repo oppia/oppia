@@ -70,9 +70,7 @@ describe('Release Coordinator Page Root', () => {
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToReleaseCoordinatorPage')
-      .and.returnValue(Promise.resolve({
-        valid: true
-      }));
+      .and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();
@@ -86,30 +84,6 @@ describe('Release Coordinator Page Root', () => {
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
-
-  it('should initialize and show error page when access is not valid',
-    fakeAsync(() => {
-      spyOn(pageHeadService, 'updateTitleAndMetaTags');
-      spyOn(
-        accessValidationBackendApiService,
-        'validateAccessToReleaseCoordinatorPage')
-        .and.returnValue(Promise.resolve({
-          valid: false
-        }));
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(loaderService, 'hideLoadingScreen');
-      component.ngOnInit();
-      tick();
-      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(
-        accessValidationBackendApiService
-          .validateAccessToReleaseCoordinatorPage)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {

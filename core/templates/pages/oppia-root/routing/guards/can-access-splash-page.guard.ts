@@ -17,9 +17,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CanLoad, Route, Router, UrlSegment, UrlTree } from '@angular/router';
+import { CanLoad, Route, UrlSegment, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserService } from 'services/user.service';
 import { AccessValidationBackendApiService } from '../access-validation-backend-api.service';
 
 @Injectable({
@@ -29,7 +30,7 @@ export class CanAccessSplashPageGuard implements CanLoad {
   constructor(
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
-    private router: Router,
+    private userService: UserService,
     private windowRef: WindowRef
   ) {}
 
@@ -39,17 +40,16 @@ export class CanAccessSplashPageGuard implements CanLoad {
   ): boolean | UrlTree | Observable<boolean | UrlTree>
   | Promise<boolean | UrlTree> {
     return this.accessValidationBackendApiService.validateAccessToSplashPage()
-      .then(resp => {
-        if (!resp.valid) {
-          // Use router.navigate once both learner dashbaord page and
-          // creator dashboard page are migrated to angular router.
-          this.windowRef.nativeWindow.location.href = (
-            '/' + resp.default_dashboard + '-dashboard');
-          return false;
-        }
+      .then(() => {
         return true;
-      }, err => {
-        this.router.navigate(['/not-found']);
+      }, () => {
+        this.userService.getUserPreferredDashboardAsync().then(
+          (preferredDashboard) => {
+            // Use router.navigate once both learner dashbaord page and
+            // creator dashboard page are migrated to angular router.
+            this.windowRef.nativeWindow.location.href = (
+              '/' + preferredDashboard + '-dashboard');
+          });
         return false;
       });
   }

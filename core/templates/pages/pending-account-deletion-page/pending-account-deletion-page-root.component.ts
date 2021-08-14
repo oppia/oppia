@@ -44,14 +44,10 @@ export class PendingAccountDeletionPageRootComponent {
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.accountDeletionIsEnabled()
       .then((resp) => {
-        if (resp.valid) {
-          this.pageIsShown = true;
-        } else {
-          this.errorPageIsShown = true;
-        }
-        this.loaderService.hideLoadingScreen();
+        this.pageIsShown = true;
       }, (err) => {
         this.errorPageIsShown = true;
+      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

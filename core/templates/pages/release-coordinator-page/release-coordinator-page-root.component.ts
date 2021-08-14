@@ -44,14 +44,10 @@ export class ReleaseCoordinatorPageRootComponent {
     this.accessValidationBackendApiService
       .validateAccessToReleaseCoordinatorPage()
       .then((resp) => {
-        if (!resp.valid) {
-          this.errorPageIsShown = true;
-        } else {
-          this.pageIsShown = true;
-        }
-        this.loaderService.hideLoadingScreen();
+        this.pageIsShown = true;
       }, (err) => {
         this.errorPageIsShown = true;
+      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

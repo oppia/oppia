@@ -54,11 +54,7 @@ class SplashAccessValidationHandler(base.BaseHandler):
             default_dashboard = user_settings.default_dashboard
             # User's request to visit splash page is not valid and they
             # need to be redirected to their preferred dashboard.
-            self.render_json( # type: ignore[no-untyped-call]
-                {'valid': False, 'default_dashboard': default_dashboard})
-        else:
-            # User's request to visit splash page is valid.
-            self.render_json({'valid': True}) # type: ignore[no-untyped-call]
+            raise self.PageNotFoundException
 
 
 class ClassroomAccessValidationHandler(base.BaseHandler):
@@ -87,15 +83,7 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
             classroom_url_fragment)
 
         if not classroom:
-            self.render_json( # type: ignore[no-untyped-call]
-                {
-                    'valid': False,
-                    'redirect_url': '/learn/%s' %
-                                    constants.DEFAULT_CLASSROOM_URL_FRAGMENT
-                })
-            return
-
-        self.render_json({'valid': True, 'redirect_url': None}) # type: ignore[no-untyped-call]
+            raise self.PageNotFoundException
 
 
 class ManageOwnAccountValidationHandler(base.BaseHandler):
@@ -105,6 +93,7 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     } # type: Dict[Text, Any]
@@ -112,7 +101,7 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account # type: ignore[misc]
     def get(self):
         # type: () -> None
-        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
+        pass
 
 
 class ProfileExistsValidationHandler(base.BaseHandler):
@@ -127,6 +116,7 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             }
         }
     } # type: Dict[Text, Any]
+
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     } # type: Dict[Text, Any]
@@ -140,10 +130,7 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             username)
 
         if not user_settings:
-            self.render_json({'valid': False}) # type: ignore[no-untyped-call]
-            return
-
-        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
+            raise self.PageNotFoundException
 
 
 class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
@@ -162,10 +149,7 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
         # type: () -> None
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
-            self.render_json({'valid': False}) # type: ignore[no-untyped-call]
-            return
-
-        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
+            raise self.PageNotFoundException
 
 
 class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
@@ -183,5 +167,4 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-
-        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
+        pass

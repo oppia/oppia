@@ -46,15 +46,11 @@ export class ProfilePageRootComponent {
     let username = this.urlService.getPathname().split('/')[2];
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.doesProfileExist(username)
-      .then((resp) => {
-        if (!resp.valid) {
-          this.errorPageIsShown = true;
-        } else {
-          this.pageIsShown = true;
-        }
-        this.loaderService.hideLoadingScreen();
+      .then(() => {
+        this.pageIsShown = true;
       }, (err) => {
         this.errorPageIsShown = true;
+      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

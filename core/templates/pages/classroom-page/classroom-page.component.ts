@@ -64,30 +64,29 @@ export class ClassroomPageComponent {
     this.loaderService.showLoadingScreen('Loading');
 
     this.accessValidationBackendApiService.validateAccessToClassroomPage(
-      this.classroomUrlFragment).then((resp) => {
-      if (!resp.valid) {
-        this.windowRef.nativeWindow.history.pushState(
-          null, 'classroom', resp.redirect_url);
-        this.ngOnInit();
-      } else {
-        this.classroomBackendApiService.fetchClassroomDataAsync(
-          this.classroomUrlFragment).then((classroomData) => {
-          this.classroomData = classroomData;
-          this.classroomDisplayName = this.capitalizePipe.transform(
-            classroomData.getName());
-          this.pageTitleService.setPageTitle(
-            `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
-          this.loaderService.hideLoadingScreen();
-          this.classroomBackendApiService.onInitializeTranslation.emit();
-          this.siteAnalyticsService.registerClassroomPageViewed();
-        }, (errorResponse) => {
-          if (AppConstants.FATAL_ERROR_CODES.indexOf(
-            errorResponse.status) !== -1) {
-            this.alertsService.addWarning('Failed to get dashboard data');
-          }
-        });
-      }
-    }, () => {});
+      this.classroomUrlFragment).then(() => {
+      this.classroomBackendApiService.fetchClassroomDataAsync(
+        this.classroomUrlFragment).then((classroomData) => {
+        this.classroomData = classroomData;
+        this.classroomDisplayName = this.capitalizePipe.transform(
+          classroomData.getName());
+        this.pageTitleService.setPageTitle(
+          `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
+        this.loaderService.hideLoadingScreen();
+        this.classroomBackendApiService.onInitializeTranslation.emit();
+        this.siteAnalyticsService.registerClassroomPageViewed();
+      }, (errorResponse) => {
+        if (AppConstants.FATAL_ERROR_CODES.indexOf(
+          errorResponse.status) !== -1) {
+          this.alertsService.addWarning('Failed to get dashboard data');
+        }
+      });
+    }, (err) => {
+      // User provided classroom doesnot exist. Redirect to default classroom.
+      this.windowRef.nativeWindow.history.pushState(
+        null, 'classroom', AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
+      this.ngOnInit();
+    });
   }
 
   getStaticImageUrl(imagePath: string): string {

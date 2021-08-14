@@ -117,8 +117,8 @@ describe('Classroom Page Component', () => {
       'Math', [], 'Course details', 'Topics covered');
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
       .and.returnValues(
-        Promise.resolve({ valid: false, redirect_url: '' }),
-        Promise.resolve({ valid: true, redirect_url: '' })
+        Promise.reject(),
+        Promise.resolve()
       );
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
@@ -150,7 +150,7 @@ describe('Classroom Page Component', () => {
         .and.returnValue(bannerImageUrl);
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve({ valid: true, redirect_url: '' }));
+        .and.returnValue(Promise.resolve());
       spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.returnValue(Promise.reject({ status: 500 }));
       spyOn(alertsService, 'addWarning');

@@ -42,15 +42,11 @@ export class PreferencesPageRootComponent {
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES);
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.validateCanManageOwnAccount()
-      .then((resp) => {
-        if (!resp.valid) {
-          this.errorPageIsShown = true;
-        } else {
-          this.pageIsShown = true;
-        }
-        this.loaderService.hideLoadingScreen();
+      .then(() => {
+        this.pageIsShown = true;
       }, (err) => {
         this.errorPageIsShown = true;
+      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

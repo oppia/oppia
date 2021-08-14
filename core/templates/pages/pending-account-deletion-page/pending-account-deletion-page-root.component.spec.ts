@@ -66,9 +66,7 @@ describe('Pending Account Deletion Page Root', () => {
   it('should initialize and show page when access is valid', fakeAsync(() => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
-      .and.returnValue(Promise.resolve({
-        valid: true
-      }));
+      .and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();
@@ -82,28 +80,6 @@ describe('Pending Account Deletion Page Root', () => {
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
-
-  it('should initialize and show error page when access is not valid',
-    fakeAsync(() => {
-      spyOn(pageHeadService, 'updateTitleAndMetaTags');
-      spyOn(
-        accessValidationBackendApiService,
-        'accountDeletionIsEnabled')
-        .and.returnValue(Promise.resolve({
-          valid: false
-        }));
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(loaderService, 'hideLoadingScreen');
-      component.ngOnInit();
-      tick();
-      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.accountDeletionIsEnabled)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {

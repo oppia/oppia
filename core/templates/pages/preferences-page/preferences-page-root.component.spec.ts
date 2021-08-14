@@ -66,9 +66,7 @@ describe('Preferences Page Root', () => {
   it('should initialize and show page when access is valid', fakeAsync(() => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
-      .and.returnValue(Promise.resolve({
-        valid: true
-      }));
+      .and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();
@@ -81,28 +79,6 @@ describe('Preferences Page Root', () => {
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
-
-  it('should initialize and show error page when access is not valid',
-    fakeAsync(() => {
-      spyOn(pageHeadService, 'updateTitleAndMetaTags');
-      spyOn(
-        accessValidationBackendApiService,
-        'validateCanManageOwnAccount')
-        .and.returnValue(Promise.resolve({
-          valid: false
-        }));
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(loaderService, 'hideLoadingScreen');
-      component.ngOnInit();
-      tick();
-      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.validateCanManageOwnAccount)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {

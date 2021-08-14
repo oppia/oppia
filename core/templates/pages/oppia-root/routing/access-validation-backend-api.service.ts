@@ -20,20 +20,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-export interface SplashPageValidatorResponse {
-  valid: boolean;
-  'default_dashboard': string;
-}
-
-interface ClassroomPageValidatorResponse {
-  valid: boolean;
-  'redirect_url': string;
-}
-
-interface ValidatorResponse {
-  valid: boolean;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -56,44 +42,41 @@ export class AccessValidationBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  validateAccessToSplashPage(): Promise<SplashPageValidatorResponse> {
-    return this.http.get<SplashPageValidatorResponse>(
-      this.SPLASH_PAGE_ACCESS_VALIDATOR).toPromise();
+  validateAccessToSplashPage(): Promise<void> {
+    return this.http.get<void>(this.SPLASH_PAGE_ACCESS_VALIDATOR).toPromise();
   }
 
   validateAccessToClassroomPage(
       classroomUrlFragment: string
-  ): Promise<ClassroomPageValidatorResponse> {
-    return this.http.get<ClassroomPageValidatorResponse>(
-      this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {
-        params: {
-          classroom_url_fragment: classroomUrlFragment
-        }
-      }).toPromise();
+  ): Promise<void> {
+    return this.http.get<void>(this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {
+      params: {
+        classroom_url_fragment: classroomUrlFragment
+      }
+    }).toPromise();
   }
 
-  validateCanManageOwnAccount(): Promise<ValidatorResponse> {
-    return this.http.get<ValidatorResponse>(
+  validateCanManageOwnAccount(): Promise<void> {
+    return this.http.get<void>(
       this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();
   }
 
-  doesProfileExist(username: string): Promise<ValidatorResponse> {
+  doesProfileExist(username: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.DOES_PROFILE_EXIST, {
         username: username
       });
 
-    return this.http.get<ValidatorResponse>(url).toPromise();
+    return this.http.get<void>(url).toPromise();
   }
 
-  accountDeletionIsEnabled(): Promise<ValidatorResponse> {
-    return this.http.get<ValidatorResponse>(
-      this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
+  accountDeletionIsEnabled(): Promise<void> {
+    return this.http.get<void>(this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
   }
 
   validateAccessToReleaseCoordinatorPage():
-  Promise<ValidatorResponse> {
-    return this.http.get<ValidatorResponse>(
+  Promise<void> {
+    return this.http.get<void>(
       this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();
   }
 }

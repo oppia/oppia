@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AccessValidationBackendApiService, SplashPageValidatorResponse } from './access-validation-backend-api.service';
+import { AccessValidationBackendApiService } from './access-validation-backend-api.service';
 
 describe('Access validation backend api service', () => {
   let avbas: AccessValidationBackendApiService;
