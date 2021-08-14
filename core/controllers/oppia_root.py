@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 
-from typing import Any, Dict # isort:ignore
+from typing import Any, Dict # isort:skip
 
 
 class OppiaRootPage(base.BaseHandler):

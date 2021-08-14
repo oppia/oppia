@@ -27,8 +27,6 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
-from typing import Any
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models

@@ -28,7 +28,7 @@ import feconf
 import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Tuple, Union # isort:skip
+from typing import Any, Dict, List, Tuple # isort:skip
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
