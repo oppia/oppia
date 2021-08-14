@@ -121,7 +121,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name: (
                     new_config_value),
             }

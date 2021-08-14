@@ -154,7 +154,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
                     new_config_value),
             }
@@ -218,7 +218,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
                     new_config_value),
             }
@@ -228,8 +228,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
-            'property_values_dict\' failed: Could not convert list to '
-            'int: [20]')
+            'property_values\' failed: Could not convert list to int: [20]')
 
     def test_raise_error_for_updating_value_to_zero_for_max_tags(self):
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -245,7 +244,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
                     new_config_value),
             }
@@ -255,7 +254,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
-            'property_values_dict\' failed: Validation failed: is_at_least'
+            'property_values\' failed: Validation failed: is_at_least'
             ' ({\'min_value\': 1}) for object 0'
         )
 
@@ -273,7 +272,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
                     new_config_value),
             }
@@ -283,6 +282,6 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
-            'property_values_dict\' failed: Validation failed: is_at_least'
+            'property_values\' failed: Validation failed: is_at_least'
             ' ({\'min_value\': 1}) for object -2'
         )

@@ -26,7 +26,6 @@ import re
 
 from constants import constants
 from core.domain import auth_services
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
@@ -1503,11 +1502,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.admin, self.COL_ID)
 
         collection_services.update_collection(
-            self.editor_id, self.COL_ID, [collection_domain.CollectionChange({
+            self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
                 'new_value': 'Some new title'
-            })], 'Changed the title')
+            }], 'Changed the title')
 
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -1528,11 +1527,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that commit to unpublished collection does not update
         # contribution time.
         collection_services.update_collection(
-            self.admin_id, self.COL_ID, [collection_domain.CollectionChange({
+            self.admin_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
                 'new_value': 'Some new title'
-            })], '')
+            }], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 
@@ -1541,11 +1540,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_collection(
             self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(
-            self.editor_id, self.COL_ID, [collection_domain.CollectionChange({
+            self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'category',
                 'new_value': 'Some new category'
-            })], '')
+            }], '')
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 

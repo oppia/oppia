@@ -1992,7 +1992,7 @@ title: Title
         with self.super_admin_context():
             self.post_json('/adminhandler', {
                 'action': 'save_config_properties',
-                'new_config_property_values_dict': {
+                'new_config_property_values': {
                     config_obj.name: new_config_value,
                 },
             }, csrf_token=self.get_new_csrf_token())

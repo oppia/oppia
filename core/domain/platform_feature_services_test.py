@@ -50,18 +50,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [['=', SERVER_MODES.dev.value]]
-            }],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         self.dev_feature = registry.Registry.create_feature_flag(
             PARAM_NAMES.feature_a, 'a feature in dev stage',
             platform_parameter_domain.FEATURE_STAGES.dev)
@@ -69,25 +57,40 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             PARAM_NAMES.feature_b, 'a feature in prod stage',
             platform_parameter_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
-            self.dev_feature.name, self.user_id, 'edit rules', new_rules)
-
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [
-                    ['=', SERVER_MODES.dev.value],
-                    ['=', SERVER_MODES.test.value],
-                    ['=', SERVER_MODES.prod.value]
-            ]}],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
+            self.dev_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                ['=', SERVER_MODES.dev.value]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
 
         registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules', new_rules)
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                ['=', SERVER_MODES.dev.value],
+                                ['=', SERVER_MODES.test.value],
+                                ['=', SERVER_MODES.prod.value]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
 
         # Replace feature lists with mocked names.
         self.original_feature_list = feature_services.ALL_FEATURES_LIST
@@ -180,22 +183,28 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
             self):
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [['=', SERVER_MODES.prod.value]],
-            }, {
-                'type': 'platform_type',
-                'conditions': [['=', 'Backend']],
-            }],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
         registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules', new_rules)
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                ['=', SERVER_MODES.prod.value]
+                            ],
+                        },
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', 'Backend']
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.prod_feature.name))
@@ -206,19 +215,22 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.is_feature_enabled('feature_that_does_not_exist')
 
     def test_update_feature_flag_rules_successfully_updates_rules(self):
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [['=', FEATURE_STAGES.dev.value]]
-            }],
-            'value_when_matched': False
-        }]
-        new_rules = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
         feature_services.update_feature_flag_rules(
-            self.dev_feature.name, self.user_id, 'test update', new_rules)
+            self.dev_feature.name, self.user_id, 'test update',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                ['=', FEATURE_STAGES.dev.value]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': False
+                },
+            ]
+        )
 
         with self.swap(constants, 'DEV_MODE', True):
             self.assertFalse(
@@ -238,20 +250,20 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_update_feature_flag_rules_with_invalid_rules_raises_error(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'must have a server_mode filter'):
-
-            new_rule_dicts = [{
-                'filters': [{
-                    'type': 'app_version',
-                    'conditions': [['=', '1.2.3']]
-                }],
-                'value_when_matched': True
-            }, {
-                'filters': [],
-                'value_when_matched': False
-            }]
-            new_rules = [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
-                    rule_dict) for rule_dict in new_rule_dicts
-            ]
             feature_services.update_feature_flag_rules(
-                self.dev_feature.name, self.user_id, 'test update', new_rules)
+                self.dev_feature.name, self.user_id, 'test update',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'app_version',
+                                'conditions': [['=', '1.2.3']]
+                            }
+                        ],
+                        'value_when_matched': True
+                    },
+                    {
+                        'filters': [], 'value_when_matched': False
+                    }
+                ]
+            )

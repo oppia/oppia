@@ -367,10 +367,10 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # the collection author should not be subscribed to the exploration nor
         # should the exploration author be subscribed to the collection.
         collection_services.update_collection(
-            self.owner_id, COLLECTION_ID, [collection_domain.CollectionChange({
+            self.owner_id, COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': EXP_ID
-            })], 'Add new exploration to collection.')
+            }], 'Add new exploration to collection.')
 
         # Ensure subscriptions are as expected.
         self.assertEqual(

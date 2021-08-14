@@ -63,13 +63,17 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'name': name,
             'description': 'for test',
             'data_type': DATA_TYPES.string.value,
-            'rules': [{
-                'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [('=', FEATURE_STAGES.dev.value)]
-                }],
-                'value_when_matched': '222'
-            }],
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev.value)]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': '111',
@@ -158,23 +162,21 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.dev.value)]
-            }],
-            'value_when_matched': 'updated'
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         registry.Registry.update_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
-            new_rules,
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev.value)]
+                        }
+                    ],
+                    'value_when_matched': 'updated'
+                }
+            ],
         )
         parameter_updated = registry.Registry.get_platform_parameter(
             parameter_name)
@@ -188,23 +190,21 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.dev.value)]
-            }],
-            'value_when_matched': 'updated'
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         registry.Registry.update_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
-            new_rules,
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev.value)]
+                        }
+                    ],
+                    'value_when_matched': 'updated'
+                }
+            ],
         )
         self.assertIsNone(
             registry.Registry.load_platform_parameter_from_memcache(
@@ -217,25 +217,23 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         param = registry.Registry.get_platform_parameter(parameter_name)
         param.validate()
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.dev.value)]
-            }],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected string'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
-                new_rules,
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.dev.value)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
             )
 
     def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
@@ -244,18 +242,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.test.value)]
-            }],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
@@ -264,7 +250,17 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
-                new_rules,
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.test.value)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
             )
 
     def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
@@ -273,18 +269,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.prod.value)]
-            }],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
@@ -293,7 +277,17 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
-                new_rules,
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.prod.value)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
             )
 
     def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
@@ -301,18 +295,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
             PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.test)
-
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.prod.value)]
-            }],
-            'value_when_matched': True
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
 
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -322,7 +304,17 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
-                new_rules,
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.prod.value)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
             )
 
     def test_updated_parameter_is_saved_in_storage(self):
@@ -332,23 +324,21 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             registry.Registry.load_platform_parameter_from_storage(
                 parameter_name))
 
-        new_rule_dicts = [{
-            'filters': [{
-                'type': 'server_mode',
-                'conditions': [('=', FEATURE_STAGES.dev.value)]
-            }],
-            'value_when_matched': 'updated'
-        }]
-        new_rules = [
-            parameter_domain.PlatformParameterRule.from_dict(
-                rule_dict) for rule_dict in new_rule_dicts
-        ]
-
         registry.Registry.update_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
-            new_rules,
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev.value)]
+                        }
+                    ],
+                    'value_when_matched': 'updated'
+                }
+            ],
         )
 
         parameter_updated = (

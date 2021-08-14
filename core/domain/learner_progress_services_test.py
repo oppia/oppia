@@ -1517,7 +1517,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.CLASSROOM_PAGES_DATA.name: (
                     new_config_value),
             }
@@ -2011,7 +2011,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         payload = {
             'action': 'save_config_properties',
-            'new_config_property_values_dict': {
+            'new_config_property_values': {
                 config_domain.CLASSROOM_PAGES_DATA.name: (
                     new_config_value),
             }
@@ -2128,10 +2128,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
         # Add an exploration to a collection that has already been completed.
         collection_services.update_collection(
-            self.owner_id, self.COL_ID_0, [collection_domain.CollectionChange({
+            self.owner_id, self.COL_ID_0, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': self.EXP_ID_2
-            })], 'Add new exploration')
+            }], 'Add new exploration')
 
         # Delete a topic in the learn section of the learner goals.
         topic_services.delete_topic(self.owner_id, self.TOPIC_ID_2)

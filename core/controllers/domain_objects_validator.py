@@ -22,7 +22,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
-from core.controllers import base
 from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
@@ -32,36 +31,26 @@ import python_utils
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
-def validate_exploration_change(change_dict):
+def validate_exploration_change(obj):
     # type: (Dict[String, Any]) -> None
     """Validates exploration change.
 
     Args:
-        change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        ExplorationChange. Returns ExplorationChange object after validation.
+        obj: dict. Data that needs to be validated.
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    return exp_domain.ExplorationChange(change_dict)
+    exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values_dict(new_config_property_values_dict):
+def validate_new_config_property_values(obj):
     # type: (Dict[String, Any]) -> None
-    """Validates the new config property values dict.
+    """Validates new config property values.
 
     Args:
-        new_config_property_values_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict(str, any). Returns new_config_property_values_dict
-        after validation.
+        obj: dict. Data that needs to be validated.
     """
-    # The method returns a dict containing config properties and its values.
-    # These items are used individually to set config properties in the
-    # handlers. Hence they need not be converted into domain objects.
-    for (name, value) in new_config_property_values_dict.items():
+    for (name, value) in obj.items():
         if not isinstance(name, python_utils.BASESTRING):
             raise Exception(
                 'config property name should be a string, received'
@@ -72,8 +61,6 @@ def validate_new_config_property_values_dict(new_config_property_values_dict):
 
         config_property.normalize(value)
 
-    return new_config_property_values_dict
-
 
 def validate_change_dict_for_blog_post(change_dict):
     # type: (Dict[Any, Any]) -> None
@@ -81,14 +68,7 @@ def validate_change_dict_for_blog_post(change_dict):
 
     Args:
         change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict(str, any). Returns change_dict after validation.
     """
-    # The method returns a dict containing blog post properties, they are used
-    # to update blog posts in the domain layer. This dict does not correspond
-    # to any domain class so we are validating the fields of change_dict
-    # as a part of schema validation.
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(
             change_dict['title'], True)
@@ -106,78 +86,54 @@ def validate_change_dict_for_blog_post(change_dict):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
 
-    return change_dict
 
-
-def validate_collection_change(change_dict):
+def validate_collection_change(obj):
     # type: (Dict[String, Any]) -> None
     """Validates collection change.
 
     Args:
-        change_dict: dict. Data that needs to be validated.
-
-    Returns:
-        CollectionChange. Returns CollectionChange object after validation.
+        obj: dict. Data that needs to be validated.
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    return collection_domain.CollectionChange(change_dict)
+    collection_domain.CollectionChange(obj)
 
 
-def validate_email_dashboard_data(email_dashboard_data_dict):
+def validate_email_dashboard_data(data):
     # type: (Dict[String, Optional[Union[bool, int]]]) -> None
-    """Validates the email dashboard data dict.
+    """Validates email dashboard data.
 
     Args:
-        email_dashboard_data_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict(str, any). Returns email dashboard data dict after validation.
+        data: dict. Data that needs to be validated.
     """
-    # The method returns a dict containing fields of email dashboard
-    # query params. This dict represents the UserQueryParams class, which is a
-    # namedtuple. Hence the fields are validating as a part of schema validation
-    # before saving new user queries in the handler.
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
-    for key, value in email_dashboard_data_dict.items():
+    for key, value in data.items():
         if value is None:
             continue
         if key not in possible_keys:
             # Raise exception if key is not one of the allowed keys.
             raise Exception('400 Invalid input for query.')
 
-    return email_dashboard_data_dict
 
-
-def validate_task_entry_dict(task_entry_dict):
+def validate_task_entries(task_entries):
     # type: (Dict[String, Any]) -> None
     """Validates the task entry dict.
 
     Args:
-        task_entry_dict: dict. Data that needs to be validated.
-
-    Returns:
-        dict(str, any). Returns task_entry_dict after validation.
+        task_entries: dict. Data that needs to be validated.
     """
-    # For creating the TaskEntry domain object, we have to include the
-    # exploration_id and the user_id which are not included in the
-    # task_entry_dict thus it might not be possible to create the domain object.
-    # Hence the fields of task_entry_dict are validating as a part of schema
-    # validation.
-    entity_version = task_entry_dict.get('entity_version', None)
+    entity_version = task_entries.get('entity_version', None)
     if entity_version is None:
         raise base.BaseHandler.InvalidInputException(
             'No entity_version provided')
-    task_type = task_entry_dict.get('task_type', None)
+    task_type = task_entries.get('task_type', None)
     if task_type is None:
         raise base.BaseHandler.InvalidInputException('No task_type provided')
-    target_id = task_entry_dict.get('target_id', None)
+    target_id = task_entries.get('target_id', None)
     if target_id is None:
         raise base.BaseHandler.InvalidInputException('No target_id provided')
-    status = task_entry_dict.get('status', None)
+    status = task_entries.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
-
-    return task_entry_dict
