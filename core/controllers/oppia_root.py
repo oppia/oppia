@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 
-from typing import Any # pylint: disable=unused-import
 from typing import Dict # pylint: disable=unused-import
 from typing import Text # pylint: disable=unused-import
 
@@ -32,7 +31,7 @@ class OppiaRootPage(base.BaseHandler):
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, **kwargs): # pylint: disable=unused-argument
-        # type: (Any) -> None
+        # type: (Dict[Text, Text]) -> None
         """Handles GET requests."""
         self.render_template( # type: ignore[no-untyped-call]
             'oppia-root.mainpage.html')
