@@ -29,7 +29,6 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
-var saveChangesButton = element(by.css('.protractor-test-save-changes'));
 
 describe('Full exploration editor', function() {
   var explorationEditorPage = null;
@@ -382,7 +381,8 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should be able to save changes when offline',
+    'should be able to make changes offline and the changes ' +
+    'shoudld be saved when online.',
     async function() {
       await users.createUser('user16@editor.com', 'user16Editor');
 
@@ -397,32 +397,38 @@ describe('Full exploration editor', function() {
       await action.waitForAutosave();
 
       // Check that the save changes button is enabled when online.
-      expect(await saveChangesButton.isEnabled()).toEqual(true);
+      expect(
+        await exploratoinEditorPage.saveChangesButton.isEnabled()
+      ).toEqual(true);
 
       // Set network connection to offline.
       await general.goOffline();
 
       // Check that toast message appeared when offline.
-      await general.offlineAlert();
+      await explorationEditorPage.waitForOfflineAlert();
 
       // Add a content change to check changes can be done when offline.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('Hello Oppia?');
       });
 
-      // Check that the save changes button is enabled when offline.
-      expect(await saveChangesButton.isEnabled()).toEqual(false);
+      // Check that the save changes button is disabled when offline.
+      expect(
+        await exploratoinEditorPage.saveChangesButton.isEnabled()
+      ).toEqual(false);
 
       // Set network connection to online.
       await general.goOnline();
 
       // Check that toast message appeared when reconnected.
-      await general.onlineAlert();
+      await explorationEditorPage.waitForOnlineAlert();
 
       await action.waitForAutosave();
 
       // Check that the save changes button is enabled when reconnected.
-      expect(await saveChangesButton.isEnabled()).toEqual(true);
+      expect(
+        await saveChangesButton.isEnabled()
+      ).toEqual(true);
 
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {

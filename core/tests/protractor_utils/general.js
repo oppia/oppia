@@ -256,21 +256,14 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await waitFor.pageToFullyLoad();
 };
 
-var goOffline = async function() {
-  await browser.driver.setNetworkConditions(
-    {
-      offline: true,
-      latency: 0,
-      download_throughput: 0,
-      upload_throughput: 0
-    });
-};
-
 var goOnline = async function() {
   // Download throughput refers to the maximum number of bytes that can be
   // downloaded in a given time.
   // Upload throughput refers to the maximum number of bytes that can be
   // uploaded in a given time.
+  // For Oppia, any speed above 150KB/s is considered good. These values
+  // are set to be large enough to download and upload a few files and are
+  // found empirically.
   await browser.driver.setNetworkConditions(
     {
       offline: false,
@@ -280,26 +273,18 @@ var goOnline = async function() {
     });
 };
 
-var offlineAlert = async function() {
-  await waitFor.visibilityOf(
-    element(by.css('.protractor-test-toast-message')),
-    'Offline warning toast message taking too long to appear.');
-  expect(await element(
-    by.css('.protractor-test-toast-message')).getText()).toMatch(
-    'Looks like you are offline. You can continue working, and can save ' +
-    'your changes once reconnected.');
-  await waitFor.invisibilityOf(
-    element(by.css('.protractor-test-toast-message')),
-    'Offline warning toast message taking too long to appear.');
-};
-
-var onlineAlert = async function() {
-  await waitFor.visibilityOf(
-    element(by.css('.protractor-test-toast-message')),
-    'Offline warning toast message taking too long to appear.');
-  expect(await element(
-    by.css('.protractor-test-toast-message')).getText()).toMatch(
-    'Reconnected. Checking whether your changes are mergeable.');
+var goOffline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: true,
+      latency: 0,
+      download_throughput: 0,
+      upload_throughput: 0
+    });
 };
 
 exports.acceptAlert = acceptAlert;
@@ -338,5 +323,3 @@ exports.navigateToTopicsAndSkillsDashboardPage = (
 
 exports.goOffline = goOffline;
 exports.goOnline = goOnline;
-exports.offlineAlert = offlineAlert;
-exports.onlineAlert = onlineAlert;
