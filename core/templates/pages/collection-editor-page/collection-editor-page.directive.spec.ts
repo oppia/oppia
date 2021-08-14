@@ -26,11 +26,11 @@ describe('Collection Editor Page', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let directive =  null;
-  let CollectionEditorStateService =  null;
-  let PageTitleService =  null;
-  let RouterService =  null;
-  let UrlService =  null;
+  let directive = null;
+  let CollectionEditorStateService = null;
+  let PageTitleService = null;
+  let RouterService = null;
+  let UrlService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -47,9 +47,9 @@ describe('Collection Editor Page', () => {
     });
 
     spyOn(CollectionEditorStateService, 'loadCollection')
-    .and.callFake((url, callback) => {
-      callback();
-    });
+      .and.callFake((url, callback) => {
+        callback();
+      });
     spyOn(UrlService, 'getCollectionIdFromEditorUrl').and.returnValue(
       'collection/edit/1'
     );

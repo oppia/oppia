@@ -165,6 +165,10 @@ describe('InputResponsePairComponent', () => {
   });
 
   it('should toggle popover when user clicks on it', () => {
+    // This throws "Type '{ toggle: () => void; }' is missing the following
+    // properties from type 'NgbPopover': _elementRef, _renderer, _ngZone,
+    // _document, and 26 more.". We need to suppress this error because we have
+    // to only test the toggle function.
     // @ts-expect-error
     component.popover = {
       toggle: () => {}
@@ -180,6 +184,9 @@ describe('InputResponsePairComponent', () => {
     spyOn(explorationHtmlFormatter, 'getShortAnswerHtml')
       .and.returnValue('Short Answer');
     component.data = {
+      // This throws "Type '{ answerDetails: string; }' is not assignable to
+      // type 'string'.". We need to suppress this error because we need to
+      // store "answerDetails" to test the relevant code.
       // @ts-expect-error
       learnerInput: {
         answerDetails: 'Answer Details'

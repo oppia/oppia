@@ -163,7 +163,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
       getSuggestionStateName: () => {},
       getSuggestionStatus: () => {},
       getReplacementHtmlFromSuggestion: () => {
-        return '<p> Replacement HTML </p>'
+        return '<p> Replacement HTML </p>';
       },
       threadId: 'id',
     };
@@ -190,6 +190,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
   }));
 
   it('should open suggestion modal', () => {
+    spyOn(ExplorationStatesService, 'setState');
     spyOn($uibModal, 'open').and.callFake((options) => {
       options.resolve.currentContent();
       options.resolve.newContent();
@@ -211,17 +212,18 @@ describe('Suggestion Modal For Exploration Editor', () => {
     smfees.showSuggestionModal('edit_exploration_state_content', extraParams);
     $scope.$apply();
 
-
+    expect(ExplorationDataService.data.version).toBe(11);
+    expect(ExplorationStatesService.setState).toHaveBeenCalled();
   });
 
   it('should error if there is problem while resolving suggestion', () => {
     spyOn(ThreadDataBackendApiService, 'resolveSuggestionAsync')
       .and.returnValue($q.reject());
     spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          action: 'accept',
-          audioUpdateRequired: true
-        })
+      result: $q.resolve({
+        action: 'accept',
+        audioUpdateRequired: true
+      })
     });
     spyOn($log, 'error');
 

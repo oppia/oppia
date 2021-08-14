@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the collection editor tab directive.
  */
 
-import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Collection Editor Tab', () => {
@@ -26,9 +25,9 @@ describe('Collection Editor Tab', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let directive =  null;
-  let CollectionEditorStateService =  null;
-  let CollectionLinearizerService =  null;
+  let directive = null;
+  let CollectionEditorStateService = null;
+  let CollectionLinearizerService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -75,7 +74,7 @@ describe('Collection Editor Tab', () => {
           1: '',
           2: ''
         }
-    });
+      });
 
     expect(ctrl.getLinearlySortedNodes()).toEqual({
       collection: {
