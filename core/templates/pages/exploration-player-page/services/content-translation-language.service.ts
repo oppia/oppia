@@ -96,10 +96,13 @@ export class ContentTranslationLanguageService {
         // the latter refers to the language that the exploration is written
         // in.)
         let languageDescription = (
-          <string> this.languageUtilService.getContentLanguageDescription(
+          this.languageUtilService.getContentLanguageDescription(
             languageCode
           )
         );
+        if (!languageDescription) {
+          throw new Error('The exploration language code is invalid');
+        }
         this.languageOptions.push({
           value: languageCode,
           displayed: languageDescription

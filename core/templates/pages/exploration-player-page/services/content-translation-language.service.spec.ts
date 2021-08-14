@@ -71,6 +71,12 @@ describe('Content translation language service', () => {
     expect(ctls.getCurrentContentLanguageCode()).toBe('zh');
   });
 
+  it('should throw error if the exploration language code is invalid', () => {
+    expect(() => {
+      ctls.init(availableLanguageCodes, ['zz'], 'iv');
+    }).toThrowError('The exploration language code is invalid');
+  });
+
   it('should correctly initialize the dropdown options', () => {
     ctls.init(availableLanguageCodes, [], 'en');
     expect(ctls.getLanguageOptionsForDropdown()).toEqual([
