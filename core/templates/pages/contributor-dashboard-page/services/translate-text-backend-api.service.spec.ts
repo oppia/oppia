@@ -172,16 +172,28 @@ describe('TranslateTextBackendApiService', () => {
     it('should handle multiple image blobs per filename', fakeAsync(() => {
       imagesData = [{
         filename: 'imageFilename1',
-        imageBlob: 'imageBlob1' as unknown as Blob
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob1'
+        } as Blob
       }, {
         filename: 'imageFilename1',
-        imageBlob: 'imageBlob2' as unknown as Blob
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob2'
+        } as Blob
       }, {
         filename: 'imageFilename2',
-        imageBlob: 'imageBlob1' as unknown as Blob
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob1'
+        } as Blob
       }, {
         filename: 'imageFilename2',
-        imageBlob: 'imageBlob2' as unknown as Blob
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob2'
+        } as Blob
       }];
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
@@ -198,10 +210,22 @@ describe('TranslateTextBackendApiService', () => {
       expect(req.request.method).toEqual('POST');
       const filename1Blobs = req.request.body.getAll('imageFilename1');
       const filename2Blobs = req.request.body.getAll('imageFilename2');
-      expect(filename1Blobs).toContain('imageBlob1');
-      expect(filename1Blobs).toContain('imageBlob2');
-      expect(filename2Blobs).toContain('imageBlob1');
-      expect(filename2Blobs).toContain('imageBlob2');
+      expect(filename1Blobs).toContain({
+        size: 0,
+        type: 'imageBlob1'
+      });
+      expect(filename1Blobs).toContain({
+        size: 0,
+        type: 'imageBlob2'
+      });
+      expect(filename2Blobs).toContain({
+        size: 0,
+        type: 'imageBlob1'
+      });
+      expect(filename2Blobs).toContain({
+        size: 0,
+        type: 'imageBlob2'
+      });
       req.flush({});
       flushMicrotasks();
 
