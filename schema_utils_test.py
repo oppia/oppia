@@ -1272,7 +1272,7 @@ class ValidateClassForTesting(python_utils.OBJECT):
         self.arg_b = arg_b
 
     @classmethod
-    def from_dict(cls, obj: Dict[Any, Any]) -> ValidateClassForTesting:
+    def from_dict(cls, obj: Dict[Any, Any]) -> 'ValidateClassForTesting':
         """Return the ValidateClassForTesting object from a dict.
 
         Args:
