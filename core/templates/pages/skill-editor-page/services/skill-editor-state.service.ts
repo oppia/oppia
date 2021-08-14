@@ -73,7 +73,9 @@ export class SkillEditorStateService {
       // The skill is set directly for the first load.
       this._skill = skill;
     } else {
-      // For every other load.
+      // After first initialization, the skill object will be retained for
+      // the lifetime of the editor and on every reload, the new contents
+      // will be copied into the same retained object.
       this._skill.copyFromSkill(skill);
     }
     this._skillIsInitialized = true;
@@ -121,7 +123,9 @@ export class SkillEditorStateService {
       // The skillRights is set directly for the first load.
       this._skillRights = skillRights;
     } else {
-      // For every other load.
+      // After first initialization, the skill Rights object will be retained
+      // for the lifetime of the editor and on every reload, the new contents
+      // will be copied into the same retained object.
       this._skillRights.copyFromSkillRights(skillRights);
     }
   };

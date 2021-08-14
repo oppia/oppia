@@ -199,9 +199,9 @@ describe('Skill editor state service', () => {
       ],
     }).compileComponents();
 
-    skillEditorStateService = TestBed.get(SkillEditorStateService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    skillUpdateService = TestBed.get(SkillUpdateService);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillUpdateService = TestBed.inject(SkillUpdateService);
 
     skillRightsObject = {
       skill_id: 'skill_id_1',
@@ -263,15 +263,19 @@ describe('Skill editor state service', () => {
 
   it('should return the last skill loaded as the same object',
     fakeAsync(() => {
-      // eslint-disable-next-line dot-notation
-      skillEditorStateService['_skill'] = (
-        skillObjectFactory.createFromBackendDict(skillDict2));
-      const previousSkill = skillEditorStateService.getSkill();
-      const expectedSkill = skillObjectFactory.createFromBackendDict(
-        fakeSkillBackendApiService.newBackendSkillObject
-      );
-      expect(previousSkill).not.toEqual(expectedSkill);
+      skillEditorStateService.setSkillRights(
+        SkillRights.createFromBackendDict(skillRightsObject));
       skillEditorStateService.loadSkill('skill_id_1');
+      tick(1000);
+      const previousSkill = skillEditorStateService.getSkill();
+
+      fakeSkillBackendApiService.newBackendSkillObject = skillDict2;
+      fakeSkillBackendApiService.skillObject =
+        skillObjectFactory.createFromBackendDict(skillDict2);
+
+      const expectedSkill = fakeSkillBackendApiService.skillObject;
+      expect(previousSkill).not.toEqual(expectedSkill);
+      skillEditorStateService.loadSkill('skill_id_2');
       tick(1000);
       const actualSkill = skillEditorStateService.getSkill();
       expect(actualSkill).toEqual(expectedSkill);
@@ -384,12 +388,10 @@ describe('Skill editor state service', () => {
 
 
   it('should be able to set a new skill rights with an in-place copy', () => {
-    skillEditorStateService.setSkillRights(SkillRights.createFromBackendDict(
-      {
-        skill_id: 'skill_id',
-        can_edit_skill_description: true,
-      }
-    ));
+    skillEditorStateService.setSkillRights(SkillRights.createFromBackendDict({
+      skill_id: 'skill_id',
+      can_edit_skill_description: true,
+    }));
     const previousSkillRights = skillEditorStateService.getSkillRights();
     const expectedSkillRights = SkillRights.createFromBackendDict(
       skillRightsObject

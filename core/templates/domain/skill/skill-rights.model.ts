@@ -25,8 +25,7 @@ export class SkillRights {
   _skillId: string;
   _canEditSkillDescription: boolean;
 
-  constructor(
-      skillId: string, canEditSkillDescription: boolean) {
+  constructor(skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }

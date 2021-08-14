@@ -132,14 +132,11 @@ describe('Skill editor page', function() {
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
         'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
-      [],
-      RecordedVoiceovers.createFromBackendDict(
-        {
-          voiceovers_mapping: {
-            COMPONENT_NAME_EXPLANATION: {}
-          }
+      [], RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
         }
-      )
+      })
     );
     ctrl.skill = new Skill(
       'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
