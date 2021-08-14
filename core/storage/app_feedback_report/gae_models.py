@@ -605,7 +605,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_stats_for_ticket(
-            cls, ticket_id: str) -> List[AppFeedbackReportStatsModel]:
+            cls, ticket_id: str) -> List['AppFeedbackReportStatsModel']:
         """Fetches the stats for a single ticket.
 
         Args:

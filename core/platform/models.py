@@ -25,7 +25,7 @@ from constants import constants
 import feconf
 import python_utils
 
-from types import ModuleType # isort:skip
+from types import ModuleType # isort:skip # pylint: disable=import-only-modules
 from typing import List, Tuple, Type # isort:skip
 
 MYPY = False
@@ -193,7 +193,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]) -> List[base_models.BaseModel]:
+            cls, model_names: List[str]) -> List['base_models.BaseModel']:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -217,7 +217,7 @@ class _Gae(Platform):
         return model_classes
 
     @classmethod
-    def get_all_storage_model_classes(cls) -> List[base_models.BaseModel]:
+    def get_all_storage_model_classes(cls) -> List['base_models.BaseModel']:
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).
@@ -423,7 +423,7 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]) -> List[base_models.BaseModel]:
+            cls, model_names: List[str]) -> List['base_models.BaseModel']:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -436,7 +436,7 @@ class Registry(python_utils.OBJECT):
         return cls._get().get_storage_model_classes(model_names)
 
     @classmethod
-    def get_all_storage_model_classes(cls) -> List[base_models.BaseModel]:
+    def get_all_storage_model_classes(cls) -> List['base_models.BaseModel']:
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).

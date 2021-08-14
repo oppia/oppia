@@ -190,7 +190,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def query_new_and_pending_training_jobs(
-            cls, offset: int) -> Tuple[List[ClassifierTrainingJobModel], int]:
+            cls, offset: int) -> Tuple[List['ClassifierTrainingJobModel'], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -327,7 +327,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             exp_id: str,
             exp_version: int,
             state_names: List[str]
-    ) -> List[Optional[StateTrainingJobsMappingModel]]:
+    ) -> List[Optional['StateTrainingJobsMappingModel']]:
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
@@ -354,7 +354,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             cls,
             exp_id: str,
             exp_version: int,
-            state_name: str) -> Optional[StateTrainingJobsMappingModel]:
+            state_name: str) -> Optional['StateTrainingJobsMappingModel']:
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -415,7 +415,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     @classmethod
     def create_multi(
             cls,
-            state_training_jobs_mappings: List[StateTrainingJobsMappingModel]
+            state_training_jobs_mappings: List['StateTrainingJobsMappingModel']
         ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 

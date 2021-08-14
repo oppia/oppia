@@ -132,7 +132,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
     def get_by_auth_id(
             cls,
             provider_id: Text,
-            auth_id: Text) -> Optional[UserAuthDetailsModel]:
+            auth_id: Text) -> Optional['UserAuthDetailsModel']:
         """Fetch a user entry by auth_id of a particular auth service.
 
         Args:
@@ -215,7 +215,7 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_gae_id(cls, gae_id: Text) -> Optional[UserIdentifiersModel]:
+    def get_by_gae_id(cls, gae_id: Text) -> Optional['UserIdentifiersModel']:
         """Fetch an entry by GAE ID.
 
         Args:
@@ -228,7 +228,7 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.get_by_id(gae_id)
 
     @classmethod
-    def get_by_user_id(cls, user_id: Text) -> Optional[UserIdentifiersModel]:
+    def get_by_user_id(cls, user_id: Text) -> Optional['UserIdentifiersModel']:
         """Fetch an entry by user ID.
 
         Args:
@@ -301,7 +301,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user_id(
-            cls, user_id: Text) -> Optional[UserIdByFirebaseAuthIdModel]:
+            cls, user_id: Text) -> Optional['UserIdByFirebaseAuthIdModel']:
         """Fetch an entry by user ID.
 
         Args:

@@ -113,7 +113,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             max_age: Optional[datetime.timedelta] = None
-    ) -> Tuple[List[CollectionCommitLogEntryModel], Optional[str], bool]:
+    ) -> Tuple[List['CollectionCommitLogEntryModel'], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their last
         updated attribute.
 
@@ -573,7 +573,7 @@ class CollectionRightsModel(base_models.VersionedModel):
     # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
     # remove Any from type-annotation below.
     def _reconstitute(
-            self, snapshot_dict: Dict[str, Any]) -> CollectionRightsModel:
+            self, snapshot_dict: Dict[str, Any]) -> 'CollectionRightsModel':
         """Populates the model instance with the snapshot.
 
         Some old CollectionRightsSnapshotContentModels can contain fields
@@ -839,7 +839,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> List[CollectionSummaryModel]:
+    def get_non_private(cls) -> List['CollectionSummaryModel']:
         """Returns an iterable with non-private collection summary models.
 
         Returns:
@@ -855,7 +855,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_private_at_least_viewable(
-            cls, user_id: str) -> List[CollectionSummaryModel]:
+            cls, user_id: str) -> List['CollectionSummaryModel']:
         """Returns an iterable with private collection summary models that are
         at least viewable by the given user.
 
@@ -881,7 +881,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_at_least_editable(
-            cls, user_id: str) -> List[CollectionSummaryModel]:
+            cls, user_id: str) -> List['CollectionSummaryModel']:
         """Returns an iterable with collection summary models that are at least
         editable by the given user.
 

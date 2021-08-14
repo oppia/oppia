@@ -26,7 +26,7 @@ from core.platform import models
 from google.cloud import ndb
 
 from typing import ( # isort:skip
-    Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
+    Any, Dict, List, Optional, Sequence, Tuple, TypeVar)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -89,7 +89,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
     return ndb.get_multi(keys)
 
 
-def update_timestamps_multi(entities: Sequence[base_models.BaseModel],
+def update_timestamps_multi(entities: Sequence['base_models.BaseModel'],
                             update_last_updated_time: bool = True) -> None:
     """Update the created_on and last_updated fields of all given entities.
 
@@ -104,7 +104,7 @@ def update_timestamps_multi(entities: Sequence[base_models.BaseModel],
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[Text]:
+def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
     """Stores a sequence of Model instances.
 
     Args:
@@ -175,7 +175,7 @@ def any_of(*nodes: ndb.Node) -> ndb.Node:
 
 
 def make_cursor(
-        urlsafe_cursor: Optional[Text] = None) -> datastore_query.Cursor:
+        urlsafe_cursor: Optional[str] = None) -> Optional[str]:
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
@@ -201,7 +201,7 @@ def make_cursor(
 
 
 def fetch_multiple_entities_by_ids_and_models(
-        ids_and_models: List[Tuple[Text, List[Text]]]
+        ids_and_models: List[Tuple[str, List[str]]]
     ) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]:
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
