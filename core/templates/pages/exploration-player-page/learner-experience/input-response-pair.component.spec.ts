@@ -73,63 +73,62 @@ describe('InputResponsePairComponent', () => {
     component = fixture.componentInstance;
 
     spyOn(playerTranscriptService, 'getCard')
-    .and.returnValue(StateCard.createNewCard(
-      'State 2', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
-        id: 'GraphInput',
-        answer_groups: [
-          {
-            outcome: {
-              dest: 'State',
-              feedback: {
-                html: '',
-                content_id: 'This is a new feedback text',
+      .and.returnValue(StateCard.createNewCard(
+        'State 2', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict({
+          id: 'GraphInput',
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'State',
+                feedback: {
+                  html: '',
+                  content_id: 'This is a new feedback text',
+                },
+                refresher_exploration_id: 'test',
+                missing_prerequisite_skill_id: 'test_skill_id',
+                labelled_as_correct: true,
+                param_changes: [],
               },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
-              param_changes: [],
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: '',
             },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: '',
+          ],
+          default_outcome: {
+            dest: 'Hola',
+            feedback: {
+              content_id: '',
+              html: '',
+            },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id',
           },
-        ],
-        default_outcome: {
-          dest: 'Hola',
-          feedback: {
-            content_id: '',
-            html: '',
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {
+              value: true,
+            },
+            placeholder: {
+              value: 1,
+            },
           },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true,
-          },
-          placeholder: {
-            value: 1,
-          },
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
-        }
-      }),
-      RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
-      'content', audioTranslationLanguageService
-    )
-  );
+          hints: [],
+          solution: {
+            answer_is_exclusive: true,
+            correct_answer: 'test_answer',
+            explanation: {
+              content_id: '2',
+              html: 'test_explanation1',
+            },
+          }
+        }),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService
+      ));
   });
 
   it('should decode profile picture URI on initialization', () => {
