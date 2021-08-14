@@ -106,7 +106,10 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
-        imageBlob: 'imageBlob' as unknown as Blob
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob'
+        } as Blob
       }];
     });
 
