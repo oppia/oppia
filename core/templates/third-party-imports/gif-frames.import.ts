@@ -16,5 +16,4 @@
  * @fileoverview This file imports the gif-frames library.
  */
 
-// TODO(#13676) Replace window.gifFrames with another approach.
 window.GifFrames = require('gif-frames');
