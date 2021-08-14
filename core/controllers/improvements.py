@@ -57,7 +57,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
                     'items': {
                         'type': 'object_dict',
                         'validation_method': (
-                            domain_objects_validator.validate_task_entry_dict
+                            domain_objects_validator.validate_task_entries
                         )
                     }
                 }
