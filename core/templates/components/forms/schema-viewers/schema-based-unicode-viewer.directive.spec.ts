@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Unicode Viewer  Directive
+ * @fileoverview Unit tests for Schema Based Unicode Viewer Directive
  */
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';

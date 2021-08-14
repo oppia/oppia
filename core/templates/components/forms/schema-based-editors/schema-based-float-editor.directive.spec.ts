@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Float Editor  Directive
+ * @fileoverview Unit tests for Schema Based Float Editor Directive
  */
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -81,14 +81,16 @@ describe('Schema Based Float Editor Directive', () => {
     expect(ctrl.validate(7.7)).toBe(true);
   });
 
-  it('should call input blur and focus when user selects and' +
-    ' deselects input', () => {
+  it('should call input focus when user selects the input field', () => {
     spyOn(ctrl, 'onInputFocus');
-    spyOn(ctrl, 'onInputBlur');
 
     ctrl.onFocus();
 
     expect(ctrl.onInputFocus).toHaveBeenCalled();
+  });
+
+  it('should call input blur user deselects the input field', () => {
+    spyOn(ctrl, 'onInputBlur');
 
     ctrl.onBlur();
 

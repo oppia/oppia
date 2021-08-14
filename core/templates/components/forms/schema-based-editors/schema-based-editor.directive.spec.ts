@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Schema Based Editor  Directive
+ * @fileoverview Unit tests for Schema Based Editor Directive
  */
 
 import { destroyPlatform } from '@angular/core';
