@@ -57,6 +57,7 @@ class AssetDevHandler(base.BaseHandler):
     _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
     _SUPPORTED_PAGE_CONTEXTS = [
         feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
+        feconf.ENTITY_TYPE_BLOG_POST,
         feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
         feconf.ENTITY_TYPE_QUESTION, feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
         feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
