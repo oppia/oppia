@@ -28,10 +28,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
-
-interface FocusObj {
-  focused: boolean;
-}
+import { FocusObj } from './math-equation-editor.component';
 
 @Component({
   selector: 'numeric-expression-editor',
@@ -43,8 +40,8 @@ export class NumericExpressionEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string;
-  currentValue!: string;
   @Output() valueChanged = new EventEmitter();
+  currentValue!: string;
 
   warningText = '';
   hasBeenTouched = false;

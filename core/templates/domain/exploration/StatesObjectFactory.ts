@@ -22,7 +22,8 @@ import { Injectable } from '@angular/core';
 import {
   StateBackendDict,
   StateObjectFactory,
-  State
+  State,
+  InteractionSpecsKey
 } from 'domain/state/StateObjectFactory';
 import { AppConstants } from 'app.constants';
 import { Voiceover } from 'domain/exploration/voiceover.model';
@@ -46,8 +47,6 @@ export interface VoiceoverObjectsDict {
 export interface WrittenTranslationObjectsDict {
   [stateName: string]: WrittenTranslation[];
 }
-
-type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
 
 const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
 
@@ -130,8 +129,10 @@ export class States {
     let finalStateNames = [];
     for (let stateName in this._states) {
       let interaction = this._states[stateName].interaction;
-      if (interaction.id &&
-          INTERACTION_SPECS[<InteractionSpecsKey>interaction.id].is_terminal) {
+      if (
+        interaction.id &&
+        INTERACTION_SPECS[<InteractionSpecsKey>interaction.id].is_terminal
+      ) {
         finalStateNames.push(stateName);
       }
     }

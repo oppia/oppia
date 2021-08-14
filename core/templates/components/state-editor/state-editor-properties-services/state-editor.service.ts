@@ -47,6 +47,9 @@ export interface AnswerChoice {
   label: string;
 }
 
+type CustomizationArgs = (
+  ItemSelectionInputCustomizationArgs | DragAndDropSortInputCustomizationArgs);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -204,18 +207,20 @@ export class StateEditorService {
     return cloneDeep(this.interaction);
   }
 
-  // Function will return null if interactionId does not exist.
+  // Function will return null if interactionId is not
+  // 'MultipleChoiceInput', 'ItemSelectionInput', 'DragAndDropSortInput' .
   getAnswerChoices(
       interactionId: string,
-      customizationArgs: InteractionCustomizationArgs): AnswerChoice[] | null {
+      customizationArgs: InteractionCustomizationArgs
+  ): AnswerChoice[] | null {
     if (!interactionId) {
-      return null;
+      throw new Error('Interaction Id does not exist');
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
       return <AnswerChoice[]>(
-        <MultipleChoiceInputCustomizationArgs> customizationArgs)
-        .choices.value.map((val, ind) => ({ val: ind, label: val.html }));
+        <MultipleChoiceInputCustomizationArgs> customizationArgs
+      ).choices.value.map((val, ind) => ({ val: ind, label: val.html }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
@@ -234,13 +239,11 @@ export class StateEditorService {
       interactionId === 'DragAndDropSortInput'
     ) {
       return <AnswerChoice[]>(
-        <
-          ItemSelectionInputCustomizationArgs|
-          DragAndDropSortInputCustomizationArgs
-        > customizationArgs)
-        .choices.value.map(val => (
-          { val: val.contentId, label: val.html}
-        ));
+        <CustomizationArgs>customizationArgs).choices.value.map(
+        val => ({
+          val: val.contentId, label: val.html}
+        )
+      );
     } else {
       return null;
     }

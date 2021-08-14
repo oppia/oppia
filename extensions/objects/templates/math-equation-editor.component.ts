@@ -29,9 +29,9 @@ import { GuppyConfigurationService } from 'services/guppy-configuration.service'
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-interface FocusObj {
+export interface FocusObj {
   focused: boolean;
- }
+}
 
 @Component({
   selector: 'math-equation-editor',

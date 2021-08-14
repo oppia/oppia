@@ -55,12 +55,12 @@ export interface StateBackendDict {
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
-  // This property is null if no skills are linked to an interaction.
+  // This property is null if no skill is linked to an interaction.
   'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
 
-type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
+export type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
 
 export class State {
   name: string;
@@ -135,9 +135,11 @@ export class State {
     // As of now we do not delete interaction.hints when a user deletes
     // interaction, so these hints' written translations are not counted in
     // checking status of a state.
-    if (!interactionId ||
+    if (
+      !interactionId ||
       INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear ||
-      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal) {
+      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal
+    ) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
           allContentIds.delete(contentId);

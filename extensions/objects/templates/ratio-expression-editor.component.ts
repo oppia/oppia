@@ -33,8 +33,8 @@ export class RatioExpressionEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: number[];
-  localValue!: { label: string; };
   @Output() valueChanged = new EventEmitter();
+  localValue!: { label: string; };
   warningText: string = '';
   eventBusGroup: EventBusGroup;
   constructor(private eventBusService: EventBusService) {

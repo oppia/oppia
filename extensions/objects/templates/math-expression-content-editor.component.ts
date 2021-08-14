@@ -49,9 +49,9 @@ export class MathExpressionContentEditorComponent implements OnInit {
   @Input() modalId!: symbol;
   @Input() alwaysEditable: boolean = false;
   @Input() value!: MathExpression;
+  @Output() valueChanged = new EventEmitter();
   numberOfElementsInQueue!: number;
   svgString!: string;
-  @Output() valueChanged = new EventEmitter();
   placeholderText = '\\frac{x}{y}';
   active: boolean = false;
   localValue: { label: string } = { label: '' };

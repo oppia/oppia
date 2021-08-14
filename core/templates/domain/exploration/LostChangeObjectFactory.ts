@@ -131,8 +131,10 @@ export class LostChange {
   isOutcomeFeedbackEqual(): boolean {
     let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
     let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
-    if (newValueOutcome && newValueOutcome?.feedback &&
-      oldValueOutcome && oldValueOutcome?.feedback) {
+    if (
+      newValueOutcome && newValueOutcome?.feedback &&
+      oldValueOutcome && oldValueOutcome?.feedback
+    ) {
       return (
         newValueOutcome.feedback.html === oldValueOutcome.feedback.html
       );
@@ -157,11 +159,12 @@ export class LostChange {
   }
 
   isFeedbackEqual(): boolean {
-    if ((<LostChangeValues> this.newValue).feedback &&
-    (<LostChangeValues> this.oldValue).feedback) {
+    let newValueFeedback = (<LostChangeValues> this.newValue).feedback;
+    let oldValueFeedback = (<LostChangeValues> this.oldValue).feedback;
+    if (newValueFeedback && oldValueFeedback) {
       return (
-        (<LostChangeValues> this.newValue).feedback?.html ===
-        (<LostChangeValues> this.oldValue).feedback?.html);
+        newValueFeedback?.html === oldValueFeedback?.html
+      );
     }
     return false;
   }
