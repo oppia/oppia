@@ -256,6 +256,16 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await waitFor.pageToFullyLoad();
 };
 
+var navigateToBlogDashboardPage = async function() {
+  await openProfileDropdown();
+  var BlogDashboardLink = element(by.css(
+    '.protractor-test-blog-dashboard-link'));
+  await action.click(
+    'Blog dashboard link from dropdown',
+    BlogDashboardLink);
+  await waitFor.pageToFullyLoad();
+};
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -289,3 +299,5 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
+exports.navigateToBlogDashboardPage = (
+  navigateToBlogDashboardPage);
