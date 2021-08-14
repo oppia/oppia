@@ -1012,6 +1012,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
+    // TODO(#13676) Replace window.gifFrames with another approach.
     window.GifFrames({
       url: imageDataURI,
       frames: 'all',

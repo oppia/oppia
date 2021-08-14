@@ -31,6 +31,7 @@ import { SimpleChanges } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 let gifshot = require('gifshot');
 
+// TODO(#13676) Replace window.gifFrames with another approach.
 declare global {
   interface Window {
     GifFrames: Function;

@@ -98,7 +98,7 @@ describe('AudioPlayerService', () => {
         }));
     });
 
-    it('should load when user plays audio', fakeAsync(async() => {
+    it('should load track when user plays audio', fakeAsync(async() => {
       audioPlayerService.loadAsync('test.mp3').then(
         successHandler, failHandler);
       flushMicrotasks();
@@ -107,7 +107,7 @@ describe('AudioPlayerService', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-    it('should not load track when a track has laready been loaded',
+    it('should not load track when a track has already been loaded',
       fakeAsync(() => {
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
@@ -117,7 +117,7 @@ describe('AudioPlayerService', () => {
         expect(assetsBackendApiService.loadAudio).toHaveBeenCalledTimes(1);
       }));
 
-    it('should play when user clicks the play button', fakeAsync(() => {
+    it('should play audio when user clicks the play button', fakeAsync(() => {
       spyOn(console, 'error');
 
       audioPlayerService.loadAsync('test.mp3');
@@ -134,37 +134,40 @@ describe('AudioPlayerService', () => {
       expect(console.error).toHaveBeenCalledWith('Howl.play');
     }));
 
-    it('should not play when audio is already playing', fakeAsync(() => {
-      spyOn(console, 'error');
-      spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
+    it('should not play audio again when audio is already being played',
+      fakeAsync(() => {
+        spyOn(console, 'error');
+        spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
 
-      audioPlayerService.loadAsync('test.mp3');
-      flushMicrotasks();
+        audioPlayerService.loadAsync('test.mp3');
+        flushMicrotasks();
 
-      audioPlayerService.play();
-      discardPeriodicTasks();
+        audioPlayerService.play();
+        discardPeriodicTasks();
 
-      // The play function of the Howl calss is called when the user clicks
-      // the  play button. Since the Howl class is mocked, a cosole.error stmt
-      // is placed inside the play function and is tested if the console.error
-      // stmt inside it triggered.
-      expect(console.error).not.toHaveBeenCalledWith('Howl.play');
-    }));
+        // The play function of the Howl calss is called when the user clicks
+        // the  play button. Since the Howl class is mocked, a cosole.error stmt
+        // is placed inside the play function and is tested if the console.error
+        // stmt inside it triggered.
+        expect(console.error).not.toHaveBeenCalledWith('Howl.play');
+      }));
 
-    it('should not pause when audio is not playing', fakeAsync(() => {
-      spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
-      spyOn(audioPlayerService, 'getCurrentTime');
-      let subjectNext = spyOn(Subject.prototype, 'next');
-      audioPlayerService.loadAsync('test.mp3');
-      flushMicrotasks();
+    it('should not pause track when audio is not being played',
+      fakeAsync(() => {
+        spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
+        spyOn(audioPlayerService, 'getCurrentTime');
+        let subjectNext = spyOn(Subject.prototype, 'next');
+        audioPlayerService.loadAsync('test.mp3');
+        flushMicrotasks();
 
-      audioPlayerService.pause();
+        audioPlayerService.pause();
 
-      expect(audioPlayerService.getCurrentTime).not.toHaveBeenCalled();
-      expect(subjectNext).toHaveBeenCalledTimes(1);
-    }));
+        expect(audioPlayerService.getCurrentTime).not.toHaveBeenCalled();
+        expect(subjectNext).toHaveBeenCalledTimes(1);
+      }));
 
-    it('should pause when user clicks the pause button', fakeAsync(() => {
+    it('should pause track when user clicks the \'Pause\' ' +
+    'button', fakeAsync(() => {
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
       let subjectNext = spyOn(Subject.prototype, 'next');
       spyOn(audioPlayerService, 'getCurrentTime');
@@ -177,7 +180,7 @@ describe('AudioPlayerService', () => {
       expect(subjectNext).toHaveBeenCalled();
     }));
 
-    it('should stop playing audio and reset the time when called',
+    it('should stop playing track and reset the time when called',
       fakeAsync(() => {
         spyOn(audioPlayerService, 'setCurrentTime');
         spyOn(console, 'error');
@@ -192,7 +195,8 @@ describe('AudioPlayerService', () => {
         expect(subjectNext).toHaveBeenCalledTimes(2);
       }));
 
-    it('should rewind when user clicks the rewind button', fakeAsync(() => {
+    it('should rewind the track when user clicks the \'Rewind\' ' +
+    'button', fakeAsync(() => {
       spyOn(console, 'error');
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
@@ -202,7 +206,8 @@ describe('AudioPlayerService', () => {
       expect(console.error).toHaveBeenCalledWith('Howl.seek ', 5);
     }));
 
-    it('should forward when user clicks the forward button', fakeAsync(() => {
+    it('should forward the track when user clicks the \'forward\'' +
+    ' button', fakeAsync(() => {
       spyOn(console, 'error');
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
@@ -212,7 +217,7 @@ describe('AudioPlayerService', () => {
       expect(console.error).toHaveBeenCalledWith('Howl.seek ', 15);
     }));
 
-    it('should get the current time of the audio when playing',
+    it('should get the current time of the track when it is being played',
       fakeAsync(() => {
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
@@ -252,14 +257,14 @@ describe('AudioPlayerService', () => {
       expect(console.error).toHaveBeenCalledWith('Howl.seek ', 0);
     }));
 
-    it('should return duration when called', fakeAsync(() => {
+    it('should return duration of the track when called', fakeAsync(() => {
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
 
       expect(audioPlayerService.getAudioDuration()).toBe(30);
     }));
 
-    it('should return false when audio is not playing', fakeAsync(() => {
+    it('should return false when audio is not being played', fakeAsync(() => {
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
 
@@ -293,7 +298,7 @@ describe('AudioPlayerService', () => {
       expect(audioPlayerService.isTrackLoaded()).toBe(false);
     }));
 
-    it('should stop track and clear it when called', fakeAsync(() => {
+    it('should stop and clear track when called', fakeAsync(() => {
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
       spyOn(audioPlayerService, 'stop');
       audioPlayerService.loadAsync('test.mp3');
@@ -308,7 +313,7 @@ describe('AudioPlayerService', () => {
     }));
   });
 
-  describe('when is not loaded', () => {
+  describe('when track is not loaded', () => {
     beforeEach(() => {
       spyOn(howler, 'Howl').and.returnValue({
         on: (evt, func) => {
@@ -350,13 +355,13 @@ describe('AudioPlayerService', () => {
       expect(subjectNext).not.toHaveBeenCalledTimes(2);
     }));
 
-    it('should not rewind when no audio is loaded', fakeAsync(() => {
+    it('should not rewind track when no audio is loaded', fakeAsync(() => {
       audioPlayerService.rewind(5);
 
       expect(console.error).not.toHaveBeenCalled();
     }));
 
-    it('should not rewind when seek does not return an number',
+    it('should not rewind track when seek does not return an number',
       fakeAsync(() => {
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
@@ -367,13 +372,13 @@ describe('AudioPlayerService', () => {
         expect(console.error).toHaveBeenCalledWith('Howl.seek');
       }));
 
-    it('should not forward when no audio is loaded', fakeAsync(() => {
+    it('should not forward track when no audio is loaded', fakeAsync(() => {
       audioPlayerService.forward(5);
 
       expect(console.error).not.toHaveBeenCalled();
     }));
 
-    it('should not foward when seek does not return an number',
+    it('should not foward track when seek does not return an number',
       fakeAsync(() => {
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
@@ -384,31 +389,32 @@ describe('AudioPlayerService', () => {
         expect(console.error).toHaveBeenCalledWith('Howl.seek');
       }));
 
-    it('should not get the current time when no audio is loaded', () => {
+    it('should not get the current time of track when no audio is' +
+    ' loaded', () => {
       expect(audioPlayerService.getCurrentTime()).toBe(0);
     });
 
-    it('should not get the current time when seek does not return an number',
-      fakeAsync(() => {
-        audioPlayerService.loadAsync('test.mp3');
-        flushMicrotasks();
+    it('should not get the current time of track when seek does not ' +
+    'return an number', fakeAsync(() => {
+      audioPlayerService.loadAsync('test.mp3');
+      flushMicrotasks();
 
-        expect(audioPlayerService.getCurrentTime()).toBe(0);
-      }));
+      expect(audioPlayerService.getCurrentTime()).toBe(0);
+    }));
 
-    it('should not forward when no audio is loaded', fakeAsync(() => {
+    it('should not forward track when no audio is loaded', fakeAsync(() => {
       audioPlayerService.forward(5);
 
       expect(console.error).not.toHaveBeenCalled();
     }));
 
-    it('should not set time when audio is not loaded', () => {
+    it('should not set time of the track when audio is not loaded', () => {
       audioPlayerService.setCurrentTime(5);
 
       expect(console.error).not.toHaveBeenCalled();
     });
 
-    it('should return 0 duration when called', fakeAsync(() => {
+    it('should return 0 duration when no audio is loaded', fakeAsync(() => {
       expect(audioPlayerService.getAudioDuration()).toBe(0);
     }));
 
@@ -420,7 +426,8 @@ describe('AudioPlayerService', () => {
     }));
   });
 
-  it('should clear translation when audio ends', fakeAsync(async() => {
+  it('should clear secondary audio translations when audio ' +
+  'ends', fakeAsync(async() => {
     spyOn(howler, 'Howl').and.returnValue({
       on: (evt, func) => {
         if (evt === 'end') {
