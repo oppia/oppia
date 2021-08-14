@@ -396,7 +396,7 @@ describe('Full exploration editor', function() {
       });
       await action.waitForAutosave();
 
-      // Check that the save changes button is clickable when online.
+      // Check that the save changes button is enabled when online.
       expect(await saveChangesButton.isEnabled()).toEqual(true);
 
       // Set network connection to offline.
@@ -410,6 +410,9 @@ describe('Full exploration editor', function() {
         await richTextEditor.appendPlainText('Hello Oppia?');
       });
 
+      // Check that the save changes button is enabled when offline.
+      expect(await saveChangesButton.isEnabled()).toEqual(false);
+
       // Set network connection to online.
       await general.goOnline();
 
@@ -418,7 +421,7 @@ describe('Full exploration editor', function() {
 
       await action.waitForAutosave();
 
-      // Check that the save changes button is clickable when reconnected.
+      // Check that the save changes button is enabled when reconnected.
       expect(await saveChangesButton.isEnabled()).toEqual(true);
 
       await explorationEditorMainTab.expectContentToMatch(
