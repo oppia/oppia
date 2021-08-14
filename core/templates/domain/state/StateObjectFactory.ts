@@ -164,10 +164,8 @@ export class StateObjectFactory {
     private paramchangesObject: ParamChangesObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
-  // Type of Constant here doesn't match with the type StateBackendDict,
-  // so we will have to typecast it as unknown first.
   get NEW_STATE_TEMPLATE(): StateBackendDict {
-    return constants.NEW_STATE_TEMPLATE as unknown as StateBackendDict;
+    return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
   createDefaultState(newStateName: string): State {

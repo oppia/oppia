@@ -322,7 +322,7 @@ describe('Changes in Human Readable Form Component', () => {
       },
       old_value: {},
       property_name: 'widget_customization_args'
-    } as unknown as LostChangeBackendDict)];
+    } as LostChangeBackendDict)];
 
     fixture.detectChanges();
 
@@ -365,7 +365,7 @@ describe('Changes in Human Readable Form Component', () => {
         property1: true
       },
       property_name: 'widget_customization_args'
-    } as unknown as LostChangeBackendDict)];
+    } as LostChangeBackendDict)];
 
     fixture.detectChanges();
 
@@ -410,7 +410,7 @@ describe('Changes in Human Readable Form Component', () => {
         property1: true
       },
       property_name: 'widget_customization_args'
-    } as unknown as LostChangeBackendDict)];
+    } as LostChangeBackendDict)];
 
     fixture.detectChanges();
 
@@ -455,7 +455,7 @@ describe('Changes in Human Readable Form Component', () => {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict),
+        } as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -465,7 +465,7 @@ describe('Changes in Human Readable Form Component', () => {
         }]
       },
       property_name: 'answer_groups'
-    } as unknown as LostChangeBackendDict)];
+    } as LostChangeBackendDict)];
 
     fixture.detectChanges();
 
@@ -510,7 +510,7 @@ describe('Changes in Human Readable Form Component', () => {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict),
+        } as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -526,7 +526,7 @@ describe('Changes in Human Readable Form Component', () => {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict),
+        } as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -536,7 +536,7 @@ describe('Changes in Human Readable Form Component', () => {
         }]
       },
       property_name: 'answer_groups'
-    } as unknown as LostChangeBackendDict)];
+    } as LostChangeBackendDict)];
 
     fixture.detectChanges();
 
@@ -590,7 +590,7 @@ describe('Changes in Human Readable Form Component', () => {
             input2: 'input2'
           }
         }]
-      } as unknown as LostChangeValue,
+      } as LostChangeValue,
       property_name: 'answer_groups'
     })];
 
@@ -630,14 +630,14 @@ describe('Changes in Human Readable Form Component', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: <LostChangeValue><unknown>(
+      new_value: <LostChangeValue>(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict)),
+        } as OutcomeBackendDict)),
       old_value: <LostChangeValue>{},
       property_name: 'default_outcome'
     })];
@@ -690,22 +690,26 @@ describe('Changes in Human Readable Form Component', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: <LostChangeValue><unknown>(
+      new_value: <LostChangeValue>(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict)),
-      old_value: <LostChangeValue><unknown>(
+        } as OutcomeBackendDict)),
+      old_value: <LostChangeValue>(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict)),
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        } as OutcomeBackendDict)),
       property_name: 'default_outcome'
     })];
 
@@ -751,14 +755,14 @@ describe('Changes in Human Readable Form Component', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: <LostChangeValue>{},
-      old_value: <LostChangeValue><unknown>{
+      old_value: <LostChangeValue>{
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        } as unknown as OutcomeBackendDict),
+        } as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {

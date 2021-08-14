@@ -5615,7 +5615,7 @@ export default {
       "content_id": "content"
     },
     "interaction": {
-      "id": null,
+      "id": "",
       "customization_args": {},
       "answer_groups": [],
       "default_outcome": {
