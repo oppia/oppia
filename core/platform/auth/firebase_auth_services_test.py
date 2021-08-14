@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import contextlib  # pylint: disable=unused-import
 import datetime
 import itertools
 import json
@@ -44,6 +43,7 @@ from typing import Dict, List, Optional, Tuple, Union, cast # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
+    import contextlib  # pylint: disable=unused-import
     from mypy_imports import auth_models
 
 auth_models, user_models = (

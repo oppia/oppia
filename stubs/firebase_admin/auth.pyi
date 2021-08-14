@@ -5,8 +5,7 @@ from . import App
 
 class UserRecord:
     def __init__(
-            self,
-            data: Dict[str, Any]
+            self, data: Dict[str, Any]
     ) -> None: ...
 
     @property
@@ -36,9 +35,7 @@ class ImportUserRecord:
 
 class UserImportResult:
     def __init__(
-            self,
-            result: Dict[str, Any],
-            total: int
+            self, result: Dict[str, Any], total: int
     ) -> None: ...
 
 
@@ -46,8 +43,7 @@ class ListUsersPage: ...
 
 class BatchDeleteAccountsResponse:
     def __init__(
-            self,
-            errors: List[Dict[str, Union[int, str]]] = ...
+            self, errors: List[Dict[str, Union[int, str]]] = ...
     ) -> None: ...
 
 def create_session_cookie(
@@ -69,8 +65,7 @@ def set_custom_user_claims(
 ) -> None: ...
 
 def revoke_refresh_tokens(
-        uid: str,
-        app: Optional[App] = ...
+        uid: str, app: Optional[App] = ...
 ) -> None: ...
 
 def verify_session_cookie(
