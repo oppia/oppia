@@ -123,7 +123,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
     'story-editor-navbar-breadcrumb.component.ts',
-    'story-editor.directive.ts',
     'story-node.model.ts',
     'story-update.service.ts',
     'student.ts',
