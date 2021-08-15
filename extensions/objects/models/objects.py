@@ -1727,6 +1727,8 @@ class JsonEncodedInString(BaseObject):
             which we want to load from json.
         """
         if not isinstance(raw, python_utils.BASESTRING):
-            raise Exception('Expected string received %s' % raw)
+            raise Exception('Expected string received %s of type %s' % (
+                raw, type(raw))
+            )
 
         return json.loads(raw)
