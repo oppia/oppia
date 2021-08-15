@@ -19,6 +19,7 @@
 var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
+var general = require('../protractor_utils/general.js');
 
 var BlogDashboardPage = require('../protractor_utils/BlogDashboardPage.js');
 

@@ -84,6 +84,7 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-intro-message'));
   var editContentButton = element(
     by.css('.protractor-test-content-button'));
+
   this.get = async function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
