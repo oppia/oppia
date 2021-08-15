@@ -56,11 +56,11 @@ describe('Blog Dashboard Tile Component', () => {
         HttpClientTestingModule,
         MatCardModule,
         MatMenuModule,
-        NgbModalModule,
+        NgbModalModule
       ],
       declarations: [
         BlogDashboardTileComponent,
-        MockTranslatePipe,
+        MockTranslatePipe
       ],
       providers: [
         {

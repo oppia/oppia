@@ -143,7 +143,9 @@ export class BlogDashboardPageService {
         () => {
           this.alertsService.addSuccessMessage(
             'Blog Post Deleted Successfully.', 5000);
-          this.navigateToMainTab();
+          if (this.activeTab === 'editor_tab') {
+            this.navigateToMainTab();
+          }
         }, (errorResponse) => {
           this.alertsService.addWarning('Failed to delete blog post.');
         }
