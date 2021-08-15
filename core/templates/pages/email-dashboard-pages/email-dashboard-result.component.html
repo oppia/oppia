@@ -34,7 +34,7 @@
     <br>
     Email body: <textarea rows="15" cols="20" placeholder="Enter email body here..." [(ngModel)]="emailBody" [ngModelOptions]="{standalone: true}"></textarea>
     <br>
-    Email intent: <select [(ngModel)]="emailIntent" [ngModelOptions]="{standalone: true}"><option *ngFor="let intent of POSSIBLE_EMAIL_INTENTS" [value]="intent">{{ intent }}</option></option></select><br><br>
+    Email intent: <select [(ngModel)]="emailIntent" [ngModelOptions]="{standalone: true}"><option *ngFor="let intent of POSSIBLE_EMAIL_INTENTS" [value]="intent">{{ intent }}</option></select><br><br>
     Email option: <input type="radio" name="email" [(ngModel)]="emailOption" [ngModelOptions]="{standalone: true}" value="all" checked> Send to all
     <input type="radio" name="email" [(ngModel)]="emailOption" [ngModelOptions]="{standalone: true}" value="custom"> Send to max N users:
     <input type="number" [(ngModel)]="maxRecipients" [ngModelOptions]="{standalone: true}" min="0" placeholder="Enter number of users..." [disabled]="emailOption == 'all'"><br><br>

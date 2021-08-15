@@ -28,8 +28,7 @@ import { UserService } from 'services/user.service';
 import { EmailDashboardDataService } from './email-dashboard-data.service';
 import { EmailDashboardPageComponent } from './email-dashboard-page.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Email Dashboard Page Component', () => {
+describe('Email Dashboard Page Component', () => {
   let fixture: ComponentFixture<EmailDashboardPageComponent>;
   let componentInstance: EmailDashboardPageComponent;
   let loaderService: LoaderService;
