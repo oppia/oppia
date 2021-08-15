@@ -114,8 +114,7 @@ def validate_email_dashboard_data(
             raise Exception('400 Invalid input for query.')
 
 
-def validate_task_entries(task_entries):
-    # type: (Dict[String, Any]) -> None
+def validate_task_entries(task_entries: Dict[str, Any]) -> None:
     """Validates the task entry dict.
 
     Args:
