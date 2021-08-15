@@ -1712,7 +1712,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
 
-class ValidateAndNormalizeJsonStrings(BaseObject):
+class JsonEncodedInString(BaseObject):
     """Converts stringified value to its actual data type."""
 
     @classmethod

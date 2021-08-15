@@ -171,6 +171,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
             )
             self.assertEqual(result['error'], error_msg)
 
+
 class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the PlatformFeatureDummyHandler."""
 

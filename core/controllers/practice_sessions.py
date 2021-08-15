@@ -57,7 +57,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             'selected_subtopic_ids': {
                 'schema': {
                     'type': 'custom',
-                    'obj_type': 'ValidateAndNormalizeJsonStrings'
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         }

@@ -1321,17 +1321,17 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
             ['1', '2'])
 
 
-class ValidateAndNormalizeJsonStringsTests(test_utils.GenericTestBase):
+class JsonEncodedInStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
         list_of_ids = ['0', '1']
         with self.assertRaisesRegexp(
             Exception, 'Expected string received 2'
         ):
-            objects.ValidateAndNormalizeJsonStrings.normalize(2)
+            objects.JsonEncodedInString.normalize(2)
 
         self.assertEqual(
-            objects.ValidateAndNormalizeJsonStrings.normalize(
+            objects.JsonEncodedInString.normalize(
                 json.dumps(list_of_ids)),
             list_of_ids
         )
