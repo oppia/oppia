@@ -41,8 +41,8 @@ class ValidateStorySnapshotMetadataModel(
 
     def _get_change_domain_class(
             self,
-            input_model: Any
-    ) -> Type[story_domain.StoryChange]: # pylint: disable=unused-argument
+            input_model: Any # pylint: disable=unused-argument
+    ) -> Type[story_domain.StoryChange]:
         """Returns a change domain class.
 
         Args:
@@ -63,7 +63,7 @@ class ValidateStoryCommitLogEntryModel(
     def _get_change_domain_class(
             self,
             input_model: Any
-    ) -> Optional[Type[story_domain.StoryChange]]: # pylint: disable=unused-argument
+    ) -> Optional[Type[story_domain.StoryChange]]:
         """Returns a change domain class.
 
         Args:

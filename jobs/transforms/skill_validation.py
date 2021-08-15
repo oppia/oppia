@@ -41,8 +41,8 @@ class ValidateSkillSnapshotMetadataModel(
 
     def _get_change_domain_class(
             self,
-            input_model: Any
-    ) -> Type[skill_domain.SkillChange]: # pylint: disable=unused-argument
+            input_model: Any # pylint: disable=unused-argument
+    ) -> Type[skill_domain.SkillChange]:
         """Returns a change domain class.
 
         Args:
@@ -63,7 +63,7 @@ class ValidateSkillCommitLogEntryModel(
     def _get_change_domain_class(
             self,
             input_model: Any
-    ) -> Optional[Type[skill_domain.SkillChange]]: # pylint: disable=unused-argument
+    ) -> Optional[Type[skill_domain.SkillChange]]:
         """Returns a change domain class.
 
         Args:
