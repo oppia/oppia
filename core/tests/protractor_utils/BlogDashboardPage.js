@@ -34,9 +34,10 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-unpublish-blog-post-button'));
   var deleteBlogPostButton = element(
     by.css('.protractor-test-delete-blog-post-button'));
-  // var matTab = element.all(by.tagName('mat-tab'));
-  // var DraftTab = matTab[0].element(
-  //   by.cssContainingText('.mat-tab-label', 'Drafts'));
+  var draftTab = element(
+    by.cssContainingText('.mat-tab-label', 'Drafts'));
+  var publishTab = element(
+    by.cssContainingText('.mat-tab-label', 'Published'));
   var BlogPostEditOptions = element.all(
     by.css('.protractor-test-blog-post-edit-box'));
   var BlogPostTitleFieldElement = element(
@@ -97,10 +98,6 @@ var BlogDashboardPage = function() {
       blogPostsTable, 'Blog posts table taking too long to appear.');
   };
 
-  this.isBlogPostTablePresent = async function() {
-    return await blogPostsTable.isPresent();
-  };
-
   this.createNewBlogPost = async function() {
     await action.click('Create Blog Post button', createBlogPostButton);
 
@@ -153,34 +150,28 @@ var BlogDashboardPage = function() {
       richTextInstructions);
   };
 
-  this.navigateToPublishTab = async function() {
+  this.navigateToPublishedTab = async function() {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      PublishTab, 'Unable to find publish tab button');
-    await action.click('Publish Tab', PublishTab);
+      publishTab, 'Unable to find publish tab button');
+    await action.click('Publish Tab', publishTab);
   };
 
   this.navigateToDraftsTab = async function() {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      DraftTab, 'Unable to find drafts tab button');
-    await action.click('Draft Tab', DraftTab);
+      draftTab, 'Unable to find drafts tab button');
+    await action.click('Draft Tab', draftTab);
   };
 
   this.expectNumberOfBlogPostsToBe = async function(number) {
-    let blogPostTableIsPresent = await blogPostsTable.isPresent();
     await this.waitForBlogPostsToLoad();
-    if (blogPostTableIsPresent) {
-      expect(await blogPostTiles.count()).toBe(number);
-    }
+    expect(await blogPostTiles.count()).toBe(number);
   };
 
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
-    let blogPostTableIsPresent = await blogPostsTable.isPresent();
     await this.waitForBlogPostsToLoad();
-    if (blogPostTableIsPresent) {
-      expect(await blogPostListItems.count()).toBe(number);
-    }
+    expect(await blogPostListItems.count()).toBe(number);
   };
 
   this.navigateToBlogPostEditorWithIndexFromList = async function(index) {
@@ -199,14 +190,16 @@ var BlogDashboardPage = function() {
     await action.click('Delete blog post button', deleteBlogPostButton);
     await action.click(
       'Confirm Delete Blog Post button', confirmButton);
-    await this.get();
+    await waitFor.pageToFullyLoad();
   };
 
   this.deleteBlogPostFromEditor = async function() {
+    await waitFor.visibilityOf(
+      deleteBlogPostButton, 'Unable to find delete button');
     await action.click('Delete blog post button', deleteBlogPostButton);
     await action.click(
       'Confirm Delete Blog Post button', confirmButton);
-    await this.get();
+    await waitFor.pageToFullyLoad();
   };
 
   this.unpublishBlogPostWithIndex = async function(index) {
@@ -216,7 +209,7 @@ var BlogDashboardPage = function() {
     await action.click('Unpublish blog post button', unpublishBlogPostButton);
     await action.click(
       'Confirm unpublishing Blog Post button', confirmButton);
-    await this.get();
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToBlogPostEditorWithIndex = async function(index) {

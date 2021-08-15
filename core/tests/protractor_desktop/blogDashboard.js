@@ -144,7 +144,7 @@ describe('Blog dashboard functionality', function() {
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/blog-dashboard');
       await blogDashboardPage.navigateToDraftsTab();
-      await blogDashboardPage.expectNumberOfBlogPostsToBe(1);
+      await blogDashboardPage.expectNumberOfBlogPostsToBe(0);
     });
 
   it('should check that blog post editor loads user profile',
@@ -188,7 +188,11 @@ describe('Blog dashboard functionality', function() {
       [1, 3, 5]);
 
     await blogDashboardPage.navigateToBlogDashboardPage();
-    await blogDashboardPage.expectNumberOfBlogPostsToBe(3);
+    await blogDashboardPage.navigateToDraftsTab();
+    await blogDashboardPage.expectNumberOfBlogPostsToBe(2);
+
+    await blogDashboardPage.navigateToPublishedTab();
+    await blogDashboardPage.expectNumberOfBlogPostsToBe(1);
   });
 
 
