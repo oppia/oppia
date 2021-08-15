@@ -22,6 +22,7 @@ import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-ba
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageService } from './blog-dashboard-page.service';
+import { BlogPostData } from 'domain/blog/blog-post.model';
 
 describe('Blog Post Page service', () => {
   let alertsService: AlertsService;
@@ -32,12 +33,11 @@ describe('Blog Post Page service', () => {
     nativeWindow = {
       location: {
         href: '',
-        hash: '/'
+        hash: '/',
+        reload: () => {}
       },
       open: (url) => {},
-      onhashchange() {
-        return this.location._hashChange;
-      },
+      onhashchange() {},
     };
   }
 
@@ -68,7 +68,7 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.activeTab).toEqual('main');
   });
 
-  it('should navigate to different tabs', function() {
+  it('should navigate to different tabs', () => {
     expect(blogDashboardPageService.activeTab).toEqual('main');
 
     blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
@@ -77,9 +77,8 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.activeTab).toEqual('editor_tab');
 
     blogDashboardPageService.navigateToMainTab();
-    mockWindowRef.nativeWindow.onhashchange();
 
-    expect(blogDashboardPageService.activeTab).toEqual('main');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/blog-dashboard');
   });
 
 
@@ -121,8 +120,11 @@ describe('Blog Post Page service', () => {
         'Failed to delete blog post.');
     }));
 
-  it('should successfully delete blog post data',
+  it('should successfully delete blog post data from blog post editor',
     fakeAsync(() => {
+      // Setting active tab as blog post editor.
+      blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
+      mockWindowRef.nativeWindow.onhashchange();
       spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
         .and.returnValue(Promise.resolve(200));
       spyOn(alertsService, 'addSuccessMessage');
@@ -134,6 +136,75 @@ describe('Blog Post Page service', () => {
         .toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Blog Post Deleted Successfully.', 5000);
-      expect(blogDashboardPageService.activeTab).toBe('main');
+      expect(blogDashboardPageService.activeTab).toBe('editor_tab');
     }));
+
+  it('should successfully delete blog post data from dashboard',
+    fakeAsync(() => {
+      spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
+        .and.returnValue(Promise.resolve(200));
+      spyOn(blogDashboardPageService, 'navigateToMainTab');
+      spyOn(alertsService, 'addSuccessMessage');
+
+      blogDashboardPageService.deleteBlogPost();
+      tick();
+
+      expect(blogPostEditorBackendApiService.deleteBlogPostAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Blog Post Deleted Successfully.', 5000);
+      expect(blogDashboardPageService.navigateToMainTab).not.toHaveBeenCalled();
+    }));
+
+  it('should succesfully set the blog post title in navbar', fakeAsync(() => {
+    spyOn(blogDashboardPageService.updateNavTitleEventEmitter, 'emit');
+
+    blogDashboardPageService.setNavTitle(false, '');
+    tick();
+
+    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
+      .toHaveBeenCalledWith('New Post - Untitled');
+
+    blogDashboardPageService.setNavTitle(false, 'Sample Title');
+    tick();
+
+    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
+      .toHaveBeenCalledWith('Draft - Sample Title');
+
+    blogDashboardPageService.setNavTitle(true, 'Sample Title');
+    tick();
+
+    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
+      .toHaveBeenCalledWith('Published - Sample Title');
+  }));
+
+  it('should set and retrieve blogPostId correctly', () => {
+    blogDashboardPageService.blogPostId = 'abc123456abc';
+
+    expect(blogDashboardPageService.blogPostId).toEqual('abc123456abc');
+  });
+
+  it('should set and retrieve author picture url correctly', () => {
+    blogDashboardPageService.authorPictureUrl = 'sample.png';
+
+    expect(blogDashboardPageService.authorPictureUrl).toEqual('sample.png');
+  });
+
+  it('should set and retrieve blog post data correctly', () => {
+    let summaryObject = BlogPostData.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        content: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+
+    blogDashboardPageService.blogPostData = summaryObject;
+
+    expect(blogDashboardPageService.blogPostData).toEqual(summaryObject);
+  });
 });

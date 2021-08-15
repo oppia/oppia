@@ -41,6 +41,7 @@ import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html'
@@ -64,6 +65,7 @@ export class BlogPostEditorComponent implements OnInit {
   newChangesAreMade: boolean = false;
   lastChangesWerePublished: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
+  MIN_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
@@ -84,6 +86,7 @@ export class BlogPostEditorComponent implements OnInit {
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +98,8 @@ export class BlogPostEditorComponent implements OnInit {
     this.title = this.blogPostData.title;
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
+    this.MIN_CHARS_IN_BLOG_POST_TITLE = (
+      AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE);
     this.loaderService.hideLoadingScreen();
     this.initEditor();
     this.contextService.setImageSaveDestinationToLocalStorage();
@@ -140,11 +145,17 @@ export class BlogPostEditorComponent implements OnInit {
           if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
             this.lastChangesWerePublished = true;
           }
+          this.blogDashboardPageService.setNavTitle(
+            this.lastChangesWerePublished, this.title);
+          this.newChangesAreMade = false;
         }, (errorResponse) => {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
-              errorResponse.status) !== -1) {
-            this.alertsService.addWarning('Failed to get blog post data.');
+              errorResponse) !== -1) {
+            this.alertsService.addWarning(
+              'Failed to get Blog Post Data. The Blog Post was either' +
+              ' deleted or the Blog Post ID is invalid.');
+            this.blogDashboardPageService.navigateToMainTab();
           }
         });
   }
@@ -159,6 +170,9 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title);
     this.newChangesAreMade = true;
+    this.blogDashboardPageService.setNavTitle(
+      this.lastChangesWerePublished, this.title);
+    this.preventPageUnloadEventService.addListener();
   }
 
   cancelEdit(): void {
@@ -181,6 +195,7 @@ export class BlogPostEditorComponent implements OnInit {
       this.contentEditorIsActive = false;
     }
     this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   saveDraft(): void {
@@ -234,6 +249,9 @@ export class BlogPostEditorComponent implements OnInit {
           this.lastChangesWerePublished = false;
         }
         this.newChangesAreMade = false;
+        this.blogDashboardPageService.setNavTitle(
+          this.lastChangesWerePublished, this.title);
+        this.preventPageUnloadEventService.removeListener();
       }, (errorResponse) => {
         this.alertsService.addWarning(
           `Failed to save Blog Post. Internal Error: ${errorResponse}`);
@@ -283,6 +301,7 @@ export class BlogPostEditorComponent implements OnInit {
       this.blogPostData.addTag(tag);
     }
     this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   showuploadThumbnailModal(): void {
@@ -303,6 +322,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.thumbnailDataUrl = thumbnailDataUrl;
     this.postImageDataToServer();
     this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   showPreview(): void {

@@ -72,7 +72,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_posts = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id_a, True))
-        self.assertIsNone(blog_posts)
+        self.assertEqual(blog_posts, [])
         blog_posts = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id_a, False))
@@ -85,7 +85,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_generate_summary_of_blog_post(self):
         html_content = '<a href="http://www.google.com">Hello, Oppia Blog</a>'
-        expected_summary = 'Hello, Oppia Blog...'
+        expected_summary = 'Hello, Oppia Blog'
         summary = blog_services.generate_summary_of_blog_post(html_content)
         self.assertEqual(expected_summary, summary)
 
@@ -100,7 +100,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id,
                 self.user_id_a,
                 '',
-                '...',
+                '',
                 '',
                 [],
                 self.blog_post_a.thumbnail_filename,
@@ -124,7 +124,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id,
                 self.user_id_a,
                 '',
-                '...',
+                '',
                 '',
                 [],
                 blog_post_summary_model.thumbnail_filename,
@@ -144,7 +144,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id,
                 self.user_id_a,
                 '',
-                '...',
+                '',
                 '',
                 [],
                 blog_post_summary.thumbnail_filename,
@@ -302,7 +302,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, strict=True))
         self.assertEqual(
             updated_blog_post_summary.thumbnail_filename, 'thummbnail.svg')
-        self.assertEqual(updated_blog_post_summary.summary, 'Hello...')
+        self.assertEqual(updated_blog_post_summary.summary, 'Hello')
         lower_id = '-' + self.blog_post_a_id.lower()
         self.assertEqual(
             updated_blog_post_summary.url_fragment, 'sample-title' + lower_id)
@@ -381,7 +381,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id,
                 self.user_id_a,
                 'Hello Bloggers',
-                '...',
+                '',
                 '',
                 [],
                 blog_post_summary.thumbnail_filename,

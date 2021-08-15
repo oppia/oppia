@@ -42,6 +42,8 @@ import { FormsModule } from '@angular/forms';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UploadBlogPostThumbnailComponent } from '../modal-templates/upload-blog-post-thumbnail.component';
 import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Blog Post Editor Component', () => {
   let fixture: ComponentFixture<BlogPostEditorComponent>;
@@ -57,6 +59,7 @@ describe('Blog Post Editor Component', () => {
   let sampleBlogPostData: BlogPostData;
   let imageLocalStorageService: ImageLocalStorageService;
   let windowDimensionsService: WindowDimensionsService;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
 
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
@@ -69,6 +72,19 @@ describe('Blog Post Editor Component', () => {
     last_updated: '11/21/2014, 04:52:46:713463',
     published_on: '11/21/2014, 04:52:46:713463',
   };
+
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: '',
+        hash: '/',
+        reload: () => {}
+      },
+      sessionStorage: {
+        clear: () => {},
+      }
+    };
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -94,6 +110,10 @@ describe('Blog Post Editor Component', () => {
           useClass: MockCapitalizePipe
         },
         {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
@@ -109,6 +129,7 @@ describe('Blog Post Editor Component', () => {
             }
           }
         },
+        PreventPageUnloadEventService,
         BlogDashboardPageService,
         BlogPostUpdateService,
         BlogPostEditorBackendApiService,
@@ -134,10 +155,13 @@ describe('Blog Post Editor Component', () => {
     blogPostUpdateService = TestBed.inject(BlogPostUpdateService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService);
     ngbModal = TestBed.inject(NgbModal);
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sampleBlogId');
+    spyOn(preventPageUnloadEventService, 'addListener');
     component.ngOnInit();
   });
 
@@ -223,7 +247,8 @@ describe('Blog Post Editor Component', () => {
   it('should display alert when unable to fetch blog post editor data',
     fakeAsync(() => {
       spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
-        .and.returnValue(Promise.reject({status: 500}));
+        .and.returnValue(Promise.reject(500));
+      spyOn(blogDashboardPageService, 'navigateToMainTab');
       spyOn(alertsService, 'addWarning');
 
       component.initEditor();
@@ -232,7 +257,9 @@ describe('Blog Post Editor Component', () => {
       expect(blogPostEditorBackendApiService.fetchBlogPostEditorData)
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to get blog post data.');
+        'Failed to get Blog Post Data. The Blog Post was either' +
+        ' deleted or the Blog Post ID is invalid.');
+      expect(blogDashboardPageService.navigateToMainTab).toHaveBeenCalled();
     }));
 
   it('should update local title value', () => {
@@ -244,6 +271,7 @@ describe('Blog Post Editor Component', () => {
 
     expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
       sampleBlogPostData, 'Sample title changed');
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
   });
 
   it('should update local edited content', () => {
@@ -270,6 +298,7 @@ describe('Blog Post Editor Component', () => {
     expect(blogPostUpdateService.setBlogPostContent).toHaveBeenCalledWith(
       sampleBlogPostData, '<p>Sample content changed</p>');
     expect(component.contentEditorIsActive).toBe(false);
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
   }));
 
   it('should cancel edit of blog post content and should close RTE', () => {
@@ -322,6 +351,7 @@ describe('Blog Post Editor Component', () => {
       component.blogPostId = sampleBlogPostData.id;
       spyOn(blogPostUpdateService, 'getBlogPostChangeDict')
         .and.returnValue({});
+      spyOn(preventPageUnloadEventService, 'removeListener');
       spyOn(blogPostUpdateService, 'setBlogPostTags');
       spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
         .and.returnValue(Promise.resolve({blogPostDict: sampleBlogPostData}));
@@ -333,6 +363,7 @@ describe('Blog Post Editor Component', () => {
       expect(blogPostUpdateService.setBlogPostTags).toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Blog Post Saved Succesfully.');
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
 
       component.updateBlogPostData(true);
       tick();
@@ -484,6 +515,7 @@ describe('Blog Post Editor Component', () => {
     component.onTagChange('sampleTag');
     expect(component.blogPostData.tags).toEqual(
       ['learners', 'news']);
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
   });
 
   it('should display alert when unable to post thumbnail data',

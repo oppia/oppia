@@ -25,6 +25,8 @@ import { BlogDashboardData, BlogDashboardBackendApiService } from 'domain/blog/b
 import { LoaderService } from 'services/loader.service';
 import { Subscription } from 'rxjs';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-blog-dashboard-page',
@@ -32,9 +34,11 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 })
 export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   activeTab: string;
+  activeView: string = 'gridView';
   authorProfilePictureUrl: string;
   blogDashboardData: BlogDashboardData;
   directiveSubscriptions = new Subscription();
+  windowIsNarrow: boolean;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
     private alertsService: AlertsService,
@@ -42,6 +46,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     private blogDashboardPageService: BlogDashboardPageService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionService: WindowDimensionsService,
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +54,11 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     if (this.activeTab === 'main') {
       this.initMainTab();
     }
+
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    });
 
     this.directiveSubscriptions.add(
       this.blogDashboardPageService.updateViewEventEmitter.subscribe(
@@ -95,6 +105,36 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
           `Unable to create new blog post.Error: ${error}`);
       }
     );
+  }
+
+  unpublishedBlogPost(blogPostSummary: BlogPostSummary): void {
+    let summaryDicts = this.blogDashboardData.publishedBlogPostSummaryDicts;
+    let index = summaryDicts.indexOf(
+      blogPostSummary);
+    if (index > -1) {
+      summaryDicts.splice(index, 1);
+    }
+    this.blogDashboardData.draftBlogPostSummaryDicts.unshift(
+      blogPostSummary);
+    this.blogDashboardData.numOfDraftBlogPosts += 1;
+    this.blogDashboardData.numOfPublishedBlogPosts -= 1;
+  }
+
+  removeBlogPost(
+      blogPostSummary: BlogPostSummary, blogPostWasPublished: boolean): void {
+    let summaryDicts: BlogPostSummary[];
+    if (blogPostWasPublished) {
+      summaryDicts = this.blogDashboardData.publishedBlogPostSummaryDicts;
+      this.blogDashboardData.numOfPublishedBlogPosts -= 1;
+    } else {
+      summaryDicts = this.blogDashboardData.draftBlogPostSummaryDicts;
+      this.blogDashboardData.numOfDraftBlogPosts -= 1;
+    }
+    let index = summaryDicts.indexOf(
+      blogPostSummary);
+    if (index > -1) {
+      summaryDicts.splice(index, 1);
+    }
   }
 }
 

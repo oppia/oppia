@@ -29,6 +29,9 @@ import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backe
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageService } from './services/blog-dashboard-page.service';
 import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
+import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { of } from 'rxjs';
 
 describe('Blog Dashboard Page Component', () => {
   let alertsService: AlertsService;
@@ -39,12 +42,15 @@ describe('Blog Dashboard Page Component', () => {
   let loaderService: LoaderService;
   let mockWindowRef: MockWindowRef;
   let urlInterpolationService: UrlInterpolationService;
+  let windowDimensionsService: WindowDimensionsService;
+  let resizeEvent = new Event('resize');
 
   class MockWindowRef {
     nativeWindow = {
       location: {
         href: '',
-        hash: '/'
+        hash: '/',
+        reload: () => {}
       },
       open: (url) => {},
       onhashchange() {
@@ -73,6 +79,13 @@ describe('Blog Dashboard Page Component', () => {
           provide: WindowRef,
           useClass: MockWindowRef
         },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
         BlogDashboardBackendApiService,
         BlogDashboardPageService,
         LoaderService,
@@ -91,6 +104,7 @@ describe('Blog Dashboard Page Component', () => {
     loaderService = TestBed.inject(LoaderService);
     blogDashboardBackendApiService = TestBed.inject(
       BlogDashboardBackendApiService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     alertsService = TestBed.inject(AlertsService);
     component.ngOnInit();
   });
@@ -126,7 +140,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(component.activeTab).toBe('editor_tab');
 
     // Changing active tab back to main tab.
-    blogDashboardPageService.navigateToMainTab();
+    mockWindowRef.nativeWindow.location.hash = '/';
     mockWindowRef.nativeWindow.onhashchange();
     tick();
 
@@ -185,6 +199,8 @@ describe('Blog Dashboard Page Component', () => {
       .toHaveBeenCalled();
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
+    expect(component.windowIsNarrow).toBe(true);
   }));
 
   it('should display alert when unable to fetch blog dashboard data',
@@ -239,4 +255,98 @@ describe('Blog Dashboard Page Component', () => {
         'Unable to create new blog post.Error: ' +
         'To many collisions with existing blog post ids.');
     }));
+
+  it('should remove unpublish blog post from published list and' +
+  ' add it to drafts list', () => {
+    let summaryObject = BlogPostSummary.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        summary: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+    let blogDashboardData = {
+      username: 'test_user',
+      profilePictureDataUrl: 'sample_url',
+      numOfPublishedBlogPosts: 1,
+      numOfDraftBlogPosts: 0,
+      publishedBlogPostSummaryDicts: [summaryObject],
+      draftBlogPostSummaryDicts: [],
+    };
+    component.blogDashboardData = blogDashboardData;
+
+    component.unpublishedBlogPost(summaryObject);
+
+    // BlogPostSummary should now be a part of draft list whereas
+    // publish blogPostSummary list should be empty.
+    expect(component.blogDashboardData.draftBlogPostSummaryDicts)
+      .toEqual([summaryObject]);
+    expect(component.blogDashboardData.publishedBlogPostSummaryDicts)
+      .toEqual([]);
+    expect(component.blogDashboardData.numOfPublishedBlogPosts).toEqual(0);
+    expect(component.blogDashboardData.numOfDraftBlogPosts).toEqual(1);
+  });
+
+  it('should successfully remove blog post summary when blog post' +
+  'published blog post is deleted', () => {
+    let summaryObject = BlogPostSummary.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        summary: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+    let blogDashboardData = {
+      username: 'test_user',
+      profilePictureDataUrl: 'sample_url',
+      numOfPublishedBlogPosts: 0,
+      numOfDraftBlogPosts: 0,
+      publishedBlogPostSummaryDicts: [summaryObject],
+      draftBlogPostSummaryDicts: [],
+    };
+    component.blogDashboardData = blogDashboardData;
+    component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
+
+    component.removeBlogPost(summaryObject, true);
+
+    expect(component.blogDashboardData.publishedBlogPostSummaryDicts).toEqual(
+      []);
+  });
+
+  it('should successfully remove blog post summary when blog post' +
+  'draft blog post is deleted', () => {
+    let summaryObject = BlogPostSummary.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        summary: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+    let blogDashboardData = {
+      username: 'test_user',
+      profilePictureDataUrl: 'sample_url',
+      numOfPublishedBlogPosts: 0,
+      numOfDraftBlogPosts: 0,
+      publishedBlogPostSummaryDicts: [],
+      draftBlogPostSummaryDicts: [summaryObject],
+    };
+    component.blogDashboardData = blogDashboardData;
+
+    component.removeBlogPost(summaryObject, false);
+
+    expect(component.blogDashboardData.draftBlogPostSummaryDicts).toEqual(
+      []);
+  });
 });
