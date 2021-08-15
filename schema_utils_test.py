@@ -826,7 +826,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             self,
             schema: Dict[str, Any],
             mappings: List[Tuple[Any, Any]],
-            invalid_items_with_error_messages: List[Tuple[Any, str]]) -> None:
+            invalid_items_with_error_messages: List[Tuple[Any, str]]
+    ) -> None:
         """Validates the schema and tests that values are normalized correctly.
 
         Args:

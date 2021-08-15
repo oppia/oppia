@@ -301,7 +301,8 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user_id(
-            cls, user_id: str) -> Optional['UserIdByFirebaseAuthIdModel']:
+            cls, user_id: str
+    ) -> Optional['UserIdByFirebaseAuthIdModel']:
         """Fetch an entry by user ID.
 
         Args:

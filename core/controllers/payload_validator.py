@@ -23,13 +23,14 @@ from __future__ import unicode_literals
 
 import schema_utils
 
-from typing import Any, Dict, List, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, import-only-modules
+from typing import Any, Dict, List, Tuple # isort:skip
 
 
 def validate(
         handler_args: Any,
         handler_args_schemas: Any,
-        allowed_extra_args: bool) -> Tuple[Dict[Any, Any], List[str]]:
+        allowed_extra_args: bool
+) -> Tuple[Dict[Any, Any], List[str]]:
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.

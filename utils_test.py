@@ -613,7 +613,8 @@ class UtilsTests(test_utils.GenericTestBase):
     def _assert_valid_thumbnail_filename(
             self,
             expected_error_substring: str,
-            thumbnail_filename: str) -> None:
+            thumbnail_filename: str
+    ) -> None:
         """Helper method for test_require_valid_thumbnail_filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):

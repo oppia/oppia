@@ -236,7 +236,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
     def _generate_id(
             cls,
             platform: str,
-            submitted_on_datetime: datetime.datetime) -> str:
+            submitted_on_datetime: datetime.datetime
+    ) -> str:
         """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
 

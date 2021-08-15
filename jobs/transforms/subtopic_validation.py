@@ -43,7 +43,8 @@ class ValidateSubtopicPageSnapshotMetadataModel(
 
     def _get_change_domain_class(
             self,
-            input_model: Any) -> Type[subtopic_page_domain.SubtopicPageChange]: # pylint: disable=unused-argument
+            input_model: Any
+    ) -> Type[subtopic_page_domain.SubtopicPageChange]: # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
@@ -66,7 +67,7 @@ class ValidateSubtopicPageCommitLogEntryModel(
     def _get_change_domain_class(
             self,
             input_model: Any
-        ) -> Optional[Type[subtopic_page_domain.SubtopicPageChange]]:
+    ) -> Optional[Type[subtopic_page_domain.SubtopicPageChange]]:
         """Returns a change domain class.
 
         Args:

@@ -146,7 +146,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 List[Dict[str, Union[int, List[str]]]]],
             state_name: str,
             status: str,
-            algorithm_version: int) -> str:
+            algorithm_version: int
+    ) -> str:
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -190,7 +191,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def query_new_and_pending_training_jobs(
-            cls, offset: int) -> Tuple[List['ClassifierTrainingJobModel'], int]:
+            cls, offset: int
+    ) -> Tuple[List['ClassifierTrainingJobModel'], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
@@ -305,7 +307,8 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             cls,
             exp_id: str,
             exp_version: int,
-            state_name: str) -> str:
+            state_name: str
+    ) -> str:
         """Generates a unique ID for the Classifier Exploration Mapping of the
         form [exp_id].[exp_version].[state_name].
 
@@ -354,7 +357,8 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             cls,
             exp_id: str,
             exp_version: int,
-            state_name: str) -> Optional['StateTrainingJobsMappingModel']:
+            state_name: str
+    ) -> Optional['StateTrainingJobsMappingModel']:
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -380,7 +384,8 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             exp_id: str,
             exp_version: int,
             state_name: str,
-            algorithm_ids_to_job_ids: Dict[str, str]) -> str:
+            algorithm_ids_to_job_ids: Dict[str, str]
+    ) -> str:
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -416,7 +421,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     def create_multi(
             cls,
             state_training_jobs_mappings: List['StateTrainingJobsMappingModel']
-        ) -> List[str]:
+    ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 
         Args:

@@ -131,7 +131,7 @@ class BaseModel(datastore_services.Model):
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: *Any, **kwargs: **Any) -> None:
         super(BaseModel, self).__init__(*args, **kwargs)
         self._last_updated_timestamp_is_fresh = False
 
@@ -502,7 +502,7 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
-    def put(self, *args: Any, **kwargs: Any) -> None:
+    def put(self, *args: *Any, **kwargs: **Any) -> None:
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError('Use put_for_human or put_for_bot instead')
 
@@ -523,7 +523,8 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi_for_human(
-            cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None:
+            cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
+    ) -> None:
         """Stores the given model instances on behalf of a human.
 
         Args:
@@ -539,7 +540,8 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi_for_bot(
-            cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None:
+            cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
+    ) -> None:
         """Stores the given model instances on behalf of a non-human.
 
         Args:
@@ -821,7 +823,8 @@ class VersionedModel(BaseModel):
     # remove Any from type-annotation below.
     def _reconstitute(
             self: SELF_VERSIONED_MODEL,
-            snapshot_dict: Dict[str, Any]) -> SELF_VERSIONED_MODEL:
+            snapshot_dict: Dict[str, Any]
+    ) -> SELF_VERSIONED_MODEL:
         """Populates the model instance with the snapshot.
 
         Args:
@@ -837,7 +840,8 @@ class VersionedModel(BaseModel):
 
     def _reconstitute_from_snapshot_id(
             self: SELF_VERSIONED_MODEL,
-            snapshot_id: str) -> SELF_VERSIONED_MODEL:
+            snapshot_id: str
+    ) -> SELF_VERSIONED_MODEL:
         """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
 
@@ -885,7 +889,8 @@ class VersionedModel(BaseModel):
             committer_id: str,
             commit_type: str,
             commit_message: str,
-            commit_cmds: List[Dict[str, Any]]) -> None:
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Evaluates and executes commit. Main function for all commit types.
 
         Args:
@@ -942,7 +947,8 @@ class VersionedModel(BaseModel):
             self,
             committer_id: str,
             commit_message: str,
-            force_deletion: bool = False) -> None:
+            force_deletion: bool = False
+    ) -> None:
         """Deletes this model instance.
 
         Args:
@@ -1009,7 +1015,8 @@ class VersionedModel(BaseModel):
             entity_ids: List[str],
             committer_id: str,
             commit_message: str,
-            force_deletion: bool = False) -> None:
+            force_deletion: bool = False
+    ) -> None:
         """Deletes the given cls instancies with the given entity_ids.
 
         Args:
@@ -1102,7 +1109,7 @@ class VersionedModel(BaseModel):
             cls.update_timestamps_multi(entities)
             BaseModel.put_multi_transactional(entities)
 
-    def put(self, *args: Any, **kwargs: Any) -> None:
+    def put(self, *args: *Any, **kwargs: **Any) -> None:
         """For VersionedModels, this method is replaced with commit()."""
         raise NotImplementedError(
             'The put() method is missing from the '
@@ -1114,7 +1121,8 @@ class VersionedModel(BaseModel):
             self,
             committer_id: str,
             commit_message: str,
-            commit_cmds: List[Dict[str, Any]]) -> None:
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Saves a version snapshot and updates the model.
 
         Args:
@@ -1163,7 +1171,8 @@ class VersionedModel(BaseModel):
             model: SELF_VERSIONED_MODEL,
             committer_id: str,
             commit_message: str,
-            version_number: int) -> None:
+            version_number: int
+    ) -> None:
         """Reverts model to previous version.
 
         Args:
@@ -1214,7 +1223,8 @@ class VersionedModel(BaseModel):
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
-            strict: bool = True) -> Optional[SELF_VERSIONED_MODEL]:
+            strict: bool = True
+    ) -> Optional[SELF_VERSIONED_MODEL]:
         """Gets model instance representing the given version.
 
         The snapshot content is used to populate this model instance. The
@@ -1255,7 +1265,8 @@ class VersionedModel(BaseModel):
     def get_multi_versions(
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
-            version_numbers: List[int]) -> List[SELF_VERSIONED_MODEL]:
+            version_numbers: List[int]
+    ) -> List[SELF_VERSIONED_MODEL]:
         """Gets model instances for each version specified in version_numbers.
 
         Args:
@@ -1308,7 +1319,8 @@ class VersionedModel(BaseModel):
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             strict: bool = True,
-            version: Optional[int] = None) -> Optional[SELF_VERSIONED_MODEL]:
+            version: Optional[int] = None
+    ) -> Optional[SELF_VERSIONED_MODEL]:
         """Gets model instance.
 
         Args:
@@ -1333,7 +1345,8 @@ class VersionedModel(BaseModel):
             cls,
             model_instance_id: str,
             version_numbers: List[int],
-            allow_deleted: bool = False) -> List[Dict[str, Any]]:
+            allow_deleted: bool = False
+    ) -> List[Dict[str, Any]]:
         """Gets a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version
@@ -1498,7 +1511,7 @@ class BaseSnapshotMetadataModel(BaseModel):
             commit_type: str,
             commit_message: Optional[str],
             commit_cmds: Union[Dict[str, Any], List[Dict[str, Any]], None]
-        ) -> SELF_BASE_SNAPSHOT_METADATA_MODEL:
+    ) -> SELF_BASE_SNAPSHOT_METADATA_MODEL:
         """This method returns an instance of the BaseSnapshotMetadataModel for
         a construct with the common fields filled.
 
@@ -1590,7 +1603,8 @@ class BaseSnapshotContentModel(BaseModel):
     def create(
             cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],
             snapshot_id: str,
-            content: Dict[str, Any]) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL:
+            content: Dict[str, Any]
+    ) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL:
         """This method returns an instance of the BaseSnapshotContentModel for
         a construct with the common fields filled.
 

@@ -406,7 +406,8 @@ class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     def get_instance_id(
             cls,
             target_entity_id: str,
-            version: Union[int, str]) -> str:
+            version: Union[int, str]
+    ) -> str:
         """A function that returns the id of the log in BaseCommitLogEntryModel.
 
         Args:

@@ -277,7 +277,8 @@ class CollectionModel(base_models.VersionedModel):
             committer_id: str,
             commit_type: str,
             commit_message: str,
-            commit_cmds: List[Dict[str, Any]]) -> None:
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -317,7 +318,8 @@ class CollectionModel(base_models.VersionedModel):
             entity_ids: List[str],
             committer_id: str,
             commit_message: str,
-            force_deletion: bool = False) -> None:
+            force_deletion: bool = False
+    ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
         Note that this extends the superclass method.
@@ -510,7 +512,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             self,
             committer_id: str,
             commit_message: str,
-            commit_cmds: List[Dict[str, Any]]) -> None:
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
 
@@ -600,7 +603,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             committer_id: str,
             commit_type: str,
             commit_message: str,
-            commit_cmds: List[Dict[str, Any]]) -> None:
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this overrides the superclass method.

@@ -85,7 +85,8 @@ class ConfigPropertyModel(base_models.VersionedModel):
     def commit(# type: ignore[override]
             self,
             committer_id: str,
-            commit_cmds: List[Dict[str, Any]]) -> None:
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
 
 
@@ -146,7 +147,8 @@ class PlatformParameterModel(base_models.VersionedModel):
             cls,
             param_name: str,
             rule_dicts: List[Dict[str, Any]],
-            rule_schema_version: int) -> 'PlatformParameterModel':
+            rule_schema_version: int
+    ) -> 'PlatformParameterModel':
         """Creates a PlatformParameterModel instance.
 
         Args:

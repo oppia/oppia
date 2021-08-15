@@ -607,7 +607,7 @@ def generate_new_session_id() -> str:
     return generate_random_string(24)
 
 
-def vfs_construct_path(base_path: str, *path_components: str) -> str:
+def vfs_construct_path(base_path: str, *path_components: List[str]) -> str:
     """Mimics behavior of os.path.join on Posix machines.
 
     Args:
@@ -1075,7 +1075,8 @@ class OrderedCounter(collections.Counter, collections.OrderedDict): # type: igno
 def grouper(
         iterable: Iterable[T],
         chunk_len: int,
-        fillvalue: Optional[T] = None) -> Iterable[Iterable[T]]:
+        fillvalue: Optional[T] = None
+) -> Iterable[Iterable[T]]:
     """Collect data into fixed-length chunks.
 
     Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
@@ -1101,7 +1102,8 @@ def grouper(
 def partition(
         iterable: Iterable[T],
         predicate: Callable[..., Any] = bool,
-        enumerated: bool = False) -> Tuple[
+        enumerated: bool = False
+) -> Tuple[
         Iterable[Union[T, Tuple[int, T]]],
         Iterable[Union[T, Tuple[int, T]]]]:
     """Returns two generators which split the iterable based on the predicate.
