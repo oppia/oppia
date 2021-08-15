@@ -34,7 +34,7 @@
           <div mat-card-avatar class="author-profile d-flex">
             <img mat-card-avatar
                  class="profile-image"
-                 [src]="authorProfilePictureUrl"
+                 [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
                  alt="Profile image of the author of the blog post.">
             <span class="author-username text-center general-text-format ml-4 my-auto">
               {{ authorUsername }}
@@ -97,7 +97,7 @@
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
       </div>
       <div class="d-block flex-grow-1">
-        <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="blog-post-content-button">
+        <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="protractor-test-content-button blog-post-content-button">
           <div class="oppia-editable-section-mask">
             <angular-html-bind-wrapper [htmlData]="this.blogPostData.content"
                                        class="protractor-test-content-display">
@@ -157,7 +157,7 @@
       <div mat-card-avatar class="author-profile mx-auto">
         <img mat-card-avatar
              class="profile-image protractor-test-profile-current-user-photo"
-             [src]="authorProfilePictureUrl"
+             [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
              alt="Profile image of the author of the blog post.">
         <span class="author-username text-center general-text-format protractor-test-username-visible">
           {{ authorUsername }}

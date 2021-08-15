@@ -245,7 +245,7 @@ export class BlogPostEditorComponent implements OnInit {
           this.lastChangesWerePublished = true;
         } else {
           this.alertsService.addSuccessMessage(
-            'Blog Post Saved Succesfully.');
+            'Blog Post Saved Successfully.');
           this.lastChangesWerePublished = false;
         }
         this.newChangesAreMade = false;

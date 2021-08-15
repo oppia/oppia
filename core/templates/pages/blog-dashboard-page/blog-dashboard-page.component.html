@@ -19,7 +19,7 @@
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <div class="col-sm-8 mx-auto" *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
+      <div class="col-sm-8 mx-auto protractor-test-intro-message" *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
         <blockquote class="blog-dashboard-intro-card">
           <p class="blog-dashboard-intro-card-message">
             {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate}}
@@ -45,17 +45,17 @@
               <mat-icon [ngClass]="{'view-active': activeView === 'listView'}">view_list</mat-icon>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container protractor-test-blog-post-table" *ngIf="activeView === 'gridView'">
+          <div class="blog-dashboard-tiles-container protractor-test-drafts-blog-post-table" *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
                                          [activeView]="activeView"
-                                         class="d-flex flex-grow-1 protractor-test-blog-post-tile-item"
+                                         class="d-flex flex-grow-1 protractor-test-draft-blog-post-tile-item"
                                          (deletedBlogPost)="removeBlogPost(blogPostSummary, false)">
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container protractor-test-blog-post-table" *ngIf="activeView === 'listView'">
+          <mat-list class="blog-dashboard-tiles-container protractor-test-drafts-blog-post-table" *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
@@ -77,18 +77,18 @@
               <mat-icon [ngClass]="{'view-active': activeView === 'listView'}">view_list</mat-icon>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container protractor-test-blog-post-table" *ngIf="activeView === 'gridView'">
+          <div class="blog-dashboard-tiles-container protractor-test-published-blog-post-table" *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="true"
                                          [activeView]="activeView"
-                                         class="d-flex flex-grow-1 protractor-test-blog-post-tile-item"
+                                         class="d-flex flex-grow-1 protractor-test-published-blog-post-tile-item"
                                          (unpublisedBlogPost)="unpublishedBlogPost(blogPostSummary)"
                                          (deletedBlogPost)="removeBlogPost(blogPostSummary, true)">
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container protractor-test-blog-post-table" *ngIf="activeView === 'listView'">
+          <mat-list class="blog-dashboard-tiles-container protractor-test-published-blog-post-table" *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"

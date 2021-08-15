@@ -46,13 +46,16 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-list-view-button'));
   var tilesViewButton = element(
     by.css('.protractor-test-tiles-view-button'));
-  var matTabBody = element(by.tagName('mat-tab-body'));
-  var blogPostsTable = matTabBody.element(
-    by.css('.protractor-test-blog-post-table'));
+  var draftBlogPostsTable = element(
+    by.css('.protractor-test-drafts-blog-post-table'));
+  var publishedBlogPostsTable = element(
+    by.css('.protractor-test-published-blog-post-table'));
   var blogPostListItems = element.all(
     by.css('.protractor-test-blog-post-list-item'));
-  var blogPostTiles = element.all(
-    by.css('.protractor-test-blog-post-tile-item'));
+  var draftBlogPostTiles = element.all(
+    by.css('.protractor-test-draft-blog-post-tile-item'));
+  var publishedBlogPostTiles = element.all(
+    by.css('.protractor-test-published-blog-post-tile-item'));
   var blogPostTags = element.all(
     by.css('.protractor-test-blog-post-tags'));
   var saveBlogPostAsDraft = element(
@@ -77,6 +80,10 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-username-visible'));
   var cancelThumbnailUploadButton = element(
     by.css('.protractor-test-photo-upload-cancel'));
+  var blogDashboardIntroMessage = element(
+    by.css('.protractor-test-intro-message'));
+  var editContentButton = element(
+    by.css('.protractor-test-content-button'));
   this.get = async function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
@@ -90,12 +97,14 @@ var BlogDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  // Only use this if the blog posts count is not zero. This is supposed
-  // to be used for actions being performed on the blog posts like deleting,
-  // editting etc.
-  this.waitForBlogPostsToLoad = async function() {
+  this.waitForDraftsBlogPostsToLoad = async function() {
     await waitFor.visibilityOf(
-      blogPostsTable, 'Blog posts table taking too long to appear.');
+      draftBlogPostsTable, 'Blog posts table taking too long to appear.');
+  };
+
+  this.waitForPublishedBlogPostsToLoad = async function() {
+    await waitFor.visibilityOf(
+      publishedBlogPostsTable, 'Blog posts table taking too long to appear.');
   };
 
   this.createNewBlogPost = async function() {
@@ -110,6 +119,10 @@ var BlogDashboardPage = function() {
 
   this.setContent = async function(richTextInstructions) {
     var schemaBasedEditorTag = element(by.tagName('schema-based-editor'));
+    var isPresent = schemaBasedEditorTag.isPresent();
+    if (!isPresent) {
+      await action.click('Edit content', editContentButton);
+    }
     await waitFor.visibilityOf(
       schemaBasedEditorTag, 'Schema based editor tag not showing up');
     var richTextEditor = await forms.RichTextEditor(schemaBasedEditorTag);
@@ -128,14 +141,22 @@ var BlogDashboardPage = function() {
     await this.setContent(richTextInstructions);
     await this.expectContentToMatch(richTextInstructions);
     await action.click('Save as draft Button', saveBlogPostAsDraft);
+    await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
   };
 
   this.publishBlogPost = async function(
       blogPostTitle, richTextInstructions, tags) {
-    await this.saveBlogPostAsDraft(blogPostTitle, richTextInstructions);
+    await action.sendKeys(
+      'New blog post title field', BlogPostTitleFieldElement, blogPostTitle);
     await this.selectTags(tags);
+    await this.setContent(richTextInstructions);
+    await this.expectContentToMatch(richTextInstructions);
     await this.setThumbnailImage();
     await action.click('Publish Blog Post', publishBlogPost);
+    await action.click(
+      'Confirm Publish Blog Post button', confirmButton);
+    await waitFor.visibilityOfSuccessToast(
+      'Blog Post Saved and Published Succesfully.');
   };
 
   this.selectTags = async function(tags) {
@@ -164,13 +185,27 @@ var BlogDashboardPage = function() {
     await action.click('Draft Tab', draftTab);
   };
 
-  this.expectNumberOfBlogPostsToBe = async function(number) {
-    await this.waitForBlogPostsToLoad();
-    expect(await blogPostTiles.count()).toBe(number);
+  this.expectNumberOfDraftsBlogPostsToBe = async function(number) {
+    var isPresent = await blogDashboardIntroMessage.isPresent();
+    if (!isPresent) {
+      await this.waitForDraftsBlogPostsToLoad();
+    }
+    expect(await draftBlogPostTiles.count()).toBe(number);
+  };
+
+  this.expectNumberOfPublishedBlogPostsToBe = async function(number) {
+    var isPresent = await blogDashboardIntroMessage.isPresent();
+    if (!isPresent) {
+      await this.waitForDraftsBlogPostsToLoad();
+    }
+    expect(await publishedBlogPostTiles.count()).toBe(number);
   };
 
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
-    await this.waitForBlogPostsToLoad();
+    var isPresent = await blogDashboardIntroMessage.isPresent();
+    if (!isPresent) {
+      await this.waitFordraftsBlogPostsToLoad();
+    }
     expect(await blogPostListItems.count()).toBe(number);
   };
 
@@ -184,12 +219,12 @@ var BlogDashboardPage = function() {
   };
 
   this.deleteBlogPostWithIndex = async function(index) {
-    await this.waitForBlogPostsToLoad();
     await action.click(
       'Blog post edit option', BlogPostEditOptions.get(index));
     await action.click('Delete blog post button', deleteBlogPostButton);
     await action.click(
       'Confirm Delete Blog Post button', confirmButton);
+    await waitFor.visibilityOfSuccessToast('Blog Post Deleted Successfully.');
     await waitFor.pageToFullyLoad();
   };
 
@@ -199,11 +234,12 @@ var BlogDashboardPage = function() {
     await action.click('Delete blog post button', deleteBlogPostButton);
     await action.click(
       'Confirm Delete Blog Post button', confirmButton);
+    await waitFor.visibilityOfSuccessToast('Blog Post Deleted Successfully.');
     await waitFor.pageToFullyLoad();
   };
 
   this.unpublishBlogPostWithIndex = async function(index) {
-    await this.waitForBlogPostsToLoad();
+    await this.waitForPublishedBlogPostsToLoad();
     await action.click(
       'Blog post edit option', BlogPostEditOptions.get(index));
     await action.click('Unpublish blog post button', unpublishBlogPostButton);
@@ -213,7 +249,6 @@ var BlogDashboardPage = function() {
   };
 
   this.navigateToBlogPostEditorWithIndex = async function(index) {
-    await this.waitForBlogPostsToLoad();
     await action.click(
       'Blog post edit option', BlogPostEditOptions.get(index));
     await action.click(
@@ -268,11 +303,10 @@ var BlogDashboardPage = function() {
   };
 
   this.setThumbnailImage = async function() {
-    var defaultThumbnailSource = (
-      await this.getThumbnailSource());
     await this.submitThumbnail('../data/img.png', false);
     var newThumbnailSource = await this.getThumbnailSource();
-    expect(defaultThumbnailSource).not.toEqual(newThumbnailSource);
+    expect(newThumbnailSource).not.toEqual('');
+    await waitFor.visibilityOfSuccessToast('Thumbnail Saved Successfully.');
   };
 };
 
