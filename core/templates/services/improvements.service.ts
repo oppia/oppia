@@ -30,7 +30,7 @@ export class ImprovementsService {
 
   isStateForcedToResolveOutstandingUnaddressedAnswers(state: State): boolean {
     if (state.interaction.id === null) {
-      throw new Error('Interaction Id is possibly null!');
+      return false;
     }
     return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
       state.interaction.id) !== -1;

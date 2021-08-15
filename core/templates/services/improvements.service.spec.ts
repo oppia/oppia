@@ -222,7 +222,7 @@ describe('ImprovementsService', () => {
       expect(() => {
         improvementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState);
-      }).toThrowError('Interaction Id is possibly null!');
+      }).toBeFalse();
     });
   });
 });
