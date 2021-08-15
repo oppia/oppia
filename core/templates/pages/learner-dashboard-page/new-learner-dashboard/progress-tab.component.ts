@@ -22,6 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
 import { LearnerDashboardBackendApiService, SubtopicMasterySummaryBackendDict } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 
@@ -31,8 +32,9 @@ import { LearnerDashboardBackendApiService, SubtopicMasterySummaryBackendDict } 
  })
 export class ProgressTabComponent implements OnInit {
   @Input() completedStoriesList: StorySummary[];
-  @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
-  @Input() learntTopicsList: LearnerTopicSummary[];
+  @Input() partiallyLearntTopicsList: LearnerTopicSummary[] = [];
+  @Input() activeSubsection?: string;
+  @Input() learntTopicsList: LearnerTopicSummary[] = [];
   topicsInSkillProficiency: LearnerTopicSummary[] = [];
   emptySkillProficiency: boolean = true;
   displaySkills: boolean[];
@@ -43,8 +45,10 @@ export class ProgressTabComponent implements OnInit {
   bronzeBadgeImageUrl: string = '';
   silverBadgeImageUrl: string = '';
   emptyBadgeImageUrl: string = '';
-  topicMastery: number[] = [];
+  topicMastery: [number, LearnerTopicSummary][] = [];
   width: number;
+  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
+    LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -109,17 +113,23 @@ export class ProgressTabComponent implements OnInit {
         this.topicsInSkillProficiency[i].id]);
       let sum = valArr.reduce((a, b) => a + b, 0);
       let arrLength = this.topicsInSkillProficiency[i].subtopics.length;
-      this.topicMastery.push(Math.floor(sum / arrLength * 100));
+      this.topicMastery.push(
+        [Math.floor(sum / arrLength * 100),
+          this.topicsInSkillProficiency[i]]);
     }
+    this.topicMastery = this.topicMastery.sort(
+      function(a, b) {
+        return b[0] - a[0];
+      });
   }
 
   calculateCircularProgress(i: number): string {
-    let degree = (90 + (360 * (this.topicMastery[i])) / 100);
+    let degree = (90 + (360 * (this.topicMastery[i][0])) / 100);
     let cssStyle = (
       `linear-gradient(${degree}deg, transparent 50%, #CCCCCC 50%)` +
       ', linear-gradient(90deg, #CCCCCC 50%, transparent 50%)');
-    if (this.topicMastery[i] > 50) {
-      degree = 3.6 * (this.topicMastery[i] - 50) - 90;
+    if (this.topicMastery[i][0] > 50) {
+      degree = 3.6 * (this.topicMastery[i][0] - 50) - 90;
       cssStyle = (
         'linear-gradient(270deg, #00645C 50%, transparent 50%), ' +
         `linear-gradient(${degree}deg, #00645C 50%, #CCCCCC 50%)`);

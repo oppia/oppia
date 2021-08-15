@@ -24,6 +24,7 @@ import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-da
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 
  @Component({
    selector: 'oppia-goals-tab',
@@ -33,7 +34,8 @@ export class GoalsTabComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private learnerDashboardActivityBackendApiService: (
-      LearnerDashboardActivityBackendApiService)) {
+      LearnerDashboardActivityBackendApiService),
+    private deviceInfoService: DeviceInfoService) {
   }
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
@@ -91,6 +93,10 @@ export class GoalsTabComponent implements OnInit {
     for (topic of this.partiallyLearntTopicsList) {
       this.topicIdsInPartiallyLearntTopics.push(topic.id);
     }
+  }
+
+  checkMobileView(): boolean {
+    return this.deviceInfoService.isMobileDevice();
   }
 
   getTopicPageUrl(
