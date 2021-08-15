@@ -77,7 +77,7 @@ const toastrConfig = {
     warning: 'toast-warning'
   },
   positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
+  messageClass: 'toast-message protractor-test-toast-message',
   progressBar: false,
   tapToDismiss: true,
   titleClass: 'toast-title'

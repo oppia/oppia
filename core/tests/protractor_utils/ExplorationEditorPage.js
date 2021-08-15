@@ -70,6 +70,7 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-save-prompt-modal'));
   var explorationSaveModalElement = element(
     by.css('.protractor-test-exploration-save-modal'));
+  var toastMessage = element(by.css('.protractor-test-toast-message'));
 
   /*
    * Non-Interactive elements
@@ -330,6 +331,16 @@ var ExplorationEditorPage = function() {
     await action.click('Save draft button', commitChangesButton);
   };
 
+  this.expectSaveChangesButtonEnabled = async function() {
+    await action.waitForAutosave();
+    expect(await saveChangesButton.isEnabled()).toBe(true);
+  };
+
+  this.expectSaveChangesButtonDisabled = async function() {
+    await action.waitForAutosave();
+    expect(await saveChangesButton.isEnabled()).toBe(false);
+  };
+
   // ---- NAVIGATION ----
 
   this.navigateToImprovementsTab = async function() {
@@ -374,6 +385,31 @@ var ExplorationEditorPage = function() {
     await action.click(
       'Translation tab button', navigateToTranslationTabButton);
     await waitFor.pageToFullyLoad();
+  };
+
+  // ---- INTERNET CONNECTION ----
+
+  this.waitForOnlineAlert = async function() {
+    await waitFor.visibilityOf(
+      toastMessage,
+      'Online info toast message taking too long to appear.');
+    expect(await toastMessage.getText()).toMatch(
+      'Reconnected. Checking whether your changes are mergeable.');
+    await waitFor.invisibilityOf(
+      toastMessage,
+      'Online info toast message taking too long to disappear.');
+  };
+
+  this.waitForOfflineAlert = async function() {
+    await waitFor.visibilityOf(
+      toastMessage,
+      'Offline warning toast message taking too long to appear.');
+    expect(await toastMessage.getText()).toMatch(
+      'Looks like you are offline. You can continue working, and can save ' +
+      'your changes once reconnected.');
+    await waitFor.invisibilityOf(
+      toastMessage,
+      'Offline warning toast message taking too long to disappear.');
   };
 };
 

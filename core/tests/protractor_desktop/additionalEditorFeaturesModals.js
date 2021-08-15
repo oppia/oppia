@@ -380,6 +380,58 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
+  it(
+    'should be able to make changes offline and the changes ' +
+    'should be saved when online.',
+    async function() {
+      await users.createUser('user16@editor.com', 'user16Editor');
+
+      await users.login('user16@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+
+      // Check that the save changes button is enabled when online.
+      await explorationEditorPage.expectSaveChangesButtonEnabled();
+
+      // Set network connection to offline.
+      await general.goOffline();
+
+      // Check that toast message appeared when offline.
+      await explorationEditorPage.waitForOfflineAlert();
+
+      // Add a content change to check changes can be done when offline.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Hello Oppia?');
+      });
+
+      // Check that the save changes button is disabled when offline.
+      await explorationEditorPage.expectSaveChangesButtonDisabled();
+
+      // Set network connection to online.
+      await general.goOnline();
+
+      // Check that toast message appeared when reconnected.
+      await explorationEditorPage.waitForOnlineAlert();
+
+      await action.waitForAutosave();
+
+      // Check that the save changes button is enabled when reconnected.
+      await explorationEditorPage.expectSaveChangesButtonEnabled();
+
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('Hello Oppia?');
+        }
+      );
+      await users.logout();
+    });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
