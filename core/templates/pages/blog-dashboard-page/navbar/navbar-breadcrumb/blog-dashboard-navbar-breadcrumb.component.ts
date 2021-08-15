@@ -16,14 +16,46 @@
  * @fileoverview Component for the navbar breadcrumb of the blog dashboard.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 
 @Component({
   selector: 'oppia-blog-dashboard-navbar-breadcrumb',
   templateUrl: './blog-dashboard-navbar-breadcrumb.component.html'
 })
-export class BlogDashboardNavbarBreadcrumbComponent {}
+export class BlogDashboardNavbarBreadcrumbComponent
+implements OnInit, OnDestroy {
+  activeTab: string;
+  title: string;
+  directiveSubscriptions = new Subscription();
+  constructor(
+    private blogDashboardPageService: BlogDashboardPageService,
+  ) {}
+  ngOnInit(): void {
+    this.activeTab = this.blogDashboardPageService.activeTab;
+    this.directiveSubscriptions.add(
+      this.blogDashboardPageService.updateViewEventEmitter.subscribe(
+        () => {
+          this.activeTab = this.blogDashboardPageService.activeTab;
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.blogDashboardPageService.updateNavTitleEventEmitter.subscribe(
+        (title) => {
+          this.title = title;
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    return this.directiveSubscriptions.unsubscribe();
+  }
+}
 
 angular.module('oppia').directive('oppiaBlogDashboardNavbarBreadcrumb',
   downgradeComponent({
