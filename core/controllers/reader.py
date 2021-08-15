@@ -117,7 +117,7 @@ class ExplorationPage(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }
@@ -147,7 +147,7 @@ class ExplorationPage(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+                        'regex_pattern': constants.ENTITY_ID_REGEX
                     }]
                 },
                 'default_value': None
@@ -195,7 +195,7 @@ class ExplorationHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }

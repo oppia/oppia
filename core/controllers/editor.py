@@ -59,7 +59,7 @@ SCHEMA_FOR_EXPLORATION_ID = {
     'type': 'basestring',
     'validators': [{
         'id': 'is_regex_matched',
-        'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+        'regex_pattern': constants.ENTITY_ID_REGEX
     }]
 }
 SCHEMA_FOR_VERSION = {
