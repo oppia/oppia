@@ -93,7 +93,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-state.service.ts',
     'skill-prerequisite-skills-editor.directive.ts',
-    'skill-questions-tab.directive.ts',
     'skill-rubrics-editor.directive.ts',
     'state-card.model.ts',
     'state-content-editor.directive.ts',
