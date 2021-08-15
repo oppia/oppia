@@ -17,7 +17,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import json
 import logging
 import string
 
@@ -361,7 +360,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
             'stringified_exp_ids': {
                 'schema': {
                     'type': 'custom',
-                    'obj_type': 'ConvertStringifiedListToProperList'
+                    'obj_type': 'JsonEncodedInString'
                 }
             },
             'include_private_explorations': {
@@ -413,7 +412,7 @@ class CollectionSummariesHandler(base.BaseHandler):
             'stringified_collection_ids': {
                 'schema': {
                     'type': 'custom',
-                    'obj_type': 'ConvertStringifiedListToProperList'
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         }

@@ -1712,7 +1712,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
 
-class ConvertStringifiedListToProperList(BaseObject):
+class JsonEncodedInString(BaseObject):
     """Converts stringified list to proper list of strings."""
 
     @classmethod
