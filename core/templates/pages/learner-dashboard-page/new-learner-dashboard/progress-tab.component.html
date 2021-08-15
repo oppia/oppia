@@ -38,18 +38,18 @@
       </p>
     </div>
     <div *ngIf="!emptySkillProficiency">
-      <div *ngFor="let tile of topicsInSkillProficiency; index as i" class="skill-proficiency-content">
-        <div class="skill-proficiency-topic-tile" [ngStyle]="displaySkills[i] && {'border-bottom': 'none', 'margin-bottom': '0'}" *ngIf="tile.practiceTabIsDisplayed">
-          <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] === 100">
-          <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] >= 80 && topicMastery[i] <= 99">
-          <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] >= 60 && topicMastery[i] <= 79">
-          <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] > 0 && topicMastery[i] <= 59">
-          <span class="skill-proficiency-topic-title protractor-test-skill-proficiency-topic-title" [ngStyle]="topicMastery[i] === 0 && {'left': '51px'}">
-          {{tile.name}}
+      <div *ngFor="let tile of topicMastery; index as i" class="skill-proficiency-content">
+        <div class="skill-proficiency-topic-tile" [ngStyle]="displaySkills[i] && {'border-bottom': 'none', 'margin-bottom': '0'}" *ngIf="tile[1].practiceTabIsDisplayed">
+          <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] === 100">
+          <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 80 && tile[0] <= 99">
+          <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 60 && tile[0] <= 79">
+          <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] > 0 && tile[0] <= 59">
+          <span class="skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
+          {{tile[1].name}}
           </span>
           <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
           <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up image" class="oppia-svg-up-image" (click)="showSkills(i)" *ngIf="displaySkills[i]">
-          <div *ngIf="topicMastery[i] > 0">
+          <div *ngIf="tile[0] > 0">
             <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
               <div class="circle">
               </div>
@@ -57,19 +57,19 @@
             <span class="progress-text">
               <p class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate">
               </p>
-              {{topicMastery[i]}}%
+              {{tile[0]}}%
             </span>
           </div>
         </div>
         <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
           <p class="skills-text" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILLS' | translate">
           </p>
-          <practice-tab [topicName]="tile.name"
-                        [subtopicsList]="tile.subtopics"
+          <practice-tab [topicName]="tile[1].name"
+                        [subtopicsList]="tile[1].subtopics"
                         [displayArea]="'progressTab'"
-                        [topicUrlFragment]="tile.urlFragment"
-                        [classroomUrlFragment]="tile.classroom"
-                        [subtopicMastery]="subtopicMastery[tile.id]">
+                        [topicUrlFragment]="tile[1].urlFragment"
+                        [classroomUrlFragment]="tile[1].classroom"
+                        [subtopicMastery]="subtopicMastery[tile[1].id]">
           </practice-tab>
         </div>
       </div>

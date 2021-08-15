@@ -309,6 +309,8 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION": "Text displayed in the learner dashboard. - This text is shown when there are no topics in the completed goals section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_STORIES_SECTION": "Text displayed in the learner dashboard. - This text is shown in the stories completed section in mobile view when the user has not completed any story.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "Text displayed in the learner dashboard. - This text is shown when there are no topics in the current goals section of the user.",
+	"I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING": "Text displayed in the learner dashboard. - This text is shown when there are no topics in the current goals section of the user.",
+	"I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL": "Link displayed in the learner dashboard. - This link is shown when there are no topics in the current goals section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION": "Text displayed in the learner dashboard. - This text is shown when there are no topics in the current goals section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST": "Text displayed in the learner dashboard. - This text is shown when there are no explorations in the playlist of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Text displayed in the learner dashboard. - This text is shown when there are no feedback threads to which the user is subscribed.",

@@ -39,6 +39,8 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var Constants = require('../protractor_utils/ProtractorConstants.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -87,6 +89,9 @@ describe('Learner dashboard functionality', function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     topicAndStoryViewerPage = (
       new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
+    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
