@@ -34,7 +34,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
 let MockAngularHtmlBindWrapperDirective = function(
-  options: Component): Directive {
+    options: Component): Directive {
   const metadata: Directive = {
     selector: options.selector,
     inputs: options.inputs,
