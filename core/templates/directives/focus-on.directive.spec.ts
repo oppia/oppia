@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Focus on directive.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -24,25 +25,26 @@ import { FocusOnDirective } from './focus-on.directive';
 
 @Component({
   selector: 'mock-comp-a',
-  template: '<div [oppiaFocusOn]="label" id="label"></div>'
+  template: '<div [oppiaFocusOn]="label" class="focus-label"></div>'
 })
 class MockCompA {
   label: 'label';
 }
 
-fdescribe('Focus on directive', () => {
+describe('Focus on component', () => {
   let component: MockCompA;
   let fixture: ComponentFixture<MockCompA>;
   let directiveInstance: FocusOnDirective;
   let mockEventEmitter = new EventEmitter();
   let focusManagerService: FocusManagerService = null;
+  let focusSpy = null;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MockCompA, FocusOnDirective]
     }).compileComponents();
     focusManagerService = TestBed.inject(FocusManagerService);
-    spyOnProperty(focusManagerService, 'onFocus')
+    focusSpy = spyOnProperty(focusManagerService, 'onFocus')
       .and.returnValue(mockEventEmitter);
 
     fixture = TestBed.createComponent(MockCompA);
@@ -54,14 +56,31 @@ fdescribe('Focus on directive', () => {
     expect(directiveEl).not.toBeNull();
     directiveInstance = directiveEl.injector.get(FocusOnDirective);
   }));
+
   afterEach(() => {
     directiveInstance.ngOnDestroy();
   })
+
+  it('should successfully compile the given component', fakeAsync(
+    () => {
+      let el = fixture.debugElement.nativeElement
+        .getElementsByClassName('focus-label')[0].innerHtml = (
+          '<div class="focus-label"></div>');
+
+      directiveInstance.focusOn = 'label';
+      mockEventEmitter.emit('labelForClearingFocus');
+      tick();
+
+      expect(el).toEqual('<div class="focus-label"></div>')
+    }));
+
   it('should focus on the given label', fakeAsync(
     () => {
-    let element = fixture.debugElement.nativeElement
-      .querySelector('.oppia-lost-changes')
+      directiveInstance.focusOn = 'label';
+
       mockEventEmitter.emit('label');
       tick();
+
+      expect(focusSpy).toHaveBeenCalled();
     }));
 });
