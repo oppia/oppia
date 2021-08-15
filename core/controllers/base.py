@@ -303,7 +303,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_validation_succeeded = True
         try:
-            self.vaidate_and_normalize_args()
+            self.validate_and_normalize_args()
         except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
@@ -318,7 +318,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         super(BaseHandler, self).dispatch()
 
-    def vaidate_and_normalize_args(self):
+    def validate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
 
         Raises:

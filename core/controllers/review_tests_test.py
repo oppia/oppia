@@ -127,7 +127,7 @@ class ReviewTestsPageTests(BaseReviewTestsControllerTests):
     def test_get_fails_when_story_doesnt_exist(self):
         self.get_html_response(
             '/learn/staging/topic/review-test/%s'
-            % 'non-existent-story-url-fragment',
+            % 'non-existent-story',
             expected_status_int=302)
 
 
@@ -198,7 +198,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             '%s/staging/topic/%s' % (
                 feconf.REVIEW_TEST_DATA_URL_PREFIX,
                 'non-existent-story-url-fragment'),
-            expected_status_int=404)
+            expected_status_int=400)
 
     def test_get_fails_when_no_completed_story_node(self):
         self.get_json(

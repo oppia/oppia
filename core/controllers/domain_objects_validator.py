@@ -22,6 +22,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
+from core.controllers import base
 from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
@@ -115,3 +116,25 @@ def validate_email_dashboard_data(data):
         if key not in possible_keys:
             # Raise exception if key is not one of the allowed keys.
             raise Exception('400 Invalid input for query.')
+
+
+def validate_task_entries(task_entries):
+    # type: (Dict[String, Any]) -> None
+    """Validates the task entry dict.
+
+    Args:
+        task_entries: dict. Data that needs to be validated.
+    """
+    entity_version = task_entries.get('entity_version', None)
+    if entity_version is None:
+        raise base.BaseHandler.InvalidInputException(
+            'No entity_version provided')
+    task_type = task_entries.get('task_type', None)
+    if task_type is None:
+        raise base.BaseHandler.InvalidInputException('No task_type provided')
+    target_id = task_entries.get('target_id', None)
+    if target_id is None:
+        raise base.BaseHandler.InvalidInputException('No target_id provided')
+    status = task_entries.get('status', None)
+    if status is None:
+        raise base.BaseHandler.InvalidInputException('No status provided')
