@@ -393,7 +393,7 @@ class _Validators(python_utils.OBJECT):
         return len(obj) >= min_value
 
     @staticmethod
-    def has_length_at_most(obj: List[Any], max_value: int) -> bool:
+    def has_length_at_most(obj, max_value): # type: ignore[no-untyped-def]
         """Returns True iff the given object (a list) has at most
         `max_value` elements.
 
@@ -420,7 +420,7 @@ class _Validators(python_utils.OBJECT):
         return bool(obj)
 
     @staticmethod
-    def is_uniquified(obj: List[Any]) -> bool:
+    def is_uniquified(obj): # type: ignore[no-untyped-def]
         """Returns True iff the given object (a list) has no duplicates.
 
         Args:
@@ -445,7 +445,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.match(constants.VALID_URL_FRAGMENT_REGEX, obj))
 
     @staticmethod
-    def is_at_least(obj: float, min_value: int) -> bool:
+    def is_at_least(obj, min_value): # type: ignore[no-untyped-def]
         """Ensures that `obj` (an int/float) is at least `min_value`.
 
         Args:
@@ -486,7 +486,7 @@ class _Validators(python_utils.OBJECT):
         return True
 
     @staticmethod
-    def is_valid_user_id(obj: str) -> bool:
+    def is_valid_user_id(obj): # type: ignore[no-untyped-def]
         """Ensures that `obj` (a string) is a valid user ID.
 
         Args:
