@@ -25,6 +25,8 @@ import python_utils
 
 import redis
 
+from typing import Dict, List, Optional, cast # isort:skip
+
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
@@ -41,7 +43,7 @@ CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
 )
 
 
-def get_memory_cache_stats():
+def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """Returns a memory profile of the redis cache. Visit
     https://redis.io/commands/memory-stats for more details on what exactly is
     returned.
@@ -51,8 +53,13 @@ def get_memory_cache_stats():
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
-    memory_stats = caching_domain.MemoryCacheStats(
+    # We have ignored [attr-defined] below because there is some error in
+    # the redis typeshed. Typestubs don't define the method memory_stats()
+    # for the redis.StrictRedis object.
+    # TODO(#13617): Update our typeshed after redis stubs are improved in
+    # typeshed. Then the ignore[attr-defined] used below can be removed.
+    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
+    memory_stats = caching_domain.MemoryCacheStats( # type: ignore[no-untyped-call]
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
         redis_full_profile.get('keys.count'))
@@ -60,27 +67,32 @@ def get_memory_cache_stats():
     return memory_stats
 
 
-def flush_caches():
+def flush_caches() -> None:
     """Wipes the Redis caches clean."""
     OPPIA_REDIS_CLIENT.flushdb()
     CLOUD_NDB_REDIS_CLIENT.flushdb()
 
 
-def get_multi(keys):
+def get_multi(keys: List[str]) -> List[Optional[str]]:
     """Looks up a list of keys in Redis cache.
 
     Args:
         keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-        list(str). A list of values in the cache corresponding to the keys that
-        are passed in.
+        list(str|None). A list of values in the cache corresponding to the keys
+        that are passed in.
     """
     assert isinstance(keys, list)
-    return OPPIA_REDIS_CLIENT.mget(keys)
+    # TODO(#13663): After we install mypy in virtual environment and upgrade
+    # our mypy, we will have latest stubs of redis available. After this
+    # the cast and type ignore used below can be removed.
+    return cast(
+        List[Optional[str]],
+        OPPIA_REDIS_CLIENT.mget(keys)) # type: ignore[no-untyped-call]
 
 
-def set_multi(key_value_mapping):
+def set_multi(key_value_mapping: Dict[str, str]) -> bool:
     """Sets multiple keys' values at once in the Redis cache.
 
     Args:
@@ -92,10 +104,15 @@ def set_multi(key_value_mapping):
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    # TODO(#13663): After we install mypy in virtual environment and upgrade
+    # our mypy, we will have latest stubs of redis available. After this
+    # the cast and type ignore used below can be removed.
+    return cast(
+        bool,
+        OPPIA_REDIS_CLIENT.mset(key_value_mapping)) # type: ignore[no-untyped-call]
 
 
-def delete_multi(keys):
+def delete_multi(keys: List[str]) -> int:
     """Deletes multiple keys in the Redis cache.
 
     Args:

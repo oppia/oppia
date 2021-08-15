@@ -26,6 +26,14 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+from typing import Dict, List, Tuple, Union # isort:skip
+
+MailgunQueryType = Tuple[
+    str,
+    Dict[str, List[Union[str, Dict[str, Dict[str, Union[int, str]]]]]],
+    Dict[str, str]
+]
+
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
@@ -33,11 +41,15 @@ class EmailTests(test_utils.GenericTestBase):
     class Response(python_utils.OBJECT):
         """Class to mock python_utils.url_open responses."""
 
-        def __init__(self, url, expected_url):
+        def __init__(
+                self,
+                url: MailgunQueryType,
+                expected_url: MailgunQueryType
+        ) -> None:
             self.url = url
             self.expected_url = expected_url
 
-        def getcode(self):
+        def getcode(self) -> int:
             """Gets the status code of this url_open mock.
 
             Returns:
@@ -45,17 +57,20 @@ class EmailTests(test_utils.GenericTestBase):
             """
             self.url = (
                 self.url[0],
-                python_utils.parse_query_string(self.url[1]),
+                python_utils.parse_query_string(self.url[1]), # type: ignore[no-untyped-call]
                 self.url[2],
             )
+            recipient_variable_0 = self.url[1]['recipient_variables'][0]
+            # Letting mypy know that the variable is of type str.
+            assert isinstance(recipient_variable_0, str)
             self.url[1]['recipient_variables'] = [ast.literal_eval(
-                self.url[1]['recipient_variables'][0])]
+                recipient_variable_0)]
             return 200 if self.url == self.expected_url else 500
 
-    def test_send_email_to_mailgun(self):
+    def test_send_email_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
-        expected_query_url = (
+        expected_query_url: MailgunQueryType = (
             'https://api.mailgun.net/v3/domain/messages',
             {
                 'from': ['a@a.com'],
@@ -154,9 +169,9 @@ class EmailTests(test_utils.GenericTestBase):
                 recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
             self.assertTrue(resp)
 
-    def test_batch_send_to_mailgun(self):
+    def test_batch_send_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
-        expected_query_url = (
+        expected_query_url: MailgunQueryType = (
             'https://api.mailgun.net/v3/domain/messages',
             {
                 'from': ['a@a.com'],
@@ -184,12 +199,12 @@ class EmailTests(test_utils.GenericTestBase):
                 'Hi abc,<br> 😂')
             self.assertTrue(resp)
 
-    def test_mailgun_key_or_domain_name_not_set_raises_exception(self):
+    def test_mailgun_key_or_domain_name_not_set_raises_exception(self) -> None:
         """Test that exceptions are raised when API key or domain name are
         unset.
         """
         # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegexp(
+        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailgun API key is not available.')
         with mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -201,7 +216,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         # Testing no mailgun domain name.
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegexp(
+        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailgun domain name is not set.')
         with swap_api, mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -211,8 +226,8 @@ class EmailTests(test_utils.GenericTestBase):
                 'plaintext_body 😂',
                 'Hi abc,<br> 😂')
 
-    def test_invalid_status_code_returns_false(self):
-        expected_query_url = (
+    def test_invalid_status_code_returns_false(self) -> None:
+        expected_query_url: MailgunQueryType = (
             'https://api.mailgun.net/v3/domain/messages',
             {
                 'from': ['a@a.com'],

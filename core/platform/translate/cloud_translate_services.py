@@ -35,7 +35,9 @@ CLIENT = translate.Client(
 LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 
 
-def translate_text(text, source_language, target_language):
+def translate_text(
+        text: str, source_language: str, target_language: str
+) -> str:
     """Translates text into the target language.
 
     This method uses ISO 639-1 compliant language codes to specify languages.
@@ -63,7 +65,11 @@ def translate_text(text, source_language, target_language):
     if source_language == target_language:
         return text
 
-    result = CLIENT.translate(
-        text, target_language=target_language, source_language=source_language)
+    result = (
+        CLIENT.translate(
+            text, target_language=target_language,
+            source_language=source_language))
+    # Letting mypy know that result is a dict.
+    assert isinstance(result, dict)
     translated_text = result['translatedText']
     return translated_text

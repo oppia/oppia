@@ -24,11 +24,20 @@ import textwrap
 
 import python_utils
 
+from typing import Dict, List, Optional, Union # isort:skip
+
 
 def send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
+        sender_email: str,
+        recipient_emails: List[str],
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
+) -> bool:
     """Prints information about sent emails to the terminal console, in order
     to model sending an email in development mode.
 
