@@ -113,21 +113,18 @@ def main(args=None):
         'on your filesystem.',
         'Running test in development environment'])
 
+    cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
-        cmd = [
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--prodEnv']
+        cmd.append('--prodEnv')
     else:
         build.main(args=[])
-
-        cmd = [
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
     if parsed_args.verbose:
         cmd.append('--terminalEnabled')
