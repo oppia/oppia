@@ -26,7 +26,7 @@ import { ImageUploaderComponent } from './image-uploader.component';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-fdescribe('ImageUploaderComponent', () => {
+describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
   let fixture: ComponentFixture<ImageUploaderComponent>;
   let igs: IdGenerationService;
