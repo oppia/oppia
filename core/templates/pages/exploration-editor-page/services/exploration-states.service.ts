@@ -557,6 +557,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         // Amend initStateName appropriately, if necessary. Note that this
         // must come after the state renaming, otherwise saving will lead to
         // a complaint that the new name is not a valid state name.
+        console.log(ExplorationInitStateNameService.displayed)
         if (ExplorationInitStateNameService.displayed === oldStateName) {
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
