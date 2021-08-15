@@ -3548,3 +3548,48 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_classdef(
                 schemaless_class_node)
+
+
+class DisallowedImportsCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(DisallowedImportsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowedImportsChecker)
+        self.checker_test_object.setup_method()
+
+    def test_importing_text_from_typing_in_single_line_raises_error(self):
+        node = astroid.extract_node("""from typing import Any, cast, Text""")
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-text-import',
+                node=node,
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node)
+
+    def test_importing_text_from_typing_in_multi_line_raises_error(self):
+        node = astroid.extract_node(
+            """
+            from typing import ( # isort:skip
+                Any, Dict, List, Optional, Sequence, Text, TypeVar)
+            """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-text-import',
+                node=node,
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node)
+
+    def test_non_import_of_text_from_typing_does_not_raise_error(self):
+        node = astroid.extract_node(
+            """
+            from typing import Any, Dict, List, Optional
+            """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node)

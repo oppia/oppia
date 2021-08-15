@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0039.
+presubmit checks. Next message id would be C0040.
 """
 
 from __future__ import absolute_import
@@ -2246,6 +2246,35 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
                 node=node, args=(node.name))
 
 
+class DisallowedImportsChecker(checkers.BaseChecker):
+    """Check that disallowed imports are not made."""
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'disallowed-imports'
+    priority = -1
+    msgs = {
+        'C0039': (
+            'Please use str instead of typing.Text',
+            'disallowed-text-import',
+            'Disallow import of Text from typing module',
+        ),
+    }
+
+    def visit_importfrom(self, node):
+        """Visits all import-from statements in a python file and ensures that
+        only allowed imports are made.
+
+        Args:
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
+        """
+        if node.modname != 'typing':
+            return
+        for (name, _) in node.names:
+            if name == 'Text':
+                self.add_message('disallowed-text-import', node=node)
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -2270,3 +2299,4 @@ def register(linter):
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowDunderMetaclassChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
+    linter.register_checker(DisallowedImportsChecker(linter))
