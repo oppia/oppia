@@ -71,6 +71,12 @@ describe('Blog Post Object Factory', () => {
     ]);
   });
 
+  it('should correctly set tags in the blog post when tags are changed', () => {
+    sampleBlogPostData.tags = ['news', 'learners'];
+
+    expect(sampleBlogPostData.tags).toEqual(['news', 'learners']);
+  });
+
   it('should raise correct validation issues for' +
     ' exceeding property limits', () => {
     sampleBlogPostData.addTag('Learner');

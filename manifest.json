@@ -220,7 +220,7 @@
         "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
-        "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"]
+        "files": ["jquery.js", "jquery.min.js"]
       },
       "jqueryUI": {
         "version": "1.12.1",
