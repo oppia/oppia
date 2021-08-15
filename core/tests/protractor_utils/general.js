@@ -57,6 +57,8 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
+  'access_validation_handler/can_access_splash_page - Failed to load' +
+  ' resource: the server responded with a status of 404'
 ];
 
 var checkForConsoleErrors = async function(
