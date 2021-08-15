@@ -37,8 +37,6 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Callable, Dict, List, Optional # isort:skip
-
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
 SCHEMA_KEY_PROPERTIES = 'properties'
@@ -72,10 +70,7 @@ EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
 def normalize_against_schema(
-        obj: Any,
-        schema: Dict[str, Any],
-        apply_custom_validators: bool = True,
-        global_validators: Optional[List[Dict[str, Any]]] = None) -> Any:
+        obj, schema, apply_custom_validators=True, global_validators=None):
     """Validate the given object using the schema, normalizing if necessary.
 
     Args:
@@ -93,7 +88,7 @@ def normalize_against_schema(
     Raises:
         AssertionError. The object fails to validate against the schema.
     """
-    normalized_obj: Any = None
+    normalized_obj = None
 
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
@@ -103,7 +98,7 @@ def normalize_against_schema(
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
-        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
+        obj_class = object_registry.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
@@ -157,7 +152,7 @@ def normalize_against_schema(
             obj = python_utils.UNICODE(obj)
         assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
-        normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
+        normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
@@ -255,7 +250,7 @@ def normalize_against_schema(
     return normalized_obj
 
 
-def get_validator(validator_id: str) -> Callable[..., bool]:
+def get_validator(validator_id):
     """Get the validator method corresponding to the given validator_id.
 
     Args:
@@ -285,7 +280,7 @@ class Normalizers(python_utils.OBJECT):
     """
 
     @classmethod
-    def get(cls, normalizer_id: str) -> Callable[..., Any]:
+    def get(cls, normalizer_id):
         """Returns the normalizer method corresponding to the specified
         normalizer_id.
 
@@ -302,10 +297,10 @@ class Normalizers(python_utils.OBJECT):
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
-        return getattr(cls, normalizer_id) # type: ignore[no-any-return]
+        return getattr(cls, normalizer_id)
 
     @staticmethod
-    def sanitize_url(obj: str) -> str:
+    def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
@@ -322,19 +317,19 @@ class Normalizers(python_utils.OBJECT):
         """
         if obj == '':
             return obj
-        url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
+        url_components = python_utils.url_split(obj)
         quoted_url_components = (
-            python_utils.url_quote(component) for component in url_components) # type: ignore[no-untyped-call]
-        raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
+            python_utils.url_quote(component) for component in url_components)
+        raw = python_utils.url_unsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
+        acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
-        return raw # type: ignore[no-any-return]
+        return raw
 
     @staticmethod
-    def normalize_spaces(obj: str) -> str:
+    def normalize_spaces(obj):
         """Collapses multiple spaces into single spaces.
 
         Args:
@@ -361,7 +356,7 @@ class _Validators(python_utils.OBJECT):
     """
 
     @classmethod
-    def get(cls, validator_id: str) -> Callable[..., bool]:
+    def get(cls, validator_id):
         """Returns the validator method corresponding to the specified
         validator_id.
 
@@ -375,10 +370,10 @@ class _Validators(python_utils.OBJECT):
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
-        return getattr(cls, validator_id) # type: ignore[no-any-return]
+        return getattr(cls, validator_id)
 
     @staticmethod
-    def has_length_at_least(obj: List[Any], min_value: int) -> bool:
+    def has_length_at_least(obj, min_value):
         """Returns True iff the given object (a list) has at least
         `min_value` elements.
 
@@ -393,7 +388,7 @@ class _Validators(python_utils.OBJECT):
         return len(obj) >= min_value
 
     @staticmethod
-    def has_length_at_most(obj, max_value): # type: ignore[no-untyped-def]
+    def has_length_at_most(obj, max_value):
         """Returns True iff the given object (a list) has at most
         `max_value` elements.
 
@@ -408,7 +403,7 @@ class _Validators(python_utils.OBJECT):
         return len(obj) <= max_value
 
     @staticmethod
-    def is_nonempty(obj: str) -> bool:
+    def is_nonempty(obj):
         """Returns True iff the given object (a string) is nonempty.
 
         Args:
@@ -420,7 +415,7 @@ class _Validators(python_utils.OBJECT):
         return bool(obj)
 
     @staticmethod
-    def is_uniquified(obj): # type: ignore[no-untyped-def]
+    def is_uniquified(obj):
         """Returns True iff the given object (a list) has no duplicates.
 
         Args:
@@ -432,7 +427,7 @@ class _Validators(python_utils.OBJECT):
         return sorted(list(set(obj))) == sorted(obj)
 
     @staticmethod
-    def is_url_fragment(obj: str) -> bool:
+    def is_url_fragment(obj):
         """Returns True iff the given object (a string) is a valid
         URL fragment.
 
@@ -445,7 +440,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.match(constants.VALID_URL_FRAGMENT_REGEX, obj))
 
     @staticmethod
-    def is_at_least(obj, min_value): # type: ignore[no-untyped-def]
+    def is_at_least(obj, min_value):
         """Ensures that `obj` (an int/float) is at least `min_value`.
 
         Args:
@@ -458,7 +453,7 @@ class _Validators(python_utils.OBJECT):
         return obj >= min_value
 
     @staticmethod
-    def is_at_most(obj: float, max_value: int) -> bool:
+    def is_at_most(obj, max_value):
         """Ensures that `obj` (an int/float) is at most `max_value`.
 
         Args:
@@ -471,7 +466,7 @@ class _Validators(python_utils.OBJECT):
         return obj <= max_value
 
     @staticmethod
-    def does_not_contain_email(obj: object) -> bool:
+    def does_not_contain_email(obj):
         """Ensures that obj doesn't contain a valid email.
 
         Args:
@@ -486,7 +481,7 @@ class _Validators(python_utils.OBJECT):
         return True
 
     @staticmethod
-    def is_valid_user_id(obj): # type: ignore[no-untyped-def]
+    def is_valid_user_id(obj):
         """Ensures that `obj` (a string) is a valid user ID.
 
         Args:
@@ -498,7 +493,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(feconf.USER_ID_REGEX, obj))
 
     @staticmethod
-    def is_valid_math_expression(obj: str, algebraic: bool) -> bool:
+    def is_valid_math_expression(obj, algebraic):
         """Checks if the given obj (a string) represents a valid algebraic or
         numeric expression. Note that purely-numeric expressions are NOT
         considered valid algebraic expressions.
@@ -514,17 +509,17 @@ class _Validators(python_utils.OBJECT):
         if len(obj) == 0:
             return True
 
-        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
+        if not expression_parser.is_valid_expression(obj):
             return False
 
-        expression_is_algebraic = expression_parser.is_algebraic(obj) # type: ignore[no-untyped-call]
+        expression_is_algebraic = expression_parser.is_algebraic(obj)
         # If the algebraic flag is true, expression_is_algebraic should
         # also be true, otherwise both should be false which would imply
         # that the expression is numeric.
         return not algebraic ^ expression_is_algebraic
 
     @staticmethod
-    def is_valid_algebraic_expression(obj: str) -> bool:
+    def is_valid_algebraic_expression(obj):
         """Checks if the given obj (a string) represents a valid algebraic
         expression.
 
@@ -537,7 +532,7 @@ class _Validators(python_utils.OBJECT):
         return get_validator('is_valid_math_expression')(obj, algebraic=True)
 
     @staticmethod
-    def is_valid_numeric_expression(obj: str) -> bool:
+    def is_valid_numeric_expression(obj):
         """Checks if the given obj (a string) represents a valid numeric
         expression.
 
@@ -550,7 +545,7 @@ class _Validators(python_utils.OBJECT):
         return get_validator('is_valid_math_expression')(obj, algebraic=False)
 
     @staticmethod
-    def is_valid_math_equation(obj: str) -> bool:
+    def is_valid_math_equation(obj):
         """Checks if the given obj (a string) represents a valid math equation.
 
         Args:
@@ -587,7 +582,7 @@ class _Validators(python_utils.OBJECT):
         return False
 
     @staticmethod
-    def is_supported_audio_language_code(obj: str) -> bool:
+    def is_supported_audio_language_code(obj):
         """Checks if the given obj (a string) represents a valid language code.
 
         Args:
@@ -599,7 +594,7 @@ class _Validators(python_utils.OBJECT):
         return utils.is_supported_audio_language_code(obj)
 
     @staticmethod
-    def is_valid_audio_language_code(obj: str) -> bool:
+    def is_valid_audio_language_code(obj):
         """Checks if the given obj (a string) represents a valid language code.
 
         Args:
@@ -611,7 +606,7 @@ class _Validators(python_utils.OBJECT):
         return utils.is_valid_language_code(obj)
 
     @staticmethod
-    def is_regex_matched(obj: str, regex_pattern: str) -> bool:
+    def is_regex_matched(obj, regex_pattern):
         """Checks if a given string is matched with the provided regular
         experssion.
 

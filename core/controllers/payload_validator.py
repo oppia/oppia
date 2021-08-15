@@ -62,7 +62,7 @@ def validate(
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
         try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema(
+            normalized_value[arg_key] = schema_utils.normalize_against_schema(# type: ignore[no-untyped-call]
                 handler_args[arg_key], arg_schema['schema'])
         except Exception as e:
             errors.append(
