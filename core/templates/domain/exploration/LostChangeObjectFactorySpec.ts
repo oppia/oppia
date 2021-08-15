@@ -139,7 +139,11 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
-      old_value: '',
+      // This throws "Type 'null' is not assignable to type
+      // 'LostChangeValue | undefined'". We need to suppress this error
+      // because we are testing validations here.
+      // @ts-ignore
+      old_value: null,
       property_name: 'widget_id'
     });
 
@@ -154,7 +158,11 @@ describe('Lost Change Object Factory', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: '',
+      // This throws "Type 'null' is not assignable to type
+      // 'LostChangeValue | undefined'". We need to suppress this error
+      // because we are testing validations here.
+      // @ts-ignore
+      new_value: null,
       old_value: 'EndExploration',
       property_name: 'widget_id'
     });
@@ -225,23 +233,26 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.isOutcomeDestEqual()).toBeFalse();
   });
 
-  it('should evaluate values from a Lost Change with equal outcomes', () => {
+  it('should return false if any of the outcome dest are not present', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: oof.createFromBackendDict({
-          dest: 'outcome 2',
-          feedback: {
-            content_id: 'feedback_2',
-            html: 'Html'
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        }),
-        dest: '',
+        outcome: undefined,
+        dest: 'dest2',
+        feedback: new SubtitledHtml('', ''),
+        html: '',
+        rules: [{
+          type: 'Type2',
+          inputs: {
+            input1: 'input3',
+            input2: 'input4'
+          }
+        }]
+      },
+      old_value: {
+        outcome: undefined,
+        dest: 'dest1',
         feedback: new SubtitledHtml('', ''),
         html: '',
         rules: [{
@@ -252,11 +263,20 @@ describe('Lost Change Object Factory', () => {
           }
         }]
       },
-      old_value: {
+      property_name: 'answer_groups'
+    });
+    expect(lostChange.isOutcomeDestEqual()).toBeFalse();
+  });
+
+  it('should evaluate values from a Lost Change with equal outcomes', () => {
+    const lostChange = lcof.createNew({
+      cmd: 'edit_state_property',
+      state_name: 'Edited state name',
+      new_value: {
         outcome: oof.createFromBackendDict({
-          dest: 'outcome 1',
+          dest: 'outcome 2',
           feedback: {
-            content_id: 'feedback_2',
+            content_id: 'feedback_1',
             html: 'Html'
           },
           labelled_as_correct: false,
@@ -264,7 +284,30 @@ describe('Lost Change Object Factory', () => {
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null
         }),
-        dest: '',
+        dest: 'dest2',
+        feedback: new SubtitledHtml('', ''),
+        html: '',
+        rules: [{
+          type: 'Type2',
+          inputs: {
+            input1: 'input3',
+            input2: 'input4'
+          }
+        }]
+      },
+      old_value: {
+        outcome: oof.createFromBackendDict({
+          dest: 'outcome 1',
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'Html'
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }),
+        dest: 'dest1',
         feedback: new SubtitledHtml('', ''),
         html: '',
         rules: [{
