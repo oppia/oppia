@@ -34,10 +34,9 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-unpublish-blog-post-button'));
   var deleteBlogPostButton = element(
     by.css('.protractor-test-delete-blog-post-button'));
-  var draftTab = element(
-    by.cssContainingText('.mat-tab-label', 'Drafts'));
-  var publishTab = element(
-    by.cssContainingText('.mat-tab-label', 'Published'));
+  var matTabLabels = element.all(by.css('.mat-tab-label'));
+  var draftTab = matTabLabels[0];
+  var publishTab = matTabLabels[1];
   var BlogPostEditOptions = element.all(
     by.css('.protractor-test-blog-post-edit-box'));
   var BlogPostTitleFieldElement = element(
@@ -84,6 +83,10 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-intro-message'));
   var editContentButton = element(
     by.css('.protractor-test-content-button'));
+  var closeBlogCardPreviewButton = element(
+    by.css('.protractor-test-close-preview-button'));
+  var blogCardPreviewButton = element(
+    by.css('.protractor-test-blog-card-preview-button'));
 
   this.get = async function() {
     await browser.get('/');
@@ -101,6 +104,17 @@ var BlogDashboardPage = function() {
   this.waitForDraftsBlogPostsToLoad = async function() {
     await waitFor.visibilityOf(
       draftBlogPostsTable, 'Blog posts table taking too long to appear.');
+  };
+
+  this.showBlogCardPreview = async function() {
+    await action.click('Preview Button', blogCardPreviewButton);
+    await waitFor.visibilityOf(
+      currUserProfilePhoto,
+      'Current user profile photo taking too long to display');
+    await waitFor.visibilityOf(
+      currUsername,
+      'Current user name taking too long to display');
+    await action.click('Close Preview', closeBlogCardPreviewButton);
   };
 
   this.waitForPublishedBlogPostsToLoad = async function() {
@@ -172,7 +186,7 @@ var BlogDashboardPage = function() {
       richTextInstructions);
   };
 
-  this.navigateToPublishedTab = async function() {
+  this.navigateToPublishTab = async function() {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       publishTab, 'Unable to find publish tab button');

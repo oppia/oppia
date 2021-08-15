@@ -362,14 +362,14 @@ describe('Blog Post Editor Component', () => {
 
       expect(blogPostUpdateService.setBlogPostTags).toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Saved Succesfully.');
+        'Blog Post Saved Successfully.');
       expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
 
       component.updateBlogPostData(true);
       tick();
 
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Saved and Published Succesfully.');
+        'Blog Post Saved and Published Successfully.');
     }));
 
   it('should display alert when unable to update blog post data',

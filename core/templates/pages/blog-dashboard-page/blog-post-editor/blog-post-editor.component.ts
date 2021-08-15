@@ -148,6 +148,7 @@ export class BlogPostEditorComponent implements OnInit {
           this.blogDashboardPageService.setNavTitle(
             this.lastChangesWerePublished, this.title);
           this.newChangesAreMade = false;
+          this.preventPageUnloadEventService.removeListener();
         }, (errorResponse) => {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -240,7 +241,7 @@ export class BlogPostEditorComponent implements OnInit {
       () => {
         if (isBlogPostPublished) {
           this.alertsService.addSuccessMessage(
-            'Blog Post Saved and Published Succesfully.'
+            'Blog Post Saved and Published Successfully.'
           );
           this.lastChangesWerePublished = true;
         } else {
