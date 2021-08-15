@@ -468,7 +468,7 @@ describe('Story node editor directive', function() {
   it('should focus on story node when story is initialized', () => {
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(StoryEditorStateService, 'onStoryInitialized')
-      .and.returnValue(mockEventEmitter)
+      .and.returnValue(mockEventEmitter);
     let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
       .and.returnValue(null);
 
@@ -483,7 +483,7 @@ describe('Story node editor directive', function() {
   it('should focus on story node when story is reinitialized', () => {
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(StoryEditorStateService, 'onStoryReinitialized')
-      .and.returnValue(mockEventEmitter)
+      .and.returnValue(mockEventEmitter);
     let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
       .and.returnValue(null);
 
@@ -499,7 +499,7 @@ describe('Story node editor directive', function() {
     $scope.getDestinationNodeIds = () => [];
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(StoryEditorStateService, 'onRecalculateAvailableNodes')
-      .and.returnValue(mockEventEmitter)
+      .and.returnValue(mockEventEmitter);
     let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
       .and.returnValue(null);
 
@@ -507,7 +507,7 @@ describe('Story node editor directive', function() {
     $rootScope.$apply();
     $timeout.flush();
 
-    $scope.storyNodeIds = ['node1']
+    $scope.storyNodeIds = ['node1'];
     mockEventEmitter.emit();
 
     expect(focusSpy).toHaveBeenCalled();

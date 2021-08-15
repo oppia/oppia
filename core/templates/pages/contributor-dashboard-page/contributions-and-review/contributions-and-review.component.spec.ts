@@ -245,8 +245,8 @@ describe('Contributions and review component', function() {
         result: Promise.resolve(['id1', 'id2'])
       });
       let removeSpy = spyOn(
-        contributionOpportunitiesService.removeOpportunitiesEventEmitter, 'emit')
-        .and.returnValue(null);
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit').and.returnValue(null);
       ctrl.contributions = {
         suggestion_1: {
           suggestion: {
@@ -262,7 +262,7 @@ describe('Contributions and review component', function() {
           details: 'skill_1'
         }
       };
-    
+
       ctrl.onClickViewSuggestion('suggestion_1');
       // Here '$scope.$apply' is used multiple times
       // in order to traverse through nested promises.
@@ -655,36 +655,36 @@ describe('Contributions and review component', function() {
         }));
       fetchSkillSpy = spyOn(skillBackendApiService, 'fetchSkillAsync')
         .and.returnValue(
-        $q.resolve({
-          skill: skillObjectFactory.createFromBackendDict({
-            id: 'skill1',
-            description: 'test description 1',
-            misconceptions: [{
-              id: '2',
-              name: 'test name',
-              notes: 'test notes',
-              feedback: 'test feedback',
-              must_be_addressed: true
-            }],
-            rubrics: [{
-              difficulty: 'Easy',
-              explanations: ['explanation']
-            }],
-            skill_contents: {
-              explanation: {
-                html: 'test explanation',
-                content_id: 'explanation',
+          $q.resolve({
+            skill: skillObjectFactory.createFromBackendDict({
+              id: 'skill1',
+              description: 'test description 1',
+              misconceptions: [{
+                id: '2',
+                name: 'test name',
+                notes: 'test notes',
+                feedback: 'test feedback',
+                must_be_addressed: true
+              }],
+              rubrics: [{
+                difficulty: 'Easy',
+                explanations: ['explanation']
+              }],
+              skill_contents: {
+                explanation: {
+                  html: 'test explanation',
+                  content_id: 'explanation',
+                },
+                worked_examples: [],
+                recorded_voiceovers: {
+                  voiceovers_mapping: {}
+                }
               },
-              worked_examples: [],
-              recorded_voiceovers: {
-                voiceovers_mapping: {}
-              }
-            },
-            language_code: 'en',
-            version: 3,
-            prerequisite_skill_ids: ['skill_1']
-          })
-        }));
+              language_code: 'en',
+              version: 3,
+              prerequisite_skill_ids: ['skill_1']
+            })
+          }));
 
       spyOn(
         contributionAndReviewService,
@@ -799,12 +799,12 @@ describe('Contributions and review component', function() {
         result: Promise.resolve([])
       });
       spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill')
-      .and.callFake((
-        targetId, suggestionId, action, reviewMessage,
-        skillDifficulty, resolveSuggestion, cb) => {
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage,
+            skillDifficulty, resolveSuggestion, cb) => {
           resolveSuggestion();
           cb();
-      });
+        });
       ctrl.onClickViewSuggestion('suggestion_1');
       // Here '$scope.$apply' is used multiple times
       // in order to traverse through nested promises.
