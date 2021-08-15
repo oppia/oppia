@@ -25,15 +25,21 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
+import { EventEmitter } from '@angular/core';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 
-fdescribe('Skill question tab directive', function() {
+describe('Skill question tab directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
   let $timeout = null;
   let directive = null;
   let skillEditorStateService: SkillEditorStateService = null;
+  let initEventEmitter = new EventEmitter();
+  let fetchSkillSpy = null;
+  let sampleSkill = null;
+  let skillObjectFactory: SkillObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -44,13 +50,19 @@ fdescribe('Skill question tab directive', function() {
     });
   });
 
-
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     directive = $injector.get('questionsTabDirective')[0];
-    skillEditorStateService = $injector.get('SkillEditorStateService')[0];
+    skillEditorStateService = $injector.get('SkillEditorStateService');
+    skillObjectFactory = $injector.get('SkillObjectFactory');
+
+    spyOnProperty(skillEditorStateService, 'onSkillChange')
+      .and.returnValue(initEventEmitter);
+    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    fetchSkillSpy = spyOn(skillEditorStateService, 'getSkill')
+      .and.returnValue(sampleSkill);
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -59,7 +71,10 @@ fdescribe('Skill question tab directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should set properties when initialized', function() {
+  it('should fetch skill when initialized', function() {
+    initEventEmitter.emit();
+    $scope.$apply();
 
+    expect(fetchSkillSpy).toHaveBeenCalled();
   });
 });
