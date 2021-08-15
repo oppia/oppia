@@ -1221,6 +1221,11 @@ class UpdateBlogPostHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % author_username)
 
+        user_actions = user_services.get_user_actions_info(author_id).actions
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
+            raise self.InvalidInputException(
+                'User does not have enough rights to be blog post author.')
+
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:

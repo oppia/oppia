@@ -2103,7 +2103,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     def test_update_blog_post_with_wrong_username_raises_error(self):
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
+        response = self.put_json(
             '/updateblogpostdatahandler',
             {
                 'blog_post_id': self.blog_post.id,
@@ -2113,27 +2113,76 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
 
+        error_msg = ('Invalid username: someusername')
+        self.assertEqual(response['error'], error_msg)
+
     def test_update_blog_post_with_wrong_blog_post_id_raises_error(self):
         csrf_token = self.get_new_csrf_token()
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
 
         self.put_json(
             '/updateblogpostdatahandler',
             {
                 'blog_post_id': 'sampleid1234',
-                'author_username': self.NEW_USER_USERNAME,
+                'author_username': self.BLOG_EDITOR_USERNAME,
                 'published_on': '05/09/2000'
             },
             csrf_token=csrf_token,
             expected_status_int=404)
 
-    def test_update_blog_post_with_correct_params(self):
+    def test_update_blog_post_with_user_without_enough_rights(self):
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
+        response = self.put_json(
             '/updateblogpostdatahandler',
             {
                 'blog_post_id': self.blog_post.id,
                 'author_username': self.NEW_USER_USERNAME,
                 'published_on': '05/09/2000'
             },
-            csrf_token=csrf_token,)
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        error_msg = ('User does not have enough rights to be blog post author.')
+        self.assertEqual(response['error'], error_msg)
+
+    def test_update_blog_post_with_invalid_date_format(self):
+        csrf_token = self.get_new_csrf_token()
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': self.blog_post.id,
+                'author_username': self.BLOG_EDITOR_USERNAME,
+                'published_on': '05/09/20000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500)
+
+        error_msg = (
+            'time data \'05/09/20000, 00:00:00:00\' does not match' +
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\'')
+        self.assertEqual(response['error'], error_msg)
+
+    def test_update_blog_post_with_correct_params(self):
+        csrf_token = self.get_new_csrf_token()
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+
+        self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': self.blog_post.id,
+                'author_username': self.BLOG_EDITOR_USERNAME,
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token)
