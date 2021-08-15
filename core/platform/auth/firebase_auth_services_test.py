@@ -30,12 +30,12 @@ from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import python_utils
+from unittest import mock
 import utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-import mock
 import webapp2
 
 auth_models, user_models = (
