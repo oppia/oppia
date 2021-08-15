@@ -20,23 +20,40 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var TopicsAndSkillsDashboardPage =
+  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
+  var topicsAndSkillsDashboardPage = null;
+  var adminPage = null;
   var libraryPage = null;
+  var topicEditorPage = null;
+  var storyEditorPage = null;
   var learnerDashboardPage = null;
   var subscriptionDashboardPage = null;
 
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    adminPage = new AdminPage.AdminPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
@@ -77,7 +94,7 @@ describe('Learner dashboard functionality', function() {
     // Both creators should be present in the subscriptions section of the
     // dashboard.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToSubscriptionsSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
     await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
@@ -153,16 +170,101 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.findExploration(EXPLORATION_FRACTION);
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_SINGING);
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
+    await users.logout();
+  });
+
+  it('should display correct topics in edit goals and current goals' +
+    ' section', async function() {
+    var TOPIC_NAME = 'Learner Dashboard Topic 1';
+    var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
+    var TOPIC_DESCRIPTION = 'Topic description';
+    await users.createAndLoginCurriculumAdminUser(
+      'creator@learnerDashboard1.com', 'learnerDashboard1');
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
+    await topicEditorPage.createStory(
+      'Story Title', 'story-one', 'Story description',
+      '../data/test_svg.svg');
+    await storyEditorPage.returnToTopic();
+
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
+    await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    await storyEditorPage.saveStory('Added meta tag.');
+    await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
+    await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
+
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    (
+      await
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Learner Dashboard Skill 1', 'Concept card explanation', false));
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Learner Dashboard Skill 1', TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.addSubtopic(
+      'Learner Dashboard Subtopic 1', 'ld-subtopic-one',
+      '../data/test2_svg.svg', 'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+
+    await topicEditorPage.updateMetaTagContent('meta tag content');
+    await topicEditorPage.updatePageTitleFragment('fragment');
+    await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
+
+    await topicEditorPage.publishTopic();
+    /**  There is one topic on the server named Learner Dashboard Topic 1
+     * which is linked to a subtopic named Learner Dashboard Subtopic 1
+     * and a story called Story Title. Learner Dashboard Subtopic 1 has one
+     * skill in it named Learner Dashboard Skill 1.
+     */
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
+      TOPIC_NAME);
+    await learnerDashboardPage.addTopicToLearnerGoals();
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
+      `Learn ${TOPIC_NAME}`);
     await users.logout();
   });
 
