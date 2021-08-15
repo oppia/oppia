@@ -2275,6 +2275,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):
             if name == 'Text':
                 self.add_message('disallowed-text-import', node=node)
 
+
 def register(linter):
     """Registers the checker with pylint.
 
