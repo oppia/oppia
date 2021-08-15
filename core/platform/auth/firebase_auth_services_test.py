@@ -49,23 +49,20 @@ if MYPY: # pragma: no cover
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
-UidsPartitionTupleType = (
-    Tuple[
-        List[Tuple[int, str]],
-        List[Tuple[int, str]]
-    ])
+UidsPartitionTupleType = Tuple[
+    List[Tuple[int, str]],
+    List[Tuple[int, str]]
+]
 
-UidsZipPartitionTupleType = (
-    Tuple[
-        List[Tuple[int, Tuple[str, str]]],
-        List[Tuple[int, Tuple[str, str]]]
-    ])
+UidsZipPartitionTupleType = Tuple[
+    List[Tuple[int, Tuple[str, str]]],
+    List[Tuple[int, Tuple[str, str]]]
+]
 
-RecordsPartitionTupleType = (
-    Tuple[
-        List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]],
-        List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]]
-    ])
+RecordsPartitionTupleType = Tuple[
+    List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]],
+    List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]]
+]
 
 
 class FirebaseAdminSdkStub(python_utils.OBJECT):
@@ -161,9 +158,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self._swap_stack = None
 
     def create_session_cookie(
-            self,
-            id_token: str,
-            unused_max_age: datetime.timedelta
+            self, id_token: str, unused_max_age: datetime.timedelta
     ) -> str:
         """Creates a new session cookie which expires after given duration.
 
@@ -191,10 +186,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return session_cookie
 
     def create_user(
-            self,
-            uid: str,
-            email: Optional[str] = None,
-            disabled: bool = False
+            self, uid: str, email: Optional[str] = None, disabled: bool = False
     ) -> str:
         """Adds user to storage if new, otherwise raises an error.
 
@@ -230,9 +222,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         del self._users_by_uid[uid]
 
     def delete_users(
-            self,
-            uids: List[str],
-            force_delete: bool = False
+            self, uids: List[str], force_delete: bool = False
     ) -> 'firebase_auth.BatchDeleteAccountsResponse':
         """Deletes the users identified by the specified user ids.
 
@@ -312,8 +302,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return user
 
     def import_users(
-            self,
-            records: List[firebase_admin.auth.ImportUserRecord]
+            self, records: List[firebase_admin.auth.ImportUserRecord]
     ) -> firebase_admin.auth.UserImportResult:
         """Adds the given user records to the stub's storage.
 
@@ -332,9 +321,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._create_user_import_result_fragile(len(records), [])
 
     def list_users(
-            self,
-            page_token: Optional[str] = None,
-            max_results: int = 1000
+            self, page_token: Optional[str] = None, max_results: int = 1000
     ) -> firebase_admin.auth.ListUsersPage:
         """Retrieves a page of user accounts from a Firebase project.
 
@@ -399,9 +386,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         }
 
     def set_custom_user_claims(
-            self,
-            uid: str,
-            custom_claims: Optional[str]
+            self, uid: str, custom_claims: Optional[str]
     ) -> str:
         """Updates the custom claims of the given user.
 
@@ -446,8 +431,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return uid
 
     def verify_id_token(
-            self,
-            token: str
+            self, token: str
     ) -> Dict[str, Optional[Union[str, bool]]]:
         """Returns claims for the corresponding user if the ID token is valid.
 
@@ -465,9 +449,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return claims
 
     def verify_session_cookie(
-            self,
-            session_cookie: str,
-            check_revoked: bool = False
+            self, session_cookie: str, check_revoked: bool = False
     ) -> Dict[str, Optional[Union[str, bool]]]:
         """Returns claims for the corresponding user if the cookie is valid.
 
@@ -637,8 +619,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             itertools.cycle(individual_error_pattern))
 
         def mock_delete_users(
-                uids: List[str],
-                force_delete: bool = False
+                uids: List[str], force_delete: bool = False
         ) -> 'firebase_auth.BatchDeleteAccountsResponse':
             """Mock function that fails according to the input patterns."""
             error_to_raise = python_utils.NEXT(updated_batch_error_pattern)
@@ -739,8 +720,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return json.dumps(claims)
 
     def _decode_user_claims(
-            self,
-            encoded_claims: str
+            self, encoded_claims: str
     ) -> Optional[Dict[str, Optional[Union[str, bool]]]]:
         """Returns the given decoded claims.
 
@@ -822,8 +802,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return page
 
     def _create_delete_users_result_fragile(
-            self,
-            errors: List[Tuple[int, str]]
+            self, errors: List[Tuple[int, str]]
     ) -> 'firebase_auth.BatchDeleteAccountsResponse':
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
@@ -842,9 +821,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             errors=[{'index': i, 'message': error} for i, error in errors])
 
     def _create_user_import_result_fragile(
-            self,
-            total: int,
-            errors: List[Tuple[int, str]]
+            self, total: int, errors: List[Tuple[int, str]]
     ) -> firebase_auth.UserImportResult:
         """Creates a new UserImportResult instance with the given values.
 
@@ -936,8 +913,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         super(FirebaseAuthServicesTestBase, self).tearDown() # type: ignore[no-untyped-call]
 
     def capture_logging(
-            self,
-            min_level: int = logging.INFO
+            self, min_level: int = logging.INFO
     ) -> 'contextlib._GeneratorContextManager[str]':
         """Context manager that captures logs into a list.
 
@@ -979,8 +955,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         return req
 
     def create_response(
-            self,
-            session_cookie: Optional[str] = None
+            self, session_cookie: Optional[str] = None
     ) -> webapp2.Response:
         """Returns a new response with the given session cookie.
 

@@ -274,8 +274,7 @@ def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
 
 
 def get_auth_id_from_user_id(
-        user_id: str,
-        include_deleted: bool = False
+        user_id: str, include_deleted: bool = False
 ) -> Optional[str]:
     """Returns the auth ID associated with the given user ID.
 
@@ -314,8 +313,7 @@ def get_multi_auth_ids_from_user_ids(
 
 
 def get_user_id_from_auth_id(
-        auth_id: str,
-        include_deleted: bool = False
+        auth_id: str, include_deleted: bool = False
 ) -> Optional[str]:
     """Returns the user ID associated with the given auth ID.
 
