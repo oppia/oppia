@@ -835,9 +835,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
             r'(exploration|collection)\.\w+\.\w+'))
 
-    def test_is_search_query_string(self):
-        # type: () -> None
-
+    def test_is_search_query_string(self) -> None:
         """Checks whether a given string is contained within parenthesis and
         double quotes.
 
