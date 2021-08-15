@@ -20,31 +20,28 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StateObjectsBackendDict, States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { Voiceover } from './voiceover.model';
-import { OutcomeBackendDict } from './OutcomeObjectFactory';
-import { SolutionBackendDict } from './SolutionObjectFactory';
-import { SubtitledHtmlBackendDict } from './subtitled-html.model';
 
 describe('States Object Factory', () => {
-  let sof: StateObjectFactory;
-  let ssof: StatesObjectFactory;
-  let statesDict: StateObjectsBackendDict;
-  let newState: StateBackendDict;
-  let newState2: StateBackendDict;
-  let secondState: StateBackendDict;
-  let statesWithCyclicOutcomeDict: StateObjectsBackendDict;
-  let statesWithAudioAndWrittenTranslationsDict: StateObjectsBackendDict;
+  let sof: StateObjectFactory = null;
+  let ssof = null;
+  let statesDict = null;
+  let newState = null;
+  let newState2 = null;
+  let secondState = null;
+  let statesWithCyclicOutcomeDict = null;
+  let statesWithAudioAndWrittenTranslationsDict = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    ssof = TestBed.inject(StatesObjectFactory);
-    sof = TestBed.inject(StateObjectFactory);
+    ssof = TestBed.get(StatesObjectFactory);
+    sof = TestBed.get(StateObjectFactory);
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
@@ -97,8 +94,7 @@ describe('States Object Factory', () => {
 
     newState = {
       classifier_model_id: null,
-      card_is_checkpoint: false,
-      content: <SubtitledHtmlBackendDict>{
+      content: {
         content_id: 'content',
         html: ''
       },
@@ -127,7 +123,6 @@ describe('States Object Factory', () => {
           missing_prerequisite_skill_id: null
         },
         hints: [],
-        solution: <SolutionBackendDict>{}
       },
       linked_skill_id: null,
       next_content_id_index: 0,
@@ -142,7 +137,6 @@ describe('States Object Factory', () => {
     };
 
     newState2 = {
-      card_is_checkpoint: false,
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -155,7 +149,6 @@ describe('States Object Factory', () => {
         }
       },
       interaction: {
-        solution: <SolutionBackendDict>{},
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -193,8 +186,6 @@ describe('States Object Factory', () => {
     };
 
     secondState = {
-      classifier_model_id: '',
-      card_is_checkpoint: false,
       content: {
         content_id: 'content',
         html: 'more content'
@@ -239,9 +230,7 @@ describe('States Object Factory', () => {
             html: ''
           },
           labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: '',
-          missing_prerequisite_skill_id: ''
+          param_changes: []
         },
         hints: [],
         solution: {
@@ -273,10 +262,6 @@ describe('States Object Factory', () => {
 
     statesWithCyclicOutcomeDict = {
       'first state': {
-        classifier_model_id: '',
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'content'
@@ -289,15 +274,12 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: [],
           id: 'MultipleChoiceInput',
           customization_args: {
             choices: {value: []},
             showChoicesInShuffledOrder: {value: false}
           },
           answer_groups: [{
-            training_data: [],
-            tagged_skill_misconception_id: '',
             outcome: {
               dest: 'second state',
               feedback: {
@@ -306,9 +288,8 @@ describe('States Object Factory', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: ''
-            } as OutcomeBackendDict,
+              refresher_exploration_id: null
+            },
             rule_specs: [{
               rule_type: 'Equals',
               inputs: {x: 10}
@@ -321,10 +302,8 @@ describe('States Object Factory', () => {
               html: ''
             },
             labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: '',
-            missing_prerequisite_skill_id: ''
-          } as OutcomeBackendDict,
+            param_changes: []
+          },
           hints: [],
           solution: null
         },
@@ -339,10 +318,6 @@ describe('States Object Factory', () => {
         },
       },
       'second state': {
-        classifier_model_id: '',
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'content'
@@ -355,17 +330,13 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: [],
           id: 'MultipleChoiceInput',
           customization_args: {
             choices: {value: []},
             showChoicesInShuffledOrder: {value: false}
           },
           answer_groups: [{
-            tagged_skill_misconception_id: '',
-            training_data: [],
             outcome: {
-              missing_prerequisite_skill_id: '',
               dest: 'first state',
               feedback: {
                 content_id: 'feedback_1',
@@ -387,10 +358,8 @@ describe('States Object Factory', () => {
               html: ''
             },
             labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: '',
-            missing_prerequisite_skill_id: ''
-          } as OutcomeBackendDict,
+            param_changes: []
+          },
           hints: [],
           solution: null
         },
@@ -408,8 +377,6 @@ describe('States Object Factory', () => {
 
     statesWithAudioAndWrittenTranslationsDict = {
       'first state': {
-        classifier_model_id: '',
-        card_is_checkpoint: false,
         content: {
           content_id: 'content',
           html: 'content'
@@ -477,12 +444,8 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          solution: <SolutionBackendDict>{},
           answer_groups: [{
-            tagged_skill_misconception_id: '',
-            training_data: [],
             outcome: {
-              missing_prerequisite_skill_id: '',
               dest: 'second state',
               feedback: {
                 content_id: 'feedback_1',
@@ -508,8 +471,6 @@ describe('States Object Factory', () => {
             rows: { value: 1 }
           },
           default_outcome: {
-            refresher_exploration_id: '',
-            missing_prerequisite_skill_id: '',
             dest: 'new state',
             feedback: {
               content_id: 'default_outcome',
@@ -588,7 +549,7 @@ describe('States Object Factory', () => {
 
 
   it('should create a new state given a state name and set ' +
-    'that state to a terminal state', () => {
+     'that state to a terminal state', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
     newStates.addState('new state');
 
@@ -606,12 +567,11 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly retrieve the terminal states', () => {
-    let newStates: States = (
-      ssof.createFromBackendDict(statesDict));
+    let newStates = ssof.createFromBackendDict(statesDict);
 
     newStates.setState(
       'first state', sof.createFromBackendDict('first state', newState));
-    expect(newStates.getFinalStateNames()).toEqual(['new state']);
+    expect(newStates.getFinalStateNames()).toEqual['new state'];
   });
 
   it('should correctly delete a state', () => {
@@ -625,16 +585,12 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly set any states\' interaction.defaultOutcomes that ' +
-     'point to a deleted or renamed state name', () => {
+      'point to a deleted or renamed state name', () => {
     let states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
     states.renameState('first state', 'third state');
     states.deleteState('second state');
     expect(states).toEqual(ssof.createFromBackendDict({
       'third state': {
-        classifier_model_id: '',
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'content'
@@ -647,15 +603,12 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: [],
           id: 'MultipleChoiceInput',
           customization_args: {
             choices: {value: []},
             showChoicesInShuffledOrder: {value: false}
           },
           answer_groups: [{
-            training_data: [],
-            tagged_skill_misconception_id: '',
             outcome: {
               dest: 'third state',
               feedback: {
@@ -664,9 +617,8 @@ describe('States Object Factory', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: ''
-            } as OutcomeBackendDict,
+              refresher_exploration_id: null
+            },
             rule_specs: [{
               rule_type: 'Equals',
               inputs: {x: 10}
@@ -679,10 +631,8 @@ describe('States Object Factory', () => {
               html: ''
             },
             labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: '',
-            missing_prerequisite_skill_id: ''
-          } as OutcomeBackendDict,
+            param_changes: []
+          },
           hints: [],
           solution: null
         },
@@ -744,11 +694,11 @@ describe('States Object Factory', () => {
 
   describe('areWrittenTranslationsDisplayable', () => {
     it('should return true for states that have no missing or update needed ' +
-       'translations', () => {
+        'translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
       const state = states.getState('first state');
 
-      state.interaction.id = '';
+      spyOn(state.interaction, 'id').and.returnValue(null);
       spyOn(state, 'getRequiredWrittenTranslationContentIds').and.returnValue(
         new Set(['content', 'default_outcome']));
 
@@ -763,11 +713,11 @@ describe('States Object Factory', () => {
     });
 
     it('should return true for states that have the minimum acceptable ' +
-       'number of missing or update needed translations', () => {
+        'number of missing or update needed translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
       const state = states.getState('first state');
 
-      state.interaction.id = '';
+      spyOn(state.interaction, 'id').and.returnValue(null);
 
       state.writtenTranslations.addContentId('feedback_1');
       state.writtenTranslations.addContentId('feedback_2');
@@ -801,11 +751,11 @@ describe('States Object Factory', () => {
     });
 
     it('should return false for states that have less than the minimum ' +
-       'acceptable number of missing or update needed translations', () => {
+        'acceptable number of missing or update needed translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
       const state = states.getState('first state');
 
-      state.interaction.id = '';
+      spyOn(state.interaction, 'id').and.returnValue(null);
       state.writtenTranslations.addContentId('feedback_1');
       state.writtenTranslations.addContentId('feedback_2');
       state.writtenTranslations.addContentId('feedback_3');
@@ -826,10 +776,9 @@ describe('States Object Factory', () => {
     });
 
     it('should return false for states with missing rule input translations, ' +
-       'even if all other translations are present', () => {
-      let statesDictWithRuleInput: StateObjectsBackendDict = {
+        'even if all other translations are present', () => {
+      let statesDictWithRuleInput = {
         'first state': {
-          card_is_checkpoint: false,
           classifier_model_id: null,
           content: {
             content_id: 'content',
@@ -842,7 +791,6 @@ describe('States Object Factory', () => {
             }
           },
           interaction: {
-            solution: null,
             answer_groups: [{
               outcome: {
                 dest: 'END',
@@ -904,8 +852,7 @@ describe('States Object Factory', () => {
         }
       };
 
-      const states = ssof.createFromBackendDict(
-        <StateObjectsBackendDict>statesDictWithRuleInput);
+      const states = ssof.createFromBackendDict(statesDictWithRuleInput);
       const state = states.getState('first state');
 
       state.writtenTranslations.addWrittenTranslation(
