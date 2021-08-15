@@ -128,7 +128,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'suggestion-modal-for-exploration-editor.service.ts',
     'teacher.ts',
     'teacher2.ts',
-    'top-navigation-bar.component.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
