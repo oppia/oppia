@@ -35,6 +35,16 @@ describe('ImageUploaderComponent', () => {
   let dropAreaRefSpy = jasmine.createSpy('dropAreaRefSpy');
   let windowRefSpy = jasmine.createSpy('windowRefSpy');
 
+  let dragoverEvent = document.createEvent('Event');
+  dragoverEvent.initEvent('mockdragover', true, true);
+  dragoverEvent.returnValue = false;
+  dragoverEvent.preventDefault = () => {};
+
+  let dropEvent = document.createEvent('Event');
+  dropEvent.initEvent('mockdrop', true, true);
+  dropEvent.returnValue = false;
+  dropEvent.preventDefault = () => {};
+
   beforeEach(waitForAsync(() => {
     windowRef = new WindowRef();
     TestBed.configureTestingModule({
@@ -252,19 +262,23 @@ describe('ImageUploaderComponent', () => {
 
   it('should prevent default browser behavior if user drops an image outside' +
     ' of image-uploader', () => {
-    const dropEvent = new DragEvent('drop');
-    const dragOverEvent = new DragEvent('dragover');
+    let mockWindow = {
+      addEventListener: function(eventname: string, callback: () => {}) {
+        document.addEventListener('mock' + eventname, callback);
+      }
+    };
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
 
     spyOn(dropEvent, 'preventDefault');
-    spyOn(dragOverEvent, 'preventDefault');
+    spyOn(dragoverEvent, 'preventDefault');
 
     component.ngAfterViewInit();
 
-    windowRef.nativeWindow.dispatchEvent(dropEvent);
+    document.dispatchEvent(dropEvent);
     expect(dropEvent.preventDefault).toHaveBeenCalled();
 
-    windowRef.nativeWindow.dispatchEvent(dragOverEvent);
-    expect(dragOverEvent.preventDefault).toHaveBeenCalled();
+    document.dispatchEvent(dragoverEvent);
+    expect(dragoverEvent.preventDefault).toHaveBeenCalled();
   });
 
   it('should upload a valid image', () => {
