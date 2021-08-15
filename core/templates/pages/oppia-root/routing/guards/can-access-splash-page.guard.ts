@@ -17,8 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CanLoad, Route, UrlSegment, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { CanLoad, Route, UrlSegment } from '@angular/router';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { AccessValidationBackendApiService } from '../access-validation-backend-api.service';
@@ -34,7 +33,7 @@ export class CanAccessSplashPageGuard implements CanLoad {
     private windowRef: WindowRef
   ) {}
 
-  canLoad(route: Route,segments: UrlSegment[]): Promise<boolean> {
+  canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
     return this.accessValidationBackendApiService.validateAccessToSplashPage()
       .then(() => {
         return true;
