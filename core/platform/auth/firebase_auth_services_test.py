@@ -39,7 +39,7 @@ from firebase_admin import exceptions as firebase_exceptions
 import mock
 import webapp2
 
-from typing import Dict, List, Optional, Tuple, Union, cast # isort:skip
+from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -590,7 +590,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self,
             batch_error_pattern: Tuple[Optional[Exception]] = (None,),
             individual_error_pattern: Tuple[Optional[bool]] = (None,)
-    ) -> 'contextlib._GeneratorContextManager[None]':
+    ) -> ContextManager[None]:
         """Returns a context in which `delete_users` fails according to the
         given patterns.
 
@@ -647,7 +647,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self,
             batch_error_pattern: Tuple[Optional[Exception]] = (None,),
             individual_error_pattern: Tuple[Optional[str]] = (None,)
-    ) -> 'contextlib._GeneratorContextManager[None]':
+    ) -> ContextManager[None]:
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
@@ -914,7 +914,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
     def capture_logging(
             self, min_level: int = logging.INFO
-    ) -> 'contextlib._GeneratorContextManager[str]':
+    ) -> 'contextlib._GeneratorContextManager[List[str]]':
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.
@@ -1425,14 +1425,14 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def swap_get_user_to_always_fail(
             self
-    ) -> 'contextlib._GeneratorContextManager[None]':
+    ) -> ContextManager[None]:
         """Swaps the get_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth, 'get_user', error=self.UNKNOWN_ERROR)
 
     def swap_delete_user_to_always_fail(
             self
-    ) -> 'contextlib._GeneratorContextManager[None]':
+    ) -> ContextManager[None]:
         """Swaps the delete_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR)
