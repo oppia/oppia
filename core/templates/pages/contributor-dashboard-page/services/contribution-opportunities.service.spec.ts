@@ -24,10 +24,10 @@ import { LoginRequiredModalContent } from '../modal-templates/login-required-mod
 import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 class MockNgbModalRef {
-  componentInstance: {};
+  componentInstance!: {};
 }
 
-describe('Contribution Opportunities Service', function() {
+describe('Contribution Opportunities Service', () => {
   let ngbModal: NgbModal;
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService;

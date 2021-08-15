@@ -16,25 +16,19 @@
  * @fileoverview Module for the thanks page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { NgModule } from '@angular/core';
 
 import { ThanksPageComponent } from './thanks-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ThanksPageRootComponent } from './thanks-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
+import { ThanksPageRoutingModule } from './thanks-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
+    ThanksPageRoutingModule
   ],
   declarations: [
     ThanksPageComponent,
@@ -43,20 +37,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   entryComponents: [
     ThanksPageComponent,
     ThanksPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [ThanksPageRootComponent]
+  ]
 })
 export class ThanksPageModule {}

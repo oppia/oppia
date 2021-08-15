@@ -250,7 +250,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         error_msg = (
             'Schema validation for \'commit_message\' failed: Validation '
-            'failed: has_length_at_most ({u\'max_value\': 375}) for object %s'
+            'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_message)
         self.assertEqual(
             json_response['error'], error_msg)
@@ -428,7 +428,11 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
-        exploration_id = base64.b64encode(exploration_id)
+        # The b64encode accepts and returns bytes, so we first need to encode
+        # the exploration_id to bytes, then decode the returned bytes back
+        # to string.
+        exploration_id = (
+            base64.b64encode(exploration_id.encode('utf-8')).decode('utf-8'))
 
         self.get_json(
             '/exploration/metadata_search?q=%s' % exploration_id)
