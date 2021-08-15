@@ -219,10 +219,10 @@ describe('ImprovementsService', () => {
 
       let mockState = stateObjectFactory.createFromBackendDict(
         'stateName', mockStateBackendDict);
-      expect(() => {
+      expect(
         improvementsService
-          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState);
-      }).toBeFalse();
+          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
+      ).toBeFalse();
     });
   });
 });
