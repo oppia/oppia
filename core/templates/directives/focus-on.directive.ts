@@ -48,9 +48,6 @@ angular.module('oppia').directive('focusOn', [
       directiveSubscriptions.add(
         FocusManagerService.onFocus.subscribe(
           (name: string) => {
-            console.log('apex123');
-            console.log(name);
-            console.log(attrs.focusOn);
             if (name === attrs.focusOn) {
               elt[0].focus();
             }

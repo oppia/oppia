@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for Focus on directive.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -32,7 +31,6 @@ class MockCompA {
 }
 
 describe('Focus on component', () => {
-  let component: MockCompA;
   let fixture: ComponentFixture<MockCompA>;
   let directiveInstance: FocusOnDirective;
   let mockEventEmitter = new EventEmitter();
@@ -48,7 +46,6 @@ describe('Focus on component', () => {
       .and.returnValue(mockEventEmitter);
 
     fixture = TestBed.createComponent(MockCompA);
-    component = fixture.componentInstance;
     fixture.detectChanges();
 
     const directiveEl = fixture.debugElement.query(
@@ -59,7 +56,7 @@ describe('Focus on component', () => {
 
   afterEach(() => {
     directiveInstance.ngOnDestroy();
-  })
+  });
 
   it('should successfully compile the given component', fakeAsync(
     () => {
@@ -71,7 +68,7 @@ describe('Focus on component', () => {
       mockEventEmitter.emit('labelForClearingFocus');
       tick();
 
-      expect(el).toEqual('<div class="focus-label"></div>')
+      expect(el).toEqual('<div class="focus-label"></div>');
     }));
 
   it('should focus on the given label', fakeAsync(
