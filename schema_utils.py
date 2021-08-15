@@ -616,8 +616,7 @@ class _Validators(python_utils.OBJECT):
         return utils.is_supported_audio_language_code(obj)
 
     @staticmethod
-    def is_valid_audio_language_code(obj):
-        # type: (Text) -> bool
+    def is_valid_audio_language_code(obj: Text) -> bool:
         """Checks if the given obj (a string) represents a valid language code.
 
         Args:
@@ -629,8 +628,7 @@ class _Validators(python_utils.OBJECT):
         return utils.is_valid_language_code(obj)
 
     @staticmethod
-    def is_regex_matched(obj, regex_pattern):
-        # type: (Text, Text) -> bool
+    def is_regex_matched(obj: Text, regex_pattern: Text) -> bool:
         """Checks if a given string is matched with the provided regular
         experssion.
 
@@ -644,8 +642,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.match(regex_pattern, obj))
 
     @staticmethod
-    def is_search_query_string(obj):
-        # type: (Text) -> bool
+    def is_search_query_string(obj: Text) -> bool:
         """Checks if the given obj (a string) is a gae search query string.
 
         Args:

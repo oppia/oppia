@@ -266,6 +266,9 @@ class SearchHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_search_query_string'
+                    }, {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': '[\\-\\w+()"\\s]*'
                     }]
                 },
                 'default_value': ''
@@ -275,6 +278,9 @@ class SearchHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_search_query_string'
+                    }, {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': '[\\-\\w+()"\\s]*'
                     }]
                 },
                 'default_value': ''

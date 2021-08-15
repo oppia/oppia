@@ -26,13 +26,13 @@ import schema_utils
 
 from typing import Any, Dict, List, Text, Tuple, Optional, Union # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
-SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
-
 
 def validate(
-        handler_args, handler_args_schemas, allowed_extra_args,
-        allow_string_to_bool_conversion=False):
-    # type: (Any, Any, bool, bool) -> Tuple[Dict[Text, Any], List[Text]]
+        handler_args: Any,
+        handler_args_schemas: Any,
+        allowed_extra_args: bool,
+        allow_string_to_bool_conversion: bool = False
+        ) -> Tuple[Dict[Text, Any], List[Text]]:
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -70,8 +70,8 @@ def validate(
         # but from API request they are received as string type.
         if (
                 allow_string_to_bool_conversion and
-                arg_schema['schema']['type'] == SCHEMA_TYPE_BOOL and
-                isinstance(handler_args[arg_key], python_utils.BASESTRING)
+                arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
+                and isinstance(handler_args[arg_key], python_utils.BASESTRING)
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
@@ -91,8 +91,7 @@ def validate(
     return normalized_value, errors
 
 
-def convert_string_to_bool(param):
-    # type: (Text) -> Optional[Union[bool, Text]]
+def convert_string_to_bool(param: Text) -> Optional[Union[bool, Text]]:
 
     """Converts a request param of type string into expected bool type.
 

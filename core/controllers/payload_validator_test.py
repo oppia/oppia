@@ -23,9 +23,7 @@ from core.tests import test_utils
 
 class PayloadValidationUnitTests(test_utils.GenericTestBase):
 
-    def test_invalid_args_raises_exceptions(self):
-        # type: () -> None
-
+    def test_invalid_args_raises_exceptions(self) -> None:
         # List of 3-tuples, where the first element is an invalid argument dict,
         # the second element is a schema dict and the third element
         # is a list of errors.
@@ -69,14 +67,16 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         for handler_args, handler_args_schema, error_msg in (
                 list_of_invalid_args_with_schema_and_errors):
             normalized_value, errors = payload_validator.validate(
-                handler_args, handler_args_schema, False, False)
+                handler_args,
+                handler_args_schema,
+                allowed_extra_args = False,
+                allow_string_to_bool_conversion = False
+            )
 
             self.assertEqual(normalized_value, {})
             self.assertEqual(error_msg, errors)
 
-    def test_valid_args_do_not_raises_exception(self):
-        # type: () -> None
-
+    def test_valid_args_do_not_raises_exception(self) -> None:
         # List of 3-tuples, where the first element is a valid argument dict,
         # the second element is a schema dict and the third element is the
         # normalized value of the corresponding argument.
@@ -125,7 +125,11 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         for handler_args, handler_args_schema, normalized_value_for_args in (
                 list_of_valid_args_with_schmea):
             normalized_value, errors = payload_validator.validate(
-                handler_args, handler_args_schema, False, True)
+                handler_args,
+                handler_args_schema,
+                allowed_extra_args = False,
+                allow_string_to_bool_conversion = True
+            )
 
             self.assertEqual(normalized_value, normalized_value_for_args)
             self.assertEqual(errors, [])
@@ -134,9 +138,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
 class CheckConversionOfStringToBool(test_utils.GenericTestBase):
     """Test class to check behaviour of convert_string_to_bool method."""
 
-    def test_convert_string_to_bool(self):
-        # type: () -> None
-
+    def test_convert_string_to_bool(self) -> None:
         """Test case to check behaviour of convert_string_to_bool method."""
         self.assertTrue(
             payload_validator.convert_string_to_bool('true'))
