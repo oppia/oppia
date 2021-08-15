@@ -22,68 +22,54 @@ var action = require('./action.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  var completedSection =
-    element(by.css('.protractor-test-completed-section'));
-  var playLaterSection =
-      element(by.css('.protractor-test-play-later-section'));
-  var incompleteSection =
-    element(by.css('.protractor-test-incomplete-section'));
+  var homeSection =
+    element(by.css('.protractor-test-home-section'));
+  var goalsSection =
+    element(by.css('.protractor-test-goals-section'));
+  var progressSection =
+    element(by.css('.protractor-test-progress-section'));
+  var communityLessonsSection =
+    element(by.css('.protractor-test-community-lessons-section'));
   var feedbackSection =
     element(by.css('.protractor-test-feedback-section'));
   var feedbackThread =
     element(by.css('.protractor-test-feedback-thread'));
-  var completedCollectionsSection =
-    element(by.css('.protractor-test-completed-collection-section'));
-  var completedExplorationsSection =
-    element(by.css('.protractor-test-completed-exp-section'));
-  var incompleteCollectionsSection =
-    element(by.css('.protractor-test-incomplete-collection-section'));
-  var incompleteExplorationsSection =
-    element(by.css('.protractor-test-incomplete-exp-section'));
-  var subscriptionsSection =
-    element(by.css('.protractor-test-subscriptions-section'));
   var subscriptionName =
     element.all(by.css('.protractor-test-subscription-name'));
   var feedbackExplorationTitle =
     element.all(by.css('.protractor-test-feedback-exploration'));
   var feedbackMessage =
     element.all(by.css('.protractor-test-feedback-message'));
+  var addToLearnerGoalsButton =
+    element(by.css('.protractor-test-add-topic-to-current-goals-button'));
+  var currentGoalsTopicName =
+    element(by.css('.protractor-test-topic-name-in-current-goals'));
+  var editGoalsTopicName =
+    element(by.css('.protractor-test-topic-name-in-edit-goals'));
+  var incompleteCommunityLessonsSection = element(by.css(
+    '.protractor-test-incomplete-community-lessons-section'));
+  var completeCommunityLessonsSection = element(by.css(
+    '.protractor-test-completed-community-lessons-section'));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToPlayLaterExplorationSection = async function() {
-    await action.click('Play Later Section', playLaterSection);
+  this.navigateToHomeSection = async function() {
+    await action.click('Home Section', homeSection);
   };
 
-  this.navigateToCompletedSection = async function() {
-    await action.click('Completed Section', completedSection);
+  this.navigateToGoalsSection = async function() {
+    await action.click('Goals Section', goalsSection);
   };
 
-  this.navigateToInCompleteSection = async function() {
-    await action.click('Incomplete Section', incompleteSection);
+  this.navigateToProgressSection = async function() {
+    await action.click('Progress Section', progressSection);
   };
 
-  this.navigateToIncompleteCollectionsSection = async function() {
-    await action.click(
-      'Incomplete Collections Section', incompleteCollectionsSection);
-  };
-
-  this.navigateToIncompleteExplorationsSection = async function() {
-    await action.click(
-      'Incomplete Explorations Section', incompleteExplorationsSection);
-  };
-
-  this.navigateToCompletedCollectionsSection = async function() {
-    await action.click(
-      'Completed Collections Section', completedCollectionsSection);
-  };
-
-  this.navigateToCompletedExplorationsSection = async function() {
-    await action.click(
-      'Completed Explorations Section', completedExplorationsSection);
+  this.navigateToCommunityLessonsSection = async function() {
+    await action.click('Community Lessons Section', communityLessonsSection);
   };
 
   this.navigateToFeedbackSection = async function() {
@@ -92,10 +78,6 @@ var LearnerDashboardPage = function() {
 
   this.navigateToFeedbackThread = async function() {
     await action.click('Feedback Thread', feedbackThread);
-  };
-
-  this.navigateToSubscriptionsSection = async function() {
-    await action.click('Subscriptions Section', subscriptionsSection);
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
@@ -117,7 +99,36 @@ var LearnerDashboardPage = function() {
     // that is the exploration with the title passed as a parameter.
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-    expect(await explorationTitle.getText()).toMatch(title);
+    expect(await action.getText(
+      'Exploration title', explorationTitle)).toMatch(title);
+  };
+
+  this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      editGoalsTopicName,
+      'Topic in Edit Goals takes too long to appear');
+    await waitFor.textToBePresentInElement(
+      editGoalsTopicName, name,
+      `Text "${name}" taking too long to be present in editGoalsTopic`);
+    var topicName = element(by.cssContainingText(
+      '.protractor-test-topic-name-in-edit-goals', name));
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
+  };
+
+  this.expectNameOfTopicInCurrentGoalsToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      currentGoalsTopicName,
+      'Topic in Current Goals takes too long to appear');
+    await waitFor.textToBePresentInElement(
+      currentGoalsTopicName, name,
+      `Text "${name}" taking too long to be present in currentGoalsTopic`);
+    var topicName = element(by.cssContainingText(
+      '.protractor-test-topic-name-in-current-goals', name));
+    expect(await action.getText('Topic Name', topicName)).toMatch(name);
+  };
+
+  this.addTopicToLearnerGoals = async function() {
+    await action.click('Add to learner goals button', addToLearnerGoalsButton);
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
@@ -147,36 +158,48 @@ var LearnerDashboardPage = function() {
     expect(await feedbackMessage.first().getText()).toMatch(message);
   };
 
-  this.checkIncompleteExplorationSection = async function(explorationTitle) {
-    await this.navigateToInCompleteSection();
-    await this.navigateToIncompleteExplorationsSection();
-    await this.expectTitleOfExplorationSummaryTileToMatch(
-      explorationTitle);
+  this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
+    async function(explorationTitle) {
+      await this.navigateToCommunityLessonsSection();
+      var explorationTitleInIncompleteSection = (
+        incompleteCommunityLessonsSection.element(by.cssContainingText(
+          '.protractor-test-exp-summary-tile-title', explorationTitle)));
+      expect(await action.getText(
+        'Incomplete exploration title',
+        explorationTitleInIncompleteSection)).toMatch(explorationTitle);
+    });
+
+  this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
+      explorationTitle) {
+    await this.navigateToCommunityLessonsSection();
+    var explorationTitleInCompleteSection = (
+      completeCommunityLessonsSection.element(by.cssContainingText(
+        '.protractor-test-exp-summary-tile-title', explorationTitle)));
+    expect(await action.getText(
+      'Complete exploration title',
+      explorationTitleInCompleteSection)).toMatch(explorationTitle);
   };
 
-  this.checkCompleteExplorationSection = async function(explorationTitle) {
-    var completedSectionVisible = await (
-      completedExplorationsSection.isDisplayed());
-    if (!completedSectionVisible) {
-      await this.navigateToCompletedSection();
-    }
-    await this.navigateToCompletedExplorationsSection();
-    await this.expectTitleOfExplorationSummaryTileToMatch(
-      explorationTitle);
+  this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
+      collectionTitle) {
+    await this.navigateToCommunityLessonsSection();
+    var collectionTitleInIncompleteSection = (
+      incompleteCommunityLessonsSection.element(by.cssContainingText(
+        '.protractor-test-collection-summary-tile-title', collectionTitle)));
+    expect(await action.getText(
+      'Incomplete collection title',
+      collectionTitleInIncompleteSection)).toMatch(collectionTitle);
   };
 
-  this.checkIncompleteCollectionSection = async function(collectionTitle) {
-    await this.navigateToInCompleteSection();
-    await this.navigateToIncompleteCollectionsSection();
-    await this.expectTitleOfCollectionSummaryTileToMatch(
-      collectionTitle);
-  };
-
-  this.checkCompleteCollectionSection = async function(collectionTitle) {
-    await this.navigateToCompletedSection();
-    await this.navigateToCompletedCollectionsSection();
-    await this.expectTitleOfCollectionSummaryTileToMatch(
-      collectionTitle);
+  this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
+      collectionTitle) {
+    await this.navigateToCommunityLessonsSection();
+    var collectionTitleInCompleteSection = (
+      completeCommunityLessonsSection.element(by.cssContainingText(
+        '.protractor-test-collection-summary-tile-title', collectionTitle)));
+    expect(await action.getText(
+      'Complete collection title',
+      collectionTitleInCompleteSection)).toMatch(collectionTitle);
   };
 };
 

@@ -376,24 +376,30 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def mock_send_mail_to_notify_admins_that_reviewers_are_needed(
-            self, admin_ids, suggestion_types_needing_reviewers):
+            self, admin_ids, translation_admin_ids, question_admin_ids,
+            suggestion_types_needing_reviewers):
         """Mocks
         email_manager.send_mail_to_notify_admins_that_reviewers_are_needed as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main.
         """
         self.admin_ids = admin_ids
+        self.translation_admin_ids = translation_admin_ids
+        self.question_admin_ids = question_admin_ids
         self.suggestion_types_needing_reviewers = (
             suggestion_types_needing_reviewers)
 
     def _mock_send_mail_to_notify_admins_suggestions_waiting(
-            self, admin_ids, reviewable_suggestion_email_infos):
+            self, admin_ids, translation_admin_ids, question_admin_ids,
+            reviewable_suggestion_email_infos):
         """Mocks
         email_manager.send_mail_to_notify_admins_suggestions_waiting_long as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main.
         """
         self.admin_ids = admin_ids
+        self.translation_admin_ids = translation_admin_ids
+        self.question_admin_ids = question_admin_ids
         self.reviewable_suggestion_email_infos = (
             reviewable_suggestion_email_infos)
 
@@ -437,6 +443,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.admin_ids = []
         self.suggestion_types_needing_reviewers = {}
         self.reviewable_suggestion_email_infos = []
+        self.translation_admin_ids = []
+        self.question_admin_ids = []
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
