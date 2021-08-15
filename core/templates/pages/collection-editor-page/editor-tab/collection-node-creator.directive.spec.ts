@@ -186,7 +186,7 @@ describe('Collection node creator directive', function() {
       expect(alertsSpy).not.toHaveBeenCalled();
     }));
 
-    it('should shown an alert message in case of ' +
+    it('should show an alert message in case of ' +
       'backend error', fakeAsync(function() {
       spyOn(searchExplorationsBackendApiService, 'fetchExplorationsAsync')
         .and.returnValue(Promise.reject());
@@ -255,7 +255,7 @@ describe('Collection node creator directive', function() {
       );
     }));
 
-    it('should show alert message incase of ' +
+    it('should show alert message in case of ' +
       'backend error', fakeAsync(function() {
       spyOn(
         explorationSummaryBackendApiService,
