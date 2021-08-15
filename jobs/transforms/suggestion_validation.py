@@ -26,7 +26,8 @@ from typing import Any, Iterator, Tuple, List, Type # isort:skip # pylint: disab
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import suggestion_models, feedback_models
+    from mypy_imports import feedback_models
+    from mypy_imports import suggestion_models
 
 (suggestion_models, feedback_models) = models.Registry.import_models(
     [models.NAMES.suggestion, models.NAMES.feedback])
@@ -34,6 +35,8 @@ if MYPY: # pragma: no cover
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     suggestion_models.GeneralSuggestionModel)
-def general_suggestion_model_relationships(model: Any) -> Iterator[Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]:
+def general_suggestion_model_relationships(
+        model: Any
+) -> Iterator[Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [feedback_models.GeneralFeedbackThreadModel]
