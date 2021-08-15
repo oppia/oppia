@@ -288,9 +288,8 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-    def test_subtopic_page_commit_log_entry_model_relationships(self):
-        # type: () -> None
-        self.assertItemsEqual(
+    def test_subtopic_page_commit_log_entry_model_relationships(self) -> None:
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'SubtopicPageCommitLogEntryModel', 'subtopic_page_id'),
             ['SubtopicPageModel'])

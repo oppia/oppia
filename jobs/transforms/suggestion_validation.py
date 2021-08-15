@@ -24,13 +24,16 @@ from jobs.decorators import validation_decorators
 
 from typing import Any, Iterator, Tuple, List, Type # isort:skip # pylint: disable=unused-import
 
-(suggestion_models, feedback_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import suggestion_models, feedback_models
+
+(suggestion_models, feedback_models) = models.Registry.import_models(
     [models.NAMES.suggestion, models.NAMES.feedback])
 
 
-@validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc, name-defined]
+@validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     suggestion_models.GeneralSuggestionModel)
-def general_suggestion_model_relationships(model):
-    # type: (Any) -> Iterator[Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]
+def general_suggestion_model_relationships(model: Any) -> Iterator[Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [feedback_models.GeneralFeedbackThreadModel]

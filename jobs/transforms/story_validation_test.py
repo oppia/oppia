@@ -334,16 +334,14 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-    def test_story_commit_log_entry_model_relationships(self):
-        # type: () -> None
-        self.assertItemsEqual(
+    def test_story_commit_log_entry_model_relationships(self) -> None:
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'StoryCommitLogEntryModel', 'story_id'),
             ['StoryModel'])
 
-    def test_story_summary_model_relationships(self):
-        # type: () -> None
-        self.assertItemsEqual(
+    def test_story_summary_model_relationships(self) -> None:
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'StorySummaryModel', 'id'),
             ['StoryModel'])

@@ -25,9 +25,8 @@ from jobs.transforms import suggestion_validation  # isort:skip # pylint: disabl
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-    def test_general_suggestion_model_relationships(self):
-        # type: () -> None
-        self.assertItemsEqual(
+    def test_general_suggestion_model_relationships(self) -> None:
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'GeneralSuggestionModel', 'id'),
             ['GeneralFeedbackThreadModel'])
