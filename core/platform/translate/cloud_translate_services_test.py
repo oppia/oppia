@@ -26,22 +26,27 @@ from core.tests import test_utils
 class CloudTranslateServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_translate_services."""
 
-    def test_translate_text_with_invalid_source_language_raises_error(self):
-        with self.assertRaisesRegexp(
+    def test_translate_text_with_invalid_source_language_raises_error(
+            self
+    ) -> None:
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid source language code: hi'):
             cloud_translate_services.translate_text(
                 'hello world', 'hi', 'es')
 
-    def test_translate_text_with_invalid_target_language_raises_error(self):
-        with self.assertRaisesRegexp(
+    def test_translate_text_with_invalid_target_language_raises_error(
+            self
+    ) -> None:
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid target language code: hi'):
             cloud_translate_services.translate_text(
                 'hello world', 'en', 'hi')
 
     def test_translate_text_with_same_source_target_language_doesnt_call_api(
-            self):
+            self
+    ) -> None:
         with self.swap_to_always_raise(
             cloud_translate_services.CLIENT,
             'translate',
@@ -51,7 +56,9 @@ class CloudTranslateServicesUnitTests(test_utils.TestBase):
                 'hello world', 'en', 'en')
             self.assertEqual(translated_text, 'hello world')
 
-    def test_translate_text_with_valid_input_calls_translate_api(self):
+    def test_translate_text_with_valid_input_calls_translate_api(
+            self
+    ) -> None:
         with self.swap_to_always_return(
             cloud_translate_services.CLIENT,
             'translate',
