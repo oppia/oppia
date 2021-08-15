@@ -78,16 +78,14 @@ class ValidateStoryCommitLogEntryModel(
 
 
 @validation_decorators.RelationshipsOf(story_models.StoryCommitLogEntryModel) # type: ignore[no-untyped-call, misc, name-defined]
-def story_commit_log_entry_model_relationships(
-        model: Any
-) -> Iterator[Tuple[Any, List[Type[story_models.StoryModel]]]]:
+def story_commit_log_entry_model_relationships(model: Any) -> Iterator[
+    Tuple[Any, List[Type[story_models.StoryModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.story_id, [story_models.StoryModel]
 
 
 @validation_decorators.RelationshipsOf(story_models.StorySummaryModel) # type: ignore[no-untyped-call, misc, name-defined]
-def story_summary_model_relationships(
-        model: Any
-) -> Iterator[Tuple[Any, List[Type[story_models.StoryModel]]]]:
+def story_summary_model_relationships(model: Any) -> Iterator[
+    Tuple[Any, List[Type[story_models.StoryModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [story_models.StoryModel]

@@ -82,8 +82,7 @@ class ValidateSubtopicPageCommitLogEntryModel(
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc, name-defined]
     subtopic_models.SubtopicPageCommitLogEntryModel)
-def subtopic_page_commit_log_entry_model_relationships(
-        model: Any
-) -> Iterator[Tuple[Any, List[Type[subtopic_models.SubtopicPageModel]]]]:
+def subtopic_page_commit_log_entry_model_relationships(model: Any) -> Iterator[
+    Tuple[Any, List[Type[subtopic_models.SubtopicPageModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.subtopic_page_id, [subtopic_models.SubtopicPageModel]

@@ -35,8 +35,7 @@ if MYPY: # pragma: no cover
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     suggestion_models.GeneralSuggestionModel)
-def general_suggestion_model_relationships(
-        model: Any
-) -> Iterator[Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]:
+def general_suggestion_model_relationships(model: Any) -> Iterator[
+    Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [feedback_models.GeneralFeedbackThreadModel]
