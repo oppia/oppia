@@ -69,7 +69,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'fatigue-detection.service.ts',
     'feedback-popup.component.ts',
     'feedback-popup.directive.ts',
-    'focus-on.directive.ts',
     'format-timer.pipe.ts',
     'generatedParser.ts',
     'google-analytics.initializer.ts',
