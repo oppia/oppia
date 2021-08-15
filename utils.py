@@ -607,7 +607,7 @@ def generate_new_session_id() -> str:
     return generate_random_string(24)
 
 
-def vfs_construct_path(base_path: str, *path_components: List[str]) -> str:
+def vfs_construct_path(base_path: str, *path_components: str) -> str:
     """Mimics behavior of os.path.join on Posix machines.
 
     Args:
