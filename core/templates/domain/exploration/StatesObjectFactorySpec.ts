@@ -549,7 +549,7 @@ describe('States Object Factory', () => {
 
 
   it('should create a new state given a state name and set ' +
-     'that state to a terminal state', () => {
+    'that state to a terminal state', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
     newStates.addState('new state');
 
@@ -585,7 +585,7 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly set any states\' interaction.defaultOutcomes that ' +
-      'point to a deleted or renamed state name', () => {
+     'point to a deleted or renamed state name', () => {
     let states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
     states.renameState('first state', 'third state');
     states.deleteState('second state');
@@ -694,7 +694,7 @@ describe('States Object Factory', () => {
 
   describe('areWrittenTranslationsDisplayable', () => {
     it('should return true for states that have no missing or update needed ' +
-        'translations', () => {
+       'translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
       const state = states.getState('first state');
 
@@ -713,7 +713,7 @@ describe('States Object Factory', () => {
     });
 
     it('should return true for states that have the minimum acceptable ' +
-        'number of missing or update needed translations', () => {
+       'number of missing or update needed translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
       const state = states.getState('first state');
 
@@ -751,7 +751,7 @@ describe('States Object Factory', () => {
     });
 
     it('should return false for states that have less than the minimum ' +
-        'acceptable number of missing or update needed translations', () => {
+       'acceptable number of missing or update needed translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
       const state = states.getState('first state');
 
@@ -776,7 +776,7 @@ describe('States Object Factory', () => {
     });
 
     it('should return false for states with missing rule input translations, ' +
-        'even if all other translations are present', () => {
+       'even if all other translations are present', () => {
       let statesDictWithRuleInput = {
         'first state': {
           classifier_model_id: null,
