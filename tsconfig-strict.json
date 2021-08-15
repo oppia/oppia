@@ -349,6 +349,8 @@
     "core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-state-skill-modal.component.ts",
     "core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-state-skill-modal.component.spec.ts",
     "core/templates/pages/exploration-editor-page/exploration-editor-page.constants.ts",
+    "core/templates/pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service.ts",
+    "core/templates/pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service.spec.ts",
     "core/templates/pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts",
     "core/templates/pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
