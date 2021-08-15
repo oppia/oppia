@@ -636,6 +636,12 @@ describe('Conversation skin directive', function() {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
+    // The conversation-skin file uses jqueryUI to animate some of the html
+    // elements. When testing the ".animate" function from jqueryUI generates
+    // "TypeError: S.easing[this.easing] is not a function" error.
+    // Therefore the call is stubbed there since changes made by
+    // animations to the html elements are not tested here.
+    spyOn($.fn, 'animate').and.stub();
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
