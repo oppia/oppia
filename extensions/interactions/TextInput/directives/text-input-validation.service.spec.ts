@@ -22,43 +22,57 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TextInputValidationService } from
-  'interactions/TextInput/directives/text-input-validation.service';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
+import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('TextInputValidationService', () => {
-  let validatorService, WARNING_TYPES;
-  let INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
+  let validatorService: TextInputValidationService;
+  let WARNING_TYPES = AppConstants.WARNING_TYPES;
+  let INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
+  // Here 'minRows' and 'maxRows' are undefined in order to test validations.
+  let minRows: number | undefined;
+  let maxRows: number | undefined;
 
-  let currentState, customizationArguments;
-  let goodAnswerGroups, goodDefaultOutcome;
-  let oof, agof, rof;
+  let currentState: string;
+  let customizationArguments: TextInputCustomizationArgs;
+  let goodAnswerGroups: AnswerGroup[];
+  let goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory;
+  let agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
-    validatorService = TestBed.get(TextInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(TextInputValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
-    customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
-    rowsSpecs = customizationArgSpecs[1];
-    minRows = rowsSpecs.schema.validators[0].min_value;
-    maxRows = rowsSpecs.schema.validators[1].max_value;
+    let customizationArgSpecs =
+     INTERACTION_SPECS.TextInput.customization_arg_specs;
+    let rowsSpecs = customizationArgSpecs[1];
+    const validators = <({
+      'min_value': number;
+      id: string;
+      'max_value'?: undefined;
+    } | {
+      'max_value': number;
+      id: string;
+      'min_value'?: undefined;
+    })[]> rowsSpecs.schema.validators;
+    minRows = validators[0].min_value;
+    maxRows = validators[1].max_value;
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: null
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -75,11 +89,11 @@ describe('TextInputValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
     createAnswerGroupByRules = (rules) => agof.createNew(
       rules,
       goodDefaultOutcome,
-      null,
+      [],
       null
     );
   });
@@ -92,6 +106,9 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch non-string value for placeholder', () => {
+    // This throws "Type 'number' is not assignable to type 'SubtitledUnicode'".
+    // We need to suppress this error because we need to test validations.
+    // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -104,6 +121,10 @@ describe('TextInputValidationService', () => {
 
   it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = (
+    // This throws "Argument of type 'undefined' is not assignable to
+    // parameter of type 'string'". We need to suppress this error
+    // because we need to test validations.
+    // @ts-ignore
       new SubtitledUnicode(undefined, undefined));
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

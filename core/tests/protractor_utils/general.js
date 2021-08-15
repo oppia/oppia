@@ -256,6 +256,37 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await waitFor.pageToFullyLoad();
 };
 
+var goOnline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  // For Oppia, any speed above 150KB/s is considered good. These values
+  // are set to be large enough to download and upload a few files and are
+  // found empirically.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: false,
+      latency: 150,
+      download_throughput: 450 * 1024,
+      upload_throughput: 150 * 1024
+    });
+};
+
+var goOffline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: true,
+      latency: 0,
+      download_throughput: 0,
+      upload_throughput: 0
+    });
+};
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -289,3 +320,6 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
+
+exports.goOffline = goOffline;
+exports.goOnline = goOnline;
