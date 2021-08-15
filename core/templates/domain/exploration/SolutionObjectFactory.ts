@@ -140,7 +140,7 @@ export class Solution {
   }
 
   getOppiaShortAnswerResponseHtml(interaction: Interaction):
-  ShortAnswerResponse {
+    ShortAnswerResponse {
     if (interaction.id === null) {
       throw new Error('Interaction id is possibly null.');
     }

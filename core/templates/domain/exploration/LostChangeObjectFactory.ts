@@ -66,7 +66,7 @@ export interface LostChangeBackendDict {
 // Properties are optional in 'LostChangeBackendDict' because all of them may
 // not be present in the dict and may change according to the cmd. Therefore,
 // they can be undefined.
-// TODO(sll): Create separate interfaces for different unique commands(cmd)
+// TODO(#13677): Create separate interfaces for different unique commands(cmd)
 // received at LostChangeBackendDict.
 export class LostChange {
   cmd: string;
