@@ -39,7 +39,7 @@
             (mousemove)="onMouseMoveRegion(idx)"
             (mousedown)="onMousedownRegion(idx)">
       </rect>
-      <a *ngFor="let labeledRegion of value.labeledRegions; let idx = index" href
+      <a *ngFor="let labeledRegion of value.labeledRegions; let idx = index"
          (click)="deleteRegion(idx)"
          target="_blank" rel="noopener">
         <text font-family="Material Icons"
