@@ -55,8 +55,8 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import 'third-party-imports/gif-frames.import';
 
-const gifFrames = require('gif-frames');
 const gifshot = require('gifshot');
 
 interface FilepathData {
@@ -861,8 +861,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       const img = new Image();
       img.onload = () => {
         // Check point 2 in the note before imports and after fileoverview.
-        this.imgData = (<FileReader>e.target).result;
-        let imageData: string | SafeResourceUrl = (<FileReader>e.target).result;
+        this.imgData = reader.result as string;
+        let imageData: string | SafeResourceUrl = reader.result as string;
         if (file.name.endsWith('.svg')) {
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
             imageData as string);
@@ -886,7 +886,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         };
         this.updateValidationWithLatestDimensions();
       };
-      img.src = <string>((<FileReader>e.target).result);
+      img.src = <string>(reader.result);
     };
     reader.readAsDataURL(file);
   }
@@ -1012,7 +1012,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    gifFrames({
+    window.GifFrames({
       url: imageDataURI,
       frames: 'all',
       outputType: 'canvas',
