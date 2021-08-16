@@ -32,8 +32,8 @@ import { SolutionBackendDict, SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { InteractionSpecsKey, MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
@@ -780,11 +780,12 @@ describe('Interaction object factory', () => {
 
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
-    const keys = <InteractionSpecsKey[]> Object.keys(INTERACTION_SPECS);
+    const keys = <InteractionSpecsKey[]> Object.keys(
+      InteractionSpecsConstants.INTERACTION_SPECS);
     keys.forEach(interactionId => {
       expect(() => {
         const defaultCa: Record<string, Object> = {};
-        const caSpecs = INTERACTION_SPECS[
+        const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
           interactionId].customization_arg_specs;
         caSpecs.forEach(
           (caSpec: { name: string; 'default_value': Object; }) => {

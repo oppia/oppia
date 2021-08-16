@@ -33,14 +33,14 @@ import { SubtitledHtml } from
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
-import { InteractionCustomizationArgs, InteractionSpecsKey } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 @Injectable({
   providedIn: 'root'

@@ -21,11 +21,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict, InteractionSpecsKey } from
+import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from
   'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +57,8 @@ export class InteractionAttributesExtractorService {
   ): InteractionCustomizationArgs {
     const caBackendDict: InteractionCustomizationArgsBackendDict = {};
     const caSpecs = (
-      INTERACTION_SPECS[interactionId].customization_arg_specs);
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interactionId].customization_arg_specs);
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
       const attributesKey = `${caName}WithValue` as keyof typeof attributes;

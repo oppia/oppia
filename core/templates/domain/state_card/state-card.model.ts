@@ -25,14 +25,14 @@ import { AudioTranslationLanguageService } from
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
-import { InteractionCustomizationArgs, InteractionSpecsKey } from
+import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface InputResponsePair {
   learnerInput: string,
@@ -116,7 +116,8 @@ export class StateCard {
     let interactionId = this.getInteractionId();
     return (
       Boolean(interactionId) &&
-      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal);
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        <InteractionSpecsKey>interactionId].is_terminal);
   }
 
   getHints(): Hint[] {
@@ -133,8 +134,10 @@ export class StateCard {
     let interactionId = this.getInteractionId();
     if (interactionId) {
       return (
-        !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal &&
-        !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear
+        !InteractionSpecsConstants.INTERACTION_SPECS[
+          <InteractionSpecsKey>interactionId].is_terminal &&
+        !InteractionSpecsConstants.INTERACTION_SPECS[
+          <InteractionSpecsKey>interactionId].is_linear
       );
     }
     return false;
@@ -158,7 +161,8 @@ export class StateCard {
     let interactionId = this.getInteractionId();
     if (interactionId) {
       return (
-        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].instructions
+        InteractionSpecsConstants.INTERACTION_SPECS[
+          <InteractionSpecsKey>interactionId].instructions
       );
     }
     return null;
@@ -177,7 +181,8 @@ export class StateCard {
     let interactionId = this.getInteractionId();
     if (interactionId) {
       var interactionDisplayMode: string | null = (
-        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode);
+        InteractionSpecsConstants.INTERACTION_SPECS[
+          <InteractionSpecsKey>interactionId].display_mode);
     } else {
       var interactionDisplayMode: string | null = null;
     }
