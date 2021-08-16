@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Callable # isort:skip # pylint: disable=unused-import
+from typing import Any, Callable # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover

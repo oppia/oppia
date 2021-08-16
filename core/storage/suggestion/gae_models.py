@@ -22,7 +22,7 @@ import datetime
 from core.platform import models
 import feconf
 
-from typing import ( # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip
     Any, Dict, List, Optional, Tuple, Union, cast)
 
 MYPY = False

@@ -22,7 +22,7 @@ import logging
 from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils
 
-from typing import Any # isort:skip # pylint: disable=unused-import
+from typing import Any # isort:skip
 
 
 class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):

@@ -24,7 +24,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, cast # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover

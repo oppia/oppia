@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import utils
 
-from typing import Dict, Optional # isort:skip # pylint: disable=unused-import
+from typing import Dict, Optional # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
