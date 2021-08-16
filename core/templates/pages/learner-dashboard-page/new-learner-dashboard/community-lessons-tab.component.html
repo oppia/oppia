@@ -1,4 +1,4 @@
-<div class="community-lessons-section">
+<div class="community-lessons-section" [ngStyle]="!checkMobileView() && {'margin-top': '64px'}">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
   </p>
   <div class="dropdown" *ngIf="checkMobileView() && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
@@ -30,7 +30,7 @@
       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" href="/community-library" [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="incomplete-section" *ngIf="!checkMobileView()">
+  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!checkMobileView()">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
       <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
       </p>
@@ -94,7 +94,7 @@
       </div>
     </div>
   </div>
-  <div class="completed-section" *ngIf="!checkMobileView()">
+  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!checkMobileView()">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
       <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
       </p>
@@ -246,10 +246,10 @@
     </div>
   </div>
 </div>
-<div class="playlist-section">
+<div class="playlist-section protractor-test-play-later-section">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
   </p>
-  <div *ngIf="totalLessonsInPlaylist.length === 0">
+  <div *ngIf="noPlaylistActivity">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></p>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" href="/community-library">
@@ -346,7 +346,7 @@
     </div>
   </div>
 </div>
-<div class="subscriptions-section">
+<div class="subscriptions-section protractor-test-subscriptions-section">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
   <div *ngIf="subscriptionsList.length === 0">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS' | translate" class="empty-section"></p>
@@ -362,7 +362,8 @@
              class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
-            <strong container="body"
+            <strong class="protractor-test-subscription-name"
+                    container="body"
                     triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
               {{ subscription.username| truncate:10 }}
             </strong>
@@ -395,7 +396,6 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: auto;
     margin-bottom: 25px;
     min-height: 215px;
     opacity: 1;
@@ -610,7 +610,12 @@
     .community-lessons-section,
     .playlist-section,
     .subscriptions-section {
+      margin: auto;
+      margin-bottom: 20px;
       width: 296px;
+    }
+    .community-lessons-section {
+      margin-top: 35px;
     }
     .community-lessons-section .summary-container,
     .playlist-section .summary-container,
@@ -649,13 +654,23 @@
       top: 12px;
     }
   }
-  @media screen and (min-width: 768px) and (max-width: 1200px) {
+  @media screen and (min-width: 768px) and (max-width: 800px) {
     .community-lessons-section,
     .playlist-section,
     .subscriptions-section {
       position: relative;
       right: 117px;
       width: 726px;
+    }
+  }
+  @media screen and (min-width: 768px) and (max-width: 1200px) {
+    .community-lessons-section,
+    .playlist-section,
+    .subscriptions-section {
+      width: 726px;
+    }
+    .community-lessons-section {
+      margin-top: 35px;
     }
     .community-lessons-mobile-view {
       display: flex;
