@@ -19,6 +19,7 @@
 import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import Cropper from 'cropperjs';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
@@ -98,8 +99,14 @@ describe('Edit Profile Picture Modal Component', () => {
           toDataURL: () => pictureDataUrl
         };
       }
-    };
+    } as Cropper;
     componentInstance.confirm();
     expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);
+  });
+
+  it('should throw error if cropper is not initialized', () => {
+    expect(() => {
+      componentInstance.confirm();
+    }).toThrowError('Cropper has not been initialized');
   });
 });

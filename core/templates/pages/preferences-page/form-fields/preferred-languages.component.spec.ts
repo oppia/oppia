@@ -60,7 +60,7 @@ describe('Preferred Languages Component', () => {
     }];
     componentInstance.formCtrl = {
       valueChanges: {
-        subscribe(callb) {
+        subscribe(callb: (val: string) => void) {
           callb(value);
         }
       }
@@ -70,7 +70,7 @@ describe('Preferred Languages Component', () => {
     value = '';
     componentInstance.formCtrl = {
       valueChanges: {
-        subscribe(callb) {
+        subscribe(callb: (val: string) => void) {
           callb(value);
         }
       }

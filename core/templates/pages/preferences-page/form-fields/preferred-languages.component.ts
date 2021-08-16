@@ -27,16 +27,19 @@ import { LanguageIdAndText } from 'domain/utilities/language-util.service';
   templateUrl: './preferred-languages.component.html'
 })
 export class PreferredLanguagesComponent {
-  @Input() preferredLanguages: string[];
-  @Input() choices: LanguageIdAndText[];
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('chipList') chipList!: MatChipList;
+  @ViewChild('languageInput') languageInput!: ElementRef<HTMLInputElement>;
+  @Input() preferredLanguages!: string[];
+  @Input() choices!: LanguageIdAndText[];
   @Output() preferredLanguagesChange: EventEmitter<string[]> = (
     new EventEmitter());
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER];
   formCtrl = new FormControl();
-  @ViewChild('chipList') chipList: MatChipList;
-  @ViewChild('languageInput') languageInput: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {

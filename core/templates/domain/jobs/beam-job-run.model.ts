@@ -69,6 +69,9 @@ class MatIcon {
   constructor(
       public readonly tooltip: string,
       public readonly code: string,
+      // The color is null for the job state 'cancelling', 'cancelled' and
+      // 'drained' since we want their respective icons to use the default
+      // font color of the component and not any of the theme colors.
       public readonly color: string | null) {}
 }
 
@@ -139,7 +142,9 @@ export class BeamJobRun {
     return this.matIcon.code;
   }
 
-  getJobStatusMaterialThemeColor(): string {
+  // This will return null if the current font color of the
+  // component is to be used as the color for the icon.
+  getJobStatusMaterialThemeColor(): string | null {
     return this.matIcon.color;
   }
 

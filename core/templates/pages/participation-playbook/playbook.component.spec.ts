@@ -44,33 +44,17 @@ class MockI18nLanguageCodeService {
 class MockWindowRef {
   _window = {
     location: {
-      _hash: '',
-      _hashChange: null,
-      _href: '',
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
-      get href() {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-      reload: (val) => val
+      hash: '',
+      hashChange: null,
+      href: '',
+      reload: (val: string) => val
     },
     get onhashchange() {
-      return this.location._hashChange;
+      return this.location.hashChange;
     },
 
     set onhashchange(val) {
-      this.location._hashChange = val;
+      this.location.hashChange = val;
     }
   };
   get nativeWindow() {
@@ -89,7 +73,7 @@ let fixture: ComponentFixture<PlaybookPageComponent>;
 
 describe('Playbook Page', () => {
   let windowRef: MockWindowRef;
-  let siteAnalyticsService = null;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();

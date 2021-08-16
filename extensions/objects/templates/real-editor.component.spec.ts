@@ -82,7 +82,7 @@ describe('RealEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     component.value = 3;
 
-    component.updateValue(null);
+    component.updateValue('');
 
     expect(component.value).toBe(0.0);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(0.0);
@@ -98,7 +98,7 @@ describe('RealEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     component.value = 0;
 
-    component.updateValue(null);
+    component.updateValue('');
 
     expect(component.value).toBe(0);
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith(0);

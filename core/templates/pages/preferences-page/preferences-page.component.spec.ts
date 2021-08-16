@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { PreferencesBackendDict, SubscriptionSummary, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { EmailPreferencesBackendDict, PreferencesBackendDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -87,7 +87,7 @@ describe('Preferences Page Component', () => {
 
     async updatePreferencesDataAsync(
         updateType: string,
-        data: boolean | string | string[] | SubscriptionSummary[]
+        data: boolean | string | string[] | EmailPreferencesBackendDict
     ): Promise<UpdatePreferencesResponse> {
       return Promise.resolve({
         bulk_email_signup_message_should_be_shown: false

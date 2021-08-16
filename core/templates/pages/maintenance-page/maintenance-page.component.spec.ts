@@ -29,7 +29,7 @@ let fixture: ComponentFixture<MaintenancePageComponent>;
 
 describe('Maintenance page', () => {
   let documentAttributeCustomizationService:
-    DocumentAttributeCustomizationService = null;
+    DocumentAttributeCustomizationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

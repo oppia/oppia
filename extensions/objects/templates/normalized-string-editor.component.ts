@@ -22,18 +22,29 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
+
+// The following properties are optional since there is a possibility that the
+// current and previous values have not yet been specified in the form.
+type NormalizedStringEditorComponentArgs = {
+  currentValue?: { largeInput: string },
+  previousValue?: { largeInput: string }
+};
+
 @Component({
   selector: 'normalized-string-editor',
   templateUrl: './unicode-string-editor.component.html'
 })
 export class NormalizedStringEditorComponent implements
     OnInit, OnChanges, OnDestroy {
-  @Input() alwaysEditable;
-  @Input() initArgs;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() initArgs!: NormalizedStringEditorComponentArgs;
+  @Input() value!: string;
+  @Input() alwaysEditable: boolean = false;
   @Output() valueChanged = new EventEmitter();
   componentSubscriptions = new Subscription();
-  active: boolean;
+  active: boolean = false;
   largeInput = false;
   constructor(private externalSaveService: ExternalSaveService) { }
 
