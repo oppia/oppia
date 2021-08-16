@@ -48,6 +48,12 @@ describe('Blog Post Object Factory', () => {
       'Blog Post title should not be empty.',
       'Blog Post content should not be empty.'
     ]);
+
+    sampleBlogPostData.title = 'aa';
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post title should not be less than 5 characters.',
+      'Blog Post content should not be empty.'
+    ]);
   });
 
   it('should not find issues with a valid publishable blog post', () => {
@@ -65,6 +71,15 @@ describe('Blog Post Object Factory', () => {
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
       'Blog Post title should not be empty.',
+      'Blog Post should have a thumbnail.',
+      'Blog Post should have atleast one tag linked to it.',
+      'Blog Post content should not be empty.',
+    ]);
+
+    sampleBlogPostData.title = 'aa';
+
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+      'Blog Post title should not be less than 5 characters.',
       'Blog Post should have a thumbnail.',
       'Blog Post should have atleast one tag linked to it.',
       'Blog Post content should not be empty.',
