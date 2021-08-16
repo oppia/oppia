@@ -27,43 +27,53 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
+import { EmailPreferencesBackendDict, SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
+
+interface AudioLangaugeChoice {
+  id: string;
+  text: string;
+}
 
 @Component({
   selector: 'oppia-preferences-page',
   templateUrl: './preferences-page.component.html'
 })
 export class PreferencesPageComponent {
-  subjectInterests: string;
-  preferredLanguageCodes;
-  preferredSiteLanguageCode: string;
-  preferredAudioLanguageCode: string;
-  subjectInterestsChangeAtLeastOnce: boolean;
-  exportingData = false;
-  profilePictureDataUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  subjectInterests!: string;
+  preferredLanguageCodes!: string[];
+  preferredSiteLanguageCode!: string;
+  preferredAudioLanguageCode!: string;
+  profilePictureDataUrl!: string;
+  AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
+  userBio!: string;
+  defaultDashboard!: string;
+  subscriptionList!: SubscriptionSummary[];
+  TAG_REGEX_STRING!: string;
+  LANGUAGE_CHOICES!: LanguageIdAndText[];
+  // The following two properties are set to null when the
+  // user is not logged in.
+  username!: string | null;
+  email!: string | null;
+  SITE_LANGUAGE_CHOICES!: typeof AppConstants.SUPPORTED_SITE_LANGUAGES;
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
-  username: string = '';
-  email: string;
-  AUDIO_LANGUAGE_CHOICES;
-  hasPageLoaded: boolean;
-  userBio: string;
-  defaultDashboard: string;
-  canReceiveEmailUpdates: boolean;
-  canReceiveEditorRoleEmail: boolean;
-  canReceiveSubscriptionEmail: boolean;
-  canReceiveFeedbackMessageEmail: boolean;
-  subscriptionList: SubscriptionSummary[];
-  userCanDeleteAccount: boolean;
-  TAG_REGEX_STRING: string;
-  LANGUAGE_CHOICES: LanguageIdAndText[];
-  SITE_LANGUAGE_CHOICES;
+  subjectInterestsChangeAtLeastOnce: boolean = false;
+  exportingData: boolean = false;
+  hasPageLoaded: boolean = false;
+  canReceiveEmailUpdates: boolean = false;
+  canReceiveEditorRoleEmail: boolean = false;
+  canReceiveSubscriptionEmail: boolean = false;
+  canReceiveFeedbackMessageEmail: boolean = false;
+  userCanDeleteAccount: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
-  userCanExportAccount: boolean;
+  userCanExportAccount: boolean = false;
 
   constructor(
     private ngbModal: NgbModal,
@@ -82,7 +92,10 @@ export class PreferencesPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  private _saveDataItem(updateType, data): void {
+  private _saveDataItem(
+      updateType: string,
+      data: string | string[] | EmailPreferencesBackendDict
+  ): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updatePreferencesDataAsync(
       updateType, data).then((returnData) => {
@@ -125,7 +138,7 @@ export class PreferencesPageComponent {
       canReceiveEmailUpdates: boolean, canReceiveEditorRoleEmail: boolean,
       canReceiveFeedbackMessageEmail: boolean,
       canReceiveSubscriptionEmail: boolean): void {
-    let data = {
+    let data: EmailPreferencesBackendDict = {
       can_receive_email_updates: canReceiveEmailUpdates,
       can_receive_editor_role_email: canReceiveEditorRoleEmail,
       can_receive_feedback_message_email: (

@@ -14,29 +14,19 @@
 
 
 /**
- * @fileoverview Unit tests for the skill editor main tab directive.
+ * @fileoverview Unit tests for the Angular html bind directive'.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+// ^^^ This block is to be removed.
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-// ^^^ This block is to be removed.
 
-describe('Skill editor main tab directive', function() {
-  var $scope = null;
-  var ctrl = null;
-  var $rootScope = null;
-  let $timeout = null;
-  var directive = null;
-  var UndoRedoService = null;
-  var $uibModal = null;
-  var SkillEditorRoutingService = null;
-  var SkillEditorStateService = null;
-  var focusManagerService = null;
-  var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
+describe('Angular html bind directive', function() {
+  let $scope = null;
+  let $rootScope = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -45,30 +35,30 @@ describe('Skill editor main tab directive', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
-    UndoRedoService = $injector.get('UndoRedoService');
-    directive = $injector.get('skillEditorMainTabDirective')[0];
-    SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
-    focusManagerService = $injector.get('FocusManagerService');
-
-    ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope,
-      $scope: $scope
-    });
-    ctrl.$onInit();
   }));
 
-  it('should initialize the variables', function() {
-    expect($scope.selectedTopic).toEqual(null);
-    expect($scope.subtopicName).toEqual(null);
-  });
+  it('should initialize', angular.mock.inject(function($compile) {
+    $scope.htmlData = '<div></div>';
+    $scope.htmlData2 = '<div>Test</div>';
+    let elem = angular.element(
+      '<angular-html-bind class="example-content" ' +
+      'html-data="htmlData"></angular-html-bind>');
+    $compile(elem)($scope);
+    $rootScope.$digest();
+
+    elem = angular.element(
+      '<angular-html-bind class="example-content" ' +
+      'html-data="htmlData2"></angular-html-bind>');
+    $compile(elem)($scope);
+    $rootScope.$digest();
+
+    $compile(elem)($scope);
+    $rootScope.$digest();
+  }));
 });
