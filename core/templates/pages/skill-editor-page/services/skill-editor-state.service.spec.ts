@@ -105,6 +105,16 @@ class FakeSkillBackendApiService {
                 description: 'Description 2',
               },
             ],
+            Name2: [
+              {
+                id: 'skill_id_3',
+                description: 'Description 1',
+              },
+              {
+                id: 'skill_id_4',
+                description: 'Description 2',
+              },
+            ],
           },
           assignedSkillTopicData: {
             topicName: ['tester'],
@@ -120,6 +130,16 @@ class FakeSkillBackendApiService {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.skillObject);
+      } else {
+        reject();
+      }
+    });
+  }
+
+  async doesSkillWithDescriptionExistAsync(description) {
+    return new Promise((resolve, reject) => {
+      if (description) {
+        resolve(true);
       } else {
         reject();
       }
@@ -232,7 +252,7 @@ describe('Skill editor state service', () => {
       const groupedSkillSummaries =
     skillEditorStateService.getGroupedSkillSummaries();
       expect(groupedSkillSummaries.current.length).toEqual(2);
-      expect(groupedSkillSummaries.others.length).toEqual(0);
+      expect(groupedSkillSummaries.others.length).toEqual(2);
 
       expect(groupedSkillSummaries.current[0].id).toEqual('skill_id_1');
       expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
@@ -371,4 +391,28 @@ describe('Skill editor state service', () => {
     expect(actualSkillRights).toBe(previousSkillRights);
     expect(actualSkillRights).not.toBe(expectedSkillRights);
   });
+
+  it('should update the skill description when calling ' +
+    '\'updateExistenceOfSkillDescription\'', fakeAsync(() => {
+    spyOn(fakeSkillBackendApiService, 'doesSkillWithDescriptionExistAsync')
+      .and.callThrough();
+    let successCb = jasmine.createSpy('success');
+    skillEditorStateService.updateExistenceOfSkillDescription(
+      'description', successCb);
+    tick();
+
+    expect(successCb).toHaveBeenCalledWith(true);
+  }));
+
+  it('should fail toupdate the skill description when ' +
+    'description is empty ', fakeAsync(() => {
+    spyOn(fakeSkillBackendApiService, 'doesSkillWithDescriptionExistAsync')
+      .and.callThrough();
+    let successCb = jasmine.createSpy('success');
+    skillEditorStateService.updateExistenceOfSkillDescription(
+      null, successCb);
+    tick();
+
+    expect(successCb).not.toHaveBeenCalled();
+  }));
 });
