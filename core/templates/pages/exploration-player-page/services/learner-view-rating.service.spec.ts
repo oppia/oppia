@@ -16,21 +16,14 @@
  * @fileoverview Tests for Learner View Rating Service.
  */
 
-import { async, TestBed } from '@angular/core/testing';
+import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerViewRatingService } from './learner-view-rating.service';
-
-
-class MockNgbModalRef {
-  componentInstance = {
-    newContent: null,
-    oldContent: null,
-    description: null
-  };
-}
+import { LearnerViewRatingBackendApiService } from './learner-view-rating-backend-api.service';
 
 describe('Learner View Rating Service', () => {
-    let learnerViewRatingService: LearnerViewRatingService;
+  let learnerViewRatingService: LearnerViewRatingService;
+  let learnerViewRatingBackendApiService: LearnerViewRatingBackendApiService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -39,17 +32,35 @@ describe('Learner View Rating Service', () => {
   }));
 
   beforeEach(() => {
-    suggestionModalForLearnerDashboardService =
-      TestBed.inject(SuggestionModalForLearnerDashboardService);
-    ngbModal = TestBed.inject(NgbModal);
-    ngbModal = TestBed.inject(NgbModal);
-    ngbModal = TestBed.inject(NgbModal);
-    ngbModal = TestBed.inject(NgbModal);
-
+    learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
+    learnerViewRatingBackendApiService = TestBed.inject(
+      LearnerViewRatingBackendApiService);
   });
 
-  it('should open an ngbModal for suggestions requested' +
-    ' when calling showSuggestionModal', () => {
+  it('should send request to backend for fetching user rating info' +
+    ' when initialized', fakeAsync(() => {
+    let userRatingSpy = spyOn(
+      learnerViewRatingBackendApiService, 'getUserRatingAsync')
+      .and.resolveTo({
+        user_rating: 2
+      });
+    let successCb = jasmine.createSpy('success');
 
-  });
-})
+    learnerViewRatingService.init(successCb);
+    tick();
+
+    expect(userRatingSpy).toHaveBeenCalled();
+  }));
+
+  it('should send request to backend for submiting user rating info' +
+    ' when calling \'submitUserRating\'', fakeAsync(() => {
+    let userRatingSpy = spyOn(
+      learnerViewRatingBackendApiService, 'submitUserRatingAsync')
+      .and.resolveTo(null);
+
+    learnerViewRatingService.submitUserRating(2);
+    tick();
+
+    expect(userRatingSpy).toHaveBeenCalled();
+  }));
+});
