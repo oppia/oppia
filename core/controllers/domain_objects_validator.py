@@ -30,7 +30,7 @@ from core.domain import exp_domain
 from core.domain import state_domain
 import python_utils
 
-from typing import Any, Dict, Optional, Union # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, import-only-modules
+from typing import Any, Dict, Optional, Union # isort:skip
 
 
 def validate_exploration_change(obj: Dict[str, Any]) -> None:

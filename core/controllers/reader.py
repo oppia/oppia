@@ -132,7 +132,7 @@ class ExplorationPage(base.BaseHandler):
             },
             'parent': {
                 'schema': {
-                    'type': 'bool'
+                    'type': 'basestring'
                 },
                 'default_value': None
             },
