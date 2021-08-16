@@ -1,0 +1,51 @@
+<div class="nav navbar-nav oppia-navbar-breadcrumb">
+  <span class="oppia-navbar-breadcrumb-separator"></span>
+  <span class="pt-3" *ngIf="activeTab === 'main'">
+    Blog Dashboard
+  </span>
+  <div class="d-flex flex-column pt-2" *ngIf="activeTab === 'editor_tab'">
+    <p class="oppia-blog-dashboard-title"
+       role="button"
+       (click)="blogDashboardPageService.navigateToMainTab()">
+      Blog Dashboard
+    </p>
+    <p class="oppia-blog-post-title pt-1">{{ title }}</p>
+  </div>
+</div>
+<style>
+  .oppia-navbar-breadcrumb-separator:after {
+    border-left-style: ridge;
+    border-width: 2px;
+    content: "";
+    font-size: 30px;
+  }
+
+  .oppia-navbar-breadcrumb {
+    padding-top: 3px;
+  }
+
+  .oppia-blog-dashboard-title {
+    cursor: pointer;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .oppia-blog-post-title {
+    color: #fff;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.2rem;
+  }
+
+  @media(max-width: 768px) {
+    .oppia-blog-post-title {
+      font-size: 1rem;
+    }
+
+    .oppia-blog-dashboard-title {
+      font-size: 1.2rem;
+    }
+  }
+
+</style>
