@@ -58,8 +58,8 @@ class InconsistentPublishLastUpdatedTimestampsError(
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model: Any) -> None:
-        message = 'last_updated=%r is later than published_on=%r' % (
-            model.last_updated, model.published_on)
+        message = 'published_on=%r is later than last_updated=%r' % (
+            model.published_on, model.last_updated)
         super( # type: ignore[no-untyped-call]
             InconsistentPublishLastUpdatedTimestampsError, self
             ).__init__(message, model)

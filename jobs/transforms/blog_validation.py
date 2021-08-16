@@ -121,9 +121,9 @@ class ValidateModelPublishTimestamps(beam.DoFn): # type: ignore[misc]
             yield blog_validation_errors.ModelMutatedDuringJobError(
                 model)
 
-        if (model.last_updated - base_validation.MAX_CLOCK_SKEW_SECS) > (
-                model.published_on):
-            yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-long
+        if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
+                model.last_updated):
+            yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-lo
 
 
 @validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
