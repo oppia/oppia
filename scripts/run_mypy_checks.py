@@ -567,8 +567,6 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/types/user_validation_errors_test.py',
     'python_utils.py',
     'python_utils_test.py',
-    'schema_utils.py',
-    'schema_utils_test.py',
     'scripts/build.py',
     'scripts/build_test.py',
     'scripts/check_e2e_tests_are_captured_in_ci.py',
