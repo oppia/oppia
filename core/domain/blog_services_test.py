@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
+
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import user_services
@@ -392,3 +394,81 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_summary.to_dict(), expected_blog_post_summary.to_dict())
         self.assertIsNone(blog_services.get_blog_post_summary_by_title('Hello'))
+
+    def test_update_blog_models_author_and_published_on_date_successfully(self):
+        model = (
+            blog_models.BlogPostModel.get_by_id(self.blog_post_a_id))
+        model.title = 'sample title'
+        model.tags = ['news']
+        model.thumbnail_filename = 'image.png'
+        model.content = 'hello bloggers'
+        model.url_fragment = 'sample'
+        model.published_on = datetime.datetime.utcnow()
+        model.update_timestamps()
+        model.put()
+
+        blog_services.update_blog_models_author_and_published_on_date(
+            self.blog_post_a_id, self.user_id_b, '05/09/2000')
+
+        blog_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_a_id))
+        self.assertEqual(
+            blog_model.author_id, self.user_id_b)
+        self.assertEqual(
+            blog_model.published_on, datetime.datetime(2000, 5, 9, 0, 0))
+
+        blog_summary_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_a_id))
+        self.assertEqual(
+            blog_summary_model.author_id, self.user_id_b)
+        self.assertEqual(
+            blog_summary_model.published_on, datetime.datetime(
+                2000, 5, 9, 0, 0))
+
+        blog_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(self.blog_post_a_id))
+        self.assertTrue(
+            self.user_id_b in blog_rights_model.editor_ids)
+
+    def test_update_blog_models_author_and_publish_date_with_invalid_date(self):
+        model = (
+            blog_models.BlogPostModel.get_by_id(self.blog_post_a_id))
+        model.title = 'sample title'
+        model.tags = ['news']
+        model.thumbnail_filename = 'image.png'
+        model.content = 'hello bloggers'
+        model.url_fragment = 'sample'
+        model.published_on = datetime.datetime.utcnow()
+        model.update_timestamps()
+        model.put()
+
+        # Invalid month.
+        with self.assertRaisesRegexp(
+            Exception,
+            'time data \'123/09/2000, 00:00:00:00\' does not match' +
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
+            blog_services.update_blog_models_author_and_published_on_date(
+                self.blog_post_a_id, self.user_id_b, '123/09/2000')
+
+        # Invalid day.
+        with self.assertRaisesRegexp(
+            Exception,
+            'time data \'01/38/2000, 00:00:00:00\' does not match' +
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
+            blog_services.update_blog_models_author_and_published_on_date(
+                self.blog_post_a_id, self.user_id_b, '01/38/2000')
+
+        # Invalid year.
+        with self.assertRaisesRegexp(
+            Exception,
+            'time data \'01/22/31126, 00:00:00:00\' does not match' +
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
+            blog_services.update_blog_models_author_and_published_on_date(
+                self.blog_post_a_id, self.user_id_b, '01/22/31126')
+
+    def test_update_blog_model_author_and_publish_on_with_invalid_blog_id(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class BlogPostModel with id invalid_blog_id not found'):
+            blog_services.update_blog_models_author_and_published_on_date(
+                'invalid_blog_id', self.user_id_b, '01/12/2000')
