@@ -158,7 +158,7 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    await users.createAndLoginSuperAdminUser(
+    await users.createAndLoginAdminUser(
       'user1@embedding.com', 'user1Embedding');
 
     // Create exploration.
