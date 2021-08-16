@@ -149,8 +149,8 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = None
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = None
+    URL_PATH_ARGS_SCHEMAS: Optional[Dict[str,Any]] = None
+    HANDLER_ARGS_SCHEMAS: Optional[Dict[str,Any]] = None
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.

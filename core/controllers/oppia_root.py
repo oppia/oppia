@@ -28,8 +28,8 @@ class OppiaRootPage(base.BaseHandler):
        with angular router.
     """
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str,Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str,Any] = {
         'GET': {}
     }
 
