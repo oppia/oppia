@@ -69,8 +69,8 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
             normalized_value, errors = payload_validator.validate(
                 handler_args,
                 handler_args_schema,
-                allowed_extra_args = False,
-                allow_string_to_bool_conversion = False
+                allowed_extra_args=False,
+                allow_string_to_bool_conversion=False
             )
 
             self.assertEqual(normalized_value, {})
@@ -127,8 +127,8 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
             normalized_value, errors = payload_validator.validate(
                 handler_args,
                 handler_args_schema,
-                allowed_extra_args = False,
-                allow_string_to_bool_conversion = True
+                allowed_extra_args=False,
+                allow_string_to_bool_conversion=True
             )
 
             self.assertEqual(normalized_value, normalized_value_for_args)

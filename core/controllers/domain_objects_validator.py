@@ -30,10 +30,10 @@ from core.domain import exp_domain
 from core.domain import state_domain
 import python_utils
 
-from typing import Any, Dict, Text, Optional, Union # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, Optional, Union # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, import-only-modules
 
 
-def validate_exploration_change(obj: (Dict[Text, Any])) -> None:
+def validate_exploration_change(obj: Dict[str, Any]) -> None:
     """Validates exploration change.
 
     Args:
@@ -44,7 +44,7 @@ def validate_exploration_change(obj: (Dict[Text, Any])) -> None:
     exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values(obj: (Dict[Text, Any])) -> None:
+def validate_new_config_property_values(obj: Dict[str, Any]) -> None:
     """Validates new config property values.
 
     Args:
@@ -62,7 +62,7 @@ def validate_new_config_property_values(obj: (Dict[Text, Any])) -> None:
         config_property.normalize(value)
 
 
-def validate_change_dict_for_blog_post(change_dict: (Dict[Any, Any])) -> None:
+def validate_change_dict_for_blog_post(change_dict: Dict[str, Any]) -> None:
     """Validates change_dict required for updating values of blog post.
 
     Args:
@@ -86,7 +86,7 @@ def validate_change_dict_for_blog_post(change_dict: (Dict[Any, Any])) -> None:
                 'Invalid tags provided. Tags not in default tags list.')
 
 
-def validate_collection_change(obj: (Dict[Text, Any])) -> None:
+def validate_collection_change(obj: Dict[str, Any]) -> None:
     """Validates collection change.
 
     Args:
@@ -97,7 +97,7 @@ def validate_collection_change(obj: (Dict[Text, Any])) -> None:
     collection_domain.CollectionChange(obj)
 
 
-def validate_state_dict(state_dict: (Dict[Text, Any])) -> None:
+def validate_state_dict(state_dict: Dict[str, Any]) -> None:
     """Validates state dict.
 
     Args:
@@ -108,8 +108,8 @@ def validate_state_dict(state_dict: (Dict[Text, Any])) -> None:
 
 
 def validate_email_dashboard_data(
-        data: (Dict[Text, Optional[Union[bool, int]]])
-    ) -> None:
+        data: Dict[str, Optional[Union[bool, int]]]
+) -> None:
     """Validates email dashboard data.
 
     Args:
@@ -126,7 +126,7 @@ def validate_email_dashboard_data(
             raise Exception('400 Invalid input for query.')
 
 
-def validate_task_entries(task_entries: Dict[Text, Any]) -> None:
+def validate_task_entries(task_entries: Dict[str, Any]) -> None:
     """Validates the task entry dict.
 
     Args:
