@@ -380,7 +380,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  fit(
+  it(
     'should be able to make changes offline and the changes ' +
     'should be saved when online.',
     async function() {
