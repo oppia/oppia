@@ -17,9 +17,8 @@
  */
 
 import { async, TestBed } from '@angular/core/testing';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { LearnerViewRatingService } from './learner-view-rating.service';
 
 
 class MockNgbModalRef {
@@ -31,9 +30,7 @@ class MockNgbModalRef {
 }
 
 describe('Learner View Rating Service', () => {
-
-  let csrfService: CsrfTokenService;
-  let ngbModal: NgbModal;
+    let learnerViewRatingService: LearnerViewRatingService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -45,37 +42,14 @@ describe('Learner View Rating Service', () => {
     suggestionModalForLearnerDashboardService =
       TestBed.inject(SuggestionModalForLearnerDashboardService);
     ngbModal = TestBed.inject(NgbModal);
-    csrfService = TestBed.inject(CsrfTokenService);
+    ngbModal = TestBed.inject(NgbModal);
+    ngbModal = TestBed.inject(NgbModal);
+    ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
-      return new Promise((resolve) => {
-        resolve('sample-csrf-token');
-      });
-    });
   });
 
   it('should open an ngbModal for suggestions requested' +
     ' when calling showSuggestionModal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
-      return <NgbModalRef>(
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        });
-    });
 
-    let suggestionType = 'edit_exploration_state_content';
-    let extraParams = {
-      newContent: 'new',
-      oldContent: 'old',
-      description: 'description'
-    };
-
-    suggestionModalForLearnerDashboardService.showSuggestionModal(
-      suggestionType, extraParams);
-
-    expect(modalSpy).toHaveBeenCalled();
   });
 })
