@@ -37,7 +37,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Callable, Dict, List, Optional, Union # isort:skip # pylint: disable=unused-import
+from typing import Any, Callable, Dict, List, Optional, Union # isort:skip
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
