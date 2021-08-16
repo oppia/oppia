@@ -24,7 +24,7 @@ import os
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
 
-def get_application_id():
+def get_application_id() -> str:
     """Returns the application's App Engine ID.
 
     Locally we set the GOOGLE_CLOUD_PROJECT environment variable in
@@ -34,10 +34,13 @@ def get_application_id():
     Returns:
         str. The application ID.
     """
-    return os.getenv('GOOGLE_CLOUD_PROJECT')
+    app_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    if app_id is None:
+        raise ValueError('Value None for application id is invalid.')
+    return app_id
 
 
-def get_gcs_resource_bucket_name():
+def get_gcs_resource_bucket_name() -> str:
     """Returns the application's bucket name for GCS resources, which depends
     on the application ID in production mode, or default bucket name in
     development mode.
