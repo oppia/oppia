@@ -191,6 +191,40 @@
   </div>
 </mat-card>
 
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update Blog Post Data</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateBlogPostData()">
+      <div class="form-group row">
+        <label>Blog Post Id:</label>
+        <input type="text"
+               [(ngModel)]="blogPostId"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Author Username:</label>
+        <input type="text"
+               [(ngModel)]="authorUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Published On:</label>
+        <input type="text"
+               [(ngModel)]="publishedOn"
+               [ngModelOptions]="{standalone: true}"
+               required="true"
+               placeholder="Enter in mm/dd/yyyy">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Update">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Revoke super admin privileges from Firebase account</h3>
   <p>The chosen user will be forcibly logged out.</p>
@@ -210,7 +244,6 @@
     </form>
   </div>
 </mat-card>
-
 <style>
   .oppia-admin-page-card {
     max-width: 700px
