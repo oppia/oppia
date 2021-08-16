@@ -19,17 +19,17 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import argparse
 import feconf
 
 from apache_beam.options import pipeline_options
 
 from typing import Any
-from typing import Dict
 from typing import List
 from typing import Optional
 
 
-class JobOptions(pipeline_options.PipelineOptions): # type: ignore
+class JobOptions(pipeline_options.PipelineOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
@@ -37,8 +37,9 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore
             str, 'Namespace for isolating the NDB operations during tests.'),
     }
 
-    def __init__(self, flags=None, **job_options):
-        # type: (Optional[List[str]], Optional[str]) -> None
+    def __init__(
+        self, flags: Optional[List[str]] = None,
+        **job_options: Optional[str]) -> None:
         """Initializes a new JobOptions instance.
 
         Args:
@@ -66,8 +67,7 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore
             **job_options)
 
     @classmethod
-    def _add_argparse_args(cls, parser):
-        # type: (argparse.ArgumentParser) -> None
+    def _add_argparse_args(cls, parser: argparse.ArgumentParser) -> None:
         """Adds Oppia's job-specific arguments to the parser.
 
         Args:

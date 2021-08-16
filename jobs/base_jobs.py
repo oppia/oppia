@@ -55,6 +55,7 @@ Dataflow service: https://cloud.google.com/dataflow.
 """
 
 from __future__ import absolute_import
+from __future__ import annotations
 from __future__ import unicode_literals
 
 from jobs.types import job_run_result
@@ -78,10 +79,13 @@ class JobMetaclass(type):
     code should simply inherit from the JobBase class, found below.
     """
 
-    _JOB_REGISTRY = {} # type: Dict[str, JobMetaclass]
+    _JOB_REGISTRY: Dict[str, JobMetaclass] = {}
 
-    def __new__(cls, name, bases, namespace):
-        # type: (Type[JobMetaclass], str, Tuple[type, ...], Dict[str, Any]) -> JobMetaclass
+    def __new__(
+            cls: Type[JobMetaclass],
+            name: str,
+            bases: Tuple[type, ...],
+            namespace: Dict[str, Any]) -> JobMetaclass:
         """Creates a new job class with type `JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
@@ -117,8 +121,7 @@ class JobMetaclass(type):
         return job_cls
 
     @classmethod
-    def get_all_jobs(cls):
-        # type: () -> List[JobMetaclass]
+    def get_all_jobs(cls) -> List[JobMetaclass]:
         """Returns all jobs that have inherited from the JobBase class.
 
         Returns:
@@ -127,8 +130,7 @@ class JobMetaclass(type):
         return list(cls._JOB_REGISTRY.values())
 
     @classmethod
-    def get_all_job_names(cls):
-        # type: () -> List[str]
+    def get_all_job_names(cls) -> List[str]:
         """Returns the names of all jobs that have inherited from the JobBase
         class.
 
@@ -138,8 +140,7 @@ class JobMetaclass(type):
         return list(cls._JOB_REGISTRY.keys())
 
     @classmethod
-    def get_job_by_name(cls, job_name):
-        # type: (str) -> JobMetaclass
+    def get_job_by_name(cls, job_name) -> JobMetaclass:
         """Returns the class associated with the given job name.
 
         Args:
@@ -176,8 +177,7 @@ class JobBase(metaclass=JobMetaclass):
                 ]))
     """
 
-    def __init__(self, pipeline):
-        # type: (beam.Pipeline) -> None
+    def __init__(self, pipeline: beam.Pipeline) -> None:
         """Initializes a new job.
 
         Args:
@@ -185,8 +185,7 @@ class JobBase(metaclass=JobMetaclass):
         """
         self.pipeline = pipeline
 
-    def run(self):
-        # type: (...) -> beam.PCollection[job_run_result.JobRunResult]
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs PTransforms with self.pipeline to compute/process PValues.
 
         Raises:

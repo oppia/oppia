@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
+
 from core.platform import models
 from jobs import base_jobs
 import python_utils
@@ -40,8 +42,7 @@ class BeamJob(python_utils.OBJECT):
         parameter_names: list(str). The names of the job's parameters.
     """
 
-    def __init__(self, job_class):
-        # type: (Type[base_jobs.JobBase]) -> None
+    def __init__(self, job_class: Type[base_jobs.JobBase]) -> None:
         """Initializes a new instance of BeamJob.
 
         Args:
@@ -51,8 +52,7 @@ class BeamJob(python_utils.OBJECT):
         self._job_class = job_class
 
     @property
-    def name(self):
-        # type: () -> str
+    def name(self) -> str:
         """Returns the name of the class that implements the job's logic.
 
         Returns:
@@ -61,8 +61,7 @@ class BeamJob(python_utils.OBJECT):
         return self._job_class.__name__
 
     @property
-    def parameter_names(self):
-        # type: () -> List[str]
+    def parameter_names(self) -> List[str]:
         """Returns the names of the job's parameters.
 
         Returns:
@@ -72,8 +71,7 @@ class BeamJob(python_utils.OBJECT):
         # should be considered an implementation detail.
         return python_utils.get_args_of_function(self._job_class.run)[1:]
 
-    def to_dict(self):
-        # type: () -> Dict[str, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representation of the BeamJob.
 
         Returns:
@@ -109,9 +107,9 @@ class BeamJobRun(python_utils.OBJECT):
     """
 
     def __init__(
-            self, job_id, job_name, job_state, job_arguments, job_started_on,
-            job_updated_on, job_is_synchronous):
-        # type: (str, str, str, List[str], datetime.datetime, datetime.datetime, bool) -> None
+            self, job_id: str, job_name: str, job_state: str,
+            job_arguments: List[str], job_started_on: datetime.datetime,
+            job_updated_on: datetime.datetime, job_is_synchronous: bool):
         """Initializes a new BeamJobRun instance.
 
         Args:
@@ -136,8 +134,7 @@ class BeamJobRun(python_utils.OBJECT):
         self.job_is_synchronous = job_is_synchronous
 
     @property
-    def in_terminal_state(self):
-        # type: () -> bool
+    def in_terminal_state(self) -> bool:
         """Returns whether the job run has reached a terminal state and is no
         longer executing.
 
@@ -152,8 +149,7 @@ class BeamJobRun(python_utils.OBJECT):
             beam_job_models.BeamJobState.FAILED.value,
         )
 
-    def to_dict(self):
-        # type: () -> Dict[str, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representation of the BeamJobRun.
 
         Returns:
@@ -192,8 +188,7 @@ class AggregateBeamJobRunResult(python_utils.OBJECT):
         stderr: str. The error output produced by the job.
     """
 
-    def __init__(self, stdout, stderr):
-        # type: (str, str) -> None
+    def __init__(self, stdout: str, stderr: str):
         """Initializes a new instance of AggregateBeamJobRunResult.
 
         Args:
@@ -203,8 +198,7 @@ class AggregateBeamJobRunResult(python_utils.OBJECT):
         self.stdout = stdout
         self.stderr = stderr
 
-    def to_dict(self):
-        # type: () -> Dict[str, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representation of the AggregateBeamJobRunResult.
 
         Returns:

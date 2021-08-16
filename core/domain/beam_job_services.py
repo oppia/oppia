@@ -32,6 +32,7 @@ from scripts import common
 import utils
 
 from typing import List
+from typing import Optional
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
@@ -90,8 +91,7 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
 }
 
 
-def get_beam_jobs():
-    # type: () -> List[beam_job_domain.BeamJob]
+def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
     """Returns the list of all registered Apache Beam jobs.
 
     Returns:
@@ -130,8 +130,8 @@ def get_beam_job_runs(refresh=False):
     return beam_job_runs
 
 
-def get_beam_job_run_result(job_id):
-    # type: (str) -> beam_job_domain.AggregateBeamJobRunResult
+def get_beam_job_run_result(
+        job_id: str) -> beam_job_domain.AggregateBeamJobRunResult:
     """Returns the result of the given Apache Beam job run.
 
     Args:
@@ -155,8 +155,9 @@ def get_beam_job_run_result(job_id):
         stdout='\n'.join(stdouts), stderr='\n'.join(stderrs))
 
 
-def create_beam_job_run_model(job_name, job_arguments, dataflow_job_id=None):
-    # type: (str, List[str], Optional[str]) -> beam_job_models.BeamJobRunModel
+def create_beam_job_run_model(
+    job_name: str, job_arguments: List[str],
+    dataflow_job_id: Optional[str] = None) -> beam_job_models.BeamJobRunModel:
     """Creates a new BeamJobRunModel without putting it into storage.
 
     Args:
@@ -179,8 +180,9 @@ def create_beam_job_run_model(job_name, job_arguments, dataflow_job_id=None):
     return model
 
 
-def create_beam_job_run_result_model(job_id, stdout, stderr):
-    # type: (str, str, str) -> beam_job_models.BeamJobRunResultModel
+def create_beam_job_run_result_model(
+    job_id: str, stdout: str, stderr: str
+) -> beam_job_models.BeamJobRunResultModel:
     """Creates a new BeamJobRunResultModel without putting it into storage.
 
     Args:
@@ -208,8 +210,9 @@ def refresh_state_of_all_beam_job_run_models():
     datastore_services.put_multi(beam_job_run_models)
 
 
-def get_beam_job_run_from_model(beam_job_run_model):
-    # type: (beam_job_models.BeamJobRunModel) -> beam_job_domain.BeamJobRun
+def get_beam_job_run_from_model(
+    beam_job_run_model: beam_job_models.BeamJobRunModel
+) -> beam_job_domain.BeamJobRun:
     """Returns a domain object corresponding to the given BeamJobRunModel.
 
     Args:

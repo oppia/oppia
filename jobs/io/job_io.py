@@ -40,8 +40,7 @@ class PutResults(beam.PTransform):
 
     _MAX_RESULT_INSTANCES_PER_MODEL = 1000
 
-    def __init__(self, job_id, label=None):
-        # type: (str, Optional[str]) -> None
+    def __init__(self, job_id: str, label: Optional[str] = None):
         """Initializes the GetModels PTransform.
 
         Args:
@@ -51,8 +50,9 @@ class PutResults(beam.PTransform):
         super(PutResults, self).__init__(label=label)
         self.job_id = job_id
 
-    def expand(self, results):
-        # type: (beam.PCollection[job_run_result.JobRunResult]) -> beam.pvalue.PDone
+    def expand(
+        self, results: beam.PCollection[job_run_result.JobRunResult]
+    ) -> beam.pvalue.PDone:
         """Writes the given job results to the NDB datastore.
 
         This overrides expand from parent class.
@@ -81,8 +81,9 @@ class PutResults(beam.PTransform):
             | ndb_io.PutModels()
         )
 
-    def create_beam_job_run_result_model(self, result, namespace):
-        # type: (job_run_result.JobRunResult, Optional[str]) -> beam_job_models.BeamJobRunResultModel
+    def create_beam_job_run_result_model(
+            self, result: job_run_result.JobRunResult,
+            namespace: Optional[str]) -> beam_job_models.BeamJobRunResultModel:
         """Returns an NDB model for storing the given JobRunResult.
 
         Args:

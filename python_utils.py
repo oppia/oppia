@@ -577,8 +577,7 @@ def is_string(value):
     return isinstance(value, six.string_types)
 
 
-def get_args_of_function(func):
-    # type: (Callable[..., Any]) -> List[str]
+def get_args_of_function(func: Callable[..., Any]) -> List[str]:
     """Returns the argument names of the function.
 
     Args:
