@@ -17,6 +17,7 @@
 """Audit jobs that validate all of the storage models in the datastore."""
 
 from __future__ import absolute_import
+from __future__ import annotations
 from __future__ import unicode_literals
 
 from core.domain import search_services
@@ -26,7 +27,16 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
+from typing import List, cast # isort:skip
+
+MYPY = False
+if MYPY:
+    from mypy_imports import datastore_services
+    from mypy_imports import exp_models
+
+
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+platform_search_services = models.Registry.import_search_services()
 
 
 class IndexExplorationsInSearch(base_jobs.JobBase):
@@ -34,39 +44,41 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
 
     MAX_BATCH_SIZE = 1000
 
-    def _index_exploration_summaries(self, exp_summary_models):
+    @staticmethod
+    def _index_exploration_summaries(
+            exp_summary_models: List[datastore_services.Model]
+    ) -> List[str]:
         """Index exploration summaries and catch any errors.
 
         Args:
-            exp_summary_models: list(ExpSummaryModel). Models to index.
+            exp_summary_models: list(Model). Models to index.
 
         Returns:
             list(str). List containing one element, which is either SUCCESS,
             or FAILURE.
-
         """
         try:
-            search_services.index_exploration_summaries(exp_summary_models)
+            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
+                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
             return ['SUCCESS']
-        except:
+        except platform_search_services.SearchException: # type: ignore[attr-defined]
             return ['FAILURE']
 
-    def run(self):
+    def run(self) -> beam.PCollection:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         the Elastic Search.
 
         Returns:
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-        the Elastic Search.
+            the Elastic Search.
         """
         return (
             self.pipeline
             | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
                     exp_models.ExpSummaryModel.get_all(include_deleted=False)))
             | 'Split models into batches' >> beam.transforms.util.BatchElements(
                 max_batch_size=self.MAX_BATCH_SIZE)
             | 'Index batches of models' >> beam.ParDo(
                 self._index_exploration_summaries)
         )
-
