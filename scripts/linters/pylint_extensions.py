@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0040.
+presubmit checks. Next message id would be C0041.
 """
 
 from __future__ import absolute_import
@@ -43,9 +43,10 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 # the punctuation and capital letter checks will be skipped for that
 # comment or docstring.
 EXCLUDED_PHRASES = [
-    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node',
-    'type: ignore'
+    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node'
 ]
+
+ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = ['pylint:', 'isort:', 'type: ignore']
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1666,6 +1667,12 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use a capital letter at the beginning of comment.',
             'no-capital-letter-at-beginning',
             'Please use capital letter to begin the content of comment.'
+        ),
+        'C0040': (
+            'This inline comment does not start with any allowed pragma. Please'
+            'put this comment in a new line.',
+            'no-allowed-inline-pragma',
+            'Inline comments should always start with an allowed inline pragma.'
         )
     }
     options = ((
@@ -1739,6 +1746,23 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 excluded_phrase_at_beginning_of_line)):
             self.add_message('invalid-punctuation-used', line=line_num)
 
+    def _check_trailing_comment_starts_with_allowed_pragma(
+            self, line, line_num):
+        comment_start_index = -1
+        for pos, char in enumerate(line):
+            if char == '#':
+                comment_start_index = pos
+        line = line[comment_start_index:]
+        self._check_space_at_beginning_of_comments(line, line_num)
+        # print(line)
+        allowed_inline_pragma_present = any(
+            line[2:].startswith(word) for word in
+            ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS
+        )
+        if allowed_inline_pragma_present:
+            return
+        self.add_message('no-allowed-inline-pragma', line=line_num)
+
     def process_tokens(self, tokens):
         """Custom pylint checker to ensure that comments follow correct style.
 
@@ -1750,17 +1774,19 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         comments_index = -1
 
         for (token_type, _, (line_num, _), _, line) in tokens:
-            if token_type == tokenize.COMMENT and line.strip().startswith('#'):
+            if token_type == tokenize.COMMENT:
                 line = line.strip()
-
-                self._check_space_at_beginning_of_comments(line, line_num)
-
-                if prev_line_num + 1 == line_num:
-                    comments_group_list[comments_index].append((line, line_num))
+                if line.startswith('#'):
+                    self._check_space_at_beginning_of_comments(line, line_num)
+                    if prev_line_num + 1 == line_num:
+                        comments_group_list[comments_index].append((line, line_num))
+                    else:
+                        comments_group_list.append([(line, line_num)])
+                        comments_index += 1
+                    prev_line_num = line_num
                 else:
-                    comments_group_list.append([(line, line_num)])
-                    comments_index += 1
-                prev_line_num = line_num
+                    self._check_trailing_comment_starts_with_allowed_pragma(
+                        line, line_num)
 
         for comments in comments_group_list:
             # Checks first line of comment.

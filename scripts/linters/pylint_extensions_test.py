@@ -2392,6 +2392,73 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_inline_comment_with_allowed_pragma_raises_no_error(self):
+        node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # type: ignore[some-rule]
+                """)
+
+        node_inline_comment_with_allowed_pragma.file = filename
+        node_inline_comment_with_allowed_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_inline_comment_with_multiple_allowed_pragmas_raises_no_error(self):
+        node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
+                """)
+
+        node_inline_comment_with_allowed_pragma.file = filename
+        node_inline_comment_with_allowed_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_inline_comment_with_invalid_pragma_raises_error(self):
+        node_inline_comment_with_invalid_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # not_a_valid_pragma
+                """)
+
+        node_inline_comment_with_invalid_pragma.file = filename
+        node_inline_comment_with_invalid_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_invalid_pragma))
+
+        message = testutils.Message(
+            msg_id='no-allowed-inline-pragma',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
     def test_variable_name_in_comment(self):
         node_variable_name_in_comment = astroid.scoped_nodes.Module(
             name='test',

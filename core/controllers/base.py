@@ -39,8 +39,6 @@ import utils
 import backports.functools_lru_cache
 import webapp2
 
-from typing import Any, Dict # isort:skip
-
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
@@ -149,8 +147,8 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = None # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = None # type: Dict[Text, Any]
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {}
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -366,7 +364,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
             request_method == 'GET')
 
-        if self.URL_PATH_ARGS_SCHEMAS is None:
+        if self.URL_PATH_ARGS_SCHEMAS is {}:
             raise NotImplementedError(
                 'Missing schema for url path args in %s handler class.' % (
                     handler_class_name))
