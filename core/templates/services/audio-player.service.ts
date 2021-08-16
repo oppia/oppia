@@ -99,6 +99,7 @@ export class AudioPlayerService {
     this.ngZone.runOutsideAngular(() => {
       if (this._currentTrack !== null) {
         // 'lastPauseOrSeekPos' will not be null since currentTrack exists.
+        // We can safely typecast it to 'number'.
         this._currentTrack.seek(<number> this._lastPauseOrSeekPos);
       }
       interval(500).pipe(takeUntil(
@@ -107,10 +108,9 @@ export class AudioPlayerService {
           this._updateViewEventEmitter.emit();
         });
       });
-      if (this._currentTrack === null) {
-        throw new Error('Current Track is not set');
-      }
-      this._currentTrack.play();
+      // 'currentTrack' is not null since the audio event has been emitted
+      // and that is why we use '?'.
+      this._currentTrack?.play();
     });
   }
 

@@ -464,6 +464,7 @@
     "core/templates/services/audio-bar-status.service.ts",
     "core/templates/services/audio-bar-status.service.spec.ts",
     "core/templates/services/audio-player.service.ts",
+    "core/templates/services/audio-player.service.spec.ts",
     "core/templates/services/auth-backend-api.service.ts",
     "core/templates/services/auth-backend-api.service.spec.ts",
     "core/templates/services/auth.service.ts",
