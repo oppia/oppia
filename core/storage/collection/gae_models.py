@@ -313,7 +313,7 @@ class CollectionModel(base_models.VersionedModel):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def delete_multi(# type: ignore[override]
+    def delete_multi( # type: ignore[override]
             cls,
             entity_ids: List[str],
             committer_id: str,

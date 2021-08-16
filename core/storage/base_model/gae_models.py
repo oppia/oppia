@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import (# isort:skip
+from typing import (  # isort:skip
     Any, Dict, List, Optional, Sequence, Tuple, Type, Union,
     TypeVar, cast)
 
@@ -943,7 +943,7 @@ class VersionedModel(BaseModel):
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-    def delete(# type: ignore[override]
+    def delete( # type: ignore[override]
             self,
             committer_id: str,
             commit_message: str,
@@ -1010,7 +1010,7 @@ class VersionedModel(BaseModel):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def delete_multi(# type: ignore[override]
+    def delete_multi( # type: ignore[override]
             cls,
             entity_ids: List[str],
             committer_id: str,
