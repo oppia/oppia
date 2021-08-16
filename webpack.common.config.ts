@@ -294,7 +294,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard'],
       filename: 'email-dashboard-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: (
         commonPrefix +
