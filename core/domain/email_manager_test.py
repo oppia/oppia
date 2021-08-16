@@ -4298,7 +4298,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     )
 
         # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         messages.sort(key=lambda m: m.html)
         self.assertEqual(len(messages), 2)
         self.assertEqual(messages[0].html, expected_email_html_body)
@@ -4317,7 +4317,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(
             sent_email_model.recipient_id, self.admin_1_id)
         self.assertEqual(
-            sent_email_model.recipient_email, self.CURRICULUM_ADMIN_1_EMAIL)
+            sent_email_model.recipient_email, self.ADMIN_1_EMAIL)
         self.assertEqual(
             sent_email_model.html_body, expected_email_html_body)
         self.assertEqual(
@@ -5075,11 +5075,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         messages.sort(key=lambda m: m.html)
         self.assertEqual(len(messages), 2)
         self.assertEqual(messages[1].html, expected_email_html_body_for_admin_1)
-        messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
+        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
@@ -5097,7 +5097,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(
             sent_email_model.recipient_id, self.admin_1_id)
         self.assertEqual(
-            sent_email_model.recipient_email, self.CURRICULUM_ADMIN_1_EMAIL)
+            sent_email_model.recipient_email, self.ADMIN_1_EMAIL)
         self.assertEqual(
             sent_email_model.html_body, expected_email_html_body_for_admin_1)
         self.assertEqual(

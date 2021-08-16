@@ -273,8 +273,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         """
         if not feconf.CAN_SEND_EMAILS:
             return
-        admin_ids = user_services.get_user_ids_by_role(
-            feconf.ROLE_ID_CURRICULUM_ADMIN)
+        admin_ids = user_services.get_user_ids_by_role(feconf.ROLE_ID_ADMIN)
         question_admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_QUESTION_ADMIN)
         translation_admin_ids = user_services.get_user_ids_by_role(
