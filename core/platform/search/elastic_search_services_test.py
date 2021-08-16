@@ -22,14 +22,19 @@ from __future__ import unicode_literals
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
+from typing import Any, Dict, List # isort:skip
+
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
     """Tests for the elastic search platform API."""
 
-    def test_create_index_with_correct_input(self):
+    def test_create_index_with_correct_input(self) -> None:
         correct_index_name = 'index1'
         correct_id = 'id'
-        def mock_index(index, body, id): # pylint: disable=redefined-builtin
+
+        def mock_index(
+                index: str, body: Dict[str, str], id: str # pylint: disable=redefined-builtin
+        ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
             self.assertEqual(body, {
@@ -45,10 +50,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'id': correct_id
             }], correct_index_name)
 
-    def test_create_index_raises_exception_when_insertion_fails(self):
+    def test_create_index_raises_exception_when_insertion_fails(self) -> None:
         correct_index_name = 'index1'
         correct_id = 'id'
-        def mock_index(index, body, id): # pylint: disable=redefined-builtin
+        def mock_index(
+                index: str, body: Dict[str, str], id: str # pylint: disable=redefined-builtin
+        ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
             self.assertEqual(body, {
@@ -64,7 +71,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'id': correct_id
             }
         ]
-        assert_raises_ctx = self.assertRaisesRegexp(
+        assert_raises_ctx = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'Failed to add document to index.')
         with assert_raises_ctx, self.swap(
@@ -72,7 +79,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             elastic_search_services.add_documents_to_index(
                 documents, correct_index_name)
 
-    def test_delete_succeeds_when_document_exists(self):
+    def test_delete_succeeds_when_document_exists(self) -> None:
         elastic_search_services.add_documents_to_index([{
             'id': 'doc_id',
             'title': 'hello'
@@ -86,7 +93,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         results, _ = elastic_search_services.search('hello', 'index1', [], [])
         self.assertEqual(len(results), 0)
 
-    def test_delete_ignores_documents_that_do_not_exist(self):
+    def test_delete_ignores_documents_that_do_not_exist(self) -> None:
         elastic_search_services.add_documents_to_index([{
             'id': 'doc_id'
         }], 'index1')
@@ -94,13 +101,17 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         elastic_search_services.delete_documents_from_index(
             ['not_a_real_id'], 'index1')
 
-    def test_delete_returns_without_error_when_index_does_not_exist(self):
+    def test_delete_returns_without_error_when_index_does_not_exist(
+            self
+    ) -> None:
         elastic_search_services.delete_documents_from_index(
             ['doc_id'], 'nonexistent_index')
 
-    def test_clear_index(self):
+    def test_clear_index(self) -> None:
         correct_index_name = 'index1'
-        def mock_delete_by_query(index, body):
+        def mock_delete_by_query(
+                index: str, body: Dict[str, Dict[str, Dict[str, str]]]
+        ) -> None:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(body, {
                 'query':
@@ -114,7 +125,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_delete_by_query:
             elastic_search_services.clear_index(correct_index_name)
 
-    def test_search_returns_ids_only(self):
+    def test_search_returns_ids_only(self) -> None:
         correct_index_name = 'index1'
         elastic_search_services.add_documents_to_index([{
             'id': 1,
@@ -137,7 +148,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [1, 12])
         self.assertIsNone(new_offset)
 
-    def test_search_returns_full_response(self):
+    def test_search_returns_full_response(self) -> None:
         correct_index_name = 'index1'
         elastic_search_services.add_documents_to_index([{
             'id': 1,
@@ -170,17 +181,24 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         }])
         self.assertIsNone(new_offset)
 
-    def test_search_returns_none_when_response_is_empty(self):
+    def test_search_returns_none_when_response_is_empty(self) -> None:
         result, new_offset = elastic_search_services.search(
             '', 'index', [], [], offset='0',
             size=50, ids_only=False)
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
 
-    def test_search_constructs_query_with_categories_and_languages(self):
+    def test_search_constructs_query_with_categories_and_languages(
+            self
+    ) -> None:
         correct_index_name = 'index1'
 
-        def mock_search(body, index, params):
+        # In the type annotation below Dict[str, Any] is used for body
+        # because this mocks the behavior of elastic_search_services.ES.search
+        # and in the type stubs the type is Any.
+        def mock_search(
+                body: Dict[str, Any], index: str, params: Dict[str, int]
+        ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
                     'bool': {
@@ -224,10 +242,17 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
-    def test_search_constructs_nonempty_query_with_categories_and_langs(self):
+    def test_search_constructs_nonempty_query_with_categories_and_langs(
+            self
+    ) -> None:
         correct_index_name = 'index1'
 
-        def mock_search(body, index, params):
+        # In the type annotation below Dict[str, Any] is used for body
+        # because this mocks the behavior of elastic_search_services.ES.search
+        # and in the type stubs the type is Any.
+        def mock_search(
+                body: Dict[str, Any], index: str, params: Dict[str, int]
+        ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
                     'bool': {
@@ -275,7 +300,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
-    def test_search_returns_the_right_number_of_docs_even_if_more_exist(self):
+    def test_search_returns_the_right_number_of_docs_even_if_more_exist(
+            self
+    ) -> None:
         elastic_search_services.add_documents_to_index([{
             'id': 'doc_id1',
             'title': 'hello world'
@@ -286,16 +313,22 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         results, new_offset = elastic_search_services.search(
             'hello', 'index', [], [], size=1)
         self.assertEqual(len(results), 1)
+        # Letting mypy know that results[0] is a dict.
+        assert isinstance(results[0], dict)
         self.assertEqual(results[0]['id'], 'doc_id1')
         self.assertEqual(new_offset, '1')
 
         results, new_offset = elastic_search_services.search(
-            'hello', 'index', [], [], offset=1, size=1)
+            'hello', 'index', [], [], offset='1', size=1)
         self.assertEqual(len(results), 1)
+        # Letting mypy know that results[0] is a dict.
+        assert isinstance(results[0], dict)
         self.assertEqual(results[0]['id'], 'doc_id2')
         self.assertIsNone(new_offset)
 
-    def test_search_returns_without_error_when_index_does_not_exist(self):
+    def test_search_returns_without_error_when_index_does_not_exist(
+            self
+    ) -> None:
         result, new_offset = elastic_search_services.search(
             'query', 'nonexistent_index', [], [])
         self.assertEqual(result, [])

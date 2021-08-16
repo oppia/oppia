@@ -963,4 +963,4 @@ class NdbWsgiMiddleware:
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()  # type: ignore[no-untyped-call]
+firebase_auth_services.establish_firebase_connection()
