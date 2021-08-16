@@ -46,7 +46,8 @@ EXCLUDED_PHRASES = [
     'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node'
 ]
 
-ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = ['pylint:', 'isort:', 'type: ignore']
+ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = [
+    'pylint:', 'isort:', 'type: ignore', 'pragma:']
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1670,7 +1671,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         ),
         'C0040': (
             'This inline comment does not start with any allowed pragma. Please'
-            'put this comment in a new line.',
+            ' put this comment in a new line.',
             'no-allowed-inline-pragma',
             'Inline comments should always start with an allowed inline pragma.'
         )
@@ -1748,13 +1749,19 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
     def _check_trailing_comment_starts_with_allowed_pragma(
             self, line, line_num):
+        """Checks if the trailing inline comment starts with a valid and
+        allowed pragma.
+
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+        """
         comment_start_index = -1
         for pos, char in enumerate(line):
             if char == '#':
                 comment_start_index = pos
         line = line[comment_start_index:]
         self._check_space_at_beginning_of_comments(line, line_num)
-        # print(line)
         allowed_inline_pragma_present = any(
             line[2:].startswith(word) for word in
             ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS
@@ -1779,7 +1786,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 if line.startswith('#'):
                     self._check_space_at_beginning_of_comments(line, line_num)
                     if prev_line_num + 1 == line_num:
-                        comments_group_list[comments_index].append((line, line_num))
+                        comments_group_list[comments_index].append(
+                            (line, line_num))
                     else:
                         comments_group_list.append([(line, line_num)])
                         comments_index += 1

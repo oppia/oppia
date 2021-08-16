@@ -436,7 +436,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     GLOBAL_VALIDATORS: List[Dict[str, Any]] = [{
         'id': 'does_not_contain_email'
-    }] #
+    }]
 
     def arbitary_method(self, obj: Dict[Any, Any]) -> None:
         """Only required for testing.
@@ -666,7 +666,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """
         is_at_most = schema_utils.get_validator('is_at_most')
         self.assertTrue(is_at_most(2, 3))
-        self.assertTrue(is_at_most(2, 2)) # boundary
+        # boundary
+        self.assertTrue(is_at_most(2, 2))
         self.assertFalse(is_at_most(2, 1))
 
     def test_has_length_at_least_validator(self) -> None:
@@ -675,7 +676,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """
         has_len_at_least = schema_utils.get_validator('has_length_at_least')
         self.assertTrue(has_len_at_least(['elem'], 0))
-        self.assertTrue(has_len_at_least(['elem'], 1)) # boundary
+        # boundary
+        self.assertTrue(has_len_at_least(['elem'], 1))
         self.assertFalse(has_len_at_least(['elem'], 2))
 
     def test_get_raises_invalid_validator_id(self) -> None:
@@ -942,10 +944,11 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_schema_key_post_normalizers(self) -> None:
         """Test post normalizers in schema using basic html schema."""
+        # html strings with no extra spaces
         schema_1 = {
             'type': schema_utils.SCHEMA_TYPE_HTML,
             'post_normalizers': [
-                {'id': 'normalize_spaces'},  # html strings with no extra spaces
+                {'id': 'normalize_spaces'},
             ]
         }
         obj_1 = 'a     a'

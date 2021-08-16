@@ -227,7 +227,7 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
             self.pipeline
             | beam.Create([blog_summary_model])
             | beam.ParDo(
-                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) #pylint: disable=line-too-long
+                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) # pylint: disable=line-too-long
         )
 
         self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
