@@ -84,8 +84,10 @@ def _should_index_exploration(exp_summary):
         bool. Whether the given exploration should be indexed for future
         search queries.
     """
-    rights = rights_manager.get_exploration_rights(exp_summary.id)
-    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    return (
+        not exp_summary.deleted and
+        exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    )
 
 
 def get_search_rank_from_exp_summary(exp_summary):
