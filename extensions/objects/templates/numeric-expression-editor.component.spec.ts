@@ -89,6 +89,10 @@ describe('NumericExpressionEditor', () => {
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
+    // This throws "Type 'null' is not assignable to type 'string'".
+    // We need to suppress this error because we are testing validations here.
+    // @ts-ignore
+    component.value = null;
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
