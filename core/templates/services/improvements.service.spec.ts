@@ -164,7 +164,7 @@ describe('ImprovementsService', () => {
       ).toBe(false);
     });
 
-    it('should throw an error if Interaction Id is null', () => {
+    it('should return false if Interaction Id or State is null', () => {
       let mockStateBackendDict = {
         classifier_model_id: null,
         content: {

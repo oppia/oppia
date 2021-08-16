@@ -166,7 +166,10 @@ describe('TranslateTextBackendApiService', () => {
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body.getAll('imageFilename')[0]).toEqual('imageBlob');
+      expect(req.request.body.getAll('imageFilename')[0]).toContain([{
+        size: 0,
+        type: 'imageBlob'
+      }]);
       req.flush({});
       flushMicrotasks();
 
@@ -211,24 +214,16 @@ describe('TranslateTextBackendApiService', () => {
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
-      const filename1Blobs = req.request.body.getAll('imageFilename1');
-      const filename2Blobs = req.request.body.getAll('imageFilename2');
-      expect(filename1Blobs).toContain({
+      const filename1Blobs = req.request.body.getAll('imageFilename1')[0];
+      const filename2Blobs = req.request.body.getAll('imageFilename2')[0];
+      expect(filename1Blobs).toContain([{
         size: 0,
         type: 'imageBlob1'
-      });
-      expect(filename1Blobs).toContain({
-        size: 0,
-        type: 'imageBlob2'
-      });
-      expect(filename2Blobs).toContain({
+      }]);
+      expect(filename2Blobs).toContain([{
         size: 0,
         type: 'imageBlob1'
-      });
-      expect(filename2Blobs).toContain({
-        size: 0,
-        type: 'imageBlob2'
-      });
+      }]);
       req.flush({});
       flushMicrotasks();
 

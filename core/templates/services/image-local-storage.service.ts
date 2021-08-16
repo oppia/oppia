@@ -108,7 +108,7 @@ export class ImageLocalStorageService {
   flushStoredImagesData(): void {
     this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
-    this.thumbnailBgColor = '';
+    this.thumbnailBgColor = null;
   }
 }
 

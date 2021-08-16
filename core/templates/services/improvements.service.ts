@@ -29,7 +29,7 @@ export class ImprovementsService {
   INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
   isStateForcedToResolveOutstandingUnaddressedAnswers(state: State): boolean {
-    if (state.interaction.id === null) {
+    if (!state || (state.interaction.id === null)) {
       return false;
     }
     return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
