@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import itertools
 import json
 import logging
+from unittest import mock
 
 from core.domain import auth_domain
 from core.domain import user_services
@@ -30,7 +31,6 @@ from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import python_utils
-from unittest import mock
 import utils
 
 import firebase_admin
