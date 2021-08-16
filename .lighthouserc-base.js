@@ -72,7 +72,6 @@ module.exports = {
       'time-to-first-byte': ['off', {}],
       // Best practices category.
       'appcache-manifest': ['error', {'minScore': 1}],
-      'errors-in-console': ['error', {'minScore': 1}],
       'no-document-write': ['error', {'minScore': 1}],
       'external-anchors-use-rel-noopener': ['error', {'minScore': 1}],
       'geolocation-on-start': ['error', {'minScore': 1}],
@@ -87,6 +86,7 @@ module.exports = {
     }
   },
   basePerformanceAssertions: {
+    'errors-in-console': ['error', {'minScore': 1}],
     'uses-webp-images': [
       'error', {'maxLength': 0, 'strategy': 'pessimistic'}
     ],

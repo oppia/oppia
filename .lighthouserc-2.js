@@ -85,6 +85,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/create/.*$',
           'assertions': {
+            'errors-in-console': ['error', {'minScore': 1}],
             // TODO(#13465): Change this maxLength to 0 once images are migrated.
             'uses-webp-images': [
               'error', {'maxLength': 3, 'strategy': 'pessimistic'}
