@@ -81,6 +81,8 @@ var updateFormName = '.protractor-test-update-form-name';
 var updateFormSubmit = '.protractor-test-update-form-submit';
 var roleSelect = '.protractor-test-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
+var cookieBannerAcceptButton = (
+  '.protractor-test-oppia-cookie-banner-accept-button');
 
 const login = async function(browser, page) {
   try {
@@ -92,6 +94,11 @@ const login = async function(browser, page) {
     await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
+      let cookies = await page.cookies();
+      if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
+        await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
+        await page.click(cookieBannerAcceptButton);
+      }
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, 'username1');
       await page.click(agreeToTermsCheckBox);
