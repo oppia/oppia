@@ -26,6 +26,8 @@ import python_utils
 
 import elasticsearch
 
+from typing import Any, Dict, List, Optional, Tuple, Union # isort:skip
+
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
 # where loading a exploration from local yaml file takes
@@ -39,7 +41,7 @@ ES = elasticsearch.Elasticsearch(
         if feconf.ES_CLOUD_ID else None), timeout=30)
 
 
-def _create_index(index_name):
+def _create_index(index_name: str) -> None:
     """Creates a new index.
 
     Args:
@@ -52,7 +54,14 @@ def _create_index(index_name):
     ES.indices.create(index_name)
 
 
-def add_documents_to_index(documents, index_name):
+# In the type annotation below Dict[str, Any] is used for documents because
+# there are no constraints for a document dictionary.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is Any.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
+def add_documents_to_index(
+        documents: List[Dict[str, Any]], index_name: str
+) -> None:
     """Adds a document to an index. This function also creates the index if it
     does not exist yet.
 
@@ -83,7 +92,7 @@ def add_documents_to_index(documents, index_name):
                 'Failed to add document to index.')
 
 
-def delete_documents_from_index(doc_ids, index_name):
+def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
     """Deletes documents from an index. Any documents which do not already
     exist in the index are ignored.
 
@@ -109,7 +118,7 @@ def delete_documents_from_index(doc_ids, index_name):
             ES.delete(index_name, doc_id)
 
 
-def clear_index(index_name):
+def clear_index(index_name: str) -> None:
     """Clears an index on the elastic search instance.
 
     Args:
@@ -129,9 +138,21 @@ def clear_index(index_name):
         })
 
 
+# In the type annotation below Dict[str, Any] is used in return type because
+# it returns the list of documents and document dictionaries can have
+# any value.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is 'Any'.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
 def search(
-        query_string, index_name, categories, language_codes, offset=None,
-        size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        query_string: str,
+        index_name: str,
+        categories: List[str],
+        language_codes: List[str],
+        offset: Optional[str] = None,
+        size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+        ids_only: bool = False
+) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[str]]:
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
@@ -178,7 +199,13 @@ def search(
     # Convert the query into a Query DSL object. See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
     # for more details about Query DSL.
-    query_definition = {
+    # In the type annotation below Dict[str, Any] is used for query_definiton
+    # because the query_definition is a dictionary having values of various
+    # types.
+    # This can be seen from the type stubs of elastic search.
+    # The type of 'body' is 'Any'.
+    # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
+    query_definition: Dict[str, Any] = {
         'query': {
             'bool': {
                 'must': [],
@@ -224,7 +251,8 @@ def search(
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
-        return [], None
+        empty_list: List[str] = []
+        return empty_list, None
 
     matched_search_docs = response['hits']['hits']
 
