@@ -22,7 +22,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionObjectFactory } from
+import { Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { StateCard } from
   'domain/state_card/state-card.model';
@@ -39,6 +39,7 @@ describe('State card object factory', () => {
   let writtenTranslationsObjectFactory = null;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard = null;
+  let _sampleCard2 = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -99,6 +100,14 @@ describe('State card object factory', () => {
       }),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
+
+    _sampleCard2 = new StateCard(
+      null, null, null, null,
+      [{
+        learnerInput: 'learnerInput',
+        oppiaResponse: 'response',
+        isHint: true
+      }], null, null, null, null);
   });
 
   it('should be able to get the various fields', () => {
@@ -185,5 +194,25 @@ describe('State card object factory', () => {
 
     _sampleCard.setLastOppiaResponse('response_3');
     expect(_sampleCard.getLastOppiaResponse()).toEqual('response_3');
+  });
+
+  it('should return last answer when calling ' +
+    '\'getLastAnswer\'', () => {
+      expect(_sampleCard2.getLastAnswer()).toEqual('learnerInput');
+  });
+
+  it('should return empty dict when calling \'getVoiceovers\' ' +
+    'if there are no voice overs', () => {
+      expect(_sampleCard2.getVoiceovers()).toEqual({});
+  });
+
+  it('should return null when calling \'getInteractionId\' ' +
+    'if there are no interactions', () => {
+      expect(_sampleCard2.getInteractionId()).toEqual(null);
+  });
+
+  it('should return null when calling \'getInteractionCustomizationArgs\' ' +
+    'if there are no interactions', () => {
+      expect(_sampleCard2.getInteractionCustomizationArgs()).toEqual(null);
   });
 });
