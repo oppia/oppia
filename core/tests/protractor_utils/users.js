@@ -118,12 +118,21 @@ var _completeSignup = async function(username) {
 
   var registerUser = element(by.css('.protractor-test-register-user'));
 
+  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
+
+  var returnUrl = currentUrl.split('return_url=')[
+    currentUrl.split('return_url=').length - 1];
+
   await waitFor.clientSideRedirection(async() => {
     // Click the "register user" button to trigger redirection.
     await action.click('Register user button', registerUser);
   }, (url) => {
     // Wait until the URL has changed to something that is not /signup.
-    return !(/signup/.test(url));
+    if (returnUrl === '/') {
+      return /(learner-dashboard|creator-dashboard)/.test(url);
+    } else {
+      return (new RegExp(returnUrl)).test(url);
+    }
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
