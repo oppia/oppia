@@ -25,6 +25,7 @@ import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
+import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
@@ -188,13 +189,22 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   unpublishStory(): void {
-    this.storyEditorStateService.changeStoryPublicationStatus(
-      false, () => {
-        this.storyIsPublished =
-          this.storyEditorStateService.isStoryPublished();
-        this.forceValidateExplorations = true;
-        this._validateStory();
-      });
+    this.ngbModal.open(
+      StoryEditorUnpublishModalComponent,
+      { backdrop: 'static' }
+    ).result.then(() => {
+      this.storyEditorStateService.changeStoryPublicationStatus(
+        false, () => {
+          this.storyIsPublished =
+            this.storyEditorStateService.isStoryPublished();
+          this.forceValidateExplorations = true;
+          this._validateStory();
+        });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   toggleWarningText(): void {

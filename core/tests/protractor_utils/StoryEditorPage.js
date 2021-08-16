@@ -156,6 +156,10 @@ var StoryEditorPage = function() {
 
   this.unpublishStory = async function() {
     await unpublishStoryButton.click();
+    await action.click('Close Save Modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Unpublish message modal takes too long to disappear.');
   };
 
   this.deleteChapterWithIndex = async function(index) {

@@ -557,7 +557,7 @@ def update_story(
         committer_id, new_story, commit_message, change_list,
         story_is_published)
     create_story_summary(new_story.id)
-    if story_is_published and _is_topic_published(new_story):
+    if story_is_published:
         opportunity_services.update_exploration_opportunities(
             old_story, new_story)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
@@ -573,19 +573,6 @@ def update_story(
     exp_models.ExplorationContextModel.update_timestamps_multi(
         new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
-
-
-def _is_topic_published(story):
-    """Returns whether the story's corresponding topic is published.
-
-    Args:
-        story: Story. The story domain object.
-
-    Returns:
-        bool. Whether the the story's corresponding topic is published.
-    """
-    topic_rights = topic_fetchers.get_topic_rights(story.corresponding_topic_id)
-    return topic_rights.topic_is_published
 
 
 def delete_story(committer_id, story_id, force_deletion=False):

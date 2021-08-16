@@ -581,7 +581,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-    def test_publish_story_does_not_create_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
+    def test_publish_story_creates_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
             self):
         self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
@@ -597,38 +597,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-    def test_publish_topic_creates_exploration_opportunity(self):
-        self.add_exploration_0_to_story()
-        # Topic is already published, so unpublish first.
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-
-    def test_publish_topic_does_not_create_exploration_opportunity_if_story_is_not_published( # pylint: disable=line-too-long
-            self):
-        self.add_exploration_0_to_story()
-        # Story and topic are already published, so unpublish first.
-        topic_services.unpublish_story(
-            self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
 
     def test_unpublish_story_deletes_exploration_opportunity(self):
         self.add_exploration_0_to_story()
@@ -649,27 +618,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-
-        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
-        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
-
-    def test_unpublish_topic_deletes_exploration_opportunity(self):
-        self.add_exploration_0_to_story()
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 1)
-
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
-
-    def test_unpublish_topic_rejects_translation_suggestions(self):
-        self.add_exploration_0_to_story()
-        self.create_translation_suggestion_for_exploration_0_and_verify()
-
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
