@@ -43,6 +43,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface StateBackendDict {
   // The classifier model ID associated with a state, if applicable,
@@ -59,8 +60,6 @@ export interface StateBackendDict {
   'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
-
-export type InteractionSpecsKeys = keyof typeof INTERACTION_SPECS;
 
 export class State {
   name: string;
@@ -138,8 +137,8 @@ export class State {
     // checking status of a state.
     if (
       !interactionId ||
-      INTERACTION_SPECS[<InteractionSpecsKeys>interactionId].is_linear ||
-      INTERACTION_SPECS[<InteractionSpecsKeys>interactionId].is_terminal
+      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear ||
+      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal
     ) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {

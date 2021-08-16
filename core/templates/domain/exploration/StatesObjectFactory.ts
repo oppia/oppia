@@ -23,7 +23,6 @@ import {
   StateBackendDict,
   StateObjectFactory,
   State,
-  InteractionSpecsKeys
 } from 'domain/state/StateObjectFactory';
 import { AppConstants } from 'app.constants';
 import { Voiceover } from 'domain/exploration/voiceover.model';
@@ -31,6 +30,7 @@ import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface StateObjectsDict {
   [state: string]: State;
@@ -131,7 +131,7 @@ export class States {
       let interaction = this._states[stateName].interaction;
       if (
         interaction.id &&
-        INTERACTION_SPECS[<InteractionSpecsKeys>interaction.id].is_terminal
+        INTERACTION_SPECS[<InteractionSpecsKey>interaction.id].is_terminal
       ) {
         finalStateNames.push(stateName);
       }
