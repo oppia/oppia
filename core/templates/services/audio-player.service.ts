@@ -39,7 +39,6 @@ export class AudioPlayerService {
   private _currentTrackFilename: string | null = null;
   private _currentTrack: Howl | null = null;
   private _lastPauseOrSeekPos: number | null = null;
-  private _loadingTrack = false;
   private _updateViewEventEmitter = new EventEmitter<void>();
   private _autoplayAudioEventEmitter = (
     new EventEmitter<void | AutoPlayAudioEvent>());
@@ -66,7 +65,6 @@ export class AudioPlayerService {
         this._currentTrack.on('load', () => {
           this._stopIntervalSubject.next();
           this._currentTrackFilename = loadedAudioFile.filename;
-          this._loadingTrack = false;
           this._lastPauseOrSeekPos = 0;
           successCallback();
         });
