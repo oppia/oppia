@@ -23,7 +23,7 @@ import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-
 import { BlogAdminPageData, BlogAdminPageDataBackendDict } from 'domain/blog-admin/blog-admin-backend-api.service';
 
 describe('Blog Admin Data Service', () => {
-  let blogAdminDataService: BlogAdminDataService = null;
+  let blogAdminDataService: BlogAdminDataService;
   let httpTestingController: HttpTestingController;
   let sampleBlogAdminData: BlogAdminPageDataBackendDict = {
     role_to_actions: {

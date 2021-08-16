@@ -28,9 +28,12 @@ import dayjs from 'dayjs';
   templateUrl: './blog-card.component.html'
 })
 export class BlogCardComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
   @Input() authorProfilePicDataUrl!: string;
-  authorProfilePictureUrl: string;
+  authorProfilePictureUrl!: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
   publishedDateString: string = '';
@@ -51,8 +54,11 @@ export class BlogCardComponent implements OnInit {
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.authorProfilePictureUrl = decodeURIComponent((
       this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
-    this.publishedDateString = this.getDateStringInWords(
-      this.blogPostSummary.publishedOn);
+    const publishedOn = this.blogPostSummary.publishedOn;
+    if (publishedOn === undefined) {
+      throw new Error('Blog Post Summary published date is not defined');
+    }
+    this.publishedDateString = this.getDateStringInWords(publishedOn);
   }
 
   getDateStringInWords(naiveDate: string): string {

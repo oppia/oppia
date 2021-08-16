@@ -28,8 +28,8 @@ describe('Page title service', () => {
     TestBed.configureTestingModule({
       providers: [PageTitleService, Title]
     });
-    titleService = TestBed.get(Title);
-    pts = TestBed.get(PageTitleService);
+    titleService = TestBed.inject(Title);
+    pts = TestBed.inject(PageTitleService);
   });
 
   it('should correctly set the page title', () => {

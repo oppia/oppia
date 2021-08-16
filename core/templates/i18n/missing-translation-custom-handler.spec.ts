@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the Missing Translations Handler.
  */
 
+import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 import { MissingTranslationCustomHandler } from './missing-translation-custom-handler';
 
@@ -26,7 +27,7 @@ describe('Missing Translations Custom Handler', () => {
     () => {
       expect(mth.handle({
         key: 'I18N_SIGNUP_PAGE_SUBTITLE',
-        translateService: null,
+        translateService: <TranslateService> {},
       })).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
     });
 
@@ -35,7 +36,7 @@ describe('Missing Translations Custom Handler', () => {
       let key = 'KEY_NOT_AVAILABLE_IN_APP_CONSTANTS';
       expect(mth.handle({
         key,
-        translateService: null,
+        translateService: <TranslateService> {}
       })).toEqual(key);
     });
 });

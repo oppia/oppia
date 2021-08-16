@@ -24,9 +24,9 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 describe('Blog Admin backend api service', () => {
   let babas: BlogAdminBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
   let blogAdminBackendResponse = {
     role_to_actions: {
       blog_post_editor: ['action for editor']
