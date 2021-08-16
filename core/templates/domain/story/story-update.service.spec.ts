@@ -208,6 +208,22 @@ describe('Story update service', () => {
     }
   );
 
+  it('should not remove a prerequisite skill ' +
+    'from a node if given id is invalid', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+    ).toEqual(['skill_1']);
+
+    expect(() => {
+      storyUpdateService.removePrerequisiteSkillIdFromNode(
+        _sampleStory, 'node_1', 'invalid_Id');
+    }).toThrowError('The given prerequisite skill is not part of the node');
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+    ).toEqual(['skill_1']);
+  });
+
   it('should create a proper backend change dict for removing a prerequisite ' +
     'skill id from a node',
   () => {
@@ -239,6 +255,22 @@ describe('Story update service', () => {
       ).toEqual(['skill_2']);
     }
   );
+
+  it('should not remove an acquired skill id ' +
+    'from a node if given id is invalid', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+    ).toEqual(['skill_2']);
+
+    expect(() => {
+      storyUpdateService.removeAcquiredSkillIdFromNode(
+        _sampleStory, 'node_1', 'invalid_Id');
+    }).toThrowError('The given acquired skill id is not part of the node');
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+    ).toEqual(['skill_2']);
+  });
 
   it('should create a proper backend change dict for removing an acquired ' +
     'skill id from a node',
@@ -272,6 +304,27 @@ describe('Story update service', () => {
       ).toEqual(['node_1']);
     }
   );
+
+  it('should not remove a destination node id from a node in the story ' +
+    'if given id is invalid', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+    ).toEqual(['node_1']);
+
+    expect(() => {
+      storyUpdateService.removeDestinationNodeIdFromNode(
+        _sampleStory, 'node_2', 'invalid_node2');
+    }).toThrowError('The given destination node is not part of the node');
+
+    expect(() => {
+      storyUpdateService.removeDestinationNodeIdFromNode(
+        _sampleStory, 'invalid_node1', 'invalid_node2');
+    }).toThrowError('The given node doesn\'t exist');
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+    ).toEqual(['node_1']);
+  });
 
   it('should create a proper backend change dict for removing a destination ' +
     'node id from a node',
@@ -357,6 +410,14 @@ describe('Story update service', () => {
     ).toBe(false);
   });
 
+  it('should throw an error if we try to finalize a story ' +
+    'which is already finalized', () => {
+    storyUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
+    expect(() => {
+      storyUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
+    }).toThrowError('Node outline is already finalized.');
+  });
+
   it('should create a proper backend change dict for finalizing a node outline',
     () => {
       storyUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
@@ -382,6 +443,13 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(true);
+  });
+
+  it('should throw an error if we try to unfinalize a story ' +
+    'with an invalid story node', () => {
+    expect(() => {
+      storyUpdateService.unfinalizeStoryNodeOutline(_sampleStory, 'node_1');
+    }).toThrowError('Node outline is already not finalized.');
   });
 
   it('should create a proper backend change dict for unfinalizing a node ' +
@@ -628,4 +696,82 @@ describe('Story update service', () => {
       }]);
     }
   );
+
+  it('should rearrange node in story when calling ' +
+    '\'rearrangeNodeInStory\'', () => {
+    storyUpdateService.rearrangeNodeInStory(
+      _sampleStory, 0, 1);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getId()).toBe('node_2');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getId()).toBe('node_1');
+  });
+
+  it('should set story node thumbnail background color when calling ' +
+    '\'setStoryNodeThumbnailBgColor\'', () => {
+    storyUpdateService.setStoryNodeThumbnailBgColor(
+      _sampleStory, 'node_1', 'red');
+    expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
+      .toBe('red');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
+      .toBe('blue');
+  });
+
+  it('should set story node thumbnail file name when calling ' +
+    '\'setStoryNodeThumbnailFilename\'', () => {
+    storyUpdateService.setStoryNodeThumbnailFilename(
+      _sampleStory, 'node_1', 'newName');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getThumbnailFilename())
+      .toBe('newName');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getThumbnailFilename())
+      .toBe('fileName');
+  });
+
+  it('should set story meta tag content when calling ' +
+    '\'setStoryMetaTagContent\'', () => {
+    storyUpdateService.setStoryMetaTagContent(
+      _sampleStory, 'newTag');
+    expect(_sampleStory.getMetaTagContent()).toBe('newTag');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getMetaTagContent()).toBe('meta');
+  });
+
+  it('should set thumbnail background color when calling ' +
+    '\'setThumbnailBgColor\'', () => {
+    storyUpdateService.setThumbnailBgColor(
+      _sampleStory, 'red');
+    expect(_sampleStory.getThumbnailBgColor()).toBe('red');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getThumbnailBgColor()).toBe('blue');
+  });
+
+  it('should set thumbnail file name when calling ' +
+    '\'setThumbnailFilename\'', () => {
+    storyUpdateService.setThumbnailFilename(
+      _sampleStory, 'newName');
+    expect(_sampleStory.getThumbnailFilename()).toBe('newName');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getThumbnailFilename()).toBe('fileName');
+  });
+
+  it('should set story url fragment when calling ' +
+    '\'setStoryUrlFragment\'', () => {
+    storyUpdateService.setStoryUrlFragment(
+      _sampleStory, 'newUrl');
+    expect(_sampleStory.getUrlFragment()).toBe('newUrl');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getUrlFragment()).toBe('url');
+  });
 });

@@ -27,7 +27,7 @@ require(
   'skill-misconceptions-editor.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-prerequisite-skills-editor/' +
-  'skill-prerequisite-skills-editor.directive.ts');
+  'skill-prerequisite-skills-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
   'skill-rubrics-editor.directive.ts');
