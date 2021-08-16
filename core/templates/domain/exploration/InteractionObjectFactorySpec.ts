@@ -23,7 +23,7 @@ import { AnswerGroupObjectFactory, AnswerGroupBackendDict } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { InteractionObjectFactory, Interaction, InteractionBackendDict, InteractionSpecsKey } from
+import { InteractionObjectFactory, Interaction, InteractionBackendDict } from
   'domain/exploration/InteractionObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -32,7 +32,7 @@ import { SolutionBackendDict, SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionSpecsKey, MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 describe('Interaction object factory', () => {
