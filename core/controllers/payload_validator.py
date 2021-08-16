@@ -31,7 +31,6 @@ def validate(
         handler_args_schemas: Any,
         allowed_extra_args: bool
 ) -> Tuple[Dict[Any, Any], List[str]]:
-
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 

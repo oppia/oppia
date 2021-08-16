@@ -149,7 +149,13 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
     URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
     HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called

@@ -339,8 +339,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return user_data
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there
         are multiple reports relevant to a user.
         """
@@ -484,8 +484,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         })
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -581,7 +581,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             cls,
             platform: str,
             ticket_id: str,
-            stats_tracking_date: datetime.date) -> str:
+            stats_tracking_date: datetime.date
+    ) -> str:
         """Generates key for the instance of AppFeedbackReportStatsModel
         class in the required format with the arguments provided.
 
@@ -606,7 +607,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_stats_for_ticket(
-            cls, ticket_id: str) -> List['AppFeedbackReportStatsModel']:
+            cls, ticket_id: str
+    ) -> List['AppFeedbackReportStatsModel']:
         """Fetches the stats for a single ticket.
 
         Args:
@@ -641,8 +643,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         })
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

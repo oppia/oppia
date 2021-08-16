@@ -74,7 +74,8 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
-            self) -> None:
+            self
+    ) -> None:
         # Deleting a full user.
         auth_models.UserAuthDetailsModel.apply_deletion_policy(self.USER_ID)
         self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id(
@@ -86,7 +87,8 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             self.PROFILE_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
-            self) -> None:
+            self
+    ) -> None:
         self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id(
             self.NONEXISTENT_USER_ID))
         auth_models.UserAuthDetailsModel.apply_deletion_policy(
@@ -137,7 +139,8 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         )
 
     def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(
-            self) -> None:
+            self
+    ) -> None:
         self.assertNotEqual(
             auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
             auth_models.UserAuthDetailsModel.get_by_auth_id(
@@ -251,7 +254,8 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
-            self) -> None:
+            self
+    ) -> None:
         # Deleting a full user.
         auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
             self.USER_ID)
@@ -260,7 +264,8 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
                 self.USER_ID, strict=False))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
-            self) -> None:
+            self
+    ) -> None:
         self.assertIsNone(
             auth_models.UserIdByFirebaseAuthIdModel.get(
                 self.NONEXISTENT_USER_ID, strict=False))

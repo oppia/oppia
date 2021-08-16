@@ -620,8 +620,8 @@ def main(args=None):
         namespace=namespace
     )
 
-    install_third_party_libs.main()
-    common.fix_third_party_imports()
+    # install_third_party_libs.main()
+    # common.fix_third_party_imports()
 
     python_utils.PRINT('Starting Linter....')
 

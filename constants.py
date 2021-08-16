@@ -28,6 +28,8 @@ import python_utils
 from typing import Any, Dict, TextIO # isort:skip
 
 
+# Here we use Dict[str, Any] as return type because we need to parse and return
+# generic json objects.
 def parse_json_from_js(js_file: TextIO) -> Dict[str, Any]:
     """Extracts JSON object from JS file.
 
@@ -62,7 +64,10 @@ def remove_comments(text: str) -> str:
 class Constants(dict): # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
-    def __setattr__(self, name: str, value: Any) -> None:
+    # Here `value` has the type Any because it parses and stores the values of
+    # contants defined in constants.ts file and we cannot define a single type
+    # which works for all of them.
+    def __setattr__(self, name: str, value: str) -> None:
         self[name] = value
 
     def __getattr__(self, name: str) -> Any:

@@ -146,7 +146,7 @@ def delete_multi(keys: List[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-def query_everything(**kwargs: Dict[str, Any]) -> ndb.Query:
+def query_everything(**kwargs):
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 
@@ -227,8 +227,8 @@ def fetch_multiple_entities_by_ids_and_models(
             [ndb.Key(model_name, entity_id) for entity_id in entity_ids])
 
     all_models: List[Optional[TYPE_MODEL_SUBCLASS]] = ndb.get_multi(entity_keys)
-    all_models_grouped_by_model_type: (
-        List[List[Optional[TYPE_MODEL_SUBCLASS]]]) = []
+    all_models_grouped_by_model_type: List[
+        List[Optional[TYPE_MODEL_SUBCLASS]]] = []
 
     start_index = 0
     for (_, entity_ids) in ids_and_models:

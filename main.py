@@ -101,7 +101,11 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
     URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
     @acl_decorators.open_access # type: ignore[misc]

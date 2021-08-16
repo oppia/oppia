@@ -2066,8 +2066,11 @@ class StateAnswersModel(base_models.BaseModel):
         else:
             return None
 
+    # Untyped decorator in cloud_transaction_services.py makes the function
+    # untyped. This ignore[misc] will be removed when the decorator has been
+    # type annotated.
     @classmethod
-    @transaction_services.run_in_transaction_wrapper
+    @transaction_services.run_in_transaction_wrapper # type: ignore[misc]
     def _insert_submitted_answers_unsafe_transactional(
             cls,
             exploration_id: str,

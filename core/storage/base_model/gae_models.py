@@ -244,7 +244,8 @@ class BaseModel(datastore_services.Model):
     def get(
             cls: Type[SELF_BASE_MODEL],
             entity_id: str,
-            strict: bool = True) -> Optional[SELF_BASE_MODEL]:
+            strict: bool = True
+    ) -> Optional[SELF_BASE_MODEL]:
         """Gets an entity by id.
 
         Args:
@@ -332,7 +333,8 @@ class BaseModel(datastore_services.Model):
     def update_timestamps_multi(
             cls,
             entities: List[SELF_BASE_MODEL],
-            update_last_updated_time: bool = True) -> None:
+            update_last_updated_time: bool = True
+    ) -> None:
         """Update the created_on and last_updated fields of all given entities.
 
         Args:
@@ -344,8 +346,11 @@ class BaseModel(datastore_services.Model):
         datastore_services.update_timestamps_multi(
             entities, update_last_updated_time=update_last_updated_time)
 
+    # Untyped decorator in cloud_transaction_services.py makes the function
+    # untyped. This ignore[misc] will be removed when the decorator has been
+    # type annotated.
     @classmethod
-    @transaction_services.run_in_transaction_wrapper
+    @transaction_services.run_in_transaction_wrapper # type: ignore[misc]
     def put_multi_transactional(cls, entities: List[SELF_BASE_MODEL]) -> None:
         """Stores the given datastore_services.Model instances and runs it
         through a transaction. Either all models are stored, or none of them
@@ -392,7 +397,8 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_all(
-            cls, include_deleted: bool = False) -> datastore_services.Query:
+            cls, include_deleted: bool = False
+    ) -> datastore_services.Query:
         """Gets iterable of all entities of this class.
 
         Args:
@@ -767,14 +773,14 @@ class VersionedModel(BaseModel):
 
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
-    SNAPSHOT_METADATA_CLASS = cast(Type['BaseSnapshotMetadataModel'], None)
+    SNAPSHOT_METADATA_CLASS: Optional[Type['BaseSnapshotMetadataModel']] = None
     # The class designated as the snapshot content model. This should be a
     # subclass of BaseSnapshotContentModel.
-    SNAPSHOT_CONTENT_CLASS = cast(Type['BaseSnapshotContentModel'], None)
+    SNAPSHOT_CONTENT_CLASS: Optional[Type['BaseSnapshotContentModel']] = None
     # The class designated as the commit log entry model. This should be
     # a subclass of BaseCommitLogEntryModel. In cases where we do not need
     # to log the commits it can be None.
-    COMMIT_LOG_ENTRY_CLASS = cast(Type[BaseCommitLogEntryModel], None)
+    COMMIT_LOG_ENTRY_CLASS: Optional[Type[BaseCommitLogEntryModel]] = None
     # Whether reverting is allowed. Default is False.
     ALLOW_REVERT = False
 
@@ -851,6 +857,7 @@ class VersionedModel(BaseModel):
         Returns:
             VersionedModel. Reconstituted instance.
         """
+        assert self.SNAPSHOT_CONTENT_CLASS is not None
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         # Ruling out the possibility of None for mypy type checking.
         assert snapshot_model is not None
@@ -1055,6 +1062,9 @@ class VersionedModel(BaseModel):
                         model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
                 if model.COMMIT_LOG_ENTRY_CLASS is not None:
+                    # This assert is used to eliminate the possibility of None
+                    # during mypy type checking.
+                    assert cls.COMMIT_LOG_ENTRY_CLASS is not None
                     commit_log_ids = (
                         cls.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
                             model.id, version_number)
@@ -1094,10 +1104,17 @@ class VersionedModel(BaseModel):
                 snapshot = model.compute_snapshot()
                 snapshot_id = model.get_snapshot_id(model.id, model.version)
 
+                # This assert is used to eliminate the possibility of None
+                # during mypy type checking.
+                assert model.SNAPSHOT_METADATA_CLASS is not None
                 snapshot_metadata_models.append(
                     model.SNAPSHOT_METADATA_CLASS.create(
                         snapshot_id, committer_id, cls._COMMIT_TYPE_DELETE,
                         commit_message, commit_cmds))
+
+                # This assert is used to eliminate the possibility of None
+                # during mypy type checking.
+                assert model.SNAPSHOT_CONTENT_CLASS is not None
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
@@ -1300,6 +1317,9 @@ class VersionedModel(BaseModel):
             snapshot_id = cls.get_snapshot_id(entity_id, version)
             snapshot_ids.append(snapshot_id)
 
+        # This assert is used to eliminate the possibility of None
+        # during mypy type checking.
+        assert cls.SNAPSHOT_CONTENT_CLASS is not None
         snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
         for snapshot_model in snapshot_models:
             if snapshot_model is None:

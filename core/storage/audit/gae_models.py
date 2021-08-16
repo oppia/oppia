@@ -64,8 +64,8 @@ class RoleQueryAuditModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model contains data corresponding to a user: user_id and username
         fields, but it isn't exported because it is only used for auditing
         purposes.
@@ -126,8 +126,8 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

@@ -63,8 +63,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Currently, the model holds authentication details relevant only for
         backend. Currently the only relevant user data is the username of the
         parent.
@@ -132,7 +132,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
     def get_by_auth_id(
             cls,
             provider_id: str,
-            auth_id: str) -> Optional['UserAuthDetailsModel']:
+            auth_id: str
+    ) -> Optional['UserAuthDetailsModel']:
         """Fetch a user entry by auth_id of a particular auth service.
 
         Args:
@@ -172,8 +173,8 @@ class UserIdentifiersModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Currently, the model holds identifiers relevant only for backend that
         should not be exported.
         """
@@ -256,8 +257,8 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Currently, the model holds IDs relevant only for backend that should
         not be exported.
         """
@@ -325,8 +326,8 @@ class FirebaseSeedModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not correspond to any users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

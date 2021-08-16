@@ -32,7 +32,7 @@ import python_utils
 from typing import Any, Dict, Optional, Union # isort:skip
 
 
-def validate_exploration_change(obj: Dict[str, Any]) -> None:
+def validate_exploration_change(obj):
     """Validates exploration change.
 
     Args:
@@ -43,7 +43,7 @@ def validate_exploration_change(obj: Dict[str, Any]) -> None:
     exp_domain.ExplorationChange(obj)
 
 
-def validate_new_config_property_values(obj: Dict[str, Any]) -> None:
+def validate_new_config_property_values(obj):
     """Validates new config property values.
 
     Args:
@@ -61,7 +61,7 @@ def validate_new_config_property_values(obj: Dict[str, Any]) -> None:
         config_property.normalize(value)
 
 
-def validate_change_dict_for_blog_post(change_dict: Dict[Any, Any]) -> None:
+def validate_change_dict_for_blog_post(change_dict):
     """Validates change_dict required for updating values of blog post.
 
     Args:
@@ -85,7 +85,7 @@ def validate_change_dict_for_blog_post(change_dict: Dict[Any, Any]) -> None:
                 'Invalid tags provided. Tags not in default tags list.')
 
 
-def validate_collection_change(obj: Dict[str, Any]) -> None:
+def validate_collection_change(obj):
     """Validates collection change.
 
     Args:
@@ -97,7 +97,8 @@ def validate_collection_change(obj: Dict[str, Any]) -> None:
 
 
 def validate_email_dashboard_data(
-        data: Dict[str, Optional[Union[bool, int]]]) -> None:
+        data: Dict[str, Optional[Union[bool, int]]]
+) -> None:
     """Validates email dashboard data.
 
     Args:
@@ -114,7 +115,7 @@ def validate_email_dashboard_data(
             raise Exception('400 Invalid input for query.')
 
 
-def validate_task_entries(task_entries: Dict[str, Any]) -> None:
+def validate_task_entries(task_entries):
     """Validates the task entry dict.
 
     Args:
