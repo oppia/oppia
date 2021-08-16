@@ -101,8 +101,8 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str,Any] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str,Any] = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:

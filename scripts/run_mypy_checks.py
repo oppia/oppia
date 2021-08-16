@@ -774,7 +774,7 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    # install_third_party_libraries(parsed_args.skip_install)
+    install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
