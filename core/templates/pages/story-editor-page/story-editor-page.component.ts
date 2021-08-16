@@ -96,7 +96,7 @@ angular.module('oppia').component('storyEditorPage', {
       var setDocumentTitle = function() {
         PageTitleService.setDocumentTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
-        PageTitleService.setPageSubtitleForMobileView(
+        PageTitleService.setNavbarSubtitleForMobileView(
           StoryEditorStateService.getStory().getTitle());
       };
 
@@ -225,7 +225,7 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         ctrl.story = StoryEditorStateService.getStory();
 
-        PageTitleService.setPageTitleForMobileView('Story Editor');
+        PageTitleService.setNavbarTitleForMobileView('Story Editor');
 
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();

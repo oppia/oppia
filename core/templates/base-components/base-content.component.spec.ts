@@ -83,11 +83,11 @@ describe('Base Content Component', () => {
   }
 
   class MockPageTitleService {
-    getPageTitleForMobileView(): string {
+    getNavbarTitleForMobileView(): string {
       return 'Page Title';
     }
 
-    getPageSubtitleForMobileView(): string {
+    getNavbarSubtitleForMobileView(): string {
       return 'Page Subtitle';
     }
   }

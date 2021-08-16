@@ -41,18 +41,18 @@ describe('Page title service', () => {
   });
 
   it('should correctly set the page title for mobile view', () => {
-    pts.setPageTitleForMobileView('First Title');
-    expect(pts.getPageTitleForMobileView()).toEqual('First Title');
+    pts.setNavbarTitleForMobileView('First Title');
+    expect(pts.getNavbarTitleForMobileView()).toEqual('First Title');
 
-    pts.setPageTitleForMobileView('Second Title');
-    expect(pts.getPageTitleForMobileView()).toEqual('Second Title');
+    pts.setNavbarTitleForMobileView('Second Title');
+    expect(pts.getNavbarTitleForMobileView()).toEqual('Second Title');
   });
 
   it('should correctly set the page subtitle for mobile view', () => {
-    pts.setPageSubtitleForMobileView('First Subtitle');
-    expect(pts.getPageSubtitleForMobileView()).toEqual('First Subtitle');
+    pts.setNavbarSubtitleForMobileView('First Subtitle');
+    expect(pts.getNavbarSubtitleForMobileView()).toEqual('First Subtitle');
 
-    pts.setPageSubtitleForMobileView('Second Subtitle');
-    expect(pts.getPageSubtitleForMobileView()).toEqual('Second Subtitle');
+    pts.setNavbarSubtitleForMobileView('Second Subtitle');
+    expect(pts.getNavbarSubtitleForMobileView()).toEqual('Second Subtitle');
   });
 });

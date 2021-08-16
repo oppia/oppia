@@ -62,19 +62,19 @@ export class PageTitleService {
     });
   }
 
-  setPageTitleForMobileView(title: string): void {
+  setNavbarTitleForMobileView(title: string): void {
     this.pageTitleForMobile = title;
   }
 
-  setPageSubtitleForMobileView(subtitle: string): void {
+  setNavbarSubtitleForMobileView(subtitle: string): void {
     this.pageSubtitleForMobile = subtitle;
   }
 
-  getPageTitleForMobileView(): string {
+  getNavbarTitleForMobileView(): string {
     return this.pageTitleForMobile;
   }
 
-  getPageSubtitleForMobileView(): string {
+  getNavbarSubtitleForMobileView(): string {
     return this.pageSubtitleForMobile;
   }
 }
