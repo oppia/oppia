@@ -175,11 +175,11 @@ export class StateCard {
 
   isInteractionInline(): boolean {
     let interactionId = this.getInteractionId();
-    if (!interactionId) {
-      var interactionDisplayMode: string | null = null;
-    } else {
-      var interactionDisplayMode = (
+    if (interactionId) {
+      var interactionDisplayMode: string | null = (
         INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode);
+    } else {
+      var interactionDisplayMode: string | null = null;
     }
     return (
       !interactionId ||
