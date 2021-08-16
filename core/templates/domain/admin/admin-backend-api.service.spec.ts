@@ -1288,4 +1288,46 @@ describe('Admin backend api service', () => {
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
   }
   ));
+
+  describe('updateBlogPostDataAsync', () => {
+    it('should make request to upload blog post', fakeAsync(() => {
+      let authorUsername = 'validUser';
+      let blogPostId = 'sampleid1234';
+      let publishedOn = '05/06/2000';
+      abas.updateBlogPostDataAsync(
+        authorUsername, blogPostId, publishedOn)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/updateblogpostdatahandler');
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let authorUsername = 'validUser';
+      let blogPostId = 'sampleid1234';
+      let publishedOn = '05/06/2000';
+      abas.updateBlogPostDataAsync(
+        authorUsername, blogPostId, publishedOn)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/updateblogpostdatahandler');
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
 });

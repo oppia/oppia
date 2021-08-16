@@ -348,6 +348,24 @@ export class AdminBackendApiService {
     });
   }
 
+  async updateBlogPostDataAsync(
+      blogPostId: string, authorUsername: string, publishedOn: string
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_UPDATE_BLOG_POST_DATA_HANDLER, {
+          blog_post_id: blogPostId,
+          author_username: authorUsername,
+          published_on: publishedOn,
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
   async getNumberOfPendingDeletionRequestAsync(
   ): Promise<PendingDeletionRequestBackendResponse> {
     return new Promise((resolve, reject) => {

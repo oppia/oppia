@@ -17,9 +17,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
 import logging
 
 from constants import constants
+from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -52,11 +54,11 @@ import python_utils
 import utils
 
 (
-    audit_models, exp_models, opportunity_models,
+    audit_models, blog_models, exp_models, opportunity_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.user
+    models.NAMES.audit, models.NAMES.blog, models.NAMES.exploration,
+    models.NAMES.opportunity, models.NAMES.user
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -2029,3 +2031,158 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(response['success'])
         self.assertIsNotNone(
             wipeout_service.get_pending_deletion_request(self.new_user_id))
+
+
+class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
+    """Tests UpdateBlogPostHandler."""
+
+    def setUp(self):
+        super(UpdateBlogPostHandlerTest, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_user_id = self.get_user_id_from_email(
+            feconf.SYSTEM_EMAIL_ADDRESS)
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+
+        self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
+        model = (
+            blog_models.BlogPostModel.get_by_id(self.blog_post.id))
+        model.title = 'sample title'
+        model.tags = ['news']
+        model.thumbnail_filename = 'image.png'
+        model.content = 'hello bloggers'
+        model.url_fragment = 'sample'
+        model.published_on = datetime.datetime.utcnow()
+        model.update_timestamps()
+        model.put()
+
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+
+    def test_update_blog_post_without_blog_post_id_raises_error(self):
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'author_username': 'someusername',
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_update_blog_post_without_author_username_raises_error(self):
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': 'sampleid',
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_update_blog_post_without_published_on_raises_error(self):
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': 'sampleid',
+                'author_username': 'someusername'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_update_blog_post_with_wrong_username_raises_error(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': self.blog_post.id,
+                'author_username': 'someusername',
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        error_msg = ('Invalid username: someusername')
+        self.assertEqual(response['error'], error_msg)
+
+    def test_update_blog_post_with_wrong_blog_post_id_raises_error(self):
+        csrf_token = self.get_new_csrf_token()
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+
+        self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': 'sampleid1234',
+                'author_username': self.BLOG_EDITOR_USERNAME,
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=404)
+
+    def test_update_blog_post_with_user_without_enough_rights(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': self.blog_post.id,
+                'author_username': self.NEW_USER_USERNAME,
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        error_msg = ('User does not have enough rights to be blog post author.')
+        self.assertEqual(response['error'], error_msg)
+
+    def test_update_blog_post_with_invalid_date_format(self):
+        csrf_token = self.get_new_csrf_token()
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': self.blog_post.id,
+                'author_username': self.BLOG_EDITOR_USERNAME,
+                'published_on': '05/09/20000'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500)
+
+        error_msg = (
+            'time data \'05/09/20000, 00:00:00:00\' does not match' +
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\'')
+        self.assertEqual(response['error'], error_msg)
+
+    def test_update_blog_post_with_correct_params(self):
+        csrf_token = self.get_new_csrf_token()
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+
+        self.put_json(
+            '/updateblogpostdatahandler',
+            {
+                'blog_post_id': self.blog_post.id,
+                'author_username': self.BLOG_EDITOR_USERNAME,
+                'published_on': '05/09/2000'
+            },
+            csrf_token=csrf_token)

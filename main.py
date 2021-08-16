@@ -212,6 +212,8 @@ URLS = [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
+        r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(

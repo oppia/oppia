@@ -625,3 +625,37 @@ def get_published_blog_post_summaries(offset=0):
         get_blog_post_summary_from_model(model) if model is not None else None
         for model in blog_post_summary_models]
     return blog_post_summaries
+
+
+def update_blog_models_author_and_published_on_date(
+        blog_post_id, author_id, date):
+    """Updates blog post model with the author id and published on
+    date provided.
+
+    Args:
+        blog_post_id: str. The ID of the blog post which has to be updated.
+        author_id: str. User ID of the author.
+        date: str. The date of publishing the blog post.
+    """
+    blog_post = get_blog_post_by_id(blog_post_id, True)
+    blog_post_rights = get_blog_post_rights(
+        blog_post_id, strict=True)
+
+    blog_post.author_id = author_id
+    supported_date_string = date + ', 00:00:00:00'
+    blog_post.published_on = utils.convert_string_to_naive_datetime_object(
+        supported_date_string)
+    blog_post.validate(strict=True)
+
+    blog_post_summary = compute_summary_of_blog_post(blog_post)
+    _save_blog_post_summary(blog_post_summary)
+
+    blog_post_model = blog_models.BlogPostModel.get(
+        blog_post.id, strict=True)
+    blog_post_model.author_id = blog_post.author_id
+    blog_post_model.published_on = blog_post.published_on
+    blog_post_model.update_timestamps()
+    blog_post_model.put()
+
+    blog_post_rights.editor_ids.append(blog_post.author_id)
+    save_blog_post_rights(blog_post_rights)

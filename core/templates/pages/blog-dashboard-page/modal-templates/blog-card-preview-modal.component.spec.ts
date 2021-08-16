@@ -62,7 +62,7 @@ describe('Blog Card Preview Modal Component', () => {
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
     last_updated: '11/21/2014, 09:45:00',
-    published_on: '11/21/2014, 09:45:00',
+    published_on: null,
   };
 
   beforeEach(waitForAsync(() => {
@@ -93,12 +93,12 @@ describe('Blog Card Preview Modal Component', () => {
       BlogCardPreviewModalComponent);
     component = fixture.componentInstance;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
-    blogPostData = BlogPostData.createFromBackendDict(
-      sampleBlogPostBackendDict);
-    console.error(blogPostData);
   }));
 
-  it('should initialize correctly', () => {
+  it('should initialize correctly when blog post is not published', () => {
+    sampleBlogPostBackendDict.published_on = null;
+    blogPostData = BlogPostData.createFromBackendDict(
+      sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
       blogPostData.authorUsername,
@@ -109,6 +109,30 @@ describe('Blog Card Preview Modal Component', () => {
       blogPostData.urlFragment,
       blogPostData.lastUpdated,
       blogPostData.lastUpdated);
+    blogDashboardPageService.blogPostData = blogPostData;
+    blogDashboardPageService.authorPictureUrl = 'sample-url';
+
+    component.ngOnInit();
+
+    expect(component.blogPostSummary).toEqual(
+      expectedBlogPostSummary);
+    expect(component.profilePicUrl).toBe('sample-url');
+  });
+
+  it('should initialize correctly when blog post is published', () => {
+    sampleBlogPostBackendDict.published_on = '11/21/2014, 09:45:00';
+    blogPostData = BlogPostData.createFromBackendDict(
+      sampleBlogPostBackendDict);
+    let expectedBlogPostSummary = new BlogPostSummary (
+      blogPostData.id,
+      blogPostData.authorUsername,
+      blogPostData.title,
+      '<p>hello</p>',
+      blogPostData.tags,
+      blogPostData.thumbnailFilename,
+      blogPostData.urlFragment,
+      blogPostData.lastUpdated,
+      blogPostData.publishedOn);
     blogDashboardPageService.blogPostData = blogPostData;
     blogDashboardPageService.authorPictureUrl = 'sample-url';
 
