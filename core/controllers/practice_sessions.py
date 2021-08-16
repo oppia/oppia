@@ -78,7 +78,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             # passed in subtopic IDs, if they don't exist, which would be the
             # case if the creator deletes subtopics after the learner has
             # loaded the topic viewer page.
-            if python_utils.UNICODE(subtopic.id) in selected_subtopic_ids:
+            if subtopic.id in selected_subtopic_ids:
                 selected_skill_ids.extend(subtopic.skill_ids)
         try:
             skills = skill_fetchers.get_multi_skills(selected_skill_ids)
