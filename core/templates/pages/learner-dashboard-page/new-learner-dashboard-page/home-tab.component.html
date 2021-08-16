@@ -1,17 +1,21 @@
 <div class="home-tab">
-  <div class="greeting">
+  <div class="greeting" [ngStyle]="!checkMobileView() && {'margin-top': '64px'}">
     Good {{getTimeOfDay()}}, {{username}}!
   </div>
   <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
     <p class="continue-where-you-left-off-heading"
-      [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
+       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="currentGoals.length !== 0">
+    </p>
+    <p class="continue-where-you-left-off-heading"
+       [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
+       *ngIf="currentGoals.length === 0">
     </p>
     <div class="empty-continue-where-you-left-off-section" *ngIf="currentGoals.length === 0">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate"
-         class="empty-continue-where-you-left-off-section-text">
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
       </p>
       <a id="setting-a-goal-link" (click)="changeActiveSection()">
-        setting a goal!
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate" class="empty-continue-where-you-left-off-section-text">
+        </p>
       </a>
     </div>
     <div class="continue-where-you-left-off-scroll">
@@ -28,13 +32,10 @@
       </div>
     </div>
   </div>
-  <div class="suggested-for-you">
+  <div class="suggested-for-you protractor-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics)">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
     </p>
-    <div class="empty-suggested-for-you-section" *ngIf="!isNonemptyObject(untrackedTopics)">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate"></p>
-    </div>
-    <div class="suggested-for-you-section" *ngIf="isNonemptyObject(untrackedTopics)">
+    <div class="suggested-for-you-section">
       <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
         <div *ngIf="item.value.length !== 0" class="classroom-name">
           {{item.key}}
@@ -59,20 +60,27 @@
       </div>
     </div>
   </div>
+  <div class="empty-suggested-for-you" *ngIf="!isNonemptyObject(untrackedTopics) && currentGoals.length === 0">
+    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
+    </p>
+    <div class="empty-suggested-for-you-section">
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
+      </p>
+    </div>
+  </div>
 </div>
 <style>
   .home-tab .greeting {
     color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
-    margin-left: 137px;
     text-align: left;
   }
   .home-tab .continue-where-you-left-off {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px 137px;
+    margin: 18px 0 25px 0;
     min-height: 179px;
     padding: 32px 0 30px 40px;
     width: 736px;
@@ -95,7 +103,8 @@
     width: fit-content;
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
-  .home-tab .suggested-for-you .suggested-for-you-heading {
+  .home-tab .suggested-for-you .suggested-for-you-heading,
+  .home-tab .empty-suggested-for-you .suggested-for-you-heading {
     color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 24px;
@@ -136,17 +145,18 @@
     color: #00645C;
     font-weight: bold;
   }
-  .home-tab .suggested-for-you .empty-suggested-for-you-section {
+  .home-tab .empty-suggested-for-you-section {
     color: #333;
     font-size: 18px;
     padding: 32px 113px 0 0;
     text-align: left;
   }
-  .home-tab .suggested-for-you {
+  .home-tab .suggested-for-you,
+  .home-tab .empty-suggested-for-you {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px 137px;
+    margin: 18px 0 25px 0;
     min-height: 206px;
     padding: 32px 0 30px 40px;
     width: 736px;
@@ -158,12 +168,15 @@
   .home-tab .continue-where-you-left-off .topic-summary {
     display: inline-block;
     padding-right: 30px;
+    width: 228px;
   }
   @media screen and (max-width: 1200px) {
     .home-tab .greeting {
       margin-left: 0;
+      padding-top: 30px;
     }
-    .home-tab .continue-where-you-left-off, .suggested-for-you {
+    .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
+    .home-tab .empty-suggested-for-you {
       margin-left: 0;
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
@@ -183,16 +196,17 @@
   }
   @media screen and (max-width: 767px) {
     .home-tab .greeting {
-      font-size: 20px;
-      margin-left: 20px;
+      font-size: 23px;
+      margin: 24px 0 0 20px;
     }
-    .home-tab .continue-where-you-left-off, .suggested-for-you {
+    .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
+    .home-tab .empty-suggested-for-you {
       margin: 18px 0 25px 20px;
       width: 365px;
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
     .home-tab .suggested-for-you .suggested-for-you-heading {
-      font-size: 16px;
+      font-size: 20px;
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
       overflow: scroll;
@@ -206,7 +220,7 @@
     .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
       font-size: 15px;
     }
-    .home-tab .suggested-for-you .empty-suggested-for-you-section {
+    .home-tab .empty-suggested-for-you-section {
       padding: 32px 32px 0 0;
     }
     .home-tab .suggested-for-you .topic-summary-tile-scroll {
@@ -219,14 +233,16 @@
       font-size: 25px;
       margin-left: 0;
     }
-    .home-tab .continue-where-you-left-off, .suggested-for-you {
+    .home-tab .continue-where-you-left-off,
+    .home-tab .suggested-for-you,
+    .home-tab .empty-suggested-for-you {
       margin: 18px 0 25px 0;
       padding: 40px 0 20px 32px;
       width: 500px;
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
     .home-tab .suggested-for-you .suggested-for-you-heading {
-      font-size: 17px;
+      font-size: 20px;
     }
     .home-tab .suggested-for-you .topic-summary-tile-scroll {
       overflow: scroll;
@@ -235,7 +251,7 @@
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
       overflow: scroll;
     }
-    .home-tab .suggested-for-you .empty-suggested-for-you-section {
+    .home-tab .empty-suggested-for-you-section {
       padding: 17px 32px 0 0;
     }
   }

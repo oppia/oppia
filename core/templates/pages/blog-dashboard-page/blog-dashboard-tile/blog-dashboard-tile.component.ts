@@ -16,9 +16,14 @@
  * @fileoverview Component for a blog dashboard card.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import dayjs from 'dayjs';
+import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
+import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
 @Component({
   selector: 'oppia-blog-dashboard-tile',
   templateUrl: './blog-dashboard-tile.component.html'
@@ -26,7 +31,16 @@ import dayjs from 'dayjs';
 export class BlogDashboardTileComponent implements OnInit {
   @Input() blogPostSummary!: BlogPostSummary;
   @Input() blogPostIsPublished: boolean;
+  @Input() activeView: string;
   lastUpdatedDateString: string = '';
+  @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
+  @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
+  constructor(
+    private blogDashboardPageService: BlogDashboardPageService,
+    private blogPostEditorBackendService: BlogPostEditorBackendApiService,
+    private ngbModal: NgbModal,
+    private alertsService: AlertsService
+  ) {}
 
   ngOnInit(): void {
     this.lastUpdatedDateString = this.getDateStringInWords(
@@ -36,5 +50,48 @@ export class BlogDashboardTileComponent implements OnInit {
   getDateStringInWords(naiveDate: string): string {
     return dayjs(
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+  }
+
+  editBlogPost(): void {
+    this.blogDashboardPageService.navigateToEditorTabWithId(
+      this.blogPostSummary.id);
+  }
+
+  deleteBlogPost(): void {
+    this.blogDashboardPageService.blogPostAction = 'delete';
+    this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
+      backdrop: 'static',
+      keyboard: false,
+    }).result.then(() => {
+      this.blogDashboardPageService.blogPostId = this.blogPostSummary.id;
+      this.blogDashboardPageService.deleteBlogPost();
+      this.deletedBlogPost.emit();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  unpublishBlogPost(): void {
+    this.blogDashboardPageService.blogPostAction = 'unpublish';
+    this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
+      backdrop: 'static',
+      keyboard: false,
+    }).result.then(() => {
+      this.blogPostEditorBackendService.updateBlogPostDataAsync(
+        this.blogPostSummary.id, false, {}).then(
+        () => {
+          this.unpublisedBlogPost.emit();
+        }, (errorResponse) => {
+          this.alertsService.addWarning(
+            `Failed to unpublish Blog Post. Internal Error: ${errorResponse}`);
+        }
+      );
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 }

@@ -213,6 +213,8 @@ URLS = [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
+        r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(
@@ -969,4 +971,4 @@ class NdbWsgiMiddleware:
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()  # type: ignore[no-untyped-call]
+firebase_auth_services.establish_firebase_connection()

@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
+from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -1178,3 +1179,60 @@ class DeleteUserHandler(base.BaseHandler):
             )
         wipeout_service.pre_delete_user(user_id)
         self.render_json({'success': True})
+
+
+class UpdateBlogPostHandler(base.BaseHandler):
+    """Handler for changing author ids and published on date in
+    blog posts."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'author_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            },
+            'published_on': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        blog_post_id = self.normalized_payload.get('blog_post_id')
+        author_username = self.normalized_payload.get('author_username')
+        published_on = self.normalized_payload.get('published_on')
+
+        author_id = user_services.get_user_id_from_username(author_username)
+        if author_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % author_username)
+
+        user_actions = user_services.get_user_actions_info(author_id).actions
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
+            raise self.InvalidInputException(
+                'User does not have enough rights to be blog post author.')
+
+        blog_post = (
+            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
+        if blog_post is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post with the given id or url doesn\'t exist.'))
+
+        blog_services.update_blog_models_author_and_published_on_date(
+            blog_post_id, author_id, published_on)
+        self.render_json({})

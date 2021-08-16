@@ -42,4 +42,7 @@ require(
 );
 require(
   'pages/blog-dashboard-page/navbar/' +
-  'blog-dashboard-navbar-breadcrumb.component.ts');
+  'navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.ts');
+require(
+  'pages/blog-dashboard-page/navbar/' +
+  'navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.ts');
