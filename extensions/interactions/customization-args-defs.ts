@@ -23,6 +23,7 @@ import { SubtitledHtmlBackendDict, SubtitledHtml } from
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
+
 export interface LabeledRegion {
   region: {
     area: number[][];

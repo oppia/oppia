@@ -69,6 +69,7 @@ import {
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
+
 export interface InteractionBackendDict {
   // A null 'default_outcome' indicates that this interaction is
   // an EndExploration interaction.
