@@ -27,7 +27,7 @@ import python_utils
 
 import redis
 
-from typing import Dict, List, Mapping, Optional, TypeVar, Union  # isort:skip
+from typing import Dict, List, Mapping, Optional, Union  # isort:skip
 
 
 REDIS_CLIENT = redis.StrictRedis(

@@ -25,7 +25,7 @@ import os
 
 from constants import constants
 
-from typing import Dict, List, NewType, Union # isort:skip
+from typing import Dict, List, Union # isort:skip
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
