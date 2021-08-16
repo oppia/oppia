@@ -301,6 +301,8 @@
 /core/templates/services/contextual/url.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-dimensions.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
+/core/templates/services/internet-connectivity.service*.ts @srijanreddy98
+/core/templates/services/server-connection-backend-api.service*.ts @srijanreddy98
 
 
 # Global stylesheet.
@@ -427,7 +429,7 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/story-creation.service*.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
 /core/templates/pages/story-editor-page/ @kevintab95
@@ -440,7 +442,7 @@
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
-/core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/topic-creation.service*.ts @kevintab95
 /core/templates/domain/classroom/ @kevintab95
 /core/templates/domain/subtopic_viewer/ @kevintab95
 /core/templates/domain/topic/ @kevintab95
@@ -535,6 +537,7 @@
 
 
 # Rich text editor team.
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @aks681
 /core/templates/components/ck-editor-helpers/ckeditor4.module.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
@@ -594,6 +597,7 @@
 /core/templates/pages/teach-page/ @vojtechjelinek
 /core/templates/pages/thanks-page/ @vojtechjelinek
 /core/templates/pages/participation-playbook/ @vojtechjelinek
+/core/templates/pages/volunteer-page/ @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @nithusha21 @vojtechjelinek

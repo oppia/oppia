@@ -17,18 +17,29 @@
  */
 
 export interface TranslatableItemBackendDict {
-  'content': string,
-  'data_format': string
+  'content': string | string[],
+  'data_format': string,
+  'content_type': string,
+  'interaction_id': string | null,
+  'rule_type': string | null
 }
 
 export class TranslatableItem {
   constructor(
-      public content: string,
-      public dataFormat: string
+    readonly content: string | string[],
+    readonly dataFormat: string,
+    readonly contentType: string,
+    readonly interactionId: string | null,
+    readonly ruleType: string | null
   ) {}
 
   static createFromBackendDict(
       backendDict: TranslatableItemBackendDict): TranslatableItem {
-    return new TranslatableItem(backendDict.content, backendDict.data_format);
+    return new TranslatableItem(
+      backendDict.content,
+      backendDict.data_format,
+      backendDict.content_type,
+      backendDict.interaction_id,
+      backendDict.rule_type);
   }
 }
