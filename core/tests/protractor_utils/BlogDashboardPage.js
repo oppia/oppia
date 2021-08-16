@@ -211,7 +211,7 @@ var BlogDashboardPage = function() {
   this.expectNumberOfPublishedBlogPostsToBe = async function(number) {
     var isPresent = await blogDashboardIntroMessage.isPresent();
     if (!isPresent) {
-      await this.waitForDraftsBlogPostsToLoad();
+      await this.waitForPublishedBlogPostsToLoad();
     }
     expect(await publishedBlogPostTiles.count()).toBe(number);
   };

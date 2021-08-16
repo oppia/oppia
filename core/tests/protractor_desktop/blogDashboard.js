@@ -33,10 +33,10 @@ describe('Blog dashboard functionality', function() {
       'blog@blogDashboard.com',
       'blog',
       'blog admin');
-    await users.login('blog@blogDashboard.com');
   });
 
   beforeEach(async function() {
+    await users.login('blog@blogDashboard.com');
     await blogDashboardPage.get();
   });
 
@@ -63,6 +63,22 @@ describe('Blog dashboard functionality', function() {
       await blogDashboardPage.expectCurrUsernameToBeVisible();
     });
 
+  it('should create, edit and delete a blog post from blog dashboard',
+    async function() {
+      await blogDashboardPage.createNewBlogPost();
+
+      await blogDashboardPage.navigateToBlogDashboardPage();
+      await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
+
+      await blogDashboardPage.navigateToBlogPostEditorWithIndex(0);
+      await blogDashboardPage.saveBlogPostAsDraft(
+        'Sample blog Title', await forms.toRichText(
+          'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
+
+      await blogDashboardPage.navigateToBlogDashboardPage();
+      await blogDashboardPage.deleteBlogPostWithIndex(0);
+    });
+
   it('should check that blog post editor shows blog card preview',
     async function() {
       await blogDashboardPage.createNewBlogPost();
@@ -80,42 +96,26 @@ describe('Blog dashboard functionality', function() {
       await blogDashboardPage.expectNumberOfBlogPostsToBe(0);
     });
 
-  it('should create, edit and delete a blog post from blog dashboard',
-    async function() {
-      await blogDashboardPage.createNewBlogPost();
+  // It('should create, publish, and delete the published blog post from' +
+  //   ' dashboard.', async function() {
+  //   await blogDashboardPage.createNewBlogPost();
 
-      await blogDashboardPage.navigateToBlogDashboardPage();
-      await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
+  //   await blogDashboardPage.publishBlogPost(
+  //     'Sample blog post Title', await forms.toRichText(
+  //       'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
+  //     [1, 2, 3]);
 
-      await blogDashboardPage.navigateToBlogPostEditorWithIndex(0);
-      await blogDashboardPage.saveBlogPostAsDraft(
-        'Sample blog Title', await forms.toRichText(
-          'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
+  //   await blogDashboardPage.navigateToBlogDashboardPage();
+  //   await blogDashboardPage.navigateToDraftsTab();
+  //   await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
 
-      await blogDashboardPage.navigateToBlogDashboardPage();
-      await blogDashboardPage.deleteBlogPostWithIndex(0);
-    });
+  //   await blogDashboardPage.navigateToBlogDashboardPage();
+  //   await blogDashboardPage.navigateToPublishTab();
+  //   await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
 
-  it('should create, publish, and delete the published blog post from' +
-    ' dashboard.', async function() {
-    await blogDashboardPage.createNewBlogPost();
-
-    await blogDashboardPage.publishBlogPost(
-      'Sample blog post Title', await forms.toRichText(
-        'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
-      [1, 2, 3]);
-
-    await blogDashboardPage.navigateToBlogDashboardPage();
-    await blogDashboardPage.navigateToDraftsTab();
-    await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
-
-    await blogDashboardPage.navigateToBlogDashboardPage();
-    await blogDashboardPage.navigateToPublishTab();
-    await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
-
-    await blogDashboardPage.deleteBlogPostWithIndex(0);
-    await blogDashboardPage.expectNumberOfBlogPostsToBe(0);
-  });
+  //   await blogDashboardPage.deleteBlogPostWithIndex(0);
+  //   await blogDashboardPage.expectNumberOfBlogPostsToBe(0);
+  // });
 
   it('should create blog post, save it as draft and delete it from editor',
     async function() {
@@ -221,9 +221,6 @@ describe('Blog dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
-  });
-
-  afterAll(async function() {
     await users.logout();
   });
 });
