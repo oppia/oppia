@@ -62,11 +62,7 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Tuple
-from typing import Type
+from typing import Any, Dict, List, Tuple, Type # isort: skip
 
 
 class JobMetaclass(type):

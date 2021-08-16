@@ -26,10 +26,7 @@ from jobs import base_jobs
 import python_utils
 import utils
 
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Type
+from typing import Any, Dict, List, Type # isort: skip
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 

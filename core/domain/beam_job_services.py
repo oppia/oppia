@@ -31,8 +31,7 @@ from jobs import registry as jobs_registry
 from scripts import common
 import utils
 
-from typing import List
-from typing import Optional
+from typing import List, Optional # isort: skip
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 

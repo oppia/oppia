@@ -24,9 +24,7 @@ import feconf
 
 from apache_beam.options import pipeline_options
 
-from typing import Any
-from typing import List
-from typing import Optional
+from typing import Any, List, Optional # isort: skip
 
 
 class JobOptions(pipeline_options.PipelineOptions):

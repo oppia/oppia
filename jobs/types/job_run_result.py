@@ -25,9 +25,7 @@ import heapq
 import python_utils
 import utils
 
-from typing import Any
-from typing import List
-from typing import Tuple
+from typing import Any, List, Tuple # isort: skip
 
 MAX_OUTPUT_BYTES = 1500
 

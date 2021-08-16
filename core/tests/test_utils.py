@@ -69,10 +69,9 @@ import utils
 
 import elasticsearch
 import requests_mock
-from typing import Any
-from typing import Dict
-from typing import Optional
 import webtest
+
+from typing import Any, Dict, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
