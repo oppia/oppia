@@ -29,7 +29,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 import python_utils
 
-from typing import Any, Dict, Optional, Union # isort:skip
+from typing import Dict, Optional, Union # isort:skip
 
 
 def validate_exploration_change(obj):

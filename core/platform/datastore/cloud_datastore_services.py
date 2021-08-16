@@ -25,8 +25,7 @@ from core.platform import models
 
 from google.cloud import ndb
 
-from typing import ( # isort:skip
-    Any, Dict, List, Optional, Sequence, Tuple, TypeVar)
+from typing import List, Optional, Sequence, Tuple, TypeVar # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover

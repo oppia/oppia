@@ -23,8 +23,6 @@ import functools
 
 from google.cloud import datastore
 
-from typing import Callable
-
 CLIENT = datastore.Client()
 
 

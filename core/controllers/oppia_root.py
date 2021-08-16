@@ -27,6 +27,7 @@ class OppiaRootPage(base.BaseHandler):
     """Renders oppia root page (unified entry point) for all routes registered
        with angular router.
     """
+
     # Using Dict[str, Any] because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
