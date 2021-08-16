@@ -22,10 +22,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { Interaction, InteractionSpecsKey } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
-import { InteractionCustomizationArgs } from
+import { InteractionCustomizationArgs, InteractionSpecsKey } from
   'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
@@ -134,7 +134,7 @@ export class StateCard {
     if (interactionId) {
       return (
         !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal &&
-          !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear
+        !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear
       );
     }
     return false;
@@ -175,12 +175,11 @@ export class StateCard {
 
   isInteractionInline(): boolean {
     let interactionId = this.getInteractionId();
-    let interactionDisplayMode;
-    if (interactionId) {
-      interactionDisplayMode = (
-        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode);
+    if (!interactionId) {
+      var interactionDisplayMode: string | null = null;
     } else {
-      interactionDisplayMode = null;
+      var interactionDisplayMode = (
+        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode);
     }
     return (
       !interactionId ||

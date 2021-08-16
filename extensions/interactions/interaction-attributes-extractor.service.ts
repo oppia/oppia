@@ -21,9 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from
+import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict, InteractionSpecsKey } from
   'extensions/interactions/customization-args-defs';
-import { InteractionObjectFactory, InteractionSpecsKey } from
+import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 

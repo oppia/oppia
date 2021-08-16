@@ -335,10 +335,10 @@ describe('Content translation manager service', () => {
     let content = new SubtitledHtml('<p>en content</p>', null);
     expect(() => {
       ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
-    }).toThrowError('content id does not exist');
+    }).toThrowError('Content ID does not exist');
     expect(() => {
       ctms._swapContent(writtenTranslations, 'fr', content);
-    }).toThrowError('content id does not exist');
+    }).toThrowError('Content ID does not exist');
   });
 
   it('should return default content HTML if translation is nonexistent', () => {

@@ -22,6 +22,7 @@ import { SubtitledHtmlBackendDict, SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 
 export interface LabeledRegion {
@@ -464,3 +465,5 @@ export type InteractionCustomizationArgs = (
   RatioExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);
+
+export type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;

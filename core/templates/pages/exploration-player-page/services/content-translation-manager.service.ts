@@ -40,9 +40,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionSpecsKey } from 'domain/exploration/InteractionObjectFactory';
-
+import { InteractionCustomizationArgs, InteractionSpecsKey } from 'interactions/customization-args-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -103,7 +101,7 @@ export class ContentTranslationManagerService {
       content: SubtitledHtml
   ): string {
     if (!content.contentId) {
-      throw new Error('content id does not exist');
+      throw new Error('Content ID does not exist');
     }
     const writtenTranslation = writtenTranslations.translationsMapping[
       content.contentId][languageCode];
@@ -130,10 +128,10 @@ export class ContentTranslationManagerService {
       content: SubtitledHtml|SubtitledUnicode
   ): void {
     if (!content.contentId) {
-      throw new Error('content id does not exist');
+      throw new Error('Content ID does not exist');
     }
-    const writtenTranslation: WrittenTranslation | null =
-      writtenTranslations.translationsMapping[content.contentId][languageCode];
+    const writtenTranslation: WrittenTranslation | null = (
+      writtenTranslations.translationsMapping[content.contentId][languageCode]);
 
     if (
       !writtenTranslation ||
@@ -244,8 +242,7 @@ export class ContentTranslationManagerService {
       if (caValues.hasOwnProperty(name)) {
         const attr = <{value: Object}> caValues[name];
         traverseSchemaAndSwapTranslatableContent(
-          attr.value,
-          <Schema>caSpec.schema);
+          attr.value, <Schema>caSpec.schema);
       }
     }
 
