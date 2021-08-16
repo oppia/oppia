@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the classroom page.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
@@ -33,10 +34,10 @@ describe('Blog dashboard functionality', function() {
       'blog@blogDashboard.com',
       'blog',
       'blog admin');
+    await users.login('blog@blogDashboard.com');
   });
 
   beforeEach(async function() {
-    await users.login('blog@blogDashboard.com');
     await blogDashboardPage.get();
   });
 
@@ -48,10 +49,9 @@ describe('Blog dashboard functionality', function() {
 
   it('should create and delete a newly created blog post', async function() {
     await blogDashboardPage.createNewBlogPost();
-
     await blogDashboardPage.navigateToBlogDashboardPage();
-
     await blogDashboardPage.deleteBlogPostWithIndex(0);
+
     await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
   });
 
@@ -61,6 +61,10 @@ describe('Blog dashboard functionality', function() {
 
       await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
       await blogDashboardPage.expectCurrUsernameToBeVisible();
+
+      await blogDashboardPage.navigateToBlogDashboardPage();
+      await blogDashboardPage.deleteBlogPostWithIndex(0);
+      await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
     });
 
   it('should create, edit and delete a blog post from blog dashboard',
@@ -87,73 +91,44 @@ describe('Blog dashboard functionality', function() {
           'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
         [1, 2, 3]);
       await blogDashboardPage.showBlogCardPreview();
-
       await blogDashboardPage.navigateToBlogDashboardPage();
       await blogDashboardPage.navigateToPublishTab();
       await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
 
       await blogDashboardPage.deleteBlogPostWithIndex(0);
-      await blogDashboardPage.expectNumberOfBlogPostsToBe(0);
+      await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
     });
 
-  // It('should create, publish, and delete the published blog post from' +
-  //   ' dashboard.', async function() {
-  //   await blogDashboardPage.createNewBlogPost();
+  it('should create, publish, and delete the published blog post from' +
+    ' dashboard.', async function() {
+    await blogDashboardPage.createNewBlogPost();
+    await blogDashboardPage.publishBlogPost(
+      'Sample blog post Title', await forms.toRichText(
+        'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
+      [1, 2, 3]);
+    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToDraftsTab();
+    await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
 
-  //   await blogDashboardPage.publishBlogPost(
-  //     'Sample blog post Title', await forms.toRichText(
-  //       'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
-  //     [1, 2, 3]);
+    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToPublishTab();
+    await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
 
-  //   await blogDashboardPage.navigateToBlogDashboardPage();
-  //   await blogDashboardPage.navigateToDraftsTab();
-  //   await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
-
-  //   await blogDashboardPage.navigateToBlogDashboardPage();
-  //   await blogDashboardPage.navigateToPublishTab();
-  //   await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
-
-  //   await blogDashboardPage.deleteBlogPostWithIndex(0);
-  //   await blogDashboardPage.expectNumberOfBlogPostsToBe(0);
-  // });
-
-  it('should create blog post, save it as draft and delete it from editor',
-    async function() {
-      await blogDashboardPage.createNewBlogPost();
-
-      await blogDashboardPage.saveBlogPostAsDraft(
-        'Sample Blog', await forms.toRichText(
-          'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
-
-      await blogDashboardPage.navigateToBlogDashboardPage();
-      await blogDashboardPage.navigateToDraftsTab();
-      await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
-
-      await blogDashboardPage.navigateToBlogPostEditorWithIndex(0);
-      await blogDashboardPage.deleteBlogPostFromEditor();
-
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/blog-dashboard');
-      await blogDashboardPage.navigateToDraftsTab();
-      await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
-    });
+    await blogDashboardPage.deleteBlogPostWithIndex(0);
+    await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
+  });
 
   it('should create, publish, unpublish and delete the blog post',
     async function() {
       await blogDashboardPage.createNewBlogPost();
-      await blogDashboardPage.saveBlogPostAsDraft(
-        'Sample Post', await forms.toRichText(
-          'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
-
       await blogDashboardPage.navigateToBlogDashboardPage();
       await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
 
       await blogDashboardPage.navigateToBlogPostEditorWithIndex(0);
       await blogDashboardPage.publishBlogPost(
-        'Sample Blog Post', async function(richTextEditor) {
-          await richTextEditor.appendItalicText('Welcome');
-        }, [1, 3, 5]);
+        'Sample Blog Post', await forms.toRichText(
+          'Hi there, I’m Oppia! I’m an online personal tutor for everybody!')
+        , [1, 3, 5]);
 
       await blogDashboardPage.navigateToBlogDashboardPage();
       await blogDashboardPage.navigateToPublishTab();
@@ -164,39 +139,45 @@ describe('Blog dashboard functionality', function() {
       await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
       await blogDashboardPage.deleteBlogPostWithIndex(0);
       await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
+      await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
     });
 
-  it('should create multiple blog posts, publish a few and check for' +
-  ' navigation through list view', async function() {
+  it('should create multiple blog posts both published and drafts and' +
+  ' check for navigation through list view', async function() {
     await blogDashboardPage.createNewBlogPost();
-
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title1', await forms.toRichText(
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
-
     await blogDashboardPage.navigateToBlogDashboardPage();
+
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title2', await forms.toRichText(
         'Hi there, I’m Oppia! I’m a tutor for everybody!'));
-
     await blogDashboardPage.navigateToBlogDashboardPage();
+
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title3', await forms.toRichText(
         'Hi there, I’m Oppia! I’m a tutor for everybody here!'));
-
     await blogDashboardPage.navigateToBlogDashboardPage();
+
     await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(3);
 
     await blogDashboardPage.getListView();
     await blogDashboardPage.expectNumberOfBlogPostsRowsToBe(3);
     await blogDashboardPage.navigateToBlogPostEditorWithIndexFromList(2);
-
-    await blogDashboardPage.publishBlogPost(
-      'Sample', await forms.toRichText(
-        'Hi there, I’m Oppia! I’m a tutor for everybody here!'),
-      [1, 3, 5]);
+    var publishBlogPostButton = element(
+      by.css('.protractor-test-publish-blog-post-button'));
+    var confirmButton = element(
+      by.css('.protractor-test-confirm-button'));
+    await blogDashboardPage.selectTags([1, 3, 5, 6]);
+    await blogDashboardPage.setThumbnailImage();
+    await action.click('Publish Blog Post', publishBlogPostButton);
+    await action.click(
+      'Confirm Publish Blog Post button', confirmButton);
+    await waitFor.visibilityOfSuccessToast(
+      'Blog Post Saved and Published Succesfully.');
 
     await blogDashboardPage.navigateToBlogDashboardPage();
     await blogDashboardPage.navigateToDraftsTab();
@@ -221,6 +202,9 @@ describe('Blog dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
     await users.logout();
   });
 });

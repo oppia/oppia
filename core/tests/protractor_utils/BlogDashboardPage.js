@@ -35,8 +35,8 @@ var BlogDashboardPage = function() {
   var deleteBlogPostButton = element(
     by.css('.protractor-test-delete-blog-post-button'));
   var matTabLabels = element.all(by.css('.mat-tab-label'));
-  var draftTab = matTabLabels[0];
-  var publishTab = matTabLabels[1];
+  var draftTab = matTabLabels.get(0);
+  var publishTab = matTabLabels.get(1);
   var BlogPostEditOptions = element.all(
     by.css('.protractor-test-blog-post-edit-box'));
   var BlogPostTitleFieldElement = element(
@@ -57,9 +57,9 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-published-blog-post-tile-item'));
   var blogPostTags = element.all(
     by.css('.protractor-test-blog-post-tags'));
-  var saveBlogPostAsDraft = element(
+  var saveBlogPostAsDraftButton = element(
     by.css('.protractor-test-save-as-draft-button'));
-  var publishBlogPost = element(
+  var publishBlogPostButton = element(
     by.css('.protractor-test-publish-blog-post-button'));
   var thumbnailClickable = element(
     by.css('.protractor-test-photo-clickable'));
@@ -81,7 +81,7 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-photo-upload-cancel'));
   var blogDashboardIntroMessage = element(
     by.css('.protractor-test-intro-message'));
-  var editContentButton = element(
+  var editContentCard = element(
     by.css('.protractor-test-content-button'));
   var closeBlogCardPreviewButton = element(
     by.css('.protractor-test-close-preview-button'));
@@ -134,10 +134,6 @@ var BlogDashboardPage = function() {
 
   this.setContent = async function(richTextInstructions) {
     var schemaBasedEditorTag = element(by.tagName('schema-based-editor'));
-    var isPresent = schemaBasedEditorTag.isPresent();
-    if (!isPresent) {
-      await action.click('Edit content', editContentButton);
-    }
     await waitFor.visibilityOf(
       schemaBasedEditorTag, 'Schema based editor tag not showing up');
     var richTextEditor = await forms.RichTextEditor(schemaBasedEditorTag);
@@ -154,8 +150,7 @@ var BlogDashboardPage = function() {
     await action.sendKeys(
       'New blog post title field', BlogPostTitleFieldElement, blogPostTitle);
     await this.setContent(richTextInstructions);
-    await this.expectContentToMatch(richTextInstructions);
-    await action.click('Save as draft Button', saveBlogPostAsDraft);
+    await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
   };
 
@@ -165,9 +160,8 @@ var BlogDashboardPage = function() {
       'New blog post title field', BlogPostTitleFieldElement, blogPostTitle);
     await this.selectTags(tags);
     await this.setContent(richTextInstructions);
-    await this.expectContentToMatch(richTextInstructions);
     await this.setThumbnailImage();
-    await action.click('Publish Blog Post', publishBlogPost);
+    await action.click('Publish Blog Post', publishBlogPostButton);
     await action.click(
       'Confirm Publish Blog Post button', confirmButton);
     await waitFor.visibilityOfSuccessToast(
@@ -182,6 +176,7 @@ var BlogDashboardPage = function() {
   };
 
   this.expectContentToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(editContentCard, 'Unable to find content card.');
     await forms.expectRichText(blogPostContentDisplay).toMatch(
       richTextInstructions);
   };
@@ -219,7 +214,7 @@ var BlogDashboardPage = function() {
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
     var isPresent = await blogDashboardIntroMessage.isPresent();
     if (!isPresent) {
-      await this.waitFordraftsBlogPostsToLoad();
+      await this.waitForDraftsBlogPostsToLoad();
     }
     expect(await blogPostListItems.count()).toBe(number);
   };
