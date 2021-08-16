@@ -136,7 +136,7 @@ class JobMetaclass(type):
         return list(cls._JOB_REGISTRY.keys())
 
     @classmethod
-    def get_job_by_name(cls, job_name) -> JobMetaclass:
+    def get_job_class_by_name(cls, job_name: str) -> JobMetaclass:
         """Returns the class associated with the given job name.
 
         Args:

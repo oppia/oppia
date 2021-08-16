@@ -2267,7 +2267,7 @@ title: Title
             self,
             url: str,
             params: Optional[Dict[str, str]] = None,
-            expected_status_int: Optional[int] = 200,
+            expected_status_int: int = 200,
             headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:

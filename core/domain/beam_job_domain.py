@@ -26,7 +26,7 @@ from jobs import base_jobs
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Type # isort: skip
+from typing import Dict, List, Type, Union # isort: skip
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
@@ -68,7 +68,7 @@ class BeamJob(python_utils.OBJECT):
         # should be considered an implementation detail.
         return python_utils.get_args_of_function(self._job_class.run)[1:]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Union[str, List[str]]]:
         """Returns a dict representation of the BeamJob.
 
         Returns:
@@ -146,7 +146,7 @@ class BeamJobRun(python_utils.OBJECT):
             beam_job_models.BeamJobState.FAILED.value,
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Union[bool, float, str, List[str]]]:
         """Returns a dict representation of the BeamJobRun.
 
         Returns:
@@ -195,7 +195,7 @@ class AggregateBeamJobRunResult(python_utils.OBJECT):
         self.stdout = stdout
         self.stderr = stderr
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representation of the AggregateBeamJobRunResult.
 
         Returns:

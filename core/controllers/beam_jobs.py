@@ -82,8 +82,8 @@ class BeamJobRunHandler(base.BaseHandler):
     @acl_decorators.can_run_any_job
     def put(self):
         # type: () -> None
-        job_name = self.payload.get('job_name')
-        job_args = self.payload.get('job_arguments')
+        job_name = self.normalized_payload.get('job_name')
+        job_args = self.normalized_payload.get('job_arguments')
         beam_job_run = jobs_manager.run_job_sync(job_name, job_args)
         self.render_json(beam_job_run.to_dict())
 

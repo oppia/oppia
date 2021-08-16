@@ -53,7 +53,7 @@ def run_job_sync(job_name, job_args, namespace=None):
     job_pipeline = beam.Pipeline(
         runner=runners.DirectRunner(),
         options=job_options.JobOptions(namespace=namespace))
-    job_class = registry.get_job_by_name(job_name)
+    job_class = registry.get_job_class_by_name(job_name)
 
     job = job_class(job_pipeline)
     run_model = beam_job_services.create_beam_job_run_model(job_name, job_args)

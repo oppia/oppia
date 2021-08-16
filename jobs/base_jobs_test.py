@@ -54,7 +54,7 @@ class JobMetaclassTests(test_utils.TestBase):
         self.assertEqual(MockJobMetaclass.get_all_job_names(), [])
         self.assertRaisesRegexp(
             ValueError, 'FooJobBase is not registered as a job',
-            lambda: MockJobMetaclass.get_job_by_name('FooJobBase'))
+            lambda: MockJobMetaclass.get_job_class_by_name('FooJobBase'))
 
     def test_puts_non_base_classes_in_registry(self):
         class FooJob(metaclass=MockJobMetaclass):
@@ -65,7 +65,7 @@ class JobMetaclassTests(test_utils.TestBase):
 
         self.assertEqual(MockJobMetaclass.get_all_jobs(), [FooJob])
         self.assertEqual(MockJobMetaclass.get_all_job_names(), ['FooJob'])
-        self.assertIs(MockJobMetaclass.get_job_by_name('FooJob'), FooJob)
+        self.assertIs(MockJobMetaclass.get_job_class_by_name('FooJob'), FooJob)
 
     def test_raises_type_error_for_jobs_with_duplicate_names(self):
         class FooJob(metaclass=MockJobMetaclass):

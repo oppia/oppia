@@ -51,7 +51,7 @@ def get_all_job_names() -> List[str]:
     return base_jobs.JobMetaclass.get_all_job_names()
 
 
-def get_job_by_name(job_name: str) -> base_jobs.JobMetaclass:
+def get_job_class_by_name(job_name: str) -> base_jobs.JobMetaclass:
     """Returns the class associated with the given job name.
 
     Args:
@@ -60,4 +60,4 @@ def get_job_by_name(job_name: str) -> base_jobs.JobMetaclass:
     Returns:
         class. The class associated to the given job name.
     """
-    return base_jobs.JobMetaclass.get_job_by_name(job_name)
+    return base_jobs.JobMetaclass.get_job_class_by_name(job_name)

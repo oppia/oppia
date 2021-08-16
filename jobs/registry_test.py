@@ -61,17 +61,18 @@ class RegistryTests(test_utils.TestBase):
     def test_get_all_job_names_never_returns_an_empty_list(self):
         self.assertNotEqual(registry.get_all_job_names(), [])
 
-    def test_get_job_by_name_returns_value_from_job_metaclass(self):
+    def test_get_job_class_by_name_returns_value_from_job_metaclass(self):
         unique_obj = object()
 
         @classmethod
-        def get_job_by_name_mock(unused_cls, unused_name):
+        def get_job_class_by_name_mock(unused_cls, unused_name):
             """Returns the unique_obj."""
             return unique_obj
 
-        get_job_by_name_swap = self.swap(
+        get_job_class_by_name_swap = self.swap(
             base_jobs.JobMetaclass,
-            'get_job_by_name', get_job_by_name_mock)
+            'get_job_class_by_name', get_job_class_by_name_mock)
 
-        with get_job_by_name_swap:
-            self.assertIs(registry.get_job_by_name('arbitrary'), unique_obj)
+        with get_job_class_by_name_swap:
+            self.assertIs(
+                registry.get_job_class_by_name('arbitrary'), unique_obj)
