@@ -121,7 +121,6 @@ export class ChangeListService implements OnInit {
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList,
       response => {
-        console.log(response.changes_are_mergeable);
         if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
@@ -148,7 +147,6 @@ export class ChangeListService implements OnInit {
   }
 
   private addChange(changeDict: ExplorationChange) {
-    console.log(this.loadingMessage)
     if (this.loadingMessage) {
       return;
     }

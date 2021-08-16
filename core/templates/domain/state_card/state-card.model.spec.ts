@@ -22,7 +22,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { Interaction, InteractionObjectFactory } from
+import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { StateCard } from
   'domain/state_card/state-card.model';
@@ -198,21 +198,21 @@ describe('State card object factory', () => {
 
   it('should return last answer when calling ' +
     '\'getLastAnswer\'', () => {
-      expect(_sampleCard2.getLastAnswer()).toEqual('learnerInput');
+    expect(_sampleCard2.getLastAnswer()).toEqual('learnerInput');
   });
 
   it('should return empty dict when calling \'getVoiceovers\' ' +
     'if there are no voice overs', () => {
-      expect(_sampleCard2.getVoiceovers()).toEqual({});
+    expect(_sampleCard2.getVoiceovers()).toEqual({});
   });
 
   it('should return null when calling \'getInteractionId\' ' +
     'if there are no interactions', () => {
-      expect(_sampleCard2.getInteractionId()).toEqual(null);
+    expect(_sampleCard2.getInteractionId()).toEqual(null);
   });
 
   it('should return null when calling \'getInteractionCustomizationArgs\' ' +
     'if there are no interactions', () => {
-      expect(_sampleCard2.getInteractionCustomizationArgs()).toEqual(null);
+    expect(_sampleCard2.getInteractionCustomizationArgs()).toEqual(null);
   });
 });

@@ -16,7 +16,7 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeListService } from './change-list.service';
 import { LoaderService } from 'services/loader.service';
@@ -26,7 +26,6 @@ import { ExplorationDataService } from './exploration-data.service';
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoggerService } from 'services/contextual/logger.service';
 
 class MockWindowRef {
   _window = {
@@ -68,11 +67,11 @@ class MockExplorationDataService1 {
       changes_are_mergeable: true,
       is_version_of_draft_valid: false,
     });
-  };
+  }
   discardDraftAsync() {
     return;
   }
-};
+}
 
 class MockExplorationDataService2 {
   explorationId: 0;
@@ -81,31 +80,31 @@ class MockExplorationDataService2 {
       changes_are_mergeable: false,
       is_version_of_draft_valid: false,
     });
-  };
+  }
   discardDraftAsync() {
     return;
   }
-};
+}
 
 class MockExplorationDataService3 {
   explorationId: 0;
   autosaveChangeListAsync(changeList, successCb, errorCb) {
     errorCb();
-  };
+  }
   discardDraftAsync() {
     return;
   }
-};
+}
 
 class MockAutosaveInfoModalsService {
   isModalOpen() {
     return false;
-  };
+  }
 
   showNonStrictValidationFailModal() {
     return;
   }
-};
+}
 
 describe('Change List Service when changes are mergable', () => {
   let changeListService: ChangeListService;
@@ -172,7 +171,7 @@ describe('Change List Service when changes are mergable', () => {
 
     changeListService.deleteState('state');
 
-    expect(saveSpy).toHaveBeenCalled()
+    expect(saveSpy).toHaveBeenCalled();
   });
 
   it('should not save changes after deleting a state ' +
@@ -186,7 +185,7 @@ describe('Change List Service when changes are mergable', () => {
     changeListService.loadingMessage = 'loadingMessage';
     changeListService.deleteState('state');
 
-    expect(saveSpy).not.toHaveBeenCalled()
+    expect(saveSpy).not.toHaveBeenCalled();
   });
 
   it('should not save changes after deleting a state ' +
@@ -201,7 +200,7 @@ describe('Change List Service when changes are mergable', () => {
 
     changeListService.deleteState('state');
 
-    expect(saveSpy).not.toHaveBeenCalled()
+    expect(saveSpy).not.toHaveBeenCalled();
   });
 
   it('should discard all changes ' +
@@ -211,7 +210,7 @@ describe('Change List Service when changes are mergable', () => {
 
     changeListService.discardAllChanges();
 
-    expect(discardSpy).toHaveBeenCalled()
+    expect(discardSpy).toHaveBeenCalled();
   });
 
   it('should show alert message if we try to edit ' +
@@ -220,8 +219,7 @@ describe('Change List Service when changes are mergable', () => {
       'prop1', 'oldValue', 'newValue');
 
     expect(alertsSpy).toHaveBeenCalledWith(
-      'Invalid exploration property: prop1'
-    )
+      'Invalid exploration property: prop1');
   });
 
   it('should show alert message if we try to edit ' +
@@ -230,28 +228,25 @@ describe('Change List Service when changes are mergable', () => {
       'stateName', 'prop1', 'oldValue', 'newValue');
 
     expect(alertsSpy).toHaveBeenCalledWith(
-      'Invalid state property: prop1'
-    )
+      'Invalid state property: prop1');
   });
 
   it('should check whether exploration locked for editing ' +
     'when calling \'isExplorationLockedForEditing\'', () => {
     changeListService.explorationChangeList.length = 2;
     expect(changeListService.isExplorationLockedForEditing())
-      .toBe(true)
+      .toBe(true);
 
     changeListService.explorationChangeList.length = 0;
     expect(changeListService.isExplorationLockedForEditing())
-      .toBe(false)
+      .toBe(false);
   });
 });
 
 describe('Change List Service when changes are not mergable', () => {
   let changeListService: ChangeListService;
-  let loaderService: LoaderService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let internetConnectivityService: InternetConnectivityService;
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
 
   let alertsSpy = null;
@@ -277,8 +272,6 @@ describe('Change List Service when changes are not mergable', () => {
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
-    loaderService = TestBed.inject(LoaderService);
-    internetConnectivityService = TestBed.inject(InternetConnectivityService);
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
 
@@ -293,7 +286,7 @@ describe('Change List Service when changes are not mergable', () => {
   it('should undo and save changes when calling \'undoLastChange\'', () => {
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null)
+      .and.returnValue(null);
     changeListService.explorationChangeList.length = 2;
 
     changeListService.undoLastChange();
@@ -313,15 +306,12 @@ describe('Change List Service when changes are not mergable', () => {
 
 describe('Change List Service when internet is available', () => {
   let changeListService: ChangeListService;
-  let loaderService: LoaderService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
-  let loggerService: LoggerService;
   let onInternetStateChangeEventEmitter = new EventEmitter();
 
   let alertsSpy = null;
-  let modalSpy = null;
   let mockExplorationDataService = null;
   let mockAutosaveInfoModalsService = null;
 
@@ -350,10 +340,8 @@ describe('Change List Service when internet is available', () => {
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
-    loaderService = TestBed.inject(LoaderService);
     internetConnectivityService = TestBed.inject(InternetConnectivityService);
     alertsService = TestBed.inject(AlertsService);
-    loggerService = TestBed.inject(LoggerService);
 
     spyOnProperty(internetConnectivityService, 'onInternetStateChange')
       .and.returnValue(onInternetStateChangeEventEmitter);
@@ -365,7 +353,7 @@ describe('Change List Service when internet is available', () => {
   it('should undo and save changes when calling \'undoLastChange\'', () => {
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null)
+      .and.returnValue(null);
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
       state_name: 'stateName'

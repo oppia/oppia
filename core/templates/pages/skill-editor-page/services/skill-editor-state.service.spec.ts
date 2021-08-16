@@ -405,7 +405,7 @@ describe('Skill editor state service', () => {
   }));
 
   it('should fail toupdate the skill description when ' +
-    'description is empty ', fakeAsync(() => {
+    'description is empty', fakeAsync(() => {
     spyOn(fakeSkillBackendApiService, 'doesSkillWithDescriptionExistAsync')
       .and.callThrough();
     let successCb = jasmine.createSpy('success');
