@@ -63,7 +63,9 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/volunteer$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.9}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/create/.*$',

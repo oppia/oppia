@@ -82,6 +82,8 @@ var editUserRoleButton = '.protractor-test-role-edit-button';
 var roleEditorContainer = '.protractor-test-roles-editor-card-container';
 var addNewRoleButton = '.protractor-test-add-new-role-button';
 var roleSelect = '.protractor-test-new-role-selector';
+var cookieBannerAcceptButton = (
+  '.protractor-test-oppia-cookie-banner-accept-button');
 
 const login = async function(browser, page) {
   try {
@@ -93,6 +95,11 @@ const login = async function(browser, page) {
     await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
+      let cookies = await page.cookies();
+      if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
+        await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
+        await page.click(cookieBannerAcceptButton);
+      }
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, 'username1');
       await page.click(agreeToTermsCheckBox);

@@ -108,27 +108,11 @@ describe('Embedding', function() {
   // exploration id. It appears just after the page loads.
   var EMBEDDING_ERRORS_TO_IGNORE = [
     'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/embed/exploration\/idToBeReplaced',
-    'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced\\?' +
-    'locale=en#version=0.0.2&secret=',
-    'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id\\?' +
-    'locale=en#version=0.0.2&secret=',
-    'http:\/\/localhost:9001\/assets\/scripts\/' +
     'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/explore\/idToBeReplaced',
-    'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?' +
-    'iframed=true&locale=en#version=0.0.1&secret=',
-    'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/explore\/fake_id\\?' +
-    'iframed=true&locale=en#version=0.0.1&secret='
+    '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
+    '\'X-Frame-Options\' to \'deny\'.',
+    'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
+    'responded with a status of 404 ()',
   ];
 
   beforeEach(function() {

@@ -87,7 +87,8 @@ var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
   let cookieBannerAcceptButton = element(
     by.css('.protractor-test-oppia-cookie-banner-accept-button'));
-  if (await cookieBannerAcceptButton.isPresent()) {
+  let cookie = await browser.manage().getCookie('OPPIA_COOKIES_ACKNOWLEDGED');
+  if (!cookie) {
     await action.click('Cookie Banner Accept button', cookieBannerAcceptButton);
   }
 

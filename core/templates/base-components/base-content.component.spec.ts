@@ -254,6 +254,10 @@ describe('Base Content Component', () => {
     componentInstance.acknowledgeCookies();
     expect(cookieService.put).toHaveBeenCalledWith(
       'OPPIA_COOKIES_ACKNOWLEDGED', String(NOW_MILLIS),
-      { expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS) });
+      {
+        expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS),
+        secure: true,
+        sameSite: 'none'
+      });
   });
 });

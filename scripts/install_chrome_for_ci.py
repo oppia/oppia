@@ -28,7 +28,7 @@ import python_utils
 from scripts import common
 
 
-CHROME_VERSION = '88.0.4324.96-1'
+CHROME_VERSION = '89.0.4389.90-1'
 URL_TEMPLATE = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
     'google-chrome-stable_{}_amd64.deb'
