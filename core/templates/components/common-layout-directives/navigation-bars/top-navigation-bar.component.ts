@@ -92,7 +92,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
-    'story_editor'];
+    'story_editor', 'blog-dashboard'];
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
