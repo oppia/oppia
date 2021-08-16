@@ -23,7 +23,6 @@ from core.controllers import base
 from core.domain import skill_fetchers
 from core.domain import topic_fetchers
 import feconf
-import python_utils
 
 
 class PracticeSessionsPage(base.BaseHandler):

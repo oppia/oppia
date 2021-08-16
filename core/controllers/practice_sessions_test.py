@@ -109,7 +109,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic('topic_id_3', self.admin_id)
         self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=["1"]' % (
+            '%s/staging/%s?selected_subtopic_ids=[1]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'noskills'),
             expected_status_int=404)
@@ -117,7 +117,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_any_user_can_access_practice_sessions_data(self):
         # Adding invalid subtopic IDs as well, which should get ignored.
         json_response = self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=["1","2","3","4"]' % (
+            '%s/staging/%s?selected_subtopic_ids=[1,2,3,4]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name'))
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -139,7 +139,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_fails_when_topic_doesnt_exist(self):
         self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=["1","2"]' % (
+            '%s/staging/%s?selected_subtopic_ids=[1,2]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'invalid'),
             expected_status_int=404)
