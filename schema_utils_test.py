@@ -666,7 +666,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """
         is_at_most = schema_utils.get_validator('is_at_most')
         self.assertTrue(is_at_most(2, 3))
-        # boundary
+        # Boundary.
         self.assertTrue(is_at_most(2, 2))
         self.assertFalse(is_at_most(2, 1))
 
@@ -676,7 +676,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """
         has_len_at_least = schema_utils.get_validator('has_length_at_least')
         self.assertTrue(has_len_at_least(['elem'], 0))
-        # boundary
+        # Boundary.
         self.assertTrue(has_len_at_least(['elem'], 1))
         self.assertFalse(has_len_at_least(['elem'], 2))
 
@@ -944,7 +944,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_schema_key_post_normalizers(self) -> None:
         """Test post normalizers in schema using basic html schema."""
-        # html strings with no extra spaces
+        # Html strings with no extra spaces.
         schema_1 = {
             'type': schema_utils.SCHEMA_TYPE_HTML,
             'post_normalizers': [
