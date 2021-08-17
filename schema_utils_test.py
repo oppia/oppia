@@ -87,6 +87,8 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 # result in any errors.
 # Note to developers: please keep this in sync with
 #     https://github.com/oppia/oppia/wiki/Schema-Based-Forms
+# The following types have recurive type definition, and currently mypy does
+# not support it. See - https://github.com/python/mypy/issues/731
 UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
@@ -124,6 +126,8 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
 }
 
 # Schemas for validators for the various types.
+# The following types have recurive type definition, and currently mypy does
+# not support it. See - https://github.com/python/mypy/issues/731
 VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},

@@ -210,6 +210,8 @@ def to_ascii(input_string: str) -> str:
     return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
+# This function accepts general structured yaml string, hence Any type has to be
+# used here for the type of returned dictionary.
 def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
     """Gets the dict representation of a YAML string.
 
@@ -231,9 +233,10 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
     except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
 
-
+# Here obj has a recursive structure. The list element or dictionary value
+# could recursively be the same structure, hence we use Any as their types.
 def recursively_remove_key(
-        obj: Union[Dict[Any, Any], List[Any]], key_to_remove: str
+        obj: Union[Dict[str, Any], List[Any]], key_to_remove: str
 ) -> None:
     """Recursively removes keys from a list or dict.
 
@@ -1011,6 +1014,10 @@ def get_asset_dir_prefix() -> str:
     return asset_dir_prefix
 
 
+# As mentioned in the documentation, `value` can have any general type which
+# a JSON object can represent, hence its type is chosen as Any. Since we
+# recursively convert this general json object into tuple or sorted tuple,
+# the return type will also be of type Any.
 def get_hashable_value(value: Any) -> Any:
     """This function returns a hashable version of the input JSON-like value.
 
@@ -1062,7 +1069,9 @@ def decompress_from_zlib(data: bytes) -> bytes:
     return zlib.decompress(data)
 
 
-def compute_list_difference(list_a: List[Any], list_b: List[Any]) -> List[Any]:
+# The mentioned types can be changed in future if they are inadequate to
+# represent the types handled by this function.
+def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
     """Returns the set difference of two lists.
 
     Args:
@@ -1112,7 +1121,7 @@ def grouper(
 
 def partition(
         iterable: Iterable[T],
-        predicate: Callable[..., Any] = bool,
+        predicate: Callable[..., bool] = bool,
         enumerated: bool = False
 ) -> Tuple[
         Iterable[Union[T, Tuple[int, T]]],

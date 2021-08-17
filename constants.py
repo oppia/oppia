@@ -67,7 +67,7 @@ class Constants(dict): # type: ignore[type-arg]
     # Here `value` has the type Any because it parses and stores the values of
     # contants defined in constants.ts file and we cannot define a single type
     # which works for all of them.
-    def __setattr__(self, name: str, value: str) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         self[name] = value
 
     def __getattr__(self, name: str) -> Any:

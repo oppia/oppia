@@ -26,6 +26,9 @@ import schema_utils
 from typing import Any, Dict, List, Tuple # isort:skip
 
 
+# This function recursively uses the schema dictionary and handler_args, and
+# passes their values to itself as arguments, so their type is Any.
+# See: https://github.com/python/mypy/issues/731
 def validate(
         handler_args: Any,
         handler_args_schemas: Any,

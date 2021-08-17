@@ -37,7 +37,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Callable, Dict, List, Optional # isort:skip
+from typing import Any, Callable, cast, Dict, List, Optional # isort:skip
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -71,9 +71,9 @@ SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
-# Using Dict[str, Any] here because the following schema can have a
-# recursive structure and currently mypy doesn't support recursive type
-# currently. See: https://github.com/python/mypy/issues/731
+# Using Dict[str, Any] here for schema because the following schema can have a
+# recursive structure and mypy doesn't support recursive type currently.
+# See: https://github.com/python/mypy/issues/731
 def normalize_against_schema(
         obj: Any,
         schema: Dict[str, Any],
@@ -289,7 +289,7 @@ class Normalizers(python_utils.OBJECT):
     """
 
     @classmethod
-    def get(cls, normalizer_id: str) -> Callable[..., Any]:
+    def get(cls, normalizer_id: str) -> Callable[..., str]:
         """Returns the normalizer method corresponding to the specified
         normalizer_id.
 
@@ -306,7 +306,9 @@ class Normalizers(python_utils.OBJECT):
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
-        return getattr(cls, normalizer_id) # type: ignore[no-any-return]
+        # Using a cast here because the return value of getattr() method is
+        # dynamic and mypy will assume it to be Any otherwise.
+        return cast(Callable[..., str], getattr(cls, normalizer_id))
 
     @staticmethod
     def sanitize_url(obj: str) -> str:
@@ -379,15 +381,17 @@ class _Validators(python_utils.OBJECT):
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
-        return getattr(cls, validator_id) # type: ignore[no-any-return]
+        # Using a cast here because the return value of getattr() method is
+        # dynamic and mypy will assume it to be Any otherwise.
+        return cast(Callable[..., bool], getattr(cls, validator_id))
 
     @staticmethod
-    def has_length_at_least(obj: List[Any], min_value: int) -> bool:
+    def has_length_at_least(obj: List[str], min_value: int) -> bool:
         """Returns True iff the given object (a list) has at least
         `min_value` elements.
 
         Args:
-            obj: list(*). A list of strings.
+            obj: list(str). A list of strings.
             min_value: int. The minimum number of elements that `obj` should
                 contain.
 
@@ -397,12 +401,12 @@ class _Validators(python_utils.OBJECT):
         return len(obj) >= min_value
 
     @staticmethod
-    def has_length_at_most(obj: List[Any], max_value: int) -> bool:
+    def has_length_at_most(obj: List[str], max_value: int) -> bool:
         """Returns True iff the given object (a list) has at most
         `max_value` elements.
 
         Args:
-            obj: list(*). A list of strings.
+            obj: list(str). A list of strings.
             max_value: int. The maximum number of elements that `obj` should
                 contain.
 
@@ -424,11 +428,11 @@ class _Validators(python_utils.OBJECT):
         return bool(obj)
 
     @staticmethod
-    def is_uniquified(obj: List[Any]) -> bool:
+    def is_uniquified(obj: List[str]) -> bool:
         """Returns True iff the given object (a list) has no duplicates.
 
         Args:
-            obj: list(*). A list of strings.
+            obj: list(str). A list of strings.
 
         Returns:
             bool. Whether the given object has no duplicates.

@@ -162,10 +162,12 @@ class SplashRedirectPage(base.BaseHandler):
         self.redirect('/')
 
 
+# Type for `defaults` is set to Dict[str, str] based on the usage in our
+# backend. Should be changed in future as per the requirements.
 def get_redirect_route(
         regex_route: str,
         handler: Type[base.BaseHandler],
-        defaults: Optional[Dict[Any, Any]] = None
+        defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 

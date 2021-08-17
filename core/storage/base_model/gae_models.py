@@ -131,6 +131,9 @@ class BaseModel(datastore_services.Model):
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
+    # We use type Any for *args and **kwargs to denote compatibility with the
+    # overidden constructor of the parent class i.e datastore_services.Model
+    # here.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(BaseModel, self).__init__(*args, **kwargs)
         self._last_updated_timestamp_is_fresh = False
@@ -508,6 +511,8 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
+    # We use type Any for *args and **kwargs to denote compatibility with the
+    # overidden put method of the parent class i.e. BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError('Use put_for_human or put_for_bot instead')
@@ -1126,6 +1131,8 @@ class VersionedModel(BaseModel):
             cls.update_timestamps_multi(entities)
             BaseModel.put_multi_transactional(entities)
 
+    # We use type Any for *args and **kwargs to denote compatibility with the
+    # overidden constructor of the parent class i.e BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """For VersionedModels, this method is replaced with commit()."""
         raise NotImplementedError(

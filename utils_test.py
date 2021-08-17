@@ -79,7 +79,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_recursively_remove_key_for_empty_dict(self) -> None:
         """Test recursively_remove_key method for an empty dict."""
-        d: Dict[None, None] = {}
+        d: Dict[str, Any] = {}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {})
 
