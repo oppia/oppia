@@ -130,7 +130,8 @@ def get_beam_job_runs(refresh=False):
 
 
 def get_beam_job_run_result(
-        job_id: str) -> beam_job_domain.AggregateBeamJobRunResult:
+    job_id: str
+) -> beam_job_domain.AggregateBeamJobRunResult:
     """Returns the result of the given Apache Beam job run.
 
     Args:
@@ -155,8 +156,10 @@ def get_beam_job_run_result(
 
 
 def create_beam_job_run_model(
-    job_name: str, job_arguments: List[str],
-    dataflow_job_id: Optional[str] = None) -> beam_job_models.BeamJobRunModel:
+    job_name: str,
+    job_arguments: List[str],
+    dataflow_job_id: Optional[str] = None
+) -> beam_job_models.BeamJobRunModel:
     """Creates a new BeamJobRunModel without putting it into storage.
 
     Args:

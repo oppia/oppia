@@ -81,7 +81,8 @@ class JobMetaclass(type):
             cls: Type[JobMetaclass],
             name: str,
             bases: Tuple[type, ...],
-            namespace: Dict[str, Any]) -> JobMetaclass:
+            namespace: Dict[str, Any]
+    ) -> JobMetaclass:
         """Creates a new job class with type `JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation

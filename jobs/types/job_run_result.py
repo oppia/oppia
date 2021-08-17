@@ -153,11 +153,13 @@ class JobRunResult(python_utils.OBJECT):
     def __hash__(self) -> int:
         return hash((self.stdout, self.stderr))
 
+    # NOTE: Needs to return Any due to https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         return (
             (self.stdout, self.stderr) == (other.stdout, other.stderr) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
+    # NOTE: Needs to return Any due to https://github.com/python/mypy/issues/363#issue-39383094
     def __ne__(self, other: Any) -> Any:
         return (
             not (self == other)

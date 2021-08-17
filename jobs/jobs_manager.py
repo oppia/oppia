@@ -19,7 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from core.domain import beam_job_domain # pylint: disable=unused-import
+from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.storage.beam_job import gae_models as beam_job_models
 from jobs import job_options
@@ -34,8 +34,11 @@ from typing import List
 from typing import Optional
 
 
-def run_job_sync(job_name, job_args, namespace=None):
-    # type: (str, List[str], Optional[str]) -> beam_job_domain.BeamJobRun
+def run_job_sync(
+        job_name: str,
+        job_args: List[str],
+        namespace: Optional[str] = None
+) -> beam_job_domain.BeamJobRun:
     """Runs the specified job synchronously.
 
     In other words, the function will wait for the job to finish running before

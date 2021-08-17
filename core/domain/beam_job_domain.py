@@ -104,9 +104,14 @@ class BeamJobRun(python_utils.OBJECT):
     """
 
     def __init__(
-            self, job_id: str, job_name: str, job_state: str,
-            job_arguments: List[str], job_started_on: datetime.datetime,
-            job_updated_on: datetime.datetime, job_is_synchronous: bool):
+            self,
+            job_id: str,
+            job_name: str,
+            job_state: str,
+            job_arguments: List[str],
+            job_started_on: datetime.datetime,
+            job_updated_on: datetime.datetime,
+            job_is_synchronous: bool):
         """Initializes a new BeamJobRun instance.
 
         Args:

@@ -1956,8 +1956,11 @@ title: Title
             yield user_id
 
     def signup(
-            self, email: str, username: str,
-            is_super_admin: Optional[bool] = False) -> None:
+            self,
+            email: str,
+            username: str,
+            is_super_admin: Optional[bool] = False
+    ) -> None:
         """Complete the signup process for the user with the given username.
 
         Args:
@@ -2268,7 +2271,8 @@ title: Title
             url: str,
             params: Optional[Dict[str, str]] = None,
             expected_status_int: int = 200,
-            headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+            headers: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
             self.assertIsInstance(params, dict)
