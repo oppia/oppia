@@ -22,8 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
 describe('Tutorial events backend service', () => {
-  let tutorialEventsBackendApiService = null;
-  let httpTestingController: HttpTestingController = null;
+  let tutorialEventsBackendApiService: TutorialEventsBackendApiService;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

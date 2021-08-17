@@ -47,10 +47,13 @@ import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia
   templateUrl: './skillreview.component.html'
 })
 export class NoninteractiveSkillreview implements OnInit, OnChanges {
-  @Input() skillIdWithValue: string;
-  @Input() textWithValue: string;
-  skillId: string;
-  linkText: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() skillIdWithValue!: string;
+  @Input() textWithValue!: string;
+  skillId!: string;
+  linkText!: string;
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -83,9 +86,11 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   // instance, then open the concept card modal. To determine if the
   // RTE is inside a CKEditor instance, check if the offsetParent
   // element contains the data attribute ckeWidgetId.
-  private _shouldOpenRTEModal(event): boolean {
+  private _shouldOpenRTEModal(event: Event): boolean {
+    const target = <HTMLElement> event.currentTarget;
+    const offsetParent = <HTMLElement> target.offsetParent;
     return (
-      event.currentTarget.offsetParent.dataset.ckeWidgetId ||
+      Boolean(offsetParent.dataset.ckeWidgetId) ||
       this.ckEditorCopyContentService.copyModeActive
     );
   }

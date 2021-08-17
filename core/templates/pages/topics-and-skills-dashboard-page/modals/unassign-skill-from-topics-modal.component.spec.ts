@@ -20,7 +20,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
+import { TopicAssignments, UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
 
 describe('Unassing SKill Modal', () => {
   let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
@@ -39,7 +39,7 @@ describe('Unassing SKill Modal', () => {
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
       return {
-        then: (callback: (resp) => void) => {
+        then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);
         }
       };
@@ -83,7 +83,11 @@ describe('Unassing SKill Modal', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedTopicNames = ['Topic 1'];
     componentInstance.topicsAssignments = {
-      'Topic 1': null
+      'Topic 1': {
+        subtopicId: 0,
+        topicVersion: 0,
+        topicId: '',
+      }
     };
     componentInstance.close();
     expect(ngbActiveModal.close).toHaveBeenCalledWith(
@@ -100,7 +104,7 @@ describe('Unassing SKill Modal', () => {
 
   it('should fetch topic assignments for skill', () => {
     componentInstance.fetchTopicAssignmentsForSkill();
-    let assignments = {};
+    let assignments: TopicAssignments = {};
     assignments[skillBackendDict.topic_name] = {
       subtopicId: skillBackendDict.subtopic_id,
       topicVersion: skillBackendDict.topic_version,

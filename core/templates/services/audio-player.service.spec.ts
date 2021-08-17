@@ -32,8 +32,8 @@ describe('AudioPlayerService', () => {
   let contextService: ContextService;
   let assetsBackendApiService: AssetsBackendApiService;
   let audioTranslationManagerService: AudioTranslationManagerService;
-  let successHandler;
-  let failHandler;
+  let successHandler: jasmine.Spy;
+  let failHandler: jasmine.Spy;
 
 
   beforeEach(waitForAsync(() => {
@@ -62,7 +62,7 @@ describe('AudioPlayerService', () => {
   describe('when audio loads successfully', () => {
     beforeEach(() => {
       spyOn(howler, 'Howl').and.returnValue({
-        on: (evt, func) => {
+        on: (evt: string, func: () => void) => {
           if (evt === 'load') {
             func();
           }
@@ -316,7 +316,7 @@ describe('AudioPlayerService', () => {
   describe('when track is not loaded', () => {
     beforeEach(() => {
       spyOn(howler, 'Howl').and.returnValue({
-        on: (evt, func) => {
+        on: (evt: string, func: () => void) => {
           if (evt === 'load') {
             func();
           }
@@ -429,7 +429,7 @@ describe('AudioPlayerService', () => {
   it('should clear secondary audio translations when audio ' +
   'ends', fakeAsync(async() => {
     spyOn(howler, 'Howl').and.returnValue({
-      on: (evt, func) => {
+      on: (evt: string, func: () => void) => {
         if (evt === 'end') {
           func();
         }
