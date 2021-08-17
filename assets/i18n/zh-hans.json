@@ -387,6 +387,7 @@
 	"I18N_MODAL_CANCEL_BUTTON": "取消",
 	"I18N_MODAL_CONTINUE_BUTTON": "继续",
 	"I18N_ONE_SUBSCRIBER_TEXT": "您有1位订阅者。",
+	"I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "合作伙伴",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "将要被删除的账户",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1": "您的用户计划于在24小时内被删除。完成删除后将通过电子邮箱通知您。",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2": "该行动会删除本用户与所有与他相关的隐私信息。为了使信息无法与本用户相联，已经公开的信息会被转为匿名。其中一些数据的所有权可能会转移到社群。",

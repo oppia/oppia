@@ -481,7 +481,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Os nomes de utilizador com 'admin' estão reservados.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Verifique que o seu nome de utilizador não contém espaços, por favor.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Este campo é obrigatório.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Note, por favor, que, ao aceitar as condições de utilização, está a concordar que todos os conteúdos e contribuições que fizer terão a licença CC-BY-SA v.4.0, com uma renúncia do requisito da atribuição (BY). Leia as nossas <a href=\"/terms\">Condições de Utilização</a> para obter mais informações sobre o licenciamento, por favor. Para mais informações sobre a CC-BY-SA, clique <a href=\"#\">aqui</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Note, por favor, que, ao aceitar as condições de utilização, está a concordar que todos os conteúdos e contribuições que fizer terão a licença CC-BY-SA v.4.0. Leia as nossas <a href=\"/terms\">Condições de Utilização</a> para obter mais informações sobre o licenciamento, por favor. Para mais informações sobre a CC-BY-SA, clique <a href=\"#\">aqui</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Usar uma licença <[licenselink]> permite que o conteúdo das explorações seja livremente copiado, reutilizado, remisturado e redistribuído. A principal condição é a de que, se alguém remisturar, transformar ou ampliar o conteúdo, tem de distribuir também o seu trabalho com a mesma licença livre.",
 	"I18N_SIGNUP_LOADING": "A carregar",
 	"I18N_SIGNUP_PAGE_TITLE": "Junte-se à comunidade - Oppia",

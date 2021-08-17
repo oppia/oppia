@@ -28,6 +28,8 @@
 	"I18N_ABOUT_PAGE_TITLE": "О нас | Oppia",
 	"I18N_ACTION_BROWSE_LESSONS": "Просмотреть наши уроки",
 	"I18N_ACTION_CREATE_LESSON": "Создайте свой собственный урок",
+	"I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON": "Новый пост",
+	"I18N_BLOG_DASHBOARD_TAB_DRAFTS": "Черновики",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "Скоро",
 	"I18N_CLASSROOM_PAGE_HEADING": "Классная комната Oppia",
 	"I18N_CONTACT_PAGE_HEADING": "Присоединяйтесь!",
