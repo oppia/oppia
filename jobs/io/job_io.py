@@ -80,7 +80,8 @@ class PutResults(beam.PTransform):
         )
 
     def create_beam_job_run_result_model(
-            self, result: job_run_result.JobRunResult,
+            self,
+            result: job_run_result.JobRunResult,
             namespace: Optional[str]
     ) -> beam_job_models.BeamJobRunResultModel:
         """Returns an NDB model for storing the given JobRunResult.
