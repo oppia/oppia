@@ -192,8 +192,16 @@ var clientSideRedirection = async function(
   // Action triggering redirection.
   await action();
 
-  // eslint-disable-next-line oppia/protractor-practices
-  await browser.sleep(5000);
+  // The action only triggers the redirection but does not wait for it to
+  // complete. Manually waiting for redirection here.
+  await browser.driver.wait(async() => {
+    var url = await browser.driver.getCurrentUrl();
+    // Condition to wait on.
+    return check(url);
+  }, DEFAULT_WAIT_TIME_MSECS);
+
+  // Waiting for caller specified conditions.
+  await waitForCallerSpecifiedConditions();
 
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
