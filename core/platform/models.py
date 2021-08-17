@@ -425,7 +425,8 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]) -> List['base_models.BaseModel']:
+            cls, model_names: List[str]
+    ) -> List['base_models.BaseModel']:
         """Get the storage model classes that are in the modules listed in
         model_names.
 

@@ -180,14 +180,16 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
-            self) -> None:
+            self
+    ) -> None:
         # Deleting a full user.
         auth_models.UserIdentifiersModel.apply_deletion_policy(self.USER_ID)
         self.assertIsNone(auth_models.UserIdentifiersModel.get_by_id(
             self.USER_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
-            self) -> None:
+            self
+    ) -> None:
         self.assertIsNone(auth_models.UserIdentifiersModel.get_by_id(
             self.NONEXISTENT_USER_ID))
         auth_models.UserIdentifiersModel.apply_deletion_policy(

@@ -392,7 +392,8 @@ class RegistryUnitTest(test_utils.TestBase):
             dev_mode_storage_services)
 
     def test_import_models_not_implemented_has_not_implemented_error(
-            self) -> None:
+            self
+    ) -> None:
         """Tests NotImplementedError of Platform."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
