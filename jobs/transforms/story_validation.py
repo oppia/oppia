@@ -34,15 +34,12 @@ if MYPY: # pragma: no cover
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-@validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel) # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)
 class ValidateStorySnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
-    def _get_change_domain_class(
-            self,
-            input_model: Any # pylint: disable=unused-argument
-    ) -> Type[story_domain.StoryChange]:
+    def _get_change_domain_class(self, unused_input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
@@ -55,15 +52,12 @@ class ValidateStorySnapshotMetadataModel(
         return story_domain.StoryChange
 
 
-@validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel) # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel)
 class ValidateStoryCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
 
-    def _get_change_domain_class(
-            self,
-            input_model: Any
-    ) -> Optional[Type[story_domain.StoryChange]]:
+    def _get_change_domain_class(self, input_model):
         """Returns a change domain class.
 
         Args:
@@ -73,7 +67,7 @@ class ValidateStoryCommitLogEntryModel(
             story_domain.StoryChange. A domain object class for the
             changes made by commit commands of the model.
         """
-        model = job_utils.clone_model(input_model) # type: ignore[no-untyped-call]
+        model = job_utils.clone_model(input_model)
 
         if model.id.startswith('story'):
             return story_domain.StoryChange

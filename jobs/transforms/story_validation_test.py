@@ -54,7 +54,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])
 
     def test_story_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
@@ -72,9 +72,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     {'invalid': 'data'},
                     'Missing cmd key in change dict')
@@ -96,9 +96,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     {'invalid': 'data'},
                     'Missing cmd key in change dict')
@@ -124,9 +124,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'The following required attributes are missing: '
@@ -154,9 +154,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     {
                         'cmd': 'add_story_node',
@@ -189,9 +189,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'Value for property_name in cmd update_story_property: '
@@ -221,9 +221,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(  # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError(  # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     {
                         'cmd': 'update_story_node_property',
@@ -259,9 +259,9 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'Value for property_name in cmd '
@@ -292,7 +292,7 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStoryCommitLogEntryModel())
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])
 
     def test_raises_commit_cmd_none_error(self) -> None:
         invalid_commit_cmd_model = (
@@ -315,8 +315,8 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStoryCommitLogEntryModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsNoneError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsNoneError(
                     invalid_commit_cmd_model)
             ])

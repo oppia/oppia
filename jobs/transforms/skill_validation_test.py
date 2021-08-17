@@ -54,7 +54,7 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])
 
     def test_skill_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
@@ -72,9 +72,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(  # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     {'invalid': 'data'},
                     'Missing cmd key in change dict')
@@ -96,9 +96,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     {'cmd': 'invalid'},
                     'Command invalid is not allowed')
@@ -124,9 +124,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'The following required attributes are missing: '
@@ -160,9 +160,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(  # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'The following extra attributes are present: invalid')
@@ -190,9 +190,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'Value for property_name in cmd update_skill_property: '
@@ -226,9 +226,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'Value for property_name in cmd '
@@ -262,9 +262,9 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
                     'Value for property_name in cmd '
@@ -292,7 +292,7 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillCommitLogEntryModel())
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])
 
     def test_raises_commit_cmd_none_error(self) -> None:
         invalid_commit_cmd_model = skill_models.SkillCommitLogEntryModel(
@@ -312,7 +312,7 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillCommitLogEntryModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model) # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
             ])

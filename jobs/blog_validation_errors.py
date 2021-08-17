@@ -22,45 +22,40 @@ from __future__ import unicode_literals
 from jobs.types import base_validation_errors
 import utils
 
-from typing import Any
-
 
 class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
     """Error class for blog posts with duplicate titles."""
 
-    def __init__(self, model: Any) -> None:
+    def __init__(self, model):
         message = 'title=%s is not unique' % utils.quoted(model.title)
-        super( # type: ignore[no-untyped-call]
-            DuplicateBlogTitleError, self).__init__(message, model)
+        super(DuplicateBlogTitleError, self).__init__(message, model)
 
 
 class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
     """Error class for blog posts with duplicate urls."""
 
-    def __init__(self, model: Any) -> None:
+    def __init__(self, model):
         message = 'url=%s is not unique' % utils.quoted(model.url_fragment)
-        super( # type: ignore[no-untyped-call]
-            DuplicateBlogUrlError, self).__init__(message, model)
+        super(DuplicateBlogUrlError, self).__init__(message, model)
 
 
 class InconsistentPublishTimestampsError(base_validation_errors.BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
-    def __init__(self, model: Any) -> None:
+    def __init__(self, model):
         message = 'created_on=%r is later than published_on=%r' % (
             model.created_on, model.published_on)
-        super( # type: ignore[no-untyped-call]
-            InconsistentPublishTimestampsError, self).__init__(message, model)
+        super(InconsistentPublishTimestampsError, self).__init__(message, model)
 
 
 class InconsistentPublishLastUpdatedTimestampsError(
         base_validation_errors.BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
-    def __init__(self, model: Any) -> None:
+    def __init__(self, model):
         message = 'published_on=%r is later than last_updated=%r' % (
             model.published_on, model.last_updated)
-        super( # type: ignore[no-untyped-call]
+        super(
             InconsistentPublishLastUpdatedTimestampsError, self
             ).__init__(message, model)
 
@@ -68,9 +63,8 @@ class InconsistentPublishLastUpdatedTimestampsError(
 class ModelMutatedDuringJobError(base_validation_errors.BaseAuditError):
     """Error class for models mutated during a job."""
 
-    def __init__(self, model: Any) -> None:
+    def __init__(self, model):
         message = (
             'published_on=%r is later than the audit job\'s start time' % (
                 model.published_on))
-        super( # type: ignore[no-untyped-call]
-            ModelMutatedDuringJobError, self).__init__(message, model)
+        super(ModelMutatedDuringJobError, self).__init__(message, model)
