@@ -257,7 +257,7 @@ describe('Story node editor directive', function() {
   });
 
   it('should show alert message when we try to ' +
-    'add a prerequisite skill id which is already exist', fakeAsync(function() {
+    'add a prerequisite skill id which already exists', fakeAsync(function() {
     spyOn(storyUpdateService, 'addPrerequisiteSkillIdToNode')
       .and.callFake(() => {
         throw new Error('skill id already exist.');
@@ -293,7 +293,7 @@ describe('Story node editor directive', function() {
   });
 
   it('should show alert message when we try to ' +
-    'add a acquired skill id which is already exist', fakeAsync(function() {
+    'add a acquired skill id which already exists', fakeAsync(function() {
     spyOn(storyUpdateService, 'addAcquiredSkillIdToNode')
       .and.callFake(() => {
         throw new Error('skill id already exist.');

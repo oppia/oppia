@@ -82,6 +82,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-list-viewer.directive.ts',
     'select2-dropdown.directive.ts',
     'shared.ts',
+    'state-content-editor.directive.ts',
+    'state-interaction-editor.directive.ts',
     'story-node.model.ts',
     'student.ts',
     'subtopic.model.ts',
