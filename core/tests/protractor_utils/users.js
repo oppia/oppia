@@ -70,12 +70,20 @@ var login = async function(email, useManualNavigation = true) {
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
 
+  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
+
+  var returnUrl = currentUrl.split('return_url=')[
+    currentUrl.split('return_url=').length - 1];
+
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
   }, (url) => {
-    // Wait until the URL has changed to something that is not /login.
-    return !(/login/.test(url));
+    if (returnUrl === '/') {
+      return /(learner-dashboard|creator-dashboard)/.test(url);
+    } else {
+      return (new RegExp(returnUrl)).test(url);
+    }
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
@@ -117,11 +125,6 @@ var _completeSignup = async function(username) {
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
   var registerUser = element(by.css('.protractor-test-register-user'));
-
-  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
-
-  var returnUrl = currentUrl.split('return_url=')[
-    currentUrl.split('return_url=').length - 1];
 
   await waitFor.clientSideRedirection(async() => {
     // Click the "register user" button to trigger redirection.

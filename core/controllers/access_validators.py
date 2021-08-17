@@ -33,28 +33,6 @@ from typing import Text # pylint: disable=unused-import
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
 
-class SplashAccessValidationHandler(base.BaseHandler):
-    """When a request is made to '/', check the user's login status, and
-    redirect them appropriately.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    } # type: Dict[Text, Any]
-
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
-        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
-                self.user_id):
-            # User's request to visit splash page is not valid and they
-            # need to be redirected to their preferred dashboard.
-            raise self.PageNotFoundException
-
-
 class ClassroomAccessValidationHandler(base.BaseHandler):
     """Validates whether request made to /learn route.
     """

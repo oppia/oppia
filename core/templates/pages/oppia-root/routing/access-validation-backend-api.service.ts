@@ -24,8 +24,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   providedIn: 'root'
 })
 export class AccessValidationBackendApiService {
-  SPLASH_PAGE_ACCESS_VALIDATOR = (
-    '/access_validation_handler/can_access_splash_page');
   CLASSROOM_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_classroom_page');
   CAN_MANAGE_OWN_ACCOUNT_VALIDATOR = (
@@ -41,10 +39,6 @@ export class AccessValidationBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
-
-  validateAccessToSplashPage(): Promise<void> {
-    return this.http.get<void>(this.SPLASH_PAGE_ACCESS_VALIDATOR).toPromise();
-  }
 
   validateAccessToClassroomPage(
       classroomUrlFragment: string

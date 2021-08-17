@@ -20,32 +20,26 @@ import { Injectable } from '@angular/core';
 import { CanLoad, Route, UrlSegment } from '@angular/router';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
-import { AccessValidationBackendApiService } from '../access-validation-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CanAccessSplashPageGuard implements CanLoad {
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef
   ) {}
 
   canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
-    return this.accessValidationBackendApiService.validateAccessToSplashPage()
-      .then(() => {
-        return true;
-      }, () => {
-        this.userService.getUserPreferredDashboardAsync().then(
-          (preferredDashboard) => {
-            // Use router.navigate once both learner dashbaord page and
-            // creator dashboard page are migrated to angular router.
-            this.windowRef.nativeWindow.location.href = (
-              '/' + preferredDashboard + '-dashboard');
-          });
+    return this.userService.getUserPreferredDashboardAsync().then(
+      (preferredDashboard) => {
+        // Use router.navigate once both learner dashbaord page and
+        // creator dashboard page are migrated to angular router.
+        this.windowRef.nativeWindow.location.href = (
+          '/' + preferredDashboard + '-dashboard');
         return false;
+      }, () => {
+        return true;
       });
   }
 }

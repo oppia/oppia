@@ -26,50 +26,6 @@ import feconf
 ACCESS_VALIDATION_HANDLER_PREFIX = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
 
 
-class SplashPageAccessValidationHandlerTests(test_utils.GenericTestBase):
-    """Checks that the user is redirected according to login status when
-    request is made to '/'."""
-
-    def setUp(self):
-        # type: () -> None
-        super(SplashPageAccessValidationHandlerTests, self).setUp() # type: ignore[no-untyped-call]
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME) # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
-        self.signup( # type: ignore[no-untyped-call]
-            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-
-    def test_redirection_if_user_is_not_fully_registered(self):
-        # type: () -> None
-        self.get_html_response( # type: ignore[no-untyped-call]
-            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
-        self.logout() # type: ignore[no-untyped-call]
-
-    def test_redirection_to_default_dashboard_if_user_is_fully_registered(self):
-        # type: () -> None
-        self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
-        csrf_token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
-
-        # Registering this user fully.
-        self.post_json( # type: ignore[no-untyped-call]
-            feconf.SIGNUP_DATA_URL,
-            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True},
-            csrf_token=csrf_token)
-
-        # Set the default dashboard as creator dashboard.
-        user_services.update_user_default_dashboard( # type: ignore[no-untyped-call]
-            self.editor_id, constants.DASHBOARD_TYPE_LEARNER)
-        self.get_json( # type: ignore[no-untyped-call]
-            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
-            expected_status_int=404)
-
-        # Set the default dashboard as creator dashboard.
-        user_services.update_user_default_dashboard( # type: ignore[no-untyped-call]
-            self.editor_id, constants.DASHBOARD_TYPE_CREATOR)
-        self.get_json( # type: ignore[no-untyped-call]
-            '%s/can_access_splash_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
-            expected_status_int=404)
-
-
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):

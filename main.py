@@ -187,10 +187,6 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.SplashAccessValidationHandler),
-
-    get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 

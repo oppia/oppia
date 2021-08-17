@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
-import { AccessValidationBackendApiService } from '../access-validation-backend-api.service';
 import { CanAccessSplashPageGuard } from './can-access-splash-page.guard';
 
 class MockWindowRef {
@@ -33,7 +32,6 @@ class MockWindowRef {
 
 describe('Can access splash page guard', () => {
   let caspg: CanAccessSplashPageGuard;
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let windowRef: MockWindowRef;
   let userService: UserService;
 
@@ -47,21 +45,16 @@ describe('Can access splash page guard', () => {
           provide: WindowRef,
           useClass: MockWindowRef
         },
-        AccessValidationBackendApiService,
         UserService
       ]
     }).compileComponents();
     caspg = TestBed.inject(CanAccessSplashPageGuard);
     windowRef = TestBed.inject(WindowRef);
-    accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
     userService = TestBed.inject(UserService);
   });
 
   it('should redirect user to default dashboard', fakeAsync(() => {
     let defaultDashboard = 'learner';
-    spyOn(accessValidationBackendApiService, 'validateAccessToSplashPage')
-      .and.returnValue(Promise.reject());
     spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
       Promise.resolve('learner'));
     caspg.canLoad(null, null);
@@ -71,9 +64,9 @@ describe('Can access splash page guard', () => {
       '/' + defaultDashboard + '-dashboard');
   }));
 
-  it('should allow user to access page if validation succeds', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService, 'validateAccessToSplashPage')
-      .and.returnValue(Promise.resolve());
+  it('should allow user to access page if not logged in', fakeAsync(() => {
+    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+      Promise.reject());
     caspg.canLoad(null, null).then((value) => {
       expect(value).toEqual(true);
     });
