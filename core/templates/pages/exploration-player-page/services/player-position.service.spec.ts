@@ -54,17 +54,17 @@ describe('Player position service', () => {
   });
 
   it('should record answer submission as true', () => {
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeFalse();
     pps.recordAnswerSubmission();
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(true);
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeTrue();
   });
 
   it('should record answer submission by the learner as false', () => {
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeFalse();
     pps.recordAnswerSubmission();
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(true);
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeTrue();
     pps.recordNavigationButtonClick();
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeFalse();
   });
 
   it('should set displayed index card to given value', () => {
