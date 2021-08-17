@@ -39,11 +39,11 @@ class ValidateSubtopicPageSnapshotMetadataModel(
     """Overrides _get_change_domain_class for SubtopicPageSnapshotMetadataModel.
     """
 
-     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+    def _get_change_domain_class(self, unused_input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            unused_input_model: datastore_services.Model. Entity to validate.
 
         Returns:
             subtopic_page_domain.SubtopicPageChange. A domain object class for

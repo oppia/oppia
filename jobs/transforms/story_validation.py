@@ -25,8 +25,6 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-from typing import Any, Optional, Type # isort:skip
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import story_models
@@ -43,7 +41,7 @@ class ValidateStorySnapshotMetadataModel(
         """Returns a change domain class.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            unused_input_model: datastore_services.Model. Entity to validate.
 
         Returns:
             story_domain.StoryChange. A domain object class for the

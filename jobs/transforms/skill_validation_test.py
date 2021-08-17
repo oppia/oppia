@@ -314,5 +314,6 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             output, [
-                base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
+                base_validation_errors.CommitCmdsNoneError(
+                    invalid_commit_cmd_model)
             ])
