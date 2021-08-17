@@ -24,7 +24,7 @@ export interface ExplorationRatings {
   '5': number;
 }
 
-interface HumanReadableContributorsSummary {
+export interface HumanReadableContributorsSummary {
   [username: string]: {
     'num_commits': number;
   }

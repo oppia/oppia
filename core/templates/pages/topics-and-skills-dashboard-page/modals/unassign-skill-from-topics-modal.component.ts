@@ -28,7 +28,7 @@ export interface TopicAssignmentsSummary {
   topicId: string
 }
 
-interface TopicAssignments {
+export interface TopicAssignments {
   [key: string]: TopicAssignmentsSummary
 }
 
@@ -38,11 +38,14 @@ interface TopicAssignments {
 })
 export class UnassignSkillFromTopicsModalComponent
   extends ConfirmOrCancelModal {
-  skillId: string;
-  topicsAssignments: TopicAssignments;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skillId!: string;
+  topicsAssignments!: TopicAssignments;
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
-  selectedTopics: TopicAssignmentsSummary[];
+  selectedTopics: TopicAssignmentsSummary[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -81,7 +84,6 @@ export class UnassignSkillFromTopicsModalComponent
     }
   }
   close(): void {
-    this.selectedTopics = [];
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(
         this.topicsAssignments[this.selectedTopicNames[index]]);
