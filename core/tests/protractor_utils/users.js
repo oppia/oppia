@@ -126,6 +126,11 @@ var _completeSignup = async function(username) {
 
   var registerUser = element(by.css('.protractor-test-register-user'));
 
+  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
+
+  var returnUrl = currentUrl.split('return_url=')[
+    currentUrl.split('return_url=').length - 1];
+
   await waitFor.clientSideRedirection(async() => {
     // Click the "register user" button to trigger redirection.
     await action.click('Register user button', registerUser);
