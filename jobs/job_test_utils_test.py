@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from unittest import mock
+
 from core.platform import models
 from core.tests import test_utils
 from jobs import job_test_utils
@@ -26,7 +28,6 @@ import python_utils
 
 import apache_beam as beam
 from apache_beam.testing import util as beam_testing_util
-import mock
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

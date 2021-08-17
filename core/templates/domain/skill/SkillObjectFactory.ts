@@ -43,10 +43,7 @@ import { ValidatorsService } from 'services/validators.service';
 import constants from 'assets/constants';
 
 export class Skill {
-  // TODO(#13637): Remove the use of interstitial skill object
-  // 'SkillId' and 'supersedingSkillId' will be null when creating
-  // interstitial Skill.
-  _id: string | null;
+  _id: string;
   _description: string;
   _misconceptions: Misconception[];
   _rubrics: Rubric[];
@@ -54,13 +51,13 @@ export class Skill {
   _languageCode: string;
   _version: number;
   _nextMisconceptionId: number;
-  _supersedingSkillId: string | null;
+  _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
   SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(
-      id: string | null,
+      id: string,
       description: string,
       misconceptions: Misconception[],
       rubrics: Rubric[],
@@ -68,7 +65,7 @@ export class Skill {
       languageCode: string,
       version: number,
       nextMisconceptionId: number,
-      supersedingSkillId: string | null,
+      supersedingSkillId: string,
       allQuestionsMerged: boolean,
       prerequisiteSkillIds: string[]) {
     this._id = id;
@@ -97,7 +94,7 @@ export class Skill {
     this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
   }
 
-  getId(): string | null {
+  getId(): string {
     return this._id;
   }
 
@@ -159,7 +156,7 @@ export class Skill {
     return (parseInt(id) + 1);
   }
 
-  getSupersedingSkillId(): string | null {
+  getSupersedingSkillId(): string {
     return this._supersedingSkillId;
   }
 
@@ -218,9 +215,6 @@ export class Skill {
   }
 
   toBackendDict(): SkillBackendDict {
-    if (this._id === null || this._supersedingSkillId === null) {
-      throw new Error('The skill IDs are not defined');
-    }
     return {
       id: this._id,
       description: this._description,
@@ -263,12 +257,6 @@ export class SkillObjectFactory {
     private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private validatorService: ValidatorsService) {
-  }
-  createInterstitialSkill(): Skill {
-    return new Skill(
-      null, 'Skill description loading',
-      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
-      'en', 1, 0, null, false, []);
   }
 
   hasValidDescription(description: string): boolean {
