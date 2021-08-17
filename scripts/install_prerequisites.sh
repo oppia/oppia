@@ -40,4 +40,4 @@ sudo apt-get install python3-yaml
 #    https://github.com/oppia/oppia/wiki/Troubleshooting
 sudo apt-get install python-matplotlib
 sudo apt-get install python3-matplotlib
-sudo pip install --upgrade pip==21.2.3
+pip install --upgrade pip==21.2.3
