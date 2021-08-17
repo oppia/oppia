@@ -587,13 +587,10 @@ def get_args_of_function(func: Callable[..., Any]) -> List[str]:
     Raises:
         TypeError. The input argument is not a function.
     """
-    try:
-        # Python 3.
-        return [p.name for p in inspect.signature(func).parameters
-                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
-    except AttributeError:
-        # Python 2.
-        return inspect.getargspec(func).args
+    return [
+        name for name, param in inspect.signature(func).parameters.items()
+        if param.kind in (param.POSITIONAL_ONLY, param.POSITIONAL_OR_KEYWORD)
+    ]
 
 
 def create_enum(*sequential):
