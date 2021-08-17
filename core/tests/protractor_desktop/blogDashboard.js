@@ -50,8 +50,9 @@ describe('Blog dashboard functionality', function() {
   it('should create and delete a newly created blog post', async function() {
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.navigateToBlogDashboardPage();
-    await blogDashboardPage.deleteBlogPostWithIndex(0);
+    await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
 
+    await blogDashboardPage.deleteBlogPostWithIndex(0);
     await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
   });
 
@@ -70,7 +71,6 @@ describe('Blog dashboard functionality', function() {
   it('should create, edit and delete a blog post from blog dashboard',
     async function() {
       await blogDashboardPage.createNewBlogPost();
-
       await blogDashboardPage.navigateToBlogDashboardPage();
       await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
 
@@ -78,25 +78,8 @@ describe('Blog dashboard functionality', function() {
       await blogDashboardPage.saveBlogPostAsDraft(
         'Sample blog Title', await forms.toRichText(
           'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
-
       await blogDashboardPage.navigateToBlogDashboardPage();
       await blogDashboardPage.deleteBlogPostWithIndex(0);
-    });
-
-  it('should check that blog post editor shows blog card preview',
-    async function() {
-      await blogDashboardPage.createNewBlogPost();
-      await blogDashboardPage.publishBlogPost(
-        'Sample Title', await forms.toRichText(
-          'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
-        [1, 2, 3]);
-      await blogDashboardPage.showBlogCardPreview();
-      await blogDashboardPage.navigateToBlogDashboardPage();
-      await blogDashboardPage.navigateToPublishTab();
-      await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
-
-      await blogDashboardPage.deleteBlogPostWithIndex(0);
-      await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
     });
 
   it('should create, publish, and delete the published blog post from' +
@@ -134,11 +117,11 @@ describe('Blog dashboard functionality', function() {
       await blogDashboardPage.navigateToPublishTab();
 
       await blogDashboardPage.unpublishBlogPostWithIndex(0);
+      await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
 
       await blogDashboardPage.navigateToDraftsTab();
       await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(1);
       await blogDashboardPage.deleteBlogPostWithIndex(0);
-      await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
       await blogDashboardPage.expectNumberOfDraftsBlogPostsToBe(0);
     });
 
@@ -186,7 +169,6 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.navigateToPublishTab();
     await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
   });
-
 
   it('should show an error if uploaded thumbnail is too large' +
   ' in blog post editor', async function() {

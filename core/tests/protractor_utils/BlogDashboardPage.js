@@ -81,8 +81,6 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-photo-upload-cancel'));
   var blogDashboardIntroMessage = element(
     by.css('.protractor-test-intro-message'));
-  var editContentCard = element(
-    by.css('.protractor-test-content-button'));
   var closeBlogCardPreviewButton = element(
     by.css('.protractor-test-close-preview-button'));
   var blogCardPreviewButton = element(
@@ -150,6 +148,8 @@ var BlogDashboardPage = function() {
     await action.sendKeys(
       'New blog post title field', BlogPostTitleFieldElement, blogPostTitle);
     await this.setContent(richTextInstructions);
+    await waitFor.visibilityOf(
+      blogPostContentDisplay, 'Blog Post content not showing up');
     await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
   };
@@ -160,6 +160,8 @@ var BlogDashboardPage = function() {
       'New blog post title field', BlogPostTitleFieldElement, blogPostTitle);
     await this.selectTags(tags);
     await this.setContent(richTextInstructions);
+    await waitFor.visibilityOf(
+      blogPostContentDisplay, 'Blog Post content not showing up');
     await this.setThumbnailImage();
     await action.click('Publish Blog Post', publishBlogPostButton);
     await action.click(
@@ -173,12 +175,6 @@ var BlogDashboardPage = function() {
       await action.click(
         'select blog post tag', blogPostTags.get(tags[i]));
     }
-  };
-
-  this.expectContentToMatch = async function(richTextInstructions) {
-    await waitFor.visibilityOf(editContentCard, 'Unable to find content card.');
-    await forms.expectRichText(blogPostContentDisplay).toMatch(
-      richTextInstructions);
   };
 
   this.navigateToPublishTab = async function() {
