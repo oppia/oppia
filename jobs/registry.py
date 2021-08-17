@@ -26,7 +26,6 @@ into this file.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from jobs import base_jobs
 # IMPORTANT: These modules MUST be imported! DO NOT DELETE!
 # We need each module to execute so that the class definitions trigger the
 # metaclass logic. That is, the following code:
@@ -41,6 +40,7 @@ from jobs import base_jobs
 # We need this to happen for every job in this registry file, because the
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
+from jobs import base_jobs
 from jobs import blog_validation_jobs  # pylint: disable=unused-import
 from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
 
