@@ -148,13 +148,6 @@ describe('Interaction Rules Registry Service', () => {
     expect(
       () => interactionRulesRegistryService.getRulesServiceByInteractionId('')
     ).toThrowError('Interaction ID must not be empty');
-    expect(
-      () => interactionRulesRegistryService.getRulesServiceByInteractionId(null)
-    ).toThrowError('Interaction ID must not be empty');
-    expect(
-      () => interactionRulesRegistryService.getRulesServiceByInteractionId(
-        undefined)
-    ).toThrowError('Interaction ID must not be empty');
   });
 
   it('should throw an error for an interaction id that does not exist', () => {

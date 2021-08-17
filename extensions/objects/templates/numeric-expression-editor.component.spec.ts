@@ -35,7 +35,7 @@ describe('NumericExpressionEditor', () => {
     }
   };
   let guppyInitializationService: GuppyInitializationService;
-  let deviceInfoService = null;
+  let deviceInfoService: DeviceInfoService;
 
   class MockGuppy {
     static focused = true;
@@ -64,7 +64,6 @@ describe('NumericExpressionEditor', () => {
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     window.Guppy = MockGuppy;
-    component.currentValue = '';
   })));
 
   afterEach(() => {
@@ -72,6 +71,7 @@ describe('NumericExpressionEditor', () => {
   });
 
   it('should add the change handler to guppy', () => {
+    component.currentValue = '';
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
     component.ngOnInit();
@@ -81,7 +81,6 @@ describe('NumericExpressionEditor', () => {
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
-    component.currentValue = undefined;
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
@@ -90,6 +89,9 @@ describe('NumericExpressionEditor', () => {
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
+    // This throws "Type 'null' is not assignable to type 'string'".
+    // We need to suppress this error because we are testing validations here.
+    // @ts-ignore
     component.value = null;
     MockGuppy.focused = false;
     component.ngOnInit();
@@ -115,6 +117,7 @@ describe('NumericExpressionEditor', () => {
   });
 
   it('should set the value of showOSK to true', () => {
+    component.currentValue = '';
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 

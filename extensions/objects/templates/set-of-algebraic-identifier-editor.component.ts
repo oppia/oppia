@@ -42,17 +42,22 @@ interface SetOfAlgebraicIdentifierEditorSchema {
   styleUrls: []
 })
 export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: unknown;
+  SCHEMA!: SetOfAlgebraicIdentifierEditorSchema;
   @Output() valueChanged = new EventEmitter();
   PLACEHOLDER_INFO = (
     'NOTE: This rule will consider each side of the equation ' +
     'independently and won\'t allow reordering of terms ' +
     'around the = sign.');
-  SCHEMA: SetOfAlgebraicIdentifierEditorSchema;
+
   constructor(
     private guppyInitializationService: GuppyInitializationService,
-    private changeDetectorRef: ChangeDetectorRef) { }
+    private changeDetectorRef: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     let customOskLetters = (
