@@ -28,18 +28,22 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 
 export class RatioExpressionEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: number[];
   @Output() valueChanged = new EventEmitter();
+  localValue!: { label: string; };
   warningText: string = '';
-  localValue: { label: string; };
   eventBusGroup: EventBusGroup;
+
   constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
   ngOnInit(): void {
-    if (this.value === null) {
+    if (this.value === undefined) {
       this.value = [1, 1];
       this.valueChanged.emit(this.value);
     }

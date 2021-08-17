@@ -1713,7 +1713,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
 
 class JsonEncodedInString(BaseObject):
-    """This method loads json strings into its appropriate type."""
+    """Converts stringified value to its actual data type."""
 
     @classmethod
     def normalize(cls, raw):
@@ -1723,7 +1723,8 @@ class JsonEncodedInString(BaseObject):
             raw: str. Strings to be validated and normalized.
 
         Returns:
-            *. The normalized value for json string.
+            *. The normalized value of any type, it depends on the raw value
+            which we want to load from json.
         """
         if not isinstance(raw, python_utils.BASESTRING):
             raise Exception('Expected string received %s of type %s' % (

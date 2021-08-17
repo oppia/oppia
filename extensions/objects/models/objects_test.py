@@ -1326,7 +1326,8 @@ class JsonEncodedInStringTests(test_utils.GenericTestBase):
     def test_normalization(self):
         list_of_ids = ['0', '1']
         with self.assertRaisesRegexp(
-            Exception, 'Expected string received 2'):
+            Exception, 'Expected string received 2 of type %s' % type(2)
+        ):
             objects.JsonEncodedInString.normalize(2)
 
         self.assertEqual(
