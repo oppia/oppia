@@ -74,7 +74,7 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
-        linked_skill_id: null,
+        linked_skill_id: '',
         next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
@@ -136,7 +136,7 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
-        linked_skill_id: null,
+        linked_skill_id: '',
         next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
@@ -162,6 +162,67 @@ describe('ImprovementsService', () => {
         improvementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
       ).toBe(false);
+    });
+
+    it('should return false if Interaction Id or State is null', () => {
+      let mockStateBackendDict = {
+        classifier_model_id: null,
+        content: {
+          html: '',
+          content_id: 'content'
+        },
+        interaction: {
+          id: null,
+          customization_args: {
+            requireSimplestForm: { value: false },
+            allowImproperFraction: { value: true },
+            allowNonzeroIntegerPart: { value: true },
+            customPlaceholder: { value: {
+              content_id: '',
+              unicode_str: ''
+            } },
+          },
+          answer_groups: [],
+          default_outcome: {
+            dest: 'Introduction',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          confirmed_unclassified_answers: [],
+          hints: [],
+          solution: null
+        },
+        linked_skill_id: '',
+        next_content_id_index: 0,
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        card_is_checkpoint: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        }
+      };
+
+      let mockState = stateObjectFactory.createFromBackendDict(
+        'stateName', mockStateBackendDict);
+      expect(
+        improvementsService
+          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
+      ).toBeFalse();
     });
   });
 });

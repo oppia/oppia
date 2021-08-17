@@ -42,9 +42,13 @@ import {
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface StateBackendDict {
-  'classifier_model_id': string;
+  // The classifier model ID associated with a state, if applicable,
+  // null otherwise.
+  'classifier_model_id': string | null;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
   'param_changes': readonly ParamChangeBackendDict[];
@@ -52,14 +56,15 @@ export interface StateBackendDict {
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
-  'linked_skill_id': string;
+  // This property is null if no skill is linked to an interaction.
+  'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
 
 export class State {
   name: string;
-  classifierModelId: string;
-  linkedSkillId: string;
+  classifierModelId: string | null;
+  linkedSkillId: string | null;
   content: SubtitledHtml;
   interaction: Interaction;
   paramChanges: ParamChange[];
@@ -68,8 +73,10 @@ export class State {
   cardIsCheckpoint: boolean;
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
+
   constructor(
-      name: string, classifierModelId: string, linkedSkillId: string,
+      name: string, classifierModelId: string | null,
+      linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
       solicitAnswerDetails: boolean, cardIsCheckpoint: boolean,
@@ -128,9 +135,11 @@ export class State {
     // As of now we do not delete interaction.hints when a user deletes
     // interaction, so these hints' written translations are not counted in
     // checking status of a state.
-    if (!interactionId ||
-      INTERACTION_SPECS[interactionId].is_linear ||
-      INTERACTION_SPECS[interactionId].is_terminal) {
+    if (
+      !interactionId ||
+      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear ||
+      INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal
+    ) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
           allContentIds.delete(contentId);
@@ -156,7 +165,7 @@ export class StateObjectFactory {
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
-    return constants.NEW_STATE_TEMPLATE;
+    return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
   createDefaultState(newStateName: string): State {
@@ -173,7 +182,8 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    newState.interaction.defaultOutcome.dest = newStateName;
+    let defaultOutcome = <Outcome> newState.interaction.defaultOutcome;
+    defaultOutcome.dest = newStateName;
     return newState;
   }
 
