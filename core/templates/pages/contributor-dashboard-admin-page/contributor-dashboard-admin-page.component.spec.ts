@@ -253,7 +253,8 @@ describe('Contributor dashboard admin page ', function() {
 
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(userInfo));
-      spyOn(contributorDashboardAdminBackendApiService,
+      spyOn(
+        contributorDashboardAdminBackendApiService,
         'viewContributionReviewersAsync')
         .and.returnValue(Promise.resolve(viewContributorsResponse));
 
