@@ -46,13 +46,13 @@
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item icon nav-list-item protractor-test-settings-tab" ng-click="$ctrl.connectedToInternet||$ctrl.selectSettingsTab()">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item icon nav-list-item protractor-test-settings-tab" ng-click="$ctrl.selectSettingsTab()">
         <a class="nav-link  navbar-tab" uib-tooltip="Settings" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'settings'}">&#xE8B8;</i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'stats'}" class="nav-item icon nav-list-item protractor-test-stats-tab" ng-click="$ctrl.connectedToInternet&&$ctrl.selectStatsTab()">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'stats'}" class="nav-item icon nav-list-item protractor-test-stats-tab" ng-click="$ctrl.selectStatsTab()">
         <a class="nav-link  navbar-tab" uib-tooltip="Statistics" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'stats'}">&#xE24B;</i>
         </a>
@@ -64,8 +64,8 @@
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'history'}" class="nav-item icon nav-list-item protractor-test-history-tab" ng-click="$ctrl.connectedToInternet&&$ctrl.selectHistoryTab()" ng-disabled="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="History" tooltip-placement="bottom" tabindex="0" ng-class="{'oppia-disabled-link': !$ctrl.connectedToInternet}">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'history'}" class="nav-item icon nav-list-item protractor-test-history-tab" ng-click="$ctrl.selectHistoryTab()">
+        <a class="nav-link  navbar-tab" uib-tooltip="History" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'history'}">&#xE192;</i>
         </a>
       </li>
