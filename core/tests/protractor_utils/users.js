@@ -24,6 +24,7 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
+var splashPage = element(by.css('.protractor-test-splash-page'));
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -82,16 +83,14 @@ var login = async function(email, useManualNavigation = true) {
 };
 
 var logout = async function() {
-  await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
-
   await waitFor.clientSideRedirection(async() => {
-    // Once logout page is fully loaded, it will trigger redirection.
-    await waitFor.pageToFullyLoad();
+    await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
   }, (url) => {
     // Wait until the URL has changed to something that is not /logout.
     return !(/logout/.test(url));
   }, async() => {
-    // Cannot predict the new page, so waiting for loading message to disappear.
+    await waitFor.visibilityOf(
+      splashPage, 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
   });
 };
