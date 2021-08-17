@@ -146,8 +146,18 @@ export class BaseContentComponent {
 
   acknowledgeCookies(): void {
     let currentDateInUnixTimeMsecs = new Date().valueOf();
+    // This cookie should support cross-site context so secure=true and
+    // sameSite='none' is set explicitly. Not setting this can cause
+    // inconsistent behaviour in different browsers in third-party contexts
+    // e.g. In Firefox, the cookie is accepted with a warning when
+    // sameSite='none' but secure=true is not set. For the same scenario in
+    // Chrome, the cookie gets rejected.
+    // See https://caniuse.com/same-site-cookie-attribute
+    // See https://www.chromium.org/updates/same-site/faq
     let cookieOptions = {
-      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
+      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS),
+      secure: true,
+      sameSite: 'none' as const
     };
     this.cookieService.put(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),
