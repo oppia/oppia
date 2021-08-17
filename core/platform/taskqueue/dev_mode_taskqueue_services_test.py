@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
+
 from core.domain import taskqueue_services
 from core.platform.taskqueue import dev_mode_taskqueue_services
 from core.tests import test_utils
@@ -26,11 +28,15 @@ import feconf
 
 import requests
 
+from typing import Any, Dict, Optional # isort:skip
+
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for dev_mode_taskqueue_services."""
 
-    def test_creating_dev_mode_task_will_create_the_correct_post_request(self):
+    def test_creating_dev_mode_task_will_create_the_correct_post_request(
+            self
+    ) -> None:
         correct_queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_payload = {
@@ -42,8 +48,16 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
 
         correct_task_name = 'task1'
 
+        # In the type annotation below, payload is of type Dict[str, Any]
+        # because it mocks the behaviour of
+        # dev_mode_taskqueue_services.CLIENT.create_task.
         def mock_create_task(
-                queue_name, url, payload, scheduled_for=None, task_name=None): # pylint: disable=unused-argument
+                queue_name: str,
+                url: str,
+                payload: Dict[str, Any],
+                scheduled_for: Optional[datetime.datetime] = None, # pylint: disable=unused-argument
+                task_name: Optional[str] = None,
+        ) -> None:
             self.assertEqual(queue_name, correct_queue_name)
             self.assertEqual(url, dummy_url)
             self.assertEqual(payload, correct_payload)
@@ -53,10 +67,10 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task)
         with swap_create_task:
             dev_mode_taskqueue_services.create_http_task(
-                correct_queue_name, dummy_url, payload=correct_payload,
+                correct_queue_name, dummy_url, correct_payload,
                 task_name=correct_task_name)
 
-    def test_task_handler_will_create_the_correct_post_request(self):
+    def test_task_handler_will_create_the_correct_post_request(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
@@ -77,7 +91,16 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'X-AppEngine-Fake-Is-Admin': '1',
             'method': 'POST'
         }
-        def mock_post(url, json, headers, timeout):
+        # In the type annotation below, we have used Dict[str, Any] for JSON.
+        # This is because this function mocks requests.post function where the
+        # type of JSON has been defined Any, hence using Dict[str, Any] here.
+        # https://github.com/python/typeshed/blob/5e0fc4607323a4657b587bf70e3c26becf1c88d0/stubs/requests/requests/api.pyi#L78
+        def mock_post(
+                url: str,
+                json: Dict[str, Any],
+                headers: Dict[str, str],
+                timeout: int
+        ) -> None:
             self.assertEqual(
                 url, 'http://localhost:%s%s' % (
                     correct_port, dummy_url))
