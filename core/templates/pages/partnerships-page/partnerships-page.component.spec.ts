@@ -33,7 +33,7 @@ describe('Partnerships page', () => {
     }).compileComponents();
   });
 
-  let component;
+  let component: PartnershipsPageComponent;
 
   beforeEach(() => {
     const partnershipsPageComponent = TestBed.createComponent(
