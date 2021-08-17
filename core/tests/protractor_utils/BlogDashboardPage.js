@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the classroom page, for use
+ * @fileoverview Page object for the blog Dashboard page, for use
  * in Protractor tests.
  */
 

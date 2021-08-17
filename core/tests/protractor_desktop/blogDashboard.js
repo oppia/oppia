@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the classroom page.
+ * @fileoverview End-to-end tests for the blog Dashboard page.
  */
 
 var action = require('../protractor_utils/action.js');
