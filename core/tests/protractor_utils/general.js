@@ -56,8 +56,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // In such cases, we ignore the error since it is out of our control.
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
-    'load resource: net::ERR_CERT_DATE_INVALID'),
-  'preferenceshandler/data 401 (Unauthorized)'
+    'load resource: net::ERR_CERT_DATE_INVALID')
 ];
 
 var checkForConsoleErrors = async function(

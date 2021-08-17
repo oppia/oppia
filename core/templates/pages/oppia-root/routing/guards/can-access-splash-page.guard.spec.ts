@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { CanAccessSplashPageGuard } from './can-access-splash-page.guard';
@@ -55,6 +56,9 @@ describe('Can access splash page guard', () => {
 
   it('should redirect user to default dashboard', fakeAsync(() => {
     let defaultDashboard = 'learner';
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        null, false, false, false, false, false, '', '', '', true)));
     spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
       Promise.resolve('learner'));
     caspg.canLoad(null, null);
@@ -65,11 +69,22 @@ describe('Can access splash page guard', () => {
   }));
 
   it('should allow user to access page if not logged in', fakeAsync(() => {
-    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
-      Promise.reject());
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        null, false, false, false, false, false, '', '', '', false)));
     caspg.canLoad(null, null).then((value) => {
       expect(value).toEqual(true);
     });
     tick();
   }));
+
+  it('should show user splash page if request to user hander fails',
+    fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.reject());
+      caspg.canLoad(null, null).then((value) => {
+        expect(value).toEqual(true);
+      });
+      tick();
+    }));
 });
