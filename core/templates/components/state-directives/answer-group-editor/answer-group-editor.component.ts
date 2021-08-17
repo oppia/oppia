@@ -119,7 +119,6 @@ angular.module('oppia').component('answerGroupEditor', {
           case 'Html':
           case 'SanitizedUrl':
           case 'Filepath':
-          case 'LogicErrorCategory':
             return '';
           case 'CodeEvaluation':
             return {

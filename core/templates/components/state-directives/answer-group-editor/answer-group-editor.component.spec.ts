@@ -218,7 +218,6 @@ describe('AnswerGroupEditorComponent', () => {
     expect(ctrl.getDefaultInputValue('Html')).toBe('');
     expect(ctrl.getDefaultInputValue('SanitizedUrl')).toBe('');
     expect(ctrl.getDefaultInputValue('Filepath')).toBe('');
-    expect(ctrl.getDefaultInputValue('LogicErrorCategory')).toBe('');
     expect(ctrl.getDefaultInputValue('CodeEvaluation')).toEqual({
       code: '',
       error: '',

@@ -752,28 +752,6 @@ class CheckedProof(BaseObject):
             raise TypeError('Cannot convert to checked proof %s' % raw)
 
 
-class LogicErrorCategory(BaseObject):
-    """A string from a list of possible categories."""
-
-    description = 'One of the possible error categories of a logic proof.'
-    default_value = 'mistake'
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'unicode',
-            'choices': [
-                'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
-                'target', 'mistake'
-            ]
-        }
-
-
 class Graph(BaseObject):
     """A (mathematical) graph with edges and vertices."""
 

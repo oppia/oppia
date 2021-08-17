@@ -736,7 +736,6 @@
     "extensions/objects/templates/int-editor.component.ts",
     "extensions/objects/templates/list-of-tabs-editor.component.ts",
     "extensions/objects/templates/list-of-unicode-string-editor.component.ts",
-    "extensions/objects/templates/logic-error-category-editor.component.ts",
     "extensions/objects/templates/math-equation-editor.component.ts",
     "extensions/objects/templates/math-equation-editor.component.spec.ts",
     "extensions/objects/templates/math-expression-content-editor.component.ts",

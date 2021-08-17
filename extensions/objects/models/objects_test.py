@@ -556,27 +556,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.CheckedProof, mappings, invalid_values_with_error_messages)
 
-    def test_logic_error_category_validation(self):
-        """Tests objects of type LogicErrorCategory."""
-
-        mappings = [
-            ('parsing', 'parsing'), ('typing', 'typing'),
-            ('mistake', 'mistake')]
-
-        invalid_values_with_error_messages = [
-            (None, 'Expected unicode string, received None'),
-            (2, 'Expected unicode string, received 2'),
-            (
-                'string',
-                'Received string which is not in the allowed range of choices'),
-            (
-                'item',
-                'Received item which is not in the allowed range of choices')]
-
-        self.check_normalization(
-            objects.LogicErrorCategory, mappings,
-            invalid_values_with_error_messages)
-
     def test_graph(self):
         """Tests objects of type Graph."""
         empty_graph = {

@@ -48,7 +48,6 @@ import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.compo
 import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
 import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
 import { MathEquationEditorComponent } from './templates/math-equation-editor.component';
-import { LogicErrorCategoryEditorComponent } from './templates/logic-error-category-editor.component';
 import { MathExpressionContentEditorComponent } from './templates/math-expression-content-editor.component';
 import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
 import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
@@ -110,7 +109,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
-    LogicErrorCategoryEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
@@ -153,7 +151,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
-    LogicErrorCategoryEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
@@ -196,7 +193,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
-    LogicErrorCategoryEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
