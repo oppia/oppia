@@ -88,6 +88,8 @@ describe('When account is deleted it', function() {
     await general.expectErrorPage(404);
     expectedConsoleErrors.push(
       'Failed to load resource: the server responded with a status of 404');
+    expectedConsoleErrors.push(
+      `The requested path /create/${explorationId} is not found.`);
     await users.logout();
   });
 

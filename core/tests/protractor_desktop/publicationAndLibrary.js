@@ -244,11 +244,15 @@ describe('Permissions for private explorations', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var expectedConsoleErrors = null;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    expectedConsoleErrors = [
+      'Failed to load resource: the server responded with a status of 404'
+    ];
   });
 
   it('should not be changeable if title is not given to exploration',
@@ -299,11 +303,11 @@ describe('Permissions for private explorations', function() {
     await general.openEditor(explorationId, false);
     await general.expectErrorPage(404);
     await users.logout();
+    expectedConsoleErrors.push(
+      `The requested path /create/${explorationId} is not found.`);
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([
-      'Failed to load resource: the server responded with a status of 404'
-    ]);
+    await general.checkForConsoleErrors(expectedConsoleErrors);
   });
 });
