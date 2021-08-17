@@ -89,12 +89,6 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.THANKS.ROUTE,
     loadChildren: () => import('pages/thanks-page/thanks-page.module')
       .then(m => m.ThanksPageModule)
-  },
-  {
-    path: '**',
-    loadChildren: () => import(
-      'pages/error-pages/error-404/error-404-page.module').then(
-      m => m.Error404PageModule)
   }
 ];
 
