@@ -47,9 +47,9 @@ describe('Keyboard Shortcuts', () => {
     }
   };
 
-  let windowRef;
+  let windowRef: WindowRef;
   let appRef: ApplicationRef;
-  let keyboardShortcutService;
+  let keyboardShortcutService: KeyboardShortcutService;
   let ngbModal: NgbModal;
 
 
