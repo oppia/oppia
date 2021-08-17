@@ -25,8 +25,8 @@ describe('Blog Post Editor backend api service', () => {
   let bpebas: BlogPostEditorBackendApiService;
   let httpTestingController: HttpTestingController;
   let blogPostEditorDataObject: BlogPostEditorData;
-  let successHandler;
-  let failHandler;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   const fakeImage = (): File => {
     const blob = new Blob([''], { type: 'image/jpeg' });

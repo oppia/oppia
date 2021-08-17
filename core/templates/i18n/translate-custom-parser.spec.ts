@@ -62,7 +62,8 @@ describe('Translate Custom Parser', () => {
   });
 
   it ('should handle cases when params is not defined', () => {
-    expect(translateCustomParser.interpolate('<[ KEY ]>', null))
+    expect(translateCustomParser.interpolate('<[ KEY ]>')).toEqual('<[ KEY ]>');
+    expect(translateCustomParser.interpolate('<[ KEY ]>', {}))
       .toEqual('<[ KEY ]>');
   });
 
@@ -80,6 +81,6 @@ describe('Translate Custom Parser', () => {
   it('should get value', () => {
     let testValue = 'test_value';
     spyOn(translateDefaultParser, 'getValue').and.returnValue(testValue);
-    expect(translateCustomParser.getValue(null, '')).toEqual(testValue);
+    expect(translateCustomParser.getValue({}, '')).toEqual(testValue);
   });
 });
