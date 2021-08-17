@@ -32,8 +32,13 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+var TopicAndStoryViewerPage = require(
+  '../protractor_utils/TopicAndStoryViewerPage.js');
+var forms = require('../protractor_utils/forms.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -42,8 +47,32 @@ describe('Learner dashboard functionality', function() {
   var libraryPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
+  var topicAndStoryViewerPage = null;
+  var explorationEditorMainTab = null;
   var learnerDashboardPage = null;
   var subscriptionDashboardPage = null;
+  var skillEditorPage = null;
+  var dummyExplorationIds = [];
+
+  var createDummyExplorations = async function() {
+    var EXPLORATION = {
+      category: 'Learning',
+      objective: 'The goal is to check story viewer functionality.',
+      language: 'English'
+    };
+
+    for (var i = 1; i <= 3; i++) {
+      await workflow.createAndPublishTwoCardExploration(
+        `Learner Dashboard Exploration ${i}`,
+        EXPLORATION.category,
+        EXPLORATION.objective,
+        EXPLORATION.language,
+        i === 1,
+        true
+      );
+      dummyExplorationIds.push(await general.getExplorationIdFromEditor());
+    }
+  };
 
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
@@ -51,9 +80,13 @@ describe('Learner dashboard functionality', function() {
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    topicAndStoryViewerPage = (
+      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
@@ -183,14 +216,19 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display correct topics in edit goals and current goals' +
-    ' section', async function() {
+  it('should display correct topics in edit goals, suggested for you section,' +
+    ' current goals and continue where you left off section', async function() {
     var TOPIC_NAME = 'Learner Dashboard Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';
     await users.createAndLoginCurriculumAdminUser(
       'creator@learnerDashboard1.com', 'learnerDashboard1');
     var handle = await browser.getWindowHandle();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectNumberOfTopicsInSuggestedForYou(0);
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectNumberOfStoriesInCompletedStory(0);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
@@ -258,6 +296,9 @@ describe('Learner dashboard functionality', function() {
      * skill in it named Learner Dashboard Skill 1.
      */
     await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectNumberOfTopicsInSuggestedForYou(1);
+    await learnerDashboardPage.expectNumberOfTopicsInContinueWhereYouLeftOff(0);
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
       TOPIC_NAME);
@@ -265,6 +306,159 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
       `Learn ${TOPIC_NAME}`);
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectNumberOfTopicsInContinueWhereYouLeftOff(1);
+    await users.logout();
+  });
+
+  it('should display all the topics that are partially learnt or learnt ' +
+    'in skill proficiency section, learnt topics in completed goals section ' +
+    'and completed stories in completed stories section', async function() {
+    var TOPIC_NAME = 'Learner Dashboard Topic 2';
+    var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-two';
+    var TOPIC_DESCRIPTION = 'Topic description';
+    await users.createAndLoginCurriculumAdminUser(
+      'creator@learnerDashboard2.com', 'learnerDashboard2');
+    await createDummyExplorations();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Learner Dashboard Skill 2', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', ['correct']);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    await skillEditorPage.saveQuestion();
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.expectNumberOfQuestionsToBe(1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(2);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Learner Dashboard Skill 2', TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.addSubtopic(
+      'Learner Dashboard Subtopic 2', 'ld-subtopic-two',
+      Constants.TEST_SVG_PATH, 'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+    await topicEditorPage.expectUncategorizedSkillsToBe(
+      ['Learner Dashboard Skill 2']);
+    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 2', 0);
+    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, [
+      'Learner Dashboard Skill 2']);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.saveTopic('Added meta tag and page title fragment.');
+    await topicEditorPage.publishTopic();
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
+    await topicEditorPage.createStory(
+      'Story 2', 'story-two',
+      'Story description', Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    for (var i = 0; i < 3; i++) {
+      await storyEditorPage.createNewChapter(
+        `Chapter ${i}`, dummyExplorationIds[i], Constants.TEST_SVG_PATH);
+      await storyEditorPage.navigateToChapterWithName(`Chapter ${i}`);
+      await storyEditorPage.changeNodeDescription('Chapter description');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText(`outline ${i}`));
+      await storyEditorPage.navigateToStoryEditorTab();
+    }
+    await storyEditorPage.expectNumberOfChaptersToBe(3);
+    await storyEditorPage.saveStory('First save');
+    await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.goToChapterIndex(1);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.goToChapterIndex(2);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    /**  There are two topics on the server named Learner Dashboard Topic 1
+     * which is linked to a subtopic named Learner Dashboard Subtopic 1 and
+     * a story called Story Title and Learner Dashboard Topic 2 which is linked
+     * to a subtopic named Learner Dashboard Subtopic 2 and a story called
+     * Story 2. Learner Dashboard Subtopic 1 has one skill in it named
+     * Learner Dashboard Skill 1 and Learner Dashboard Subtopic 2 has one
+     * skill in it named Learner Dashboard Skill 2.
+    */
+    await topicAndStoryViewerPage.get(
+      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectNameOfTopicInSkillProficiencyToMatch(
+      TOPIC_NAME
+    );
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectNumberOfStoriesInCompletedStory(1);
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInCompletedGoalsToMatch(
+      TOPIC_NAME);
     await users.logout();
   });
 
