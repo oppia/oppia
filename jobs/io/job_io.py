@@ -71,9 +71,7 @@ class PutResults(beam.PTransform):
             # GroupIntoBatches() requires (key, value) pairs as input, so we
             # give everything None keys and then immediately discard them.
             | beam.GroupIntoBatches(self._MAX_RESULT_INSTANCES_PER_MODEL)
-            # NOTE: Pylint is wrong. Values() is a decorated function with a
-            # different signature than the one it's defined with.
-            | beam.Values()  # pylint: disable=no-value-for-parameter
+            | beam.Values() # pylint: disable=no-value-for-parameter
             | beam.FlatMap(job_run_result.JobRunResult.accumulate)
             | beam.Map(
                 self.create_beam_job_run_result_model,
