@@ -66,7 +66,7 @@
       <div class="oppia-completed-goals-content">
         <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image">
         <a [href]="completedGoalsTopicPageUrl[i]"
-           class="oppia-completed-goals-topic-name">
+           class="oppia-completed-goals-topic-name protractor-test-completed-goals-topic-name">
           Learnt {{topic.name}}
         </a>
         <div *ngFor="let story of topic.storyTitles">

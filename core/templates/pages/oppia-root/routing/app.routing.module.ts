@@ -183,7 +183,7 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module')
       .then(m => m.VolunteerPageModule)
-  },
+  }
 ];
 
 // Register stewards landing pages.
