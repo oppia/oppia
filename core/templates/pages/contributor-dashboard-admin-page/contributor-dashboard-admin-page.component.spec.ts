@@ -100,7 +100,8 @@ describe('Contributor dashboard admin page ', function() {
   describe('on clicking add rights button ', () => {
     it('should successfully update the rights of the user', fakeAsync(() => {
       let contributorDashboardAdminBackendApiServiceSpy = spyOn(
-        contributorDashboardAdminBackendApiService, 'addContributionReviewerAsync')
+        contributorDashboardAdminBackendApiService,
+        'addContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
 
       const addContributionRightsAction = {
@@ -124,7 +125,8 @@ describe('Contributor dashboard admin page ', function() {
       ctrl.taskRunningInBackground = true;
 
       let contributorDashboardAdminBackendApiServiceSpy = spyOn(
-        contributorDashboardAdminBackendApiService, 'addContributionReviewerAsync')
+        contributorDashboardAdminBackendApiService,
+        'addContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
 
       const addContributionRightsAction = {
@@ -251,7 +253,8 @@ describe('Contributor dashboard admin page ', function() {
 
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(userInfo));
-      spyOn(contributorDashboardAdminBackendApiService, 'viewContributionReviewersAsync')
+      spyOn(contributorDashboardAdminBackendApiService,
+        'viewContributionReviewersAsync')
         .and.returnValue(Promise.resolve(viewContributorsResponse));
 
       expect(ctrl.contributionReviewersResult).toEqual(undefined);
@@ -279,7 +282,8 @@ describe('Contributor dashboard admin page ', function() {
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(userInfo));
       let contributorDashboardAdminBackendApiServiceSpy = spyOn(
-        contributorDashboardAdminBackendApiService, 'viewContributionReviewersAsync')
+        contributorDashboardAdminBackendApiService,
+        'viewContributionReviewersAsync')
         .and.resolveTo(viewContributorsResponse);
 
       const viewContributionReviewersAction = {
@@ -297,7 +301,8 @@ describe('Contributor dashboard admin page ', function() {
       ctrl.submitViewContributorUsersForm(viewContributionReviewersAction);
       tick();
 
-      expect(contributorDashboardAdminBackendApiServiceSpy).not.toHaveBeenCalled();
+      expect(contributorDashboardAdminBackendApiServiceSpy)
+        .not.toHaveBeenCalled();
       expect(ctrl.contributionReviewersDataFetched).toBe(false);
     }));
   });
@@ -305,7 +310,8 @@ describe('Contributor dashboard admin page ', function() {
   describe('on clicking remove rights button ', () => {
     it('should successfully remove the rights of the user', fakeAsync(() => {
       let contributorDashboardAdminBackendApiServiceSpy = spyOn(
-        contributorDashboardAdminBackendApiService, 'removeContributionReviewerAsync')
+        contributorDashboardAdminBackendApiService,
+        'removeContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
 
       const removeContributionRightsAction = {
@@ -332,7 +338,8 @@ describe('Contributor dashboard admin page ', function() {
       ctrl.taskRunningInBackground = true;
 
       let contributorDashboardAdminBackendApiServiceSpy = spyOn(
-        contributorDashboardAdminBackendApiService, 'removeContributionReviewerAsync')
+        contributorDashboardAdminBackendApiService,
+        'removeContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
 
       const removeContributionRightsAction = {
@@ -349,11 +356,12 @@ describe('Contributor dashboard admin page ', function() {
         removeContributionRightsAction);
       tick();
 
-      expect(contributorDashboardAdminBackendApiServiceSpy).not.toHaveBeenCalled();
+      expect(contributorDashboardAdminBackendApiServiceSpy)
+        .not.toHaveBeenCalled();
     }));
   });
 
-  describe('on clicking \'View Translation Contribution Stats\' button ', () => {
+  describe('on clicking \'View Translation Stats\' button ', () => {
     it('should successfully show the Translation contribution ' +
       'stats', fakeAsync(() => {
       let contributorDashboardAdminBackendApiServiceSpy = spyOn(
@@ -397,10 +405,11 @@ describe('Contributor dashboard admin page ', function() {
       ctrl.submitViewTranslationContributionStatsForm(viewTranslationAction);
       tick();
 
-      expect(contributorDashboardAdminBackendApiServiceSpy).not.toHaveBeenCalled();
+      expect(contributorDashboardAdminBackendApiServiceSpy)
+        .not.toHaveBeenCalled();
     }));
 
-    it('should show error message in case of  ' +
+    it('should show error message in case of ' +
       'backend error', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
@@ -494,7 +503,7 @@ describe('Contributor dashboard admin page ', function() {
 
     describe('in the view translation contribution stats section ', () => {
       it('should return true if there are no validation errors ' +
-        'when fetching translation stats ', fakeAsync(() => {
+        'when fetching translation stats', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
 
@@ -506,7 +515,7 @@ describe('Contributor dashboard admin page ', function() {
       }));
 
       it('should return false if there are validation errors ' +
-        'when fetching translation stats ', fakeAsync(() => {
+        'when fetching translation stats', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
 

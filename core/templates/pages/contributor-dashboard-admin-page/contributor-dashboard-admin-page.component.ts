@@ -127,7 +127,6 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               .contributionReviewerRightsAsync(
                 formResponse.username
               ).then((contributionRights) => {
-                console.log(ctrl.CONTRIBUTION_RIGHT_CATEGORIES)
                 if (
                   ctrl.CONTRIBUTION_RIGHT_CATEGORIES.hasOwnProperty(
                     'REVIEW_TRANSLATION')) {
