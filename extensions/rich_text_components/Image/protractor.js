@@ -23,7 +23,7 @@ var waitFor = require(
 var request = require('request');
 var path = require('path');
 
-const FABRIC_VERSION = '4.5.0';
+const FABRIC_VERSION = '4.5.1';
 const SVGTAGS = {
   rectangle: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +

@@ -23,6 +23,7 @@ import datetime
 import itertools
 import json
 import logging
+from unittest import mock
 
 from core.domain import auth_domain
 from core.domain import user_services
@@ -36,7 +37,6 @@ import utils
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-import mock
 import webapp2
 
 from typing import ( # isort:skip

@@ -28,6 +28,7 @@ import subprocess
 import sys
 import threading
 import time
+from unittest import mock
 
 from core.tests import test_utils
 import python_utils
@@ -35,7 +36,6 @@ from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
 
-import mock
 import psutil
 
 
