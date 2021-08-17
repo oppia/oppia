@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
+import json
 import re
 
 from core.tests import test_utils
@@ -1318,3 +1319,19 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
         self.assertEqual(
             objects.TranslatableSetOfUnicodeString.normalize_value(['1', '2']),
             ['1', '2'])
+
+
+class JsonEncodedInStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        list_of_ids = ['0', '1']
+        with self.assertRaisesRegexp(
+            Exception, 'Expected string received 2 of type %s' % type(2)
+        ):
+            objects.JsonEncodedInString.normalize(2)
+
+        self.assertEqual(
+            objects.JsonEncodedInString.normalize(
+                json.dumps(list_of_ids)),
+            list_of_ids
+        )

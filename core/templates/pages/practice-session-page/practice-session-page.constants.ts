@@ -22,12 +22,12 @@ export const PracticeSessionPageConstants = {
   PRACTICE_SESSIONS_DATA_URL: (
     '/practice_session/data/<classroom_url_fragment>/' +
     '<topic_url_fragment>?selected_subtopic_ids=' +
-    '<comma_separated_subtopic_ids>'),
+    '<stringified_subtopic_ids>'),
 
   TOPIC_VIEWER_PAGE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>'),
 
   PRACTICE_SESSIONS_URL: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice/' +
-    'session?selected_subtopic_ids=<comma_separated_subtopic_ids>')
+    'session?selected_subtopic_ids=<stringified_subtopic_ids>')
 } as const;

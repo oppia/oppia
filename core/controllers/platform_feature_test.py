@@ -134,6 +134,43 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                 '[\'test\', \'alpha\', \'beta\', \'release\'] if specified.'
             )
 
+    def test_get_features_invalid_browser_type_raises_400(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'browser_type': 'invalid_browser',
+                },
+                expected_status_int=400
+            )
+
+            error_msg = (
+                'Schema validation for \'browser_type\' failed: Received '
+                'invalid_browser which is not in the allowed range of choices: '
+                '[\'Chrome\', \'Edge\', \'Safari\', \'Firefox\', \'Others\']'
+            )
+            self.assertEqual(result['error'], error_msg)
+
+    def test_get_features_invalid_app_version_raises_400(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'app_version': 'invalid_app_version',
+                },
+                expected_status_int=400
+            )
+
+            error_msg = (
+                'Schema validation for \'%s\' failed: Validation failed: '
+                'is_regex_matched ({\'regex_pattern\': \'%s\'}) for '
+                'object invalid_app_version' % (
+                    'app_version',
+                    '^(\\\\d+(?:\\\\.\\\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$'
+                )
+            )
+            self.assertEqual(result['error'], error_msg)
+
 
 class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the PlatformFeatureDummyHandler."""

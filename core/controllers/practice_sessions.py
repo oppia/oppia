@@ -17,16 +17,24 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
 from core.domain import topic_fetchers
 import feconf
-import python_utils
 
 
 class PracticeSessionsPage(base.BaseHandler):
     """Renders the practice sessions page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
@@ -39,6 +47,20 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
     """Fetches relevant data for the practice sessions page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'selected_subtopic_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
@@ -46,8 +68,8 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        comma_separated_subtopic_ids = self.request.get('selected_subtopic_ids')
-        selected_subtopic_ids = comma_separated_subtopic_ids.split(',')
+        selected_subtopic_ids = (
+            self.normalized_request.get('selected_subtopic_ids'))
 
         selected_skill_ids = []
         for subtopic in topic.subtopics:
@@ -55,7 +77,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             # passed in subtopic IDs, if they don't exist, which would be the
             # case if the creator deletes subtopics after the learner has
             # loaded the topic viewer page.
-            if python_utils.UNICODE(subtopic.id) in selected_subtopic_ids:
+            if subtopic.id in selected_subtopic_ids:
                 selected_skill_ids.extend(subtopic.skill_ids)
         try:
             skills = skill_fetchers.get_multi_skills(selected_skill_ids)
