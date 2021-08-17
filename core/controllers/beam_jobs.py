@@ -25,13 +25,15 @@ from core.domain import beam_job_services
 import feconf
 from jobs import jobs_manager
 
+from typing import Any, Dict # isort: skip
+
 
 class BeamJobHandler(base.BaseHandler):
     """Handler for getting the definitions of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {}
     }
 
@@ -46,8 +48,8 @@ class BeamJobRunHandler(base.BaseHandler):
     """Handler for managing the execution of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {},
         'PUT': {
             'job_name': {
@@ -79,9 +81,14 @@ class BeamJobRunHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def put(self) -> None:
-        job_name = self.normalized_payload.get('job_name')
-        job_args = self.normalized_payload.get('job_arguments')
-        beam_job_run = jobs_manager.run_job_sync(job_name, job_args)
+        job_name = (
+            self.normalized_payload.get('job_name')
+            if self.normalized_payload else None)
+        job_arguments = (
+            self.normalized_payload.get('job_arguments')
+            if self.normalized_payload else None)
+
+        beam_job_run = jobs_manager.run_job_sync(job_name, job_arguments)
         self.render_json(beam_job_run.to_dict())
 
 
@@ -89,8 +96,8 @@ class BeamJobRunResultHandler(base.BaseHandler):
     """Handler for getting the result of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {
             'job_id': {
                 'schema': {

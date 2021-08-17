@@ -99,7 +99,9 @@ def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
 
 
-def get_beam_job_runs(refresh=False):
+def get_beam_job_runs(
+    refresh: bool = False
+) -> List[beam_job_domain.BeamJobRun]:
     """Returns all of the Apache Beam job runs recorded in the datastore.
 
     Args:

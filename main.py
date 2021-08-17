@@ -109,7 +109,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
+        self.render_json({'is_internet_connected': True})
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -121,7 +121,7 @@ class FrontendErrorHandler(base.BaseHandler):
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
-        self.render_json(self.values) # type: ignore[no-untyped-call]
+        self.render_json(self.values)
 
 
 class WarmupPage(base.BaseHandler):

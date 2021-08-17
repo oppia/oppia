@@ -33,8 +33,7 @@ import apache_beam as beam
 class FooJob(base_jobs.JobBase):
     """Simple test-only class."""
 
-    def run(self):
-        # type: () -> beam.PCollection
+    def run(self) -> beam.PCollection:
         """Does nothing."""
         return self.pipeline | beam.Create([])
 
@@ -42,8 +41,7 @@ class FooJob(base_jobs.JobBase):
 class BeamHandlerTestBase(test_utils.GenericTestBase):
     """Common setUp() and tearDown() for Apache Beam job handler tests."""
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(BeamHandlerTestBase, self).setUp() # type: ignore[no-untyped-call]
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
@@ -52,16 +50,14 @@ class BeamHandlerTestBase(test_utils.GenericTestBase):
             feconf.ROLE_ID_RELEASE_COORDINATOR)
         self.login(self.RELEASE_COORDINATOR_EMAIL, is_super_admin=True)
 
-    def tearDown(self):
-        # type: () -> None
+    def tearDown(self) -> None:
         self.logout()
         super(BeamHandlerTestBase, self).tearDown() # type: ignore[no-untyped-call]
 
 
 class BeamJobHandlerTests(BeamHandlerTestBase):
 
-    def test_get_returns_registered_jobs(self):
-        # type: () -> None
+    def test_get_returns_registered_jobs(self) -> None:
         job = beam_job_domain.BeamJob(FooJob)
         get_beam_jobs_swap = self.swap_to_always_return(
             beam_job_services, 'get_beam_jobs', value=[job])
@@ -76,8 +72,7 @@ class BeamJobHandlerTests(BeamHandlerTestBase):
 
 class BeamJobRunHandlerTests(BeamHandlerTestBase):
 
-    def test_get_returns_all_runs(self):
-        # type: () -> None
+    def test_get_returns_all_runs(self) -> None:
         beam_job_services.create_beam_job_run_model('FooJob', []).put()
         beam_job_services.create_beam_job_run_model('FooJob', []).put()
         beam_job_services.create_beam_job_run_model('FooJob', []).put()
@@ -91,8 +86,7 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         self.assertCountEqual(
             [run['job_arguments'] for run in runs], [[], [], []])
 
-    def test_put_starts_new_job(self):
-        # type: () -> None
+    def test_put_starts_new_job(self) -> None:
         now = datetime.datetime.utcnow()
         mock_job = beam_job_domain.BeamJobRun(
             '123', 'FooJob', 'RUNNING', [], now, now, False)
@@ -109,16 +103,14 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
 
 class BeamJobRunResultHandlerTests(BeamHandlerTestBase):
 
-    def test_get_returns_job_output(self):
-        # type: () -> None
+    def test_get_returns_job_output(self) -> None:
         beam_job_services.create_beam_job_run_result_model('123', 'o', '').put()
 
         response = self.get_json('/beam_job_run_result?job_id=123')
 
         self.assertEqual(response, {'stdout': 'o', 'stderr': ''})
 
-    def test_get_raises_when_job_id_missing(self):
-        # type: () -> None
+    def test_get_raises_when_job_id_missing(self) -> None:
         response = (
             self.get_json('/beam_job_run_result', expected_status_int=400))
 

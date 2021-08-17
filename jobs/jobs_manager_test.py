@@ -34,8 +34,7 @@ import apache_beam as beam
 class WorkingJob(base_jobs.JobBase):
     """Simple job that outputs string literals."""
 
-    def run(self):
-        # type: () -> beam.PCollection[job_run_result.JobRunResult]
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         return (
             self.pipeline
             | beam.Create([job_run_result.JobRunResult(stdout='o', stderr='e')])
@@ -45,15 +44,13 @@ class WorkingJob(base_jobs.JobBase):
 class FailingJob(base_jobs.JobBase):
     """Simple job that always raises an exception."""
 
-    def run(self):
-        # type: () -> beam.PCollection[job_run_result.JobRunResult]
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         raise Exception('uh-oh')
 
 
 class RunJobSyncTests(test_utils.GenericTestBase):
 
-    def test_working_job(self):
-        # type: () -> None
+    def test_working_job(self) -> None:
         run = jobs_manager.run_job_sync(
             'WorkingJob', [], namespace=self.namespace)
 
@@ -68,8 +65,7 @@ class RunJobSyncTests(test_utils.GenericTestBase):
             beam_job_services.get_beam_job_run_result(run.job_id).to_dict(),
             {'stdout': 'o', 'stderr': 'e'})
 
-    def test_failing_job(self):
-        # type: () -> None
+    def test_failing_job(self) -> None:
         run = jobs_manager.run_job_sync(
             'FailingJob', [], namespace=self.namespace)
 
