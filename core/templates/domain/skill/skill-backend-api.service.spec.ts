@@ -21,11 +21,8 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillObjectFactory, SkillBackendDict, Skill } from 'domain/skill/SkillObjectFactory';
-import { ConceptCard } from './ConceptCardObjectFactory';
+import { SkillObjectFactory, SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 
 describe('Skill backend API service', () => {
   let httpTestingController: HttpTestingController;
@@ -38,9 +35,9 @@ describe('Skill backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    skillBackendApiService = TestBed.get(SkillBackendApiService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
       id: '2',
@@ -102,19 +99,9 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
-    const conceptCard = new ConceptCard(
-      SubtitledHtml.createDefault(
-        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
-      [],
-      RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          COMPONENT_NAME_EXPLANATION: {}
-        }
-      })
+    skills.push(
+      skillObjectFactory.createFromBackendDict(skillBackendDict).toBackendDict()
     );
-    const skill = new Skill(
-      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []);
-    skills.push(skill.toBackendDict());
     skillBackendApiService.fetchAllSkills().toPromise().then(
       res => {
         expect(res).toEqual(skills);
