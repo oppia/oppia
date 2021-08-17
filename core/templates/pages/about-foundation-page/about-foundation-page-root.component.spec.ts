@@ -49,10 +49,9 @@ describe('About foundation Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');

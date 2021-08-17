@@ -61,7 +61,7 @@ class FoundationRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/about-foundation')
+        self.redirect(feconf.ABOUT_FOUNDATION_PAGE_URL)
 
 
 class TeachRedirectPage(base.BaseHandler):
