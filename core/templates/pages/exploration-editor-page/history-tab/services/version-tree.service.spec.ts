@@ -16,12 +16,11 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
-import { ExplorationSnapshot, VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
+import { ExplorationSnapshot, VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 
 describe('Versions tree service', () => {
   describe('versions tree service', () => {
-    let vts: VersionTreeService = null;
+    let vts: VersionTreeService;
     var snapshots: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
