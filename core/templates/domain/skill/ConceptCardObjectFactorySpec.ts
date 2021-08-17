@@ -105,15 +105,6 @@ describe('Concept card object factory', () => {
     expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
   });
 
-  it('should create an interstitial concept card', () => {
-    let conceptCard =
-        conceptCardObjectFactory.createInterstitialConceptCard();
-    expect(conceptCard.getExplanation()).toEqual(
-      SubtitledHtml.createDefault(
-        'Loading review material', 'explanation'));
-    expect(conceptCard.getWorkedExamples()).toEqual([]);
-  });
-
   it('should return recorded voice overs when called', () => {
     let voiceover = {
       voiceovers_mapping: {

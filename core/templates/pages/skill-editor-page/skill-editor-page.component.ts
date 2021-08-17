@@ -88,7 +88,7 @@ angular.module('oppia').component('skillEditorPage', {
         }
       };
       ctrl.getWarningsCount = function() {
-        return ctrl.skill.getValidationIssues().length;
+        return ctrl.skill ? ctrl.skill.getValidationIssues().length : 0;
       };
 
       ctrl.$onInit = function() {

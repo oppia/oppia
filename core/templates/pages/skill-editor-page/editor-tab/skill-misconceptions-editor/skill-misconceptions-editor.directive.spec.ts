@@ -23,7 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
@@ -32,6 +32,7 @@ import { EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
 describe('Skill Misconception Editor Directive', function() {
   let $scope = null;
@@ -40,7 +41,6 @@ describe('Skill Misconception Editor Directive', function() {
   let directive = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillUpdateService: SkillUpdateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
   let windowDimensionsService: WindowDimensionsService = null;
   let ngbModal: NgbModal;
@@ -69,14 +69,15 @@ describe('Skill Misconception Editor Directive', function() {
 
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillUpdateService = $injector.get('SkillUpdateService');
-    skillObjectFactory = $injector.get('SkillObjectFactory');
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     windowDimensionsService = $injector.get('WindowDimensionsService');
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     ngbModal = TestBed.inject(NgbModal);
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    sampleSkill = new Skill(
+      'id1', 'description', [], [], {} as ConceptCard, 'en',
+      1, 0, 'id1', false, []);
     sampleMisconception = misconceptionObjectFactory.create(
       'misconceptionId', 'misconceptionName', 'notes', 'feedback', false);
     sampleSkill._misconceptions = [sampleMisconception];

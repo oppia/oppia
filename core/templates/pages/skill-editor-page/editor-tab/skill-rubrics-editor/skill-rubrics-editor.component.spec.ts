@@ -15,7 +15,7 @@
 import { EventEmitter } from '@angular/core';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -33,6 +33,8 @@ describe('skillRubricsEditor', function() {
   let skillUpdateService: SkillUpdateService = null;
   let windowDimensionsService: WindowDimensionsService = null;
   let mockEventEmitter = new EventEmitter();
+  let skillBackendDict: SkillBackendDict;
+
 
   let sampleSkill = null;
 
@@ -46,7 +48,35 @@ describe('skillRubricsEditor', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    const skillContentsDict = {
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      worked_examples: [],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
+      }
+    };
+
+    skillBackendDict = {
+      id: '1',
+      description: 'test description',
+      misconceptions: [],
+      rubrics: [],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      next_misconception_id: 6,
+      superseding_skill_id: '2',
+      all_questions_merged: false,
+      prerequisite_skill_ids: ['skill_1']
+    };
+    sampleSkill = skillObjectFactory.createFromBackendDict(skillBackendDict);
 
     ctrl = $componentController('skillRubricsEditor', {
       $scope: $scope
