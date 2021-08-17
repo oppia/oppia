@@ -233,6 +233,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
     except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
 
+
 # Here obj has a recursive structure. The list element or dictionary value
 # could recursively be the same structure, hence we use Any as their types.
 def recursively_remove_key(
