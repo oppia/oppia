@@ -99,7 +99,9 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
-    skills.push(skillObjectFactory.createInterstitialSkill().toBackendDict());
+    skills.push(
+      skillObjectFactory.createFromBackendDict(skillBackendDict).toBackendDict()
+    );
     skillBackendApiService.fetchAllSkills().toPromise().then(
       res => {
         expect(res).toEqual(skills);
