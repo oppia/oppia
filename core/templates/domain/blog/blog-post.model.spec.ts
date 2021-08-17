@@ -29,8 +29,8 @@ describe('Blog Post Object Factory', () => {
       thumbnail_filename: 'image',
       url_fragment: 'sampleUrl',
       tags: ['news'],
-      last_updated: 3454354354,
-      published_on: 3454354354,
+      last_updated: '3454354354',
+      published_on: '3454354354',
     };
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
@@ -46,6 +46,12 @@ describe('Blog Post Object Factory', () => {
 
     expect(sampleBlogPostData.validate()).toEqual([
       'Blog Post title should not be empty.',
+      'Blog Post content should not be empty.'
+    ]);
+
+    sampleBlogPostData.title = 'aa';
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post title should not be less than 5 characters.',
       'Blog Post content should not be empty.'
     ]);
   });
@@ -69,6 +75,21 @@ describe('Blog Post Object Factory', () => {
       'Blog Post should have atleast one tag linked to it.',
       'Blog Post content should not be empty.',
     ]);
+
+    sampleBlogPostData.title = 'aa';
+
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+      'Blog Post title should not be less than 5 characters.',
+      'Blog Post should have a thumbnail.',
+      'Blog Post should have atleast one tag linked to it.',
+      'Blog Post content should not be empty.',
+    ]);
+  });
+
+  it('should correctly set tags in the blog post when tags are changed', () => {
+    sampleBlogPostData.tags = ['news', 'learners'];
+
+    expect(sampleBlogPostData.tags).toEqual(['news', 'learners']);
   });
 
   it('should raise correct validation issues for' +
@@ -96,7 +117,7 @@ describe('Blog Post Object Factory', () => {
   });
 
   it('should return correct property values', () => {
-    expect(sampleBlogPostData.lastUpdated).toEqual(3454354354);
-    expect(sampleBlogPostData.publishedOn).toEqual(3454354354);
+    expect(sampleBlogPostData.lastUpdated).toEqual('3454354354');
+    expect(sampleBlogPostData.publishedOn).toEqual('3454354354');
   });
 });

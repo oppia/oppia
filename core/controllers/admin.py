@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
 import logging
 import random
 
@@ -25,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
+from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -201,19 +203,11 @@ class AdminHandler(base.BaseHandler):
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
-            'updatable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.UPDATABLE_ROLES
-            },
-            'viewable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.VIEWABLE_ROLES
-            },
+            'updatable_roles': role_services.UPDATABLE_ROLES,
+            'viewable_roles': role_services.VIEWABLE_ROLES,
+            'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
+            'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
-            'role_to_actions': {
-                role_services.HUMAN_READABLE_ROLES[role]: actions
-                for role, actions in role_services.get_role_actions().items()
-            },
             'feature_flags': feature_flag_dicts,
         })
 
@@ -312,11 +306,10 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.convert_to_bytes(
-                exploration_id))
+            exp_services.load_demo(python_utils.UNICODE(exploration_id))
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    exploration_id))
+                user_services.get_system_user(),
+                python_utils.UNICODE(exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -620,11 +613,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(
-                python_utils.convert_to_bytes(collection_id))
+            collection_services.load_demo(collection_id)
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    collection_id))
+                user_services.get_system_user(), collection_id)
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -687,7 +678,8 @@ class AdminRoleHandler(base.BaseHandler):
             },
             'role': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': role_services.VIEWABLE_ROLES
                 },
                 'default_value': None
             },
@@ -733,14 +725,12 @@ class AdminRoleHandler(base.BaseHandler):
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
             role = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_ROLE)
-            users_by_role = {
-                username: role
-                for username in user_services.get_usernames_by_role(role)
-            }
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
-            self.render_json(users_by_role)
+            self.render_json({
+                'usernames': user_services.get_usernames_by_role(role)
+            })
         elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
@@ -978,9 +968,16 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
+        topic_similarities = (
+            recommendations_services.get_topic_similarities_as_csv()
+        )
+        # Downloadable file accepts only bytes, so we need to encode
+        # topic_similarities to bytes.
         self.render_downloadable_file(
-            recommendations_services.get_topic_similarities_as_csv(),
-            'topic_similarities.csv', 'text/csv')
+            io.BytesIO(topic_similarities.encode('utf-8')),
+            'topic_similarities.csv',
+            'text/csv'
+        )
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
@@ -1182,3 +1179,60 @@ class DeleteUserHandler(base.BaseHandler):
             )
         wipeout_service.pre_delete_user(user_id)
         self.render_json({'success': True})
+
+
+class UpdateBlogPostHandler(base.BaseHandler):
+    """Handler for changing author ids and published on date in
+    blog posts."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'author_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            },
+            'published_on': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        blog_post_id = self.normalized_payload.get('blog_post_id')
+        author_username = self.normalized_payload.get('author_username')
+        published_on = self.normalized_payload.get('published_on')
+
+        author_id = user_services.get_user_id_from_username(author_username)
+        if author_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % author_username)
+
+        user_actions = user_services.get_user_actions_info(author_id).actions
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
+            raise self.InvalidInputException(
+                'User does not have enough rights to be blog post author.')
+
+        blog_post = (
+            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
+        if blog_post is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post with the given id or url doesn\'t exist.'))
+
+        blog_services.update_blog_models_author_and_published_on_date(
+            blog_post_id, author_id, published_on)
+        self.render_json({})

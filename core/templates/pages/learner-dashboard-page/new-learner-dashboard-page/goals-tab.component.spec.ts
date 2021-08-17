@@ -273,6 +273,13 @@ describe('Goals tab Component', () => {
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
   });
 
+  it('should detect when application is being used on a mobile', () => {
+    expect(component.checkMobileView()).toBe(false);
+
+    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+    expect(component.checkMobileView()).toBe(true);
+  });
+
   it('should add topic to learner goals if not already present', () => {
     component.topicIdsInCurrentGoals.length = 0;
     component.topicIdsInCompletedGoals = ['1', '2'];

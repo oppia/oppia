@@ -210,7 +210,9 @@ class ParamChange(python_utils.OBJECT):
                 'Expected generator ID to be a string, received %s '
                 % self._generator_id)
 
-        if not hasattr(self, 'generator'):
+        try:
+            hasattr(self, 'generator')
+        except KeyError:
             raise utils.ValidationError(
                 'Invalid generator ID %s' % self._generator_id)
 

@@ -28,41 +28,44 @@ from jobs.transforms import blog_validation
 
 import apache_beam as beam
 
-(blog_models, user_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
-    [models.NAMES.blog, models.NAMES.user])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
+
+(blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_blog_post_model_relationships(self):
         # type: () -> None
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostModel', 'id'),
             ['BlogPostSummaryModel', 'BlogPostRightsModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_summary_model_relationships(self):
         # type: () -> None
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostSummaryModel', 'id'),
             ['BlogPostModel', 'BlogPostRightsModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostSummaryModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_rights_model_relationships(self):
         # type: () -> None
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostRightsModel', 'id'),
             ['BlogPostModel', 'BlogPostSummaryModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostRightsModel', 'editor_ids'),
             ['UserSettingsModel'])
@@ -104,8 +107,8 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             author_id='user',
             url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.YEAR_AGO)
+            last_updated=self.YEAR_AGO,
+            published_on=self.NOW)
 
         output = (
             self.pipeline
@@ -150,7 +153,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             author_id='user',
             url_fragment='url-fragment-1',
             created_on=self.NOW,
-            last_updated=self.NOW,
+            last_updated=self.YEAR_LATER,
             published_on=self.YEAR_LATER)
 
         output = (
@@ -169,36 +172,6 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
 
 class ValidateBlogPostModelDomainObjectsInstancesTests(
         job_test_utils.PipelinedTestBase):
-
-    def test_validation_type_for_domain_object_non_strict(self):
-        # type: () -> None
-        blog_model = blog_models.BlogPostModel(
-            id='validblogid1',
-            title='',
-            content='<p>hello</p>,',
-            author_id='user',
-            url_fragment='url-fragment-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.NOW,
-            tags=['learners'])
-
-        blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid1',
-            editor_ids=['user'],
-            blog_post_is_published=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
-        output = (
-            self.pipeline
-            | beam.Create([blog_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogPostModelDomainObjectsInstances())
-        )
-
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
 
     def test_validation_type_for_domain_object_strict(self):
         # type: () -> None
@@ -234,36 +207,6 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
 
 class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
         job_test_utils.PipelinedTestBase):
-
-    def test_validation_type_for_domain_object_non_strict(self):
-        # type: () -> None
-        blog_summary_model = blog_models.BlogPostSummaryModel(
-            id='validblogid3',
-            title='Sample Title',
-            summary='<p>hello</p>,',
-            author_id='user',
-            url_fragment='url-fragment-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.NOW,
-            tags=['learners'])
-
-        blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid3',
-            editor_ids=['user'],
-            blog_post_is_published=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
-        output = (
-            self.pipeline
-            | beam.Create([blog_summary_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) #pylint: disable=line-too-long
-        )
-
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
 
     def test_validation_type_for_domain_object_strict(self):
         # type: () -> None

@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <p>
+    Are you sure you want to unpublish this story? Unpublishing a story will
+    delete any corresponding translation opportunities from the Contributor
+    Dashboard and reject any related pending translation suggestions.
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary"
+          (click)="cancel()"
+          type="button">
+          Cancel
+  </button>
+  <button class="btn btn-success protractor-test-close-save-modal-button"
+          (click)="confirm()">
+    Unpublish Story
+  </button>
+</div>

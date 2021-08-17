@@ -16,7 +16,7 @@
  * @fileoverview Component for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, ViewRef } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -30,12 +30,16 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './edit-profile-picture-modal.component.html'
 })
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
-  uploadedImage: SafeResourceUrl;
+  // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
+  uploadedImage: SafeResourceUrl | null = null;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
+  // 'cropper' is initialized before it is to be used, hence we need to do
+  // non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  cropper!: Cropper;
+  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -46,12 +50,14 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   initializeCropper(): void {
-    let profilePicture = this.croppableImageRef.nativeElement;
-    this.cropper = new Cropper(profilePicture, {
-      minContainerWidth: 500,
-      minContainerHeight: 350,
-      aspectRatio: 1
-    });
+    if (this.croppableImageRef) {
+      let profilePicture = this.croppableImageRef.nativeElement;
+      this.cropper = new Cropper(profilePicture, {
+        minContainerWidth: 500,
+        minContainerHeight: 350,
+        aspectRatio: 1
+      });
+    }
   }
 
   onFileChanged(file: Blob): void {
@@ -64,7 +70,9 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         this.uploadedImage = decodeURIComponent(
           (<FileReader>e.target).result as string);
       }
-      this.changeDetectorRef.detectChanges();
+      if (!(this.changeDetectorRef as ViewRef).destroyed) {
+        this.changeDetectorRef.detectChanges();
+      }
       this.initializeCropper();
     };
 
@@ -82,6 +90,9 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
+    if (this.cropper === undefined) {
+      throw new Error('Cropper has not been initialized');
+    }
     this.cropppedImageDataUrl = (
       this.cropper.getCroppedCanvas({
         height: 150,

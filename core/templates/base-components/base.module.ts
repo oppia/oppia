@@ -48,7 +48,7 @@ import {
 // Miscenellous.
 import * as hammer from 'hammerjs';
 import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 // Configurations.
 
@@ -77,7 +77,7 @@ const toastrConfig = {
     warning: 'toast-warning'
   },
   positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
+  messageClass: 'toast-message protractor-test-toast-message',
   progressBar: false,
   tapToDismiss: true,
   titleClass: 'toast-title'

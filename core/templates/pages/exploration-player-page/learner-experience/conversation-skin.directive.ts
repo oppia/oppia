@@ -18,6 +18,7 @@
 
 import { Subscription } from 'rxjs';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { ServicesConstants } from 'services/services.constants';
 
 require(
   'components/question-directives/question-player/services/' +
@@ -36,7 +37,7 @@ require(
   'learner-answer-info-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'supplemental-card.directive.ts');
+  'supplemental-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
@@ -418,6 +419,7 @@ angular.module('oppia').directive('conversationSkin', [
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
+          var questionPlayerConfig = null;
 
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
@@ -446,7 +448,6 @@ angular.module('oppia').directive('conversationSkin', [
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           // This variable is used only when viewport is narrow.
           // Indicates whether the tutor card is displayed.
-          var questionPlayerConfig = $scope.getQuestionPlayerConfig();
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -506,10 +507,11 @@ angular.module('oppia').directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                MessengerService.sendMessage(MessengerService.HEIGHT_CHANGE, {
-                  height: newHeight,
-                  scroll: scroll
-                });
+                MessengerService.sendMessage(
+                  ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+                    height: newHeight,
+                    scroll: scroll
+                  });
                 $scope.lastRequestedHeight = newHeight;
                 $scope.lastRequestedScroll = scroll;
               }
@@ -885,7 +887,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
           $scope.initializePage = function() {
             hasInteractedAtLeastOnce = false;
-            $scope.recommendedExplorationSummaries = null;
+            $scope.recommendedExplorationSummaries = [];
             PlayerPositionService.init(_navigateToDisplayedCard);
             if (questionPlayerConfig) {
               ExplorationPlayerStateService.initializeQuestionPlayer(
@@ -1227,7 +1229,7 @@ angular.module('oppia').directive('conversationSkin', [
             $timeout(function() {
               var tutorCard = $('.conversation-skin-main-tutor-card');
 
-              if (tutorCard.length === 0) {
+              if (tutorCard && tutorCard.length === 0) {
                 return;
               }
               var tutorCardBottom = (
@@ -1307,6 +1309,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           ctrl.$onInit = function() {
+            questionPlayerConfig = $scope.getQuestionPlayerConfig();
             ctrl.directiveSubscriptions.add(
               // TODO(#11996): Remove when migrating to Angular2+.
               CurrentInteractionService.onAnswerChanged$.subscribe(() => {
@@ -1338,7 +1341,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.isIframed = UrlService.isIframed();
             LoaderService.showLoadingScreen('Loading');
             $scope.hasFullyLoaded = false;
-            $scope.recommendedExplorationSummaries = null;
+            $scope.recommendedExplorationSummaries = [];
             $scope.answerIsCorrect = false;
             $scope.nextCard = null;
             $scope.pendingCardWasSeenBefore = false;

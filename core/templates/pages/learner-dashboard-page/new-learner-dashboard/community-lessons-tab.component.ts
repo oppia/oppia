@@ -315,6 +315,11 @@ export class CommunityLessonsTabComponent {
             this.endIndexInPlaylist = 3;
           }
         }
+        this.noCommunityLessonActivity = (
+          (this.totalIncompleteLessonsList.length === 0) &&
+          (this.totalCompletedLessonsList.length === 0));
+        this.noPlaylistActivity = (
+          (this.totalLessonsInPlaylist.length === 0));
       });
   }
 }

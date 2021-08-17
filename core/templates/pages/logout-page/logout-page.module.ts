@@ -16,23 +16,19 @@
  * @fileoverview Module for the logout page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LogoutPageRootComponent } from './logout-page-root.component';
+import { CommonModule } from '@angular/common';
+import { LogoutPageRoutingModule } from './logout-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
+    LogoutPageRoutingModule
   ],
   declarations: [
     LogoutPageComponent,
@@ -41,20 +37,6 @@ import { LogoutPageRootComponent } from './logout-page-root.component';
   entryComponents: [
     LogoutPageComponent,
     LogoutPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-  ],
-  bootstrap: [LogoutPageRootComponent]
+  ]
 })
 export class LogoutPageModule {}

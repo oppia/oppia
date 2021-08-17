@@ -815,10 +815,10 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
-    misconception_is_deleted = any([
+    misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
         for change in change_list
-    ])
+    )
     if misconception_is_deleted:
         deleted_skill_misconception_ids = [
             skill.generate_skill_misconception_id(change.misconception_id)
@@ -1109,7 +1109,7 @@ def filter_skills_by_mastery(user_id, skill_ids):
 
     # Arranges the skill_ids in the order as it was received.
     arranged_filtered_skill_ids = []
-    for i in python_utils.RANGE(len(skill_ids)):
-        if skill_ids[i] in filtered_skill_ids:
-            arranged_filtered_skill_ids.append(skill_ids[i])
+    for skill_id in skill_ids:
+        if skill_id in filtered_skill_ids:
+            arranged_filtered_skill_ids.append(skill_id)
     return arranged_filtered_skill_ids
