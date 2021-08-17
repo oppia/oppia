@@ -100,12 +100,6 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module')
       .then(m => m.VolunteerPageModule)
-  },
-  {
-    path: '**',
-    loadChildren: () => import(
-      'pages/error-pages/error-404/error-404-page.module').then(
-      m => m.Error404PageModule)
   }
 ];
 

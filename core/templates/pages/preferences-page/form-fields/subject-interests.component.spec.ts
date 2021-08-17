@@ -65,7 +65,7 @@ describe('Subject interests form field Component', () => {
     input = 'math';
     componentInstance.formCtrl = {
       valueChanges: {
-        subscribe(callb) {
+        subscribe(callb: (val: string) => void) {
           callb(input);
         }
       }
