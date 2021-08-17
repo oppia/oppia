@@ -71,6 +71,9 @@ SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
+# Using Dict[str, Any] here because the following schema can have a
+# recursive structure and currently mypy doesn't support recursive type
+# currently. See: https://github.com/python/mypy/issues/731
 def normalize_against_schema(
         obj: Any,
         schema: Dict[str, Any],

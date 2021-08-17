@@ -151,7 +151,7 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users resolve tasks.
         """

@@ -76,8 +76,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         )
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -194,8 +194,8 @@ class CollectionModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -453,8 +453,8 @@ class CollectionRightsModel(base_models.VersionedModel):
         )
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to collections and have varying rights.
         """
@@ -576,7 +576,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
     # remove Any from type-annotation below.
     def _reconstitute(
-            self, snapshot_dict: Dict[str, Any]) -> 'CollectionRightsModel':
+            self, snapshot_dict: Dict[str, Any]
+    ) -> 'CollectionRightsModel':
         """Populates the model instance with the snapshot.
 
         Some old CollectionRightsSnapshotContentModels can contain fields
@@ -790,8 +791,8 @@ class CollectionSummaryModel(base_models.BaseModel):
         )
 
     @staticmethod
-    def get_model_association_to_user() -> (
-            base_models.MODEL_ASSOCIATION_TO_USER):
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
@@ -859,7 +860,8 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_private_at_least_viewable(
-            cls, user_id: str) -> List['CollectionSummaryModel']:
+            cls, user_id: str
+    ) -> List['CollectionSummaryModel']:
         """Returns an iterable with private collection summary models that are
         at least viewable by the given user.
 
@@ -885,7 +887,8 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_at_least_editable(
-            cls, user_id: str) -> List['CollectionSummaryModel']:
+            cls, user_id: str
+    ) -> List['CollectionSummaryModel']:
         """Returns an iterable with collection summary models that are at least
         editable by the given user.
 

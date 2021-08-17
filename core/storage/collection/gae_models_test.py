@@ -458,7 +458,8 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_translator_ids_field_is_successful(
-            self) -> None:
+            self
+    ) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
         broken_dict: Dict[str, Any] = dict(**self.original_dict)

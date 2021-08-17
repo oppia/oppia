@@ -63,7 +63,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -252,7 +252,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

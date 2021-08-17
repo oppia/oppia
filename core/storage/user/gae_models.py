@@ -143,7 +143,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -429,7 +429,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -526,7 +526,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -620,7 +620,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user, since a user
         has multiple playthroughs associated with their account.
         """
@@ -769,7 +769,7 @@ class LearnerGoalsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -846,7 +846,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -924,7 +924,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1031,7 +1031,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1093,7 +1093,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1235,7 +1235,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not included because it contains data corresponding to other
         users.
         """
@@ -1292,7 +1292,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1363,7 +1363,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1517,7 +1517,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple explorations (and corresponding data) relevant to a user.
         """
@@ -1728,7 +1728,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there can be
         multiple collections associated with a user.
         """
@@ -1929,7 +1929,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user
         can have multiple stories associated with their account.
         """
@@ -2158,7 +2158,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
         """
@@ -2294,7 +2294,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2331,7 +2331,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user has
         many relevant skill masteries.
         """
@@ -2437,7 +2437,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user has
         multiple relevant contribution proficiencies.
         """
@@ -2713,7 +2713,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -2855,7 +2855,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not need to be exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
@@ -2912,7 +2912,7 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2948,7 +2948,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

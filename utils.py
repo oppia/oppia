@@ -90,7 +90,8 @@ class ExplorationConversionError(Exception):
 
 
 def get_file_contents(
-        filepath: str, raw_bytes: bool = False, mode: str = 'r') -> str:
+        filepath: str, raw_bytes: bool = False, mode: str = 'r'
+) -> str:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -115,7 +116,8 @@ def get_file_contents(
 
 
 def get_exploration_components_from_dir(
-        dir_path: str) -> Tuple[str, List[Tuple[str, str]]]:
+        dir_path: str
+) -> Tuple[str, List[Tuple[str, str]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -231,7 +233,8 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
 
 
 def recursively_remove_key(
-        obj: Union[Dict[Any, Any], List[Any]], key_to_remove: str) -> None:
+        obj: Union[Dict[Any, Any], List[Any]], key_to_remove: str
+) -> None:
     """Recursively removes keys from a list or dict.
 
     Args:
@@ -368,7 +371,8 @@ def camelcase_to_snakecase(camelcase_str: str) -> str:
 
 
 def set_url_query_parameter(
-        url: str, param_name: str, param_value: str) -> str:
+        url: str, param_name: str, param_value: str
+) -> str:
     """Set or replace a query parameter, and return the modified URL.
 
     Args:
@@ -488,7 +492,8 @@ def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
 
 
 def convert_string_to_naive_datetime_object(
-        date_time_string: str) -> datetime.datetime:
+        date_time_string: str
+) -> datetime.datetime:
     """Returns the naive datetime object equivalent of the date string.
 
     Args:
@@ -529,7 +534,8 @@ def get_human_readable_time_string(time_msec: float) -> str:
 
 
 def create_string_from_largest_unit_in_timedelta(
-        timedelta_obj: datetime.timedelta) -> str:
+        timedelta_obj: datetime.timedelta
+) -> str:
     """Given the timedelta object, find the largest nonzero time unit and
     return that value, along with the time unit, as a human readable string.
     The returned string is not localized.
@@ -570,7 +576,8 @@ def create_string_from_largest_unit_in_timedelta(
 
 def are_datetimes_close(
         later_datetime: datetime.datetime,
-        earlier_datetime: datetime.datetime) -> bool:
+        earlier_datetime: datetime.datetime
+) -> bool:
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
 
@@ -633,7 +640,8 @@ def vfs_normpath(path: str) -> str:
 
 
 def require_valid_name(
-        name: str, name_type: str, allow_empty: bool = False) -> None:
+        name: str, name_type: str, allow_empty: bool = False
+) -> None:
     """Generic name validation.
 
     Args:
@@ -679,7 +687,8 @@ def require_valid_name(
 
 
 def require_valid_url_fragment(
-        name: str, name_type: str, allowed_length: int) -> None:
+        name: str, name_type: str, allowed_length: int
+) -> None:
     """Generic URL fragment validation.
 
     Args:
@@ -803,7 +812,8 @@ def require_valid_meta_tag_content(meta_tag_content: str) -> None:
 
 
 def require_valid_page_title_fragment_for_web(
-        page_title_fragment_for_web: str) -> None:
+        page_title_fragment_for_web: str
+) -> None:
     """Generic page title fragment validation.
 
     Args:
@@ -924,7 +934,8 @@ def get_supported_audio_language_description(language_code: str) -> str:
 def is_user_id_valid(
         user_id: str,
         allow_system_user_id: bool = False,
-        allow_pseudonymous_id: bool = False) -> bool:
+        allow_pseudonymous_id: bool = False
+) -> bool:
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.
 

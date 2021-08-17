@@ -165,7 +165,8 @@ class SplashRedirectPage(base.BaseHandler):
 def get_redirect_route(
         regex_route: str,
         handler: Type[base.BaseHandler],
-        defaults: Optional[Dict[Any, Any]] = None) -> routes.RedirectRoute:
+        defaults: Optional[Dict[Any, Any]] = None
+) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs

@@ -122,7 +122,8 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 2)
 
     def test_query_new_and_pending_training_jobs_with_non_zero_offset(
-            self) -> None:
+            self
+    ) -> None:
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
             next_scheduled_check_time = (

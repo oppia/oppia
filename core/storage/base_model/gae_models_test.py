@@ -89,7 +89,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.export_data('')
 
     def test_get_model_association_to_user_raises_not_implemented_error(
-            self) -> None:
+            self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
             re.escape(
@@ -436,13 +437,15 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_get_model_association_to_user_is_not_corresponding_to_user(
-            self) -> None:
+            self
+    ) -> None:
         self.assertEqual(
             base_models.BaseCommitLogEntryModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_base_class_get_instance_id_raises_not_implemented_error(
-            self) -> None:
+            self
+    ) -> None:
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -613,7 +616,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
     def test_trusted_commit_with_no_snapshot_metadata_raises_error(
-            self) -> None:
+            self
+    ) -> None:
         model1 = TestVersionedModel(id='model_id1')
         # TODO(#13528): Remove this test after the backend is fully
         # type-annotated. Here ignore[assignment] is used to test method
@@ -649,7 +653,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
     def test_put_raises_not_implemented_error_for_versioned_models(
-            self) -> None:
+            self
+    ) -> None:
         model1 = TestVersionedModel(id='model_id1')
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -744,7 +749,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             model1.revert(model1, feconf.SYSTEM_COMMITTER_ID, '', 1)
 
     def test_get_snapshots_metadata_with_invalid_model_raises_error(
-            self) -> None:
+            self
+    ) -> None:
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 

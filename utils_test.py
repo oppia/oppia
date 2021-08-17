@@ -263,7 +263,8 @@ class UtilsTests(test_utils.GenericTestBase):
             '12/01/2016, 01:02:03:000000')
 
     def test_string_to_datetime_conversion_returns_correct_datetime(
-            self) -> None:
+            self
+    ) -> None:
         time_string = '12/01/2016, 01:02:03:000000'
         initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
         self.assertEqual(
@@ -271,7 +272,8 @@ class UtilsTests(test_utils.GenericTestBase):
             initial_time)
 
     def test_create_string_from_largest_unit_in_timedelta_raises_for_zero_diff(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(days=0)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -280,7 +282,8 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
 
     def test_create_string_from_largest_unit_in_timedelta_raises_for_neg_diff(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(days=-40)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -289,7 +292,8 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
 
     def test_create_string_from_largest_unit_in_timedelta_returns_days(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=4, hours=1, minutes=1, seconds=1)
 
@@ -300,7 +304,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '4 days')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_day(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=1, hours=1, minutes=1, seconds=1)
 
@@ -311,7 +316,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 day')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_hours(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=2, minutes=1, seconds=1)
 
@@ -322,7 +328,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '2 hours')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_an_hour(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=1, minutes=1, seconds=1)
 
@@ -333,7 +340,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 hour')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_minutes(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=4, seconds=1)
 
@@ -344,7 +352,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '4 minutes')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_minute(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=1, seconds=12)
 
@@ -355,7 +364,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 minute')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_min_for_min(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=1, seconds=0)
 
@@ -366,7 +376,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 minute')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_minute_if_sec(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=0, seconds=1)
 
@@ -377,7 +388,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 minute')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_min_if_msec(
-            self) -> None:
+            self
+    ) -> None:
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=0, seconds=0, milliseconds=1)
 
@@ -511,7 +523,8 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.convert_to_hash(1, 10) # type: ignore[arg-type]
 
     def test_convert_png_to_data_url_with_non_png_image_raises_error(
-            self) -> None:
+            self
+    ) -> None:
         favicon_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'favicon.ico') # type: ignore[no-untyped-call]
 
@@ -520,7 +533,8 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
-            self) -> None:
+            self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'Found invalid non-asset file .+'
@@ -534,7 +548,8 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_exploration_components_from_dir('.')
 
     def test_get_exploration_components_from_dir_with_multiple_yaml_files(
-            self) -> None:
+            self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'More than one non-asset file specified for '
@@ -543,7 +558,8 @@ class UtilsTests(test_utils.GenericTestBase):
                 'core/tests/data/dummy_assets/assets/')
 
     def test_get_exploration_components_from_dir_with_no_yaml_file(
-            self) -> None:
+            self
+    ) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'No yaml file specifed for core/tests/data/dummy_assets'):
@@ -559,7 +575,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(base64.b64decode(base64_number), b'[108]')
 
     def test_get_supported_audio_language_description_with_invalid_code(
-            self) -> None:
+            self
+    ) -> None:
         valid_language_code = 'en'
         expected_language_description = 'English'
         self.assertEqual(
@@ -641,7 +658,8 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_thumbnail_filename(filename)
 
     def _assert_valid_image_filename(
-            self, expected_error_substring: str, image_filename: str) -> None:
+            self, expected_error_substring: str, image_filename: str
+    ) -> None:
         """Helper method for test_require_valid_image_filename."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
@@ -719,7 +737,8 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.convert_png_data_url_to_binary(image_data_url), b'test123')
 
     def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
-            self) -> None:
+            self
+    ) -> None:
         image_data_url = python_utils.url_quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
