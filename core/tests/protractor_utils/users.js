@@ -158,7 +158,6 @@ var createAndLoginCurriculumAdminUser = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
-  await adminPage.get();
   await adminPage.addRole(username, 'curriculum admin');
 };
 
