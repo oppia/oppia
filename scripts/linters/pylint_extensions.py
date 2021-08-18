@@ -1767,7 +1767,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         excluded_phrase_at_beginning_of_line = any(
             trail_comment[1:].startswith(word)
             for word in ALLOWED_INLINE_PRAGMAS) or any(
-                trail_comment.startswith(word) for word in 
+                trail_comment.startswith(word) for word in
                     ALLOWED_INLINE_PRAGMAS)
         if excluded_phrase_at_beginning_of_line:
             if not trail_comment[0].isspace():
