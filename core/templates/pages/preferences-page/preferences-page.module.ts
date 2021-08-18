@@ -16,32 +16,32 @@
  * @fileoverview Module for the preferences page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PreferencesPageComponent } from './preferences-page.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-language-selector.component';
 import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
 import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
-import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 import { PreferencesPageRootComponent } from './preferences-page-root.component';
+import { CommonModule } from '@angular/common';
+import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     NgbPopoverModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     ReactiveFormsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    PreferencesPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     EditProfilePictureModalComponent,
@@ -58,20 +58,6 @@ import { PreferencesPageRootComponent } from './preferences-page-root.component'
     PreferredLanguagesComponent,
     PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [PreferencesPageRootComponent]
+  ]
 })
 export class PreferencesPageModule {}

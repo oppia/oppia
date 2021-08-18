@@ -28,6 +28,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { ContributorDashboardAdminNavbarComponent } from './navbar/contributor-dashboard-admin-navbar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     ReactiveFormsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ContributorDashboardAdminNavbarComponent
@@ -67,6 +69,7 @@ class ContributorDashboardAdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

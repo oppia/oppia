@@ -57,7 +57,8 @@
             <h1 class="oppia-classroom-h1">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_1' | translate }}</h1>
             <p class="oppia-classroom-p">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200"
-               href="/learn/math">
+               href="/learn/math"
+               routerLink="/learn/math">
                {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
             </a>
           </div>
@@ -368,6 +369,9 @@
     max-width: 848px;
     overflow: hidden;
     position: relative;
+  }
+  .oppia-library-container {
+    background-color: #afd2eb;
   }
   .oppia-library-container-inner {
     position: relative;

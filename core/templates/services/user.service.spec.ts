@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
@@ -27,6 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserService } from 'services/user.service';
 import { UrlService } from './contextual/url.service';
+import { PreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
 
 class MockWindowRef {
   _window = {
@@ -46,6 +47,7 @@ describe('User Api Service', () => {
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
   let windowRef: MockWindowRef;
+  let userBackendApiService: UserBackendApiService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -58,6 +60,7 @@ describe('User Api Service', () => {
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
     csrfService = TestBed.get(CsrfTokenService);
+    userBackendApiService = TestBed.inject(UserBackendApiService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       async() => {
@@ -379,4 +382,16 @@ describe('User Api Service', () => {
 
       flushMicrotasks();
     }));
+
+  it('should get user preferred dashboard', fakeAsync(() => {
+    let defaultDashboard = 'learner';
+    spyOn(userBackendApiService, 'getPreferencesAsync').and.returnValue(
+      Promise.resolve({
+        default_dashboard: defaultDashboard
+      } as PreferencesBackendDict));
+    userService.getUserPreferredDashboardAsync().then(preferredDashboard => {
+      expect(preferredDashboard).toEqual(defaultDashboard);
+    });
+    tick();
+  }));
 });

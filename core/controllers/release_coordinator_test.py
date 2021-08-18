@@ -35,24 +35,6 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
-    def test_guest_user_cannot_access_the_page(self):
-        self.get_html_response(
-            '/release-coordinator', expected_status_int=302)
-
-    def test_exploration_editor_cannot_access_the_page(self):
-        self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '/release-coordinator', expected_status_int=401)
-
-    def test_release_coordinator_can_acces_the_page(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        response = self.get_html_response('/release-coordinator')
-        response.mustcontain(
-            '<oppia-release-coordinator-page-root>' +
-            '</oppia-release-coordinator-page-root>')
-        self.logout()
-
 
 class MemoryCacheHandlerTest(test_utils.GenericTestBase):
     """Tests MemoryCacheHandler."""

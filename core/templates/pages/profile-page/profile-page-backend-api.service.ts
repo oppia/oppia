@@ -17,7 +17,6 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
@@ -94,7 +93,3 @@ export class ProfilePageBackendApiService {
     return this._fetchProfileDataAsync();
   }
 }
-
-angular.module('oppia').factory(
-  'ProfilePageBackendApiService',
-  downgradeInjectable(ProfilePageBackendApiService));

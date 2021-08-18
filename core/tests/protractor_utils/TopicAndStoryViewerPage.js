@@ -27,6 +27,8 @@ var TopicAndStoryViewerPage = function() {
   var lessonUncompletedIcons = element.all(
     by.css('.protractor-test-lesson-icon-uncompleted'));
   var lessonTrack = element(by.css('.protractor-test-lesson-track'));
+  var practiceSessionContainer = element(
+    by.css('.protractor-test-practice-session-container'));
 
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
@@ -52,6 +54,10 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
     expect(await lessonUncompletedIcons.count()).toEqual(count);
+  };
+
+  this.waitForPracticeSessionContainer = async function() {
+    await waitFor.presenceOf(practiceSessionContainer);
   };
 };
 

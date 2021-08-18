@@ -39,16 +39,10 @@ import utils
 
 class ProfilePageTests(test_utils.GenericTestBase):
 
-    def test_get_profile_page_of_non_existing_user_raises_status_404(self):
-        self.get_html_response(
-            '/profile/%s' % self.OWNER_USERNAME, expected_status_int=404)
-
     def test_get_profile_page_of_existing_user(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
-        self.assertIn(
-            b'<oppia-profile-page-root></oppia-profile-page-root>',
-            response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -134,7 +128,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn(b'{"title": "Preferences | Oppia"})', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 
@@ -820,13 +814,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
     def test_get_delete_account_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/delete-account')
-            self.assertIn(
-                b'<oppia-delete-account-page-root>' +
-                b'</oppia-delete-account-page-root>', response.body)
-
-    def test_get_delete_account_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response('/delete-account', expected_status_int=404)
+            self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
@@ -1087,12 +1075,7 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
     def test_get_pending_account_deletion_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/pending-account-deletion')
-            self.assertIn(b'Pending Account Deletion', response.body)
-
-    def test_get_pending_account_deletion_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response(
-                '/pending-account-deletion', expected_status_int=404)
+            self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

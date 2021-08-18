@@ -16,55 +16,34 @@
  * @fileoverview Module for the profile page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 import { ProfilePageComponent } from './profile-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { EditProfilePictureModalComponent } from 'pages/preferences-page/modal-templates/edit-profile-picture-modal.component';
 import { ProfilePageRootComponent } from './profile-page-root.component';
+import { CommonModule } from '@angular/common';
+import { ProfilePageRoutingModule } from './profile-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     NgbPopoverModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ProfilePageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
-    EditProfilePictureModalComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent
   ],
   entryComponents: [
-    EditProfilePictureModalComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [ProfilePageRootComponent]
+  ]
 })
 export class ProfilePageModule {}

@@ -9,7 +9,11 @@
       <div class="form-group row">
         <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_USERNAME' | translate }}</label>
         <div class="col-lg-8 col-md-8 col-sm-8">
-          <a *ngIf="username" href="/profile/{{ username }}">{{ username }}</a>
+          <a *ngIf="username"
+             href="/profile/{{ username }}"
+             [routerLink]="'/profile/' + username">
+             {{ username }}
+          </a>
           <em *ngIf="!username">{{ 'I18N_PREFERENCES_USERNAME_NOT_SELECTED' | translate }}</em>
         </div>
       </div>
@@ -102,7 +106,11 @@
         <mat-grid-list *ngIf="subscriptionList?.length > 0" cols="2" rowHeight="100px">
           <mat-grid-tile *ngFor="let subscription of subscriptionList">
             <mat-card class="oppia-subscription-card oppia-subscription-list-container">
-              <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.creator_username }}" rel="noopener" target="_blank">
+              <a class="oppia-subscription-profile-link"
+                 href="/profile/{{ subscription.creator_username }}"
+                 [routerLink]="'/profile/' + subscription.creator_username"
+                 rel="noopener"
+                 target="_blank">
                 <img [src]="subscription.creator_picture_data_url" class="oppia-subscription-card-profile-picture rounded-circle">
                 <span class="oppia-subscription-card-summary">
                   <div class="oppia-subscription-card-summary-text-container">
@@ -258,7 +266,7 @@
     <div *ngIf="userCanDeleteAccount" role="form" class="form-group row">
       <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}</label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account">
+        <a href="/delete-account" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
           <button type="button" class="btn btn-danger protractor-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>

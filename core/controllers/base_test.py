@@ -232,16 +232,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'must-revalidate, no-cache, no-store'
         )
 
-    def test_root_redirect_rules_for_logged_in_learners(self):
-        self.login(self.TEST_LEARNER_EMAIL)
-
-        # Since by default the homepage for all logged in users is the
-        # learner dashboard, going to '/' should redirect to the learner
-        # dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner-dashboard', response.headers['location'])
-        self.logout()
-
     def test_root_redirect_rules_for_deleted_user_prod_mode(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
@@ -253,66 +243,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn('pending-account-deletion', response.headers['location'])
-
-    def test_root_redirect_rules_for_users_with_no_user_contribution_model(
-            self):
-        self.login(self.TEST_LEARNER_EMAIL)
-        # Delete the UserContributionModel.
-        user_id = user_services.get_user_id_from_username(
-            self.TEST_LEARNER_USERNAME)
-        user_contribution_model = user_models.UserContributionsModel.get(
-            user_id)
-        user_contribution_model.delete()
-
-        # Since by default the homepage for all logged in users is the
-        # learner dashboard, going to '/' should redirect to the learner
-        # dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner-dashboard', response.headers['location'])
-        self.logout()
-
-    def test_root_redirect_rules_for_logged_in_creators(self):
-        self.login(self.TEST_CREATOR_EMAIL)
-        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        # Set the default dashboard as creator dashboard.
-        user_services.update_user_default_dashboard(
-            creator_user_id, constants.DASHBOARD_TYPE_CREATOR)
-
-        # Since the default dashboard has been set as creator dashboard, going
-        # to '/' should redirect to the creator dashboard.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('creator-dashboard', response.headers['location'])
-
-    def test_root_redirect_rules_for_logged_in_editors(self):
-        self.login(self.TEST_CREATOR_EMAIL)
-        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.get_user_actions_info(creator_user_id)
-        editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
-        exploration_id = '1_en_test_exploration'
-        self.save_new_valid_exploration(
-            exploration_id, creator_user_id, title='Test',
-            category='Test', language_code='en')
-        rights_manager.assign_role_for_exploration(
-            creator, exploration_id, editor_user_id,
-            rights_domain.ROLE_EDITOR)
-        self.logout()
-        self.login(self.TEST_EDITOR_EMAIL)
-        exp_services.update_exploration(
-            editor_user_id, exploration_id, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'edited title'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'category',
-                'new_value': 'edited category'
-            })], 'Change title and category')
-
-        # Since user has edited one exploration created by another user,
-        # going to '/' should redirect to the dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('dashboard', response.headers['location'])
-        self.logout()
 
     def test_get_with_invalid_return_type_logs_correct_warning(self):
         # Modify the testapp to use the mock handler.
@@ -463,7 +393,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ))
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<oppia-splash-page-root></oppia-splash-page-root>',
+                b'<oppia-root></oppia-root>',
                 response.body
             )
 
@@ -517,8 +447,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<oppia-library-page-root>', response.body)
-        self.assertNotIn(b'<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
+        self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_html_response_is_not_rejected_when_user_is_release_coordinator(
@@ -530,8 +460,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<oppia-library-page-root>', response.body)
-        self.assertNotIn(b'<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
+        self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):

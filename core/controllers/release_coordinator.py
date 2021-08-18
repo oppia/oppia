@@ -23,15 +23,6 @@ from core.domain import caching_services
 import feconf
 
 
-class ReleaseCoordinatorPage(base.BaseHandler):
-    """Handler for the release cordinator page."""
-
-    @acl_decorators.can_access_release_coordinator_page
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('release-coordinator-page.mainpage.html')
-
-
 class MemoryCacheHandler(base.BaseHandler):
     """Handler for memory cache profile."""
 

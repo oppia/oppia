@@ -16,26 +16,20 @@
  * @fileoverview Module for the classroom page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { NgModule } from '@angular/core';
 import { ClassroomPageComponent } from './classroom-page.component';
 import { TopicSummaryTileComponent } from
   'components/summary-tile/topic-summary-tile.component';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
+import { CommonModule } from '@angular/common';
+import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    ClassroomPageRoutingModule
   ],
   declarations: [
     ClassroomPageComponent,
@@ -46,20 +40,6 @@ import { ClassroomPageRootComponent } from './classroom-page-root.component';
     ClassroomPageComponent,
     ClassroomPageRootComponent,
     TopicSummaryTileComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [ClassroomPageRootComponent]
+  ]
 })
 export class ClassroomPageModule {}

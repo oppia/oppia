@@ -16,24 +16,21 @@
  * @fileoverview Module for the delete account page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { DeleteAccountPageComponent } from './delete-account-page.component';
 import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
 import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
+import { DeleteAccountPageRoutingModule } from './delete-account-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    DeleteAccountPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     DeleteAccountModalComponent,
@@ -44,20 +41,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
     DeleteAccountPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [DeleteAccountPageRootComponent]
+  ]
 })
 export class DeleteAccountPageModule {}

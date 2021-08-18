@@ -40,6 +40,8 @@ export class AdminNavbarComponent implements OnInit {
   logoutUrl = '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
   profileDropdownIsActive = false;
   dropdownMenuIsActive = false;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private adminRouterService: AdminRouterService,

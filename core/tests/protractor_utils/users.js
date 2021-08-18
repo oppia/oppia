@@ -24,6 +24,7 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
+var splashPage = element(by.css('.protractor-test-splash-page'));
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -68,17 +69,40 @@ var login = async function(email, useManualNavigation = true) {
   await action.sendKeys('Email input', emailInput, email);
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
-  await action.click('Sign in button', signInButton);
 
-  await waitFor.pageToFullyLoad();
+  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
+
+  var returnUrl = currentUrl.split('return_url=')[
+    currentUrl.split('return_url=').length - 1];
+
+  await waitFor.clientSideRedirection(async() => {
+    // Click the "sign in" button to trigger redirection.
+    await action.click('Sign in button', signInButton);
+  }, (url) => {
+    if (returnUrl === '/') {
+      // Users will be redirected to preferred dashboard if they are fully
+      // registered. Otherwise, they will be redirected to signup page.
+      return /(learner-dashboard|creator-dashboard|signup)/.test(url);
+    } else {
+      return (new RegExp(returnUrl + '|signup')).test(url);
+    }
+  }, async() => {
+    // Cannot predict the new page, so waiting for loading message to disappear.
+    await waitFor.pageToFullyLoad();
+  });
 };
 
 var logout = async function() {
-  await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
-  // Wait for logout page to load.
-  await waitFor.pageToFullyLoad();
-  // Wait for redirection to occur.
-  await waitFor.pageToFullyLoad();
+  await waitFor.clientSideRedirection(async() => {
+    await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+  }, (url) => {
+    // Wait until the URL has changed to something that is not /logout.
+    return !(/logout/.test(url));
+  }, async() => {
+    await waitFor.visibilityOf(
+      splashPage, 'Splash page takes too long to appear');
+    await waitFor.pageToFullyLoad();
+  });
 };
 
 // The user needs to log in immediately before this method is called. Note
@@ -103,9 +127,25 @@ var _completeSignup = async function(username) {
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
   var registerUser = element(by.css('.protractor-test-register-user'));
-  await action.click('Register user button', registerUser);
 
-  await waitFor.pageToFullyLoad();
+  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
+
+  var returnUrl = currentUrl.split('return_url=')[
+    currentUrl.split('return_url=').length - 1];
+
+  await waitFor.clientSideRedirection(async() => {
+    // Click the "register user" button to trigger redirection.
+    await action.click('Register user button', registerUser);
+  }, (url) => {
+    if (returnUrl === '/') {
+      return /(learner-dashboard|creator-dashboard)/.test(url);
+    } else {
+      return (new RegExp(returnUrl)).test(url);
+    }
+  }, async() => {
+    // Cannot predict the new page, so waiting for loading message to disappear.
+    await waitFor.pageToFullyLoad();
+  });
 };
 
 var createAndLoginUser = async function(
@@ -119,7 +159,6 @@ var createAndLoginCurriculumAdminUser = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
-  await adminPage.get();
   await adminPage.addRole(username, 'curriculum admin');
 };
 

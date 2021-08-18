@@ -53,11 +53,6 @@ describe('When account is deleted it', function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
-    await waitFor.visibilityOf(
-      pendingAccountDeletionHeading,
-      'Pending Account Deletion Page takes too long to appear');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
 
     await users.login('user1@delete.com');
     await waitFor.visibilityOf(
@@ -77,11 +72,6 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationCollaborator('ExpCollaborator');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
-    await waitFor.visibilityOf(
-      pendingAccountDeletionHeading,
-      'Pending Account Deletion Page takes too long to appear');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
 
     await users.login('ExpCollaborator@oppia.com');
     await general.openEditor(explorationId, false);
@@ -106,11 +96,6 @@ describe('When account is deleted it', function() {
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete3');
-    await waitFor.visibilityOf(
-      pendingAccountDeletionHeading,
-      'Pending Account Deletion Page takes too long to appear');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
 
     await users.login('user@check.com');
     await general.openEditor(explorationId, true);
@@ -128,11 +113,6 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationManager('secondOwner');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete4');
-    await waitFor.visibilityOf(
-      pendingAccountDeletionHeading,
-      'Pending Account Deletion Page takes too long to appear');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
 
     await users.login('secondOwner@check.com');
     await general.openEditor(explorationId, true);

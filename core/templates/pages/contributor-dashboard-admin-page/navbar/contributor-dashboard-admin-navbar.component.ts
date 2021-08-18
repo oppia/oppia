@@ -37,6 +37,8 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   profileDropdownIsActive: boolean = false;
   logoWebpImageSrc: string;
   logoPngImageSrc: string;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

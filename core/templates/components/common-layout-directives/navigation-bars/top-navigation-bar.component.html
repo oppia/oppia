@@ -16,6 +16,7 @@
   </a>
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block"
      href="/"
+     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
      [oppiaFocusOn]="labelForClearingFocus"
      [ngClass]="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
     <picture>
@@ -93,6 +94,7 @@
             class="nav-item oppia-clickable-navbar-element">
           <a class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
              href="/community-library"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
              [innerHTML]="'I18N_TOPNAV_LIBRARY' | translate">
           </a>
         </li>
@@ -279,6 +281,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
+             [routerLink]="profilePageUrl"
              class="dropdown-item nav-link protractor-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
             <strong>
@@ -319,6 +322,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
              class="dropdown-item nav-link protractor-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
           </a>

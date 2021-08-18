@@ -16,26 +16,20 @@
  * @fileoverview Module for the story viewer page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { StoryViewerNavbarBreadcrumbComponent } from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
 import { StoryViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
+import { CommonModule } from '@angular/common';
+import { StoryViewerPageRoutingModule } from './story-viewer-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    StoryViewerPageRoutingModule
   ],
   declarations: [
     StoryViewerNavbarBreadcrumbComponent,
@@ -48,20 +42,6 @@ import { StoryViewerPageRootComponent } from './story-viewer-page-root.component
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent,
     StoryViewerPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [StoryViewerPageRootComponent]
+  ]
 })
 export class StoryViewerPageModule {}

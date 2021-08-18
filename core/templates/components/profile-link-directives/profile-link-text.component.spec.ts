@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { ProfileLinkTextComponent } from './profile-link-text.component';
 
 /**
@@ -25,6 +26,9 @@ describe('ProfileLinkTextComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MockRouterModule
+      ],
       declarations: [ProfileLinkTextComponent]
     }).compileComponents();
   }));

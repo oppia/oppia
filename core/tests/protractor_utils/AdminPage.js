@@ -132,7 +132,6 @@ var AdminPage = function() {
 
   var _switchToRolesTab = async function() {
     await action.click('Admin roles tab button', adminRolesTab);
-    await waitFor.pageToFullyLoad();
 
     expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(

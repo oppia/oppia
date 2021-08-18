@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { UserProfile } from 'domain/user/user-profile.model';
@@ -73,6 +73,8 @@ export class ProfilePageComponent {
   subjectInterests: string[] = [];
   profilePictureDataUrl: string = '';
   firstContributionMsec: number;
+  preferencesUrl = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -261,8 +263,3 @@ export class ProfilePageComponent {
     return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
   }
 }
-
-angular.module('oppia').directive('oppiaProfilePage',
-  downgradeComponent({
-    component: ProfilePageComponent
-  }) as angular.IDirectiveFactory);

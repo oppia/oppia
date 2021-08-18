@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -32,6 +33,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 export class PlaybookPageComponent implements OnInit {
   TAB_ID_PARTICIPATION: string = 'participation';
   TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+  communityLibraryUrl = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,

@@ -38,21 +38,6 @@ import feconf
 import utils
 
 
-class ProfilePage(base.BaseHandler):
-    """The world-viewable profile page."""
-
-    @acl_decorators.open_access
-    def get(self, username):
-        """Handles GET requests for the publicly-viewable profile page."""
-
-        user_settings = user_services.get_user_settings_from_username(username)
-
-        if not user_settings:
-            raise self.PageNotFoundException
-
-        self.render_template('profile-page.mainpage.html')
-
-
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
@@ -102,15 +87,6 @@ class ProfileHandler(base.BaseHandler):
             'is_user_visiting_own_profile': is_user_visiting_own_profile
         })
         self.render_json(self.values)
-
-
-class PreferencesPage(base.BaseHandler):
-    """The preferences page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('preferences-page.mainpage.html')
 
 
 class BulkEmailWebhookEndpoint(base.BaseHandler):
@@ -399,17 +375,6 @@ class SignupHandler(base.BaseHandler):
         })
 
 
-class DeleteAccountPage(base.BaseHandler):
-    """The delete account page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('delete-account-page.mainpage.html')
-
-
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
 
@@ -466,20 +431,6 @@ class ExportAccountHandler(base.BaseHandler):
         # Render file for download.
         self.render_downloadable_file(
             temp_file, 'oppia_takeout_data.zip', 'text/plain')
-
-
-class PendingAccountDeletionPage(base.BaseHandler):
-    """The account pending deletion page. This page is accessible by all users
-    even if they are not scheduled for deletion. This is because users that are
-    scheduled for deletion are logged out instantly when they try to login.
-    """
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('pending-account-deletion-page.mainpage.html')
 
 
 class UsernameCheckHandler(base.BaseHandler):

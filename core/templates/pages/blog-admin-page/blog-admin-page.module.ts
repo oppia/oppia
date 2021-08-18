@@ -31,8 +31,9 @@ import { RolesAndActionsVisualizerComponent } from 'pages/admin-page/roles-tab/r
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ToastrModule } from 'ngx-toastr';
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 declare var angular: ng.IAngularStatic;
 
@@ -47,6 +48,7 @@ declare var angular: ng.IAngularStatic;
     MatCardModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     BlogAdminNavbarComponent,
