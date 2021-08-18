@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { PositionOfTerm, PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
 
-fdescribe('PositionOfTerms', () => {
+describe('PositionOfTerms', () => {
   let fixture: ComponentFixture<PositionOfTermsEditorComponent>;
   let component: PositionOfTermsEditorComponent;
 
