@@ -362,14 +362,14 @@ class Collection(python_utils.OBJECT):
         """Returns a Collection domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
-                decoded into a dictionary representing a Collection. Only call
-                on strings that were created using serialize().
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Collection.
+                Only call on strings that were created using serialize().
 
         Returns:
             Collection. The corresponding Collection domain object.
         """
-        collection_dict = json.loads(json_string.decode('utf-8'))
+        collection_dict = json.loads(json_string)
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(
@@ -391,8 +391,8 @@ class Collection(python_utils.OBJECT):
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         collection_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -413,7 +413,7 @@ class Collection(python_utils.OBJECT):
             collection_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
-        return json.dumps(collection_dict).encode('utf-8')
+        return json.dumps(collection_dict)
 
     def to_yaml(self):
         """Convert the Collection domain object into YAML.

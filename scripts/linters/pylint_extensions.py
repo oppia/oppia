@@ -48,7 +48,7 @@ EXCLUDED_PHRASES = [
 ]
 
 # If a comment begins with a pragma, it is permitted to be inline.
-PRAGMAS = [
+ALLOWED_INLINE_PRAGMAS = [
     'pylint:', 'type:', 'pragma:', 'isort:'
 ]
 
@@ -69,7 +69,8 @@ def read_from_node(node):
     Returns:
         list(str). The data read from the ast node.
     """
-    return list([line.decode('utf-8') for line in node.stream().readlines()])
+    # Readlines returns bytes, thus we need to decode them to string.
+    return [line.decode('utf-8') for line in node.stream().readlines()]
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
@@ -221,12 +222,9 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         parameters = []
         parameter_name_to_index = {}
         for i, arg in enumerate(called.args.args):
-            if isinstance(arg, astroid.Tuple):
-                name = None
-            else:
-                assert isinstance(arg, astroid.AssignName)
-                name = arg.name
-                parameter_name_to_index[name] = i
+            assert isinstance(arg, astroid.AssignName)
+            name = arg.name
+            parameter_name_to_index[name] = i
             if i >= num_mandatory_parameters:
                 defval = called.args.defaults[i - num_mandatory_parameters]
             else:
@@ -278,27 +276,26 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             tokens: astroid.Tokens. Object to process tokens.
         """
-        escape_character_indicator = b'\\'
-        string_indicator = b'\''
+        escape_character_indicator = '\\'
+        string_indicator = '\''
         excluded = False
         for (token_type, token, (line_num, _), _, line) in tokens:
             # Check if token type is an operator and is either a
             # left parenthesis '(' or a right parenthesis ')'.
-            if token_type == tokenize.OP and (
-                    token == b'(' or token == b')'):
+            if token_type == tokenize.OP and token in ('(', ')'):
                 line = line.strip()
 
                 # Exclude 'if', 'elif', 'while' statements.
-                if line.startswith((b'if ', b'while ', b'elif ')):
+                if line.startswith(('if ', 'while ', 'elif ')):
                     excluded = True
                 # Skip check if there is a comment at the end of line.
                 if excluded:
                     split_line = line.split()
                     if '#' in split_line:
                         comment_index = split_line.index('#')
-                        if split_line[comment_index - 1].endswith(b'):'):
+                        if split_line[comment_index - 1].endswith('):'):
                             excluded = False
-                    elif line.endswith(b'):'):
+                    elif line.endswith('):'):
                         excluded = False
                 if excluded:
                     continue
@@ -324,11 +321,11 @@ class HangingIndentChecker(checkers.BaseChecker):
                     if in_string:
                         continue
 
-                    if char == b'(':
+                    if char == '(':
                         if bracket_count == 0:
                             position = char_num
                         bracket_count += 1
-                    elif char == b')' and bracket_count > 0:
+                    elif char == ')' and bracket_count > 0:
                         bracket_count -= 1
 
                 if bracket_count > 0 and position + 1 < line_length:
@@ -345,7 +342,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                         if comment_index == 0:
                             continue
                         else:
-                            if split_content[comment_index - 1].endswith(b'('):
+                            if split_content[comment_index - 1].endswith('('):
                                 continue
                     self.add_message(
                         'no-break-after-hanging-indent', line=line_num)
@@ -416,19 +413,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'Missing yield type documentation',
             'missing-yield-type-doc',
             'Please document the type yielded by this method.',
-            # We can't use the same old_name for two different warnings
-            # {'old_names': [('W9009', 'missing-yields-doc')]}.
         ),
         'W9015': (
             '"%s" missing in parameter documentation',
             'missing-param-doc',
             'Please add parameter declarations for all parameters.',
-            {'old_names': [('W9003', 'missing-param-doc')]}),
+            {'old_names': [('W9003', 'old-missing-param-doc')]}),
         'W9016': (
             '"%s" missing in parameter type documentation',
             'missing-type-doc',
-            'Please add parameter type declarations for all parameters.',
-            {'old_names': [('W9004', 'missing-type-doc')]}),
+            'Please add parameter type declarations for all parameters.'
+        ),
         'W9017': (
             '"%s" differing in parameter documentation',
             'differing-param-doc',
@@ -612,20 +607,20 @@ class DocstringParameterChecker(checkers.BaseChecker):
         # Iterate till the start of docstring.
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
+            if line.startswith(('"""', '\'\'\'', '\'', '"')):
                 break
-            else:
-                line_number += 1
 
-        doc_length = len(node.doc.split(b'\n'))
+            line_number += 1
+
+        doc_length = len(node.doc.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
             node.root().file, line_number).strip()
         second_line_after_doc = linecache.getline(
             node.root().file, line_number + 1).strip()
-        if first_line_after_doc != b'':
+        if first_line_after_doc != '':
             self.add_message('newline-below-class-docstring', node=node)
-        elif second_line_after_doc == b'':
+        elif second_line_after_doc == '':
             self.add_message('newline-below-class-docstring', node=node)
 
     def visit_functiondef(self, node):
@@ -808,22 +803,22 @@ class DocstringParameterChecker(checkers.BaseChecker):
         blank_line_counter = 0
         for line in docstring:
             line = line.strip()
-            if line == b'':
+            if line == '':
                 blank_line_counter += 1
             if blank_line_counter == 0 or blank_line_counter > 1:
-                if line == b'Args:':
+                if line == 'Args:':
                     self.add_message(
                         'single-space-above-args', node=node)
-                elif line == b'Returns:':
+                elif line == 'Returns:':
                     self.add_message(
                         'single-space-above-returns', node=node)
-                elif line == b'Raises:':
+                elif line == 'Raises:':
                     self.add_message(
                         'single-space-above-raises', node=node)
-                elif line == b'Yields:':
+                elif line == 'Yields:':
                     self.add_message(
                         'single-space-above-yield', node=node)
-            if line != b'':
+            if line != '':
                 blank_line_counter = 0
 
     def check_docstring_structure(self, node):
@@ -838,10 +833,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if node.doc:
             docstring = node.doc.splitlines()
             # Check for space after """ in docstring.
-            if len(docstring[0]) > 0 and docstring[0][0] == b' ':
+            if len(docstring[0]) > 0 and docstring[0][0] == ' ':
                 self.add_message('space-after-triple-quote', node=node)
             # Check if single line docstring span two lines.
-            if len(docstring) == 2 and docstring[-1].strip() == b'':
+            if len(docstring) == 2 and docstring[-1].strip() == '':
                 self.add_message(
                     'single-line-docstring-span-two-lines', node=node)
             # Check for punctuation at end of a single line docstring.
@@ -850,9 +845,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 self.add_message('no-period-used', node=node)
             # Check for punctuation at the end of a multiline docstring.
             elif len(docstring) > 1:
-                if docstring[-2].strip() == b'':
+                if docstring[-2].strip() == '':
                     self.add_message('empty-line-before-end', node=node)
-                elif docstring[-1].strip() != b'':
+                elif docstring[-1].strip() != '':
                     self.add_message(
                         'no-newline-used-at-end', node=node)
                 elif (docstring[-2][-1] not in
@@ -928,7 +923,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
-                    if re.search(br'^[a-zA-Z0-9_\.\*]+[.] ',
+                    if re.search(r'^[a-zA-Z0-9_\.\*]+[.] ',
                                  stripped_line):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
@@ -956,7 +951,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                           self.DOCSTRING_SECTION_YIELDS)):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
-                    if (re.search(br'^[a-zA-Z_() -:,\*]+\.',
+                    if (re.search(r'^[a-zA-Z_() -:,\*]+\.',
                                   stripped_line) and not in_description):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
@@ -965,7 +960,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                                 node=node)
                         # If the line ends with a colon, we can assume the rest
                         # of the section is free form.
-                        if re.search(br':$', stripped_line):
+                        if re.search(r':$', stripped_line):
                             in_freeform_section = True
                         in_description = True
                     # In a description line of a returns or yields, we keep the
@@ -979,7 +974,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                                 node=node)
                         # If the description line ends with a colon, we can
                         # assume the rest of the section is free form.
-                        if re.search(br':$', stripped_line):
+                        if re.search(r':$', stripped_line):
                             in_freeform_section = True
                 # Check for the start of an Args: section and check the correct
                 # indentation.
@@ -998,13 +993,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 # parameter is in the function arguments set. We also check for
                 # arguments that start with * which means it's autofill and will
                 # not appear in the node args list so we handle those too.
-                elif (currently_in_args_section and parameter
-                      and ((
+                elif (currently_in_args_section and
+                      parameter and ((
                           parameter.group(0).strip('*')
                           in expected_argument_names) or
-                           re.search(
-                               br'\*[^ ]+: ',
-                               stripped_line))):
+                           re.search(r'\*[^ ]+: ', stripped_line))):
                     words_in_line = stripped_line.split(' ')
                     currently_in_freeform_section = False
                     # Check if the current parameter section indentation is
@@ -1375,7 +1368,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     }
 
     # If import from any of these is made, it may not be a module.
-    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing']
+    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing', 'mypy_imports']
 
     @checker_utils.check_messages('import-only-modules')
     def visit_importfrom(self, node):
@@ -1440,7 +1433,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         """
         file_content = read_from_node(node)
         for (line_num, line) in enumerate(file_content):
-            if line.rstrip(b'\r\n').endswith(b'\\'):
+            if line.rstrip('\r\n').endswith('\\'):
                 self.add_message(
                     'backslash-continuation', line=line_num + 1)
 
@@ -1519,7 +1512,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
     )
 
     def __init__(self, linter=None):
-        super(RestrictedImportChecker, self).__init__(linter)
+        super(RestrictedImportChecker, self).__init__(linter=linter)
         self._module_to_forbidden_imports = []
 
     def open(self):
@@ -1652,7 +1645,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         Args:
             node: astroid.node.BinOp. Node to access module content.
         """
-        if node.op == b'/':
+        if node.op == '/':
             self.add_message(
                 'division-operator-used', node=node)
 
@@ -1680,8 +1673,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use capital letter to begin the content of comment.'
         ),
         'C0039': (
-            'Please use a single space before pragmas.',
-            'no-space-before-pylint-pragma',
+            'Please use a single space before the start of pragma keyword.',
+            'no-space-before-pragma',
             'Ensures that there is a space before any pragmas.'
         ),
         'C0040': (
@@ -1706,7 +1699,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line: str. The current line of comment.
             line_num: int. Line number of the current comment.
         """
-        if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+        if re.search(r'^#[^\s].*$', line) and not line.startswith('#!'):
             self.add_message(
                 'no-space-at-beginning', line=line_num)
 
@@ -1722,7 +1715,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line_num: int. Line number of the current comment.
         """
         # Check if variable name is used.
-        if line[1:].startswith(b' '):
+        if line[1:].startswith(' '):
             starts_with_underscore = '_' in line.split()[1]
         else:
             starts_with_underscore = '_' in line.split()[0]
@@ -1735,7 +1728,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         # Check if comment contains any excluded phrase.
         excluded_phrase_is_present = any(
             line[1:].strip().startswith(word) for word in EXCLUDED_PHRASES)
-        if (re.search(br'^# [a-z].*', line) and not (
+        if (re.search(r'^# [a-z].*', line) and not (
                 excluded_phrase_is_present or
                 starts_with_underscore or allowed_prefix_is_present)):
             self.add_message(
@@ -1773,8 +1766,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         trail_comment = split_line[1]
         excluded_phrase_at_beginning_of_line = any(
             trail_comment[1:].startswith(word)
-            for word in PRAGMAS) or any(
-                trail_comment.startswith(word) for word in PRAGMAS)
+            for word in ALLOWED_INLINE_PRAGMAS) or any(
+                trail_comment.startswith(word) for word in ALLOWED_INLINE_PRAGMAS)
         if excluded_phrase_at_beginning_of_line:
             if not trail_comment[0].isspace():
                 self.add_message('no-space-before-pragma', line=line_num)
@@ -1855,21 +1848,21 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
         # Iterate till the start of docstring.
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith((b'\'', b'"')):
+            if line.startswith(('\'', '"')):
                 break
-            else:
-                line_number += 1
 
-        doc_length = len(node.doc.split(b'\n'))
+            line_number += 1
+
+        doc_length = len(node.doc.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
             node.root().file, line_number).strip()
         second_line_after_doc = linecache.getline(
             node.root().file, line_number + 1).strip()
-        if first_line_after_doc != b'':
+        if first_line_after_doc != '':
             self.add_message(
                 'no-empty-line-provided-below-fileoverview', node=node)
-        elif second_line_after_doc == b'':
+        elif second_line_after_doc == '':
             self.add_message(
                 'only-a-single-empty-line-should-be-provided', node=node)
 
@@ -1911,7 +1904,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                 # pylint will raise the error of single-line-pragma because
                 # from here on all this lint check is enabled. So we need to
                 # ignore this line.
-                if re.search(br'^(#\s*pylint:)', line):
+                if re.search(r'^(#\s*pylint:)', line):
                     if 'enable' in line and 'single-line-pragma' in line:
                         continue
                     self.add_message(
@@ -1949,7 +1942,7 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                 line = line.strip()
                 # Regex evaluates to True if the line is of the form "if #" or
                 # "... if #" where # is not a space.
-                if not re.search(br'(\s|^)' + token + br'(\s[^\s]|$)', line):
+                if not re.search(r'(\s|^)' + token + r'(\s[^\s]|$)', line):
                     self.add_message(
                         'single-space-after-keyword',
                         args=(token),
@@ -2085,7 +2078,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
         ),)
 
     def __init__(self, linter=None):
-        super(DisallowedFunctionsChecker, self).__init__(linter)
+        super(DisallowedFunctionsChecker, self).__init__(linter=linter)
         self.funcs_to_replace_str = {}
         self.funcs_to_remove_str = set()
         self.funcs_to_replace_regex = []

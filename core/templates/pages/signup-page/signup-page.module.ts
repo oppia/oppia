@@ -16,54 +16,32 @@
  * @fileoverview Module for the signup page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
 import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
 import { SignupPageRootComponent } from './signup-page-root.component';
 import { SignupPageComponent } from './signup-page.component';
+import { CommonModule } from '@angular/common';
+import { SignupPageRoutingModule } from './signup-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    SignupPageRoutingModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SignupPageComponent,
     SignupPageRootComponent,
     RegistrationSessionExpiredModalComponent,
     LicenseExplanationModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SignupPageComponent,
     SignupPageRootComponent,
     RegistrationSessionExpiredModalComponent,
     LicenseExplanationModalComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [SignupPageRootComponent]
+  ]
 })
 export class SignupPageModule {}

@@ -247,11 +247,6 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'OpenFractionsFromLandingPage', 'click', collectionId);
   }
-  registerStewardsLandingPageEvent(
-      viewerType: string, buttonText: string): void {
-    this._sendEventToGoogleAnalytics(
-      'ClickButtonOnStewardsPage', 'click', viewerType + ':' + buttonText);
-  }
   registerSaveRecordedAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'SaveRecordedAudio', 'click', explorationId);

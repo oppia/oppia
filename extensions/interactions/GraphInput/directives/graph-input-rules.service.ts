@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { GraphUtilsService } from
+import { AdjacencyMatrix, GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { UtilsService } from 'services/utils.service';
 import { GraphAnswer } from 'interactions/answer-defs';
@@ -151,6 +151,16 @@ export class GraphInputRulesService {
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
 
+  private _getDegreesOfMatrix(adj: AdjacencyMatrix): number[] {
+    return <number[]> adj.map((value) => {
+      return value.reduce((prev, cur) => {
+        prev = (prev === null) ? 0 : prev;
+        cur = (cur === null) ? 0 : cur;
+        return prev + cur;
+      });
+    }).sort();
+  }
+
   private isIsomorphic(graph1: GraphAnswer, graph2: GraphAnswer): boolean {
     if (graph1.vertices.length !== graph2.vertices.length) {
       return false;
@@ -161,17 +171,8 @@ export class GraphInputRulesService {
 
     // Check that for every vertex from the first graph there is a vertex in
     // the second graph with the same sum of weights of outgoing edges.
-    var degrees1 = adj1.map(function(value) {
-      return value.reduce(function(prev, cur) {
-        return prev + cur;
-      });
-    }).sort();
-
-    var degrees2 = adj2.map(function(value) {
-      return value.reduce(function(prev, cur) {
-        return prev + cur;
-      });
-    }).sort();
+    var degrees1 = this._getDegreesOfMatrix(adj1);
+    var degrees2 = this._getDegreesOfMatrix(adj2);
 
     if (!this.utilsService.isEquivalent(degrees1, degrees2)) {
       return false;
@@ -179,14 +180,17 @@ export class GraphInputRulesService {
 
     // Check against every permutation of vectices.
     var numVertices = graph2.vertices.length;
-    var permutation = [];
+    // The permutation will be 'null' when there are no more
+    // lexicographical permutation of vertices.
+    var permutation: number[] | null = [];
     for (var i = 0; i < numVertices; i++) {
       permutation.push(i);
     }
     while (permutation !== null) {
       var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
-        graph2.vertices.every(function(vertex, index) {
-          return vertex.label === graph1.vertices[permutation[index]].label;
+        graph2.vertices.every((vertex, index) => {
+          const _permutation = <number[]> permutation;
+          return vertex.label === graph1.vertices[_permutation[index]].label;
         });
       if (doLabelsMatch &&
           this.gus.areAdjacencyMatricesEqualWithPermutation(

@@ -29,8 +29,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
@@ -38,17 +36,17 @@ import { SubtopicsListComponent } from
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -56,8 +54,6 @@ import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navb
     TopicEditorNavbarBreadcrumbComponent,
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,

@@ -29,6 +29,9 @@ describe('Translatable Texts model', () => {
     return {
       data_format: 'html',
       content: text,
+      content_type: 'content',
+      interaction_id: null,
+      rule_type: null
     };
   };
 
@@ -52,11 +55,11 @@ describe('Translatable Texts model', () => {
   it('should get state name to content id mapping', () => {
     const expectedStatewiseContents = {
       state1: {
-        1: new TranslatableItem('text1', 'html'),
-        2: new TranslatableItem('text2', 'html')
+        1: new TranslatableItem('text1', 'html', 'content', null, null),
+        2: new TranslatableItem('text2', 'html', 'content', null, null)
       },
       state2: {
-        1: new TranslatableItem('text3', 'html')
+        1: new TranslatableItem('text3', 'html', 'content', null, null)
       }
     };
     expect(sampleTranslatableTexts.stateWiseContents)

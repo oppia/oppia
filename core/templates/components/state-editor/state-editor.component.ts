@@ -20,7 +20,7 @@ require(
   'components/state-editor/state-content-editor/' +
   'state-content-editor.directive.ts');
 require(
-  'components/state-editor/state-hints-editor/state-hints-editor.directive.ts');
+  'components/state-editor/state-hints-editor/state-hints-editor.component.ts');
 require(
   'components/state-editor/state-interaction-editor/' +
   'state-interaction-editor.directive.ts');
@@ -32,7 +32,7 @@ require(
   'state-responses.component.ts');
 require(
   'components/state-editor/state-solution-editor/' +
-  'state-solution-editor.directive.ts');
+  'state-solution-editor.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(

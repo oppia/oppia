@@ -29,28 +29,39 @@ import { ExternalRteSaveService } from 'services/external-rte-save.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import 'mathjaxConfig.ts';
+
+interface MathExpression {
+  'svg_filename': string;
+  'raw_latex': string;
+  mathExpressionSvgIsBeingProcessed: boolean;
+  svgFile: string;
+}
+
 @Component({
   selector: 'math-expression-content-editor',
   templateUrl: './math-expression-content-editor.component.html',
   styleUrls: []
 })
 export class MathExpressionContentEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() alwaysEditable: boolean;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() alwaysEditable: boolean = false;
+  @Input() value!: MathExpression;
   @Output() valueChanged = new EventEmitter();
+  numberOfElementsInQueue!: number;
+  svgString!: string;
   placeholderText = '\\frac{x}{y}';
-  numberOfElementsInQueue: number;
-  svgString: string;
-  active: boolean;
-  localValue: {label: string} = {label: ''};
+  active: boolean = false;
+  localValue: { label: string } = { label: '' };
 
   constructor(
     private alertsService: AlertsService,
     private externalRteSaveService: ExternalRteSaveService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     // Reset the component each time the value changes (e.g. if this is
@@ -87,7 +98,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // TODO(#10197): Upgrade to MathJax 3, after proper investigation
   // and testing. MathJax 3 provides a faster and more cleaner way to
   // convert a LaTeX string to an SVG.
-  private convertLatexStringToSvg(inputLatexString) {
+  private convertLatexStringToSvg(inputLatexString: string) {
     const outputElement = document.createElement('div');
     // We need to append the element with a script tag so that Mathjax
     // can typeset and convert this element. The typesetting is not

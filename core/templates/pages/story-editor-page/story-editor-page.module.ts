@@ -31,27 +31,30 @@ import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.compone
 import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
 import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
 import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
+import { StoryEditorUnpublishModalComponent } from './modal-templates/story-editor-unpublish-modal.component';
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
     StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
+    StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
     StoryPreviewTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
     StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
+    StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
     StoryPreviewTabComponent
   ],

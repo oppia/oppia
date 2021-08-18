@@ -41,7 +41,7 @@ var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.protractor-test-create-activity';
-var dismissCreateModalSelector = '.protractor-test-dismiss-welcome-modal';
+var dismissWelcomeModalSelector = '.protractor-test-dismiss-welcome-modal';
 
 var createCollectionButtonSelector = '.protractor-test-create-collection';
 var addExplorationInput = '.protractor-test-add-exploration-input';
@@ -65,7 +65,6 @@ var storyDescriptionField = '.protractor-test-new-story-description-field';
 var storyThumbnailButton = '.protractor-test-photo-button';
 var storyUploadButton = '.protractor-test-photo-upload-input';
 var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
-var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmStoryCreationButton =
   '.protractor-test-confirm-story-creation-button';
 
@@ -83,6 +82,8 @@ var editUserRoleButton = '.protractor-test-role-edit-button';
 var roleEditorContainer = '.protractor-test-roles-editor-card-container';
 var addNewRoleButton = '.protractor-test-add-new-role-button';
 var roleSelect = '.protractor-test-new-role-selector';
+var cookieBannerAcceptButton = (
+  '.protractor-test-oppia-cookie-banner-accept-button');
 
 const login = async function(browser, page) {
   try {
@@ -94,6 +95,11 @@ const login = async function(browser, page) {
     await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
+      let cookies = await page.cookies();
+      if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
+        await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
+        await page.click(cookieBannerAcceptButton);
+      }
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, 'username1');
       await page.click(agreeToTermsCheckBox);
@@ -146,7 +152,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
-      dismissCreateModalSelector, {visible: true});
+      dismissWelcomeModalSelector, {visible: true});
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console

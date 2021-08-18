@@ -37,6 +37,12 @@ require(
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 require(
-  'pages/blog-dashboard-page/navbar/' +
-  'blog-dashboard-navbar-breadcrumb.component.ts'
+  'pages/blog-dashboard-page/' +
+  'blog-dashboard-page.component.ts'
 );
+require(
+  'pages/blog-dashboard-page/navbar/' +
+  'navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.ts');
+require(
+  'pages/blog-dashboard-page/navbar/' +
+  'navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.ts');
