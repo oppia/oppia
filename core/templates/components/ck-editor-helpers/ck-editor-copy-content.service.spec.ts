@@ -41,18 +41,18 @@ describe('Ck editor copy content service', () => {
   let htmlEscaperService = new HtmlEscaperService(loggerService);
 
   let service: CkEditorCopyContentService;
-  let ckEditorStub: Partial<CKEDITOR.editor>;
+  let ckEditorStub: CKEDITOR.editor;
   let insertHtmlSpy: jasmine.Spy<(
     html: string, mode?: string,
     range?: CKEDITOR.dom.range) => void>;
-  let execCommandSpy;
+  let execCommandSpy: jasmine.Spy<(commandName: string) => boolean>;
 
   beforeEach(() => {
     ckEditorStub = {
       id: 'editor1',
       insertHtml: (html: string) => {},
       execCommand: (commandName: string): boolean => true,
-    };
+    } as CKEDITOR.editor;
     insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
     execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
@@ -112,10 +112,10 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
     const imageWidgetElement = generateContent(
-      '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
-      '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
-      ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
-      'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>');
+      '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" capt' +
+      'ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;' +
+      'quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
+      '"></oppia-noninteractive-image>');
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
@@ -218,7 +218,7 @@ describe('Ck editor copy content service', () => {
 
     const pElement = generateContent('<p>Hello</p>');
 
-    ckEditorStub = { ...ckEditorStub, status: 'destroyed' };
+    ckEditorStub = { ...ckEditorStub, status: 'destroyed' } as CKEDITOR.editor;
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
     expect(insertHtmlSpy).not.toHaveBeenCalled();

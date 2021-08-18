@@ -17,8 +17,8 @@ missing third-party dependencies and starts up a local GAE development
 server.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import contextlib
@@ -48,10 +48,6 @@ Note that the root folder MUST be named 'oppia'.
 _PARSER.add_argument(
     '--save_datastore',
     help='optional; if specified, does not clear the datastore.',
-    action='store_true')
-_PARSER.add_argument(
-    '--enable_console',
-    help='optional; if specified, enables console.',
     action='store_true')
 _PARSER.add_argument(
     '--disable_host_checking',
@@ -158,6 +154,8 @@ def main(args=None):
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator(
                 recover_users=parsed_args.save_datastore))
+            stack.enter_context(servers.managed_cloud_datastore_emulator(
+                clear_datastore=not parsed_args.save_datastore))
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
@@ -168,8 +166,6 @@ def main(args=None):
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
         dev_appserver = stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
-            clear_datastore=not parsed_args.save_datastore,
-            enable_console=parsed_args.enable_console,
             enable_host_checking=not parsed_args.disable_host_checking,
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,

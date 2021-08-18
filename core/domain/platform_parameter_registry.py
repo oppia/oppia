@@ -16,8 +16,8 @@
 
 """Registry for platform parameters."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
@@ -136,10 +136,7 @@ class Registry(python_utils.OBJECT):
         if parameter_from_cache is not None:
             return parameter_from_cache
 
-        parameter = None
-
-        parameter_from_storage = cls.load_platform_parameter_from_storage(
-            name)
+        parameter_from_storage = cls.load_platform_parameter_from_storage(name)
         if parameter_from_storage is not None:
             parameter = parameter_from_storage
         elif name in cls.parameter_registry:

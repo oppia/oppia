@@ -16,11 +16,12 @@
 
 """Decorators to provide authorization across the site."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import functools
 import logging
+import re
 
 from constants import constants
 from core.controllers import base
@@ -453,7 +454,7 @@ def can_manage_email_dashboard(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.user.actions:
+        if self.current_user_is_super_admin:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -941,6 +942,101 @@ def can_access_admin_page(handler):
     return test_super_admin
 
 
+def can_access_contributor_dashboard_admin_page(handler):
+    """Decorator that checks if the user can access the contributor dashboard
+    admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks user can
+        access the contributor dashboard admin page.
+    """
+
+    def test_can_access_contributor_dashboard_admin_page(self, **kwargs):
+        """Checks if the user can access the contributor dashboard admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannot access the contributor
+                dashboard admin page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
+                self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access contributor dashboard '
+            'admin page.')
+
+    test_can_access_contributor_dashboard_admin_page.__wrapped__ = True
+
+    return test_can_access_contributor_dashboard_admin_page
+
+
+def can_manage_contributors_role(handler):
+    """Decorator that checks if the current user can modify contributor's role
+    for the contributor dashboard page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can modify contributor's role for the contributor dashboard page.
+    """
+
+    def test_can_manage_contributors_role(self, category, **kwargs):
+        """Checks if the user can modify contributor's role for the contributor
+        dashboard page.
+
+        Args:
+            category: str. The category of contribution.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannnot modify contributor's
+                role for the contributor dashboard page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if category in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+            if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, category, **kwargs)
+        elif category == (
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+            if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, category, **kwargs)
+        else:
+            raise self.InvalidInputException(
+                'Invalid category: %s' % category)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to modify contributor\'s role.')
+    test_can_manage_contributors_role.__wrapped__ = True
+
+    return test_can_manage_contributors_role
+
+
 def can_delete_any_user(handler):
     """Decorator that checks if the current user can delete any user.
 
@@ -1202,8 +1298,12 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         entity_type = feedback_services.get_thread(thread_id).entity_type
         entity_types_with_unrestricted_view_suggestion_access = (
@@ -1260,8 +1360,12 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
@@ -1902,6 +2006,48 @@ def can_modify_exploration_roles(handler):
     return test_can_modify
 
 
+def can_perform_tasks_in_taskqueue(handler):
+    """Decorator to ensure that the handler is being called by task scheduler or
+    by a superadmin of the application.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also ensures that
+        the handler can only be executed if it is called by task scheduler or by
+        a superadmin of the application.
+    """
+
+    def test_can_perform(self, **kwargs):
+        """Checks if the handler is called by task scheduler or by a superadmin
+        of the application.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        # The X-AppEngine-QueueName header is set inside AppEngine and if
+        # a request from outside comes with this header AppEngine will get
+        # rid of it.
+        # https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_app_engine_task_request_headers
+        if (self.request.headers.get('X-AppEngine-QueueName') is None and
+                not self.current_user_is_super_admin):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        else:
+            return handler(self, **kwargs)
+    test_can_perform.__wrapped__ = True
+
+    return test_can_perform
+
+
 def can_perform_cron_tasks(handler):
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
@@ -1929,12 +2075,15 @@ def can_perform_cron_tasks(handler):
             UnauthorizedUserException. The user does not have
                 credentials to access the page.
         """
+        # The X-AppEngine-Cron header is set inside AppEngine and if a request
+        # from outside comes with this header AppEngine will get rid of it.
+        # https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#validating_cron_requests
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        else:
-            return handler(self, **kwargs)
+
+        return handler(self, **kwargs)
     test_can_perform.__wrapped__ = True
 
     return test_can_perform
@@ -2200,7 +2349,8 @@ def can_view_question_editor(handler):
             question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException
-        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in self.user.actions:
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
+                self.user.actions):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2393,7 +2543,7 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_EDIT_SKILLS in self.user.actions:
+        if role_services.ACTION_EDIT_SKILL in self.user.actions:
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2704,7 +2854,7 @@ def can_view_any_topic_editor(handler):
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, topic_id, **kwargs)
         else:
@@ -2871,7 +3021,7 @@ def can_access_topic_viewer_page(handler):
 
         if (
                 topic_rights.topic_is_published or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, topic.name, **kwargs)
         else:
@@ -2968,7 +3118,7 @@ def can_access_story_viewer_page(handler):
 
         if (
                 (story_is_published and topic_is_published) or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, story_id, *args, **kwargs)
         else:
@@ -3030,7 +3180,7 @@ def can_access_subtopic_viewer_page(handler):
 
         if (
                 (topic_rights is None or not topic_rights.topic_is_published)
-                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
+                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE not in
                 user_actions_info.actions):
             _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,

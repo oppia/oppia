@@ -18,10 +18,13 @@
 handler arguments.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from constants import constants
+from core.controllers import base
 from core.domain import blog_domain
+from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 import python_utils
@@ -37,7 +40,7 @@ def validate_exploration_change(obj):
         obj: dict. Data that needs to be validated.
     """
     # No explicit call to validate_dict method is necessary, because
-    # ExplorationChange calls it while initialization.
+    # ExplorationChange calls validate method while initialization.
     exp_domain.ExplorationChange(obj)
 
 
@@ -75,7 +78,7 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
         blog_domain.BlogPost.require_valid_tags(
-            change_dict['tags'], True)
+            change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
         list_of_default_tags = config_domain.Registry.get_config_property(
@@ -83,3 +86,55 @@ def validate_change_dict_for_blog_post(change_dict):
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
+
+
+def validate_collection_change(obj):
+    # type: (Dict[String, Any]) -> None
+    """Validates collection change.
+
+    Args:
+        obj: dict. Data that needs to be validated.
+    """
+    # No explicit call to validate_dict method is necessary, because
+    # CollectionChange calls validate method while initialization.
+    collection_domain.CollectionChange(obj)
+
+
+def validate_email_dashboard_data(data):
+    # type: (Dict[String, Optional[Union[bool, int]]]) -> None
+    """Validates email dashboard data.
+
+    Args:
+        data: dict. Data that needs to be validated.
+    """
+    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    possible_keys = [predicate['backend_attr'] for predicate in predicates]
+
+    for key, value in data.items():
+        if value is None:
+            continue
+        if key not in possible_keys:
+            # Raise exception if key is not one of the allowed keys.
+            raise Exception('400 Invalid input for query.')
+
+
+def validate_task_entries(task_entries):
+    # type: (Dict[String, Any]) -> None
+    """Validates the task entry dict.
+
+    Args:
+        task_entries: dict. Data that needs to be validated.
+    """
+    entity_version = task_entries.get('entity_version', None)
+    if entity_version is None:
+        raise base.BaseHandler.InvalidInputException(
+            'No entity_version provided')
+    task_type = task_entries.get('task_type', None)
+    if task_type is None:
+        raise base.BaseHandler.InvalidInputException('No task_type provided')
+    target_id = task_entries.get('target_id', None)
+    if target_id is None:
+        raise base.BaseHandler.InvalidInputException('No target_id provided')
+    status = task_entries.get('status', None)
+    if status is None:
+        raise base.BaseHandler.InvalidInputException('No status provided')

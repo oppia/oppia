@@ -42,7 +42,8 @@ export class EmailDashboardBackendApiService {
     private http: HttpClient) {}
 
   async fetchQueriesPageAsync(
-      pageSize: number, cursor: string): Promise<EmailDashboardQueryResults> {
+      pageSize: number, cursor: string | null
+  ): Promise<EmailDashboardQueryResults> {
     // Here 'cursor' property is optional because it is present only if this
     // function is called with a non-null value to 'cursor' arg.
     // If we send a null value of 'cursor' the request URL would have

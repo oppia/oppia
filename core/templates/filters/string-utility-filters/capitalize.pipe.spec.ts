@@ -30,8 +30,6 @@ describe('Testing filters', () => {
 
   it('should correctly capitalize strings', () =>{
     expect(pipe.transform('')).toEqual('');
-    expect(pipe.transform(null)).toEqual(null);
-    expect(pipe.transform(undefined)).toEqual(undefined);
 
     expect(pipe.transform('a')).toEqual('A');
     expect(pipe.transform('a  ')).toEqual('A');

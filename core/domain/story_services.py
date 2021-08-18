@@ -20,8 +20,8 @@ delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import logging
@@ -72,6 +72,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         title=story.title,
         thumbnail_bg_color=story.thumbnail_bg_color,
         thumbnail_filename=story.thumbnail_filename,
+        thumbnail_size_in_bytes=story.thumbnail_size_in_bytes,
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
@@ -376,8 +377,7 @@ def validate_explorations_for_story(exp_ids, strict):
                 sample_exp_id = exp_id
                 break
         common_exp_category = exps_dict[sample_exp_id].category
-        for exp_id in exps_dict:
-            exp = exps_dict[exp_id]
+        for exp_id, exp in exps_dict.items():
             if exp.category != common_exp_category:
                 error_string = (
                     'All explorations in a story should be of the '
@@ -457,6 +457,7 @@ def _save_story(
     story_model.title = story.title
     story_model.thumbnail_bg_color = story.thumbnail_bg_color
     story_model.thumbnail_filename = story.thumbnail_filename
+    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
     story_model.notes = story.notes
     story_model.language_code = story.language_code
     story_model.story_contents_schema_version = (
@@ -556,7 +557,7 @@ def update_story(
         committer_id, new_story, commit_message, change_list,
         story_is_published)
     create_story_summary(new_story.id)
-    if story_is_published and _is_topic_published(new_story):
+    if story_is_published:
         opportunity_services.update_exploration_opportunities(
             old_story, new_story)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
@@ -572,19 +573,6 @@ def update_story(
     exp_models.ExplorationContextModel.update_timestamps_multi(
         new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
-
-
-def _is_topic_published(story):
-    """Returns whether the story's corresponding topic is published.
-
-    Args:
-        story: Story. The story domain object.
-
-    Returns:
-        bool. Whether the the story's corresponding topic is published.
-    """
-    topic_rights = topic_fetchers.get_topic_rights(story.corresponding_topic_id)
-    return topic_rights.topic_is_published
 
 
 def delete_story(committer_id, story_id, force_deletion=False):

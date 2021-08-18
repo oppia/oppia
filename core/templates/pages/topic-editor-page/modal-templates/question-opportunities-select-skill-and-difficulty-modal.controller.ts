@@ -21,6 +21,8 @@
 import { AppConstants } from 'app.constants';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
+import constants from 'assets/constants';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -68,7 +70,7 @@ angular.module('oppia').controller(
           imageFilenames.forEach(imageFilename => {
             imageFileFetchPromises.push(AssetsBackendApiService.fetchFile(
               AppConstants.ENTITY_TYPE.SKILL, skillId,
-              imageFilename, AppConstants.ASSET_TYPE_IMAGE));
+              imageFilename, constants.ASSET_TYPE_IMAGE));
           });
           Promise.all(imageFileFetchPromises).then(files => {
             files.forEach(file => {

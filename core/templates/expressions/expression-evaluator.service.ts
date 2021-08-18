@@ -120,7 +120,7 @@ export class ExpressionEvaluatorService {
       const funcArgs = parsed.slice(1).map(item => this.evaluate(item, envs));
       const funcEnvs = <SystemEnv> this.expressionSyntaxTreeService.lookupEnvs(
         funcName, envs);
-      return funcEnvs.eval(funcArgs);
+      return funcEnvs.eval(<string[]> funcArgs);
     }
 
     // This should be a terminal node with an actual value.

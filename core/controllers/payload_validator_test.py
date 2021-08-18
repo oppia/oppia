@@ -14,8 +14,8 @@
 
 """Tests for various errors raised by validate method of payload validator."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import payload_validator
 from core.tests import test_utils
@@ -52,11 +52,11 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 }
             }, [
                 'Schema validation for \'version\' failed: '
-                'Could not convert unicode to int: random_string']),
+                'Could not convert str to int: random_string']),
             ({
                 'exploration_id': 'any_exp_id'
             }, {}, [
-                'Found extra args: [u\'exploration_id\'].']),
+                'Found extra args: [\'exploration_id\'].']),
             ({}, {
                 'exploration_id': {
                     'schema': {

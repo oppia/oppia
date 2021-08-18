@@ -23,7 +23,7 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
@@ -144,10 +144,9 @@ angular.module('oppia').component('contributionsAndReview', {
               ' / ' + details.chapter_title);
           }
 
-          var change = suggestion.change;
           var requiredData = {
             id: suggestion.suggestion_id,
-            heading: $filter('formatRtePreview')(change.translation_html),
+            heading: getTranslationSuggestionHeading(suggestion),
             subheading: subheading,
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
@@ -157,6 +156,14 @@ angular.module('oppia').component('contributionsAndReview', {
           translationContributionsSummaryList.push(requiredData);
         });
         return translationContributionsSummaryList;
+      };
+
+      var getTranslationSuggestionHeading = function(suggestion) {
+        const changeTranslation = suggestion.change.translation_html;
+        if (Array.isArray(changeTranslation)) {
+          return $filter('formatRtePreview')(changeTranslation.join(', '));
+        }
+        return $filter('formatRtePreview')(changeTranslation);
       };
 
       var resolveSuggestionSuccess = function(suggestionId) {

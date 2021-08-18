@@ -16,8 +16,8 @@
 
 """Controllers for suggestions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -47,7 +47,7 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
         dict. Dict mapping target_id to corresponding exploration opportunity
         summary dict.
     """
-    target_ids = set([s.target_id for s in suggestions])
+    target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in (
@@ -67,7 +67,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     Returns:
         dict. Dict mapping target_id to corresponding skill opportunity dict.
     """
-    target_ids = set([s.target_id for s in suggestions])
+    target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
@@ -109,6 +109,21 @@ class SuggestionHandler(base.BaseHandler):
                 self.payload.get('description'))
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
+
+        suggestion_change = suggestion.change
+        if (
+                suggestion_change.cmd == 'add_written_translation' and
+                (
+                    suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
+                    suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                )
+        ):
+            self.render_json(self.values)
+            return
 
         # TODO(#10513) : Find a way to save the images before the suggestion is
         # created.
@@ -403,10 +418,18 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 'The parameter \'translation_html\' is missing.'
             )
 
-        if not isinstance(
-                self.payload.get('translation_html'), python_utils.BASESTRING):
+        if (
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    python_utils.BASESTRING)
+                and
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    list)
+        ):
             raise self.InvalidInputException(
-                'The parameter \'translation_html\' should be a string.'
+                'The parameter \'translation_html\' should be a string or a' +
+                ' list.'
             )
 
         suggestion_services.update_translation_suggestion(

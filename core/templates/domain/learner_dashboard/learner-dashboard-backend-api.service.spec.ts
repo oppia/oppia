@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AddMessagePayload, LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 describe('Learner Dashboard Backend API Service', () => {
   let learnerDashboardBackendApiService:
@@ -431,6 +432,11 @@ describe('Learner Dashboard Backend API Service', () => {
     completed_to_incomplete_stories: [],
     learnt_to_partially_learnt_topics: []
   };
+  let sampleSubtopicMastery = {
+    topic_id: {
+      1: 0
+    }
+  };
 
   let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
   let ERROR_STATUS_CODE = 400;
@@ -466,6 +472,52 @@ describe('Learner Dashboard Backend API Service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should successfully fetch subtopic mastery data from the' +
+    ' backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    var topicIds = 'topic_id';
+
+    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleSubtopicMastery);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should use rejection handler if subtopic mastery data' +
+    ' backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    var topicIds = 'topic_id';
+
+    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 400
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
   }
   ));
 
@@ -524,6 +576,75 @@ describe('Learner Dashboard Backend API Service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }
   ));
+
+  it('should get untracked topics', () => {
+    let subtopic = {
+      skill_ids: ['skill_id_2'],
+      id: 1,
+      title: 'subtopic_name',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      url_fragment: 'subtopic-name'
+    };
+
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+
+    let sampleLearnerTopicSummaryBackendDict = {
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 2,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    };
+    let untrackedTopics = {
+      math: [sampleLearnerTopicSummaryBackendDict]
+    };
+    expect(learnerDashboardBackendApiService.getUntrackedTopics(
+      untrackedTopics)).toEqual(
+      {
+        math: [LearnerTopicSummary.createFromBackendDict(
+          sampleLearnerTopicSummaryBackendDict)]});
+  });
 
   it('should fail to add current message to the feedback updates thread' +
     ' when calling addNewMessageAsync', fakeAsync(() => {

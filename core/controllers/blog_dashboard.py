@@ -14,8 +14,8 @@
 
 """Controllers for the blog dashboard page"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -49,6 +49,21 @@ def _get_blog_card_summary_dicts_for_dashboard(summaries):
     return summary_dicts
 
 
+class BlogDashboardPage(base.BaseHandler):
+    """Blog Dashboard Page Handler to render the frontend template."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_template('blog-dashboard-page.mainpage.html')
+
+
 class BlogDashboardDataHandler(base.BaseHandler):
     """Provides user data for the blog dashboard."""
 
@@ -66,9 +81,9 @@ class BlogDashboardDataHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
 
         no_of_published_blog_posts = 0
-        published_post_summary_dicts = None
+        published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
-        draft_blog_post_summary_dicts = None
+        draft_blog_post_summary_dicts = []
         published_post_summaries = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id, True))
@@ -86,7 +101,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
             draft_blog_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_dashboard(
                     draft_blog_post_summaries))
-
         self.values.update({
             'username': user_settings.username,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
@@ -158,8 +172,7 @@ class BlogPostHandler(base.BaseHandler):
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
             raise self.PageNotFoundException(
-                Exception(
-                    'The blog post with the given id or url doesn\'t exist.'))
+                'The blog post with the given id or url doesn\'t exist.')
         user_settings = user_services.get_users_settings(
             [blog_post.author_id], strict=False, include_marked_deleted=True)
         username = user_settings[0].username
@@ -171,6 +184,7 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
+        blog_post_dict['author_username'] = username
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
@@ -222,7 +236,7 @@ class BlogPostHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         entity_id = blog_post_id
-        filename_prefix = 'blog_post_thumbnail'
+        filename_prefix = 'thumbnail'
 
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)

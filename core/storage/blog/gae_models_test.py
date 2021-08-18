@@ -16,8 +16,8 @@
 
 """Tests for Blog Post models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import types
@@ -126,22 +126,19 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        user_data = blog_models.BlogPostModel.export_data(
-            self.USER_ID),
+        user_data = blog_models.BlogPostModel.export_data(self.USER_ID)
         blog_post_id = 'blog_one'
-        test_data = (
-            {
-                blog_post_id: {
-                    'content': self.CONTENT,
-                    'title': self.TITLE,
-                    'published_on': utils.get_time_in_millisecs(
-                        self.blog_post_model.published_on),
-                    'url_fragment': 'sample-url-fragment',
-                    'tags': self.TAGS,
-                    'thumbnail_filename': self.THUMBNAIL
-                }
-            },
-        )
+        test_data = {
+            blog_post_id: {
+                'title': self.TITLE,
+                'content': self.CONTENT,
+                'url_fragment': 'sample-url-fragment',
+                'tags': self.TAGS,
+                'thumbnail_filename': self.THUMBNAIL,
+                'published_on': utils.get_time_in_millisecs(
+                    self.blog_post_model.published_on)
+            }
+        }
         self.assertEqual(user_data, test_data)
 
 
@@ -231,13 +228,13 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.blog_post_rights_model.update_timestamps()
         self.blog_post_rights_model.put()
 
-        self.blog_post_rights_model_new = blog_models.BlogPostRightsModel(
+        self.blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_OLD,
             editor_ids=[self.USER_ID_OLD, self.USER_ID_NEW, self.USER_ID],
             blog_post_is_published=False,
         )
-        self.blog_post_rights_model_new.update_timestamps()
-        self.blog_post_rights_model_new.put()
+        self.blog_post_rights_draft_model.update_timestamps()
+        self.blog_post_rights_draft_model.put()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -255,13 +252,96 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_models.BlogPostRightsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
-    def test_get_by_user(self):
+    def test_get_all_by_user_for_fetching_all_rights_model(self):
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_by_user(self.USER_ID_NEW),
-            [self.blog_post_rights_model, self.blog_post_rights_model_new])
+            blog_models.BlogPostRightsModel.get_all_by_user(self.USER_ID_NEW),
+            [self.blog_post_rights_model, self.blog_post_rights_draft_model])
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_by_user(self.USER_ID),
-            [self.blog_post_rights_model_new])
+            blog_models.BlogPostRightsModel.get_all_by_user(self.USER_ID),
+            [self.blog_post_rights_draft_model])
+
+    def test_get_published_models_by_user_when_limit_is_set(self):
+        blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
+            id='blog_post_two',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=False,
+        )
+        blog_post_rights_draft_model.update_timestamps()
+        blog_post_rights_draft_model.put()
+
+        blog_post_rights_punlished_model = blog_models.BlogPostRightsModel(
+            id='blog_post_one',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=True,
+        )
+        blog_post_rights_punlished_model.update_timestamps()
+        blog_post_rights_punlished_model.put()
+
+        # The latest two published blog post rights models should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                self.USER_ID_NEW, 2),
+            [blog_post_rights_punlished_model, self.blog_post_rights_model])
+
+        # The latest published blog post rights model should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                self.USER_ID_NEW, 1), [blog_post_rights_punlished_model])
+
+    def test_get_published_models_by_user_when_no_limit(self):
+        blog_post_rights_punlished_model = blog_models.BlogPostRightsModel(
+            id='blog_post_one',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=True,
+        )
+        blog_post_rights_punlished_model.update_timestamps()
+        blog_post_rights_punlished_model.put()
+
+        self.assertEqual(
+            len(
+                blog_models.BlogPostRightsModel
+                .get_published_models_by_user(self.USER_ID_NEW)), 2)
+
+    def test_get_draft_models_by_user_when_limit_is_set(self):
+        blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
+            id='blog_post_two',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=False,
+        )
+        blog_post_rights_draft_model.update_timestamps()
+        blog_post_rights_draft_model.put()
+
+        blog_post_rights_published_model = blog_models.BlogPostRightsModel(
+            id='blog_post_one',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=True,
+        )
+        blog_post_rights_published_model.update_timestamps()
+        blog_post_rights_published_model.put()
+
+        # The latest two draft blog post rights models should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
+                self.USER_ID_NEW, 2),
+            [blog_post_rights_draft_model, self.blog_post_rights_draft_model])
+
+        # The latest draft blog post rights model should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
+                self.USER_ID_NEW, 1), [blog_post_rights_draft_model])
+
+    def test_get_draft_models_by_user_when_no_limit_is_set(self):
+        blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
+            id='blog_post_two',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=False,
+        )
+        blog_post_rights_draft_model.update_timestamps()
+        blog_post_rights_draft_model.put()
+
+        self.assertEqual(
+            len(blog_models.BlogPostRightsModel.get_draft_models_by_user(
+                self.USER_ID_NEW)), 2)
 
     def test_export_data_on_editor(self):
         """Test export data on user who is editor of the blog post."""

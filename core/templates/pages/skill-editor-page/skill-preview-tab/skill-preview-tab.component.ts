@@ -25,7 +25,7 @@ require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
   'components/question-directives/question-player/' +
-    'question-player.directive.ts');
+    'question-player.component.ts');
 require('pages/review-test-page/review-test-page.constants.ajs.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
@@ -71,7 +71,11 @@ angular.module('oppia').component('skillPreviewTab', {
             INTERACTION_TYPES[interaction]);
         }
         ctrl.skill = SkillEditorStateService.getSkill();
-        ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().html;
+        ctrl.htmlData = (
+          ctrl.skill ?
+          ctrl.skill.getConceptCard().getExplanation().html :
+          'loading review material'
+        );
 
         QuestionBackendApiService.fetchQuestionsAsync(
           [ctrl.skillId], QUESTION_COUNT, false).then((response) => {

@@ -22,7 +22,7 @@ require(
   'background-banner.component.ts');
 require(
   'components/question-directives/question-player/' +
-  'question-player.directive.ts');
+  'question-player.component.ts');
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
@@ -53,14 +53,14 @@ angular.module('oppia').component('practiceSessionPage', {
               topic_url_fragment: topicUrlFragment,
               classroom_url_fragment: (
                 UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-              comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
+              stringified_subtopic_ids: ctrl.stringifiedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
             topic_url_fragment: topicUrlFragment,
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-            comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
+            stringified_subtopic_ids: ctrl.stringifiedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
@@ -106,7 +106,7 @@ angular.module('oppia').component('practiceSessionPage', {
       };
       ctrl.$onInit = function() {
         ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
-        ctrl.commaSeparatedSubtopicIds = (
+        ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
       };

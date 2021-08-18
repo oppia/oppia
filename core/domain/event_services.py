@@ -16,8 +16,8 @@
 
 """Classes for handling events."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -81,7 +81,7 @@ class StatsEventsHandler(BaseEventHandler):
         if 'undefined' in aggregated_stats['state_stats_mapping']:
             logging.error(
                 'Aggregated stats contains an undefined state name: %s'
-                % aggregated_stats['state_stats_mapping'].keys())
+                % list(aggregated_stats['state_stats_mapping'].keys()))
             return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(

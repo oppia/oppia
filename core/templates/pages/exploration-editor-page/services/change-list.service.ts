@@ -28,6 +28,8 @@ import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +42,8 @@ export class ChangeListService implements OnInit {
   // undone change.
   ndoneChangeStack = [];
   loadingMessage: string = '';
+  // Temporary list of the changes made to the exploration when offline.
+  temporaryListOfChanges: ExplorationChange[] = [];
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -81,12 +85,24 @@ export class ChangeListService implements OnInit {
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(
+    private windowRef: WindowRef,
     private alertsService: AlertsService,
     private autosaveInfoModalsService: AutosaveInfoModalsService,
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-  ) {}
+    private internetConnectivityService: InternetConnectivityService,
+  ) {
+    this.internetConnectivityService.onInternetStateChange.subscribe(
+      internetAccessible => {
+        if (internetAccessible && this.temporaryListOfChanges.length > 0) {
+          for (let change of this.temporaryListOfChanges) {
+            this.addChange(change);
+          }
+          this.temporaryListOfChanges = [];
+        }
+      });
+  }
 
   ngOnInit(): void {
     this.loaderService.onLoadingMessageChange.subscribe(
@@ -100,18 +116,22 @@ export class ChangeListService implements OnInit {
     // If error is present -> Check for the type of error occurred
     // (Display the corresponding modals in both cases, if not already
     // opened):
-    // - Version Mismatch.
+    // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList,
       response => {
-        if (!response.is_version_of_draft_valid) {
+        if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
               explorationChangeList);
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
+        if (!response.is_version_of_draft_valid &&
+          response.changes_are_mergeable) {
+          this.windowRef.nativeWindow.location.reload();
+        }
       },
       () => {
         this.alertsService.clearWarnings();
@@ -128,6 +148,10 @@ export class ChangeListService implements OnInit {
 
   private addChange(changeDict: ExplorationChange) {
     if (this.loadingMessage) {
+      return;
+    }
+    if (!this.internetConnectivityService.isOnline()) {
+      this.temporaryListOfChanges.push(changeDict);
       return;
     }
     this.explorationChangeList.push(changeDict);

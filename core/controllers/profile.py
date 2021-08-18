@@ -14,9 +14,10 @@
 
 """Controllers for the profile page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import io
 import json
 import logging
 import re
@@ -34,7 +35,6 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 import feconf
-import python_utils
 import utils
 
 
@@ -310,7 +310,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.render_template('signup-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -453,9 +453,10 @@ class ExportAccountHandler(base.BaseHandler):
             user_images = []
 
         # Create zip file.
-        temp_file = python_utils.string_io()
+        temp_file = io.BytesIO()
         with zipfile.ZipFile(
-            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED
+        ) as zfile:
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
                 decoded_png = utils.convert_png_data_url_to_binary(
@@ -464,7 +465,7 @@ class ExportAccountHandler(base.BaseHandler):
 
         # Render file for download.
         self.render_downloadable_file(
-            temp_file.getvalue(), 'oppia_takeout_data.zip', 'text/plain')
+            temp_file, 'oppia_takeout_data.zip', 'text/plain')
 
 
 class PendingAccountDeletionPage(base.BaseHandler):
@@ -532,9 +533,11 @@ class UserInfoHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             self.render_json({
+                'roles': self.roles,
                 'is_moderator': (
-                    user_services.is_at_least_moderator(self.user_id)),
-                'is_admin': user_services.is_admin(self.user_id),
+                    user_services.is_moderator(self.user_id)),
+                'is_curriculum_admin': user_services.is_curriculum_admin(
+                    self.user_id),
                 'is_super_admin': self.current_user_is_super_admin,
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),

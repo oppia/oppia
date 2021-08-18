@@ -87,7 +87,7 @@ describe('InteractiveMapValidationService', () => {
         }
       }, 'InteractiveMap')],
       goodDefaultOutcome,
-      null,
+      [],
       null
     )];
   });

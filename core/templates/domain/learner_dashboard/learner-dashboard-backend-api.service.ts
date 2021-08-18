@@ -50,6 +50,7 @@ import {
   ProfileSummary,
 } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
+import { AppConstants } from 'app.constants';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
@@ -63,7 +64,7 @@ interface LearnerDashboardDataBackendDict {
   'partially_learnt_topics_list': LearnerTopicSummaryBackendDict[];
   'topics_to_learn_list': LearnerTopicSummaryBackendDict[];
   'all_topics_list': LearnerTopicSummaryBackendDict[];
-  'untracked_topics_list': LearnerTopicSummaryBackendDict[];
+  'untracked_topics': Record<string, LearnerTopicSummaryBackendDict[]>;
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];
@@ -85,7 +86,7 @@ interface LearnerDashboardData {
   partiallyLearntTopicsList: LearnerTopicSummary[];
   topicsToLearnList: LearnerTopicSummary[];
   allTopicsList: LearnerTopicSummary[];
-  untrackedTopicsList: LearnerTopicSummary[];
+  untrackedTopics: Record<string, LearnerTopicSummary[]>;
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
   completedToIncompleteCollections: string[];
@@ -99,6 +100,14 @@ export interface AddMessagePayload {
   'updated_status': boolean,
   'updated_subject': string,
   'text': string;
+}
+
+export interface SubtopicMasterySummaryBackendDict {
+  [mastery: string]: number;
+}
+
+export interface SubtopicMasteryDict {
+  'subtopic_mastery_dict': Record<string, SubtopicMasterySummaryBackendDict>;
 }
 
 interface MessageSummaryList {
@@ -161,10 +170,8 @@ export class LearnerDashboardBackendApiService {
             dashboardData.all_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
-          untrackedTopicsList: (
-            dashboardData.untracked_topics_list.map(
-              topicSummary => LearnerTopicSummary
-                .createFromBackendDict(topicSummary))),
+          untrackedTopics: this.getUntrackedTopics(
+            dashboardData.untracked_topics),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
@@ -188,6 +195,19 @@ export class LearnerDashboardBackendApiService {
         reject(errorResponse.status);
       });
     });
+  }
+
+  getUntrackedTopics(
+      untrackedTopics: Record<string,
+      LearnerTopicSummaryBackendDict[]>): Record<string,
+      LearnerTopicSummary[]> {
+    var topics = {};
+    for (var i in untrackedTopics) {
+      topics[i] = untrackedTopics[i].map(
+        topicSummary => LearnerTopicSummary.createFromBackendDict(
+          topicSummary));
+    }
+    return topics;
   }
 
   async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
@@ -216,6 +236,26 @@ export class LearnerDashboardBackendApiService {
         reject(errorResponse.error.error);
       });
     });
+  }
+
+  async _fetchSubtopicMastery(
+      topicIds: string): Promise<Record<string,
+    SubtopicMasterySummaryBackendDict>> {
+    return new Promise((resolve, reject) => {
+      this.http.get<SubtopicMasteryDict>(
+        AppConstants.SUBTOPIC_MASTERY_DATA_URL_TEMPLATE, {
+          params: { comma_separated_topic_ids: topicIds }}).toPromise()
+        .then(response => {
+          resolve(response.subtopic_mastery_dict);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
+    SubtopicMasterySummaryBackendDict>> {
+    return this._fetchSubtopicMastery(topicIds);
   }
 }
 
