@@ -886,7 +886,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 54)
+        self.assertEqual(count, 53)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
