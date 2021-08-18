@@ -81,7 +81,7 @@
         </div>
       </li>
 
-      <li class="nav-item icon nav-list-item" ng-click="$ctrl.showUserHelpModal()">
+      <li ng-class="{'oppia-disabled-link': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item" ng-click="$ctrl.showUserHelpModal()">
         <a href="#"
            uib-tooltip="Help"
            tooltip-placement="bottom"
