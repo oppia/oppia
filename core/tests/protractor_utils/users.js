@@ -80,9 +80,11 @@ var login = async function(email, useManualNavigation = true) {
     await action.click('Sign in button', signInButton);
   }, (url) => {
     if (returnUrl === '/') {
-      return /(learner-dashboard|creator-dashboard)/.test(url);
+      // Users will be redirected to preferred dashboard if they are fully
+      // registered. Otherwise, they will be redirected to signup page.
+      return /(learner-dashboard|creator-dashboard|signup)/.test(url);
     } else {
-      return (new RegExp(returnUrl)).test(url);
+      return (new RegExp(returnUrl + '|signup')).test(url);
     }
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
