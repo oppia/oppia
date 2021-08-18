@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { PositionOfTerm, PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
 
-describe('PositionOfTerms', () => {
+fdescribe('PositionOfTerms', () => {
   let fixture: ComponentFixture<PositionOfTermsEditorComponent>;
   let component: PositionOfTermsEditorComponent;
 
@@ -39,6 +39,7 @@ describe('PositionOfTerms', () => {
 
   it('should have the correct default value of position', () => {
     expect(component.localValue.name).toBe('both');
+    expect(component.value).toBe('both');
   });
 
   it('should change ctrl.value when ctrl.localValue changes', () => {
