@@ -32,6 +32,9 @@ import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('View beam job output dialog', () => {
   const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', [], 0, 0, false);
@@ -53,9 +56,12 @@ describe('View beam job output dialog', () => {
         BrowserDynamicTestingModule,
         ClipboardModule,
         MatButtonModule,
+        MatCardModule,
         MatDialogModule,
+        MatIconModule,
         MatProgressBarModule,
         MatTabsModule,
+        MatTooltipModule,
         NoopAnimationsModule,
       ],
       providers: [

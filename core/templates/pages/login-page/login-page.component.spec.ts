@@ -33,7 +33,7 @@ import { LoginPageComponent } from './login-page.component';
 
 class MockWindowRef {
   constructor(
-      public location: string = null, public searchParams: string = '') {}
+    public location: string | null = null, public searchParams: string = '') {}
 
   get nativeWindow() {
     const that = this;
@@ -53,11 +53,11 @@ class MockWindowRef {
 class PendingPromise<T = void> {
   public readonly promise: Promise<T>;
   public readonly resolve: (_: T | PromiseLike<T>) => void;
-  public readonly reject: (_?) => void;
+  public readonly reject: (_?: Object) => void;
 
   constructor() {
-    let resolve: (_: T | PromiseLike<T>) => void;
-    let reject: (_?) => void;
+    let resolve: (_: T | PromiseLike<T>) => void = () => {};
+    let reject: (_?: Object) => void = () => {};
     this.promise = new Promise((res, rej) => {
       // Can't assign to this directly because resolve and reject are readonly.
       resolve = res;
@@ -74,6 +74,7 @@ describe('Login Page', () => {
   let loaderService: jasmine.SpyObj<LoaderService>;
   let userService: jasmine.SpyObj<UserService>;
   let windowRef: MockWindowRef;
+  let email: string;
 
   let loginPageComponent: LoginPageComponent;
   let fixture: ComponentFixture<LoginPageComponent>;
@@ -165,7 +166,7 @@ describe('Login Page', () => {
 
   describe('Emulator mode', function() {
     beforeEach(() => {
-      this.email = 'a@a.com';
+      email = 'a@a.com';
       spyOnProperty(loginPageComponent, 'emulatorModeIsEnabled', 'get')
         .and.returnValue(true);
     });
@@ -179,7 +180,7 @@ describe('Login Page', () => {
     it('should redirect to sign up after successful sign in', fakeAsync(() => {
       const signInPromise = spyOnSignInWithEmail();
 
-      loginPageComponent.onClickSignInButtonAsync(this.email);
+      loginPageComponent.onClickSignInButtonAsync(email);
 
       flushMicrotasks();
 
@@ -196,7 +197,7 @@ describe('Login Page', () => {
     it('should acknowledge a user pending account deletion', fakeAsync(() => {
       const signInPromise = spyOnSignInWithEmail();
 
-      loginPageComponent.onClickSignInButtonAsync(this.email);
+      loginPageComponent.onClickSignInButtonAsync(email);
 
       expect(windowRef.location).toBeNull();
 
@@ -211,7 +212,7 @@ describe('Login Page', () => {
     it('should add a warning message when signin fails', fakeAsync(() => {
       const signInPromise = spyOnSignInWithEmail();
 
-      loginPageComponent.onClickSignInButtonAsync(this.email);
+      loginPageComponent.onClickSignInButtonAsync(email);
 
       expect(windowRef.location).toBeNull();
 
@@ -229,7 +230,7 @@ describe('Login Page', () => {
       const signInPromise = spyOnSignInWithEmail();
       windowRef.searchParams = '?return_url=/admin';
 
-      loginPageComponent.onClickSignInButtonAsync(this.email);
+      loginPageComponent.onClickSignInButtonAsync(email);
 
       expect(windowRef.location).toBeNull();
 

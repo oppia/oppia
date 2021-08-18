@@ -19,12 +19,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import argparse
 import feconf
 
 from apache_beam.options import pipeline_options
 
+from typing import List, Optional # isort: skip
 
-class JobOptions(pipeline_options.GoogleCloudOptions):
+
+class JobOptions(pipeline_options.PipelineOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
@@ -32,11 +35,15 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
             str, 'Namespace for isolating the NDB operations during tests.'),
     }
 
-    def __init__(self, flags=None, **job_options):
+    def __init__(
+        self,
+        flags: Optional[List[str]] = None,
+        **job_options: Optional[str]
+    ) -> None:
         """Initializes a new JobOptions instance.
 
         Args:
-            flags: dict(str:str)|None. Command-line flags for customizing a
+            flags: list(str)|None. Command-line flags for customizing a
                 pipeline. Although Oppia doesn't use command-line flags to
                 control jobs or pipelines, we still need to pass the value
                 (unmodified) because PipelineOptions, a parent class, needs it.
@@ -45,12 +52,13 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
         """
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:
-            unsupported_options = ', '.join(sorted(unsupported_options))
-            raise ValueError('Unsupported option(s): %s' % unsupported_options)
+            joined_unsupported_options = ', '.join(sorted(unsupported_options))
+            raise ValueError(
+                'Unsupported option(s): %s' % joined_unsupported_options)
         super(JobOptions, self).__init__(
-            # Needed by PipelineOptions superclass.
+            # Needed by PipelineOptions.
             flags=flags,
-            # Needed by GoogleCloudOptions superclass.
+            # Needed by GoogleCloudOptions.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             # TODO(#11475): Figure out what these values should be. We can't run
@@ -59,7 +67,7 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
             **job_options)
 
     @classmethod
-    def _add_argparse_args(cls, parser):
+    def _add_argparse_args(cls, parser: argparse.ArgumentParser) -> None:
         """Adds Oppia's job-specific arguments to the parser.
 
         Args:
