@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 @Component({
   selector: 'number-with-units-editor',
@@ -28,11 +29,15 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
   styleUrls: []
 })
 export class NumberWithUnitsEditorComponent implements OnInit {
-  @Input() modalId;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  // 'value' will be null if user has not input any value.
+  @Input() value!: NumberWithUnitsAnswer | null;
   @Output() valueChanged = new EventEmitter();
-  numberWithUnitsString: string;
-  errorMessage: string;
+  numberWithUnitsString!: string;
+  errorMessage: string = '';
   eventBusGroup: EventBusGroup;
 
   constructor(
@@ -56,7 +61,6 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
       this.value = numberWithUnits;
       this.valueChanged.emit(this.value);
-      this.errorMessage = '';
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         value: false,
         modalId: this.modalId

@@ -23,7 +23,7 @@ import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashbo
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
+import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 
  @Component({
