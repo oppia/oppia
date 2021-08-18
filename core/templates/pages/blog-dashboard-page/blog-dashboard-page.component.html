@@ -19,7 +19,8 @@
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <div class="col-sm-8 mx-auto protractor-test-intro-message" *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
+      <div class="col-sm-8 mx-auto protractor-test-intro-message-container"
+           *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
         <blockquote class="blog-dashboard-intro-card">
           <p class="blog-dashboard-intro-card-message">
             {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate}}
@@ -32,9 +33,9 @@
           </button>
         </blockquote>
       </div>
-      <mat-tab-group *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
+      <mat-tab-group class="protractor-test-mat-tabs" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
         <mat-tab>
-          <ng-template mat-tab-label class="protractor-test-drafts-tab-button">
+          <ng-template mat-tab-label>
             {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{ blogDashboardData.numOfDraftBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">

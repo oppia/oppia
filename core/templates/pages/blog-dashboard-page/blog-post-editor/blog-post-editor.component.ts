@@ -309,7 +309,9 @@ export class BlogPostEditorComponent implements OnInit {
     let modalRef = this.ngbModal.open(UploadBlogPostThumbnailModalComponent, {
       backdrop: 'static'
     });
-
+    if (this.thumbnailDataUrl) {
+      this.imageLocalStorageService.flushStoredImagesData();
+    }
     modalRef.result.then((imageDataUrl) => {
       this.saveBlogPostThumbnail(imageDataUrl);
     }, () => {

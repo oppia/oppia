@@ -104,7 +104,7 @@
             </angular-html-bind-wrapper>
           </div>
         </div>
-        <div *ngIf="contentEditorIsActive">
+        <div *ngIf="contentEditorIsActive"  class="protractor-test-content-editor">
           <schema-based-editor *ngIf="contentEditorIsActive"
                                [schema]="getSchema.bind(this)"
                                [headersEnabled]="headersAreEnabledCallBack.bind(this)"
