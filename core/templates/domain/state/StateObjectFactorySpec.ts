@@ -19,6 +19,7 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
+import { OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 
 describe('State Object Factory', () => {
   let sof: StateObjectFactory;
@@ -173,7 +174,8 @@ describe('State Object Factory', () => {
   it('should create a default state object', () => {
     const stateName = 'Default state';
     const stateObjectDefault = sof.createDefaultState(stateName);
-    stateObject.interaction.default_outcome.dest = stateName;
+    const outcome = <OutcomeBackendDict>stateObject.interaction.default_outcome;
+    outcome.dest = stateName;
 
     expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);
   });
@@ -199,7 +201,7 @@ describe('State Object Factory', () => {
 
   it('should correctly get required written translation content ids', () => {
     const state = sof.createFromBackendDict('State name', stateObject);
-    state.interaction.id = null;
+    state.interaction.id = '';
     expect(
       state.getRequiredWrittenTranslationContentIds()
     ).toEqual(new Set(['content', 'rule_input_2']));
