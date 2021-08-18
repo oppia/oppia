@@ -244,7 +244,7 @@ describe('Contributions and review component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve(['id1', 'id2'])
       });
-      let removeSpy = spyOn(
+      const removeSpy = spyOn(
         contributionOpportunitiesService.removeOpportunitiesEventEmitter,
         'emit').and.returnValue(null);
       ctrl.contributions = {
@@ -785,6 +785,7 @@ describe('Contributions and review component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
+
       ctrl.loadContributions().then(function() {
         ctrl.onClickViewSuggestion('suggestion_1');
         $scope.$apply();
@@ -805,6 +806,7 @@ describe('Contributions and review component', function() {
           resolveSuggestion();
           cb();
         });
+
       ctrl.onClickViewSuggestion('suggestion_1');
       // Here '$scope.$apply' is used multiple times
       // in order to traverse through nested promises.

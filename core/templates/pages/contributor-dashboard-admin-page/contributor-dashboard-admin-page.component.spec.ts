@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the Contributor dashboard admin page ctrl.
+ * @fileoverview Unit tests for the Contributor dashboard admin page.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -88,7 +88,7 @@ describe('Contributor dashboard admin page ', function() {
   }));
 
   it('should fetch user info when initialized', fakeAsync(function() {
-    let userInfoSpy = spyOn(userService, 'getUserInfoAsync')
+    const userInfoSpy = spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfo));
 
     ctrl.$onInit();
@@ -99,11 +99,10 @@ describe('Contributor dashboard admin page ', function() {
 
   describe('on clicking add rights button ', () => {
     it('should successfully update the rights of the user', fakeAsync(() => {
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
-
       const addContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -123,12 +122,10 @@ describe('Contributor dashboard admin page ', function() {
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       ctrl.taskRunningInBackground = true;
-
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
-
       const addContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -148,52 +145,52 @@ describe('Contributor dashboard admin page ', function() {
     it('should return true if there are no validation errors ' +
       'when updating user rights for category translation', fakeAsync(() => {
       ctrl.$onInit();
-
       // Setting category to be translation.
       ctrl.formData.addContributionReviewer.category = 'translation';
       ctrl.formData.addContributionReviewer.languageCode = 'en';
       ctrl.formData.addContributionReviewer.username = 'user1';
       $scope.$apply();
 
-      let result = ctrl.formData.addContributionReviewer.isValid();
+      const result = ctrl.formData.addContributionReviewer.isValid();
+
       expect(result).toBe(true);
     }));
 
     it('should return true if there are no validation errors ' +
-      'when updating user rights for category voicover', fakeAsync(() => {
+      'when updating user rights for category voiceover', fakeAsync(() => {
       ctrl.$onInit();
-
       // Setting category to be voiceover.
       ctrl.formData.addContributionReviewer.category = 'voiceOver';
       ctrl.formData.addContributionReviewer.username = 'user1';
       $scope.$apply();
 
-      let result = ctrl.formData.addContributionReviewer.isValid();
+      const result = ctrl.formData.addContributionReviewer.isValid();
+
       expect(result).toBe(true);
     }));
 
     it('should return false if there are validation errors ' +
       'when updating user rights', fakeAsync(() => {
       ctrl.$onInit();
-
       // Setting category to be null.
       ctrl.formData.addContributionReviewer.category = null;
       ctrl.formData.addContributionReviewer.username = 'user1';
       $scope.$apply();
 
-      let result = ctrl.formData.addContributionReviewer.isValid();
+      const result = ctrl.formData.addContributionReviewer.isValid();
+
       expect(result).toBe(false);
     }));
 
     it('should return false if user name is empty ' +
       'when updating user rights', fakeAsync(() => {
       ctrl.$onInit();
-
       // Setting username to be empty.
       ctrl.formData.addContributionReviewer.username = '';
       $scope.$apply();
 
-      let result = ctrl.formData.addContributionReviewer.isValid();
+      const result = ctrl.formData.addContributionReviewer.isValid();
+
       expect(result).toBe(false);
     }));
   });
@@ -209,14 +206,12 @@ describe('Contributor dashboard admin page ', function() {
         languageCode: 'en',
         username: 'user1'
       };
-
       const viewContributorsResponse = {
         can_review_questions: true,
         can_review_translation_for_language_codes: ['en', 'es'],
         can_review_voiceover_for_language_codes: ['en', 'es'],
         can_submit_questions: true
       };
-
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(userInfo));
       spyOn(
@@ -246,11 +241,9 @@ describe('Contributor dashboard admin page ', function() {
         languageCode: 'en',
         username: 'user1'
       };
-
       const viewContributorsResponse = {
         usernames: ['user1']
       };
-
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(userInfo));
       spyOn(
@@ -279,14 +272,12 @@ describe('Contributor dashboard admin page ', function() {
       const viewContributorsResponse = {
         usernames: ['user1']
       };
-
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(userInfo));
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'viewContributionReviewersAsync')
         .and.resolveTo(viewContributorsResponse);
-
       const viewContributionReviewersAction = {
         category: 'category',
         filterCriterion: 'username',
@@ -294,7 +285,6 @@ describe('Contributor dashboard admin page ', function() {
         languageCode: 'en',
         username: 'user1'
       };
-
       expect(ctrl.contributionReviewersDataFetched).toBe(undefined);
 
       ctrl.$onInit();
@@ -310,11 +300,10 @@ describe('Contributor dashboard admin page ', function() {
 
   describe('on clicking remove rights button ', () => {
     it('should successfully remove the rights of the user', fakeAsync(() => {
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
-
       const removeContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -337,12 +326,10 @@ describe('Contributor dashboard admin page ', function() {
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       ctrl.taskRunningInBackground = true;
-
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
-
       const removeContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -365,13 +352,12 @@ describe('Contributor dashboard admin page ', function() {
   describe('on clicking \'View Translation Stats\' button ', () => {
     it('should successfully show the Translation contribution ' +
       'stats', fakeAsync(() => {
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'viewTranslationContributionStatsAsync')
         .and.returnValue(Promise.resolve({
           translation_contribution_stats: []
         }));
-
       const viewTranslationAction = {
         isValid: () => true,
         username: 'user1'
@@ -390,12 +376,10 @@ describe('Contributor dashboard admin page ', function() {
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       ctrl.taskRunningInBackground = true;
-
-      let contributorDashboardAdminBackendApiServiceSpy = spyOn(
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'viewTranslationContributionStatsAsync')
         .and.returnValue(Promise.resolve(null));
-
       const viewTranslationAction = {
         isValid: () => true,
         username: 'user1'
@@ -416,7 +400,6 @@ describe('Contributor dashboard admin page ', function() {
         contributorDashboardAdminBackendApiService,
         'viewTranslationContributionStatsAsync')
         .and.returnValue(Promise.reject('Internal Server Error.'));
-
       const viewTranslationAction = {
         isValid: () => true,
         username: 'user1'
@@ -432,24 +415,23 @@ describe('Contributor dashboard admin page ', function() {
     }));
   });
 
-  // Note that 'refreshFormData()' is called when
-  // ever change is detected in any one of the
-  // forms available.
+  // Note that 'refreshFormData()' is called whenever a change
+  // is detected in any of the forms.
   describe('on validating form data ', () => {
     describe('in the view contributor dashboard users section ', () => {
       it('should return true if there are no validation errors ' +
         'when fetching user rights with filter criterion as ' +
-        'rights and category as voiceOver', fakeAsync(() => {
+        'rights and category as voiceover', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Note that rights is filter criterion here.
         ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
         ctrl.formData.viewContributionReviewers.category = 'voiceOver';
         ctrl.formData.viewContributionReviewers.username = 'user1';
         $scope.$apply();
 
-        let result = ctrl.formData.viewContributionReviewers.isValid();
+        const result = ctrl.formData.viewContributionReviewers.isValid();
+
         expect(result).toBe(true);
       }));
 
@@ -457,14 +439,14 @@ describe('Contributor dashboard admin page ', function() {
         'when fetching user rights', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Note that rights is filter criterion here.
         ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
         // Setting category to null.
         ctrl.formData.viewContributionReviewers.category = null;
         $scope.$apply();
 
-        let result = ctrl.formData.viewContributionReviewers.isValid();
+        const result = ctrl.formData.viewContributionReviewers.isValid();
+
         expect(result).toBe(false);
       }));
 
@@ -473,7 +455,6 @@ describe('Contributor dashboard admin page ', function() {
         'rights and category as translation', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Note that rights is filter criterion here.
         ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
         ctrl.formData.viewContributionReviewers.category = 'translation';
@@ -481,7 +462,8 @@ describe('Contributor dashboard admin page ', function() {
         ctrl.formData.viewContributionReviewers.username = 'user1';
         $scope.$apply();
 
-        let result = ctrl.formData.viewContributionReviewers.isValid();
+        const result = ctrl.formData.viewContributionReviewers.isValid();
+
         expect(result).toBe(true);
       }));
 
@@ -490,14 +472,14 @@ describe('Contributor dashboard admin page ', function() {
         'username', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Note that username is filter criterion here.
         ctrl.formData.viewContributionReviewers.filterCriterion = (
           'username');
         ctrl.formData.viewContributionReviewers.username = 'user1';
         $scope.$apply();
 
-        let result = ctrl.formData.viewContributionReviewers.isValid();
+        const result = ctrl.formData.viewContributionReviewers.isValid();
+
         expect(result).toBe(true);
       }));
     });
@@ -507,11 +489,11 @@ describe('Contributor dashboard admin page ', function() {
         'when fetching translation stats', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         ctrl.formData.viewTranslationContributionStats.username = 'user1';
         $scope.$apply();
 
-        let result = ctrl.formData.viewTranslationContributionStats.isValid();
+        const result = ctrl.formData.viewTranslationContributionStats.isValid();
+
         expect(result).toBe(true);
       }));
 
@@ -519,12 +501,12 @@ describe('Contributor dashboard admin page ', function() {
         'when fetching translation stats', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Setting user name as empty.
         ctrl.formData.viewTranslationContributionStats.username = '';
         $scope.$apply();
 
-        let result = ctrl.formData.viewTranslationContributionStats.isValid();
+        const result = ctrl.formData.viewTranslationContributionStats.isValid();
+
         expect(result).toBe(false);
       }));
     });
@@ -534,7 +516,6 @@ describe('Contributor dashboard admin page ', function() {
         'when removing user rights for all categories', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Setting method to all.
         ctrl.formData.removeContributionReviewer.category = 'all';
         ctrl.formData.removeContributionReviewer.languageCode = 'en';
@@ -542,7 +523,8 @@ describe('Contributor dashboard admin page ', function() {
         ctrl.formData.removeContributionReviewer.method = 'all';
         $scope.$apply();
 
-        let result = ctrl.formData.removeContributionReviewer.isValid();
+        const result = ctrl.formData.removeContributionReviewer.isValid();
+
         expect(result).toBe(true);
       }));
 
@@ -550,7 +532,6 @@ describe('Contributor dashboard admin page ', function() {
         'when removing user rights for category translation', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Setting category to translation.
         ctrl.formData.removeContributionReviewer.category = 'translation';
         ctrl.formData.removeContributionReviewer.languageCode = 'en';
@@ -558,22 +539,23 @@ describe('Contributor dashboard admin page ', function() {
         ctrl.formData.removeContributionReviewer.method = 'specific';
         $scope.$apply();
 
-        let result = ctrl.formData.removeContributionReviewer.isValid();
+        const result = ctrl.formData.removeContributionReviewer.isValid();
+
         expect(result).toBe(true);
       }));
 
       it('should return true if there are no validation errors ' +
-        'when removing user rights for category voicover', fakeAsync(() => {
+        'when removing user rights for category voiceover', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Setting category to voiceover.
         ctrl.formData.removeContributionReviewer.category = 'voiceOver';
         ctrl.formData.removeContributionReviewer.username = 'user1';
         ctrl.formData.removeContributionReviewer.method = 'specific';
         $scope.$apply();
 
-        let result = ctrl.formData.removeContributionReviewer.isValid();
+        const result = ctrl.formData.removeContributionReviewer.isValid();
+
         expect(result).toBe(true);
       }));
 
@@ -581,14 +563,14 @@ describe('Contributor dashboard admin page ', function() {
         'when removing user rights', fakeAsync(() => {
         ctrl.$onInit();
         $scope.$apply();
-
         // Setting category to be null.
         ctrl.formData.removeContributionReviewer.category = null;
         ctrl.formData.removeContributionReviewer.username = 'user1';
         ctrl.formData.removeContributionReviewer.method = 'specific';
         $scope.$apply();
 
-        let result = ctrl.formData.removeContributionReviewer.isValid();
+        const result = ctrl.formData.removeContributionReviewer.isValid();
+
         expect(result).toBe(false);
       }));
     });
