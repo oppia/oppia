@@ -38,8 +38,8 @@ describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
-  let _sampleCard = null;
-  let _sampleCard2 = null;
+  let _sampleCard: StateCard;
+  let _sampleCard2: StateCard;
 
 
   beforeEach(() => {
