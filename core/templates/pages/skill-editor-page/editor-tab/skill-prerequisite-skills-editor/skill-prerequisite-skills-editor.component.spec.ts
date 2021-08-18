@@ -332,7 +332,7 @@ describe('Skill editor main tab directive', function() {
           })
         });
       });
-
+      $scope.skill = sampleSkill;
       $scope.addSkill();
       tick();
 

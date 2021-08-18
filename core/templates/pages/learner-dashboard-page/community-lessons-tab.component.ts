@@ -19,11 +19,12 @@
 
 import { Component, Input } from '@angular/core';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
+import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { AppConstants } from 'app.constants';
 
  @Component({
    selector: 'oppia-community-lessons-tab',
@@ -81,6 +82,8 @@ export class CommunityLessonsTabComponent {
   pageNumberInPlaylist: number = 1;
   startIndexInPlaylist: number = 0;
   endIndexInPlaylist: number = 3;
+  communityLibraryUrl = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
   ngOnInit(): void {
     this.noCommunityLessonActivity = (

@@ -23,6 +23,7 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { LoaderService } from 'services/loader.service';
@@ -37,7 +38,6 @@ class MockCapitalizePipe {
   }
 }
 
-
 describe('Classroom Page Component', () => {
   let component: ClassroomPageComponent;
   let fixture: ComponentFixture<ClassroomPageComponent>;
@@ -48,6 +48,7 @@ describe('Classroom Page Component', () => {
   let pageTitleService: PageTitleService;
   let siteAnalyticsService: SiteAnalyticsService;
   let alertsService: AlertsService;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -85,6 +86,8 @@ describe('Classroom Page Component', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     alertsService = TestBed.inject(AlertsService);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService);
   });
 
   it('should create', () => {
@@ -112,10 +115,16 @@ describe('Classroom Page Component', () => {
     spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
     let classroomData = ClassroomData.createFromBackendData(
       'Math', [], 'Course details', 'Topics covered');
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValues(
+        Promise.reject(),
+        Promise.resolve()
+      );
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
 
     component.ngOnInit();
+    tick();
     tick();
     expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
     expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
@@ -140,6 +149,8 @@ describe('Classroom Page Component', () => {
       spyOn(urlInterpolationService, 'getStaticImageUrl')
         .and.returnValue(bannerImageUrl);
       spyOn(loaderService, 'showLoadingScreen');
+      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+        .and.returnValue(Promise.resolve());
       spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.returnValue(Promise.reject({ status: 500 }));
       spyOn(alertsService, 'addWarning');
