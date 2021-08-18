@@ -71,7 +71,6 @@ def create_http_task(
     parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
-
     # In the type annotation below, task is of type Dict[str, Any] because
     # its structure can vary a lot.
     # We can see how the proto message for Task is defined. See the link:
