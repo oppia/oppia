@@ -19,7 +19,7 @@
 
 import { Component, Input } from '@angular/core';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
+import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
