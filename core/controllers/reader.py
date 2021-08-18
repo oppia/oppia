@@ -126,7 +126,11 @@ class ExplorationPage(base.BaseHandler):
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1 # Version must be greater than zero.
+                    }]
                 },
                 'default_value': None
             },
@@ -204,7 +208,11 @@ class ExplorationHandler(base.BaseHandler):
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1 # Version must be greater than zero.
+                    }]
                 },
                 'default_value': None
             }

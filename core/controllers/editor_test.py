@@ -1893,8 +1893,6 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             exp_id, self.owner_id, title='Title for emails handler test!',
             category='Category')
 
-        exp_fetchers.get_exploration_by_id(exp_id)
-
         csrf_token = self.get_new_csrf_token()
         exp_email_preferences = (
             user_services.get_email_preferences_for_exploration(

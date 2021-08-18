@@ -66,7 +66,7 @@ SCHEMA_FOR_VERSION = {
     'type': 'int',
     'validators': [{
         'id': 'is_at_least',
-        'min_value': 1 # Version must be grater than zero.
+        'min_value': 1 # Version must be greater than zero.
     }]
 }
 
@@ -1073,7 +1073,8 @@ class EditorAutosaveHandler(ExplorationHandler):
         change_list_dict = self.normalized_payload.get('change_list')
         change_list = [
             exp_domain.ExplorationChange(change)
-            for change in change_list_dict]
+            for change in change_list_dict
+        ]
 
         version = self.normalized_payload.get('version')
         exploration_rights = rights_manager.get_exploration_rights(
