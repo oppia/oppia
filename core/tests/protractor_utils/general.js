@@ -256,15 +256,6 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await waitFor.pageToFullyLoad();
 };
 
-var navigateToBlogDashboardPage = async function() {
-  await openProfileDropdown();
-  var BlogDashboardLink = element(by.css(
-    '.protractor-test-blog-dashboard-link'));
-  await action.click(
-    'Blog dashboard link from dropdown',
-    BlogDashboardLink);
-  await waitFor.pageToFullyLoad();
-};
 var goOnline = async function() {
   // Download throughput refers to the maximum number of bytes that can be
   // downloaded in a given time.
@@ -329,8 +320,6 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
-exports.navigateToBlogDashboardPage = (
-  navigateToBlogDashboardPage);
 
 exports.goOffline = goOffline;
 exports.goOnline = goOnline;
