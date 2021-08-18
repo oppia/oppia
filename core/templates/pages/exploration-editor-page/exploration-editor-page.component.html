@@ -46,7 +46,7 @@
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item icon nav-list-item protractor-test-settings-tab" ng-click="$ctrl.selectSettingsTab()">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'settings', 'oppia-disabled-link': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item protractor-test-settings-tab" ng-click="$ctrl.selectSettingsTab()">
         <a class="nav-link  navbar-tab" uib-tooltip="Settings" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'settings'}">&#xE8B8;</i>
         </a>
@@ -81,7 +81,7 @@
         </div>
       </li>
 
-      <li class="nav-item icon nav-list-item" ng-class="{'oppia-disabled-link': !$ctrl.connectedToInternet}" ng-click="$ctrl.showUserHelpModal()">
+      <li class="nav-item icon nav-list-item" ng-click="$ctrl.showUserHelpModal()">
         <a href="#"
            uib-tooltip="Help"
            tooltip-placement="bottom"

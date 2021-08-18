@@ -527,6 +527,9 @@ angular.module('oppia').component('explorationEditorPage', {
                   'your changes once reconnected.',
                   disconnectedMessageTimeoutMilliseconds);
                 PreventPageUnloadEventService.addListener();
+                if (RouterService.getActiveTabName() !== 'main') {
+                  ctrl.selectMainTab();
+                }
               }
             })
         );
