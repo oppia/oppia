@@ -53,7 +53,9 @@ INJECTABLES_TO_IGNORE = [
     # This file is required for the js-ts-linter-test.
     'MockIgnoredService',
     # We don't want this service to be present in the index.
-    'UpgradedServices'
+    'UpgradedServices',
+    # Route guards cannot be made injectables until migration is complete.
+    'CanAccessSplashPageGuard',
 ]
 
 

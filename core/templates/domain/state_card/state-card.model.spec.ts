@@ -22,7 +22,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionObjectFactory } from
+import { InteractionBackendDict, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { StateCard } from
   'domain/state_card/state-card.model';
@@ -35,23 +35,23 @@ import { Voiceover } from 'domain/exploration/voiceover.model';
 
 
 describe('State card object factory', () => {
-  let interactionObjectFactory = null;
-  let writtenTranslationsObjectFactory = null;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
-  let _sampleCard = null;
+  let _sampleCard: StateCard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
 
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    writtenTranslationsObjectFactory = TestBed.get(
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
-    audioTranslationLanguageService = TestBed.get(
+    audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
 
-    let interactionDict = {
+    let interactionDict: InteractionBackendDict = {
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -71,10 +71,14 @@ describe('State card object factory', () => {
           content_id: 'default_outcome',
           html: ''
         },
-        param_changes: []
+        param_changes: [],
+        labelled_as_correct: false,
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       },
       hints: [],
-      id: 'TextInput'
+      id: 'TextInput',
+      solution: null
     };
     _sampleCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
@@ -153,19 +157,28 @@ describe('State card object factory', () => {
     );
 
     _sampleCard.addInputResponsePair({
-      oppiaResponse: 'response'
+      oppiaResponse: 'response',
+      learnerInput: '',
+      isHint: false
     });
 
     expect(_sampleCard.getOppiaResponse(0)).toEqual('response');
     expect(_sampleCard.getLastOppiaResponse()).toEqual('response');
     expect(_sampleCard.getLastInputResponsePair()).toEqual({
-      oppiaResponse: 'response'
+      oppiaResponse: 'response',
+      learnerInput: '',
+      isHint: false
     });
   });
 
   it('should add input response pair', () => {
-    _sampleCard.addInputResponsePair('pair 1');
-    expect(_sampleCard.getInputResponsePairs()).toEqual(['pair 1']);
+    const responsePair1 = {
+      oppiaResponse: 'pair_1',
+      learnerInput: '',
+      isHint: false
+    };
+    _sampleCard.addInputResponsePair(responsePair1);
+    expect(_sampleCard.getInputResponsePairs()).toEqual([responsePair1]);
   });
 
   it('should add not add response if input response pair is empty', () => {
@@ -180,7 +193,9 @@ describe('State card object factory', () => {
       '<interaction_2></interaction_2>');
 
     _sampleCard.addInputResponsePair({
-      oppiaResponse: 'response'
+      oppiaResponse: 'response',
+      learnerInput: '',
+      isHint: false
     });
 
     _sampleCard.setLastOppiaResponse('response_3');
