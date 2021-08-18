@@ -135,7 +135,6 @@ var _completeSignup = async function(username) {
     // Click the "register user" button to trigger redirection.
     await action.click('Register user button', registerUser);
   }, (url) => {
-    // Wait until the URL has changed to something that is not /signup.
     if (returnUrl === '/') {
       return /(learner-dashboard|creator-dashboard)/.test(url);
     } else {
