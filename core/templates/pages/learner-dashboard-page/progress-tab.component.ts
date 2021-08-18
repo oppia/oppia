@@ -22,7 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
+import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { LearnerDashboardBackendApiService, SubtopicMasterySummaryBackendDict } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 
