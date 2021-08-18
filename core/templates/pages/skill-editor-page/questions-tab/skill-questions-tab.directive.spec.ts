@@ -25,7 +25,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { EventEmitter } from '@angular/core';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 
 
 describe('Skill question tab directive', function() {
@@ -37,7 +37,6 @@ describe('Skill question tab directive', function() {
   let initEventEmitter = new EventEmitter();
   let fetchSkillSpy = null;
   let sampleSkill = null;
-  let skillObjectFactory: SkillObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -53,11 +52,13 @@ describe('Skill question tab directive', function() {
     $scope = $rootScope.$new();
     directive = $injector.get('questionsTabDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
-    skillObjectFactory = $injector.get('SkillObjectFactory');
 
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(initEventEmitter);
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    sampleSkill = new Skill(
+      null, 'Skill description loading',
+      [], [], null,
+      'en', 1, 0, null, false, []);
     fetchSkillSpy = spyOn(skillEditorStateService, 'getSkill')
       .and.returnValue(sampleSkill);
 

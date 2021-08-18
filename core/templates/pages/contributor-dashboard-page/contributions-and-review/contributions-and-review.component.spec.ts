@@ -821,7 +821,7 @@ describe('Contributions and review component', function() {
 
     it('should open suggestion modal when user clicks on ' +
       'view suggestion', fakeAsync(function() {
-      let modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      const modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
       ctrl.onClickViewSuggestion('suggestion_1');
       $scope.$apply();
