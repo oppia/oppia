@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Union # isort:skip
+from typing import Any, Dict, List # isort:skip
 
 
 class UtilsTests(test_utils.GenericTestBase):
