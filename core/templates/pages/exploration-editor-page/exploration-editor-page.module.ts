@@ -59,6 +59,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
+    WelcomeModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -70,6 +71,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
+    WelcomeModalComponent,
   ],
   providers: [
     {
@@ -92,6 +94,7 @@ class ExplorationEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
