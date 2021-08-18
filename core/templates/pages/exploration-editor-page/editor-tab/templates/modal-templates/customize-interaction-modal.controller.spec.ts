@@ -400,21 +400,21 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should open a confirmation modal with resolution', function() {
-      spyOn($uibModal, 'open').and.returnValue({
+      let modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
       $scope.cancelWithConfirm();
       $scope.$apply();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+      expect(modalSpy).toHaveBeenCalled();
     });
 
     it('should open a confirmation modal with rejection', function() {
-      spyOn($uibModal, 'open').and.returnValue({
+      let modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
       $scope.cancelWithConfirm();
       $scope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
     });
 
     it('should not open a new confirmation modal if one is already open',
