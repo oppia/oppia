@@ -18,10 +18,8 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AboutFoundationPageComponent } from
-  './about-foundation-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { AboutFoundationPageComponent } from './about-foundation-page.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 describe('About foundation page', () => {
   beforeEach(async() => {

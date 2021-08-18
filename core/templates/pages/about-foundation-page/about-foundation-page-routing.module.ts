@@ -18,8 +18,7 @@
 
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { AboutFoundationPageRootComponent } from
-  './about-foundation-page-root.component';
+import { AboutFoundationPageRootComponent } from './about-foundation-page-root.component';
 
 const routes: Route[] = [
   {

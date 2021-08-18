@@ -22,8 +22,7 @@ import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { AboutFoundationPageRootComponent } from
-  './about-foundation-page-root.component';
+import { AboutFoundationPageRootComponent } from './about-foundation-page-root.component';
 
 describe('About foundation Page Root', () => {
   let fixture: ComponentFixture<AboutFoundationPageRootComponent>;

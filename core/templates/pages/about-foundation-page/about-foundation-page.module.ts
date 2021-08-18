@@ -19,11 +19,9 @@
 import { NgModule } from '@angular/core';
 import { AboutFoundationPageComponent } from './about-foundation-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { AboutFoundationPageRootComponent } from
-  './about-foundation-page-root.component';
+import { AboutFoundationPageRootComponent } from './about-foundation-page-root.component';
 import { CommonModule } from '@angular/common';
-import { AboutFoundationPageRoutingModule } from
-  './about-foundation-page-routing.module';
+import { AboutFoundationPageRoutingModule } from './about-foundation-page-routing.module';
 
 @NgModule({
   imports: [
