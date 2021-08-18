@@ -53,6 +53,7 @@ describe('Customize Interaction Modal Controller', function() {
   var $scope = null;
   var $uibModal = null;
   var $q = null;
+  var $compile = null;
   var $uibModalInstance = null;
   var contextService = null;
   var imageClickInputValidationService = null;
@@ -155,6 +156,7 @@ describe('Customize Interaction Modal Controller', function() {
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
+      $compile = $injector.get('$compile')
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -186,6 +188,12 @@ describe('Customize Interaction Modal Controller', function() {
         StateNextContentIdIndexService: stateNextContentIdIndexService,
         showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
+
+      var element = angular.element(
+        '<div class="modal-title"> Title </div>');
+      angular.element(document.body).append(element);
+      $compile(element)($scope);
+      $scope.$digest();
     }));
 
     it('should initialize $scope properties after controller is initialized',
