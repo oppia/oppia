@@ -20,15 +20,22 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { Rubric } from 'domain/skill/rubric.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+
+type SkillLabelToFloatKey = (
+  keyof typeof AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT);
 
 @Component({
   selector: 'oppia-question-difficulty-selector',
   templateUrl: './question-difficulty-selector.component.html'
 })
 export class QuestionDifficultySelectorComponent {
-  @Input() skillIdToRubricsObject;
-  @Input() skillWithDifficulty: SkillDifficulty;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+  @Input() skillWithDifficulty!: SkillDifficulty;
   @Output() skillWithDifficultyChange: EventEmitter<SkillDifficulty> = (
     new EventEmitter());
   availableDifficultyValues: number[] = [];
@@ -36,7 +43,8 @@ export class QuestionDifficultySelectorComponent {
   ngOnInit(): void {
     for (let difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
       this.availableDifficultyValues.push(
-        AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+        AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+          <SkillLabelToFloatKey> difficulty]);
     }
   }
 

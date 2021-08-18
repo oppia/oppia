@@ -34,7 +34,7 @@ class MockGuppy {
     end: () => {}
   };
 
-  render(_): void {}
+  render(): void {}
   'import_text'(): void {}
   asciimath(): string {
     return 'Dummy value';
@@ -49,10 +49,10 @@ class MockGuppy {
 }
 
 describe('GuppyInitializationService', () => {
-  let guppyInitializationService: GuppyInitializationService = null;
+  let guppyInitializationService: GuppyInitializationService;
 
   beforeEach(() => {
-    guppyInitializationService = TestBed.get(GuppyInitializationService);
+    guppyInitializationService = TestBed.inject(GuppyInitializationService);
     window.Guppy = MockGuppy;
   });
 

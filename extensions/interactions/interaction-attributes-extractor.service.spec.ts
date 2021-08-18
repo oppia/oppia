@@ -25,16 +25,16 @@ import { ContinueCustomizationArgs } from './customization-args-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Interaction attributes extractor service', () => {
-  let iaes: InteractionAttributesExtractorService = null;
-  let hes: HtmlEscaperService = null;
+  let iaes: InteractionAttributesExtractorService;
+  let hes: HtmlEscaperService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [InteractionAttributesExtractorService, HtmlEscaperService]
     });
 
-    iaes = TestBed.get(InteractionAttributesExtractorService);
-    hes = TestBed.get(HtmlEscaperService);
+    iaes = TestBed.inject(InteractionAttributesExtractorService);
+    hes = TestBed.inject(HtmlEscaperService);
   });
 
   it('should properly extract customization arguments values from attributes',

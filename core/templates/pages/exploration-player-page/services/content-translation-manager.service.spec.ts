@@ -50,13 +50,13 @@ describe('Content translation manager service', () => {
   let writtenTranslations: WrittenTranslations;
 
   beforeEach(() => {
-    ctms = TestBed.get(ContentTranslationManagerService);
-    ehfs = TestBed.get(ExplorationHtmlFormatterService);
-    iof = TestBed.get(InteractionObjectFactory);
-    pts = TestBed.get(PlayerTranscriptService);
-    suof = TestBed.get(SubtitledUnicodeObjectFactory);
-    wtof = TestBed.get(WrittenTranslationsObjectFactory);
-    atls = TestBed.get(AudioTranslationLanguageService);
+    ctms = TestBed.inject(ContentTranslationManagerService);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
+    iof = TestBed.inject(InteractionObjectFactory);
+    pts = TestBed.inject(PlayerTranscriptService);
+    suof = TestBed.inject(SubtitledUnicodeObjectFactory);
+    wtof = TestBed.inject(WrittenTranslationsObjectFactory);
+    atls = TestBed.inject(AudioTranslationLanguageService);
 
     let defaultOutcomeDict = {
       dest: 'dest_default',
@@ -190,7 +190,8 @@ describe('Content translation manager service', () => {
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          interaction.id, interaction.customizationArgs, true, null, null),
+          <string>interaction.id, interaction.customizationArgs, true, '', null
+        ),
         interaction,
         RecordedVoiceovers.createEmpty(),
         writtenTranslations,
@@ -218,7 +219,7 @@ describe('Content translation manager service', () => {
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
     expect(interaction.hints[0].hintContent.html).toBe('<p>fr hint</p>');
-    expect(interaction.solution.explanation.html).toBe('<p>fr solution</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
     expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>fr feedback</p>');
@@ -226,7 +227,7 @@ describe('Content translation manager service', () => {
       contentId: 'rule_input_3',
       normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
     });
-    expect(interaction.defaultOutcome.feedback.html).toBe(
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
   });
 
@@ -250,7 +251,7 @@ describe('Content translation manager service', () => {
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
     expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
-    expect(interaction.solution.explanation.html).toBe('<p>fr solution</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
     expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>fr feedback</p>');
@@ -258,7 +259,7 @@ describe('Content translation manager service', () => {
       contentId: 'rule_input_3',
       normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
     });
-    expect(interaction.defaultOutcome.feedback.html).toBe(
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
   });
 
@@ -281,7 +282,7 @@ describe('Content translation manager service', () => {
 
     expect(card.contentHtml).toBe('<p>en content</p>');
     expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
-    expect(interaction.solution.explanation.html).toBe('<p>en solution</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>en solution</p>');
     expect(interaction.customizationArgs).toEqual(originalCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>en feedback</p>');
@@ -289,7 +290,7 @@ describe('Content translation manager service', () => {
       contentId: 'rule_input_3',
       normalizedStrSet: ['InputString']
     });
-    expect(interaction.defaultOutcome.feedback.html).toBe(
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>en default outcome</p>');
   });
 
@@ -318,6 +319,27 @@ describe('Content translation manager service', () => {
     let translatedHtml = ctms.getTranslatedHtml(
       writtenTranslations, 'fr', content);
     expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
+  it('should throw error if content id is not defined', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', null);
+    expect(() => {
+      ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
+    }).toThrowError('Content ID does not exist');
+    expect(() => {
+      ctms._swapContent(writtenTranslations, 'fr', content);
+    }).toThrowError('Content ID does not exist');
   });
 
   it('should return default content HTML if translation is nonexistent', () => {
@@ -440,7 +462,7 @@ describe('Content translation manager service', () => {
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          newInteraction.id, newInteraction.customizationArgs, true, null,
+          <string>newInteraction.id, newInteraction.customizationArgs, true, '',
           null),
         newInteraction,
         RecordedVoiceovers.createEmpty(),

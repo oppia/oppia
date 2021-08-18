@@ -27,9 +27,7 @@ import { ExplorationLanguageInfo } from
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
 
-import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +39,10 @@ export class ContentTranslationLanguageService {
     private urlService: UrlService
   ) {}
 
-  private currentContentLanguageCode: string;
+  // The 'currentContentLanguageCode' is initialized using private methods.
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private currentContentLanguageCode!: string;
   private languageOptions: ExplorationLanguageInfo[] = [];
 
   _init(
@@ -49,7 +50,7 @@ export class ContentTranslationLanguageService {
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string
   ): void {
-    this.currentContentLanguageCode = null;
+    this.currentContentLanguageCode = '';
     this.languageOptions = [];
     // Set the content language that is chosen initially.
     // Use the following priority (highest to lowest):
@@ -68,7 +69,7 @@ export class ContentTranslationLanguageService {
     }
 
     if (
-      this.currentContentLanguageCode === null &&
+      !this.currentContentLanguageCode &&
       preferredContentLanguageCodes !== null
     ) {
       for (const languageCode of preferredContentLanguageCodes) {
@@ -80,7 +81,7 @@ export class ContentTranslationLanguageService {
     }
 
     if (
-      this.currentContentLanguageCode === null &&
+      !this.currentContentLanguageCode &&
       explorationLanguageCode !== null
     ) {
       this.currentContentLanguageCode = explorationLanguageCode;
@@ -94,9 +95,14 @@ export class ContentTranslationLanguageService {
         // that this is not the same as "getContentLanguageDescription", because
         // the latter refers to the language that the exploration is written
         // in.)
-        let languageDescription =
-            this.languageUtilService.getContentLanguageDescription(
-              languageCode);
+        let languageDescription = (
+          this.languageUtilService.getContentLanguageDescription(
+            languageCode
+          )
+        );
+        if (!languageDescription) {
+          throw new Error('The exploration language code is invalid');
+        }
         this.languageOptions.push({
           value: languageCode,
           displayed: languageDescription

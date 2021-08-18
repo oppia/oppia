@@ -96,8 +96,8 @@ describe('NumberWithUnitsEditorComponent', () => {
 
     component.updateValue('24kg');
 
-    expect(component.value.real).toBe(24);
-    expect(component.value.units[0].unit).toBe('kg');
+    expect(component.value?.real).toBe(24);
+    expect(component.value?.units[0].unit).toBe('kg');
     expect(component.errorMessage).toBe('');
     expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
   });

@@ -31,9 +31,9 @@ describe('Content translation language service', () => {
   let availableLanguageCodes: string[];
 
   beforeEach(() => {
-    ctls = TestBed.get(ContentTranslationLanguageService);
-    ctms = TestBed.get(ContentTranslationManagerService);
-    us = TestBed.get(UrlService);
+    ctls = TestBed.inject(ContentTranslationLanguageService);
+    ctms = TestBed.inject(ContentTranslationManagerService);
+    us = TestBed.inject(UrlService);
     availableLanguageCodes = ['fr', 'zh'];
   });
 
@@ -69,6 +69,12 @@ describe('Content translation language service', () => {
 
     ctls.init(availableLanguageCodes, ['zz'], 'zh');
     expect(ctls.getCurrentContentLanguageCode()).toBe('zh');
+  });
+
+  it('should throw error if the exploration language code is invalid', () => {
+    expect(() => {
+      ctls.init(availableLanguageCodes, ['zz'], 'iv');
+    }).toThrowError('The exploration language code is invalid');
   });
 
   it('should correctly initialize the dropdown options', () => {

@@ -19,18 +19,20 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Hint, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
-  let hasms;
-  let hof;
-  let sof;
-  let firstHint, secondHint, thirdHint;
-  let solution;
-  let pps;
+  let hasms: HintsAndSolutionManagerService;
+  let hof: HintObjectFactory;
+  let sof: SolutionObjectFactory;
+  let firstHint: Hint;
+  let secondHint: Hint;
+  let thirdHint: Hint;
+  let solution: Solution;
+  let pps: PlayerPositionService;
 
   let mockNewCardAvailableEmitter = new EventEmitter();
 
@@ -40,37 +42,37 @@ describe('HintsAndSolutionManager service', () => {
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
 
   beforeEach(fakeAsync(() => {
-    pps = TestBed.get(PlayerPositionService);
+    pps = TestBed.inject(PlayerPositionService);
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);
-    hasms = TestBed.get(HintsAndSolutionManagerService);
-    hof = TestBed.get(HintObjectFactory);
-    sof = TestBed.get(SolutionObjectFactory);
+    hasms = TestBed.inject(HintsAndSolutionManagerService);
+    hof = TestBed.inject(HintObjectFactory);
+    sof = TestBed.inject(SolutionObjectFactory);
 
     firstHint = hof.createFromBackendDict({
       hint_content: {
+        content_id: 'one',
         html: 'one',
-        audio_translations: {}
       }
     });
     secondHint = hof.createFromBackendDict({
       hint_content: {
+        content_id: 'two',
         html: 'two',
-        audio_translations: {}
       }
     });
     thirdHint = hof.createFromBackendDict({
       hint_content: {
+        content_id: 'three',
         html: 'three',
-        audio_translations: {}
       }
     });
     solution = sof.createFromBackendDict({
       answer_is_exclusive: false,
       correct_answer: 'This is a correct answer!',
       explanation: {
+        content_id: 'sol-one',
         html: 'This is the explanation to the answer',
-        audio_translations: {}
       }
     });
   }));
@@ -95,7 +97,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(0)?.html).toBe('one');
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
@@ -106,8 +108,8 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
-    expect(hasms.displayHint(1).html).toBe('two');
+    expect(hasms.displayHint(0)?.html).toBe('one');
+    expect(hasms.displayHint(1)?.html).toBe('two');
     expect(hasms.displayHint(3)).toBeNull();
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(true);
@@ -133,7 +135,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(0)?.html).toBe('one');
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
@@ -142,7 +144,7 @@ describe('HintsAndSolutionManager service', () => {
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(0)?.html).toBe('one');
     expect(hasms.displayHint(1)).toBeNull();
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
@@ -163,7 +165,7 @@ describe('HintsAndSolutionManager service', () => {
     tick(WAIT_FOR_FIRST_HINT_MSEC);
 
     expect(hasms.isSolutionConsumed()).toBe(false);
-    expect(hasms.displaySolution().correctAnswer).toBe(
+    expect(hasms.displaySolution()?.correctAnswer).toBe(
       'This is a correct answer!');
     expect(hasms.isSolutionConsumed()).toBe(true);
   }));
@@ -186,7 +188,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isHintViewable(2)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(0)?.html).toBe('one');
 
     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
@@ -194,8 +196,8 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isHintViewable(2)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
-    expect(hasms.displayHint(1).html).toBe('two');
+    expect(hasms.displayHint(0)?.html).toBe('one');
+    expect(hasms.displayHint(1)?.html).toBe('two');
 
     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
@@ -203,9 +205,9 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isHintViewable(2)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).html).toBe('one');
-    expect(hasms.displayHint(1).html).toBe('two');
-    expect(hasms.displayHint(2).html).toBe('three');
+    expect(hasms.displayHint(0)?.html).toBe('one');
+    expect(hasms.displayHint(1)?.html).toBe('two');
+    expect(hasms.displayHint(2)?.html).toBe('three');
 
     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 

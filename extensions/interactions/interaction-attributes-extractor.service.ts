@@ -21,12 +21,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionCustomizationArgs } from
+import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from
   'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -54,18 +53,23 @@ export class InteractionAttributesExtractorService {
   ) {}
 
   getValuesFromAttributes(
-      interactionId: string, attributes: Object
+      interactionId: InteractionSpecsKey, attributes: Object
   ): InteractionCustomizationArgs {
-    const caBackendDict = {};
+    const caBackendDict: InteractionCustomizationArgsBackendDict = {};
     const caSpecs = (
-      INTERACTION_SPECS[interactionId].customization_arg_specs);
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interactionId].customization_arg_specs);
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
-      const attributesKey = `${caName}WithValue`;
-      caBackendDict[caName] = {
-        value:
-          this.htmlEscaperService.escapedJsonToObj(attributes[attributesKey])
-      };
+      const attributesKey = `${caName}WithValue` as keyof typeof attributes;
+      Object.defineProperty(caBackendDict, caName, {
+        value: {
+          value: this.htmlEscaperService.escapedJsonToObj(
+            attributes[attributesKey].toString()
+          ),
+        },
+        enumerable: true
+      });
     });
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
@@ -73,9 +77,14 @@ export class InteractionAttributesExtractorService {
     if (this.migratedInteractions.indexOf(interactionId) >= 0) {
       return ca;
     }
-    const caValues = {};
-    Object.keys(ca).forEach(caName => {
-      caValues[caName] = ca[caName].value;
+    const caValues: InteractionCustomizationArgs = {};
+    const caKeys = <(keyof InteractionCustomizationArgs)[]> Object.keys(ca);
+    caKeys.forEach(caName => {
+      const attr = <{ value: Object }> ca[caName];
+      Object.defineProperty(caValues, caName, {
+        value: attr.value,
+        enumerable: true
+      });
     });
 
     return caValues;

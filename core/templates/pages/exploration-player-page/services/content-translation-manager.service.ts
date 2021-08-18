@@ -33,20 +33,23 @@ import { SubtitledHtml } from
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
-
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContentTranslationManagerService {
-  private explorationLanguageCode: string;
+  // This is initialized using the class initialization method.
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
   // The 'originalTranscript' is a copy of the transcript in the exploration
@@ -97,6 +100,9 @@ export class ContentTranslationManagerService {
       languageCode: string,
       content: SubtitledHtml
   ): string {
+    if (!content.contentId) {
+      throw new Error('Content ID does not exist');
+    }
     const writtenTranslation = writtenTranslations.translationsMapping[
       content.contentId][languageCode];
     if (!writtenTranslation) {
@@ -121,22 +127,30 @@ export class ContentTranslationManagerService {
       languageCode: string,
       content: SubtitledHtml|SubtitledUnicode
   ): void {
-    const writtenTranslation = writtenTranslations.translationsMapping[
-      content.contentId][languageCode];
+    if (!content.contentId) {
+      throw new Error('Content ID does not exist');
+    }
+    const writtenTranslation: WrittenTranslation | null = (
+      writtenTranslations.translationsMapping[content.contentId][languageCode]);
 
-    if (!this._isValidStringTranslation(writtenTranslation)) {
+    if (
+      !writtenTranslation ||
+      !this._isValidStringTranslation(writtenTranslation)
+    ) {
       return;
     }
 
-    let valueName;
+    let valueName = '';
     // Note: The content can only be of type SubtitledHtml|SubtitledUnicode.
     if (content instanceof SubtitledHtml) {
-      valueName = 'html';
+      valueName = '_html';
     } else if (content instanceof SubtitledUnicode) {
-      valueName = 'unicode';
+      valueName = '_unicode';
     }
 
-    content[valueName] = writtenTranslation.translation;
+    Object.defineProperty(content, valueName, {
+      value: writtenTranslation.translation
+    });
   }
 
   _displayTranslationsForCard(card: StateCard, languageCode: string): void {
@@ -165,11 +179,12 @@ export class ContentTranslationManagerService {
         writtenTranslations, languageCode, solution.explanation);
     }
 
-    if (card.getInteraction().defaultOutcome) {
+    const defaultOutcome = card.getInteraction().defaultOutcome;
+    if (defaultOutcome) {
       this._swapContent(
         writtenTranslations,
         languageCode,
-        card.getInteraction().defaultOutcome.feedback);
+        defaultOutcome.feedback);
     }
 
     const answerGroups = card.getInteraction().answerGroups;
@@ -211,7 +226,7 @@ export class ContentTranslationManagerService {
             item, <Schema> schema.items));
       } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
         schema.properties.forEach(property => {
-          const name = property.name;
+          const name = <keyof typeof value> property.name;
           traverseSchemaAndSwapTranslatableContent(
             value[name],
             property.schema);
@@ -220,13 +235,14 @@ export class ContentTranslationManagerService {
     };
 
     const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
-      interactionId].customization_arg_specs;
+      <InteractionSpecsKey>interactionId
+    ].customization_arg_specs;
     for (const caSpec of caSpecs) {
-      const name = caSpec.name;
+      const name = <keyof InteractionCustomizationArgs>caSpec.name;
       if (caValues.hasOwnProperty(name)) {
+        const attr = <{value: Object}> caValues[name];
         traverseSchemaAndSwapTranslatableContent(
-          caValues[name].value,
-          caSpec.schema);
+          attr.value, <Schema>caSpec.schema);
       }
     }
 
@@ -247,9 +263,13 @@ export class ContentTranslationManagerService {
           let ruleInputValue = rule.inputs[key];
           if (this._isTranslatableObject(ruleInputValue)) {
             const writtenTranslation = writtenTranslations.translationsMapping[
-              ruleInputValue.contentId][languageCode];
+              <string>ruleInputValue.contentId
+            ][languageCode];
             // There must be at least one translation.
-            if (writtenTranslation.translation.length === 0) {
+            if (
+              !writtenTranslation ||
+              writtenTranslation.translation.length === 0
+            ) {
               continue;
             }
 
@@ -260,8 +280,10 @@ export class ContentTranslationManagerService {
             ruleInputValueKeys.splice(contentIdIndex, 1);
 
             // Retrieve the value corresponding to the other key.
-            let nonContentIdKey = ruleInputValueKeys[0];
-            ruleInputValue[nonContentIdKey] = writtenTranslation.translation;
+            let nonContentIdKey = (
+              <keyof BaseTranslatableObject>ruleInputValueKeys[0]);
+            ruleInputValue[nonContentIdKey] = (
+              <string>writtenTranslation.translation);
           }
         }
       });
