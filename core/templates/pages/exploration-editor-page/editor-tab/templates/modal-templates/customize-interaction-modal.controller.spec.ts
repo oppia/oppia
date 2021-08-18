@@ -431,6 +431,8 @@ describe('Customize Interaction Modal Controller', function() {
 
     it('should not open a new confirmation modal if one is already open',
       function() {
+        angular.element(document.querySelector('.modal-title')).remove();
+
         var mockDiv = document.createElement('div');
         mockDiv.setAttribute('class', 'modal-title');
         mockDiv.textContent = 'Confirmation Required';
