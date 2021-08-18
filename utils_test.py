@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List # isort:skip
+from typing import Any, Dict, List, Union # isort:skip
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -423,12 +423,14 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertFalse(utils.is_valid_language_code('unknown'))
 
     def test_require_valid_name(self) -> None:
-        name: Any = 'name'
+        name = 'name'
         utils.require_valid_name(name, 'name_type')
 
-        name = 0
+        invalid_name = 0
         with self.assertRaisesRegexp(Exception, '0 must be a string.'): # type: ignore[no-untyped-call]
-            utils.require_valid_name(name, 'name_type')
+            # Type ignore is used below because we are providing integer
+            # argument instead of string for invalid_name for testing purposes.
+            utils.require_valid_name(invalid_name, 'name_type') # type: ignore[arg-type]
 
     def test_require_valid_meta_tag_content(self) -> None:
         meta_tag_content = 'name'

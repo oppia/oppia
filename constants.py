@@ -29,7 +29,7 @@ from typing import Any, Dict, TextIO # isort:skip
 
 
 # Here we use Dict[str, Any] as return type because we need to parse and return
-# generic json objects.
+# generic JSON objects.
 def parse_json_from_js(js_file: TextIO) -> Dict[str, Any]:
     """Extracts JSON object from JS file.
 
@@ -70,6 +70,8 @@ class Constants(dict): # type: ignore[type-arg]
     def __setattr__(self, name: str, value: Any) -> None:
         self[name] = value
 
+    # The return value here refers to the `value` in the above method, hence the
+    # type Any is used for it.
     def __getattr__(self, name: str) -> Any:
         return self[name]
 

@@ -90,7 +90,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
 
 
 def update_timestamps_multi(
-        entities: Sequence['base_models.BaseModel'],
+        entities: List[TYPE_MODEL_SUBCLASS],
         update_last_updated_time: bool = True
 ) -> None:
     """Update the created_on and last_updated fields of all given entities.

@@ -2289,7 +2289,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0039': (
-            'Please use str instead of typing.Text',
+            'Please use str instead of Text',
             'disallowed-text-import',
             'Disallow import of Text from typing module',
         ),

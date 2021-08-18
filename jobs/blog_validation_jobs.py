@@ -65,8 +65,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
         Returns:
             value. The value of the property of model.
         """
-        return job_utils.get_model_property(
-            model, self._property_name)
+        return job_utils.get_model_property(model, self._property_name)
 
 
 class BlogPostTitleUniquenessJob(base_jobs.JobBase):

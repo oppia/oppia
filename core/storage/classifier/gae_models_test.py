@@ -381,8 +381,8 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             mappings[0].algorithm_ids_to_job_ids, {'algorithm_id': job_id})
 
     def test_create_multi_mappings(self) -> None:
-        state_training_jobs_mappings: (
-            List[classifier_domain.StateTrainingJobsMapping]) = []
+        state_training_jobs_mappings: List[
+            classifier_domain.StateTrainingJobsMapping] = []
         state_training_jobs_mappings.append(
             classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
                 u'1', 1, 'Home', {'algorithm_id': 'job_id1'}))
