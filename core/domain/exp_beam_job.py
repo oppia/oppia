@@ -28,7 +28,7 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
-(exp_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+(exp_models,) = models.Registry.import_models(
     [models.NAMES.exploration])
 
 
@@ -38,7 +38,7 @@ class PopulateExplorationWithProtoSize(base_jobs.JobBase):
     def run(self): # type: ignore[no-untyped-def]
         """Update every exploration model in datastore."""
 
-        exploration_model_query = exp_models.ExplorationModel.query()
+        exploration_model_query = exp_models.ExplorationModel.query() # type: ignore[attr-defined]
         migrated_models = (
             self.pipeline
             | 'Get every Exploration Model' >> (
