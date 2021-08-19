@@ -25,7 +25,7 @@ import { ClassifierDataBackendApiService } from 'services/classifier-data-backen
 import { LoggerService } from 'services/contextual/logger.service';
 
 interface StateClassifierMapping {
-  // This property will be null when Machine Learning Classification
+  // 'state' will be 'null' when Machine Learning Classification
   // is not enabled.
   [state: string]: Classifier | null;
 }
