@@ -140,10 +140,28 @@ describe('Static Pages Tour', function() {
         element(by.css('.protractor-test-learner-dashboard-page')));
 
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
-      await browser.get('/login');
-      await waitFor.pageToFullyLoad();
-      await waitFor.presenceOf(
-        learnerDashboardPage, 'Learner dashboard page did not load');
+
+      await waitFor.clientSideRedirection(async() => {
+        // Login page will redirect user away if logged in.
+        await browser.get('/login');
+
+        // Wait for first redirection (login page to splash page).
+        await browser.driver.wait(async() => {
+          var url = await browser.driver.getCurrentUrl();
+          // Wait until the URL has changed to something that is not /login.
+          return !(/login/.test(url));
+        }, 10000);
+      },
+      (url) => {
+        // Wait for second redirection (splash page to preferred dashboard
+        // page).
+        return url !== 'http://localhost:9001/';
+      },
+      async() => {
+        await waitFor.presenceOf(
+          learnerDashboardPage, 'Learner dashboard page did not load');
+      });
+
       expect(await loginPage.isPresent()).toBe(false);
 
       await users.logout();

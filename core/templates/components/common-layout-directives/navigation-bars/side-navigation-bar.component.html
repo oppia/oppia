@@ -114,14 +114,16 @@
         <span>{{ 'I18N_SIDEBAR_CLASSROOM' | translate }}</span>
       </a>
       <div [hidden]="!classroomSubmenuIsShown" class="classroom-submenu">
-        <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
+        <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
           <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
         </a>
       </div>
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/community-library'}">
-      <a href="/community-library" class="protractor-mobile-test-library-link">
+      <a href="/community-library"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
+         class="protractor-mobile-test-library-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0E0;</i>
         <span>{{ 'I18N_SIDEBAR_LIBRARY_LINK' | translate }}</span>
       </a>
