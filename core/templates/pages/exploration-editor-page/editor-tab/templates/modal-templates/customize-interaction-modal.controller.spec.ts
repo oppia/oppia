@@ -392,25 +392,47 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should open a confirmation modal with resolution', function() {
-      spyOn($uibModal, 'open').and.returnValue({
+      angular.element(document.querySelector('.modal-title')).remove();
+
+      var mockDiv = document.createElement('div');
+      mockDiv.setAttribute('class', 'modal-title');
+      mockDiv.textContent = 'Title';
+      var $document = angular.element(document);
+      $document.find('body').append(mockDiv.outerHTML);
+      let modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
+
       $scope.cancelWithConfirm();
       $scope.$apply();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+      expect(modalSpy).toHaveBeenCalled();
+
+      angular.element(document.querySelector('.modal-title')).remove();
     });
 
     it('should open a confirmation modal with rejection', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+      angular.element(document.querySelector('.modal-title')).remove();
+
+      var mockDiv = document.createElement('div');
+      mockDiv.setAttribute('class', 'modal-title');
+      mockDiv.textContent = 'Title';
+      var $document = angular.element(document);
+      $document.find('body').append(mockDiv.outerHTML);
+      let modalSpy = spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
       });
+
       $scope.cancelWithConfirm();
       $scope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
+
+      angular.element(document.querySelector('.modal-title')).remove();
     });
 
     it('should not open a new confirmation modal if one is already open',
       function() {
+        angular.element(document.querySelector('.modal-title')).remove();
+
         var mockDiv = document.createElement('div');
         mockDiv.setAttribute('class', 'modal-title');
         mockDiv.textContent = 'Confirmation Required';
