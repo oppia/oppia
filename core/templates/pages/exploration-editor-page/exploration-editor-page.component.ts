@@ -143,6 +143,7 @@ require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -174,7 +175,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService',
     'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
+    'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -197,7 +199,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService,
         FocusManagerService, GraphDataService, InternetConnectivityService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        ParamSpecsObjectFactory, PreventPageUnloadEventService,
+        RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -209,6 +212,7 @@ angular.module('oppia').component('explorationEditorPage', {
       var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
+      ctrl.connectedToInternet = true;
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -510,16 +514,22 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.directiveSubscriptions.add(
           InternetConnectivityService.onInternetStateChange.subscribe(
             internetAccessible => {
+              ctrl.connectedToInternet = internetAccessible;
               if (internetAccessible) {
                 AlertsService.addSuccessMessage(
                   'Reconnected. Checking whether your changes are mergeable.',
                   reconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.removeListener();
               } else {
                 AlertsService.addInfoMessage(
                   'Looks like you are offline. ' +
                   'You can continue working, and can save ' +
                   'your changes once reconnected.',
                   disconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.addListener();
+                if (RouterService.getActiveTabName() !== 'main') {
+                  ctrl.selectMainTab();
+                }
               }
             })
         );
