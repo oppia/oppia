@@ -107,13 +107,8 @@ describe('State card object factory', () => {
       'content', audioTranslationLanguageService);
 
     _sampleCard2 = new StateCard(
-      null, null, null, null,
-      [{
-        learnerInput: 'learnerInput',
-        oppiaResponse: 'response',
-        isHint: true
-      }], null, null, null, null);
-  });
+      'test_name', 'content', 'interaction', null, [],
+      null, null, 'contentId', null);
 
   it('should be able to get the various fields', () => {
     expect(_sampleCard.getStateName()).toEqual('State 1');
