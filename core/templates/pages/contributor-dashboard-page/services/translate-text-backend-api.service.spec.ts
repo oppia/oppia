@@ -252,5 +252,27 @@ describe('TranslateTextBackendApiService', () => {
       req.error(errorEvent);
       flushMicrotasks();
     }));
+
+    it('should throw error if Image Data is not present in' +
+       ' local Storage', async() => {
+      imagesData = [{
+        filename: 'imageFilename1',
+        imageBlob: null
+      }];
+
+
+      await expectAsync(
+        translateTextBackendApiService.suggestTranslatedTextAsync(
+          'activeExpId',
+          'activeExpVersion',
+          'activeContentId',
+          'activeStateName',
+          'languageCode',
+          'contentHtml',
+          'translationHtml',
+          imagesData,
+          'html')
+      ).toBeRejectedWithError('No Image Data Found');
+    });
   });
 });
