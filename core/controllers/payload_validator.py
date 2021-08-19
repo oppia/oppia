@@ -58,7 +58,6 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
             elif 'default_value' not in arg_schema:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
-
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
@@ -94,20 +93,11 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableTopicDataHandler',
     'EditorAutosaveHandler',
     'EditorHandler',
-    'EmailDashboardDataHandler',
-    'EmailDashboardPage',
-    'EmailDashboardResultPage',
-    'EmailDashboardTestBulkEmailHandler',
-    'EmailDashboardCancelEmailHandler',
     'ExplorationActualStartEventHandler',
     'ExplorationCompleteEventHandler',
     'ExplorationEmbedPage',
-    'ExplorationFeaturesHandler',
     'ExplorationFileDownloader',
     'ExplorationHandler',
-    'ExplorationImprovementsConfigHandler',
-    'ExplorationImprovementsHandler',
-    'ExplorationImprovementsHistoryHandler',
     'ExplorationMaybeLeaveHandler',
     'ExplorationModeratorRightsHandler',
     'ExplorationPage',
@@ -119,9 +109,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ExplorationStatusHandler',
     'ExplorationSummariesHandler',
     'ExportAccountHandler',
-    'FeedbackStatsHandler',
     'FeedbackThreadStatusChangeEmailHandler',
-    'FeedbackThreadViewEventHandler',
     'FetchIssuesHandler',
     'FetchPlaythroughHandler',
     'FetchSkillsHandler',
@@ -154,10 +142,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'OldLibraryRedirectPage',
     'OldNotificationsDashboardRedirectPage',
     'PendingAccountDeletionPage',
-    'PlatformFeatureDummyHandler',
-    'PlatformFeaturesEvaluationHandler',
-    'PracticeSessionsPage',
-    'PracticeSessionsPageDataHandler',
     'PreferenceHandler',
     'PreferencesHandler',
     'PreferencesPage',
@@ -168,7 +152,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ProfilePictureHandlerByUsernameHandler',
     'PromoBarHandler',
     'QuebstionsListHandler',
-    'QueryStatusCheckHandler',
     'QuestionCountDataHandler',
     'QuestionCreationHandler',
     'QuestionPlayerHandler',
@@ -177,13 +160,10 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'RatingHandler',
     'ReaderFeedbackHandler',
     'RecentCommitsHandler',
-    'RecentFeedbackMessagesHandler',
     'RecommendationsHandler',
     'ReleaseCoordinatorPage',
     'ResolveIssueHandler',
     'ResubmitSuggestionHandler',
-    'ReviewTestsPage',
-    'ReviewTestsPageDataHandler',
     'ReviewableSuggestionsHandler',
     'SearchHandler',
     'SignupHandler',
@@ -220,9 +200,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
-    'ThreadHandler',
-    'ThreadListHandler',
-    'ThreadListHandlerForTopicsHandler',
     'TopUnresolvedAnswersHandler',
     'TopicAssignmentsHandler',
     'TopicEditorPage',
@@ -248,20 +225,23 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UsernameCheckHandler',
     'ValidateExplorationsHandler',
     'ValueGeneratorHandler',
-    'VoiceArtistManagementHandler'
+    'VoiceArtistManagementHandler',
+    'OppiaMLVMHandler',
+    # Oppia Root page is the unified entry for page routes to the frontend.
+    # So, it should exempted from schema validation.
+    'OppiaRootPage',
+    'CsrfTokenHandler',
+    'Error404Handler',
+    'FrontendErrorHandler',
+    'WarmupPage',
+    'HomePageRedirectPage',
+    'SplashRedirectPage'
     ]
 
 # These handlers do not require any schema validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'SessionBeginHandler',
     'SessionEndHandler',
-    'OppiaMLVMHandler',
-    'CsrfTokenHandler',
-    'Error404Handler',
-    'FrontendErrorHandler',
-    'WarmupPage',
-    'HomePageRedirectPage',
-    'SplashRedirectPage',
     'SeedFirebaseHandler'
 ]
 

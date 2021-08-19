@@ -3,7 +3,7 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.24.0
+apache-beam[gcp]==2.31.0
 backports.functools-lru-cache==1.6.1
 beautifulsoup4==4.9.3
 bleach==3.3.0
@@ -25,17 +25,19 @@ soupsieve==1.9.5
 webencodings==0.5.1
 pillow==8.2.0
 redis==3.5.3
-requests==2.24.0
+requests==2.26.0
 requests-mock==1.5.2
 requests-toolbelt==0.9.1
-googledatastore==7.0.0
-google-auth==1.28.1
+rsa==4.7
+googledatastore==7.0.2
+google-auth==1.34.0
 google-cloud-ndb==1.8.0
 google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
 pytest==6.2.3
 webapp2==3.0.0b1
-elasticsearch==7.10.0
+elasticsearch==7.14.0
+urllib3==1.26.6
 # TODO(#13506): Remove these after we refactor the Python library
 # handling process.
 # These libraries are already in oppia_tools folder, but are also needed here

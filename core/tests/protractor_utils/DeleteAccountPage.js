@@ -19,6 +19,8 @@
 
 var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
+var pendingAccountDeletionHeading =
+  element(by.css('.protractor-test-pending-account-deletion'));
 
 var DeleteAccountPage = function() {
   var DELETE_ACCOUNT_PAGE_URL = '/delete-account';
@@ -39,7 +41,15 @@ var DeleteAccountPage = function() {
     await waitFor.modalPopupToAppear();
     await action.sendKeys(
       'Fill username', confirmDeletionUsernameField, username);
-    await action.click('Confirm deletion button', confirmDeletionButton);
+    await waitFor.clientSideRedirection(async() => {
+      await action.click('Confirm deletion button', confirmDeletionButton);
+    }, (url) => {
+      return url === 'http://localhost:9001/pending-account-deletion';
+    }, async() => {
+      await waitFor.visibilityOf(
+        pendingAccountDeletionHeading,
+        'Pending Account Deletion Page takes too long to appear');
+    });
   };
 };
 

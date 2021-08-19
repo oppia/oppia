@@ -86,34 +86,13 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            // We need to use passive event listeners on this page so that
-            // the page works correctly.
-            'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            'deprecations': ['error', {'minScore': 1}],
-            'redirects': ['error', {'minScore': 0.5}]
-          }
-        },
-        {
           'matchingUrlPattern': 'http://[^/]+/license$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/nonprofits$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/moderator$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
-        {
-          'matchingUrlPattern': 'http://[^/]+/parents$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        }
       ]
     },
     'upload': {

@@ -37,12 +37,15 @@ interface MemoryCacheProfile {
   templateUrl: './release-coordinator-page.component.html',
 })
 export class ReleaseCoordinatorPageComponent implements OnInit {
-  statusMessage: string;
-  activeTab: string;
-  memoryCacheProfile: MemoryCacheProfile;
-  memoryCacheDataFetched: boolean;
-  promoBarConfigForm: FormGroup;
-  submitButtonDisabled: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  statusMessage!: string;
+  activeTab!: string;
+  memoryCacheProfile!: MemoryCacheProfile;
+  promoBarConfigForm!: FormGroup;
+  memoryCacheDataFetched: boolean = false;
+  submitButtonDisabled: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;

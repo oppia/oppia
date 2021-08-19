@@ -60,14 +60,15 @@ describe('Practice session page', function() {
     spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'abbrev-topic');
     spyOn(UrlService, 'getSelectedSubtopicsFromUrl').and.returnValue(
-      '1,2,3,4,5');
+      '["1","2","3","4","5"]');
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
     $httpBackend.expectGET(
       '/practice_session/data/math/abbrev-topic?' +
-      'selected_subtopic_ids=1%2C2%2C3%2C4%2C5').respond({
+      'selected_subtopic_ids=' + encodeURIComponent(
+        '["1","2","3","4","5"]')).respond({
       skill_ids_to_descriptions_map: {
         skill_1: 'Description 1',
         skill_2: 'Description 2',
@@ -78,7 +79,7 @@ describe('Practice session page', function() {
     $httpBackend.flush();
 
     expect(ctrl.topicName).toBe('Foo Topic');
-    expect(ctrl.commaSeparatedSubtopicIds).toBe('1,2,3,4,5');
+    expect(ctrl.stringifiedSubtopicIds).toBe('["1","2","3","4","5"]');
     expect(ctrl.questionPlayerConfig).toEqual({
       resultActionButtons: [
         {
@@ -89,7 +90,7 @@ describe('Practice session page', function() {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
           url: '/learn/math/abbrev-topic/practice/session?' +
-          'selected_subtopic_ids=1%2C2%2C3%2C4%2C5'
+          'selected_subtopic_ids=' + encodeURIComponent('["1","2","3","4","5"]')
         },
         {
           type: 'DASHBOARD',

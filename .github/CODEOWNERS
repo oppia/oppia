@@ -54,6 +54,7 @@
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
 /core/templates/modules/ @srijanreddy98 @darksun27
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
+/core/templates/pages/common-imports.ts @srijanreddy98 @darksun27
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
 /core/templates/pages/oppia-root/ @srijanreddy98 @darksun27
 /core/templates/i18n/ @srijanreddy98 @darksun27
@@ -162,7 +163,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevintab95 @krishnarao22 @U8NWXD
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
+/.circleci/ @kevintab95 @SAEb-ai @U8NWXD
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -295,6 +297,8 @@
 /core/templates/services/contextual/url.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-dimensions.service*.ts @srijanreddy98
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
+/core/templates/services/internet-connectivity.service*.ts @srijanreddy98
+/core/templates/services/server-connection-backend-api.service*.ts @srijanreddy98
 
 
 # Global stylesheet.
@@ -421,7 +425,7 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/story-creation.service*.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
 /core/templates/pages/story-editor-page/ @kevintab95
@@ -434,7 +438,7 @@
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
-/core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/topic-creation.service*.ts @kevintab95
 /core/templates/domain/classroom/ @kevintab95
 /core/templates/domain/subtopic_viewer/ @kevintab95
 /core/templates/domain/topic/ @kevintab95
@@ -529,6 +533,7 @@
 
 
 # Rich text editor team.
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @aks681
 /core/templates/components/ck-editor-helpers/ckeditor4.module.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
@@ -588,6 +593,7 @@
 /core/templates/pages/teach-page/ @vojtechjelinek
 /core/templates/pages/thanks-page/ @vojtechjelinek
 /core/templates/pages/participation-playbook/ @vojtechjelinek
+/core/templates/pages/volunteer-page/ @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @nithusha21 @vojtechjelinek
@@ -659,17 +665,18 @@
 /data/ @nithusha21
 /core/controllers/android_e2e_config*.py @seanlip @BenHenning
 /core/templates/karma.module.ts @vojtechjelinek
-/core/tests/protractor_utils/ @kevintab95 @krishnarao22 @U8NWXD
-/core/tests/protractor_desktop/ @kevintab95 @krishnarao22 @U8NWXD
-/core/tests/protractor/ @kevintab95 @krishnarao22 @U8NWXD
-/core/tests/protractor.conf.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/interactions/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/extensions/objects/protractor.js @kevintab95 @krishnarao22 @U8NWXD
-/scripts/backend_test_shards.json @krishnarao22 @U8NWXD
-/.github/actions @krishnarao22 @U8NWXD
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
+/core/tests/protractor_utils/ @kevintab95 @SAEb-ai @U8NWXD
+/core/tests/protractor_desktop/ @kevintab95 @SAEb-ai @U8NWXD
+/core/tests/protractor/ @kevintab95 @SAEb-ai @U8NWXD
+/core/tests/protractor.conf.js @kevintab95 @SAEb-ai @U8NWXD
+/extensions/interactions/*/protractor.js @kevintab95 @U8NWXD
+/extensions/interactions/protractor.js @kevintab95 @U8NWXD
+/extensions/rich_text_components/*/protractor.js @kevintab95 @U8NWXD
+/extensions/rich_text_components/protractor.js @kevintab95 @U8NWXD
+/extensions/objects/protractor.js @kevintab95 @U8NWXD
+/scripts/backend_test_shards.json @U8NWXD
+/.github/actions @SAEb-ai @U8NWXD
 
 
 # Python 3 Migration project.
@@ -692,6 +699,7 @@
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
 /core/templates/services/svg-sanitizer.service.ts @seanlip
 /scripts/linters/warranted_angular_security_bypasses.py @seanlip
+/core/controllers/access_validators*.py @seanlip
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/html*.py @seanlip
@@ -708,4 +716,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @DubeySandeep @krishnarao22 @U8NWXD
+# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
+/.github/workflows/ @DubeySandeep @SAEb-ai @U8NWXD
