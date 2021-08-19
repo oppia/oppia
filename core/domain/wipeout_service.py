@@ -169,10 +169,14 @@ def pre_delete_user(user_id):
         )
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
+        # The user's preference in bulk email db need not be updated with this
+        # call, since the user itself is being deleted in the next function.
         user_services.update_email_preferences(
-            user_id, False, False, False, False)
-        bulk_email_services.permanently_delete_user_from_list(
-            user_settings.email)
+            user_id, False, False, False, False,
+            bulk_email_db_already_updated=True)
+        if feconf.CAN_SEND_EMAILS:
+            bulk_email_services.permanently_delete_user_from_list(
+                user_settings.email)
 
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (
