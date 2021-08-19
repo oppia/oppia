@@ -43,11 +43,13 @@ angular.module('oppia').component('skillPreviewTab', {
   template: require('./skill-preview-tab.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$rootScope', '$scope', 'ContextService', 'QuestionBackendApiService',
-    'QuestionPlayerEngineService', 'SkillEditorStateService', 'UrlService',
+    '$rootScope', '$scope', 'ContextService', 'CurrentInteractionService',
+    'QuestionBackendApiService', 'QuestionPlayerEngineService',
+    'SkillEditorStateService', 'UrlService',
     function(
-        $rootScope, $scope, ContextService, QuestionBackendApiService,
-        QuestionPlayerEngineService, SkillEditorStateService, UrlService) {
+        $rootScope, $scope, ContextService, CurrentInteractionService,
+        QuestionBackendApiService, QuestionPlayerEngineService,
+        SkillEditorStateService, UrlService) {
       var ctrl = this;
       var QUESTION_COUNT = 20;
       const INTERACTION_TYPES = {
@@ -89,6 +91,7 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.directiveSubscriptions.add(
           SkillEditorStateService.onSkillChange.subscribe(
             () => $rootScope.$applyAsync()));
+        CurrentInteractionService.setOnSubmitFn(() => {});
       };
 
       ctrl.initializeQuestionCard = function(card) {
