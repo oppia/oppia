@@ -113,7 +113,24 @@ describe('State card object factory', () => {
         learnerInput: 'learnerInput',
         oppiaResponse: 'response',
         isHint: true
-      }], null, null, null, null);
+      }], RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'filename1.mp3',
+              file_size_bytes: 100000,
+              needs_update: false,
+              duration_secs: 10.0
+            },
+            hi: {
+              filename: 'filename2.mp3',
+              file_size_bytes: 11000,
+              needs_update: false,
+              duration_secs: 0.11
+            }
+          }
+        }
+      }), null, null, null);
   });
 
   it('should be able to get the various fields', () => {
