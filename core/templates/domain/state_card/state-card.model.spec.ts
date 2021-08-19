@@ -107,8 +107,13 @@ describe('State card object factory', () => {
       'content', audioTranslationLanguageService);
 
     _sampleCard2 = new StateCard(
-      'test_name', 'content', 'interaction', null, [],
-      null, null, 'contentId', null);
+      null, null, null,
+      interactionObjectFactory.createFromBackendDict(interactionDict),
+      [{
+        learnerInput: 'learnerInput',
+        oppiaResponse: 'response',
+        isHint: true
+      }], null, null, null, null);
   });
 
   it('should be able to get the various fields', () => {
