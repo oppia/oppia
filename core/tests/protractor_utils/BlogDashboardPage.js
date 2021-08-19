@@ -275,7 +275,7 @@ var BlogDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToBlogPostEditorWithTitleFromList = async function(index) {
+  this.navigateToBlogPostEditorWithTitleFromList = async function(title) {
     for (i = 0; i < await blogPostListItems.count(); i++) {
       var blogPostRow = blogPostListItems.get(i);
       var blogPostTitleContainer = blogPostRow.element(
