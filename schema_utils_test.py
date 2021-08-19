@@ -603,8 +603,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        # The following types have recurive type definition, and currently mypy does
-        # not support it, hence we are using type Any here.
+        # The following types have recurive type definition, and currently mypy
+        # does not support it, hence we are using type Any here.
         # See - https://github.com/python/mypy/issues/731
         valid_schemas: List[Dict[str, Any]] = [{
             'type': 'float'

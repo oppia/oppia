@@ -185,7 +185,7 @@ class BaseHandler(webapp2.RequestHandler):
         # sure to fix all the subclasses using normalized_request.get() method
         # by removing their type: ignore[union-attr] and using a type cast
         # instead to eliminate the possibility on union types.
-        # e.g. ClassroomAccessValidationHandler
+        # e.g. ClassroomAccessValidationHandler.
         self.normalized_request = None
         self.normalized_payload = None
 

@@ -121,7 +121,9 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME) # type: ignore[no-untyped-call]
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME) # type: ignore[no-untyped-call]
 
-    def test_profile_validation_returns_true_if_user_views_other_profile(self) -> None:
+    def test_profile_validation_returns_true_if_user_views_other_profile(
+        self
+    ) -> None:
         # Viewer looks at editor's profile page.
         self.login(self.VIEWER_EMAIL) # type: ignore[no-untyped-call]
         self.get_html_response( # type: ignore[no-untyped-call]
@@ -129,7 +131,9 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME))
         self.logout() # type: ignore[no-untyped-call]
 
-    def test_profile_validation_returns_true_if_user_views_own_profile(self) -> None:
+    def test_profile_validation_returns_true_if_user_views_own_profile(
+        self
+    ) -> None:
         # Editor looks at their own profile page.
         self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
         self.get_html_response( # type: ignore[no-untyped-call]
@@ -137,7 +141,9 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME))
         self.logout() # type: ignore[no-untyped-call]
 
-    def test_profile_validation_returns_false_if_profile_doesnot_exist(self) -> None:
+    def test_profile_validation_returns_false_if_profile_doesnot_exist(
+        self
+    ) -> None:
         # Editor looks at non-existing profile page.
         self.login(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
         self.get_json( # type: ignore[no-untyped-call]
