@@ -28,6 +28,8 @@ class OppiaRootPage(base.BaseHandler):
        with angular router.
     """
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, **kwargs: Dict[str, str]) -> None: # pylint: disable=unused-argument
         """Handles GET requests."""

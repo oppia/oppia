@@ -181,6 +181,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
+        # Once the attribute `normalized_request` is type annotated here, make
+        # sure to fix all the subclasses using normalized_request.get() method
+        # by removing their type: ignore[union-attr] and using a type cast
+        # instead to eliminate the possibility on union types.
+        # e.g. ClassroomAccessValidationHandler
         self.normalized_request = None
         self.normalized_payload = None
 

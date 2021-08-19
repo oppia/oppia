@@ -108,6 +108,8 @@ class InternetConnectivityHandler(base.BaseHandler):
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET requests."""
@@ -119,6 +121,8 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
         """Records errors reported by the frontend."""
@@ -129,6 +133,8 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET warmup requests."""
@@ -138,6 +144,8 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
         self.redirect('/')

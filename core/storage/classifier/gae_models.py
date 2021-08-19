@@ -36,6 +36,11 @@ datastore_services = models.Registry.import_datastore_services()
 
 NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
 
+TRAINING_DATA_UNION_TYPE = Union[
+    Dict[str, Union[int, List[str]]],
+    List[Dict[str, Union[int, List[str]]]]
+]
+
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
@@ -141,9 +146,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str,
             exp_version: int,
             next_scheduled_check_time: datetime.datetime,
-            training_data: Union[
-                Dict[str, Union[int, List[str]]],
-                List[Dict[str, Union[int, List[str]]]]],
+            training_data: TRAINING_DATA_UNION_TYPE,
             state_name: str,
             status: str,
             algorithm_version: int

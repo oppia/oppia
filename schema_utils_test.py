@@ -88,7 +88,8 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 # Note to developers: please keep this in sync with
 #     https://github.com/oppia/oppia/wiki/Schema-Based-Forms
 # The following types have recurive type definition, and currently mypy does
-# not support it. See - https://github.com/python/mypy/issues/731
+# not support it, hence we are using type Any here.
+# See - https://github.com/python/mypy/issues/731
 UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
@@ -127,7 +128,8 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
 
 # Schemas for validators for the various types.
 # The following types have recurive type definition, and currently mypy does
-# not support it. See - https://github.com/python/mypy/issues/731
+# not support it, hence we are using type Any here.
+# See - https://github.com/python/mypy/issues/731
 VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
@@ -214,6 +216,8 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
 }
 
 
+# The type of `validator` is Dict[str, Any] here because its values represent
+# objects for normalization, and they can have any type.
 def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
     """Validates the value of a UI configuration.
 
@@ -234,6 +238,8 @@ def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
             value, reference_dict[key])
 
 
+# The type of `validator` is Dict[str, Any] here because its values represent
+# objects for normalization, and they can have any type.
 def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
     """Validates the value of a 'validator' field.
 
@@ -282,6 +288,9 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
                     set(customization_keys + ['obj']))))
 
 
+# Here the type chosen for `dict_to_check` is Dict[str, Any] because here we are
+# only concerned about the keys of the dictionary, not its values. Using Any for
+# dictionary values helps us achieve that.
 def _validate_dict_keys(
         dict_to_check: Dict[str, Any],
         required_keys: List[str],
@@ -305,6 +314,9 @@ def _validate_dict_keys(
         'Extra keys: %s' % dict_to_check)
 
 
+# The type Dict[str, Any] is used as type for schema because it can have a
+# recursive structure and mypy doesn't support recursive type currently.
+# See: https://github.com/python/mypy/issues/731
 def validate_schema(schema: Dict[str, Any]) -> None:
     """Validates a schema.
 
@@ -438,11 +450,16 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         }]
     }
 
+    # The following types have recurive type definition, and currently mypy does
+    # not support it, hence we are using type Any here.
+    # See - https://github.com/python/mypy/issues/731
     GLOBAL_VALIDATORS: List[Dict[str, Any]] = [{
         'id': 'does_not_contain_email'
     }]
 
-    def arbitary_method(self, obj: Dict[Any, Any]) -> None:
+    # We are only concerned with dictionary keys here and the method should work
+    # regardless of dictionary value type, hence using type Any for it.
+    def arbitary_method(self, obj: Dict[str, Any]) -> None:
         """Only required for testing.
 
         Args:
@@ -586,6 +603,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
         ]
 
+        # The following types have recurive type definition, and currently mypy does
+        # not support it, hence we are using type Any here.
+        # See - https://github.com/python/mypy/issues/731
         valid_schemas: List[Dict[str, Any]] = [{
             'type': 'float'
         }, {
@@ -829,6 +849,13 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
 
+    # `schema` has recursive type definition, and currently mypy does not
+    # support it, hence we are using type Any here.
+    # See - https://github.com/python/mypy/issues/731
+    # `mappings` has type Tuple[Any, Any] because objects for normalization and
+    # normalized objects can have any type.
+    # `invalid_items_with_error_messages` has Any type for first element of the
+    # tuple because it represents object for normalization.
     def check_normalization(
             self,
             schema: Dict[str, Any],
@@ -888,6 +915,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
         }
         mappings = [('a', 'a'), ('', ''), (b'bytes', 'bytes'), (None, None)]
+        # Type Any used because its passed as an argument to check_normalization
+        # method defined above.
         invalid_values_with_error_messages: List[Tuple[List[Any], str]] = [
             ([], r'Expected unicode string or None, received'),
         ]
@@ -1142,6 +1171,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        # Type Any used because its passed as an argument to check_normalization
+        # method defined above.
         invalid_values_with_error_messages: List[Tuple[Any, str]] = []
 
         self.check_normalization(
@@ -1255,7 +1286,9 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             sanitize_url('www.oppia.org')
 
 
-def validation_method_for_testing(obj: Dict[Any, Any]) -> None:
+# We are only concerned with dictionary keys here and the method should work
+# regardless of dictionary value type, hence using type Any for it.
+def validation_method_for_testing(obj: Dict[str, Any]) -> None:
     """Method to test 'validation_method' key of schema.
 
     Args:
@@ -1281,14 +1314,14 @@ class ValidateClassForTesting(python_utils.OBJECT):
         self.arg_b = arg_b
 
     @classmethod
-    def from_dict(cls, obj: Dict[Any, Any]) -> 'ValidateClassForTesting':
+    def from_dict(cls, obj: Dict[str, Any]) -> 'ValidateClassForTesting':
         """Return the ValidateClassForTesting object from a dict.
 
         Args:
             obj: dict. Dictionary representation of the object.
 
         Returns:
-            ValidateClassForTesting. The correcponding test object.
+            ValidateClassForTesting. The corresponding test object.
         """
         return cls(obj['arg_a'], obj['arg_b'])
 
