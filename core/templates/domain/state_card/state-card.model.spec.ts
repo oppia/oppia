@@ -109,7 +109,7 @@ describe('State card object factory', () => {
     _sampleCard2 = new StateCard(
       'test_name', 'content', 'interaction', null, [],
       null, null, 'contentId', null);
-    });
+  });
 
   it('should be able to get the various fields', () => {
     expect(_sampleCard.getStateName()).toEqual('State 1');
