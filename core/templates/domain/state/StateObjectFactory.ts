@@ -182,8 +182,11 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    let defaultOutcome = <Outcome> newState.interaction.defaultOutcome;
-    defaultOutcome.dest = newStateName;
+    let defaultOutcome = null;
+    if (newState.interaction.defaultOutcome !== null) {
+      defaultOutcome = newState.interaction.defaultOutcome;
+      defaultOutcome.dest = newStateName;
+    }
     return newState;
   }
 

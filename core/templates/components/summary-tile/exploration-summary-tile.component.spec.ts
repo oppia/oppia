@@ -375,7 +375,7 @@ describe('Exploration Summary Tile Component', () => {
     expect(urlSpy).toHaveBeenCalled();
   });
 
-  it('should return to the same page if ExplorationId is undefined' +
+  it('should return to the same page if ExplorationId is empty' +
      ' not present', () => {
     component.getExplorationId = '';
     const result = component.getExplorationLink();

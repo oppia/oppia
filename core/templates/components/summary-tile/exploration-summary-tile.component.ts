@@ -78,7 +78,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   contributors!: object;
   // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
   // received after component interactions is empty or does not exist.
-  lastUpdatedDateTime: string | null = '';
+  lastUpdatedDateTime: string | null = null;
   // 'avgRating' will be null if the exploration has no ratings.
   avgRating!: number | null;
   thumbnailIcon!: string;
