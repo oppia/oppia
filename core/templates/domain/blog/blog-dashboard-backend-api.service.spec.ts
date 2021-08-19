@@ -20,22 +20,22 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
-import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 
 describe('Blog Dashboard backend api service', () => {
   let bdbas: BlogDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
-  let successHandler;
-  let failHandler;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
   let blogDashboardBackendResponse = {
     username: 'testUsername',
     profile_picture_data_url: 'image',
     no_of_published_blog_posts: 0,
     no_of_draft_blog_posts: 0,
-    published_blog_post_summary_dicts: [],
-    draft_blog_post_summary_dicts: []
+    published_blog_post_summary_dicts: <BlogPostSummaryBackendDict[]>[],
+    draft_blog_post_summary_dicts: <BlogPostSummaryBackendDict[]>[]
   };
-  let blogPostSummary = {
+  let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
     author_username: 'test_user',
     title: 'sample_title',
@@ -53,8 +53,8 @@ describe('Blog Dashboard backend api service', () => {
     numOfDraftBlogPosts: blogDashboardBackendResponse.no_of_draft_blog_posts,
     numOfPublishedBlogPosts: (
       blogDashboardBackendResponse.no_of_published_blog_posts),
-    publishedBlogPostSummaryDicts: [],
-    draftBlogPostSummaryDicts: [],
+    publishedBlogPostSummaryDicts: <BlogPostSummary[]>[],
+    draftBlogPostSummaryDicts: <BlogPostSummary[]>[],
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
     blogPostSummary);

@@ -32,33 +32,33 @@ import { SolutionValidityService } from 'pages/exploration-editor-page/editor-ta
 import { Subscription } from 'rxjs';
 
 describe('Editor state service', () => {
-  let ecs: StateEditorService = null;
-  let suof: SubtitledUnicodeObjectFactory = null;
-  let sof: SolutionObjectFactory = null;
-  let hof: HintObjectFactory = null;
-  let interactionObjectFactory: InteractionObjectFactory = null;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
-  let outcomeObjectFactory: OutcomeObjectFactory = null;
-  let solutionValidityService: SolutionValidityService = null;
+  let ecs: StateEditorService;
+  let suof: SubtitledUnicodeObjectFactory;
+  let sof: SolutionObjectFactory;
+  let hof: HintObjectFactory;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let answerGroupObjectFactory: AnswerGroupObjectFactory;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let solutionValidityService: SolutionValidityService;
   let mockInteraction: Interaction;
 
-  let stateEditorInitializedSpy = null;
-  let stateEditorDirectiveInitializedSpy = null;
-  let interactionEditorInitializedSpy = null;
-  let showTranslationTabBusyModalSpy = null;
-  let refreshStateTranslationSpy = null;
-  let updateAnswerChoicesSpy = null;
-  let saveOutcomeDestDetailsSpy = null;
-  let handleCustomArgsUpdateSpy = null;
-  let objectFormValidityChangeSpy = null;
-  let testSubscriptions = null;
+  let stateEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
+  let stateEditorDirectiveInitializedSpy: jasmine.Spy<jasmine.Func>;
+  let interactionEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
+  let showTranslationTabBusyModalSpy: jasmine.Spy<jasmine.Func>;
+  let refreshStateTranslationSpy: jasmine.Spy<jasmine.Func>;
+  let updateAnswerChoicesSpy: jasmine.Spy<jasmine.Func>;
+  let saveOutcomeDestDetailsSpy: jasmine.Spy<jasmine.Func>;
+  let handleCustomArgsUpdateSpy: jasmine.Spy<jasmine.Func>;
+  let objectFormValidityChangeSpy: jasmine.Spy<jasmine.Func>;
+  let testSubscriptions: Subscription;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [StateEditorService]
     });
 
-    ecs = TestBed.get(StateEditorService);
+    ecs = TestBed.inject(StateEditorService);
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     hof = TestBed.inject(HintObjectFactory);
@@ -172,10 +172,7 @@ describe('Editor state service', () => {
 
   it('should not allow invalid state names to be set', () => {
     ecs.setActiveStateName('');
-    expect(ecs.getActiveStateName()).toBeNull();
-
-    ecs.setActiveStateName(null);
-    expect(ecs.getActiveStateName()).toBeNull();
+    expect(ecs.getActiveStateName()).toBeUndefined();
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {
@@ -207,7 +204,6 @@ describe('Editor state service', () => {
   it('should correctly set and get linkedSkillId', () => {
     const linkedSkillId = 'skill_id1';
 
-    expect(ecs.getLinkedSkillId()).toEqual(null);
     ecs.setLinkedSkillId(linkedSkillId);
     expect(ecs.getLinkedSkillId()).toEqual(linkedSkillId);
   });
@@ -300,7 +296,7 @@ describe('Editor state service', () => {
           new SubtitledHtml('Choice 2', '')
         ]
       }
-    })).toBe(null);
+    })).toBeNull();
   });
 
   it('should return if exploration is whitelisted or not', () => {
@@ -403,7 +399,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction', () => {
-    expect(ecs.getInteraction()).toEqual(null);
+    expect(ecs.getInteraction()).toBeUndefined();
     ecs.setInteraction(mockInteraction);
     expect(ecs.getInteraction()).toEqual(mockInteraction);
   });

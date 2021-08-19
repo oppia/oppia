@@ -217,11 +217,11 @@ describe('Base Content Component', () => {
     let document = TestBed.inject(DOCUMENT);
     spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError(
-      'Variable mainContentElement is undefined.');
+      'Variable mainContentElement is null.');
   });
 
   it('should show the cookie banner if there is no cookie set', () => {
-    spyOn(cookieService, 'get').and.returnValue(null);
+    spyOn(cookieService, 'get').and.returnValue('');
     expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
   });
 
@@ -254,6 +254,10 @@ describe('Base Content Component', () => {
     componentInstance.acknowledgeCookies();
     expect(cookieService.put).toHaveBeenCalledWith(
       'OPPIA_COOKIES_ACKNOWLEDGED', String(NOW_MILLIS),
-      { expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS) });
+      {
+        expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS),
+        secure: true,
+        sameSite: 'none'
+      });
   });
 });
