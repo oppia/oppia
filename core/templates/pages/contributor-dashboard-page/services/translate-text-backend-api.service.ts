@@ -67,7 +67,7 @@ export class TranslateTextBackendApiService {
     imagesData.forEach(obj => {
       let imageBlob: string | Blob;
       if (obj.imageBlob !== null) {
-        imageBlob = <Blob>obj.imageBlob;
+        imageBlob = obj.imageBlob;
       } else {
         throw new Error('No Image Data Found');
       }
