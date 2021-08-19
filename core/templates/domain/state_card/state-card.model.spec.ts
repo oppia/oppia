@@ -32,6 +32,7 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Voiceover } from 'domain/exploration/voiceover.model';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 
 describe('State card object factory', () => {
@@ -39,8 +40,6 @@ describe('State card object factory', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard: StateCard;
-  let _sampleCard2: StateCard;
-
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -105,32 +104,6 @@ describe('State card object factory', () => {
       }),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
-
-    _sampleCard2 = new StateCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(interactionDict),
-      [{
-        learnerInput: 'learnerInput',
-        oppiaResponse: 'response',
-        isHint: true
-      }], RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content: {
-            en: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100000,
-              needs_update: false,
-              duration_secs: 10.0
-            },
-            hi: {
-              filename: 'filename2.mp3',
-              file_size_bytes: 11000,
-              needs_update: false,
-              duration_secs: 0.11
-            }
-          }
-        }
-      }), null, null, null);
   });
 
   it('should be able to get the various fields', () => {
@@ -230,23 +203,36 @@ describe('State card object factory', () => {
     expect(_sampleCard.getLastOppiaResponse()).toEqual('response_3');
   });
 
-  it('should return last answer when calling ' +
-    '\'getLastAnswer\'', () => {
-    expect(_sampleCard2.getLastAnswer()).toEqual('learnerInput');
+  it('should return null when calling \'getLastAnswer\'' +
+    'if there is no last answer', () => {
+    expect(_sampleCard.getLastAnswer()).toEqual(null);
   });
 
   it('should return empty dict when calling \'getVoiceovers\' ' +
     'if there are no voice overs', () => {
-    expect(_sampleCard2.getVoiceovers()).toEqual({});
+    const expectedResults = {
+      en: new Voiceover('filename1.mp3', 100000, false, 10),
+      hi: new Voiceover('filename2.mp3', 11000, false, 0.11)
+    };
+    expect(_sampleCard.getVoiceovers()).toEqual(expectedResults);
   });
 
   it('should return null when calling \'getInteractionId\' ' +
     'if there are no interactions', () => {
-    expect(_sampleCard2.getInteractionId()).toEqual(null);
+    expect(_sampleCard.getInteractionId()).toEqual('TextInput');
   });
 
-  it('should return null when calling \'getInteractionCustomizationArgs\' ' +
-    'if there are no interactions', () => {
-    expect(_sampleCard2.getInteractionCustomizationArgs()).toEqual(null);
+  it('should return interaction customization arguments when calling ' +
+    '\'getInteractionCustomizationArgs\'', () => {
+    const expectedResults = {
+      rows: {
+        value: 1
+      },
+      placeholder: {
+        value: new SubtitledUnicode(
+          'Type your answer here.', '')
+      }
+    } as InteractionCustomizationArgs;
+    expect(_sampleCard.getInteractionCustomizationArgs()).toEqual(expectedResults);
   });
 });
