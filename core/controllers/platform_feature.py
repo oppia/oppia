@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core import platform_feature_list
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -29,6 +30,38 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
     """The handler for retrieving feature flag values."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'platform_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'browser_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': (
+                        constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES)
+                },
+                'default_value': None
+            },
+            'app_version': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': (
+                            constants.
+                            PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+                        )
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -36,9 +69,9 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
         the given client information.
         """
         context_dict = {
-            'platform_type': self.request.get('platform_type', None),
-            'browser_type': self.request.get('browser_type', None),
-            'app_version': self.request.get('app_version', None),
+            'platform_type': self.normalized_request.get('platform_type'),
+            'browser_type': self.normalized_request.get('browser_type'),
+            'app_version': self.normalized_request.get('app_version'),
         }
         context = (
             platform_feature_services.create_evaluation_context_for_client(
@@ -59,6 +92,10 @@ class PlatformFeatureDummyHandler(base.BaseHandler):
     """Dummy handler for testing e2e feature gating flow."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

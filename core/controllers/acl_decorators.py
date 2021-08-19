@@ -152,10 +152,18 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
-            _redirect_based_on_return_type(
-                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            # This decorator should only be used for JSON handlers, since all
+            # HTML page handlers are expected to be migrated to the Angular
+            # router and access validation for such pages should be done using
+            # the access validation handler endpoint.
+            if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+                raise self.PageNotFoundException
+            else:
+                # As this decorator is not expected to be used with other
+                # handler types, raising an error here.
+                raise Exception(
+                    'does_classroom_exist decorator is only expected to '
+                    'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
