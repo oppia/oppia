@@ -151,7 +151,7 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await publishStoryButton.click();
+    await action.click('Publish Story Button', publishStoryButton);
   };
 
   this.unpublishStory = async function() {
