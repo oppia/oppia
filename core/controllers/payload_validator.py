@@ -142,10 +142,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'OldLibraryRedirectPage',
     'OldNotificationsDashboardRedirectPage',
     'PendingAccountDeletionPage',
-    'PlatformFeatureDummyHandler',
-    'PlatformFeaturesEvaluationHandler',
-    'PracticeSessionsPage',
-    'PracticeSessionsPageDataHandler',
     'PreferenceHandler',
     'PreferencesHandler',
     'PreferencesPage',
@@ -229,20 +225,23 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UsernameCheckHandler',
     'ValidateExplorationsHandler',
     'ValueGeneratorHandler',
-    'VoiceArtistManagementHandler'
+    'VoiceArtistManagementHandler',
+    'OppiaMLVMHandler',
+    # Oppia Root page is the unified entry for page routes to the frontend.
+    # So, it should exempted from schema validation.
+    'OppiaRootPage',
+    'CsrfTokenHandler',
+    'Error404Handler',
+    'FrontendErrorHandler',
+    'WarmupPage',
+    'HomePageRedirectPage',
+    'SplashRedirectPage'
     ]
 
 # These handlers do not require any schema validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'SessionBeginHandler',
     'SessionEndHandler',
-    'OppiaMLVMHandler',
-    'CsrfTokenHandler',
-    'Error404Handler',
-    'FrontendErrorHandler',
-    'WarmupPage',
-    'HomePageRedirectPage',
-    'SplashRedirectPage',
     'SeedFirebaseHandler'
 ]
 

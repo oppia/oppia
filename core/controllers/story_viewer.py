@@ -33,15 +33,6 @@ import feconf
 import utils
 
 
-class StoryPage(base.BaseHandler):
-    """Page describing a single story."""
-
-    @acl_decorators.can_access_story_viewer_page
-    def get(self, _):
-        """Handles GET requests."""
-        self.render_template('story-viewer-page.mainpage.html')
-
-
 class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
