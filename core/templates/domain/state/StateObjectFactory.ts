@@ -42,7 +42,6 @@ import {
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface StateBackendDict {
