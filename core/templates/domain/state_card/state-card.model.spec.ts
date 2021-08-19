@@ -107,7 +107,7 @@ describe('State card object factory', () => {
       'content', audioTranslationLanguageService);
 
     _sampleCard2 = new StateCard(
-      null, null, null,
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
       [{
         learnerInput: 'learnerInput',
