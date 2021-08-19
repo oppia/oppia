@@ -42,7 +42,6 @@
         "core/tests/protractor_desktop/*.js"
       ],
       "excludedFiles": [
-        "BlogDashboardPage.js",
         "ClassroomPage.js",
         "DeleteAccountPage.js",
         "ExplorationEditorHistoryTab.js",

@@ -22,6 +22,7 @@ var waitFor = require('./waitFor.js');
 var forms = require('../protractor_utils/forms.js');
 var workflow = require('../protractor_utils/workflow.js');
 var general = require('../protractor_utils/general.js');
+const { element } = require('protractor');
 
 var BlogDashboardPage = function() {
   var currUserProfilePhoto = element(
@@ -35,10 +36,8 @@ var BlogDashboardPage = function() {
   var deleteBlogPostButton = element(
     by.css('.protractor-test-delete-blog-post-button'));
   var matTabLabels = element.all(by.css('.mat-tab-label'));
-  var draftTab = matTabLabels.get(0);
-  var publishTab = matTabLabels.get(1);
-  var blogPostEditOptions = element.all(
-    by.css('.protractor-test-blog-post-edit-box'));
+  var blogPostEditOptions = by.css(
+    '.protractor-test-blog-post-edit-box');
   var blogPostContentEditor = element(
     by.css('.protractor-test-content-editor'));
   var blogPostTitleFieldElement = element(
@@ -89,9 +88,14 @@ var BlogDashboardPage = function() {
     by.css('.protractor-test-blog-card-preview-button'));
   var blogDashboardLink = element(by.css(
     '.protractor-test-blog-dashboard-link'));
+  var blogPostTiles = element.all(by.css(
+    '.protractor-test-blog-dashboard-tile'));
+  var blogPostTileTitle = by.css(
+    '.protractor-test-blog-post-title');
+  var navigateToBlogDashboardButton = element(
+    by.css('.protractor-test-back-button'));
 
   this.get = async function() {
-    await browser.get('/');
     await waitFor.pageToFullyLoad();
     await general.openProfileDropdown();
     await action.click(
@@ -101,7 +105,8 @@ var BlogDashboardPage = function() {
   };
 
   this.navigateToBlogDashboardPage = async function() {
-    await browser.get('/blog-dashboard');
+    await action.click(
+      'Navigate back to blog dashboard button', navigateToBlogDashboardButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -188,20 +193,36 @@ var BlogDashboardPage = function() {
   };
 
   this.selectTags = async function(tags) {
-    for (let i = 0; i < tags.length; i++) {
-      await action.click(
-        'select blog post tag', blogPostTags.get(tags[i]));
+    for (i = 0; i < await blogPostTags.count(); i++) {
+      var tag = blogPostTags.get(i);
+      var tagName = await action.getText(
+        `Blog Post Editor tag ${i}`, tag);
+      if (tags.includes(tagName)) {
+        await action.click(
+          'select blog post tag', tag);
+      }
+    }
+  };
+
+  this.getMatTab = async function(tabName) {
+    for (i = 0; i < await matTabLabels.count(); i++) {
+      var matTab = matTabLabels.get(i);
+      var tabText = await action.getText(
+        `Blog Dashboard tab ${i}`, matTab);
+      if (tabText.startsWith(tabName)) {
+        await action.click(`${tabName} tab`, matTab);
+      }
     }
   };
 
   this.navigateToPublishTab = async function() {
     await waitFor.pageToFullyLoad();
-    await action.click('Publish Tab', publishTab);
+    await this.getMatTab('PUBLISHED');
   };
 
   this.navigateToDraftsTab = async function() {
     await waitFor.pageToFullyLoad();
-    await action.click('Draft Tab', draftTab);
+    await this.getMatTab('DRAFTS');
   };
 
   this.expectNumberOfDraftBlogPostsToBe = async function(number) {
@@ -228,19 +249,44 @@ var BlogDashboardPage = function() {
     expect(await blogPostListItems.count()).toBe(number);
   };
 
-  this.navigateToBlogPostEditorWithIndexFromList = async function(index) {
-    await action.click('blog post row', blogPostListItems.get(index));
-    await waitFor.pageToFullyLoad();
+  this.getBlogPostTileEditOption = async function(title) {
+    for (i = 0; i < await blogPostTiles.count(); i++) {
+      var blogPostTile = blogPostTiles.get(i);
+      var blogPostTitleContainer = blogPostTile.element(
+        blogPostTileTitle);
+      var blogPostTitle = await action.getText(
+        `Blog Post Tile Title ${i}`, blogPostTitleContainer);
+      if (blogPostTitle === title) {
+        var blogPostEditOptionButton = blogPostTile.element(
+          blogPostEditOptions);
+        return blogPostEditOptionButton;
+      }
+    }
   };
 
-  this.deleteBlogPostWithIndex = async function(index) {
+  this.deleteBlogPostWithTitle = async function(title) {
+    var blogPostEditOptionButton = await this.getBlogPostTileEditOption(title);
     await action.click(
-      'Blog post edit option', blogPostEditOptions.get(index));
+      'Blog post edit option', blogPostEditOptionButton);
     await action.click('Delete blog post button', deleteBlogPostButton);
     await action.click(
       'Confirm Delete Blog Post button', confirmButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Deleted Successfully.');
     await waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToBlogPostEditorWithTitleFromList = async function(index) {
+    for (i = 0; i < await blogPostListItems.count(); i++) {
+      var blogPostRow = blogPostListItems.get(i);
+      var blogPostTitleContainer = blogPostRow.element(
+        blogPostTileTitle);
+      var blogPostTitle = await action.getText(
+        `Blog Post Tile Title ${i}`, blogPostTitleContainer);
+      if (blogPostTitle === title) {
+        await action.click('blog post row', blogPostRow);
+        await waitFor.pageToFullyLoad();
+      }
+    }
   };
 
   this.deleteBlogPostFromEditor = async function() {
@@ -251,19 +297,20 @@ var BlogDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.unpublishBlogPostWithIndex = async function(index) {
-    await this.waitForPublishedBlogPostsToLoad();
+  this.unpublishBlogPostWithTitle = async function(title) {
+    var blogPostEditOptionButton = await this.getBlogPostTileEditOption(title);
     await action.click(
-      'Blog post edit option', blogPostEditOptions.get(index));
+      'Blog post edit option', blogPostEditOptionButton);
     await action.click('Unpublish blog post button', unpublishBlogPostButton);
     await action.click(
       'Confirm unpublishing Blog Post button', confirmButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToBlogPostEditorWithIndex = async function(index) {
+  this.navigateToBlogPostEditorWithTitle = async function(title) {
+    var blogPostEditOptionButton = await this.getBlogPostTileEditOption(title);
     await action.click(
-      'Blog post edit option', blogPostEditOptions.get(index));
+      'Blog post edit option', blogPostEditOptionButton);
     await action.click(
       'Edit blog post button', editBlogPostButton);
     await waitFor.pageToFullyLoad();

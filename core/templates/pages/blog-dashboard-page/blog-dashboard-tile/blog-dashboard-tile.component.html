@@ -1,4 +1,4 @@
-<mat-card class="blog-dashboard-tile" *ngIf="activeView === 'gridView'">
+<mat-card class="blog-dashboard-tile protractor-test-blog-dashboard-tile" *ngIf="activeView === 'gridView'">
   <div class="blog-dashboard-tile-content">
     <mat-card-content>
       <div class="blog-dashboard-tile-header">
@@ -41,12 +41,12 @@
     </mat-card-content>
   </div>
 </mat-card>
-<div class="d-flex row flex-grow-1 justify-content-between align-items-baseline" *ngIf="activeView === 'listView'">
-  <div class="d-flex row ml-1 align-items-baseline" (click)="editBlogPost()">
-    <span class="blog-dashboard-tile-title mr-5" *ngIf="blogPostSummary.title !== ''">
+<div class="d-flex row flex-grow-1 justify-content-between align-items-baseline" (click)="editBlogPost()" *ngIf="activeView === 'listView'">
+  <div class="d-flex row ml-1 align-items-baseline">
+    <span class="blog-dashboard-tile-title protractor-test-blog-post-title mr-5" *ngIf="blogPostSummary.title !== ''">
       {{ blogPostSummary.title }}
     </span>
-    <span class="blog-dashboard-tile-title mr-5" *ngIf="blogPostSummary.title === ''">
+    <span class="blog-dashboard-tile-title protractor-test-blog-post-title mr-5" *ngIf="blogPostSummary.title === ''">
       {{ 'I18N_BLOG_POST_UNTITLED_HEADING' | translate }}
     </span>
     <p class="blog-post-summary truncated-text">

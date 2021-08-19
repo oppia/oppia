@@ -142,8 +142,11 @@ export class BlogPostEditorComponent implements OnInit {
               this.blogDashboardPageService.imageUploaderIsNarrow = true;
             }
           }
-          if (this.blogPostData.lastUpdated !== this.blogPostData.publishedOn) {
-            this.lastChangesWerePublished = false;
+          if (this.blogPostData.publishedOn) {
+            if (this.blogPostData.lastUpdated.slice(0, -8) !== (
+              this.blogPostData.publishedOn.slice(0, -8))) {
+              this.lastChangesWerePublished = false;
+            }
           }
           this.blogDashboardPageService.setNavTitle(
             this.lastChangesWerePublished, this.title);
