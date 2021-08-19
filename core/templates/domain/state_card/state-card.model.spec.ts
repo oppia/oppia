@@ -208,8 +208,8 @@ describe('State card object factory', () => {
     expect(_sampleCard.getLastAnswer()).toEqual(null);
   });
 
-  it('should return empty dict when calling \'getVoiceovers\' ' +
-    'if there are no voice overs', () => {
+  it('should return voiceovers when calling ' +
+    '\'getVoiceovers\'', () => {
     const expectedResults = {
       en: new Voiceover('filename1.mp3', 100000, false, 10),
       hi: new Voiceover('filename2.mp3', 11000, false, 0.11)
@@ -217,8 +217,8 @@ describe('State card object factory', () => {
     expect(_sampleCard.getVoiceovers()).toEqual(expectedResults);
   });
 
-  it('should return null when calling \'getInteractionId\' ' +
-    'if there are no interactions', () => {
+  it('should return current interaction id when calling ' +
+    '\'getInteractionId\'', () => {
     expect(_sampleCard.getInteractionId()).toEqual('TextInput');
   });
 
@@ -233,6 +233,7 @@ describe('State card object factory', () => {
           'Type your answer here.', '')
       }
     } as InteractionCustomizationArgs;
-    expect(_sampleCard.getInteractionCustomizationArgs()).toEqual(expectedResults);
+    expect(_sampleCard.getInteractionCustomizationArgs())
+      .toEqual(expectedResults);
   });
 });
