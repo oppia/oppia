@@ -101,22 +101,6 @@ class OldLibraryRedirectPage(base.BaseHandler):
         self.redirect(feconf.LIBRARY_INDEX_URL, permanent=True)
 
 
-class LibraryPage(base.BaseHandler):
-    """The main library page. Used for both the default list of categories and
-    for search results.
-    """
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('library-page.mainpage.html')
-
-
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
@@ -173,22 +157,6 @@ class LibraryIndexHandler(base.BaseHandler):
             'preferred_language_codes': preferred_language_codes,
         })
         self.render_json(self.values)
-
-
-class LibraryGroupPage(base.BaseHandler):
-    """The page for displaying top rated and recently published
-    explorations.
-    """
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('library-page.mainpage.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):

@@ -28,6 +28,24 @@ module.exports = {
     'assert': {
       'assertMatrix': [
         baseConfig['basePerformanceAssertMatrix'],
+        // Signup page redirects logged in user to learner dashboard page.
+        // So, need to keep these two pages in same shard.
+        {
+          'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            // We need to use passive event listeners on this page so that
+            // the page works correctly.
+            'uses-passive-event-listeners': ['error', {'minScore': 0}],
+            // Sign up redirects logged in user to learner dashboard page.
+            // Learner dashboard Page cannot be preloaded.
+            'uses-rel-preload': ['error', {'minScore': 0}],
+            'deprecations': ['error', {'minScore': 1}],
+            'redirects': ['error', {'minScore': 0}]
+          }
+        },
         {
           'matchingUrlPattern': 'http://[^/]+/preferences$',
           'assertions': baseConfig['basePerformanceAssertions']

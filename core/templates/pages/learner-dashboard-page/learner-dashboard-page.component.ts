@@ -130,6 +130,8 @@ export class LearnerDashboardPageComponent implements OnInit {
   threadId: string;
   messageSummaries: FeedbackMessageSummary[];
   threadSummary: FeedbackThreadSummary;
+  communityLibraryUrl = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
