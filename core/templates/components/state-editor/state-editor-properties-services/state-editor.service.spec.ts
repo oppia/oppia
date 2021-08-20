@@ -553,4 +553,14 @@ describe('Editor state service', () => {
     ecs.deleteCurrentSolutionValidity();
     expect(ecs.isCurrentSolutionValid()).toBeFalse();
   });
+
+  it('should throw error on deletion of current solution validity' +
+     ' if activeStateName is null', () => {
+    ecs.activeStateName = null;
+    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+    expect(() => {
+      ecs.deleteCurrentSolutionValidity();
+    }).toThrowError('Active State for this solution is not set');
+    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+  });
 });

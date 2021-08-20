@@ -303,10 +303,10 @@ export class StateEditorService {
   }
 
   isCurrentSolutionValid(): boolean {
-    if (this.activeStateName) {
-      return this.solutionValidityService.isSolutionValid(this.activeStateName);
+    if (this.activeStateName === null) {
+      return false;
     }
-    return false;
+    return this.solutionValidityService.isSolutionValid(this.activeStateName);
   }
 
   deleteCurrentSolutionValidity(): void {

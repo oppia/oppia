@@ -91,8 +91,6 @@ export class TextInputValidationService {
               maxRows + '.')
           });
         }
-      } else {
-        throw new Error('Invalid customization args for TextInput');
       }
     } else {
       warningsList.push({
