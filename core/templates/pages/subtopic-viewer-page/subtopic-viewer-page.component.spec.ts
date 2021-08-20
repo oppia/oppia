@@ -29,8 +29,9 @@ import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-fdescribe('Subtopic viewer page', function() {
+describe('Subtopic viewer page', function() {
   let component: SubtopicViewerPageComponent;
   let fixture: ComponentFixture<SubtopicViewerPageComponent>;
   let pageTitleService: PageTitleService;
@@ -38,6 +39,8 @@ fdescribe('Subtopic viewer page', function() {
   let alertsService: AlertsService;
   let windowDimensionsService: WindowDimensionsService;
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
+  let urlService: UrlService;
+  let loaderService: LoaderService;
 
   let topicName = 'Topic Name';
   let topicId = '1';
@@ -69,6 +72,9 @@ fdescribe('Subtopic viewer page', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
       declarations: [
         SubtopicViewerPageComponent,
         MockTranslatePipe
@@ -95,6 +101,8 @@ fdescribe('Subtopic viewer page', function() {
     alertsService = TestBed.inject(AlertsService);
     subtopicViewerBackendApiService = TestBed.inject(
       SubtopicViewerBackendApiService);
+    urlService = TestBed.inject(UrlService);
+    loaderService = TestBed.inject(LoaderService);
   });
 
   it('should succesfully get subtopic data and set context', fakeAsync(() => {
@@ -102,25 +110,34 @@ fdescribe('Subtopic viewer page', function() {
     spyOn(pageTitleService, 'updateMetaTag');
     spyOn(contextService, 'setCustomEntityContext');
     spyOn(contextService, 'removeCustomEntityContext');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic-url');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom-url');
+    spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'subtopic-url');
+    spyOn(loaderService, 'showLoadingScreen');
 
     expect(component.nextSubtopicSummaryIsShown).toBe(false);
+    spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
+      .and.returnValue(Promise.resolve(subtopicDataObject));
 
     component.ngOnInit();
     tick();
 
-    expect(component.pageContents.getHtml()).toBe('This is a html');
-    expect(component.subtopicTitle).toBe(subtopicTitle);
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-      `Review ${subtopicTitle} | Oppia`);
-    expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
-      `Review the skill of ${subtopicTitle.toLowerCase()}.`);
-    expect(contextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'topic', topicId);
-
-    expect(component.parentTopicId).toBe(topicId);
+    expect(component.pageContents).toEqual(
+      subtopicDataObject.getPageContents());
+    expect(component.subtopicTitle).toEqual(
+      subtopicDataObject.getSubtopicTitle());
+    expect(component.parentTopicId).toEqual(
+      subtopicDataObject.getParentTopicId());
     expect(component.nextSubtopic).toEqual(
       subtopicDataObject.getNextSubtopic());
-    expect(component.nextSubtopicSummaryIsShown).toBe(true);
+    expect(component.nextSubtopicSummaryIsShown).toBeTrue();
+
+    expect(contextService.setCustomEntityContext).toHaveBeenCalled();
+    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.updateMetaTag).toHaveBeenCalled();
 
     component.ngOnDestroy();
     expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
@@ -129,20 +146,22 @@ fdescribe('Subtopic viewer page', function() {
   it(
     'should use reject handler when fetching subtopic data fails',
     fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic-url');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('classroom-url');
+      spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'subtopic-url');
+      spyOn(loaderService, 'showLoadingScreen');
       spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
         .returnValue(Promise.reject({
           status: 404
         }));
-      spyOn(alertsService, 'addWarning').and.callThrough();
-
-      expect(component.nextSubtopicSummaryIsShown).toBe(false);
-
+      spyOn(alertsService, 'addWarning');
       component.ngOnInit();
       tick();
-
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get subtopic data');
-      expect(component.nextSubtopicSummaryIsShown).toBe(false);
     }));
 
   it('should check if the view is mobile or not', function() {
