@@ -27,6 +27,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let contributionAndReviewService = null;
   let AlertsService = null;
   let userService = null;
+  let languageUtilService = null;
   let userInfoSpy = null;
   let contributionRightsDataSpy = null;
 
@@ -88,6 +89,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
       userService = $injector.get('UserService');
+      languageUtilService = $injector.get('LanguageUtilService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
@@ -102,6 +104,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
           can_review_translation_for_language_codes: () => 'hi',
           getUsername: () => 'admin-1'
         }));
+      spyOn(
+        languageUtilService, 'getAudioLanguageDescription')
+        .and.returnValue('audio_language_description');
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
         $scope: $scope,

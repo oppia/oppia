@@ -172,7 +172,7 @@ describe('Editor state service', () => {
 
   it('should not allow invalid state names to be set', () => {
     ecs.setActiveStateName('');
-    expect(ecs.getActiveStateName()).toBeUndefined();
+    expect(ecs.getActiveStateName()).toBeNull();
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {

@@ -182,8 +182,7 @@ export class StateObjectFactory {
       next_content_id_index: newStateTemplate.next_content_id_index
     });
     if (newState.interaction.defaultOutcome !== null) {
-      let defaultOutcome = null;
-      defaultOutcome = newState.interaction.defaultOutcome;
+      let defaultOutcome = newState.interaction.defaultOutcome;
       defaultOutcome.dest = newStateName;
     }
     return newState;
