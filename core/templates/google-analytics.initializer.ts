@@ -18,10 +18,9 @@
 
 import constants from 'assets/constants';
 
-export function intializeGoogleAnalytics() {
+export function initializeGoogleAnalytics() {
   if (constants.ANALYTICS_SANDBOX_MODE) {
-    // Assign a mock gtag library to window object. So, calls to library
-    // doesnot change throughout the application.
+    // Mock gtag function will prevent sending analytics to google in sandbox mode.
     window.gtag = function() {}
     return;
   }

@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { intializeGoogleAnalytics } from 'google-analytics.initializer';
+import { initializeGoogleAnalytics } from 'google-analytics.initializer';
 
 // Service for sending events to Google Analytics.
 
@@ -33,9 +33,9 @@ export class SiteAnalyticsService {
 
   constructor(private windowRef: WindowRef) {
     if (!SiteAnalyticsService.googleAnalyticsAreInitialized) {
-      // This make sure that gtag is intialized whenever dev
-      // tries to send analytics.
-      intializeGoogleAnalytics();
+      // This make sure that google analytics are initialized whenever this
+      // service is used.
+      initializeGoogleAnalytics();
       SiteAnalyticsService.googleAnalyticsAreInitialized = true;
     }
   }
