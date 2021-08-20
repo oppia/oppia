@@ -36,11 +36,16 @@ describe('Translation Suggestion Review Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     contributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
+    languageUtilService = $injector.get('LanguageUtilService');
+
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     AlertsService = $injector.get('AlertsService');
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview');
+    spyOn(
+      languageUtilService, 'getAudioLanguageDescription')
+      .and.returnValue('audio_language_description');
   }));
 
   describe('when reviewing suggestion', function() {
@@ -89,7 +94,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
       userService = $injector.get('UserService');
-      languageUtilService = $injector.get('LanguageUtilService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
@@ -104,9 +108,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
           can_review_translation_for_language_codes: () => 'hi',
           getUsername: () => 'admin-1'
         }));
-      spyOn(
-        languageUtilService, 'getAudioLanguageDescription')
-        .and.returnValue('audio_language_description');
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
         $scope: $scope,
