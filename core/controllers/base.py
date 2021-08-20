@@ -397,9 +397,11 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
+        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
             payload_validator.validate(
-                handler_args, schema_for_request_method, extra_args_are_allowed)
+                handler_args, schema_for_request_method, extra_args_are_allowed,
+                allow_string_to_bool_conversion)
         )
 
         self.normalized_payload = {

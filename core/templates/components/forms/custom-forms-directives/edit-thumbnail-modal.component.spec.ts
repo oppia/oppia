@@ -49,13 +49,13 @@ describe('Edit Thumbnail Modal Component', () => {
 
   class MockReaderObject {
     result = null;
-    onload = null;
+    onload: () => string;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL(file: File) {
       this.onload();
       return 'The file is loaded';
     }
@@ -63,19 +63,19 @@ describe('Edit Thumbnail Modal Component', () => {
 
   class MockImageObject {
     source = null;
-    onload = null;
+    onload: () => string;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url) {
+    set src(url: string) {
       this.onload();
     }
   }
 
   let mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
+    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri: string) => {
       return { tags: ['script'], attrs: [] };
     },
   };
