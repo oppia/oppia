@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
 import os
 import re
 import sys
@@ -32,14 +33,15 @@ from .. import concurrent_task_utils
 _PATHS_TO_INSERT = [
     common.PYLINT_PATH,
     common.PYCODESTYLE_PATH,
-    common.PYLINT_QUOTES_PATH
+    common.PYLINT_QUOTES_PATH,
+    common.ISORT_PATH,
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(1, path)
 
 from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-import isort  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
@@ -103,7 +105,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         _batch_size = 50
         current_batch_start_index = 0
-        stdout = python_utils.string_io()
+        stdout = io.StringIO()
 
         while current_batch_start_index < len(files_to_lint):
             # Note that this index is an exclusive upper bound -- i.e.,
@@ -118,7 +120,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 reporter=text.TextReporter(pylint_report),
-                exit=False).linter
+                exit=False
+            ).linter
 
             if pylinter.msg_status != 0:
                 lint_message = pylint_report.getvalue()
@@ -223,12 +226,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 # This line prints the error message along with file path
-                # and returns True if it finds an error else returns False
-                # If check is set to True, isort simply checks the file and
-                # if check is set to False, it autocorrects import-order errors.
-                if (isort.SortImports(
-                        filepath, check=True, show_diff=(
-                            True)).incorrectly_sorted):
+                # and returns True if it finds an error else returns False.
+                if not isort.api.check_file(filepath, show_diff=True):
                     failed = True
 
             if failed:

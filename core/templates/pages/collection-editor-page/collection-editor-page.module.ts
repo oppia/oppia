@@ -33,13 +33,21 @@ import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/set
 import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CollectionDetailsEditorComponent } from './settings-tab/collection-details-editor.component';
+import { CollectionPermissionsCardComponent } from './settings-tab/collection-permissions-card.component';
+import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-editor-navbar-breadcrumb.component';
+import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
+import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CollectionNodeCreatorComponent,
@@ -83,11 +91,6 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { CollectionDetailsEditorComponent } from './settings-tab/collection-details-editor.component';
-import { CollectionPermissionsCardComponent } from './settings-tab/collection-permissions-card.component';
-import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-editor-navbar-breadcrumb.component';
-import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
-import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

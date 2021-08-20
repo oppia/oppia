@@ -30,8 +30,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
@@ -46,17 +44,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent
   ],
   entryComponents: [
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
@@ -83,6 +80,8 @@ class TopicViewerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

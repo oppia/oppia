@@ -19,10 +19,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '2.x'
+          python-version: '3.7'
           architecture: 'x64'
-      - name: Setup python by installing wheel
-        run: pip install wheel==0.35.0
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.

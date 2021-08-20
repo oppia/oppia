@@ -47,7 +47,7 @@ require('domain/question/question-update.service.ts');
 require('domain/state/StateObjectFactory.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 
 describe('Question update service', function() {
   var QuestionUpdateService = null;
@@ -254,5 +254,22 @@ describe('Question update service', function() {
     expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
     QuestionUndoRedoService.undoChange(sampleQuestion);
     expect(sampleQuestion.getStateData()).toEqual(oldStateData);
+  });
+
+  it('should set question inapplicable skills misconception ids when ' +
+    'calling \'setQuestionInapplicableSkillMisconceptionIds\'', function() {
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toBe(undefined);
+
+    QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
+      sampleQuestion, ['id1']);
+
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toEqual(['id1']);
+
+    QuestionUndoRedoService.undoChange(sampleQuestion);
+
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toBe(undefined);
   });
 });
