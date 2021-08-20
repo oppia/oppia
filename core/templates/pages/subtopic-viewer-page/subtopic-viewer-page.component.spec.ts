@@ -16,21 +16,21 @@
  * @fileoverview Unit tests for subtopic viewer page component.
  */
 
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 
 import { PageTitleService } from 'services/page-title.service';
 import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import { SubtopicViewerPageComponent } from './subtopic-viewer-page.component';
-import { Injectable, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { LoaderService } from 'services/loader.service';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-
-describe('Subtopic viewer page', function() {
+fdescribe('Subtopic viewer page', function() {
   let component: SubtopicViewerPageComponent;
   let fixture: ComponentFixture<SubtopicViewerPageComponent>;
   let pageTitleService: PageTitleService;
@@ -40,7 +40,6 @@ describe('Subtopic viewer page', function() {
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
 
   let topicName = 'Topic Name';
-  let abbreviatedTopicName = 'abbrev';
   let topicId = '1';
   let subtopicTitle = 'Subtopic Title';
   let subtopicUrlFragment = 'subtopic-title';
@@ -68,106 +67,26 @@ describe('Subtopic viewer page', function() {
       }
     }));
 
-  @Pipe({name: 'translate'})
-  class MockTranslatePipe {
-    transform(value: string, params: Object | undefined): string {
-      return value;
-    }
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockAlertsService {
-    addWarning(message: string): void {}
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockContextService {
-    hideLoadingScreen(): void {}
-    setCustomEntityContext(entityType: string, entityId: string): void {}
-    removeCustomEntityContext(): void {}
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockLoaderService {
-    showLoadingScreen(message: string): void {}
-    hideLoadingScreen(): void {}
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockPageTitleService {
-    updateMetaTag(message: string): void {}
-    setPageTitle(message: string): void {}
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockSubtopicViewerBackendApiService {
-    fetchSubtopicDataAsync(
-        topicUrlFragment: string,
-        classroomUrlFragment: string,
-        subtopicUrlFragment: string): Promise<ReadOnlySubtopicPageData> {
-      return new Promise<ReadOnlySubtopicPageData>((resolve, reject) => {
-        resolve(subtopicDataObject);
-      });
-    }
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockUrlService {
-    getTopicUrlFragmentFromLearnerUrl(): string {
-      return abbreviatedTopicName;
-    }
-
-    getClassroomUrlFragmentFromLearnerUrl(): string {
-      return 'math';
-    }
-
-    getSubtopicUrlFragmentFromLearnerUrl(): string {
-      return subtopicUrlFragment;
-    }
-  }
-
-  @Injectable({providedIn: 'root'})
-  class MockWindowDimensionsService {
-    getWidth(): number {
-      return 100;
-    }
-  }
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SubtopicViewerPageComponent, MockTranslatePipe],
+      declarations: [
+        SubtopicViewerPageComponent,
+        MockTranslatePipe
+      ],
       providers: [
-        {
-          provide: AlertsService,
-          useClass: MockAlertsService
-        },
-        {
-          provide: ContextService,
-          useClass: MockContextService
-        },
-        {
-          provide: LoaderService,
-          useClass: MockLoaderService
-        },
-        {
-          provide: PageTitleService,
-          useClass: MockPageTitleService
-        },
-        {
-          provide: SubtopicViewerBackendApiService,
-          useClass: MockSubtopicViewerBackendApiService
-        },
-        {
-          provide: UrlService,
-          useClass: MockUrlService
-        },
-        {
-          provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+        AlertsService,
+        ContextService,
+        LoaderService,
+        PageTitleService,
+        SubtopicViewerBackendApiService,
+        UrlService,
+        WindowDimensionsService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+  }));
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(SubtopicViewerPageComponent);
     component = fixture.componentInstance;
     pageTitleService = TestBed.inject(PageTitleService);
@@ -176,18 +95,18 @@ describe('Subtopic viewer page', function() {
     alertsService = TestBed.inject(AlertsService);
     subtopicViewerBackendApiService = TestBed.inject(
       SubtopicViewerBackendApiService);
-  }));
+  });
 
   it('should succesfully get subtopic data and set context', fakeAsync(() => {
-    spyOn(pageTitleService, 'setPageTitle').and.callThrough();
-    spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
-    spyOn(contextService, 'setCustomEntityContext').and.callThrough();
-    spyOn(contextService, 'removeCustomEntityContext').and.callThrough();
+    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'updateMetaTag');
+    spyOn(contextService, 'setCustomEntityContext');
+    spyOn(contextService, 'removeCustomEntityContext');
 
     expect(component.nextSubtopicSummaryIsShown).toBe(false);
 
     component.ngOnInit();
-    flushMicrotasks();
+    tick();
 
     expect(component.pageContents.getHtml()).toBe('This is a html');
     expect(component.subtopicTitle).toBe(subtopicTitle);
@@ -211,16 +130,15 @@ describe('Subtopic viewer page', function() {
     'should use reject handler when fetching subtopic data fails',
     fakeAsync(() => {
       spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
-        .returnValue(
-          new Promise((resolve, reject) => reject({
-            status: 404
-          })));
+        .returnValue(Promise.reject({
+          status: 404
+        }));
       spyOn(alertsService, 'addWarning').and.callThrough();
 
       expect(component.nextSubtopicSummaryIsShown).toBe(false);
 
       component.ngOnInit();
-      flushMicrotasks();
+      tick();
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get subtopic data');
