@@ -17,6 +17,7 @@
  * in Protractor tests.
  */
 
+const { element } = require('protractor');
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 var forms = require('../protractor_utils/forms.js');
