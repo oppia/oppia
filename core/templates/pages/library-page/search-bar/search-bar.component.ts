@@ -47,6 +47,9 @@ interface LanguageIdAndText {
   templateUrl: './search-bar.component.html'
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   searchBarPlaceholder!: string;
   categoryButtonText!: string;
   languageButtonText!: string;
@@ -85,7 +88,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   searchToBeExec(e: {target: {value: string}}): void {
     if (this.classroomPageIsActive) {
-      throw new Error('Could not find target value');
+      return;
     } else {
       this.searchQueryChanged.next(e.target.value);
     }

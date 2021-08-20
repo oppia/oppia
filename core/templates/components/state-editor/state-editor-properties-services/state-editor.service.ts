@@ -310,9 +310,10 @@ export class StateEditorService {
   }
 
   deleteCurrentSolutionValidity(): void {
-    if (this.activeStateName) {
-      this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
+    if (this.activeStateName === null) {
+      throw new Error('Active State for this solution is not set');
     }
+    this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
   get onStateEditorInitialized(): EventEmitter<State> {
