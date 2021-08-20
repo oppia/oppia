@@ -47,9 +47,7 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         response = self.get_html_response('/learn/math')
-        self.assertIn(
-            '<oppia-classroom-page-root></oppia-classroom-page-root>',
-            response)
+        self.assertIn('<oppia-root></oppia-root>', response)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):

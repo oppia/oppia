@@ -18,7 +18,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlService } from 'services/contextual/url.service';
 
@@ -36,7 +35,3 @@ export class ProfilePageNavbarComponent implements OnInit {
     this.username = this.urlService.getUsernameFromProfileUrl();
   }
 }
-
-angular.module('oppia').directive(
-  'profilePageNavbar', downgradeComponent(
-    {component: ProfilePageNavbarComponent}));

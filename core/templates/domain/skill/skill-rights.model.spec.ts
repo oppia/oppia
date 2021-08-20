@@ -20,28 +20,26 @@ import { SkillRights } from
   'domain/skill/skill-rights.model';
 
 describe('Skill rights model', () => {
-  it('should create an interstitial skill rights object', () => {
-    var interstitialSkillRights =
-      SkillRights.createInterstitialSkillRights();
-
-    expect(interstitialSkillRights.getSkillId()).toEqual(null);
-    expect(interstitialSkillRights.canEditSkillDescription()).toBe(false);
-  });
-
   it('should make a copy from another skill rights object', () => {
-    var sampleSkillRightsObject = {
+    const sampleSkillRightsObject1 = {
       skill_id: '1',
       can_edit_skill_description: true
     };
 
-    var sampleSkillRights = SkillRights.createFromBackendDict(
-      sampleSkillRightsObject);
+    const sampleSkillRightsObject2 = {
+      skill_id: '2',
+      can_edit_skill_description: false
+    };
 
-    var interstitialSkillRights =
-      SkillRights.createInterstitialSkillRights();
 
-    interstitialSkillRights.copyFromSkillRights(sampleSkillRights);
-    expect(interstitialSkillRights.getSkillId()).toEqual('1');
-    expect(interstitialSkillRights.canEditSkillDescription()).toBe(true);
+    const sampleSkillRights1 = SkillRights.createFromBackendDict(
+      sampleSkillRightsObject1);
+
+    const sampleSkillRights2 = SkillRights.createFromBackendDict(
+      sampleSkillRightsObject2);
+
+    sampleSkillRights2.copyFromSkillRights(sampleSkillRights1);
+    expect(sampleSkillRights2.getSkillId()).toEqual('1');
+    expect(sampleSkillRights2.canEditSkillDescription()).toBe(true);
   });
 });
