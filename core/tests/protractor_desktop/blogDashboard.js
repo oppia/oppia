@@ -40,6 +40,7 @@ describe('Blog dashboard functionality', function() {
   ' create, edit and delete a blog post from blog dashboard', async function() {
     await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
     await blogDashboardPage.expectCurrUsernameToBeVisible();
+    await blogDashboardPage.blogDashboardIntroMessageIsVisible();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
@@ -55,7 +56,7 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.navigateToBlogDashboardPage();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(1);
     await blogDashboardPage.deleteBlogPostWithTitle('Sample blog Title');
-    await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(0);
+    await blogDashboardPage.blogDashboardIntroMessageIsVisible();
   });
 
   it('should create, publish, and delete the published blog post from' +
@@ -72,7 +73,7 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.navigateToPublishTab();
     await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
     await blogDashboardPage.deleteBlogPostWithTitle('Sample blog post Title');
-    await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
+    await blogDashboardPage.blogDashboardIntroMessageIsVisible();
   });
 
   it('should create, publish, check for thumbnail uploading error,' +
@@ -102,7 +103,7 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.navigateToDraftsTab();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(1);
     await blogDashboardPage.deleteBlogPostWithTitle('Sample Blog Post');
-    await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(0);
+    await blogDashboardPage.blogDashboardIntroMessageIsVisible();
   });
 
   it('should create multiple blog posts both published and drafts and' +

@@ -226,26 +226,23 @@ var BlogDashboardPage = function() {
   };
 
   this.expectNumberOfDraftBlogPostsToBe = async function(number) {
-    var isPresent = await blogDashboardIntroMessageContainer.isPresent();
-    if (!isPresent) {
-      await this.waitForDraftsBlogPostsToLoad();
-    }
+    await this.waitForDraftsBlogPostsToLoad();
     expect(await draftBlogPostTiles.count()).toBe(number);
   };
 
+  this.blogDashboardIntroMessageIsVisible = async function() {
+    await waitFor.visibilityOf(
+      blogDashboardIntroMessageContainer, 'Blog Dashboard Intro message ' +
+      'taking too long to be visible');
+  };
+
   this.expectNumberOfPublishedBlogPostsToBe = async function(number) {
-    var isPresent = await blogDashboardIntroMessageContainer.isPresent();
-    if (!isPresent) {
-      await this.waitForPublishedBlogPostsToLoad();
-    }
+    await this.waitForPublishedBlogPostsToLoad();
     expect(await publishedBlogPostTiles.count()).toBe(number);
   };
 
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
-    var isPresent = await blogDashboardIntroMessageContainer.isPresent();
-    if (!isPresent) {
-      await this.waitForDraftsBlogPostsToLoad();
-    }
+    await this.waitForDraftsBlogPostsToLoad();
     expect(await blogPostListItems.count()).toBe(number);
   };
 
