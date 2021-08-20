@@ -22,7 +22,6 @@ var waitFor = require('./waitFor.js');
 var forms = require('../protractor_utils/forms.js');
 var workflow = require('../protractor_utils/workflow.js');
 var general = require('../protractor_utils/general.js');
-const { element } = require('protractor');
 
 var BlogDashboardPage = function() {
   var currUserProfilePhoto = element(

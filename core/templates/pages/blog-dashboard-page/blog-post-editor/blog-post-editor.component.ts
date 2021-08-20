@@ -63,7 +63,7 @@ export class BlogPostEditorComponent implements OnInit {
   thumbnailDataUrl: string;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
-  lastChangesWerePublished: boolean = true;
+  lastChangesWerePublished: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
   MIN_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
@@ -143,9 +143,9 @@ export class BlogPostEditorComponent implements OnInit {
             }
           }
           if (this.blogPostData.publishedOn) {
-            if (this.blogPostData.lastUpdated.slice(0, -8) !== (
+            if (this.blogPostData.lastUpdated.slice(0, -8) === (
               this.blogPostData.publishedOn.slice(0, -8))) {
-              this.lastChangesWerePublished = false;
+              this.lastChangesWerePublished = true;
             }
           }
           this.blogDashboardPageService.setNavTitle(
