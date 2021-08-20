@@ -36,6 +36,7 @@ interface SetOfAlgebraicIdentifierEditorSchema {
     id: 'is_uniquified'
   }]
 }
+
 @Component({
   selector: 'set-of-algebraic-identifier-editor',
   templateUrl: './set-of-algebraic-identifier-editor.component.html',
@@ -88,12 +89,11 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   }
 
   updateValue(newValue: number[]): void {
-    if (this.value === newValue) {
-      return;
+    if (this.value !== newValue) {
+      this.value = newValue;
+      this.valueChanged.emit(this.value);
+      this.changeDetectorRef.detectChanges();
     }
-    this.value = newValue;
-    this.valueChanged.emit(this.value);
-    this.changeDetectorRef.detectChanges();
   }
 }
 
