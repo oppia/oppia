@@ -43,7 +43,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() explorationId!: string;
   @Input() explorationTitle!: string;
   @Input() storyNodeId!: string;
-  @Input() lastUpdatedMsecs!: number;
+  @Input() lastUpdatedMsec!: number;
   @Input() numViews!: string;
   @Input() objective!: string;
   @Input() category!: string;
@@ -159,9 +159,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // Function will return null when the property 'lastUpdatedMsecs' is null
   // or undefined.
   getLastUpdatedDatetime(): string | null {
-    if (this.lastUpdatedMsecs) {
+    if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-        this.lastUpdatedMsecs);
+        this.lastUpdatedMsec);
     }
     return null;
   }

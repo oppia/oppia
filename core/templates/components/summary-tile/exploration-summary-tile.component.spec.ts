@@ -348,7 +348,7 @@ describe('Exploration Summary Tile Component', () => {
       dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
       .and.returnValue('1:30 am');
 
-    component.lastUpdatedMsecs = 1000;
+    component.lastUpdatedMsec = 1000;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
