@@ -631,3 +631,17 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object matched with the regex pattern.
         """
         return bool(re.match(regex_pattern, obj))
+
+    @staticmethod
+    def is_search_query_string(obj: str) -> bool:
+        """Checks if the given obj (a string) is a gae search query string.
+
+        Args:
+            obj: str. The string to verify.
+
+        Returns:
+            bool. Whether the given object is a gae search query string.
+        """
+        if obj and (not obj.startswith('("') or not obj.endswith('")')):
+            return False
+        return True

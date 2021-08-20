@@ -27,6 +27,7 @@ from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import state_domain
 import python_utils
 
 from typing import Dict, Optional, Union # isort:skip
@@ -40,7 +41,7 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj)
+    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
 
 
 def validate_new_config_property_values(obj):
@@ -54,7 +55,7 @@ def validate_new_config_property_values(obj):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name)
+        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -68,17 +69,17 @@ def validate_change_dict_for_blog_post(change_dict):
         change_dict: dict. Data that needs to be validated.
     """
     if 'title' in change_dict:
-        blog_domain.BlogPost.require_valid_title(
+        blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
             change_dict['title'], True)
     if 'thumbnail_filename' in change_dict:
-        blog_domain.BlogPost.require_valid_thumbnail_filename(
+        blog_domain.BlogPost.require_valid_thumbnail_filename( # type: ignore[no-untyped-call]
             change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
-        blog_domain.BlogPost.require_valid_tags(
+        blog_domain.BlogPost.require_valid_tags( # type: ignore[no-untyped-call]
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property(
+        list_of_default_tags = config_domain.Registry.get_config_property( # type: ignore[no-untyped-call]
             'list_of_default_tags_for_blog_post').value
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
@@ -93,7 +94,17 @@ def validate_collection_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    collection_domain.CollectionChange(obj)
+    collection_domain.CollectionChange(obj) # type: ignore[no-untyped-call]
+
+
+def validate_state_dict(state_dict):
+    """Validates state dict.
+
+    Args:
+        state_dict: dict. Data that needs to be validated.
+    """
+    validation_class = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
+    validation_class.validate(None, True)
 
 
 def validate_email_dashboard_data(
