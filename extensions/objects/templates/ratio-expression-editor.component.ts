@@ -43,7 +43,7 @@ export class RatioExpressionEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value === undefined) {
+    if (this.value === undefined || this.value === null) {
       this.value = [1, 1];
       this.valueChanged.emit(this.value);
     }
