@@ -22,9 +22,13 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { EventEmitter } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -35,7 +39,6 @@ describe('Skill Editor Navbar Directive', function() {
   let $q = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
 
   let sampleSkill: Skill = null;
@@ -58,12 +61,23 @@ describe('Skill Editor Navbar Directive', function() {
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     directive = $injector.get('skillEditorNavbarDirective')[0];
-    skillObjectFactory = $injector.get('SkillObjectFactory');
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     undoRedoService = $injector.get('UndoRedoService');
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      })
+    );
+    sampleSkill = new Skill(
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+    );
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);

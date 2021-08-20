@@ -27,13 +27,17 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EmailDashboardResultComponent } from './email-dashboard-result.component';
 import { EmailDashboardResultPageRootComponent } from './email-dashboard-result-page-root.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
+
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     EmailDashboardResultComponent,

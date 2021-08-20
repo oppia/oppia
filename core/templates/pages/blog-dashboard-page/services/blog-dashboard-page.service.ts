@@ -17,7 +17,6 @@
  */
 
 import { Injectable, EventEmitter } from '@angular/core';
-import { Location } from '@angular/common';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -25,6 +24,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { BlogPostData } from 'domain/blog/blog-post.model';
 
 @Injectable({
@@ -38,16 +38,17 @@ export class BlogDashboardPageService {
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
   private _blogPostAction: string = '';
+  private _updateViewEventEmitter = new EventEmitter<void>();
+  private _updateNavTitleEventEmitter = new EventEmitter<string>();
   private _imageUploaderIsNarrow: boolean = false;
-  private _updateViewEventEmitter= new EventEmitter<void>();
 
   constructor(
     private alertsService: AlertsService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private location: Location,
     private windowRef: WindowRef,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
   ) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._setActiveTab(currentHash);
@@ -60,6 +61,7 @@ export class BlogDashboardPageService {
       this._blogPostId = this.urlService.getBlogPostIdFromUrl();
     } else {
       this._activeTab = 'main';
+      this.preventPageUnloadEventService.removeListener();
     }
     this.updateViewEventEmitter.emit();
   }
@@ -80,7 +82,7 @@ export class BlogDashboardPageService {
   }
 
   navigateToMainTab(): void {
-    this.windowRef.nativeWindow.location.hash = '/';
+    this.windowRef.nativeWindow.location.href = '/blog-dashboard';
   }
 
   set blogPostAction(action: string) {
@@ -97,6 +99,10 @@ export class BlogDashboardPageService {
 
   get blogPostId(): string {
     return this._blogPostId;
+  }
+
+  set blogPostId(id: string) {
+    this._blogPostId = id;
   }
 
   set blogPostData(data: BlogPostData | null) {
@@ -127,17 +133,36 @@ export class BlogDashboardPageService {
     return this._updateViewEventEmitter;
   }
 
+  get updateNavTitleEventEmitter(): EventEmitter<string> {
+    return this._updateNavTitleEventEmitter;
+  }
+
   deleteBlogPost(): void {
     this.blogPostEditorBackendService.deleteBlogPostAsync(this._blogPostId)
       .then(
         () => {
           this.alertsService.addSuccessMessage(
             'Blog Post Deleted Successfully.', 5000);
-          this.navigateToMainTab();
+          if (this.activeTab === 'editor_tab') {
+            this.navigateToMainTab();
+          }
         }, (errorResponse) => {
           this.alertsService.addWarning('Failed to delete blog post.');
         }
       );
+  }
+
+  setNavTitle(
+      blogPostIsPublished: boolean, title: string): void {
+    if (title) {
+      if (blogPostIsPublished) {
+        return this.updateNavTitleEventEmitter.emit(`Published - ${title}`);
+      } else {
+        return this.updateNavTitleEventEmitter.emit(`Draft - ${title}`);
+      }
+    } else {
+      return this.updateNavTitleEventEmitter.emit('New Post - Untitled');
+    }
   }
 }
 

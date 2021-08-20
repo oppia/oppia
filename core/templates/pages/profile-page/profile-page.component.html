@@ -5,7 +5,10 @@
       <div class="oppia-profile-picture-container">
         <div class="oppia-profile-picture">
           <h1>{{ profileIsOfCurrentUsers }}</h1>
-          <a *ngIf="profileIsOfCurrentUser" href="/preferences" class="oppia-profile-preferences">
+          <a *ngIf="profileIsOfCurrentUser"
+             href="/preferences"
+             [routerLink]="preferencesUrl"
+             class="oppia-profile-preferences">
             <div class="oppia-profile-picture-mask">
               <div class="oppia-profile-picture-edit-prompt">
                Edit avatar

@@ -164,6 +164,18 @@ describe('Solution object factory', () => {
         expectedShortAnswerHtml);
     });
 
+    it('should throw an error if Interaction\'s id is null', () => {
+      const interaction = new Interaction([], [], {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')]
+        }
+      }, null, [], null, null);
+
+      expect(() => {
+        solution.getOppiaShortAnswerResponseHtml(interaction);
+      }).toThrowError('Interaction id is possibly null.');
+    });
+
     it('should handle when answer exclusivity is true', () => {
       const solution = sof.createFromBackendDict({
         answer_is_exclusive: true,
