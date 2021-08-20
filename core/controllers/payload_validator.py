@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Tuple # isort:skip
+from typing import Any, Dict, List, Optional, Tuple, Union # isort:skip
 
 
 # This function recursively uses the schema dictionary and handler_args, and
@@ -35,7 +35,7 @@ def validate(
         handler_args_schemas: Any,
         allowed_extra_args: bool,
         allow_string_to_bool_conversion: bool = False
-) -> Tuple[Dict[Text, Any], List[Text]]:
+) -> Tuple[Dict[str, Any], List[str]]:
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -94,7 +94,7 @@ def validate(
     return normalized_value, errors
 
 
-def convert_string_to_bool(param: Text) -> Optional[Union[bool, Text]]:
+def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
 
     """Converts a request param of type string into expected bool type.
 
