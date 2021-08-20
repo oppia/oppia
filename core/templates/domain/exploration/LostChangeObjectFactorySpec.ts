@@ -17,8 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { LostChangeObjectFactory } from
-  'domain/exploration/LostChangeObjectFactory';
+import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { OutcomeObjectFactory } from './OutcomeObjectFactory';
 import { SubtitledHtml } from './subtitled-html.model';
 
@@ -191,9 +190,9 @@ describe('Lost Change Object Factory', () => {
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null
         }),
-        dest: '',
-        feedback: new SubtitledHtml('', ''),
-        html: '',
+        dest: 'default',
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        html: '<p>Correct</p>',
         rules: [{
           type: 'Type1',
           inputs: {
@@ -214,9 +213,9 @@ describe('Lost Change Object Factory', () => {
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null
         }),
-        dest: '',
-        feedback: new SubtitledHtml('', ''),
-        html: '',
+        dest: 'default',
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        html: '<p>Correct</p>',
         rules: [{
           type: 'Type1',
           inputs: {
@@ -240,7 +239,7 @@ describe('Lost Change Object Factory', () => {
       new_value: {
         outcome: undefined,
         dest: 'dest2',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type2',
@@ -253,7 +252,7 @@ describe('Lost Change Object Factory', () => {
       old_value: {
         outcome: undefined,
         dest: 'dest1',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type1',
@@ -285,7 +284,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest2',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type2',
@@ -308,7 +307,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest1',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type1',

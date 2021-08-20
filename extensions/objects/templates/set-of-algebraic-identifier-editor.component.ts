@@ -46,7 +46,7 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  @Input() value!: unknown;
+  @Input() value!: number[];
   SCHEMA!: SetOfAlgebraicIdentifierEditorSchema;
   @Output() valueChanged = new EventEmitter();
   PLACEHOLDER_INFO = (
@@ -87,7 +87,7 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: unknown): void {
+  updateValue(newValue: number[]): void {
     if (this.value === newValue) {
       return;
     }

@@ -216,6 +216,8 @@ describe('TranslateTextBackendApiService', () => {
       expect(req.request.method).toEqual('POST');
       const filename1Blobs = req.request.body.getAll('imageFilename1')[0];
       const filename2Blobs = req.request.body.getAll('imageFilename2')[0];
+      const filename3Blobs = req.request.body.getAll('imageFilename1')[1];
+      const filename4Blobs = req.request.body.getAll('imageFilename2')[1];
       expect(filename1Blobs).toContain([{
         size: 0,
         type: 'imageBlob1'
@@ -223,6 +225,14 @@ describe('TranslateTextBackendApiService', () => {
       expect(filename2Blobs).toContain([{
         size: 0,
         type: 'imageBlob1'
+      }]);
+      expect(filename3Blobs).toContain([{
+        size: 0,
+        type: 'imageBlob2'
+      }]);
+      expect(filename4Blobs).toContain([{
+        size: 0,
+        type: 'imageBlob2'
       }]);
       req.flush({});
       flushMicrotasks();

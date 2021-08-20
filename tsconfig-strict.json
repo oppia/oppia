@@ -447,6 +447,7 @@
     "core/templates/pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts",
     "core/templates/pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.spec.ts",
     "core/templates/pages/library-page/library-page.constants.ts",
+    "core/templates/pages/library-page/search-bar/search-bar.component.ts",
     "core/templates/pages/login-page/login-page.component.ts",
     "core/templates/pages/login-page/login-page.component.spec.ts",
     "core/templates/pages/logout-page/logout-page.component.ts",

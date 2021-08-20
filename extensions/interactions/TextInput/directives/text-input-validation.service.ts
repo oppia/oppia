@@ -46,7 +46,10 @@ interface Warning {
   providedIn: 'root'
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(
+    private bivs: baseInteractionValidationService
+  ) {}
+
   getCustomizationArgsWarnings(
       customizationArgs: TextInputCustomizationArgs): Warning[] {
     let warningsList = [];
@@ -88,6 +91,8 @@ export class TextInputValidationService {
               maxRows + '.')
           });
         }
+      } else {
+        throw new Error('Invalid customization args for TextInput');
       }
     } else {
       warningsList.push({

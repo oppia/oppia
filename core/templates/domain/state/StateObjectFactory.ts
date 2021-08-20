@@ -55,7 +55,7 @@ export interface StateBackendDict {
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
-  // This property is null if no skill is linked to an interaction.
+  // This property is null if no skill is linked to an State.
   'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
@@ -181,8 +181,8 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    let defaultOutcome = null;
     if (newState.interaction.defaultOutcome !== null) {
+      let defaultOutcome = null;
       defaultOutcome = newState.interaction.defaultOutcome;
       defaultOutcome.dest = newStateName;
     }
