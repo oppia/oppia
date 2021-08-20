@@ -73,8 +73,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/cron_test.py',
     'core/controllers/custom_landing_pages.py',
     'core/controllers/custom_landing_pages_test.py',
-    'core/controllers/domain_objects_validator.py',
-    'core/controllers/domain_objects_validator_test.py',
     'core/controllers/editor.py',
     'core/controllers/editor_test.py',
     'core/controllers/email_dashboard.py',

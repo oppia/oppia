@@ -112,7 +112,7 @@ describe('Embedding', function() {
     '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
     '\'X-Frame-Options\' to \'deny\'.',
     'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
-    'responded with a status of 404 ()',
+    'responded with a status of 400 ()',
   ];
 
   beforeEach(function() {

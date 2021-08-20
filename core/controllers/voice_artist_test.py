@@ -92,7 +92,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_put_with_no_payload_version_raises_error(self):
         with self.assertRaisesRegexp(
-            Exception, 'Invalid POST request: a version must be specified.'):
+            Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{

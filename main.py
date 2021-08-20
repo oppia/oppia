@@ -582,7 +582,7 @@ URLS = [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        r'/createhandler/state_interaction_stats/<exploration_id>/<state_name>',
         editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,

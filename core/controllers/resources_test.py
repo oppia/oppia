@@ -71,7 +71,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'No filename supplied')
+        self.assertEqual(
+            response_dict['error'], 'Missing key in handler args: filename.')
 
         self.logout()
 
@@ -101,7 +102,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'Invalid filename')
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation'
+            ' failed: is_regex_matched ({\'regex_pattern\': '
+            '\'\\\\w+[.]\\\\w+\'}) for object .png'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -396,7 +402,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn('Filenames should not include', response_dict['error'])
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
+            'for object test/a.png')
+        self.assertIn(error_msg, response_dict['error'])
 
         self.logout()
 
@@ -416,8 +427,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn(
-            'Image filename with no extension', response_dict['error'])
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
+            'for object test')
+        self.assertIn(error_msg, response_dict['error'])
 
         self.logout()
 
