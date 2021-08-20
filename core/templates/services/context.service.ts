@@ -238,8 +238,8 @@ export class ContextService {
     if (this.explorationId) {
       return this.explorationId;
     } else if (
-        !this.isInQuestionPlayerMode() ||
-        this.getQuestionPlayerIsManuallySet()
+      !this.isInQuestionPlayerMode() ||
+      this.getQuestionPlayerIsManuallySet()
       ) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.

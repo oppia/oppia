@@ -44,10 +44,12 @@ angular.module('oppia').component('skillPreviewTab', {
   controllerAs: '$ctrl',
   controller: [
     '$rootScope', '$scope', 'ContextService', 'CurrentInteractionService',
+    'ExplorationPlayerStateService',
     'QuestionBackendApiService', 'QuestionPlayerEngineService',
     'SkillEditorStateService', 'UrlService',
     function(
         $rootScope, $scope, ContextService, CurrentInteractionService,
+        ExplorationPlayerStateService,
         QuestionBackendApiService, QuestionPlayerEngineService,
         SkillEditorStateService, UrlService) {
       var ctrl = this;
@@ -91,7 +93,9 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.directiveSubscriptions.add(
           SkillEditorStateService.onSkillChange.subscribe(
             () => $rootScope.$applyAsync()));
-        CurrentInteractionService.setOnSubmitFn(() => {});
+        CurrentInteractionService.setOnSubmitFn(() => {
+          ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+        });
       };
 
       ctrl.initializeQuestionCard = function(card) {
