@@ -56,6 +56,9 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
+        # Please use type casting here instead of type ignore[union-attr] once
+        # this attribute `normalized_request` has been type annotated in the
+        # parent class BaseHandler.
         classroom_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
             'classroom_url_fragment')
         classroom = classroom_services.get_classroom_by_url_fragment( # type: ignore[no-untyped-call]
