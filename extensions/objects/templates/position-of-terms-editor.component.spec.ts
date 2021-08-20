@@ -39,6 +39,7 @@ describe('PositionOfTerms', () => {
 
   it('should have the correct default value of position', () => {
     expect(component.localValue.name).toBe('both');
+    expect(component.value).toBe('both');
   });
 
   it('should change ctrl.value when ctrl.localValue changes', () => {

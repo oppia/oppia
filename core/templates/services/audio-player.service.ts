@@ -36,10 +36,11 @@ export interface AutoPlayAudioEvent {
   providedIn: 'root'
 })
 export class AudioPlayerService {
+  // 'currentTrackFilename','currentTrack' and 'lastPauseOrSeekPos'
+  // will be 'null' when the track is not selected or ended.
   private _currentTrackFilename: string | null = null;
   private _currentTrack: Howl | null = null;
   private _lastPauseOrSeekPos: number | null = null;
-  private _loadingTrack = false;
   private _updateViewEventEmitter = new EventEmitter<void>();
   private _autoplayAudioEventEmitter = (
     new EventEmitter<void | AutoPlayAudioEvent>());
@@ -51,10 +52,11 @@ export class AudioPlayerService {
     private ngZone: NgZone
   ) {}
 
-  private async _loadAsync(filename: string, successCallback, errorCallback) {
-    if (this._loadingTrack) {
-      throw new Error('Already loading a track... Please try again!');
-    }
+  private async _loadAsync(
+      filename: string,
+      successCallback: () => void,
+      errorCallback: (reason?: string[]) => void
+  ) {
     if (this._currentTrackFilename === filename) {
       return;
     }
@@ -69,7 +71,6 @@ export class AudioPlayerService {
         this._currentTrack.on('load', () => {
           this._stopIntervalSubject.next();
           this._currentTrackFilename = loadedAudioFile.filename;
-          this._loadingTrack = false;
           this._lastPauseOrSeekPos = 0;
           successCallback();
         });
@@ -97,7 +98,9 @@ export class AudioPlayerService {
 
     this.ngZone.runOutsideAngular(() => {
       if (this._currentTrack !== null) {
-        this._currentTrack.seek(this._lastPauseOrSeekPos);
+        // 'lastPauseOrSeekPos' will not be null since currentTrack exists.
+        // We can safely typecast it to 'number'.
+        this._currentTrack.seek(<number> this._lastPauseOrSeekPos);
       }
       interval(500).pipe(takeUntil(
         this._stopIntervalSubject)).subscribe(() => {
@@ -105,8 +108,9 @@ export class AudioPlayerService {
           this._updateViewEventEmitter.emit();
         });
       });
-
-      this._currentTrack.play();
+      // 'currentTrack' is not null since the audio event has been emitted
+      // and that is why we use '?'.
+      this._currentTrack?.play();
     });
   }
 
@@ -115,7 +119,9 @@ export class AudioPlayerService {
       return;
     }
     this._lastPauseOrSeekPos = this.getCurrentTime();
-    this._currentTrack.pause();
+    // 'currentTrack' is not null since the track is playing
+    // and that is why we use '?'.
+    this._currentTrack?.pause();
     this._stopIntervalSubject.next();
   }
 
@@ -191,7 +197,7 @@ export class AudioPlayerService {
   }
 
   isPlaying(): boolean {
-    return this._currentTrack && this._currentTrack.playing();
+    return this._currentTrack !== null && this._currentTrack.playing();
   }
 
   isTrackLoaded(): boolean {

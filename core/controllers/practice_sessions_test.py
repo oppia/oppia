@@ -78,18 +78,18 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
     def test_any_user_can_access_practice_sessions_page(self):
         self.get_html_response(
             '/learn/staging/public-topic-name/practice/session?'
-            'selected_subtopic_ids=1,2')
+            'selected_subtopic_ids=["1","2"]')
 
     def test_no_user_can_access_unpublished_topic_practice_session_page(self):
         self.get_html_response(
             '/learn/staging/private-topic-name/practice/session?'
-            'selected_subtopic_ids=1,2',
+            'selected_subtopic_ids=["1","2"]',
             expected_status_int=404)
 
     def test_get_fails_when_topic_doesnt_exist(self):
         self.get_html_response(
             '/learn/staging/invalid/practice/session?'
-            'selected_subtopic_ids=1,2',
+            'selected_subtopic_ids=["1","2"]',
             expected_status_int=302)
 
 
@@ -109,7 +109,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic('topic_id_3', self.admin_id)
         self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=1' % (
+            '%s/staging/%s?selected_subtopic_ids=[1]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'noskills'),
             expected_status_int=404)
@@ -117,7 +117,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_any_user_can_access_practice_sessions_data(self):
         # Adding invalid subtopic IDs as well, which should get ignored.
         json_response = self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=1,2,3,4' % (
+            '%s/staging/%s?selected_subtopic_ids=[1,2,3,4]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name'))
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -132,14 +132,26 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_no_user_can_access_unpublished_topic_practice_session_data(self):
         self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=1,2' % (
+            '%s/staging/%s?selected_subtopic_ids=["1","2"]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'private-topic-name'),
             expected_status_int=404)
 
     def test_get_fails_when_topic_doesnt_exist(self):
         self.get_json(
-            '%s/staging/%s?selected_subtopic_ids=1,2' % (
+            '%s/staging/%s?selected_subtopic_ids=[1,2]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'invalid'),
             expected_status_int=404)
+
+    def test_get_fails_when_json_loads_fails(self):
+        response = self.get_json(
+            '%s/staging/%s?selected_subtopic_ids=1,2' % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'invalid'),
+            expected_status_int=400)
+        error_msg = (
+            'Schema validation for \'selected_subtopic_ids\' failed: '
+            'Extra data: line 1 column 2 (char 1)'
+        )
+        self.assertEqual(response['error'], error_msg)

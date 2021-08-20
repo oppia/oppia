@@ -92,7 +92,13 @@ export class ChangeListService implements OnInit {
     private loaderService: LoaderService,
     private loggerService: LoggerService,
     private internetConnectivityService: InternetConnectivityService,
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    this.loaderService.onLoadingMessageChange.subscribe(
+      (message: string) => this.loadingMessage = message
+    );
+
     this.internetConnectivityService.onInternetStateChange.subscribe(
       internetAccessible => {
         if (internetAccessible && this.temporaryListOfChanges.length > 0) {
@@ -102,12 +108,6 @@ export class ChangeListService implements OnInit {
           this.temporaryListOfChanges = [];
         }
       });
-  }
-
-  ngOnInit(): void {
-    this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => this.loadingMessage = message
-    );
   }
 
   private autosaveChangeListOnChange(explorationChangeList) {

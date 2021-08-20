@@ -27,7 +27,7 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import
+from typing import Any  # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,7 +41,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
     """Helper class to retrive models with duplicate properties."""
 
     def __init__(self, property_name):
-        # type: (Text) -> None
+        # type: (str) -> None
         super(GetModelsWithDuplicatePropertyValues, self).__init__()
         self._property_name = property_name
 
@@ -55,7 +55,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
                 beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
             | 'Group pairs by their %s' % self._property_name >> (
                 beam.GroupByKey())
-            | 'Discard %s key' % self._property_name >> beam.Values()
+            | 'Discard %s key' % self._property_name >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self._property_name >> (
                 beam.Filter(lambda models: len(models) > 1))
         )

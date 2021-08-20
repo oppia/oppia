@@ -29,7 +29,9 @@ from core.platform.translate import cloud_translate_services
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
-def translate_text(text, source_language, target_language):
+def translate_text(
+        text: str, source_language: str, target_language: str
+) -> str:
     """Translates text into the target language.
 
     For more information on ISO 639-1 see:
