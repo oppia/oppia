@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for the story editor directive.
  */
 
+import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Story editor Directive', function() {
+describe('Story editor Directive having two story nodes', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -36,6 +37,7 @@ describe('Story editor Directive', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
   var WindowRef = null;
+  let fetchSpy = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
@@ -92,7 +94,8 @@ describe('Story editor Directive', function() {
     directive = $injector.get('storyEditorDirective')[0];
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
+    fetchSpy = spyOn(StoryEditorStateService, 'getStory')
+      .and.returnValue(story);
     spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
       'math');
     spyOn(StoryEditorStateService, 'getTopicUrlFragment').and.returnValue(
@@ -104,6 +107,10 @@ describe('Story editor Directive', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should init the controller', function() {
     expect($scope.storyPreviewCardIsShown).toEqual(false);
@@ -164,6 +171,40 @@ describe('Story editor Directive', function() {
   it('should call StoryUpdate service to rearrange nodes', function() {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'rearrangeNodeInStory');
     $scope.rearrangeNodeInStory(10);
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
+
+  it('should not rearrange nodes if staring node is same ' +
+    'as the end node', function() {
+    let storyUpdateSpy = spyOn(StoryUpdateService, 'rearrangeNodeInStory');
+
+    $scope.dragStartIndex = 10;
+    $scope.rearrangeNodeInStory(10);
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should set initial node id when re arranging node in ' +
+    'story and start index is set to 0', function() {
+    let storyUpdateSpy = spyOn(StoryUpdateService, 'setInitialNodeId')
+      .and.returnValue(null);
+
+    $scope.story = story;
+    $scope.dragStartIndex = 0;
+    $scope.rearrangeNodeInStory(1);
+
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
+
+  it('should set initial node id when re arranging node in ' +
+    'story and last index is set to 0', function() {
+    let storyUpdateSpy = spyOn(StoryUpdateService, 'setInitialNodeId')
+      .and.returnValue(null);
+
+    $scope.story = story;
+    $scope.dragStartIndex = 1;
+    $scope.rearrangeNodeInStory(0);
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
@@ -304,4 +345,129 @@ describe('Story editor Directive', function() {
     $scope.returnToTopicEditorPage();
     expect(WindowRef.nativeWindow.open).toHaveBeenCalled();
   });
+
+  it('should fetch story when story is initialized', () => {
+    let mockEventEmitter = new EventEmitter();
+    spyOnProperty(StoryEditorStateService, 'onStoryInitialized')
+      .and.returnValue(mockEventEmitter);
+
+    ctrl.$onInit();
+    $rootScope.$apply();
+    mockEventEmitter.emit();
+
+    expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('should fetch story when story is reinitialized', () => {
+    let mockEventEmitter = new EventEmitter();
+    spyOnProperty(StoryEditorStateService, 'onStoryReinitialized')
+      .and.returnValue(mockEventEmitter);
+
+    ctrl.$onInit();
+    $rootScope.$apply();
+    mockEventEmitter.emit();
+
+    expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('should fetch story node when story editor is opened', () => {
+    $scope.getDestinationNodeIds = () => [];
+    let mockEventEmitter = new EventEmitter();
+    spyOnProperty(StoryEditorStateService, 'onViewStoryNodeEditor')
+      .and.returnValue(mockEventEmitter);
+
+    ctrl.$onInit();
+    $rootScope.$apply();
+    mockEventEmitter.emit();
+
+    expect(fetchSpy).toHaveBeenCalled();
+  });
+});
+
+describe('Story editor Directive having one story node', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
+  var $uibModal = null;
+  var $scope = null;
+  var ctrl = null;
+  var $q = null;
+  var $rootScope = null;
+  var directive = null;
+  var story = null;
+  var WindowDimensionsService = null;
+
+  var StoryEditorStateService = null;
+  var StoryObjectFactory = null;
+
+  beforeEach(angular.mock.inject(function($injector) {
+    $uibModal = $injector.get('$uibModal');
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
+    StoryObjectFactory = $injector.get('StoryObjectFactory');
+    StoryEditorStateService = $injector.get('StoryEditorStateService');
+    $q = $injector.get('$q');
+
+
+    var sampleStoryBackendObject = {
+      id: 'sample_story_id',
+      title: 'Story title',
+      description: 'Story description',
+      notes: 'Story notes',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      url_fragment: 'story_title',
+      story_contents: {
+        initial_node_id: 'node_2',
+        nodes: [
+          {
+            id: 'node_1',
+            title: 'Title 1',
+            description: 'Description 1',
+            prerequisite_skill_ids: ['skill_1'],
+            acquired_skill_ids: ['skill_2'],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: null,
+            outline_is_finalized: false
+          }],
+        next_node_id: 'node_3'
+      },
+      language_code: 'en'
+    };
+    story = StoryObjectFactory.createFromBackendDict(sampleStoryBackendObject);
+    directive = $injector.get('storyEditorDirective')[0];
+
+    spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOn(StoryEditorStateService, 'getStory')
+      .and.returnValue(story);
+    spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
+      'math');
+    spyOn(StoryEditorStateService, 'getTopicUrlFragment').and.returnValue(
+      'fractions');
+    spyOn(StoryEditorStateService, 'getTopicName').and.returnValue('addition');
+    ctrl = $injector.instantiate(directive.controller, {
+      $scope: $scope,
+      $uibModal
+    });
+    ctrl.$onInit();
+  }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should call StoryUpdateService to add destination node id',
+    function() {
+      var deferred = $q.defer();
+      deferred.resolve();
+      var modalSpy = spyOn($uibModal, 'open').and.returnValue(
+        {result: deferred.promise});
+
+      $scope.createNode();
+      $rootScope.$apply();
+
+      expect(modalSpy).toHaveBeenCalled();
+    });
 });

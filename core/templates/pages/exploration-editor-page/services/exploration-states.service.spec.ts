@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
 import { TestBed } from '@angular/core/testing';
+import { ValidatorsService } from 'services/validators.service';
+import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
 
 
 require(
@@ -33,6 +35,9 @@ describe('ExplorationStatesService', function() {
   let changeListService: ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
+  let validatorsService: ValidatorsService = null;
+  let explorationInitStateNameService:
+    ExplorationInitStateNameService = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -51,12 +56,15 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ContextService_,
-      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
+      _ExplorationInitStateNameService_, _ExplorationStatesService_,
+      _StateSolicitAnswerDetailsService_, _ValidatorsService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     ContextService = _ContextService_;
+    explorationInitStateNameService = _ExplorationInitStateNameService_;
     ExplorationStatesService = _ExplorationStatesService_;
+    validatorsService = _ValidatorsService_;
   }));
 
   beforeEach(function() {
@@ -164,10 +172,34 @@ describe('ExplorationStatesService', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'renameState');
 
+        explorationInitStateNameService.init('Hola');
         ExplorationStatesService.registerOnStateRenamedCallback(spy);
         ExplorationStatesService.renameState('Hola', 'Bonjour');
 
         expect(spy).toHaveBeenCalledWith('Hola', 'Bonjour');
+      });
+
+      it('should not rename state when state name is invalid', function() {
+        var spy = jasmine.createSpy('callback');
+        spyOn(changeListService, 'renameState');
+        spyOn(validatorsService, 'isValidStateName')
+          .and.returnValue(false);
+
+        ExplorationStatesService.registerOnStateRenamedCallback(spy);
+        ExplorationStatesService.renameState('Hola', 'Bonjour');
+
+        expect(spy).not.toHaveBeenCalled();
+      });
+
+      it('should not rename state when new state name is ' +
+        'old state name', function() {
+        var spy = jasmine.createSpy('callback');
+        spyOn(changeListService, 'renameState');
+
+        ExplorationStatesService.registerOnStateRenamedCallback(spy);
+        ExplorationStatesService.renameState('Hola', 'Hola');
+
+        expect(spy).not.toHaveBeenCalled();
       });
     });
 
