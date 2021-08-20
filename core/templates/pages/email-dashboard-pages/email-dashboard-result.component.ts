@@ -18,7 +18,6 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
 

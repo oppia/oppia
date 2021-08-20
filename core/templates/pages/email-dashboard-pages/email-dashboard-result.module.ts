@@ -30,7 +30,6 @@ import { EmailDashboardResultPageRootComponent } from './email-dashboard-result-
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 
-
 @NgModule({
   imports: [
     BrowserModule,
