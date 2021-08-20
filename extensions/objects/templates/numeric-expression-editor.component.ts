@@ -58,7 +58,7 @@ export class NumericExpressionEditorComponent implements OnInit {
   ngOnInit(): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
-    if (this.value === null) {
+    if (this.value === null || this.value === undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
