@@ -58,7 +58,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
-    if (this.value === null) {
+    if (this.value === undefined || this.value === null) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
