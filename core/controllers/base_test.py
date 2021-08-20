@@ -1442,7 +1442,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     default_value_schema = {arg: schema}
 
                     _, errors = payload_validator.validate(
-                        default_value, default_value_schema, True)
+                        default_value,
+                        default_value_schema,
+                        allowed_extra_args=True,
+                        allow_string_to_bool_conversion=False
+                    )
                     if len(errors) == 0:
                         continue
                     self.log_line(
@@ -1641,6 +1645,12 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                         'type': 'basestring'
                     },
                     'default_value': 'random_exp_id'
+                },
+                'apply_draft': {
+                    'schema': {
+                        'type': 'bool'
+                    },
+                    'default_value': False
                 }
             }
         }
@@ -1731,7 +1741,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp3):
-            self.get_json('/mock_play_exploration')
+            self.get_json('/mock_play_exploration?apply_draft=true')
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp4):
