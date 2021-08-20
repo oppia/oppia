@@ -21,6 +21,13 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
+from typing import Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -50,17 +57,18 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         repeated=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -78,9 +86,15 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_translation_opportunities(
-            cls, page_size, urlsafe_start_cursor, language_code):
+            cls,
+            page_size: int,
+            urlsafe_start_cursor: Optional[str],
+            language_code: str
+    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -97,7 +111,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(ExplorationOpportunitySummaryModel)|None. A list
+                results: list(ExplorationOpportunitySummaryModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -112,15 +126,33 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         else:
             start_cursor = datastore_services.make_cursor()
 
-        results, cursor, more = cls.query(
-            cls.incomplete_translation_language_codes == language_code).order(
-                cls.incomplete_translation_language_codes).fetch_page(
-                    page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        language_query = cls.query(
+            cls.incomplete_translation_language_codes == language_code
+        ).order(cls.incomplete_translation_language_codes)
 
+        results, cursor, _ = (
+            language_query.fetch_page(page_size, start_cursor=start_cursor))
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = (
+            language_query.fetch_page(page_size + 1, start_cursor=start_cursor))
+        more_results = len(plus_one_query_models) == page_size + 1
+        # The urlsafe returns bytes and we need to decode them to string.
+        return (
+            cast(List[ExplorationOpportunitySummaryModel], results),
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more_results
+        )
+
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_voiceover_opportunities(
-            cls, page_size, urlsafe_start_cursor, language_code):
+            cls,
+            page_size: int,
+            urlsafe_start_cursor: Optional[str],
+            language_code: str
+    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -137,7 +169,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(ExplorationOpportunitySummaryModel)|None. A list
+                results: list(ExplorationOpportunitySummaryModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -152,25 +184,47 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         else:
             start_cursor = None
 
-        results, cursor, more = cls.query(
-            cls.language_codes_needing_voice_artists == language_code).order(
-                cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        language_created_on_query = cls.query(
+            cls.language_codes_needing_voice_artists == language_code
+        ).order(cls.created_on)
+
+        results, cursor, _ = (
+            language_created_on_query.fetch_page(
+                page_size, start_cursor=start_cursor))
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = (
+            language_created_on_query.fetch_page(
+                page_size + 1, start_cursor=start_cursor))
+        more_results = len(plus_one_query_models) == page_size + 1
+        # The urlsafe returns bytes and we need to decode them to string.
+        return (
+            cast(List[ExplorationOpportunitySummaryModel], results),
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more_results
+        )
 
     @classmethod
-    def get_by_topic(cls, topic_id):
+    def get_by_topic(
+            cls,
+            topic_id: str
+    ) -> List['ExplorationOpportunitySummaryModel']:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
-            list(ExplorationOpportunitySummaryModel)|None. A list of
+            list(ExplorationOpportunitySummaryModel). A list of
             ExplorationOpportunitySummaryModel having given topic_id.
         """
-        return cls.query(cls.topic_id == topic_id).fetch()
+        return cast(
+            List[ExplorationOpportunitySummaryModel],
+            cls.query(cls.topic_id == topic_id).fetch())
 
     @classmethod
-    def delete_all(cls):
+    def delete_all(cls) -> None:
         """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query().fetch(keys_only=True))
         datastore_services.delete_multi(keys)
 
 
@@ -192,25 +246,32 @@ class SkillOpportunityModel(base_models.BaseModel):
         datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool) to a domain object.
     @classmethod
-    def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
+    def get_skill_opportunities(
+            cls,
+            page_size: int,
+            urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[List['SkillOpportunityModel'], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -224,7 +285,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(SkillOpportunityModel)|None. A list
+                results: list(SkillOpportunityModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -239,12 +300,25 @@ class SkillOpportunityModel(base_models.BaseModel):
         else:
             start_cursor = None
 
-        results, cursor, more = cls.get_all().order(
-            cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        created_on_query = cls.get_all().order(cls.created_on)
+        query_models, cursor, _ = (
+            created_on_query.fetch_page(page_size, start_cursor=start_cursor))
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = (
+            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+        more_results = len(plus_one_query_models) == page_size + 1
+        # The urlsafe returns bytes and we need to decode them to string.
+        return (
+            cast(List[SkillOpportunityModel], query_models),
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more_results
+        )
 
     @classmethod
-    def delete_all(cls):
+    def delete_all(cls) -> None:
         """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query().fetch(keys_only=True))
         datastore_services.delete_multi(keys)

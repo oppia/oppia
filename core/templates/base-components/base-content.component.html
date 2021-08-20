@@ -86,7 +86,7 @@
     </div>
   </div>
 
-  <div *ngIf="!hasAcknowledgedCookies()" class="oppia-cookie-banner-container">
+  <div *ngIf="!hasAcknowledgedCookies()" [hidden]="loadingMessage" class="oppia-cookie-banner-container">
     <div class="oppia-cookie-banner">
       <p class="oppia-cookie-banner-explanation" [innerHTML]="'I18N_COOKIE_BANNER_EXPLANATION' | translate"></p>
       <button (click)="acknowledgeCookies()"
@@ -139,7 +139,7 @@
     color: #FFF;
     font-family: 'Roboto', Arial, sans-serif;
     padding: 24px 0;
-    position: sticky;
+    position: fixed;
     width: 100%;
     z-index: 1000;
   }

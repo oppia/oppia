@@ -101,7 +101,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
             draft_blog_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_dashboard(
                     draft_blog_post_summaries))
-
         self.values.update({
             'username': user_settings.username,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
@@ -173,8 +172,7 @@ class BlogPostHandler(base.BaseHandler):
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
             raise self.PageNotFoundException(
-                Exception(
-                    'The blog post with the given id or url doesn\'t exist.'))
+                'The blog post with the given id or url doesn\'t exist.')
         user_settings = user_services.get_users_settings(
             [blog_post.author_id], strict=False, include_marked_deleted=True)
         username = user_settings[0].username
@@ -186,6 +184,7 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
+        blog_post_dict['author_username'] = username
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
@@ -237,7 +236,7 @@ class BlogPostHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         entity_id = blog_post_id
-        filename_prefix = 'blog_post_thumbnail'
+        filename_prefix = 'thumbnail'
 
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)

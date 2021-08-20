@@ -71,7 +71,11 @@ angular.module('oppia').component('skillPreviewTab', {
             INTERACTION_TYPES[interaction]);
         }
         ctrl.skill = SkillEditorStateService.getSkill();
-        ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().html;
+        ctrl.htmlData = (
+          ctrl.skill ?
+          ctrl.skill.getConceptCard().getExplanation().html :
+          'loading review material'
+        );
 
         QuestionBackendApiService.fetchQuestionsAsync(
           [ctrl.skillId], QUESTION_COUNT, false).then((response) => {

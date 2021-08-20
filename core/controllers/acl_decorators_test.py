@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -351,6 +352,86 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
+    """Tests for does_classroom_exist decorator"""
+
+    class MockDataHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.does_classroom_exist
+        def get(self, _):
+            self.render_json({'success': True})
+
+    class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.does_classroom_exist
+        def get(self, _):
+            self.render_json('oppia-root.mainpage.html')
+
+    def setUp(self):
+        super(ClassroomExistDecoratorTests, self).setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        config_services.set_property(
+            self.user_id_admin, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_classroom_data/<classroom_url_fragment>',
+                self.MockDataHandler),
+            webapp2.Route(
+                '/mock_classroom_page/<classroom_url_fragment>',
+                self.MockPageHandler
+            )],
+            debug=feconf.DEBUG
+        ))
+
+    def test_any_user_can_access_a_valid_classroom(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_classroom_data/math', expected_status_int=200)
+
+    def test_redirects_user_to_default_classroom_if_given_not_available(
+            self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_classroom_data/invalid', expected_status_int=404)
+
+    def test_raises_error_if_return_type_is_not_json(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_html_response(
+                '/mock_classroom_page/invalid', expected_status_int=500)
+
+
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_create_exploration decorator."""
 
@@ -563,7 +644,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_comment_on_feedback_thread/invalid_thread_id',
                 expected_status_int=400)
-            self.assertEqual(response['error'], 'Thread ID must contain a .')
+            self.assertEqual(response['error'], 'Not a valid thread id.')
         self.logout()
 
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
@@ -772,6 +853,15 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response['error'], 'You do not have credentials to view '
                 'exploration feedback.')
+        self.logout()
+
+    def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_feedback_thread/invalid_thread_id',
+                expected_status_int=400)
+            self.assertEqual(response['error'], 'Not a valid thread id.')
         self.logout()
 
     def test_viewer_can_view_non_exploration_related_feedback(self):
@@ -3295,7 +3385,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, _):
-            self.render_template('story-viewer-page.mainpage.html')
+            self.render_template('oppia-root.mainpage.html')
 
     def setUp(self):
         super(StoryViewerTests, self).setUp()
@@ -4071,6 +4161,59 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
+class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
+    """Tests for decorator can_perform_tasks_in_taskqueue."""
+
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_perform_tasks_in_taskqueue
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(PerformTasksInTaskqueueTests, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_perform_tasks_in_taskqueue', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_super_admin_can_perform_tasks_in_taskqueue(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_perform_tasks_in_taskqueue')
+        self.logout()
+
+    def test_normal_user_cannot_perform_tasks_in_taskqueue(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_perform_tasks_in_taskqueue', expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have the credentials to access this page.')
+        self.logout()
+
+    def test_request_with_appropriate_header_can_perform_tasks_in_taskqueue(
+            self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_perform_tasks_in_taskqueue',
+                headers={'X-AppEngine-QueueName': 'name'})
+
+
 class PerformCronTaskTests(test_utils.GenericTestBase):
     """Tests for decorator can_perform_cron_tasks."""
 
@@ -4115,6 +4258,11 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
                 response['error'],
                 'You do not have the credentials to access this page.')
         self.logout()
+
+    def test_request_with_appropriate_header_can_perform_cron_tasks(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_perform_cron_task', headers={'X-AppEngine-Cron': 'true'})
 
 
 class EditSkillDecoratorTests(test_utils.GenericTestBase):

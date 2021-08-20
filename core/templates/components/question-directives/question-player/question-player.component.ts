@@ -66,7 +66,7 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
-require('components/score-ring/score-ring.directive.ts');
+require('components/score-ring/score-ring.component.ts');
 require(
   'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
 require(

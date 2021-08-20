@@ -20,7 +20,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CookieModule } from 'ngx-cookie';
-import { ToastrModule } from 'ngx-toastr';
 
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
@@ -48,7 +47,7 @@ import {
 // Miscenellous.
 import * as hammer from 'hammerjs';
 import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 // Configurations.
 
@@ -67,22 +66,6 @@ export class MyHammerConfig extends HammerGestureConfig {
   };
 }
 
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
-
 @NgModule({
   imports: [
     CommonModule,
@@ -93,7 +76,6 @@ const toastrConfig = {
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     SharedPipesModule,
-    ToastrModule.forRoot(toastrConfig),
   ],
 
   providers: [

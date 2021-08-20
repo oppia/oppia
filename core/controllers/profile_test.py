@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import io
 import logging
 import re
 import zipfile
 
 from constants import constants
-from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -32,27 +32,17 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import main_cron
-import python_utils
 import utils
-
-import webtest
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
 
-    def test_get_profile_page_of_non_existing_user_raises_status_404(self):
-        self.get_html_response(
-            '/profile/%s' % self.OWNER_USERNAME, expected_status_int=404)
-
     def test_get_profile_page_of_existing_user(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
-        self.assertIn(
-            '<oppia-profile-page-root></oppia-profile-page-root>',
-            response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -138,7 +128,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn('{"title": "Preferences | Oppia"})', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 
@@ -171,7 +161,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
-        self.process_and_flush_pending_mapreduce_tasks()
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
@@ -485,7 +474,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
-        def _mock_true_function(*unused):
+        def _mock_true_function(*_):
             """Mock function that returns True.
 
             Returns:
@@ -825,13 +814,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
     def test_get_delete_account_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/delete-account')
-            self.assertIn(
-                '<oppia-delete-account-page-root>' +
-                '</oppia-delete-account-page-root>', response.body)
-
-    def test_get_delete_account_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response('/delete-account', expected_status_int=404)
+            self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
@@ -935,88 +918,6 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
             self.delete_json('/delete-account-handler', expected_status_int=404)
 
 
-class DeleteAccountTests(test_utils.GenericTestBase):
-    """Integration tests for the account deletion."""
-
-    def setUp(self):
-        super(DeleteAccountTests, self).setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.login(self.EDITOR_EMAIL)
-        self.enable_deletion_swap = (
-            self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True))
-        self.testapp_swap_1 = self.swap(
-            self, 'testapp', webtest.TestApp(main_cron.app))
-        self.testapp_swap_2 = self.swap(
-            self, 'testapp', webtest.TestApp(main_cron.app))
-
-        def _mock_send_mail_to_admin(unused_email_subject, unused_email_body):
-            """Mocks email_manager.send_mail_to_admin()"""
-            pass
-
-        self.send_mail_to_admin_swap_1 = self.swap(
-            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.send_mail_to_admin_swap_2 = self.swap(
-            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-
-    def _run_account_deletion(self):
-        """Execute complete deletion for the user that is logged in."""
-        with self.enable_deletion_swap:
-            data = self.delete_json('/delete-account-handler')
-            self.assertEqual(data, {'success': True})
-
-        self.logout()
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        with self.testapp_swap_1:
-            self.get_html_response('/cron/users/user_deletion')
-
-        with self.send_mail_to_admin_swap_1:
-            self.process_and_flush_pending_tasks()
-
-        with self.testapp_swap_2:
-            self.get_html_response('/cron/users/fully_complete_user_deletion')
-
-        with self.send_mail_to_admin_swap_2:
-            self.process_and_flush_pending_tasks()
-        self.logout()
-
-    def test_delete_account_without_activities(self):
-        self._run_account_deletion()
-
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.editor_id))
-        self.assertIsNone(
-            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
-        self.assertIsNotNone(
-            user_models.DeletedUserModel.get_by_id(self.editor_id))
-
-    def test_new_signup_after_deleting_account(self):
-        self._run_account_deletion()
-
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
-        self.assertNotEqual(
-            self.editor_id, self.get_user_id_from_email(self.EDITOR_EMAIL))
-
-    def test_delete_account_with_activities(self):
-        self.save_new_valid_collection('col_id', self.editor_id)
-        self.save_new_valid_exploration('exp_id', self.editor_id)
-        self.save_new_topic('topic_id', self.editor_id)
-        self.save_new_skill('skill_id', self.editor_id)
-        self.save_new_story('story_id', self.editor_id, 'topic_id')
-        self.save_new_subtopic('subtopic_id', self.editor_id, 'topic_id')
-
-        self._run_account_deletion()
-
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.editor_id))
-        self.assertIsNone(
-            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
-        self.assertIsNotNone(
-            user_models.DeletedUserModel.get_by_id(self.editor_id))
-
-
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
@@ -1083,8 +984,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 data.headers['Content-Disposition'],
                 'attachment; filename=%s' % filename)
-            zf_saved = zipfile.ZipFile(
-                python_utils.string_io(buffer_value=data.body))
+            zf_saved = zipfile.ZipFile(io.BytesIO(data.body))
             self.assertEqual(
                 zf_saved.namelist(),
                 [
@@ -1147,8 +1047,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 data.headers['Content-Disposition'],
                 'attachment; filename=%s' % filename)
-            zf_saved = zipfile.ZipFile(
-                python_utils.string_io(buffer_value=data.body))
+            zf_saved = zipfile.ZipFile(io.BytesIO(data.body))
             self.assertEqual(
                 zf_saved.namelist(),
                 [
@@ -1176,12 +1075,7 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
     def test_get_pending_account_deletion_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/pending-account-deletion')
-            self.assertIn('Pending Account Deletion', response.body)
-
-    def test_get_pending_account_deletion_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response(
-                '/pending-account-deletion', expected_status_int=404)
+            self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

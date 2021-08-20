@@ -468,8 +468,7 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
 
-    for subtopic_page_id in updated_subtopic_pages_dict:
-        subtopic_page = updated_subtopic_pages_dict[subtopic_page_id]
+    for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
             subtopic_page_id]
         subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
@@ -579,8 +578,11 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
-    opportunity_services.create_exploration_opportunities_for_story(
-        story_id, topic_id)
+    # Create exploration opportunities corresponding to the story and linked
+    # explorations.
+    linked_exp_ids = story.story_contents.get_all_linked_exp_ids()
+    opportunity_services.add_new_exploration_opportunities(
+        story_id, linked_exp_ids)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -909,7 +911,6 @@ def publish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds)
-    opportunity_services.create_exploration_opportunities_for_topic(topic.id)
 
 
 def unpublish_topic(topic_id, committer_id):
@@ -940,15 +941,6 @@ def unpublish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
-
-    # Delete the exploration opportunities associated with the topic and reject
-    # the corresponding translation suggestions.
-    exp_ids = (
-        opportunity_services
-        .get_exploration_opportunity_ids_corresponding_to_topic(topic_id)
-    )
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):

@@ -151,11 +151,15 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await publishStoryButton.click();
+    await action.click('Publish Story Button', publishStoryButton);
   };
 
   this.unpublishStory = async function() {
     await unpublishStoryButton.click();
+    await action.click('Close Save Modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Unpublish message modal takes too long to disappear.');
   };
 
   this.deleteChapterWithIndex = async function(index) {
@@ -217,6 +221,8 @@ var StoryEditorPage = function() {
 
   this.navigateToStoryEditorTab = async function() {
     await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      backToStoryEditorButton, 'Back to story button is not visible');
     await general.scrollToTop();
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };

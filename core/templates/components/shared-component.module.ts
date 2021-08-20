@@ -53,6 +53,7 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
+import { PracticeTabComponent } from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
@@ -97,6 +98,9 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 // Services.
 import { AuthService } from 'services/auth.service';
 
+// Miscellaneous.
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+
 @NgModule({
   imports: [
     BaseModule,
@@ -104,6 +108,9 @@ import { AuthService } from 'services/auth.service';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
@@ -138,6 +145,7 @@ import { AuthService } from 'services/auth.service';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
@@ -187,6 +195,7 @@ import { AuthService } from 'services/auth.service';
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    PracticeTabComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -251,6 +260,7 @@ import { AuthService } from 'services/auth.service';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
