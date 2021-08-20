@@ -37,7 +37,9 @@ from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-from core.proto import exploration_pb2
+from proto_files import exploration_pb2
+from proto_files import languages_pb2
+from proto_files import state_pb2
 import feconf
 import python_utils
 import schema_utils
@@ -649,9 +651,9 @@ class Exploration(python_utils.OBJECT):
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
-        exp_android_proto = cls.to_android_proto(exploration)
+        exp_android_proto = cls.to_android_proto(cls, exploration)
         exp_android_proto_size = int(exp_android_proto.ByteSize())
-        exploration.update_proto_size_in_bytes(exp_android_proto_size)
+        cls.update_proto_size_in_bytes(cls, exp_android_proto_size)
         return exploration
 
     @classmethod
@@ -775,7 +777,6 @@ class Exploration(python_utils.OBJECT):
 
         return exploration
 
-    @classmethod
     def to_android_proto(cls, exploration):
         """Calculate the exploration size by setting exploration proto.
 
@@ -791,15 +792,15 @@ class Exploration(python_utils.OBJECT):
         written_translation_protos = {}
         voiceover_language_mapping_list = []
         written_translation_mapping_list = []
-        recorded_voiceover_proto = exploration_pb2.RecordedVoiceovers()
-        written_translations_proto = exploration_pb2.WrittenTranslations()
+        recorded_voiceover_proto = languages_pb2.RecordedVoiceovers()
+        written_translations_proto = languages_pb2.WrittenTranslations()
 
         for (state_name, state) in exploration.states.items():
             for (_, language_code_to_voiceover) in (
                     state.recorded_voiceovers.voiceovers_mapping.items()):
                 for (language_code_to_voiceover_item, voiceover) in (
                         language_code_to_voiceover.items()):
-                    voiceover_proto = exploration_pb2.Voiceover(
+                    voiceover_proto = languages_pb2.Voiceover(
                         filename=voiceover.filename,
                         file_size_bytes=voiceover.file_size_bytes,
                         duration_secs=voiceover.duration_secs
@@ -807,7 +808,7 @@ class Exploration(python_utils.OBJECT):
                     voiceover_lang_protos[
                         language_code_to_voiceover_item] = voiceover_proto
                 voiceover_content_mapping = (
-                    exploration_pb2.VoiceoverContentMapping(
+                    languages_pb2.VoiceoverContentMapping(
                         voiceover_content_mapping=voiceover_lang_protos
                     ))
                 voiceover_language_mapping_list.append(
@@ -820,82 +821,41 @@ class Exploration(python_utils.OBJECT):
                 for (language_code_item, written_translation) in (
                         language_code.items()):
                     written_translation_proto = (
-                        exploration_pb2.WrittenTranslation(
+                        languages_pb2.WrittenTranslation(
                             data_format=written_translation.data_format,
                             translation=written_translation.translation
                         ))
                     written_translation_protos[language_code_item] = (
                         written_translation_proto)
                 translation_mapping = (
-                    exploration_pb2.WrittenTranslationContentMapping(
+                    languages_pb2.WrittenTranslationContentMapping(
                         translation_content_mapping=written_translation_protos
                     ))
                 written_translation_mapping_list.append(translation_mapping)
             written_translations_proto.translation_language_mapping.extend(
                 written_translation_mapping_list)
 
-            customization_args_proto = (
-                exploration_pb2.ContinueInstance.CustomizationArgs())
-            numeric_input_proto = exploration_pb2.NumericInputInstance()
-            if state.interaction.id == 'Continue':
-                customization_args_proto = cls.set_continue_interaction(
-                    state.interaction.customization_args[
-                        'buttonText'].value.content_id,
-                    state.interaction.customization_args[
-                        'buttonText'].value.unicode_str
-                )
-            elif state.interaction.id == 'NumericInput':
-                numeric_input_proto = cls.set_numeric_input_interaction(
-                    state.interaction.answer_groups,
-                    state.interaction.solution
-                )
-
-            default_outcome_proto = exploration_pb2.Outcome()
-            if state.interaction.default_outcome is not None:
-                default_outcome = exploration_pb2.Outcome(
-                    destination_state=state.interaction.default_outcome.dest,
-                    feedback=exploration_pb2.SubtitledHtml(
-                        content_id=(
-                            state.interaction.default_outcome
-                            .feedback.content_id),
-                        html=state.interaction.default_outcome.feedback.html,
-                    ),
-                    labelled_as_correct=(
-                        state.interaction.default_outcome.labelled_as_correct)
-                )
-                default_outcome_proto = default_outcome
-            else:
-                default_outcome_proto = None
-
-            interaction_proto = exploration_pb2.InteractionInstance(
-                continue_=exploration_pb2.ContinueInstance(
-                    customization_args=customization_args_proto
-                ),
-                default_outcome=default_outcome_proto,
-                numeric_input=numeric_input_proto
-            )
-            state_proto = exploration_pb2.State(
-                content=exploration_pb2.SubtitledHtml(
+            state_proto = state_pb2.State(
+                content=languages_pb2.SubtitledHtml(
                     content_id=exploration.states[
                         state_name].content.content_id,
                     html=exploration.states[state_name].content.html
                 ),
                 recorded_voiceovers=recorded_voiceover_proto,
-                written_translations=written_translations_proto,
-                interaction=interaction_proto
+                written_translations=written_translations_proto
             )
             state_protos[state_name] = state_proto
 
         exploration_proto = exploration_pb2.Exploration(
             id=exploration.id,
-            version=exploration.version,
+            content_version=exploration.version,
             init_state_name=exploration.init_state_name,
             title=exploration.title,
             states=state_protos
         )
+        print(exploration_proto)
         return exploration_proto
 
-    @classmethod
     def set_continue_interaction(cls, content_id, html):
         """Set ContinueInstance of Interaction Message in exploration.proto.
 
@@ -915,7 +875,6 @@ class Exploration(python_utils.OBJECT):
             ))
         return customization_args_proto
 
-    @classmethod
     def set_numeric_input_interaction(cls, answer_groups, solution):
         """Set NumericInputInstance of Interaction Message in exploration.proto.
 

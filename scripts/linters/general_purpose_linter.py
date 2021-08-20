@@ -40,7 +40,6 @@ EXCLUDED_PATHS = (
     'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
     'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
     'scripts/linters/test_files/*', 'proto_files/*',
-    'core/proto/exploration_pb2.py', 'core/proto/*.proto'
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
