@@ -18,7 +18,14 @@
 
 import constants from 'assets/constants';
 
-(function() {
+export function intializeGoogleAnalytics() {
+  if (constants.ANALYTICS_SANDBOX_MODE) {
+    // Assign a mock gtag library to window object. So, calls to library
+    // doesnot change throughout the application.
+    window.gtag = function() {}
+    return;
+  }
+
   if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
@@ -35,4 +42,4 @@ import constants from 'assets/constants';
       'forceSSL': true,
     });
   }
-})()
+}

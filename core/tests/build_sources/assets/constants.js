@@ -8,8 +8,9 @@
  *    functions.
  */
 var constants = {
-  // Whether to allow custom event reporting to Google Analytics.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
+  // Analytics Sandbox mode allows using mock gtag function call instead of
+  // invoking actual gtag.
+  "ANALYTICS_SANDBOX_MODE": true,
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",

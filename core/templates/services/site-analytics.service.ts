@@ -20,35 +20,34 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import constants from 'assets/constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { intializeGoogleAnalytics } from 'google-analytics.initializer';
 
 // Service for sending events to Google Analytics.
-//
-// Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
-// turned on. This flag must be turned on explicitly by the application
-// owner in feconf.py.
 
 @Injectable({
   providedIn: 'root'
 })
 export class SiteAnalyticsService {
-  constructor(private windowRef: WindowRef) {}
+  static googleAnalyticsAreInitialized: boolean = false;
 
-  get CAN_SEND_ANALYTICS_EVENTS(): boolean {
-    return constants.CAN_SEND_ANALYTICS_EVENTS;
+  constructor(private windowRef: WindowRef) {
+    if (!SiteAnalyticsService.googleAnalyticsAreInitialized) {
+      // This make sure that gtag is intialized whenever dev
+      // tries to send analytics.
+      intializeGoogleAnalytics();
+      SiteAnalyticsService.googleAnalyticsAreInitialized = true;
+    }
   }
 
   // For definitions of the various arguments, please see:
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.gtag('event', eventAction, {
-        event_category: eventCategory,
-        event_label: eventLabel
-      });
-    }
+    this.windowRef.nativeWindow.gtag('event', eventAction, {
+      event_category: eventCategory,
+      event_label: eventLabel
+    });
   }
 
   // The srcElement refers to the element on the page that is clicked.

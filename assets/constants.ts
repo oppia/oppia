@@ -18,8 +18,11 @@
  */
 
 export default {
-  // Whether to allow custom event reporting to Google Analytics.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
+  // Analytics sandbox mode allows using mock gtag function instead of calling
+  // actual gtag library.
+  // This flag is expected to be true unless app actually requires to send
+  // analytics.
+  "ANALYTICS_SANDBOX_MODE": true,
 
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
