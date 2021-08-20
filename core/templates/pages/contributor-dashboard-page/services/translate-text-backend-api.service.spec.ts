@@ -271,7 +271,7 @@ describe('TranslateTextBackendApiService', () => {
           'translationHtml',
           imagesData,
           'html')
-      ).toBeRejectedWithError('No Image Data Found');
+      ).toBeRejectedWithError('No image data found');
     });
   });
 });
