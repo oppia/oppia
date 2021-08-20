@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AppConstants } from 'app.constants';
 
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
@@ -33,9 +32,6 @@ describe('Site Analytics Service', () => {
 
   it('should intialize google analytics', () => {
     expect(ws.nativeWindow.gtag).toBeDefined();
-    if (AppConstants.ANALYTICS_SANDBOX_MODE) {
-      expect(ws.nativeWindow.gtag).toEqual(function() {});
-    }
   });
 
   describe('Events', () => {
@@ -517,7 +513,8 @@ describe('Site Analytics Service', () => {
     it('should register Contributor Dashboard view suggestion for review event',
       () => {
         const contributionType = 'Translation';
-        sas.registerContributorDashboardViewSuggestionForReview(contributionType);
+        sas.registerContributorDashboardViewSuggestionForReview(
+          contributionType);
 
         expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
           event_category: 'ContributorDashboardViewSuggestionForReview',
