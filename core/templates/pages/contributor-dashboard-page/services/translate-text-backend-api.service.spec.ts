@@ -260,7 +260,6 @@ describe('TranslateTextBackendApiService', () => {
         imageBlob: null
       }];
 
-
       await expectAsync(
         translateTextBackendApiService.suggestTranslatedTextAsync(
           'activeExpId',
