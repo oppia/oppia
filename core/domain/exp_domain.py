@@ -37,10 +37,10 @@ from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
+import feconf
 from proto_files import exploration_pb2
 from proto_files import languages_pb2
 from proto_files import state_pb2
-import feconf
 import python_utils
 import schema_utils
 import utils
@@ -777,7 +777,7 @@ class Exploration(python_utils.OBJECT):
 
         return exploration
 
-    def to_android_proto(cls, exploration):
+    def to_android_proto(self, exploration):
         """Calculate the exploration size by setting exploration proto.
 
         Args:
@@ -853,10 +853,9 @@ class Exploration(python_utils.OBJECT):
             title=exploration.title,
             states=state_protos
         )
-        print(exploration_proto)
         return exploration_proto
 
-    def set_continue_interaction(cls, content_id, html):
+    def set_continue_interaction(self, content_id, html):
         """Set ContinueInstance of Interaction Message in exploration.proto.
 
         Args:
@@ -875,7 +874,7 @@ class Exploration(python_utils.OBJECT):
             ))
         return customization_args_proto
 
-    def set_numeric_input_interaction(cls, answer_groups, solution):
+    def set_numeric_input_interaction(self, answer_groups, solution):
         """Set NumericInputInstance of Interaction Message in exploration.proto.
 
         Args:
