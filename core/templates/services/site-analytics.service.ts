@@ -24,6 +24,10 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { initializeGoogleAnalytics } from 'google-analytics.initializer';
 
 // Service for sending events to Google Analytics.
+//
+// Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
+// turned on. This flag must be turned on explicitly by the application
+// owner in feconf.py.
 
 @Injectable({
   providedIn: 'root'
