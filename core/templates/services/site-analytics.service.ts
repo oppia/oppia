@@ -33,7 +33,7 @@ export class SiteAnalyticsService {
 
   constructor(private windowRef: WindowRef) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
-      // This ensures that google analytics are initialized whenever this
+      // This ensures that google analytics is initialized whenever this
       // service is used.
       initializeGoogleAnalytics();
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
