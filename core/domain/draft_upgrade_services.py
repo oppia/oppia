@@ -136,8 +136,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     for value_index, value in enumerate(
                             new_value['choices']['value']):
                         if isinstance(value, dict) and 'html' in value:
-                            new_value['choices']['value'][value_index] = (
-                                conversion_fn(value['html']))
+                            new_value['choices']['value'][value_index][
+                                'html'
+                            ] = conversion_fn(value['html'])
                         elif isinstance(value, python_utils.BASESTRING):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
