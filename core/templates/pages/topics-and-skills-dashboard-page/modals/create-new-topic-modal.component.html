@@ -4,12 +4,13 @@
   </h3>
   <i class="fa fa-times modal-close-button" (click)="cancel()"></i>
 </div>
-<form ng-submit="save()">
+<form (submit)="save()">
   <div class="modal-body create-new-topic-form">
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Name*</span></div>
       <input class="protractor-test-new-topic-name-field required"
              [(ngModel)]="newlyCreatedTopic.name"
+             [ngModelOptions]="{standalone: true}"
              [maxlength]="MAX_CHARS_IN_TOPIC_NAME"
              (change)="onTopicNameChange()" autofocus>
       <div class="oppia-input-box-subtitle">
@@ -27,13 +28,14 @@
       <div><span class="create-new-topic-input-label">Topic URL Fragment*</span></div>
       <input class="protractor-test-new-topic-url-fragment-field required"
              [(ngModel)]="newlyCreatedTopic.urlFragment"
+             [ngModelOptions]="{standalone: true}"
              [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
              [ngClass]="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
              (change)="onTopicUrlFragmentChange()">
       <div>
         <span class="oppia-input-box-subtitle">
           <em>
-            The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+            The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_TOPIC_URL_FRAGMENT }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
             This topic can be accessed at the following URL:<br>
             {{ hostname }}/learn/staging/{{ newlyCreatedTopic.urlFragment }}
           </em>
@@ -50,7 +52,8 @@
       <textarea class="protractor-test-new-topic-description-field required"
                 rows="4" cols="50" placeholder="Enter description"
                 [maxlength]="MAX_CHARS_IN_TOPIC_DESCRIPTION"
-                [(ngModel)]="newlyCreatedTopic.description">
+                [(ngModel)]="newlyCreatedTopic.description"
+                [ngModelOptions]="{standalone: true}">
       </textarea>
       <div class="oppia-input-box-subtitle">
         <em>
@@ -60,13 +63,12 @@
     </div>
     <div class="create-new-topic-input-field">
       <label class="create-new-topic-input-label">Topic Thumbnail*</label>
-      <oppia-thumbnail-uploader [preview-title]="newlyCreatedTopic.name"
-                                [aspect-ratio]="'4:3'"
+      <oppia-thumbnail-uploader [previewTitle]="newlyCreatedTopic.name"
+                                [aspectRatio]="'4:3'"
                                 [disabled]="false"
-                                [use-local-storage]="true"
-                                [allowed-bg-colors]="allowedBgColors"
-                                preview-description-bg-color="#2F6687"
-                                (image-save)="updateView()">
+                                [useLocalStorage]="true"
+                                [allowedBgColors]="allowedBgColors"
+                                previewDescriptionBgColor="#2F6687">
       </oppia-thumbnail-uploader>
     </div>
   </div>
@@ -78,6 +80,7 @@
     </button>
   </div>
 </form>
+
 <style>
   .create-new-topic-form .ng-touched.invalid-field,
   .create-new-topic-form .ng-touched.ng-empty.required {

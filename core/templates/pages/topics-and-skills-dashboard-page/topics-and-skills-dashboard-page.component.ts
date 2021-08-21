@@ -20,19 +20,17 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardFilter } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/create-new-skill-modal.service';
 import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboard-page.service';
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-page',
   templateUrl: './topics-and-skills-dashboard-page.component.html'
@@ -40,13 +38,13 @@ require('base-components/base-content.directive.ts');
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
   TOPIC_CLASSROOM_UNASSIGNED: string = 'UNASSIGNED';
-  totalTopicSummaries: TopicSummary[] = [];
-  topicSummaries: TopicSummary[] = [];
+  totalTopicSummaries= [];
+  topicSummaries= [];
   totalEntityCountToDisplay: number;
   currentCount: number;
   totalSkillCount: number;
   skillsCategorizedByTopics;
-  editableTopicSummaries: TopicSummary[] = [];
+  editableTopicSummaries = [];
   untriagedSkillSummaries: SkillSummary[] = [];
   totalUntriagedSkillSummaries: SkillSummary[] = [];
   mergeableSkillSummaries: SkillSummary[] = [];
@@ -80,12 +78,11 @@ export class TopicsAndSkillsDashboardPageComponent {
   moreSkillsPresent;
   nextCursor: string;
   firstTimeFetchingSkills;
-  displayedTopicSummaries: TopicSummary[] = [];
+  displayedTopicSummaries = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
 
   constructor(
-    private alertsService: AlertsService,
     private focusManagerService: FocusManagerService,
     private createNewSkillModalService: CreateNewSkillModalService,
     private topicCreationService: TopicCreationService,
@@ -171,7 +168,6 @@ export class TopicsAndSkillsDashboardPageComponent {
     } else if (this.activeTab === this.TAB_NAME_SKILLS) {
       this.initSkillDashboard();
       this.focusManagerService.setFocus('createSkillBtn');
-      console.log(this.activeTab);
     }
   }
 
@@ -237,7 +233,6 @@ export class TopicsAndSkillsDashboardPageComponent {
             ((this.skillPageNumber + 1) * this.itemsPerPage)) {
       this.goToPageNumber(this.pageNumber + 1);
     }
-    console.log(this.skillSummaries);
   }
 
   navigateSkillPage(direction: string): void {
@@ -274,7 +269,6 @@ export class TopicsAndSkillsDashboardPageComponent {
       this.skillSummaries = [];
       this.nextCursor = null;
       this.fetchSkills();
-      this._forceSelect2Refresh();
       return;
     }
     this.topicSummaries = (
@@ -285,18 +279,6 @@ export class TopicsAndSkillsDashboardPageComponent {
             this.topicSummaries.slice(0, this.itemsPerPage);
     this.currentCount = this.topicSummaries.length;
     this.goToPageNumber(0);
-    this._forceSelect2Refresh();
-  }
-
-  // Select2 dropdown cannot automatically refresh its display
-  // after being translated.
-  // Use ctrl.select2DropdownIsShown in its ng-if attribute
-  // and this function to force it to reload.
-  _forceSelect2Refresh(): void {
-    this.select2DropdownIsShown = false;
-    setTimeout(() => {
-      this.select2DropdownIsShown = true;
-    }, 100);
   }
 
   resetFilters(): void {

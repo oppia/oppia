@@ -44,6 +44,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
+import { FilteredChoicesFieldComponent } from './search-filters/filtered-choices-field.component';
 
 @NgModule({
   imports: [
@@ -65,6 +66,7 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     TopicsListComponent,
     DeleteTopicModalComponent,
     SelectTopicsComponent,
+    FilteredChoicesFieldComponent,
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent,
     DeleteTopicModalComponent
@@ -79,6 +81,7 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     TopicsListComponent,
     DeleteTopicModalComponent,
     SelectTopicsComponent,
+    FilteredChoicesFieldComponent,
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent
   ],

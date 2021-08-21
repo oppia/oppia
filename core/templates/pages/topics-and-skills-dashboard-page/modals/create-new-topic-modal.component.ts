@@ -18,9 +18,11 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { NewlyCreatedTopic } from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
+import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
@@ -29,15 +31,39 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
   templateUrl: './create-new-topic-modal.component.html'
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors: object = constants.ALLOWED_THUMBNAIL_BG_COLORS;
-  validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
+  allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+  validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedTopic: NewlyCreatedTopic = NewlyCreatedTopic.createDefault();
   hostname: string = this.windowRef.nativeWindow.location.hostname;
-  MAX_CHARS_IN_TOPIC_NAME: number = constants.MAX_CHARS_IN_TOPIC_NAME;
-  MAX_CHARS_IN_TOPIC_DESCRIPTION: number =
-  constants.MAX_CHARS_IN_TOPIC_DESCRIPTION;
+  MAX_CHARS_IN_TOPIC_NAME: number = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
+  MAX_CHARS_IN_TOPIC_DESCRIPTION: number = (
+    AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION);
+  MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
+    AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
   topicUrlFragmentExists: boolean = false;
   topicNameExists: boolean = false;
+
+  constructor(
+    private contextService: ContextService,
+    private ngbActiveModal: NgbActiveModal,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private windowRef: WindowRef,
+    private topicEditorStateService: TopicEditorStateService
+  ) {
+    super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.contextService.setImageSaveDestinationToLocalStorage();
+  }
+
+  save(): void {
+    this.ngbActiveModal.close(this.newlyCreatedTopic);
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss('cancel');
+  }
 
   isValid(): boolean {
     return Boolean(
@@ -46,19 +72,28 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
     );
   }
 
-  onTopicUrlFragementChange(): void {
+  onTopicUrlFragmentChange(): void {
     if (!this.newlyCreatedTopic.urlFragment) {
       return;
     }
-    this
+
+    this.topicEditorStateService.updateExistenceOfTopicUrlFragment(
+      this.newlyCreatedTopic.urlFragment, () => {
+        this.topicUrlFragmentExists = (
+          this.topicEditorStateService.getTopicWithUrlFragmentExists())
+      });
   }
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-    private imageLocalStorageService: ImageLocalStorageService,
-    private windowRef: WindowRef,
-    private topicEditorStateService: TopicEditorStateService
-  ) {
-    super(ngbActiveModal);
+  onTopicNameChange(): void {
+    if (!this.newlyCreatedTopic.name) {
+      return;
+    }
+
+    this.topicEditorStateService.updateExistenceOfTopicName(
+      this.newlyCreatedTopic.name, () => {
+        this.topicNameExists = (
+          this.topicEditorStateService.getTopicWithNameExists());
+      }
+    );
   }
 }
