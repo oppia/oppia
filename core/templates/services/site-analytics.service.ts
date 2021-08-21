@@ -29,14 +29,14 @@ import { initializeGoogleAnalytics } from 'google-analytics.initializer';
   providedIn: 'root'
 })
 export class SiteAnalyticsService {
-  static googleAnalyticsAreInitialized: boolean = false;
+  static googleAnalyticsIsInitialized: boolean = false;
 
   constructor(private windowRef: WindowRef) {
-    if (!SiteAnalyticsService.googleAnalyticsAreInitialized) {
-      // This make sure that google analytics are initialized whenever this
+    if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
+      // This ensures that google analytics are initialized whenever this
       // service is used.
       initializeGoogleAnalytics();
-      SiteAnalyticsService.googleAnalyticsAreInitialized = true;
+      SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
   }
 

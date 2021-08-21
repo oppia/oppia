@@ -19,8 +19,8 @@
 import constants from 'assets/constants';
 
 export function initializeGoogleAnalytics() {
-  if (constants.ANALYTICS_SANDBOX_MODE) {
-    // Mock gtag function will prevent sending analytics to google in sandbox mode.
+  if (!constants.CAN_SEND_ANALYTICS_EVENTS) {
+    // Mock gtag function will prevent sending analytics to google.
     window.gtag = function() {}
     return;
   }

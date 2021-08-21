@@ -30,11 +30,11 @@ describe('Site Analytics Service', () => {
     ws = TestBed.get(WindowRef);
   });
 
-  it('should intialize google analytics', () => {
+  it('should initialize google analytics', () => {
     expect(ws.nativeWindow.gtag).toBeDefined();
   });
 
-  describe('Events', () => {
+  describe('when tested using gtag spy', () => {
     beforeEach(() => {
       gtagSpy = spyOn(ws.nativeWindow, 'gtag').and.stub();
     });
