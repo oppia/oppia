@@ -16,6 +16,21 @@
  * @fileoverview Unit tests for text input validation service.
  */
 
+interface MinMaxValue {
+  'max_value'?: number;
+  id: string;
+  'min_value'?: number;
+}
+
+type RequireOnlyOne<T, Keys extends keyof T> =
+  Pick<T, Exclude<keyof T, Keys>>
+   & { [K in Keys]-?:
+       Required<Pick<T, K>>
+       & Partial<Record<Exclude<Keys, K>, undefined>>
+     }[Keys];
+
+type Validators = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
+
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
@@ -55,15 +70,7 @@ describe('TextInputValidationService', () => {
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
     let rowsSpecs = customizationArgSpecs[1];
-    const validators = <({
-      'min_value': number;
-      id: string;
-      'max_value'?: undefined;
-    } | {
-      'max_value': number;
-      id: string;
-      'min_value'?: undefined;
-    })[]> rowsSpecs.schema.validators;
+    const validators = <Validators[]>rowsSpecs.schema.validators;
     minRows = validators[0].min_value;
     maxRows = validators[1].max_value;
 
