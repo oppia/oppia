@@ -138,9 +138,9 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
-      // 'old_value' will be undefined/empty when the EndExploration
+      // 'old_value' will be null when the EndExploration
       // is newly added.
-      old_value: undefined,
+      old_value: null,
       property_name: 'widget_id'
     });
 
@@ -155,9 +155,9 @@ describe('Lost Change Object Factory', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      // 'new_value' will be undefined/empty when the EndExploration
+      // 'new_value' will be null when the EndExploration
       // is deleted or removed.
-      new_value: undefined,
+      new_value: null,
       old_value: 'EndExploration',
       property_name: 'widget_id'
     });

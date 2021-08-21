@@ -55,8 +55,10 @@ export interface LostChangeBackendDict {
   'new_state_name'?: string;
   'old_state_name'?: string;
   'state_name'?: string;
-  'new_value'?: LostChangeValue;
-  'old_value'?: LostChangeValue;
+  // 'new_value' is null when an Exploration is deleted or Removed.
+  'new_value'?: LostChangeValue | null;
+  // 'old_value' is null when EndExploration is newly added.
+  'old_value'?: LostChangeValue | null;
   'property_name'?: string;
   'translation_html'?: string;
   'content_id'?: string;
@@ -73,8 +75,8 @@ export class LostChange {
   stateName?: string;
   newStateName?: string;
   oldStateName?: string;
-  newValue?: LostChangeValue;
-  oldValue?: LostChangeValue;
+  newValue?: LostChangeValue | null;
+  oldValue?: LostChangeValue | null;
   propertyName?: string;
   contentId?: string;
   languageCode?: string;
@@ -83,8 +85,9 @@ export class LostChange {
 
   constructor(
       utilsService: UtilsService, cmd: string, newStateName?: string,
-      oldStateName?: string, stateName?: string, newValue?: LostChangeValue,
-      oldValue?: LostChangeValue, propertyName?: string, contentId?: string,
+      oldStateName?: string, stateName?: string,
+      newValue?: LostChangeValue | null, oldValue?: LostChangeValue | null,
+      propertyName?: string, contentId?: string,
       languageCode?: string, translationHTML?: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
