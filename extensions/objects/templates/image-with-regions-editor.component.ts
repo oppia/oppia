@@ -322,7 +322,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   regionLabelSetter(label: string): void {
     if (this.utilsService.isDefined(label)) {
-      this.value.labeledRegions[<number> this.selectedRegion].label = label;
+      if (this.selectedRegion !== null) {
+        this.value.labeledRegions[this.selectedRegion].label = label;
+      }
       this.valueChanged.emit(this.value);
       const labels = this.value.labeledRegions.map(
         region => {
@@ -353,7 +355,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     } else if (this.userIsCurrentlyDragging) {
       const labeledRegions = this.value.labeledRegions;
       let draggedRegion = null;
-      if (this.selectedRegion) {
+      if (this.selectedRegion !== null) {
         draggedRegion = labeledRegions[this.selectedRegion].region;
       }
       const deltaX = this.mouseX - this.originalMouseX;
