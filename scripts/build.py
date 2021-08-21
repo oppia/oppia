@@ -1368,7 +1368,7 @@ def main(args=None):
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 
-    save_hashes_to_file(dict())
+    save_hashes_to_file({})
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
