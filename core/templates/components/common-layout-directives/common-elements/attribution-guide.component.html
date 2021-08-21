@@ -28,7 +28,6 @@
       </a>.
     </div>
     <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">Generate Attribution</a>
-    <a *ngIf="!generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
   </div>
   <div *ngIf="getAttributionModalStatus()" class="attribution-modal-container">
     <div (click)="hideAttributionModal()"></div>
@@ -40,11 +39,6 @@
         </button>
         <div class="container pt-4">
           <div class="font-weight-bold">How to attribute this lesson for sharing or reusing</div>
-          <span class="oppia-attribution-guide-description">You can find more information about how to attribute our lessons in our </span>
-          <a href="https://www.oppia.org/about#foundation" rel="noopener" target="_blank">
-            <span class="oppia-attribution-guide-link">Oppia Attribution Guide</span>
-            <span class="material-icons oppia-open-new-tab-icon">open_in_new</span>
-          </a>
           <div class="attribution-html-section">
             <div class="font-weight-bold">Attribute in HTML</div>
             <ol class="attribute-instructions">

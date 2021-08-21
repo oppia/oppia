@@ -16,13 +16,16 @@
 
 """Decorators to provide authorization across the site."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import functools
+import logging
+import re
 
 from constants import constants
 from core.controllers import base
+from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_services
 from core.domain import feedback_services
@@ -89,6 +92,41 @@ def open_access(handler):
     return test_can_access
 
 
+def is_source_mailchimp(handler):
+    """Decorator to check whether the request was generated from Mailchimp.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_source_mailchimp(self, secret, **kwargs):
+        """Checks whether the request was generated from Mailchimp.
+
+        Args:
+            secret: str. The key that is used to authenticate that the request
+                has originated from Mailchimp.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+            raise self.PageNotFoundException
+        elif secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+            logging.error(
+                'Invalid Mailchimp webhook request received with secret: %s'
+                % secret)
+            raise self.PageNotFoundException
+        else:
+            return handler(self, secret, **kwargs)
+    test_is_source_mailchimp.__wrapped__ = True
+
+    return test_is_source_mailchimp
+
+
 def does_classroom_exist(handler):
     """Decorator to check whether classroom exists.
 
@@ -114,10 +152,18 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
-            _redirect_based_on_return_type(
-                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            # This decorator should only be used for JSON handlers, since all
+            # HTML page handlers are expected to be migrated to the Angular
+            # router and access validation for such pages should be done using
+            # the access validation handler endpoint.
+            if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+                raise self.PageNotFoundException
+            else:
+                # As this decorator is not expected to be used with other
+                # handler types, raising an error here.
+                raise Exception(
+                    'does_classroom_exist decorator is only expected to '
+                    'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
@@ -416,7 +462,7 @@ def can_manage_email_dashboard(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.user.actions:
+        if self.current_user_is_super_admin:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -424,6 +470,217 @@ def can_manage_email_dashboard(handler):
     test_can_manage_emails.__wrapped__ = True
 
     return test_can_manage_emails
+
+
+def can_access_blog_admin_page(handler):
+    """Decorator to check whether user can access blog admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the blog admin page.
+    """
+
+    def test_can_access_blog_admin_page(self, **kwargs):
+        """Checks if the user is logged in and can access blog admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the blog admin page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_BLOG_ADMIN_PAGE in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access blog admin page.')
+    test_can_access_blog_admin_page.__wrapped__ = True
+
+    return test_can_access_blog_admin_page
+
+
+def can_manage_blog_post_editors(handler):
+    """Decorator to check whether user can add and remove users as blog
+    post editors.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to manage blog post editors.
+    """
+
+    def test_can_manage_blog_post_editors(self, **kwargs):
+        """Checks if the user is logged in and can add and remove users as blog
+        post editors.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                manage blog post editors..
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_BLOG_POST_EDITORS in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to add or remove blog post editors.')
+    test_can_manage_blog_post_editors.__wrapped__ = True
+
+    return test_can_manage_blog_post_editors
+
+
+def can_access_blog_dashboard(handler):
+    """Decorator to check whether user can access blog dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the blog dashboard.
+    """
+    def test_can_access_blog_dashboard(self, **kwargs):
+        """Checks if the user is logged in and can access blog dashboard.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the blog dashboard.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access blog dashboard page.')
+    test_can_access_blog_dashboard.__wrapped__ = True
+
+    return test_can_access_blog_dashboard
+
+
+def can_delete_blog_post(handler):
+    """Decorator to check whether user can delete blog post.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if a user has
+        permission to delete a given blog post.
+    """
+    def test_can_delete(self, blog_post_id, **kwargs):
+        """Checks if the user can delete the blog post.
+
+        Args:
+            blog_post_id: str. The blog post id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have permissions to
+                delete this blog post.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        blog_post_rights = blog_services.get_blog_post_rights(
+            blog_post_id, strict=False)
+
+        if not blog_post_rights:
+            raise self.PageNotFoundException(
+                Exception('The given blog post id is invalid.'))
+
+        if role_services.ACTION_DELETE_ANY_BLOG_POST in self.user.actions:
+            return handler(self, blog_post_id, **kwargs)
+        if self.user_id in blog_post_rights.editor_ids:
+            return handler(self, blog_post_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'User %s does not have permissions to delete blog post %s' %
+                (self.user_id, blog_post_id))
+    test_can_delete.__wrapped__ = True
+
+    return test_can_delete
+
+
+def can_edit_blog_post(handler):
+    """Decorator to check whether user can edit blog post.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if a user has
+        permission to edit a given blog post.
+    """
+    def test_can_edit(self, blog_post_id, **kwargs):
+        """Checks if the user can edit the blog post.
+
+        Args:
+            blog_post_id: str. The blog post id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have permissions to
+                edit this blog post.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        blog_post_rights = blog_services.get_blog_post_rights(
+            blog_post_id, strict=False)
+
+        if not blog_post_rights:
+            raise self.PageNotFoundException(
+                Exception('The given blog post id is invalid.'))
+
+        if role_services.ACTION_EDIT_ANY_BLOG_POST in self.user.actions:
+            return handler(self, blog_post_id, **kwargs)
+        if self.user_id in blog_post_rights.editor_ids:
+            return handler(self, blog_post_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'User %s does not have permissions to edit blog post %s' %
+                (self.user_id, blog_post_id))
+    test_can_edit.__wrapped__ = True
+
+    return test_can_edit
 
 
 def can_access_moderator_page(handler):
@@ -462,6 +719,122 @@ def can_access_moderator_page(handler):
     test_can_access_moderator_page.__wrapped__ = True
 
     return test_can_access_moderator_page
+
+
+def can_access_release_coordinator_page(handler):
+    """Decorator to check whether user can access release coordinator page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the release coordinator page.
+    """
+
+    def test_can_access_release_coordinator_page(self, **kwargs):
+        """Checks if the user is logged in and can access release coordinator
+        page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the release coordinator page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (
+                self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access release coordinator page.')
+    test_can_access_release_coordinator_page.__wrapped__ = True
+
+    return test_can_access_release_coordinator_page
+
+
+def can_manage_memcache(handler):
+    """Decorator to check whether user can can manage memcache.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to manage memcache.
+    """
+
+    def test_can_manage_memcache(self, **kwargs):
+        """Checks if the user is logged in and can manage memcache.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials manage
+                memcache.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_MEMCACHE in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage memcache.')
+    test_can_manage_memcache.__wrapped__ = True
+
+    return test_can_manage_memcache
+
+
+def can_run_any_job(handler):
+    """Decorator to check whether user can can run any job.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to run any job.
+    """
+
+    def test_can_run_any_job(self, **kwargs):
+        """Checks if the user is logged in and can run any job.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials run
+                any job.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to run jobs.')
+    test_can_run_any_job.__wrapped__ = True
+
+    return test_can_run_any_job
 
 
 def can_send_moderator_emails(handler):
@@ -575,6 +948,101 @@ def can_access_admin_page(handler):
     test_super_admin.__wrapped__ = True
 
     return test_super_admin
+
+
+def can_access_contributor_dashboard_admin_page(handler):
+    """Decorator that checks if the user can access the contributor dashboard
+    admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks user can
+        access the contributor dashboard admin page.
+    """
+
+    def test_can_access_contributor_dashboard_admin_page(self, **kwargs):
+        """Checks if the user can access the contributor dashboard admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannot access the contributor
+                dashboard admin page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
+                self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access contributor dashboard '
+            'admin page.')
+
+    test_can_access_contributor_dashboard_admin_page.__wrapped__ = True
+
+    return test_can_access_contributor_dashboard_admin_page
+
+
+def can_manage_contributors_role(handler):
+    """Decorator that checks if the current user can modify contributor's role
+    for the contributor dashboard page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can modify contributor's role for the contributor dashboard page.
+    """
+
+    def test_can_manage_contributors_role(self, category, **kwargs):
+        """Checks if the user can modify contributor's role for the contributor
+        dashboard page.
+
+        Args:
+            category: str. The category of contribution.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannnot modify contributor's
+                role for the contributor dashboard page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if category in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+            if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, category, **kwargs)
+        elif category == (
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+            if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, category, **kwargs)
+        else:
+            raise self.InvalidInputException(
+                'Invalid category: %s' % category)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to modify contributor\'s role.')
+    test_can_manage_contributors_role.__wrapped__ = True
+
+    return test_can_manage_contributors_role
 
 
 def can_delete_any_user(handler):
@@ -838,8 +1306,12 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         entity_type = feedback_services.get_thread(thread_id).entity_type
         entity_types_with_unrestricted_view_suggestion_access = (
@@ -896,8 +1368,12 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
@@ -1117,6 +1593,58 @@ def can_voiceover_exploration(handler):
     test_can_voiceover.__wrapped__ = True
 
     return test_can_voiceover
+
+
+def can_manage_voice_artist(handler):
+    """Decorator to check whether the user can manage voice artist.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a user
+        has permission to manage voice artist.
+    """
+
+    def test_can_manage_voice_artist(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can manage a voice artist for the given entity.
+
+        Args:
+            entity_type: str. The type of entity.
+            entity_id: str. The Id of the entity.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            InvalidInputException. The given entity type is not supported.
+            PageNotFoundException. The page is not found.
+            UnauthorizedUserException. The user does not have the credentials
+                to manage voice artist.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            raise self.InvalidInputException(
+                'Unsupported entity_type: %s' % entity_type)
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            entity_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user, exploration_rights):
+            return handler(self, entity_type, entity_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to manage voice artists.')
+    test_can_manage_voice_artist.__wrapped__ = True
+
+    return test_can_manage_voice_artist
 
 
 def can_save_exploration(handler):
@@ -1474,7 +2002,7 @@ def can_modify_exploration_roles(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if rights_manager.check_can_modify_activity_roles(
+        if rights_manager.check_can_modify_core_activity_roles(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -1484,6 +2012,48 @@ def can_modify_exploration_roles(handler):
     test_can_modify.__wrapped__ = True
 
     return test_can_modify
+
+
+def can_perform_tasks_in_taskqueue(handler):
+    """Decorator to ensure that the handler is being called by task scheduler or
+    by a superadmin of the application.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also ensures that
+        the handler can only be executed if it is called by task scheduler or by
+        a superadmin of the application.
+    """
+
+    def test_can_perform(self, **kwargs):
+        """Checks if the handler is called by task scheduler or by a superadmin
+        of the application.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        # The X-AppEngine-QueueName header is set inside AppEngine and if
+        # a request from outside comes with this header AppEngine will get
+        # rid of it.
+        # https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_app_engine_task_request_headers
+        if (self.request.headers.get('X-AppEngine-QueueName') is None and
+                not self.current_user_is_super_admin):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        else:
+            return handler(self, **kwargs)
+    test_can_perform.__wrapped__ = True
+
+    return test_can_perform
 
 
 def can_perform_cron_tasks(handler):
@@ -1513,12 +2083,15 @@ def can_perform_cron_tasks(handler):
             UnauthorizedUserException. The user does not have
                 credentials to access the page.
         """
+        # The X-AppEngine-Cron header is set inside AppEngine and if a request
+        # from outside comes with this header AppEngine will get rid of it.
+        # https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#validating_cron_requests
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        else:
-            return handler(self, **kwargs)
+
+        return handler(self, **kwargs)
     test_can_perform.__wrapped__ = True
 
     return test_can_perform
@@ -1784,7 +2357,8 @@ def can_view_question_editor(handler):
             question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException
-        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in self.user.actions:
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
+                self.user.actions):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1977,7 +2551,7 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_EDIT_SKILLS in self.user.actions:
+        if role_services.ACTION_EDIT_SKILL in self.user.actions:
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2288,7 +2862,7 @@ def can_view_any_topic_editor(handler):
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, topic_id, **kwargs)
         else:
@@ -2455,7 +3029,7 @@ def can_access_topic_viewer_page(handler):
 
         if (
                 topic_rights.topic_is_published or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, topic.name, **kwargs)
         else:
@@ -2552,7 +3126,7 @@ def can_access_story_viewer_page(handler):
 
         if (
                 (story_is_published and topic_is_published) or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, story_id, *args, **kwargs)
         else:
@@ -2614,7 +3188,7 @@ def can_access_subtopic_viewer_page(handler):
 
         if (
                 (topic_rights is None or not topic_rights.topic_is_published)
-                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
+                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE not in
                 user_actions_info.actions):
             _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
@@ -2933,3 +3507,85 @@ def is_from_oppia_ml(handler):
     test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
 
     return test_request_originates_from_valid_oppia_ml_instance
+
+
+def can_update_suggestion(handler):
+    """Decorator to check whether the current user can update suggestions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+        if the user can update a given suggestion.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            edit this suggestion.
+        InvalidInputException. The submitted suggestion id is not valid.
+        PageNotFoundException. A suggestion is not found with the given
+            suggestion id.
+    """
+    def test_can_update_suggestion(
+            self, suggestion_id, **kwargs):
+        """Returns a handler to test whether a suggestion can be updated based
+        on the user's roles.
+
+        Args:
+            suggestion_id: str. The suggestion id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            function. The handler for updating a suggestion.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                edit this suggestion.
+            InvalidInputException. The submitted suggestion id is not valid.
+            PageNotFoundException. A suggestion is not found with the given
+                suggestion id.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        user_actions = self.user.actions
+
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException(
+                'Invalid format for suggestion_id.' +
+                ' It must contain 3 parts separated by \'.\'')
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if suggestion is None:
+            raise self.PageNotFoundException
+
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
+
+        if suggestion.author_id == self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'The user, %s is not allowed to update self-created'
+                'suggestions.' % (user_services.get_username(self.user_id)))
+
+        if suggestion.suggestion_type not in (
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
+            raise self.InvalidInputException('Invalid suggestion type.')
+
+        if suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(
+                    self.user_id,
+                    language_code=suggestion.change.language_code):
+                return handler(self, suggestion_id, **kwargs)
+        elif suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            if user_services.can_review_question_suggestions(self.user_id):
+                return handler(self, suggestion_id, **kwargs)
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You are not allowed to update the suggestion.')
+
+    test_can_update_suggestion.__wrapped__ = True
+    return test_can_update_suggestion

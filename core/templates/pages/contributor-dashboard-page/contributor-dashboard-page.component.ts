@@ -16,7 +16,7 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
@@ -84,6 +84,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
         LocalStorageService.updateLastSelectedTranslationLanguageCode(
           ctrl.languageCode);
+        $rootScope.$applyAsync();
       };
 
       ctrl.showLanguageSelector = function() {

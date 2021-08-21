@@ -21,8 +21,8 @@ import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 
 describe('State hints service', () => {
-  let shs: StateHintsService = null;
-  let hof: HintObjectFactory = null;
+  let shs: StateHintsService;
+  let hof: HintObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

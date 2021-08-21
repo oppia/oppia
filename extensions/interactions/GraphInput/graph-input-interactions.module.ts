@@ -20,24 +20,24 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { GraphVizComponent } from './directives/graph-viz.component';
 import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
 import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
 import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { MaterialModule } from 'components/material.module';
+import { TranslateModule } from '@ngx-translate/core';
+import { MaterialModule } from 'modules/material.module';
 import { DirectivesModule } from 'directives/directives.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     FormsModule,
     MaterialModule,
     DirectivesModule,
-    SharedPipesModule
+    SharedPipesModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveGraphInput,

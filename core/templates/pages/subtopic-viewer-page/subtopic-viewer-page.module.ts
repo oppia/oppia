@@ -30,19 +30,20 @@ import { SubtopicViewerNavbarBreadcrumbComponent } from
   'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
@@ -66,6 +67,8 @@ class SubtopicViewerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -14,8 +14,8 @@
 
 """File for compiling and checking typescript."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import json
@@ -76,8 +76,8 @@ def compile_and_check_typescript(config_path):
         config_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     error_messages = []
-    for line in iter(process.stdout.readline, ''):
-        if not line.startswith('node_modules'):
+    for line in iter(process.stdout.readline, b''):
+        if not line.startswith(b'node_modules'):
             error_messages.append(line)
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)

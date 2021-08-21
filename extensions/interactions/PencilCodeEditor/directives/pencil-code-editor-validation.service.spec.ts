@@ -86,7 +86,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
       expect(pcevs.getAllWarnings(
@@ -110,7 +110,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);
@@ -158,7 +158,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);
@@ -168,9 +168,9 @@ describe('Pencil Code Editor Validation Service', () => {
         message: 'The initialCode must be a string.'
       });
       expect(pcevs.getAllWarnings(
-        // This throws "Type '1' is not assignable to type 'string'."
-        // Here we are assigning the wrong type of value to
-        // "customizationArguments" in order to test validations.
+        // This throws "Type '1'. We need to suppress this error because is not
+        // assignable to type 'string'." Here we are assigning the wrong type
+        // of value to "customizationArguments" in order to test validations.
         // @ts-expect-error
         statename, customizationArgs, [answergroup2], testOutcome2)
       ).toEqual(partialWarningsList);

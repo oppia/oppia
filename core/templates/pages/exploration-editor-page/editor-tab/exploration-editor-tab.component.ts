@@ -53,7 +53,11 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('components/state-editor/state-editor.directive.ts');
+require('pages/exploration-editor-page/exploration-editor-page.component.ts');
+require('components/state-editor/state-editor.component.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-card-is-checkpoint.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -66,6 +70,9 @@ require('services/site-analytics.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorTab', {
+  bindings: {
+    explorationIsLinkedToStory: '='
+  },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
     '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
@@ -73,20 +80,23 @@ angular.module('oppia').component('explorationEditorTab', {
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
     'LoaderService',
-    'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
-    'StateEditorService', 'StateTutorialFirstTimeService',
-    'UrlInterpolationService', 'UserExplorationPermissionsService',
+    'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
+    'StateEditorRefreshService', 'StateEditorService',
+    'StateTutorialFirstTimeService',
+    'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService, GraphDataService,
         LoaderService,
-        RouterService, SiteAnalyticsService, StateEditorRefreshService,
-        StateEditorService, StateTutorialFirstTimeService,
-        UrlInterpolationService, UserExplorationPermissionsService) {
+        RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
+        StateEditorRefreshService, StateEditorService,
+        StateTutorialFirstTimeService,
+        UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.stateCardIsCheckpointService = StateCardIsCheckpointService;
       // Replace the ng-joyride template with one that uses <[...]>
       // interpolators instead of/ {{...}} interpolators.
       var ngJoyrideTemplate = $templateCache.get(
@@ -193,6 +203,13 @@ angular.module('oppia').component('explorationEditorTab', {
         ctrl.interactionIsShown = true;
       };
 
+      ctrl.saveLinkedSkillId = function(displayedValue) {
+        ExplorationStatesService.saveLinkedSkillId(
+          StateEditorService.getActiveStateName(),
+          angular.copy(displayedValue));
+        StateEditorService.setLinkedSkillId(angular.copy(displayedValue));
+      };
+
       ctrl.saveInteractionId = function(displayedValue) {
         ExplorationStatesService.saveInteractionId(
           StateEditorService.getActiveStateName(),
@@ -275,8 +292,8 @@ angular.module('oppia').component('explorationEditorTab', {
         });
         if (shouldPrompt) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/mark-all-audio-and-' +
+            template: require(
+              'components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
@@ -292,8 +309,8 @@ angular.module('oppia').component('explorationEditorTab', {
                 contentId)) {
                 writtenTranslations.markAllTranslationsAsNeedingUpdate(
                   contentId);
-                ExplorationStatesService.saveWrittenTranslations(
-                  stateName, writtenTranslations);
+                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
+                  contentId, stateName);
               }
             });
           }, function() {
@@ -309,6 +326,17 @@ angular.module('oppia').component('explorationEditorTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.onChangeCardIsCheckpoint = function() {
+        var displayedValue = ctrl.stateCardIsCheckpointService.displayed;
+        ExplorationStatesService.saveCardIsCheckpoint(
+          StateEditorService.getActiveStateName(),
+          angular.copy(displayedValue));
+        StateEditorService.setCardIsCheckpoint(
+          angular.copy(displayedValue));
+        StateCardIsCheckpointService.saveDisplayedValue();
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           StateEditorRefreshService.onRefreshStateEditor.subscribe(() => {

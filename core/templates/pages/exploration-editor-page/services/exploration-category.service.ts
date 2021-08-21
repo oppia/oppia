@@ -32,6 +32,10 @@ angular.module('oppia').factory('ExplorationCategoryService', [
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
+    /**
+     * @param {string} value - The input to be validated.
+     * @returns {boolean} - True if category name is valid.
+     */
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(
         value, true, ExplorationRightsService.isPrivate());

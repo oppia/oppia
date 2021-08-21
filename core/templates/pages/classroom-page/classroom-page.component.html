@@ -1,32 +1,37 @@
 <background-banner></background-banner>
 <div class="oppia-classroom-viewer-container position-relative">
   <div class="oppia-classroom-header">
-    <div class="classroom-header" translate="I18N_CLASSROOM_PAGE_HEADING"></div>
-    <div class="classroom-name"><[$ctrl.classroomDisplayName]></div>
+    <div class="classroom-header">{{ 'I18N_CLASSROOM_PAGE_HEADING' | translate }}</div>
+    <div class="classroom-name">{{ classroomDisplayName }}</div>
   </div>
   <div class="oppia-classroom-banner">
-    <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center" width="100%" alt="">
+    <img [src]="bannerImageFileUrl" align="center" width="100%" alt="">
   </div>
-  <div class="oppia-classroom-details">
-    <h2 translate="I18N_CLASSROOM_PAGE_COURSE_DETAILS"></h2>
-    <p class="course-details"> <[$ctrl.classroomData.getCourseDetails()]> </p>
-    <h2 translate="I18N_CLASSROOM_PAGE_TOPICS_COVERED"></h2>
-    <p> <[$ctrl.classroomData.getTopicListIntro()]> </p>
+  <div class="oppia-classroom-details" *ngIf="classroomData">
+    <h2>{{ 'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate }}</h2>
+    <p class="course-details"> {{ classroomData.getCourseDetails() }} </p>
+    <h2>{{ 'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate }}</h2>
+    <p>{{ classroomData.getTopicListIntro() }}</p>
   </div>
-  <div class="oppia-topic-summary-tiles">
-    <div ng-repeat="topicSummary in $ctrl.classroomData.getTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
-      <topic-summary-tile topic-summary="topicSummary"
-                          classroom-url-fragment="$ctrl.classroomUrlFragment"
-                          published="topicSummary.isTopicPublished()">
-      </topic-summary-tile>
+  <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
+    <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
+         class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
+      <oppia-topic-summary-tile [topicSummary]="topicSummary"
+                                [classroomUrlFragment]="classroomUrlFragment"
+                                [isPublished]="topicSummary.isTopicPublished()">
+      </oppia-topic-summary-tile>
     </div>
   </div>
   <div class="oppia-classroom-search-container">
     <div class="oppia-classroom-search-section">
-      <div class="classroom-page-help-text initial-help-text" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING"></div>
-      <div class="classroom-page-help-text oppia-classroom-page-subheading-text" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING"></div>
+      <div class="classroom-page-help-text initial-help-text">
+        {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING' | translate }}
+      </div>
+      <div class="classroom-page-help-text oppia-classroom-page-subheading-text">
+        {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING' | translate }}
+      </div>
       <div>
-        <search-bar enable-dropup="true"></search-bar>
+        <oppia-search-bar [enableDropup]="true"></oppia-search-bar>
       </div>
     </div>
   </div>

@@ -159,11 +159,15 @@ angular.module('oppia').factory('TranslationStatusService', [
           // Rule inputs do not need voiceovers. To have an accurate
           // representation of the progress bar for voiceovers, we remove rule
           // input content ids.
-          const numOfRuleInputContentIds = (
-            _getContentIdListRelatedToComponent(
-              COMPONENT_NAME_RULE_INPUT, allContentIds).length);
+          const ruleInputContentIds = _getContentIdListRelatedToComponent(
+            COMPONENT_NAME_RULE_INPUT, allContentIds);
           explorationVoiceoverContentRequiredCount += (
-            allContentIds.length - numOfRuleInputContentIds);
+            allContentIds.length - ruleInputContentIds.length);
+          if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+            allContentIds = allContentIds.filter(function(contentId) {
+              return ruleInputContentIds.indexOf(contentId) < 0;
+            });
+          }
 
           allContentIds.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(

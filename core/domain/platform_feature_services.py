@@ -30,18 +30,13 @@ For more details of the usage of these two methods, please refer their
 docstrings in this file.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core import platform_feature_list
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.platform import models
-
-current_user_services = models.Registry.import_current_user_services()
-
 
 ALL_FEATURES_LIST = (
     platform_feature_list.DEV_FEATURES_LIST +
@@ -49,7 +44,7 @@ ALL_FEATURES_LIST = (
     platform_feature_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET = set([feature.value for feature in ALL_FEATURES_LIST])
+ALL_FEATURES_NAMES_SET = set(feature.value for feature in ALL_FEATURES_LIST)
 
 
 class FeatureFlagNotFoundException(Exception):

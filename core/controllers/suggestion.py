@@ -16,8 +16,8 @@
 
 """Controllers for suggestions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -29,8 +29,10 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
+from core.domain import state_domain
 from core.domain import suggestion_services
 import feconf
+import python_utils
 import utils
 
 
@@ -45,7 +47,7 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
         dict. Dict mapping target_id to corresponding exploration opportunity
         summary dict.
     """
-    target_ids = set([s.target_id for s in suggestions])
+    target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in (
@@ -65,7 +67,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     Returns:
         dict. Dict mapping target_id to corresponding skill opportunity dict.
     """
-    target_ids = set([s.target_id for s in suggestions])
+    target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
@@ -108,6 +110,21 @@ class SuggestionHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        suggestion_change = suggestion.change
+        if (
+                suggestion_change.cmd == 'add_written_translation' and
+                (
+                    suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
+                    suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                )
+        ):
+            self.render_json(self.values)
+            return
+
         # TODO(#10513) : Find a way to save the images before the suggestion is
         # created.
         suggestion_image_context = suggestion.image_context
@@ -117,7 +134,7 @@ class SuggestionHandler(base.BaseHandler):
         for filename in new_image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging.exception(
                     'Image not provided for file with name %s when the '
                     ' suggestion with target id %s was created.' % (
                         filename, suggestion.target_id))
@@ -373,4 +390,100 @@ class SuggestionListHandler(base.BaseHandler):
             query_fields_and_values)
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
+        self.render_json(self.values)
+
+
+class UpdateTranslationSuggestionHandler(base.BaseHandler):
+    """Handles update operations relating to translation suggestions."""
+
+    @acl_decorators.can_update_suggestion
+    def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Raises:
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'translation_html' parameter is missing.
+            InvalidInputException. The 'translation_html' parameter is not a
+                string.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.is_handled:
+            raise self.InvalidInputException(
+                'The suggestion with id %s has been accepted or rejected'
+                % (suggestion_id)
+            )
+
+        if self.payload.get('translation_html') is None:
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' is missing.'
+            )
+
+        if (
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    python_utils.BASESTRING)
+                and
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    list)
+        ):
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' should be a string or a' +
+                ' list.'
+            )
+
+        suggestion_services.update_translation_suggestion(
+            suggestion_id, self.payload.get('translation_html'))
+
+        self.render_json(self.values)
+
+
+class UpdateQuestionSuggestionHandler(base.BaseHandler):
+    """Handles update operations relating to question suggestions."""
+
+    @acl_decorators.can_update_suggestion
+    def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Raises:
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'skill_difficulty' parameter is missing.
+            InvalidInputException. The 'skill_difficulty' is not a decimal.
+            InvalidInputException. The 'question_state_data' parameter is
+                missing.
+            InvalidInputException. The 'question_state_data' parameter is
+                invalid.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.is_handled:
+            raise self.InvalidInputException(
+                'The suggestion with id %s has been accepted or rejected'
+                % (suggestion_id)
+            )
+
+        if self.payload.get('skill_difficulty') is None:
+            raise self.InvalidInputException(
+                'The parameter \'skill_difficulty\' is missing.'
+            )
+
+        if not isinstance(self.payload.get('skill_difficulty'), float):
+            raise self.InvalidInputException(
+                'The parameter \'skill_difficulty\' should be a decimal.'
+            )
+
+        if self.payload.get('question_state_data') is None:
+            raise self.InvalidInputException(
+                'The parameter \'question_state_data\' is missing.'
+            )
+
+        question_state_data_obj = state_domain.State.from_dict(
+            self.payload.get('question_state_data'))
+
+        question_state_data_obj.validate(None, False)
+
+        suggestion_services.update_question_suggestion(
+            suggestion_id,
+            self.payload.get('skill_difficulty'),
+            self.payload.get('question_state_data'))
+
         self.render_json(self.values)

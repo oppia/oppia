@@ -17,7 +17,7 @@
  */
 
 import { destroyPlatform } from '@angular/core';
-import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils';
+import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
 import { CollectionPermissionsCard } from
   './collection-permissions-card.directive';
 import { async } from '@angular/core/testing';

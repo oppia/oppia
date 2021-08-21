@@ -19,6 +19,8 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var customizeComponent = async function(modal, text, skillDescription) {
   await objects.UnicodeStringEditor(
@@ -33,6 +35,10 @@ var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
   var link = elem.element(by.tagName('a'));
   expect(await link.getText()).toBe(text);
   await link.click();
+  await waitFor.visibilityOf(
+    element(by.css('.protractor-test-concept-card-explanation')),
+    'concept-card-explanation taking too long to show up'
+  );
   await forms.expectRichText(
     element(by.css('.protractor-test-concept-card-explanation'))
   ).toMatch(reviewMaterial);

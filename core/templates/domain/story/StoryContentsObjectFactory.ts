@@ -32,10 +32,13 @@ export interface StoryContentsBackendDict {
 }
 
 interface NodeTitles {
-  [key: string]: string
+  [title: string]: string
 }
 
 export class StoryContents {
+  // When the Story contains a single node and it needs to be deleted
+  // then the value '_initialNodeId' needs to be changed to null.
+  // See 'deleteNode' function below in this file for more details.
   _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
@@ -99,7 +102,10 @@ export class StoryContents {
     });
   }
 
-  getNodeIndex(nodeId: string): number {
+  // A nodeId will be null if the initial node does not exist.
+  // A nodeId will be undefined if the pending nodes to visit are not present.
+  // If the nodeId is null, empty or undefined then the function returns -1.
+  getNodeIndex(nodeId: string | null | undefined): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
         return i;

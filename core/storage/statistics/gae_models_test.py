@@ -16,16 +16,23 @@
 
 """Tests for Oppia statistics models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import logging
 import types
 
 from core.domain import exp_domain
+from core.domain import stats_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+
+from typing import Dict, List # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import stats_models
 
 (base_models, stats_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.statistics])
@@ -33,12 +40,12 @@ import feconf
 
 class StateCounterModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateCounterModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_state_counter_model_gets_created(self):
+    def test_state_counter_model_gets_created(self) -> None:
         # This tests whether get_or_create() can create the model.
         model_instance = stats_models.StateCounterModel.get_or_create(
             'exp_id1', 'state_name')
@@ -49,7 +56,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
         self.assertEqual(model_instance.resolved_answer_count, 0)
         self.assertEqual(model_instance.active_answer_count, 0)
 
-    def test_get_state_counter_model(self):
+    def test_get_state_counter_model(self) -> None:
         # This tests whether get_or_create() can get/fetch the model when the
         # model is created by creating an instance.
         stats_models.StateCounterModel(id='exp_id1.state_name')
@@ -67,13 +74,13 @@ class StateCounterModelTests(test_utils.GenericTestBase):
 class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the AnswerSubmittedEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.AnswerSubmittedEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.AnswerSubmittedEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
@@ -81,6 +88,8 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -93,13 +102,13 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the ExplorationActualStartEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.ExplorationActualStartEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.ExplorationActualStartEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1'))
@@ -107,6 +116,8 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         event_model = stats_models.ExplorationActualStartEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -116,12 +127,12 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.SolutionHitEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.SolutionHitEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
@@ -129,6 +140,8 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.SolutionHitEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -139,13 +152,13 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StartExplorationEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StartExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.StartExplorationEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', {},
@@ -154,6 +167,8 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.StartExplorationEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -166,7 +181,7 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the MaybeLeaveExplorationEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.MaybeLeaveExplorationEventLogEntryModel
             .get_deletion_policy(),
@@ -177,13 +192,13 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the CompleteExplorationEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.CompleteExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.CompleteExplorationEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', 0.0, {},
@@ -192,6 +207,8 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -205,7 +222,7 @@ class RateExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the RateExplorationEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.RateExplorationEventLogEntryModel
             .get_deletion_policy(),
@@ -215,12 +232,12 @@ class RateExplorationEventLogEntryModelUnitTests(
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateHitEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.StateHitEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', {},
@@ -229,6 +246,8 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.StateHitEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -239,12 +258,12 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateCompleteEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateCompleteEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.StateCompleteEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
@@ -252,6 +271,8 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.StateCompleteEventLogEntryModel.get(
             event_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -263,13 +284,13 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_event_models(self):
+    def test_create_and_get_event_models(self) -> None:
         event_id = (
             stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
                 'exp_id1', 'exp_id2', 1, 'state_name1', 'session_id1', 0.0))
@@ -278,6 +299,8 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel.get(
                 event_id))
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
         self.assertEqual(event_model.exp_version, 1)
@@ -292,12 +315,12 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.ExplorationStatsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_analytics_model(self):
+    def test_create_and_get_analytics_model(self) -> None:
         model_id = (
             stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
@@ -305,6 +328,8 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         model = stats_models.ExplorationStatsModel.get_model(
             'exp_id1', 1)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -316,7 +341,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.num_completions_v2, 0)
         self.assertEqual(model.state_stats_mapping, {})
 
-    def test_get_multi_stats_models(self):
+    def test_get_multi_stats_models(self) -> None:
         stats_models.ExplorationStatsModel.create(
             'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
         stats_models.ExplorationStatsModel.create(
@@ -325,13 +350,17 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
 
         exp_version_reference_dicts = [
-            exp_domain.ExpVersionReference('exp_id1', 1),
-            exp_domain.ExpVersionReference('exp_id1', 2),
-            exp_domain.ExpVersionReference('exp_id2', 1)]
+            exp_domain.ExpVersionReference('exp_id1', 1), # type: ignore[no-untyped-call]
+            exp_domain.ExpVersionReference('exp_id1', 2), # type: ignore[no-untyped-call]
+            exp_domain.ExpVersionReference('exp_id2', 1)] # type: ignore[no-untyped-call]
 
         stat_models = stats_models.ExplorationStatsModel.get_multi_stats_models(
             exp_version_reference_dicts)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert stat_models[0] is not None
+        assert stat_models[1] is not None
+        assert stat_models[2] is not None
         self.assertEqual(len(stat_models), 3)
         self.assertEqual(stat_models[0].exp_id, 'exp_id1')
         self.assertEqual(stat_models[0].exp_version, 1)
@@ -344,18 +373,20 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
 class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationIssuesModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.ExplorationIssuesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_exp_issues_model(self):
+    def test_create_and_get_exp_issues_model(self) -> None:
         model_id = (
             stats_models.ExplorationIssuesModel.create(
                 'exp_id1', 1, []))
 
         model = stats_models.ExplorationIssuesModel.get(model_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -365,18 +396,20 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
 class PlaythroughModelUnitTests(test_utils.GenericTestBase):
     """Test the PlaythroughModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.PlaythroughModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_playthrough_model(self):
+    def test_create_and_get_playthrough_model(self) -> None:
         model_id = (
             stats_models.PlaythroughModel.create(
                 'exp_id1', 1, 'EarlyQuit', {}, []))
 
         model = stats_models.PlaythroughModel.get(model_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -384,13 +417,13 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.issue_customization_args, {})
         self.assertEqual(model.actions, [])
 
-    def test_create_raises_error_when_many_id_collisions_occur(self):
+    def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, stats_models.PlaythroughModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The id generator for PlaythroughModel is producing too '
             'many collisions.')
 
@@ -402,12 +435,12 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     """Tests the LearnerAnswerDetailsModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.LearnerAnswerDetailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_state_reference_for_exploration(self):
+    def test_get_state_reference_for_exploration(self) -> None:
         exp_id_1 = 'expid1'
         state_name_1 = 'intro'
         state_reference_1 = (
@@ -437,7 +470,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_reference_5, '1234:%s' % (state_name_5))
 
-    def test_get_state_reference_for_question(self):
+    def test_get_state_reference_for_question(self) -> None:
         question_id_1 = 'first question'
         state_reference_1 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_1)) #pylint: disable=line-too-long
@@ -447,7 +480,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_2)) #pylint: disable=line-too-long
         self.assertEqual(state_reference_2, 'first.question')
 
-    def test_get_instance_id(self):
+    def test_get_instance_id(self) -> None:
         state_reference = 'exp_id:state_name'
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         expected_instance_id = 'exploration:exp_id:state_name'
@@ -455,12 +488,12 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             entity_type, state_reference)
         self.assertEqual(instance_id, expected_instance_id)
 
-    def test_create_model_instance(self):
+    def test_create_model_instance(self) -> None:
         # Test to create model instance for exploration state.
         state_reference = 'exp_id:state_name'
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
-        learner_answer_info_list = []
+        learner_answer_info_list: List[stats_domain.LearnerAnswerInfo] = []
         learner_answer_info_schema_version = (
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
@@ -471,6 +504,8 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_instance is not None
         self.assertEqual(model_instance.id, 'exploration:exp_id:state_name')
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
@@ -481,29 +516,31 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         state_reference = 'question_id'
         entity_type = feconf.ENTITY_TYPE_QUESTION
         interaction_id = 'TextInput'
-        learner_answer_info_list = []
+        learner_answer_info_list_2: List[stats_domain.LearnerAnswerInfo] = []
         learner_answer_info_schema_version = (
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
-            learner_answer_info_list, learner_answer_info_schema_version,
+            learner_answer_info_list_2, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_QUESTION, state_reference))
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_instance is not None
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
             model_instance.entity_type, feconf.ENTITY_TYPE_QUESTION)
         self.assertEqual(model_instance.learner_answer_info_list, [])
 
-    def test_get_model_instance_returns_none(self):
+    def test_get_model_instance_returns_none(self) -> None:
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_QUESTION, 'expID:stateName'))
         self.assertEqual(model_instance, None)
 
-    def test_save_and_get_model_instance_for_unicode_state_names(self):
+    def test_save_and_get_model_instance_for_unicode_state_names(self) -> None:
         exp_id = '123'
         state_name = u'टेक्स्ट'
         state_reference = (
@@ -512,7 +549,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             state_reference, '123:%s' % (state_name))
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
-        learner_answer_info_list = []
+        learner_answer_info_list: List[stats_domain.LearnerAnswerInfo] = []
         learner_answer_info_schema_version = (
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
@@ -523,6 +560,8 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_instance is not None
         self.assertNotEqual(model_instance, None)
         self.assertEqual(
             model_instance.state_reference, '123:%s' % (state_name))
@@ -531,24 +570,26 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
 class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationAnnotationsModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.ExplorationAnnotationsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_models(self):
+    def test_create_and_get_models(self) -> None:
         stats_models.ExplorationAnnotationsModel.create(
             'exp_id1', '1', 5, 4, {})
 
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model1 is not None
         self.assertEqual(model1.exploration_id, 'exp_id1')
         self.assertEqual(model1.version, '1')
         self.assertEqual(model1.num_starts, 5)
         self.assertEqual(model1.num_completions, 4)
         self.assertEqual(model1.state_hit_counts, {})
 
-    def test_get_versions(self):
+    def test_get_versions(self) -> None:
         stats_models.ExplorationAnnotationsModel.create(
             'exp_id1', '1', 5, 4, {})
         stats_models.ExplorationAnnotationsModel.create(
@@ -559,7 +600,7 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(sorted(versions), ['1', '2'])
 
-    def test_get_version_for_invalid_exploration_id(self):
+    def test_get_version_for_invalid_exploration_id(self) -> None:
         versions = stats_models.ExplorationAnnotationsModel.get_versions(
             'invalid_exp_id')
 
@@ -569,12 +610,12 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
 class StateAnswersModelUnitTests(test_utils.GenericTestBase):
     """Tests the StateAnswersModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateAnswersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_shard_count_is_updated_when_data_overflows(self):
+    def test_shard_count_is_updated_when_data_overflows(self) -> None:
 
         submitted_answer_list = [{'answer': 'value'}]
 
@@ -585,6 +626,8 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         model1 = stats_models.StateAnswersModel.get_master_model(
             'exp_id', 1, 'state_name')
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model1 is not None
         # Ensure we got the correct model.
         self.assertEqual(model1.exploration_id, 'exp_id')
         self.assertEqual(model1.exploration_version, 1)
@@ -603,6 +646,8 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             model1 = stats_models.StateAnswersModel.get_master_model(
                 'exp_id', 1, 'state_name')
 
+            # Ruling out the possibility of None for mypy type checking.
+            assert model1 is not None
             self.assertEqual(model1.shard_count, 1)
 
             stats_models.StateAnswersModel.insert_submitted_answers(
@@ -612,6 +657,8 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             model1 = stats_models.StateAnswersModel.get_master_model(
                 'exp_id', 1, 'state_name')
 
+            # Ruling out the possibility of None for mypy type checking.
+            assert model1 is not None
             self.assertEqual(model1.shard_count, 2)
 
         # 'shard_count' will not increase as number of answers are less than
@@ -623,59 +670,15 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         model1 = stats_models.StateAnswersModel.get_master_model(
             'exp_id', 1, 'state_name')
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert model1 is not None
         self.assertEqual(model1.shard_count, 2)
 
 
 class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutputModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateAnswersCalcOutputModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-
-    def test_get_model_returns_created_properties(self):
-
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
-
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertEqual(model1.exploration_id, 'exp_id')
-        self.assertEqual(model1.exploration_version, '1')
-        self.assertEqual(model1.state_name, 'state_name')
-        self.assertEqual(model1.calculation_id, 'calculation_id')
-
-        # Model with 'invalid_exp_id' does not exist.
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'invalid_exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertIsNone(model1)
-
-    def test_raise_exception_with_large_calculation_output(self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.exception."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-
-        large_calculation_output = {'key': 'a' * 1200000}
-
-        with logging_swap:
-            stats_models.StateAnswersCalcOutputModel.create_or_update(
-                'exp_id', '1', 'state_name', '', 'calculation_id', '',
-                large_calculation_output)
-
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Failed to add calculation output for exploration ID '
-                    'exp_id, version 1, state name state_name, and '
-                    'calculation ID calculation_id'
-                )
-            )

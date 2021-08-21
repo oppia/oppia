@@ -14,8 +14,8 @@
 
 """Controllers for the topic viewer page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -107,7 +107,7 @@ class TopicPageDataHandler(base.BaseHandler):
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.error(
+            logging.exception(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic.id)
             )

@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,12 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ChangeListService } from './change-list.service';
+import { TestBed } from '@angular/core/testing';
+import { ValidatorsService } from 'services/validators.service';
+import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
+
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -27,21 +32,39 @@ describe('ExplorationStatesService', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var ChangeListService = null;
+  let changeListService: ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
+  let validatorsService: ValidatorsService = null;
+  let explorationInitStateNameService:
+    ExplorationInitStateNameService = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ChangeListService
+      ]
+    });
+  });
+
+  beforeEach(() => {
+    changeListService = TestBed.inject(ChangeListService);
+  });
+
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
-      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
+      _$q_, _$rootScope_, _$uibModal_, _ContextService_,
+      _ExplorationInitStateNameService_, _ExplorationStatesService_,
+      _StateSolicitAnswerDetailsService_, _ValidatorsService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
+    explorationInitStateNameService = _ExplorationInitStateNameService_;
     ExplorationStatesService = _ExplorationStatesService_;
+    validatorsService = _ValidatorsService_;
   }));
 
   beforeEach(function() {
@@ -99,6 +122,7 @@ describe('ExplorationStatesService', function() {
           id: 'TextInput',
           solution: null,
         },
+        linked_skill_id: null,
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
@@ -117,7 +141,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateAddedCallback', function() {
       it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'addState');
+        spyOn(changeListService, 'addState');
 
         ExplorationStatesService.registerOnStateAddedCallback(spy);
         ExplorationStatesService.addState('Me Llamo');
@@ -131,7 +155,7 @@ describe('ExplorationStatesService', function() {
         spyOn($uibModal, 'open').and.callFake(function() {
           return {result: $q.resolve()};
         });
-        spyOn(ChangeListService, 'deleteState');
+        spyOn(changeListService, 'deleteState');
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
@@ -146,12 +170,36 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateRenamedCallback', function() {
       it('should callback when a state is renamed', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'renameState');
+        spyOn(changeListService, 'renameState');
 
+        explorationInitStateNameService.init('Hola');
         ExplorationStatesService.registerOnStateRenamedCallback(spy);
         ExplorationStatesService.renameState('Hola', 'Bonjour');
 
         expect(spy).toHaveBeenCalledWith('Hola', 'Bonjour');
+      });
+
+      it('should not rename state when state name is invalid', function() {
+        var spy = jasmine.createSpy('callback');
+        spyOn(changeListService, 'renameState');
+        spyOn(validatorsService, 'isValidStateName')
+          .and.returnValue(false);
+
+        ExplorationStatesService.registerOnStateRenamedCallback(spy);
+        ExplorationStatesService.renameState('Hola', 'Bonjour');
+
+        expect(spy).not.toHaveBeenCalled();
+      });
+
+      it('should not rename state when new state name is ' +
+        'old state name', function() {
+        var spy = jasmine.createSpy('callback');
+        spyOn(changeListService, 'renameState');
+
+        ExplorationStatesService.registerOnStateRenamedCallback(spy);
+        ExplorationStatesService.renameState('Hola', 'Hola');
+
+        expect(spy).not.toHaveBeenCalled();
       });
     });
 
@@ -159,7 +207,7 @@ describe('ExplorationStatesService', function() {
       it('should callback when answer groups of a state are saved',
         function() {
           var spy = jasmine.createSpy('callback');
-          spyOn(ChangeListService, 'editStateProperty');
+          spyOn(changeListService, 'editStateProperty');
 
           ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
           ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
@@ -174,9 +222,9 @@ describe('ExplorationStatesService', function() {
     expect(
       ExplorationStatesService.getSolicitAnswerDetailsMemento(
         'Hola', 'solicit_answer_details')).toEqual(false);
-    spyOn(ChangeListService, 'editStateProperty');
+    const changeListSpy = spyOn(changeListService, 'editStateProperty');
     ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
-    expect(ChangeListService.editStateProperty).toHaveBeenCalledWith(
+    expect(changeListSpy).toHaveBeenCalledWith(
       'Hola', 'solicit_answer_details', true, false);
     expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(
       'Hola', 'solicit_answer_details')).toEqual(true);

@@ -21,13 +21,13 @@ import { OppiaAngularRootComponent } from
 
 require('rich_text_components/richTextComponentsRequires.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
-require('components/summary-tile/subtopic-summary-tile.directive.ts');
+require('components/summary-tile/subtopic-summary-tile.component.ts');
 
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');

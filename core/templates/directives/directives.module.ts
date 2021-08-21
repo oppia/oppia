@@ -21,28 +21,29 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { FocusOnDirective } from './focus-on.directive';
+import { HeadroomDirective } from './headroom.directive';
 import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     FormsModule,
   ],
   declarations: [
     FocusOnDirective,
+    HeadroomDirective,
     MathJaxDirective,
-    NgInitDirective
+    NgInitDirective,
   ],
   entryComponents: [],
   exports: [
     FocusOnDirective,
+    HeadroomDirective,
     MathJaxDirective,
-    NgInitDirective
+    NgInitDirective,
   ],
 })
 

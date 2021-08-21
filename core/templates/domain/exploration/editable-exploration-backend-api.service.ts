@@ -44,7 +44,7 @@ export class EditableExplorationBackendApiService {
 
   private async _updateExplorationAsync(
       explorationId: string,
-      explorationVersion: string,
+      explorationVersion: number,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     const putData = {
@@ -63,7 +63,7 @@ export class EditableExplorationBackendApiService {
   }
 
   private async _deleteExplorationAsync(explorationId: string): Promise<void> {
-    return this.httpClient['delete']<void>(
+    return this.httpClient.delete<void>(
       this._getExplorationUrl(explorationId, false)).pipe(tap(
       // Delete item from the ReadOnlyExplorationBackendApiService's cache.
       _ => this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
@@ -116,7 +116,7 @@ export class EditableExplorationBackendApiService {
    */
   async updateExplorationAsync(
       explorationId: string,
-      explorationVersion: string,
+      explorationVersion: number,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     return this._updateExplorationAsync(

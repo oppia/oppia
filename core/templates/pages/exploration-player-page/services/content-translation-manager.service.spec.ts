@@ -27,35 +27,36 @@ import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { AudioTranslationLanguageService} from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
-  let scof: StateCardObjectFactory;
   let suof: SubtitledUnicodeObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
+  let atls: AudioTranslationLanguageService;
 
   let writtenTranslations: WrittenTranslations;
 
   beforeEach(() => {
-    ctms = TestBed.get(ContentTranslationManagerService);
-    ehfs = TestBed.get(ExplorationHtmlFormatterService);
-    iof = TestBed.get(InteractionObjectFactory);
-    pts = TestBed.get(PlayerTranscriptService);
-    scof = TestBed.get(StateCardObjectFactory);
-    suof = TestBed.get(SubtitledUnicodeObjectFactory);
-    wtof = TestBed.get(WrittenTranslationsObjectFactory);
+    ctms = TestBed.inject(ContentTranslationManagerService);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
+    iof = TestBed.inject(InteractionObjectFactory);
+    pts = TestBed.inject(PlayerTranscriptService);
+    suof = TestBed.inject(SubtitledUnicodeObjectFactory);
+    wtof = TestBed.inject(WrittenTranslationsObjectFactory);
+    atls = TestBed.inject(AudioTranslationLanguageService);
 
     let defaultOutcomeDict = {
       dest: 'dest_default',
@@ -185,15 +186,17 @@ describe('Content translation manager service', () => {
     const interaction = iof.createFromBackendDict(interactionDict);
 
     pts.addNewCard(
-      scof.createNewCard(
+      StateCard.createNewCard(
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          interaction.id, interaction.customizationArgs, true, null, null),
+          <string>interaction.id, interaction.customizationArgs, true, '', null
+        ),
         interaction,
         RecordedVoiceovers.createEmpty(),
         writtenTranslations,
-        'content'
+        'content',
+        atls
       )
     );
   });
@@ -216,7 +219,7 @@ describe('Content translation manager service', () => {
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
     expect(interaction.hints[0].hintContent.html).toBe('<p>fr hint</p>');
-    expect(interaction.solution.explanation.html).toBe('<p>fr solution</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
     expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>fr feedback</p>');
@@ -224,7 +227,7 @@ describe('Content translation manager service', () => {
       contentId: 'rule_input_3',
       normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
     });
-    expect(interaction.defaultOutcome.feedback.html).toBe(
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
   });
 
@@ -248,7 +251,7 @@ describe('Content translation manager service', () => {
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
     expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
-    expect(interaction.solution.explanation.html).toBe('<p>fr solution</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
     expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>fr feedback</p>');
@@ -256,7 +259,7 @@ describe('Content translation manager service', () => {
       contentId: 'rule_input_3',
       normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
     });
-    expect(interaction.defaultOutcome.feedback.html).toBe(
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
   });
 
@@ -279,7 +282,7 @@ describe('Content translation manager service', () => {
 
     expect(card.contentHtml).toBe('<p>en content</p>');
     expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
-    expect(interaction.solution.explanation.html).toBe('<p>en solution</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>en solution</p>');
     expect(interaction.customizationArgs).toEqual(originalCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>en feedback</p>');
@@ -287,7 +290,7 @@ describe('Content translation manager service', () => {
       contentId: 'rule_input_3',
       normalizedStrSet: ['InputString']
     });
-    expect(interaction.defaultOutcome.feedback.html).toBe(
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>en default outcome</p>');
   });
 
@@ -316,6 +319,27 @@ describe('Content translation manager service', () => {
     let translatedHtml = ctms.getTranslatedHtml(
       writtenTranslations, 'fr', content);
     expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
+  it('should throw error if content id is not defined', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', null);
+    expect(() => {
+      ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
+    }).toThrowError('Content ID does not exist');
+    expect(() => {
+      ctms._swapContent(writtenTranslations, 'fr', content);
+    }).toThrowError('Content ID does not exist');
   });
 
   it('should return default content HTML if translation is nonexistent', () => {
@@ -434,16 +458,17 @@ describe('Content translation manager service', () => {
     pts.init();
     const newInteraction = iof.createFromBackendDict(newInteractionDict);
     pts.addNewCard(
-      scof.createNewCard(
+      StateCard.createNewCard(
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          newInteraction.id, newInteraction.customizationArgs, true, null,
+          <string>newInteraction.id, newInteraction.customizationArgs, true, '',
           null),
         newInteraction,
         RecordedVoiceovers.createEmpty(),
         newWrittenTranslations,
-        'content'
+        'content',
+        atls
       )
     );
 
@@ -457,10 +482,10 @@ describe('Content translation manager service', () => {
 
   describe('with custom INTERACTION_SPECS cases', () => {
     beforeAll(() => {
-      // This throws a "Property 'DummyInteraction' does not exist on type"
-      // error.
+      // This throws a error. We need to suppress this error because
+      // "Property 'DummyInteraction' does not exist on type".
       // @ts-expect-error
-      INTERACTION_SPECS.DummyInteraction = {
+      InteractionSpecsConstants.INTERACTION_SPECS.DummyInteraction = {
         customization_arg_specs: [{
           name: 'dummyCustArg',
           schema: {
@@ -486,10 +511,10 @@ describe('Content translation manager service', () => {
     });
 
     afterAll(() => {
-      // This throws a "Property 'DummyInteraction' does not exist on type"
-      // error.
+      // This throws a error. We need to suppress this error because
+      // "Property 'DummyInteraction' does not exist on type".
       // @ts-expect-error
-      delete INTERACTION_SPECS.DummyInteraction;
+      delete InteractionSpecsConstants.INTERACTION_SPECS.DummyInteraction;
     });
 
     it('should replace translatable customization args', () => {

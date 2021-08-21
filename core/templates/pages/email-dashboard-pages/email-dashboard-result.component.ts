@@ -16,7 +16,7 @@
  * @fileoverview Component for oppia email dashboard page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 angular.module('oppia').component('emailDashboardResultPage', {
   template: require('./email-dashboard-result.component.html'),
@@ -69,17 +69,17 @@ angular.module('oppia').component('emailDashboardResultPage', {
             email_body: ctrl.emailBody,
             email_intent: ctrl.emailIntent,
             max_recipients: (
-              ctrl.emailOption !== 'all' ? ctrl.max_recipients : null)
+              ctrl.emailOption !== 'all' ? ctrl.maxRecipients : null)
           };
 
-          $http.post(resultHandlerUrl, {
-            data: data
-          }).then(function() {
+          $http.post(
+            resultHandlerUrl, data
+          ).then(function() {
             ctrl.emailSubmitted = true;
             $timeout(function() {
               WindowRef.nativeWindow.location.href = EMAIL_DASHBOARD_PAGE;
             }, 4000);
-          })['catch'](function() {
+          }).catch(function() {
             ctrl.errorHasOccurred = true;
             ctrl.submitIsInProgress = false;
           });

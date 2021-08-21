@@ -17,7 +17,7 @@
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { MathEquationEditorComponent } from './math-equation-editor.component';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -65,32 +65,37 @@ describe('MathEquationEditor', () => {
       MathEquationEditorComponent);
     component = fixture.componentInstance;
     window.Guppy = MockGuppy;
-    component.currentValue = '';
   });
 
   afterEach(() => {
+    // This throws "The operand of a 'delete' operator must be optional".
+    // We need to suppress this error because "Property Guppy is not an
+    // optional property in global interface Window. A property needs to
+    // be optional or have undefined as a union type in order to be deleted".
+    // @ts-ignore
     delete window.Guppy;
   });
 
   it('should add the change handler to guppy', () => {
+    component.currentValue = '';
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
   });
 
   it('should initialize component.value with an empty string', () => {
+    component.currentValue = '';
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
-    component.value = null;
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
@@ -117,6 +122,7 @@ describe('MathEquationEditor', () => {
   });
 
   it('should set the value of showOSK to true', () => {
+    component.currentValue = '';
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 
@@ -124,7 +130,7 @@ describe('MathEquationEditor', () => {
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });

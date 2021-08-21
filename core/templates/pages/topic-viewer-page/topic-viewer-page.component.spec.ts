@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { TopicViewerPageComponent } from
@@ -28,13 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { PageTitleService } from 'services/page-title.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Topic viewer page', () => {
   let httpTestingController = null;

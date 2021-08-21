@@ -16,8 +16,8 @@
 
 """Tests for state domain objects and methods defined on them."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import logging
@@ -34,10 +34,9 @@ from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
 import feconf
+import python_utils
 import schema_utils
 import utils
-
-import contextlib2
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -77,47 +76,44 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': False
             }
         }
-
-        state_answer_group_dict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>State Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': '<p>HasElementXAtPositionY rule_spec html</p>',
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                    'y': '<p>y input for HasElementXAtPositionY rule_spec </p>'
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[(
-                        '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'
-                        'ule_spec htmls</p>')]]
-                }
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>State Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }),
+                state_domain.RuleSpec(
+                    'HasElementXAtPositionY',
+                    {
+                        'x': '<p>HasElementXAtPositionY rule_spec '
+                             'html</p>',
+                        'y': 2
+                    }),
+                state_domain.RuleSpec(
+                    'HasElementXBeforeElementY',
+                    {
+                        'x': '<p>x input for HasElementXAtPositionY '
+                             'rule_spec </p>',
+                        'y': '<p>y input for HasElementXAtPositionY '
+                             'rule_spec </p>'
+                    }),
+                state_domain.RuleSpec(
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                    {
+                        'x': [[(
+                            '<p>IsEqualToOrderingWithOneItemAtIncorrectPos'
+                            'ition rule_spec htmls</p>')
+                              ]]
+                    })
+            ],
+            [],
+            None
+        )
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
@@ -318,7 +314,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_answer_groups(
-            [state_answer_group_dict])
+            [state_answer_group])
         state.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
                 state_written_translations_dict))
@@ -348,7 +344,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with rules_registry_swap, interaction_registry_swap:
             html_list = state.get_all_html_content_strings()
 
-        self.assertEqual(
+        self.assertItemsEqual(
             html_list,
             [
                 '<p>state written_translation solution-hi</p>',
@@ -404,30 +400,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>state outcome html</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }})
+            ],
+            [],
+            None
+        )]
         state_default_outcome = state_domain.Outcome(
             'State1', state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for State1</p>'),
@@ -469,7 +457,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
         state.update_interaction_answer_groups(
-            [state_answer_group_dict])
+            state_answer_group)
         state.update_interaction_default_outcome(state_default_outcome)
         state.update_interaction_hints(state_hint_list)
         solution = state_domain.Solution.from_dict(
@@ -527,42 +515,37 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ]
             }
         }
-        state_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': ['<p>Equals rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
-                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
-                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
-                }
-            }],
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>state outcome html</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>Equals rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'ContainsAtLeastOneOf',
+                    {
+                        'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'IsProperSubsetOf',
+                    {
+                        'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'DoesNotContainAtLeastOneOf',
+                    {
+                        'x': ['<p>DoesNotContainAtLeastOneOf rule_'
+                              'spec html</p>']
+                    })
+            ],
+            [],
+            None
+        )
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
@@ -587,7 +570,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_answer_groups(state_answer_groups)
+        state.update_interaction_answer_groups([state_answer_group])
         state.update_interaction_customization_args(
             state_customization_args_dict)
         state.update_next_content_id_index(4)
@@ -651,45 +634,41 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': ['<p>Equals rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
-                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
-                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
-                }
-            }],
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>state outcome html</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>Equals rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'ContainsAtLeastOneOf',
+                    {
+                        'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+
+                    }),
+                state_domain.RuleSpec(
+                    'IsProperSubsetOf',
+                    {
+                        'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'DoesNotContainAtLeastOneOf',
+                    {
+                        'x': ['<p>DoesNotContainAtLeastOneOf rule_'
+                              'spec html</p>']
+                    })
+            ],
+            [],
+            None
+        )
 
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_answer_groups(state_answer_groups)
+        state.update_interaction_answer_groups([state_answer_group])
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
             rules_registry.Registry.get_html_field_types_to_rule_specs(
@@ -756,27 +735,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': ['<p>init_state customization arg html 1</p>']
-                }
-            }],
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>state outcome html</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>init_state customization arg html 1</p>']
+                    })
+            ],
+            [],
+            None
+        )
         state_customization_args_dict = {
             'maxAllowableSelectionCount': {
                 'value': 1
@@ -806,7 +779,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
-        state.update_interaction_answer_groups(state_answer_groups)
+        state.update_interaction_answer_groups([state_answer_group])
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
             rules_registry.Registry.get_html_field_types_to_rule_specs(
@@ -974,6 +947,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'linked_skill_id': None,
             'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
@@ -1122,47 +1096,41 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome)
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': (
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', (
                         '<oppia-noninteractive-tabs tab_contents-with-value'
                         '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
                         '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                         'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
                         'quot;:&amp;quot;hello&amp;quot;}]\">'
-                        '</oppia-noninteractive-tabs>')
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+                        '</oppia-noninteractive-tabs>')),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
 
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_answer_group])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
-        answer_group_dict['outcome']['feedback']['html'] = (
+        state_answer_group.outcome.feedback.html = (
             '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
             '&amp;quot;" filepath-with-value="&amp;quot;startBlue.png&amp;'
             'quot;" alt-with-value="&amp;quot;&amp;quot;">'
             '</oppia-noninteractive-image></p>')
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_answer_group])
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         init_state.update_content(
@@ -1293,33 +1261,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_interaction_default_outcome(default_outcome)
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'), False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
 
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_answer_group])
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1360,13 +1321,32 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_written_translations(written_translations)
 
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'hint_1': '<p>hint one</p>',
-                'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>'
-            })
+            content_id_mapping_needing_translations[
+                'hint_1'
+            ].content,
+            '<p>hint one</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'solution'
+            ].content,
+            '<p>hello_world is a string</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'feedback_1'
+            ].content,
+            '<p>Feedback</p>',
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content,
+            '<p>The default outcome.</p>'
+        )
 
     def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1396,34 +1376,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
 
         init_state.update_interaction_default_outcome(default_outcome)
-
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_4',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
 
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_answer_group])
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1446,24 +1419,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations_dict = {
             'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>hello!</p>',
-                        'needs_update': False
-                    }
-                },
+                'content': {},
                 'hint_1': {},
                 'default_outcome': {},
                 'solution': {},
                 'feedback_1': {},
-                'ca_placeholder_0': {
-                    'hi': {
-                        'data_format': 'unicode',
-                        'translation': 'Placeholder translation',
-                        'needs_update': False
-                    }
-                },
+                'ca_placeholder_0': {},
                 'rule_input_4': {}
             }
         }
@@ -1472,13 +1433,178 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_written_translations(written_translations)
 
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'hint_1': '<p>hint one</p>',
-                'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>'
-            })
+            content_id_mapping_needing_translations[
+                'hint_1'
+            ].content,
+            '<p>hint one</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'solution'
+            ].content,
+            '<p>hello_world is a string</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'feedback_1'
+            ].content,
+            '<p>Feedback</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content,
+            '<p>The default outcome.</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'content'
+            ].content,
+            '<p>This is content</p>',
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_placeholder_0'
+            ].content,
+            'Placeholder'
+        )
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Contains')
+
+    def test_get_content_id_mapping_needing_translations_for_set_input_rule(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('SetInput')
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'unicodeStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        init_state.update_interaction_answer_groups(
+            [state_answer_group])
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'feedback_1': {},
+                'rule_input_4': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'SetInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Equals')
+
+    def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        # Set the content.
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        # Set the multiple choice interaction.
+        init_state.update_interaction_id('MultipleChoiceInput')
+        state_interaction_cust_args = {
+            'showChoicesInShuffledOrder': {
+                'value': True
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '\u003cp\u003eoption 1\u003c/p\u003e'
+                    },
+                    {
+                        'content_id': 'ca_choices_1',
+                        'html': '1,000'
+                    },
+                    {
+                        'content_id': 'ca_choices_2',
+                        'html': '100'
+                    }
+                ]
+            }
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+        # Set the default outcome.
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+        # Set the translations.
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'default_outcome': {},
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        # Choice 2 should not be returned as its value is numeric.
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'content'
+            ].content, '<p>This is content</p>')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content, '<p>The default outcome.</p>')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_0'
+            ].content, '\u003cp\u003eoption 1\u003c/p\u003e')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_1'
+            ].content, '1,000')
+        self.assertFalse(
+            'ca_choices_2' in content_id_mapping_needing_translations)
 
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1638,6 +1764,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.update_solicit_answer_details('abc')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
+
+    def test_update_linked_skill_id(self):
+        """Test updating linked_skill_id."""
+        state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(state.linked_skill_id, None)
+        state.update_linked_skill_id('string_2')
+        self.assertEqual(state.linked_skill_id, 'string_2')
 
     def test_update_card_is_checkpoint(self):
         """Test update card_is_checkpoint."""
@@ -1820,6 +1953,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -1901,6 +2035,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2075,6 +2210,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2145,6 +2281,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2280,6 +2417,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2339,6 +2477,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2459,6 +2598,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2508,6 +2648,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2670,6 +2811,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -2751,6 +2893,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2874,6 +3017,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2982,6 +3126,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3066,6 +3211,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -3159,6 +3305,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3201,6 +3348,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3597,6 +3745,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, True)
 
+    def test_validate_state_linked_skill_id(self):
+        """Test validation of linked_skill_id."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.linked_skill_id, None)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected linked_skill_id to be ' +
+            'a str, received 12.'):
+            with self.swap(init_state, 'linked_skill_id', 12):
+                exploration.validate()
+        self.assertEqual(init_state.linked_skill_id, None)
+
     def test_validate_state_card_is_checkpoint(self):
         """Test validation of card_is_checkpoint."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3659,33 +3819,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_answer_group_feedback(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
 
         exploration.init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_answer_group])
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'feedback_1',
@@ -3698,41 +3852,35 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_answer_group_rules(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }, {
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test1']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                            }
+                    }),
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test1']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
 
         exploration.init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_answer_group])
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id rule_input_Contains'):
@@ -3807,7 +3955,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(
@@ -4064,27 +4212,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_interaction_confirmed_unclassified_answers(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': 'Test'
+                    })
+            ],
+            [],
+            None
+        )
 
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
@@ -4093,12 +4235,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         (
             exploration.init_state
             .update_interaction_confirmed_unclassified_answers(
-                answer_groups_list)
+                [state_answer_group])
         )
 
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
-            answer_groups_list)
+            [state_answer_group])
 
     def test_cannot_update_non_list_interaction_answer_groups(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4110,94 +4252,72 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_answer_groups_with_non_dict_rule_inputs(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': [],
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains', []
+                    )
+            ],
+            [],
+            None
+        )
 
         with self.assertRaisesRegexp(
             Exception,
             re.escape('Expected rule_inputs to be a dict, received []')
         ):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                [state_answer_group])
 
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': {},
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'), False, [], None, None
+            ), {}, [], None
+        )
+        state_answer_group.rule_specs = {}
 
         with self.assertRaisesRegexp(
             Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                [state_answer_group])
 
     def test_cannot_update_answer_groups_with_invalid_rule_input_value(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': [[]]
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': [[]]
+                            }
+                    })
+            ],
+            [],
+            None
+        )
 
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
-                'Equals\'} has the wrong type. It should be a TranslatableSetOf'
-                'NormalizedString.'
+                'Value has the wrong type. It should be a TranslatableSetOf'
+                'NormalizedString. The value is'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                [state_answer_group])
 
     def test_validate_rule_spec(self):
         observed_log_messages = []
@@ -4209,33 +4329,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
 
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        exploration.init_state.update_interaction_answer_groups(answer_groups)
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        exploration.init_state.update_interaction_answer_groups(
+            [state_answer_group])
 
-        with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
+        with logging_swap, self.assertRaisesRegexp(KeyError, '\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
                 .rule_specs[0].validate([], {})
@@ -4245,7 +4360,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([u\'x\'])'
+                'parameter names: {\'x\'}'
             ]
         )
 
@@ -4408,7 +4523,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations.add_content_id_for_translation('feedback_1')
         written_translations.add_content_id_for_translation('feedback_2')
-        self.assertEqual(
+        self.assertItemsEqual(
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
@@ -4634,7 +4749,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
-            written_translations.validate([b'invalid_content'])
+            written_translations.validate(['invalid_content'])
 
     def test_get_content_ids_that_are_correctly_translated(self):
         written_translations_dict = {
@@ -4743,8 +4858,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
         recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
         recorded_voiceovers.add_content_id_for_voiceover('feedback_2')
-        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [
-            'feedback_2', 'feedback_1'])
+        self.assertItemsEqual(
+            recorded_voiceovers.get_content_ids_for_voiceovers(),
+            ['feedback_2', 'feedback_1'])
 
     def test_add_content_id_for_voiceovers_adds_content_id(self):
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
@@ -4932,7 +5048,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state recorded_voiceovers to match the listed '
                 'content ids [\'invalid_content\']')):
-            recorded_voiceovers.validate([b'invalid_content'])
+            recorded_voiceovers.validate(['invalid_content'])
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):

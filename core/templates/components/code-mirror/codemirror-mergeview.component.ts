@@ -18,6 +18,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-codemirror-mergeview',
@@ -27,14 +28,24 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class CodemirrorMergeviewComponent implements
   AfterViewInit, OnInit, OnChanges {
   @Input() options = {};
-  @Input() leftValue;
-  @Input() rightValue;
-  codeMirrorInstance: CodeMirror.MergeView.MergeViewEditor;
-  constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
+  // These properties are initialized using Angular lifecycle hooks
+  // and component interactions, therefore we need to do non-null assertion,
+  // for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() leftValue!: string | undefined;
+  @Input() rightValue!: string | undefined;
+  codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
+
+  constructor(
+    private elementRef: ElementRef,
+    private ngZone: NgZone,
+    private windowRef: WindowRef) { }
 
   ngOnInit(): void {
     // Require CodeMirror.
-    if (window.CodeMirror === undefined) {
+    if (
+      (this.windowRef.nativeWindow as typeof window).CodeMirror === undefined
+    ) {
       throw new Error('CodeMirror not found.');
     }
   }
@@ -43,14 +54,15 @@ export class CodemirrorMergeviewComponent implements
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {
-      this.codeMirrorInstance = window.CodeMirror.MergeView(
-        this.elementRef.nativeElement,
-        {
-          value: this.leftValue !== undefined ? this.leftValue : ' ',
-          orig: this.rightValue !== undefined ? this.rightValue : ' ',
-          ...this.options
-        }
-      );
+      this.codeMirrorInstance =
+        (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
+          this.elementRef.nativeElement,
+          {
+            value: this.leftValue !== undefined ? this.leftValue : ' ',
+            orig: this.rightValue !== undefined ? this.rightValue : ' ',
+            ...this.options
+          }
+        );
     });
   }
 

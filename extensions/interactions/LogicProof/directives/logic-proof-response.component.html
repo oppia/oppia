@@ -1,0 +1,17 @@
+<div>
+  <span [innerHTML]="answer.displayed_question | translate: {target: answer.target_string, assumptions: answer.assumptions_string}"></span>
+  <div *ngIf="answer.correct">
+    <pre>{{ answer.displayed_proof[0] }}</pre>
+  </div>
+
+  <div *ngIf="!answer.correct">
+    <div>
+      <pre>
+        {{ answer.displayed_proof[0] }}
+        <div class="logic-proof-erroneous-line">{{ answer.displayed_proof[1] }}</div>
+        {{ answer.displayed_proof[2] }}
+      </pre>
+    </div>
+    <p class="logic-proof-error-message">{{ answer.displayed_message }}</p>
+  </div>
+</div>

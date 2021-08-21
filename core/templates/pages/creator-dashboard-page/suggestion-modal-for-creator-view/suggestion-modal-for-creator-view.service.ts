@@ -15,7 +15,7 @@
 /**
  * @fileoverview Service to display suggestion modal in creator view.
  */
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -116,7 +116,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             }
           }
           clearActiveThread();
-        })['catch'](function() {
+        }).catch(function() {
           $log.error('Error resolving suggestion');
         });
       }, () => {

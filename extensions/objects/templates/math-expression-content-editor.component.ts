@@ -29,35 +29,56 @@ import { ExternalRteSaveService } from 'services/external-rte-save.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import 'mathjaxConfig.ts';
+
+interface MathExpression {
+  'svg_filename': string;
+  'raw_latex': string;
+  mathExpressionSvgIsBeingProcessed: boolean;
+  svgFile: string;
+}
+
 @Component({
   selector: 'math-expression-content-editor',
   templateUrl: './math-expression-content-editor.component.html',
   styleUrls: []
 })
 export class MathExpressionContentEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() alwaysEditable: boolean;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() alwaysEditable: boolean = false;
+  @Input() value!: MathExpression;
   @Output() valueChanged = new EventEmitter();
+  numberOfElementsInQueue!: number;
+  svgString!: string;
   placeholderText = '\\frac{x}{y}';
-  numberOfElementsInQueue: number;
-  svgString: string;
-  active: boolean;
-  localValue: {label: string} = {label: ''};
+  active: boolean = false;
+  localValue: { label: string } = { label: '' };
 
   constructor(
     private alertsService: AlertsService,
     private externalRteSaveService: ExternalRteSaveService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     // Reset the component each time the value changes (e.g. if this is
     // part of an editable list).
     this.svgString = '';
     this.numberOfElementsInQueue = 0;
-    this.value.mathExpressionSvgIsBeingProcessed = true;
+    // If svg_filename and raw_latex values are already initialised, it means
+    // that an existing math expression is being edited. In this case, the
+    // editor template can be initialised with the actual values instead of
+    // default ones.
+    if (this.value.svg_filename && this.value.raw_latex) {
+      this.localValue.label = this.value.raw_latex;
+      this.value.mathExpressionSvgIsBeingProcessed = false;
+      this.convertLatexStringToSvg(this.localValue.label);
+    } else {
+      this.value.mathExpressionSvgIsBeingProcessed = true;
+    }
     this.valueChanged.emit(this.value);
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
@@ -77,7 +98,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // TODO(#10197): Upgrade to MathJax 3, after proper investigation
   // and testing. MathJax 3 provides a faster and more cleaner way to
   // convert a LaTeX string to an SVG.
-  private convertLatexStringToSvg(inputLatexString) {
+  private convertLatexStringToSvg(inputLatexString: string) {
     const outputElement = document.createElement('div');
     // We need to append the element with a script tag so that Mathjax
     // can typeset and convert this element. The typesetting is not
@@ -94,8 +115,15 @@ export class MathExpressionContentEditorComponent implements OnInit {
     this.numberOfElementsInQueue++;
     MathJax.Hub.Queue(() => {
       if (outputElement.getElementsByTagName('svg')[0] !== undefined) {
-        this.svgString = (
-          outputElement.getElementsByTagName('svg')[0].outerHTML);
+        let svgElement = outputElement.getElementsByTagName('svg')[0];
+        // This is required so that DOMParser can correctly set the namespaceURI
+        // for the document when parsing the SVG string in SVGSanitizerService.
+        // Without this change, getting the 'outerHTML' property on the parsed
+        // document will result in xmlns being removed in Firefox browsers and
+        // the image rendered will appear broken. Note that Chrome's
+        // implementation of outerHTML does not remove xmlns.
+        svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        this.svgString = svgElement.outerHTML;
       }
       this.numberOfElementsInQueue--;
       // We need to ensure that all the typepsetting requests in the

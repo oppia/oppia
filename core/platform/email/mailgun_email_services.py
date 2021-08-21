@@ -16,19 +16,28 @@
 
 """Provides mailgun api to send emails."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 
 import feconf
 import python_utils
 
+from typing import Dict, List, Optional, Union # isort:skip
+
 
 def send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
+        sender_email: str,
+        recipient_emails: List[str],
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
+) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
 
@@ -84,12 +93,11 @@ def send_email_to_recipients(
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body
+            'subject': subject.encode('utf-8'),
+            'text': plaintext_body.encode('utf-8'),
+            'html': html_body.encode('utf-8'),
+            'to': email_list[0] if len(email_list) == 1 else email_list
         }
-
-        data['to'] = email_list[0] if len(email_list) == 1 else email_list
 
         if bcc:
             data['bcc'] = bcc[0] if len(bcc) == 1 else bcc
@@ -102,8 +110,13 @@ def send_email_to_recipients(
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
 
-        encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
-        auth_str = 'Basic %s' % encoded
+        # The b64encode accepts and returns bytes, so we first need to encode
+        # the MAILGUN_API_KEY to bytes, then decode the returned bytes back
+        # to string.
+        base64_mailgun_api_key = base64.b64encode(
+            b'api:%b' % feconf.MAILGUN_API_KEY.encode('utf-8')
+        ).strip().decode('utf-8')
+        auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}
         server = (
             ('https://api.mailgun.net/v3/%s/messages')

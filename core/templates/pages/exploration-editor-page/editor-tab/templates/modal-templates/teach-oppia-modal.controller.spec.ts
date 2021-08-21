@@ -39,7 +39,7 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Teach Oppia Modal Controller', function() {
   importAllAngularServices();
@@ -115,6 +115,7 @@ describe('Teach Oppia Modal Controller', function() {
       hints: [],
       solution: null
     },
+    linked_skill_id: null,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}

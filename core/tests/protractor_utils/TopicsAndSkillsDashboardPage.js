@@ -105,10 +105,22 @@ var TopicsAndSkillsDashboardPage = function() {
   var assignedTopicNamesInput = element.all(
     by.css('.protractor-test-unassign-topic'));
   var assignedTopicNameInputClass = by.css('.protractor-test-unassign-topic');
+  var topicNameFieldElement = element(
+    by.css('.protractor-test-topic-name-field'));
+  var searchFieldLocator = by.css('.select2-search__field');
+  var editor = element(by.css('.protractor-test-concept-card-text'));
+  var retLocator = by.css('.protractor-test-rte');
+  var skillDescriptionField = element(
+    by.css('.protractor-test-skill-description-field'));
 
   this.get = async function() {
-    await browser.get('/');
-    await waitFor.pageToFullyLoad();
+    await waitFor.clientSideRedirection(async() => {
+      await browser.get('/');
+    }, (url) => {
+      return /learner-dashboard/.test(url);
+    }, async() => {
+      await waitFor.pageToFullyLoad();
+    });
     await general.navigateToTopicsAndSkillsDashboardPage();
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/topics-and-skills-dashboard');
@@ -167,6 +179,9 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
+    await waitFor.visibilityOf(
+      assignSkillToTopicButtons.first(),
+      'Assign skill to topic buttons taking too long to appear');
     expect(await assignSkillToTopicButtons.count()).toEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons.first());
@@ -216,8 +231,7 @@ var TopicsAndSkillsDashboardPage = function() {
     }
     await browser.switchTo().window(newHandle);
     await waitFor.visibilityOf(
-      element(by.css('.protractor-test-topic-name-field')),
-      'Topic Editor is taking too long to appear.');
+      topicNameFieldElement, 'Topic Editor is taking too long to appear.');
     if (shouldCloseTopicEditor) {
       await browser.driver.close();
       await browser.switchTo().window(parentHandle);
@@ -241,7 +255,7 @@ var TopicsAndSkillsDashboardPage = function() {
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.');
     var filterKeywordInput = topicFilterKeywordField.element(
-      by.css('.select2-search__field'));
+      searchFieldLocator);
 
     await action.sendKeys(
       'Topic Dashboard keyword filter', filterKeywordInput, keyword + '\n');
@@ -301,21 +315,16 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Create Skill button', createSkillButtonSecondary);
     }
 
-    await waitFor.visibilityOf(
-      skillNameField,
-      'Create Skill modal takes too long to appear.');
     await action.sendKeys('Skill Name Field', skillNameField, description);
     await action.click(
       'Open Concept Card button', openConceptCardExplanationButton);
 
-    var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-    var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
-    await action.click(
-      'Skill review material input', skillReviewMaterialInput);
+    var skillReviewMaterialInput = editor.element(retLocator);
     await action.sendKeys(
-      'Skill Review Material Field', skillReviewMaterialInput, reviewMaterial);
+      'Skill Review Material Field', skillReviewMaterialInput,
+      reviewMaterial, true);
 
     await action.click('Create Skill button', confirmSkillCreationButton);
 
@@ -338,8 +347,7 @@ var TopicsAndSkillsDashboardPage = function() {
         'Create skill modal takes too long to be disappear.');
     } else {
       await waitFor.visibilityOf(
-        element(by.css('.protractor-test-skill-description-field')),
-        'Skill Editor is taking too long to appear.');
+        skillDescriptionField, 'Skill Editor is taking too long to appear.');
     }
     await waitFor.pageToFullyLoad();
   };

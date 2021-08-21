@@ -18,12 +18,12 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
@@ -144,10 +144,9 @@ angular.module('oppia').component('contributionsAndReview', {
               ' / ' + details.chapter_title);
           }
 
-          var change = suggestion.change;
           var requiredData = {
             id: suggestion.suggestion_id,
-            heading: $filter('formatRtePreview')(change.translation_html),
+            heading: getTranslationSuggestionHeading(suggestion),
             subheading: subheading,
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
@@ -157,6 +156,14 @@ angular.module('oppia').component('contributionsAndReview', {
           translationContributionsSummaryList.push(requiredData);
         });
         return translationContributionsSummaryList;
+      };
+
+      var getTranslationSuggestionHeading = function(suggestion) {
+        const changeTranslation = suggestion.change.translation_html;
+        if (Array.isArray(changeTranslation)) {
+          return $filter('formatRtePreview')(changeTranslation.join(', '));
+        }
+        return $filter('formatRtePreview')(changeTranslation);
       };
 
       var resolveSuggestionSuccess = function(suggestionId) {
@@ -232,7 +239,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var _showTranslationSuggestionModal = function(
-          suggestionIdToSuggestion, initialSuggestionId, reviewable) {
+          suggestionIdToContribution, initialSuggestionId, reviewable) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
@@ -245,8 +252,8 @@ angular.module('oppia').component('contributionsAndReview', {
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            suggestionIdToSuggestion: function() {
-              return cloneDeep(suggestionIdToSuggestion);
+            suggestionIdToContribution: function() {
+              return cloneDeep(suggestionIdToContribution);
             },
             initialSuggestionId: function() {
               return initialSuggestionId;
@@ -297,15 +304,15 @@ angular.module('oppia').component('contributionsAndReview', {
           });
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
-          const suggestionIdToSuggestion = {};
+          const suggestionIdToContribution = {};
           for (let suggestionId in ctrl.contributions) {
             var contribution = ctrl.contributions[suggestionId];
-            suggestionIdToSuggestion[suggestionId] = contribution.suggestion;
+            suggestionIdToContribution[suggestionId] = contribution;
           }
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS, suggestion.target_id);
           _showTranslationSuggestionModal(
-            suggestionIdToSuggestion, suggestionId, reviewable);
+            suggestionIdToContribution, suggestionId, reviewable);
         }
       };
 

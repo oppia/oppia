@@ -29,32 +29,48 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
+import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
+import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
+import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
+    DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    SaveVersionMismatchModalComponent,
+    SaveValidationFailModalComponent,
+    ChangesInHumanReadableFormComponent,
+    LostChangesModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
+    DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    SaveVersionMismatchModalComponent,
+    SaveValidationFailModalComponent,
+    ChangesInHumanReadableFormComponent,
+    LostChangesModalComponent,
   ],
   providers: [
     {
@@ -77,6 +93,8 @@ class ExplorationEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

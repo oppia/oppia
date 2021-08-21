@@ -19,7 +19,7 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface NonnegativeIntSchema {
@@ -34,8 +34,11 @@ interface NonnegativeIntSchema {
   templateUrl: './nonnegative-int-editor.component.html'
 })
 export class NonnegativeIntEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: number;
 
   @Output() valueChanged: EventEmitter<number> = new EventEmitter<number>();
   SCHEMA: NonnegativeIntSchema = {
@@ -47,7 +50,7 @@ export class NonnegativeIntEditorComponent implements OnInit {
       id: 'is_integer'
     }]
   };
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     if (!this.value) {
@@ -61,8 +64,12 @@ export class NonnegativeIntEditorComponent implements OnInit {
   }
 
   updateValue(value: number): void {
+    if (value === this.value) {
+      return;
+    }
     this.value = value;
     this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 angular.module('oppia').directive('nonnegativeIntEditor', downgradeComponent({

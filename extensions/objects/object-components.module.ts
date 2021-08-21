@@ -20,9 +20,9 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
@@ -32,11 +32,12 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
 import { FractionEditorComponent } from './templates/fraction-editor.component';
 import { FormsModule } from '@angular/forms';
 import { FilepathEditorComponent } from './templates/filepath-editor.component';
+import { ImageEditorComponent } from './templates/image-editor.component';
 import { GraphInputInteractionModule } from 'interactions/GraphInput/graph-input-interactions.module';
 import { GraphEditorComponent } from './templates/graph-editor.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { HtmlEditorComponent } from './templates/html-editor.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
 import { IntEditorComponent } from './templates/int-editor.component';
@@ -53,19 +54,43 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
 import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
 import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
 import { NumberWithUnitsEditorComponent } from './templates/number-with-units-editor.component';
+import { NumericExpressionEditorComponent } from './templates/numeric-expression-editor.component';
+import { PositionOfTermsEditorComponent } from './templates/position-of-terms-editor.component';
+import { PositiveIntEditorComponent } from './templates/positive-int-editor.component';
+import { RatioExpressionEditorComponent } from './templates/ratio-expression-editor.component';
+import { RealEditorComponent } from './templates/real-editor.component';
+import { SanitizedUrlEditorComponent } from './templates/sanitized-url-editor.component';
+import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-algebraic-identifier-editor.component';
+import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
+import { SvgEditorComponent } from './templates/svg-editor.component';
+import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
+import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
+import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
+import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
+import { MatCardModule } from '@angular/material/card';
+import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-editor.component';
+import { TranslatableHtmlContentIdEditorComponent } from './templates/translatable-html-content-id.component';
+import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
+import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
+    CommonElementsModule,
     FormsModule,
     LeafletModule,
     SharedFormsModule,
     GraphInputInteractionModule,
     DynamicContentModule,
     DirectivesModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
+    MatCheckboxModule,
     NgbModalModule,
+    NgbTooltipModule,
     NgxTrimDirectiveModule
   ],
   declarations: [
@@ -76,6 +101,7 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -91,8 +117,25 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -102,6 +145,7 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -117,8 +161,25 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -128,6 +189,7 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -143,8 +205,25 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
 })
 

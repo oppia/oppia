@@ -51,9 +51,9 @@ import {
   SuggestionThreadObjectFactory
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict
+} from 'domain/topic/creator-topic-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';
@@ -69,12 +69,13 @@ interface CreatorDashboardDataBackendDict {
   'suggestions_to_review_list': SuggestionBackendDict[];
   'explorations_list': CreatorExplorationSummaryBackendDict[];
   'collections_list': CollectionSummaryBackendDict[];
-  'topic_summary_dicts': TopicSummaryBackendDict[];
+  'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
 }
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  lastWeekStats: CreatorDashboardStats;
+  // 'lastWeekStats' is null for a new creator.
+  lastWeekStats: CreatorDashboardStats | null;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
@@ -85,7 +86,8 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
-  topicSummaries: TopicSummary[];
+  // 'topicSummaryDicts' is null if no summary is provided for a topic.
+  topicSummaries: CreatorTopicSummary[] | null;
 }
 
 @Injectable({
@@ -172,7 +174,7 @@ export class CreatorDashboardBackendApiService {
         topicSummaries: (
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
-              topicSummaryDict => TopicSummary.createFromBackendDict(
+              topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
                 topicSummaryDict))) : null)
       };
     }, errorResponse => {

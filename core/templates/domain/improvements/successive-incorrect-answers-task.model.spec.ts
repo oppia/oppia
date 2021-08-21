@@ -121,9 +121,9 @@ describe('Successive incorrect answers task model', function() {
         entity_id: 'eid',
         entity_version: 1,
         // This throws "Type '"???"' is not assignable to type
-        // '"successive_incorrect_answers"'." This is because 'task_type'
-        // should be equal to 'successive_incorrect_answers' but we set it
-        // to an invalid value in order to test validations.
+        // '"successive_incorrect_answers"'.". We need to suppress this error
+        // because 'task_type' should be equal to 'successive_incorrect_answers'
+        // but we set it to an invalid value in order to test validations.
         // @ts-expect-error
         task_type: '???',
         target_type: 'state',

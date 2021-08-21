@@ -51,8 +51,8 @@ class MockWindowRef {
 }
 
 describe('Context service', () => {
-  let ecs: ContextService = null;
-  let urlService: UrlService = null;
+  let ecs: ContextService;
+  let urlService: UrlService;
   let windowRef: MockWindowRef;
 
   describe('behavior in the exploration learner view', () => {
@@ -196,6 +196,7 @@ describe('Context service', () => {
     it('should correctly set and retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('topic');
     });
 
@@ -317,6 +318,7 @@ describe('Context service', () => {
     it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('skill');
     });
 
@@ -330,6 +332,53 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(false);
         spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
+  });
+
+  describe('behavior in the blog dashboarrd page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the blog post id', () => {
+      expect(ecs.getEntityId()).toBe('undefined');
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog-dashboard');
+      spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue(
+        'sample123456');
+
+      expect(ecs.getEntityId()).toBe('sample123456');
+    });
+
+    it('should correctly retrieve the entity type', () => {
+      expect(ecs.getEntityType()).toBeUndefined();
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog-dashboard');
+
+      expect(ecs.getEntityType()).toBe('blog_post');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      expect(ecs.getPageContext()).toBe('other');
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog-dashboard');
+
+      expect(ecs.getPageContext()).toBe('blog_dashboard');
+    });
+
+    it('should correctly check that page allows editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(false);
+
+        spyOn(urlService, 'getPathname').and.returnValue(
+          '/blog-dashboard');
+
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
   });

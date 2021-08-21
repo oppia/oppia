@@ -31,7 +31,6 @@ describe('Exploration translation and voiceover tab', function() {
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
-  var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
   var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233, 179, 48)';
   var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
@@ -41,16 +40,14 @@ describe('Exploration translation and voiceover tab', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationPreviewTab = explorationEditorPage.getPreviewTab();
 
     await users.createUser(
       'voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
-    await users.createAndLoginAdminUser(
-      'superUser@translationTab.com', 'superUser');
-    await users.logout();
+    await users.createUserWithRole(
+      'voiceoverAdmin@exp.com', 'voiceoverManager', 'voiceover admin');
     await users.login('user@editorTab.com');
     await workflow.createExploration(true);
 
@@ -83,13 +80,15 @@ describe('Exploration translation and voiceover tab', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('This is final card.'));
     await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Test Exploration');
-    await explorationEditorSettingsTab.setCategory('Algorithms');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorSettingsTab.setObjective(
-      'Run tests using same exploration.');
     await explorationEditorPage.saveChanges('Done!');
+    await explorationEditorPage.publishCardExploration(
+      'Test Exploration', 'Run tests using same exploration.', 'Algorithms',
+      'English', ['maths']);
+    var explorationId = await general.getExplorationIdFromEditor();
+    await users.logout();
+    await users.login('voiceoverAdmin@exp.com');
+    await general.openEditor(explorationId, true);
+    await explorationEditorPage.navigateToSettingsTab();
     await workflow.addExplorationVoiceArtist('userVoiceArtist');
     await users.logout();
   });
@@ -185,8 +184,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  it(
-    'should maintain its active sub-tab on saving draft and publishing changes',
+  it('should maintain its active sub-tab on saving draft',
     async function() {
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
@@ -197,9 +195,7 @@ describe('Exploration translation and voiceover tab', function() {
       await explorationEditorTranslationTab.navigateToFeedbackTab();
       await explorationEditorTranslationTab.setTranslation(
         await forms.toRichText('Sample Translation.'));
-      await explorationEditorPage.saveChanges('Adds one translation.');
-      explorationEditorTranslationTab.expectFeedbackTabToBeActive();
-      await workflow.publishExploration();
+      await explorationEditorPage.publishChanges('Adds one translation.');
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       await users.logout();
     });
@@ -233,7 +229,7 @@ describe('Exploration translation and voiceover tab', function() {
 
   it('should allow adding translation and reflect the progress',
     async function() {
-      const expEditorTranslationTab = explorationEditorTranslationTab;
+      let expEditorTranslationTab = explorationEditorTranslationTab;
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');

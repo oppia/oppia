@@ -17,11 +17,24 @@
  */
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TestBed } from '@angular/core/testing';
+
+class MockNgbModalRef {
+  componentInstance: {
+    skillSummaries: null,
+    skillsInSameTopicCount: null,
+    categorizedSkills: null,
+    allowSkillsFromOtherTopics: null,
+    untriagedSkillSummaries: null
+  };
+}
 
 describe('Question Editor Modal Controller', function() {
   let $q = null;
   let $scope = null;
+  let ngbModal: NgbModal;
   let $uibModal = null;
   let $uibModalInstance = null;
   let AlertsService = null;
@@ -60,6 +73,7 @@ describe('Question Editor Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
+      ngbModal = TestBed.inject(NgbModal);
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
@@ -157,7 +171,8 @@ describe('Question Editor Modal Controller', function() {
         untriagedSkillSummaries: untriagedSkillSummaries,
         questionStateData: questionStateData,
         rubric: rubric,
-        skillName: skillName
+        skillName: skillName,
+        NgbModal: ngbModal
       });
     }));
 
@@ -230,104 +245,56 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should open a modal when adding a new skill', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-
-      $scope.addSkill();
-
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should not add a new skill when it\'s already exists', function() {
-      spyOn(AlertsService, 'addInfoMessage').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          id: '1'
-        })
+    it('should open add skill modal when adding a new skill', function() {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve('success')
+          });
       });
       $scope.addSkill();
       $scope.$apply();
-
-      expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Skill already linked to question');
-      expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);
+      expect(modalSpy).toHaveBeenCalled();
     });
 
-    it('should add a new skill successfully', function() {
-      const skillSummaryDict = {
-        id: '4',
-        description: 'Description 4'
-      };
-      const openModalSpy = spyOn($uibModal, 'open');
-      openModalSpy.and.returnValue({
-        result: $q.resolve(skillSummaryDict)
+    it('should not add a new skill when it\'s already exists',
+      () => {
+        const summary = {id: '1', description: 'Description 1'};
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          setTimeout(opt.beforeDismiss);
+          return <NgbModalRef>(
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve(summary)
+            });
+        });
+        $scope.addSkill();
+        $scope.$apply();
+        expect(modalSpy).toHaveBeenCalled();
       });
-      expect($scope.associatedSkillSummaries.length).toEqual(3);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
+
+    it('should close add skill modal on clicking cancel', () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.reject()
+          });
+      });
       $scope.addSkill();
       $scope.$apply();
-
-      expect($scope.associatedSkillSummaries).toContain(
-        ShortSkillSummary.create(
-          skillSummaryDict.id, skillSummaryDict.description));
-      expect($scope.associatedSkillSummaries.length).toEqual(4);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(1);
-    });
-
-    it('should not add skill when dismissing the add skill modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      expect($scope.associatedSkillSummaries.length).toEqual(3);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
-      $scope.addSkill();
-      $scope.$apply();
-
-      expect($scope.associatedSkillSummaries.length).toEqual(3);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
+      expect(modalSpy).toHaveBeenCalled();
     });
 
     it('should save and commit when there is no pending changes', function() {
-      const skillSummaryDict = {
-        id: '4',
-        description: 'Description 4'
-      };
-      const openModalSpy = spyOn($uibModal, 'open');
-      openModalSpy.and.returnValue({
-        result: $q.resolve(skillSummaryDict)
-      });
-
-      $scope.addSkill();
-      $scope.$apply();
-
-      expect($scope.associatedSkillSummaries).toContain(
-        ShortSkillSummary.create(
-          skillSummaryDict.id, skillSummaryDict.description));
-
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
-      expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
+      expect($scope.isSaveAndCommitButtonDisabled()).toBe(true);
       $scope.saveAndCommit();
-
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
     it('should save and commit after modifying skills', function() {
-      const skillSummaryDict = {
-        id: '4',
-        description: 'Description 4'
-      };
       const openModalSpy = spyOn($uibModal, 'open');
-      openModalSpy.and.returnValue({
-        result: $q.resolve(skillSummaryDict)
-      });
-
-      $scope.addSkill();
-      $scope.$apply();
-
-      expect($scope.associatedSkillSummaries).toContain(
-        ShortSkillSummary.create(
-          skillSummaryDict.id, skillSummaryDict.description));
-
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
       const commitMessage = 'Commiting skills';
@@ -346,22 +313,7 @@ describe('Question Editor Modal Controller', function() {
 
     it('should not save and commit when dismissing the add skill modal',
       function() {
-        const skillSummaryDict = {
-          id: '4',
-          description: 'Description 4'
-        };
         const openModalSpy = spyOn($uibModal, 'open');
-        openModalSpy.and.returnValue({
-          result: $q.resolve(skillSummaryDict)
-        });
-
-        $scope.addSkill();
-        $scope.$apply();
-
-        expect($scope.associatedSkillSummaries).toContain(
-          ShortSkillSummary.create(
-            skillSummaryDict.id, skillSummaryDict.description));
-
         spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
         expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
         openModalSpy.and.returnValue({
@@ -407,6 +359,7 @@ describe('Question Editor Modal Controller', function() {
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
+      ngbModal = TestBed.inject(NgbModal);
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
@@ -506,7 +459,8 @@ describe('Question Editor Modal Controller', function() {
         questionStateData: questionStateData,
         untriagedSkillSummaries: [],
         rubric: rubric,
-        skillName: skillName
+        skillName: skillName,
+        NgbModal: ngbModal
       });
     }));
 

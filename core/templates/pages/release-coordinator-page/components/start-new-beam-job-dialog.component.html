@@ -1,0 +1,20 @@
+<mat-dialog-content>
+  <h2 mat-dialog-title>Start new {{beamJob.name}}?</h2>
+</mat-dialog-content>
+
+<mat-progress-bar *ngIf="isRunning" color="primary" mode="indeterminate"></mat-progress-bar>
+
+<mat-dialog-actions class="start-new-beam-job-actions">
+  <button mat-button [disabled]="isRunning" mat-dialog-close>Close</button>
+  <button mat-raised-button color="primary" (click)="onActionClick()" [disabled]="isRunning">
+    Start New Job
+  </button>
+</mat-dialog-actions>
+
+<style>
+  .start-new-beam-job-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+</style>

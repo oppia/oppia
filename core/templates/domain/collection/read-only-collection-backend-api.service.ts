@@ -42,7 +42,7 @@ interface CollectionDetailsCache {
   [collectionId: string]: CollectionDetails;
 }
 
-interface ReadOnlyCollectionBackendResponse {
+export interface ReadOnlyCollectionBackendResponse {
   'meta_name': string;
   'can_edit': boolean;
   'meta_description': string;

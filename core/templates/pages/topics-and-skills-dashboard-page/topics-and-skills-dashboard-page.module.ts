@@ -39,17 +39,23 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
     DynamicContentModule,
-    FormsModule
+    FormsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SkillsListComponent,
     DeleteSkillModalComponent,
     UnassignSkillFromTopicsModalComponent,
@@ -60,11 +66,10 @@ import { FormsModule } from '@angular/forms';
     DeleteTopicModalComponent,
     SelectTopicsComponent,
     TopicsAndSkillsDashboardPageComponent,
-    CreateNewTopicModalComponent
+    CreateNewTopicModalComponent,
     DeleteTopicModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SkillsListComponent,
     DeleteSkillModalComponent,
     UnassignSkillFromTopicsModalComponent,
@@ -103,7 +108,6 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

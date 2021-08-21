@@ -47,8 +47,8 @@ $ export PORTSERVER_ADDRESS=portserver.sock
 $ # ... launch a bunch of tests that use portpicker ...
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import collections
@@ -379,10 +379,10 @@ def _parse_port_ranges(pool_str):
             a, b = range_str.split('-', 1)
             start, end = int(a), int(b)
         except ValueError:
-            logging.error('Ignoring unparsable port range %r.', range_str)
+            logging.info('Ignoring unparsable port range %r.', range_str)
             continue
         if start < 1 or end > 65535:
-            logging.error('Ignoring out of bounds port range %r.', range_str)
+            logging.info('Ignoring out of bounds port range %r.', range_str)
             continue
         ports.update(set(python_utils.RANGE(start, end + 1)))
     return ports
@@ -438,9 +438,11 @@ class Server(python_utils.OBJECT):
         except socket.error:
             pass
         finally:
-            self.socket.close()
-        if not self.socket_path.startswith('\0'):
-            os.remove(self.socket_path)
+            try:
+                self.socket.close()
+            finally:
+                if not self.socket_path.startswith('\0'):
+                    os.remove(self.socket_path)
 
     @staticmethod
     def handle_connection(connection, handler):
@@ -476,8 +478,7 @@ class Server(python_utils.OBJECT):
             sock.bind(path)
         except socket.error as err:
             raise RuntimeError(
-                'Failed to bind socket {}. Error: {}'.format(
-                    path, err)
+                'Failed to bind socket {}. Error: {}'.format(path, err)
             )
         sock.listen(self.max_backlog)
         return sock
@@ -491,10 +492,13 @@ class Server(python_utils.OBJECT):
             is created.
         """
         if hasattr(socket, 'AF_UNIX'):
-            return socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         else:
             # Fallback to AF_INET if this is not unix.
-            return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Make the socket reusable.
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return sock
 
 
 def main():
@@ -514,17 +518,16 @@ def main():
         config.portserver_unix_socket_address.replace('@', '\0', 1),
     )
     logging.info(
-        'Serving portserver on %s',
-        config.portserver_unix_socket_address
-    )
+        'Serving portserver on %s' % config.portserver_unix_socket_address)
     try:
         server.run()
     except KeyboardInterrupt:
         logging.info('Stopping portserver due to ^C.')
-
-    server.close()
-    request_handler.dump_stats()
-    logging.info('Shutting down portserver.')
+    finally:
+        server.close()
+        request_handler.dump_stats()
+        logging.info('Shutting down portserver.')
+        sys.exit(0)
 
 
 if __name__ == '__main__':

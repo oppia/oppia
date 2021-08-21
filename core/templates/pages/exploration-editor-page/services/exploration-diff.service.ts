@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 import {
   ExplorationChangeAddState,
@@ -32,7 +32,7 @@ import {
 } from 'domain/exploration/exploration-draft.model';
 import { StateObjectsDict } from 'domain/exploration/StatesObjectFactory';
 
-interface ExplorationGraphChangeList {
+export interface ExplorationGraphChangeList {
   changeList: ExplorationChange[];
   directionForwards: boolean;
 }
@@ -151,12 +151,14 @@ export class ExplorationDiffService {
       if (oldState) {
         oldStateIsTerminal = (
           oldState.interaction.id &&
-            INTERACTION_SPECS[oldState.interaction.id].is_terminal);
+            InteractionSpecsConstants.INTERACTION_SPECS[
+              oldState.interaction.id].is_terminal);
       }
       if (newState) {
         newStateIsTerminal = (
           newState.interaction.id &&
-            INTERACTION_SPECS[newState.interaction.id].is_terminal);
+            InteractionSpecsConstants.INTERACTION_SPECS[
+              newState.interaction.id].is_terminal);
       }
       if (oldStateIsTerminal || newStateIsTerminal) {
         finalStateIds.push(stateId);
@@ -272,7 +274,9 @@ export class ExplorationDiffService {
         } else if (
           change.cmd !== 'migrate_states_schema_to_latest_version' &&
           change.cmd !== 'AUTO_revert_version_number' &&
-          change.cmd !== 'edit_exploration_property'
+          change.cmd !== 'edit_exploration_property' &&
+          change.cmd !== 'add_written_translation' &&
+          change.cmd !== 'mark_written_translations_as_needing_update'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }

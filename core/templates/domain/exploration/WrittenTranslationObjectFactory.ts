@@ -33,6 +33,9 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
 
+export type DataFormatToDefaultValuesKey = (
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
+
 export interface TranslationBackendDict {
   'data_format': string;
   'translation': string|string[];
@@ -41,7 +44,7 @@ export interface TranslationBackendDict {
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: string,
+      public dataFormat: DataFormatToDefaultValuesKey,
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
@@ -75,7 +78,8 @@ export class WrittenTranslation {
 
   setTranslation(translation: string|string[]): void {
     if (typeof translation !==
-        typeof DATA_FORMAT_TO_DEFAULT_VALUES[this.dataFormat]) {
+        typeof DATA_FORMAT_TO_DEFAULT_VALUES[
+          <DataFormatToDefaultValuesKey> this.dataFormat]) {
       throw new Error(
         'This translation is not of the correct type for data format ' +
         this.dataFormat);
@@ -102,13 +106,16 @@ export class WrittenTranslationObjectFactory {
     }
 
     return new WrittenTranslation(
-      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat], false);
+      <DataFormatToDefaultValuesKey> dataFormat,
+      DATA_FORMAT_TO_DEFAULT_VALUES[<DataFormatToDefaultValuesKey> dataFormat],
+      false
+    );
   }
 
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.data_format,
+      <DataFormatToDefaultValuesKey> translationBackendDict.data_format,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }

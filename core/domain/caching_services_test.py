@@ -16,8 +16,10 @@
 
 """Tests for methods in core.domain.caching_services"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import json
 
 from constants import constants
 from core.domain import caching_domain
@@ -46,7 +48,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 44,
+        'states_schema_version': 45,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
@@ -84,6 +86,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': '<p>Unicode Characters 😍😍😍😍</p>'
                 },
+                'linked_skill_id': None,
                 'next_content_id_index': 5,
                 'interaction': {
                     'hints': [{
@@ -154,7 +157,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     # unicode characters that is set to the memory cache.
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, "tags"'
-        ': [], "states_schema_version": 44, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 45, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
@@ -171,17 +174,18 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id'
         '": "ca_placeholder_0"}}}, "confirmed_unclassified_answers": [], "id": '
         '"TextInput", "hints": [{"hint_content": {"content_id": "hint_3", "html'
-        '": "<p>This is a copyright character \\u00a9.</p>"}}]}, "recorded_voic'
-        'eovers": {"voiceovers_mapping": {"feedback_2": {}, "rule_input_4": {},'
-        ' "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0'
-        '": {}}}, "classifier_model_id": null, "content": {"content_id": "conte'
-        'nt", "html": "<p>Unicode Characters \\ud83d\\ude0d\\ud83d\\ude0d\\ud83'
-        'd\\ude0d\\ud83d\\ude0d</p>"}, "written_translations": {"translations_m'
-        'apping": {"feedback_2": {}, "rule_input_4": {}, "content": {}, "hint_'
-        '3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, "next_content'
-        '_id_index": 5, "solicit_answer_details": false}}, "version": 0, "corre'
-        'ctness_feedback_enabled": false, "language_code": "en", "objective": "'
-        '", "init_state_name": "Introduction", "blurb": "", "author_notes": ""}'
+        '": "<p>This is a copyright character \\u00a9.</p>"}}]}, "linked_skill_'
+        'id": null, "recorded_voiceovers": {"voiceovers_mapping": {"feedback_2"'
+        ': {}, "rule_input_4": {}, "content": {}, "hint_3": {}, "default_outcom'
+        'e": {}, "ca_placeholder_0": {}}}, "classifier_model_id": null, "conten'
+        't": {"content_id": "content", "html": "<p>Unicode Characters \\ud83d\\'
+        'ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, "written_transl'
+        'ations": {"translations_mapping": {"feedback_2": {}, "rule_input_4": {'
+        '}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder'
+        '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
+        '}}, "version": 0, "correctness_feedback_enabled": false, "language_cod'
+        'e": "en", "objective": "", "init_state_name": "Introduction", "blurb":'
+        ' "", "author_notes": ""}'
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self):
@@ -221,7 +225,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]
             ).get(exploration_id))
 
-        caching_services.flush_memory_cache()
+        caching_services.flush_memory_caches()
 
         self.assertEqual(
             caching_services.get_multi(
@@ -489,10 +493,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c']))
 
         self.assertGreater(
-            caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION,
-                '0', [exploration_id]),
-            0)
+            len(
+                caching_services.get_multi(
+                    caching_services.CACHE_NAMESPACE_EXPLORATION,
+                    '0',
+                    [exploration_id]
+                ),
+            ),
+            0
+        )
 
         self.assertTrue(
             caching_services.delete_multi(
@@ -568,9 +577,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(key, 'config::email_footer')
                 self.assertEqual(
                     value,
-                    '"You can change your email preferences via the <a href='
-                    '\\"https://www.example.com\\">Preferences</a> page. '
-                    '\\u00a9\\u00a9\\u00ae\\u00ae"')
+                    '"You can change your email preferences via the <a href'
+                    '=\\"https://www.example.com\\">Preferences</a> page. '
+                    '\\u00a9\\u00a9\\u00ae\\u00ae"'
+                )
 
         config_id = 'email_footer'
 
@@ -582,13 +592,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             memory_cache_services, 'set_multi',
-            mock_memory_cache_services_set_multi):
+            mock_memory_cache_services_set_multi
+        ):
             caching_services.set_multi(
                 caching_services.CACHE_NAMESPACE_CONFIG, None,
                 {
                     config_id: (
                         'You can change your email preferences via the <a href'
-                        '="https://www.example.com">Preferences</a> page. ©©®®')
+                        '="https://www.example.com">Preferences</a> page. ©©®®'
+                    )
                 })
 
         cache_strings_response = caching_services.set_multi(
@@ -596,7 +608,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {
                 config_id: (
                     'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®')
+                    '="https://www.example.com">Preferences</a> page. ©©®®'
+                )
             })
 
         self.assertTrue(cache_strings_response)
@@ -608,7 +621,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {
                 config_id: (
                     'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®')
+                    '="https://www.example.com">Preferences</a> page. ©©®®'
+                )
             })
 
     def test_explorations_identically_cached_in_dev_and_test_environment(
@@ -642,8 +656,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             for key, value in id_value_mapping.items():
                 self.assertEqual(key, 'exploration:0:%s' % exploration_id)
                 self.assertEqual(
-                    value,
-                    self.json_encoded_string_representing_an_exploration)
+                    json.loads(value),
+                    json.loads(
+                        self.json_encoded_string_representing_an_exploration))
         with self.swap(
             memory_cache_services, 'set_multi',
             mock_memory_cache_services_set_multi):

@@ -43,7 +43,7 @@ describe('Topic editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
   });
 
@@ -202,7 +202,7 @@ describe('Chapter editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       USER_EMAIL, 'creatorChapterTest');
     dummyExplorationIds = await createDummyExplorations(1);
   });
@@ -241,7 +241,6 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.saveStory('First save');
     // Check if the thumbnail images persist on reload.
     await browser.refresh();
-    await general.scrollToTop();
     await storyEditorPage.navigateToStoryEditorTab();
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);

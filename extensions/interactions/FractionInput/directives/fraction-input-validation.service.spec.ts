@@ -18,42 +18,54 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { OutcomeObjectFactory } from
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { TestBed } from '@angular/core/testing';
+import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { FractionDict } from 'domain/objects/fraction.model';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('FractionInputValidationService', () => {
-  var validatorService, WARNING_TYPES;
-
-  var currentState;
-  var answerGroups, goodDefaultOutcome, customizationArgs;
-  var denominatorEqualsFiveRule, equalsOneAndHalfRule, equalsOneRule,
-    equalsThreeByTwoRule, equivalentToOneAndSimplestFormRule,
-    equivalentToOneRule, exactlyEqualToOneAndNotInSimplestFormRule,
-    HasFractionalPartExactlyEqualToOneAndHalfRule,
-    HasFractionalPartExactlyEqualToNegativeValue,
-    HasFractionalPartExactlyEqualToThreeHalfs,
-    HasFractionalPartExactlyEqualToTwoFifthsRule,
-    greaterThanMinusOneRule, integerPartEqualsOne,
-    integerPartEqualsZero, lessThanTwoRule, nonIntegerRule,
-    numeratorEqualsFiveRule, zeroDenominatorRule;
-  var createFractionDict;
-  var oof, agof, rof;
+  let validatorService: FractionInputValidationService;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
+  let currentState: string;
+  let answerGroups: AnswerGroup[];
+  let goodDefaultOutcome: Outcome;
+  let customizationArgs: FractionInputCustomizationArgs;
+  let denominatorEqualsFiveRule: Rule, equalsOneAndHalfRule: Rule,
+    equalsOneRule: Rule, equalsThreeByTwoRule: Rule,
+    equivalentToOneAndSimplestFormRule: Rule, equivalentToOneRule: Rule,
+    exactlyEqualToOneAndNotInSimplestFormRule: Rule,
+    HasFractionalPartExactlyEqualToOneAndHalfRule: Rule,
+    HasFractionalPartExactlyEqualToNegativeValue: Rule,
+    HasFractionalPartExactlyEqualToThreeHalfs: Rule,
+    HasFractionalPartExactlyEqualToTwoFifthsRule: Rule,
+    HasNoFractionalPart: Rule, greaterThanMinusOneRule: Rule,
+    integerPartEqualsOne: Rule, integerPartEqualsZero: Rule,
+    lessThanTwoRule: Rule, nonIntegerRule: Rule, numeratorEqualsFiveRule: Rule,
+    zeroDenominatorRule: Rule;
+  let createFractionDict: (
+    isNegative: boolean, wholeNumber: number,
+        numerator: number, denominator: number) => FractionDict;
+  let oof: OutcomeObjectFactory;
+  let agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   beforeEach(() => {
-    validatorService = TestBed.get(FractionInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(FractionInputValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    createFractionDict = function(
-        isNegative, wholeNumber, numerator, denominator) {
+    createFractionDict = (
+        isNegative: boolean, wholeNumber: number, numerator: number,
+        denominator: number): FractionDict => {
       return {
         isNegative: isNegative,
         wholeNumber: wholeNumber,
@@ -73,7 +85,7 @@ describe('FractionInputValidationService', () => {
         value: true
       },
       customPlaceholder: {
-        value: ''
+        value: new SubtitledUnicode('', '')
       }
     };
 
@@ -82,7 +94,7 @@ describe('FractionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -216,10 +228,17 @@ describe('FractionInputValidationService', () => {
       }
     }, 'FractionInput');
 
+    HasNoFractionalPart = rof.createFromBackendDict({
+      rule_type: 'HasNoFractionalPart',
+      inputs: {
+        f: createFractionDict(false, 2, 0, 1)
+      }
+    }, 'FractionInput');
+
     answerGroups = [agof.createNew(
       [equalsOneRule, lessThanTwoRule],
       goodDefaultOutcome,
-      false,
+      [],
       null
     )];
   });
@@ -409,6 +428,16 @@ describe('FractionInputValidationService', () => {
       }]);
     });
 
+  it('should not catch anything when there is no fractional part',
+    () => {
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [HasNoFractionalPart];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+    });
+
   it('should catch if not allowNonzeroIntegerPart and ' +
     'rule is HasIntegerPartEqualTo a non zero value', () => {
     customizationArgs.allowNonzeroIntegerPart.value = false;
@@ -437,7 +466,7 @@ describe('FractionInputValidationService', () => {
 
   it('should allow equivalent fractions with if not requireSimplestForm ' +
     'and rules are IsExactlyEqualTo', () => {
-    customizationArgs.requireSimplestForm = false;
+    customizationArgs.requireSimplestForm.value = false;
     answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [equalsOneRule];
     answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
@@ -449,7 +478,7 @@ describe('FractionInputValidationService', () => {
 
   it('should allow if numerator and denominator should equal the same value ' +
     'and are set in different rules', () => {
-    customizationArgs.requireSimplestForm = false;
+    customizationArgs.requireSimplestForm.value = false;
     answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [numeratorEqualsFiveRule];
     answerGroups[1].rules = [denominatorEqualsFiveRule];
@@ -461,7 +490,7 @@ describe('FractionInputValidationService', () => {
 
   it('should correctly check validity of HasFractionalPartExactlyEqualTo rule',
     () => {
-      customizationArgs.requireSimplestForm = false;
+      customizationArgs.requireSimplestForm.value = false;
       answerGroups[0].rules = [HasFractionalPartExactlyEqualToOneAndHalfRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
@@ -473,7 +502,7 @@ describe('FractionInputValidationService', () => {
           'integer part should be zero')
       }]);
 
-      customizationArgs.allowImproperFraction = false;
+      customizationArgs.allowImproperFraction.value = false;
       answerGroups[0].rules = [HasFractionalPartExactlyEqualToThreeHalfs];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
@@ -496,7 +525,7 @@ describe('FractionInputValidationService', () => {
           'sign should be positive')
       }]);
 
-      customizationArgs.allowImproperFraction = true;
+      customizationArgs.allowImproperFraction.value = true;
       answerGroups[0].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,

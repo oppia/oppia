@@ -16,12 +16,11 @@
 
 """Option class for configuring the behavior of Oppia jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import feconf
 
-import apache_beam as beam
 from apache_beam.options import pipeline_options
 
 
@@ -29,10 +28,8 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
-        'model_getter': (
-            beam.PTransform,
-            'The type of PTransform the pipeline should use to fetch models '
-            'from the datastore.'),
+        'namespace': (
+            str, 'Namespace for isolating the NDB operations during tests.'),
     }
 
     def __init__(self, flags=None, **job_options):

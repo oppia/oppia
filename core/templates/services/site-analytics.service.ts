@@ -110,6 +110,11 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
   }
+  registerCreateLessonButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'CreateLessonButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerApplyToTeachWithOppiaEvent(): void {
     this._sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
   }
@@ -242,11 +247,6 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'OpenFractionsFromLandingPage', 'click', collectionId);
   }
-  registerStewardsLandingPageEvent(
-      viewerType: string, buttonText: string): void {
-    this._sendEventToGoogleAnalytics(
-      'ClickButtonOnStewardsPage', 'click', viewerType + ':' + buttonText);
-  }
   registerSaveRecordedAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'SaveRecordedAudio', 'click', explorationId);
@@ -318,7 +318,7 @@ export class SiteAnalyticsService {
       explorationId);
   }
 
-  registerClassoomHeaderClickEvent(): void {
+  registerClassroomHeaderClickEvent(): void {
     this._sendEventToGoogleAnalytics(
       'ClassroomEngagement', 'click', 'ClickOnClassroom');
   }

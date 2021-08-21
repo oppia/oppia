@@ -19,8 +19,8 @@
 
 """Unit tests for scripts/pylint_extensions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import tempfile
 import unittest
@@ -30,6 +30,7 @@ import python_utils
 from . import pylint_extensions
 
 import astroid  # isort:skip
+from pylint import interfaces  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
 from pylint import utils  # isort:skip
@@ -47,8 +48,8 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
     def test_finds_non_explicit_keyword_args(self):
         (
             func_call_node_one, func_call_node_two, func_call_node_three,
-            func_call_node_four, func_call_node_five, func_call_node_six,
-            class_call_node) = astroid.extract_node(
+            func_call_node_four, func_call_node_five, class_call_node
+        ) = astroid.extract_node(
                 """
         class TestClass():
             pass
@@ -61,15 +62,11 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         def test_1(test_var_one, test_var_one):
             pass
 
-        def test_2((a, b)):
-            pass
-
         test(2, 5, test_var_three=6) #@
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
         max(5, 1) #@
         test_1(1, 2) #@
-        test_2((1, 2)) #@
 
         TestClass() #@
         """)
@@ -113,9 +110,6 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_call(func_call_node_five)
-
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_call(func_call_node_six)
 
     def test_finds_arg_name_for_non_keyword_arg(self):
         node_arg_name_for_non_keyword_arg = astroid.extract_node(
@@ -169,6 +163,16 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
                     pass
 
             TestClass(first=1, second=2) #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
+                node_with_no_error_message)
+
+    def test_checker_skips_object_call_when_noncallable_object_is_called(self):
+        node_with_no_error_message = astroid.extract_node(
+            """
+            1() #@
             """)
 
         with self.checker_test_object.assertNoMessages():
@@ -1875,6 +1879,19 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node6)
 
+    def test_importing_internals_from_allowed_modules_does_not_raise_message(
+            self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ImportOnlyModulesChecker)
+        checker_test_object.setup_method()
+        importfrom_node = astroid.extract_node(
+            """
+            from __future__ import invalid_module #@
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node)
+
 
 class BackslashContinuationCheckerTests(unittest.TestCase):
 
@@ -3032,8 +3049,8 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         (
             self.checker_test_object
             .checker.config.disallowed_functions_and_replacements_str) = [
-                b'example_func',
-                b'a.example_attr',
+                'example_func',
+                'a.example_attr',
             ]
         self.checker_test_object.checker.open()
 
@@ -3046,18 +3063,21 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_remove_example_func = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call1,
-            args=b'example_func'
+            args='example_func',
+            confidence=interfaces.UNDEFINED
         )
 
         message_remove_example_attr = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call2,
-            args=b'a.example_attr'
+            args='a.example_attr',
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_remove_example_func,
-            message_remove_example_attr):
+            message_remove_example_attr
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
 
@@ -3065,10 +3085,10 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         (
             self.checker_test_object
             .checker.config.disallowed_functions_and_replacements_str) = [
-                b'datetime.datetime.now=>datetime.datetime.utcnow',
-                b'self.assertEquals=>self.assertEqual',
-                b'b.next=>python_utils.NEXT',
-                b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
+                'datetime.datetime.now=>datetime.datetime.utcnow',
+                'self.assertEquals=>self.assertEqual',
+                'b.next=>python_utils.NEXT',
+                'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
             ]
         self.checker_test_object.checker.open()
 
@@ -3087,40 +3107,39 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_replace_disallowed_datetime = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call1,
-            args=(
-                b'datetime.datetime.now',
-                b'datetime.datetime.utcnow')
+            args=('datetime.datetime.now', 'datetime.datetime.utcnow'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_disallowed_assert_equals = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call2,
-            args=(
-                b'self.assertEquals',
-                b'self.assertEqual')
+            args=('self.assertEquals', 'self.assertEqual'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_disallowed_str = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call3,
             args=(
-                b'str',
-                b'python_utils.convert_to_bytes or python_utils.UNICODE')
+                'str', 'python_utils.convert_to_bytes or python_utils.UNICODE'
+            ),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_disallowed_next = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call4,
-            args=(
-                b'b.next',
-                b'python_utils.NEXT')
+            args=('b.next', 'python_utils.NEXT'),
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_replace_disallowed_datetime,
             message_replace_disallowed_assert_equals,
             message_replace_disallowed_str,
-            message_replace_disallowed_next):
+            message_replace_disallowed_next
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
             self.checker_test_object.checker.visit_call(call3)
@@ -3145,18 +3164,21 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_remove_example_func = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call1,
-            args=b'somethingexample_func'
+            args='somethingexample_func',
+            confidence=interfaces.UNDEFINED
         )
 
         message_remove_example_attr = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call2,
-            args=b'c.someexample_attr'
+            args='c.someexample_attr',
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_remove_example_func,
-            message_remove_example_attr):
+            message_remove_example_attr
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
 
@@ -3180,32 +3202,37 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_replace_example_func = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call1,
-            args=(b'somethingexample_func', b'other_func')
+            args=('somethingexample_func', 'other_func'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_example_attr1 = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call2,
-            args=(b'd.example_attr', b'other_attr')
+            args=('d.example_attr', 'other_attr'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_example_attr2 = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call3,
-            args=(b'd.example_attr', b'other_attr')
+            args=('d.example_attr', 'other_attr'),
+            confidence=interfaces.UNDEFINED
         )
 
         message_replace_example_attr3 = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call4,
-            args=(b'd.b.example_attr', b'other_attr')
+            args=('d.b.example_attr', 'other_attr'),
+            confidence=interfaces.UNDEFINED
         )
 
         with self.checker_test_object.assertAddsMessages(
             message_replace_example_func,
             message_replace_example_attr1,
             message_replace_example_attr2,
-            message_replace_example_attr3):
+            message_replace_example_attr3
+        ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
             self.checker_test_object.checker.visit_call(call3)
@@ -3298,7 +3325,8 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='no-dunder-metaclass',
-                node=metaclass_node
+                node=metaclass_node,
+                confidence=interfaces.UNDEFINED
             )
         ):
             checker_test_object.checker.visit_classdef(metaclass_node)
@@ -3340,3 +3368,183 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_classdef(metaclass_node)
+
+
+class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
+
+    def setUp(self):
+        super(DisallowHandlerWithoutSchemaTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowHandlerWithoutSchema)
+        self.checker_test_object.setup_method()
+
+    def test_schema_handlers_without_request_args_raise_error(self):
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+
+            class FakeClass(BaseHandler):
+                URL_PATH_ARGS_SCHEMAS = {}
+            """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-schema-for-handler-args',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
+
+    def test_schema_handlers_without_url_path_args_raise_error(self):
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+
+            class FakeClass(BaseHandler):
+                HANDLER_ARGS_SCHEMAS = {}
+            """)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-schema-for-url-path-elements',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
+
+    def test_handlers_with_valid_schema_do_not_raise_error(self):
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+
+            class FakeClass(BaseHandler):
+                URL_PATH_ARGS_SCHEMAS = {}
+                HANDLER_ARGS_SCHEMAS = {'GET': {}}
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
+
+    def test_list_of_non_schema_handlers_do_not_raise_errors(self):
+        """Handler class name in list of
+        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS do not raise error
+        for missing schemas.
+        """
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+
+            class SessionBeginHandler(BaseHandler):
+                def get(self):
+                    return
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
+
+    def test_schema_handler_with_basehandler_as_an_ancestor_raise_error(self):
+        """Handlers which are child classes of BaseHandler must have schema
+        defined locally in the class.
+        """
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+
+            class BaseClass(BaseHandler):
+                HANDLER_ARGS_SCHEMAS = {}
+                URL_PATH_ARGS_SCHEMAS = {}
+
+            class FakeClass(BaseClass):
+                HANDLER_ARGS_SCHEMAS = {}
+            """)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-schema-for-url-path-elements',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
+
+    def test_wrong_data_type_in_url_path_args_schema_raise_error(self):
+        """Checks whether the schemas in URL_PATH_ARGS_SCHEMAS must be of
+        dict type.
+        """
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMA = None
+
+            class BaseClass(BaseHandler):
+                HANDLER_ARGS_SCHEMAS = {}
+                URL_PATH_ARGS_SCHEMAS = {}
+
+            class FakeClass(BaseClass):
+                URL_PATH_ARGS_SCHEMAS = 5
+                HANDLER_ARGS_SCHEMAS = {}
+            """)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='url-path-args-schemas-must-be-dict',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
+
+    def test_wrong_data_type_in_handler_args_schema_raise_error(self):
+        """Checks whether the schemas in URL_PATH_ARGS_SCHEMAS must be of
+        dict type.
+        """
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler():
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+
+            class BaseClass(BaseHandler):
+                HANDLER_ARGS_SCHEMAS = {}
+                URL_PATH_ARGS_SCHEMAS = {}
+
+            class FakeClass(BaseClass):
+                URL_PATH_ARGS_SCHEMAS = {}
+                HANDLER_ARGS_SCHEMAS = 10
+            """)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='handler-args-schemas-must-be-dict',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)

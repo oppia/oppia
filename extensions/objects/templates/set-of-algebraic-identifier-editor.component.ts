@@ -20,44 +20,84 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-require('services/guppy-initialization.service.ts');
+import { ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
 
-angular.module('oppia').component('setOfAlgebraicIdentifierEditor', {
-  bindings: {
-    value: '='
+interface SetOfAlgebraicIdentifierEditorSchema {
+  type: 'list',
+  items: {
+    type: 'unicode',
+    choices: string[]
   },
-  template: require('./set-of-algebraic-identifier-editor.component.html'),
-  controller: ['GuppyInitializationService', 'VALID_ALGEBRAIC_IDENTIFIERS',
-    function(GuppyInitializationService, VALID_ALGEBRAIC_IDENTIFIERS) {
-      const ctrl = this;
+  validators: [{
+    id: 'is_uniquified'
+  }]
+}
+@Component({
+  selector: 'set-of-algebraic-identifier-editor',
+  templateUrl: './set-of-algebraic-identifier-editor.component.html',
+  styleUrls: []
+})
+export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: unknown;
+  SCHEMA!: SetOfAlgebraicIdentifierEditorSchema;
+  @Output() valueChanged = new EventEmitter();
+  PLACEHOLDER_INFO = (
+    'NOTE: This rule will consider each side of the equation ' +
+    'independently and won\'t allow reordering of terms ' +
+    'around the = sign.');
 
-      ctrl.$onInit = function() {
-        ctrl.PLACEHOLDER_INFO = (
-          'NOTE: This rule will consider each side of the equation ' +
-          'independently and won\'t allow reordering of terms ' +
-          'around the = sign.');
+  constructor(
+    private guppyInitializationService: GuppyInitializationService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) { }
 
-        let customOskLetters = GuppyInitializationService.getCustomOskLetters();
+  ngOnInit(): void {
+    let customOskLetters = (
+      this.guppyInitializationService.getCustomOskLetters());
 
-        let choices = (
-          customOskLetters ? customOskLetters :
-          VALID_ALGEBRAIC_IDENTIFIERS);
+    let choices = (
+      customOskLetters ? customOskLetters :
+      AppConstants.VALID_ALGEBRAIC_IDENTIFIERS);
 
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'unicode',
-            choices: choices
-          },
-          validators: [{
-            id: 'is_uniquified'
-          }]
-        };
+    this.SCHEMA = {
+      type: 'list',
+      items: {
+        type: 'unicode',
+        choices: choices as unknown as string[]
+      },
+      validators: [{
+        id: 'is_uniquified'
+      }]
+    };
 
-        if (!ctrl.value) {
-          ctrl.value = [];
-        }
-      };
+    if (!this.value) {
+      this.value = [];
     }
-  ]
-});
+  }
+
+  getSchema(): SetOfAlgebraicIdentifierEditorSchema {
+    return this.SCHEMA;
+  }
+
+  updateValue(newValue: unknown): void {
+    if (this.value === newValue) {
+      return;
+    }
+    this.value = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
+  }
+}
+
+angular.module('oppia').directive(
+  'setOfAlgebraicIdentifierEditor', downgradeComponent({
+    component: SetOfAlgebraicIdentifierEditorComponent
+  }) as angular.IDirectiveFactory);

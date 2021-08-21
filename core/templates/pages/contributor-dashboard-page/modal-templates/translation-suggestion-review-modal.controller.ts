@@ -19,33 +19,73 @@
 
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
+require('domain/utilities/language-util.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'AlertsService',
-    'ContextService', 'ContributionAndReviewService', 'SiteAnalyticsService',
-    'UrlInterpolationService',
-    'initialSuggestionId', 'reviewable', 'subheading',
-    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
-    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT',
+    '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
+    'ContributionAndReviewService', 'ContributionOpportunitiesService',
+    'LanguageUtilService', 'SiteAnalyticsService', 'UrlInterpolationService',
+    'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
+    'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
-        $http, $scope, $uibModalInstance, AlertsService,
-        ContextService, ContributionAndReviewService, SiteAnalyticsService,
-        UrlInterpolationService,
-        initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
-        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT) {
+        $http, $scope, $uibModalInstance, AlertsService, ContextService,
+        ContributionAndReviewService, ContributionOpportunitiesService,
+        LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
+        UserService, ValidatorsService, initialSuggestionId, reviewable,
+        subheading, suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
+        ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
-      $scope.activeSuggestion = suggestionIdToSuggestion[
+      $scope.activeContribution = suggestionIdToContribution[
         $scope.activeSuggestionId];
+      $scope.activeSuggestion = $scope.activeContribution.suggestion;
+      $scope.authorName = $scope.activeSuggestion.author_name;
+      $scope.languageDescription = (
+        LanguageUtilService.getAudioLanguageDescription(
+          $scope.activeSuggestion.language_code));
+      $scope.activeContributionDetails = $scope.activeContribution.details;
       $scope.subheading = subheading;
-      delete suggestionIdToSuggestion[initialSuggestionId];
-      var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
+      $scope.MAX_REVIEW_MESSAGE_LENGTH = MAX_REVIEW_MESSAGE_LENGTH;
+      $scope.startedEditing = false;
+      $scope.translationUpdated = false;
+      $scope.HTML_SCHEMA = {
+        type: 'html'
+      };
+      $scope.UNICODE_SCHEMA = { type: 'unicode' };
+      $scope.SET_OF_STRINGS_SCHEMA = {
+        type: 'list',
+        items: {
+          type: 'unicode'
+        }
+      };
+      $scope.canEditTranslation = false;
+
+      $scope.updateSuggestion = function() {
+        const updatedTranslation = $scope.editedContent;
+        const suggestionId = $scope.activeSuggestion.suggestion_id;
+        ContributionAndReviewService.updateTranslationSuggestionAsync(
+          suggestionId,
+          updatedTranslation,
+          (success) => {
+            $scope.translationHtml = updatedTranslation;
+            $scope.translationUpdated = true;
+            ContributionOpportunitiesService.
+              reloadOpportunitiesEventEmitter.emit();
+          },
+          $scope.showTranslationSuggestionUpdateError);
+        $scope.startedEditing = false;
+      };
+
+      delete suggestionIdToContribution[initialSuggestionId];
+      var remainingContributions = Object.entries(suggestionIdToContribution);
 
       if (reviewable) {
         SiteAnalyticsService
@@ -59,7 +99,9 @@ angular.module('oppia').controller(
         var stateName = $scope.activeSuggestion.change.state_name;
         var contentType = contentId.split('_')[0];
 
-        return `${contentType} section of "${stateName}" card`;
+        var commitMessage = `${contentType} section of "${stateName}" card`;
+
+        return commitMessage;
       };
 
       var _getThreadHandlerUrl = function(suggestionId) {
@@ -75,13 +117,45 @@ angular.module('oppia').controller(
         });
       };
 
-      var init = function() {
+      $scope.init = function() {
+        let userCanReviewTranslationSuggestionsInLanguages: string[] = [];
+        const languageCode: string = $scope.activeSuggestion.change.
+          language_code;
+        UserService.getUserInfoAsync().then(userInfo => {
+          $scope.username = userInfo.getUsername();
+          $scope.isCurriculumAdmin = userInfo.isCurriculumAdmin();
+        });
+        UserService.getUserContributionRightsDataAsync().then(
+          userContributionRights => {
+            userCanReviewTranslationSuggestionsInLanguages = (
+              userContributionRights
+                .can_review_translation_for_language_codes);
+            $scope.canEditTranslation = (
+              userCanReviewTranslationSuggestionsInLanguages.includes(
+                languageCode) && $scope.username !== $scope.activeSuggestion.
+                author_name
+            );
+          });
         $scope.resolvingSuggestion = false;
-        $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
+        $scope.lastSuggestionToReview = remainingContributions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
+        $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
+        $scope.isHtmlContent = (
+          $scope.activeSuggestion.change.data_format === 'html'
+        );
+        $scope.isUnicodeContent = (
+          $scope.activeSuggestion.change.data_format === 'unicode'
+        );
+        $scope.isSetOfStringsContent = (
+          $scope.activeSuggestion.change.data_format ===
+            'set_of_normalized_string' ||
+          $scope.activeSuggestion.change.data_format ===
+            'set_of_unicode_string'
+        );
+        $scope.editedContent = $scope.translationHtml;
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
@@ -96,7 +170,7 @@ angular.module('oppia').controller(
         }
       };
 
-      init();
+      $scope.init();
 
       $scope.showNextItemToReview = function(suggestionId) {
         resolvedSuggestionIds.push($scope.activeSuggestionId);
@@ -106,15 +180,26 @@ angular.module('oppia').controller(
           return;
         }
 
-        [$scope.activeSuggestionId, $scope.activeSuggestion] = (
-          remainingSuggestions.pop());
+        [$scope.activeSuggestionId, $scope.activeContribution] = (
+          remainingContributions.pop());
+        $scope.activeSuggestion = $scope.activeContribution.suggestion;
+        $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
           $scope.activeSuggestion.target_id);
-        init();
+        $scope.subheading = (
+          $scope.activeContributionDetails.topic_name + ' / ' +
+          $scope.activeContributionDetails.story_title +
+          ' / ' + $scope.activeContributionDetails.chapter_title);
+        $scope.init();
       };
 
       $scope.acceptAndReviewNext = function() {
+        $scope.finalCommitMessage = generateCommitMessage();
+        if ($scope.translationUpdated) {
+          $scope.reviewMessage = $scope.reviewMessage + ': This suggestion' +
+            ' was submitted with reviewer edits.';
+        }
         $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
           'Translation');
@@ -122,7 +207,7 @@ angular.module('oppia').controller(
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           ACTION_ACCEPT_SUGGESTION,
-          $scope.reviewMessage, generateCommitMessage(),
+          $scope.reviewMessage, $scope.finalCommitMessage,
           $scope.showNextItemToReview, (error) => {
             $scope.rejectAndReviewNext('Invalid Suggestion');
             AlertsService.clearWarnings();
@@ -131,18 +216,35 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function(reviewMessage) {
-        $scope.resolvingSuggestion = true;
-        SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
-          'Translation');
+        if (ValidatorsService.isValidReviewMessage(reviewMessage,
+          /* ShowWarnings= */ true)) {
+          $scope.resolvingSuggestion = true;
+          SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
+            'Translation');
 
-        ContributionAndReviewService.resolveSuggestionToExploration(
-          $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
-          generateCommitMessage(), $scope.showNextItemToReview);
+          ContributionAndReviewService.resolveSuggestionToExploration(
+            $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
+            ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
+            generateCommitMessage(), $scope.showNextItemToReview);
+        }
+      };
+
+      $scope.editSuggestion = function() {
+        $scope.startedEditing = true;
+      };
+
+      $scope.cancelEdit = function() {
+        $scope.startedEditing = false;
+        $scope.editedContent = $scope.translationHtml;
       };
 
       $scope.cancel = function() {
         $uibModalInstance.close(resolvedSuggestionIds);
+      };
+
+      $scope.showTranslationSuggestionUpdateError = function(error) {
+        AlertsService.clearWarnings();
+        AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
       };
     }
   ]);

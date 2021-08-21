@@ -1,0 +1,131 @@
+<div align="center"
+     *ngIf="statusMessage"
+     class="oppia-status-message-container">
+  {{ statusMessage }}
+</div>
+<br>
+<div class="blog-admin-page-container">
+  <div class="container-fluid row">
+    <div class="col-md-8">
+      <div class="roles-tab">
+        <mat-card class="oppia-page-card oppia-long-text">
+          <form class="form-horizontal" (submit)="submitUpdateRoleForm(formData.updateRole)">
+            <legend class="text-center">Update Role</legend>
+            <div class="d-xl-inline-flex form-group">
+              <label for="label-target-update-form-name" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+              <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+                <input type="text"
+                       id="label-target-update-form-name"
+                       placeholder="Enter username"
+                       [(ngModel)]="formData.updateRole.username"
+                       [ngModelOptions]="{standalone: true}"
+                       class="form-control">
+              </div>
+            </div>
+            <div class="d-xl-inline-flex form-group">
+              <label for="label-target-update-form-role-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+              <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+                <select id="label-target-update-form-role-select"
+                        [(ngModel)]="formData.updateRole.newRole"
+                        [ngModelOptions]="{standalone: true}"
+                        class="form-control">
+                  <option *ngFor="let role of UPDATABLE_ROLES | keyvalue" [value]="role.key">{{ role.value }}</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success" [disabled]="!formData.updateRole.isValid()" value="update role">Update Role</button>
+          </form>
+        </mat-card>
+
+        <mat-card class="oppia-page-card oppia-long-text">
+          <form class="form-horizontal" (submit)="submitRemoveEditorRoleForm(formData.removeEditorRole)">
+            <legend class="text-center">Remove Blog Editor</legend>
+            <div class="d-xl-inline-flex form-group">
+              <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+              <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+                <input type="text"
+                       id="label-target-form-reviewer-username"
+                       class="form-control"
+                       placeholder="Enter username"
+                       [(ngModel)]="formData.removeEditorRole.username"
+                       [ngModelOptions]="{standalone: true}">
+              </div>
+            </div>
+            <button type="submit"
+                    class="btn btn-success"
+                    [disabled]="!formData.removeEditorRole.isValid()" value="update role">Remove Blog Editor
+            </button>
+          </form>
+        </mat-card>
+      </div>
+      <div class="config-properties">
+        <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+          <legend class="text-center">Configuration properties</legend>
+          <div class="container ml-0">
+            <div *ngFor="let property of configProperties | keyvalue">
+              <div class="row oppia-description-text-container">
+                <span class="col-lg-2 col-md-2 col-sm-2">
+                  <em>{{ property.value.description }}</em>
+                </span>
+                <span class="col-lg-6 col-md-6 col-sm-6">
+                  <schema-based-editor [schema]="getSchemaCallback(property.value.schema)" [(localValue)]="property.value.value">
+                  </schema-based-editor>
+                </span>
+                <span class="col-lg-2 col-md-2 col-sm-2">
+                  <button type="button" class="btn btn-secondary oppia-revert-button" (click)="revertToDefaultConfigPropertyValue(property.key)">
+                    Revert to default
+                  </button>
+                </span>
+              </div>
+            </div>
+            <button (click)="saveConfigProperties()">Save</button>
+            <button (click)="reloadConfigProperties()">Undo changes</button>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <mat-card class="oppia-page-card oppia-long-text" *ngIf="roleToActions">
+        <legend class="text-center">Roles</legend>
+        <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions"></oppia-roles-and-actions-visualizer>
+      </mat-card>
+    </div>
+  </div>
+</div>
+<style>
+  .config-properties .oppia-description-text-container {
+    margin-right: -10vw;
+    padding-bottom: 10px;
+  }
+  .config-properties .mat-card.oppia-page-card {
+    background: rgb(255, 255, 255);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    padding: 30px 55px 30px 45px;
+    position: relative;
+  }
+  .roles-tab .form-horizontal .col-form-label {
+    padding-left: 0;
+    text-align: left;
+  }
+  .roles-tab .view-results-table {
+    margin-top: 20px;
+  }
+
+  .blog-admin-page-container {
+    padding-top: 16px;
+  }
+
+  .oppia-status-message-container {
+    background-color: #fff;
+    border: 1px solid #00376d;
+    bottom: 30px;
+    max-width: 30%;
+    position: fixed;
+    right: 30px;
+    z-index: 3000;
+  }
+
+  .oppia-page-card {
+    margin-bottom: 25px
+  }
+</style>
