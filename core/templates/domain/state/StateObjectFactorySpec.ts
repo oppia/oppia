@@ -19,7 +19,6 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
-import { OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 
 describe('State Object Factory', () => {
   let sof: StateObjectFactory;
@@ -29,7 +28,7 @@ describe('State Object Factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    sof = TestBed.get(StateObjectFactory);
+    sof = TestBed.inject(StateObjectFactory);
 
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
@@ -174,7 +173,12 @@ describe('State Object Factory', () => {
   it('should create a default state object', () => {
     const stateName = 'Default state';
     const stateObjectDefault = sof.createDefaultState(stateName);
-    const outcome = <OutcomeBackendDict>stateObject.interaction.default_outcome;
+    // 'default_outcome' does not exist for an EndExploration Interaction,
+    // but it is not the case here, we're testing it for a TextInput interaction
+    // and default_outcome exists. Non-null assertion is done here to
+    // only satisfy typechecking.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const outcome = stateObject.interaction.default_outcome!;
     outcome.dest = stateName;
 
     expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);

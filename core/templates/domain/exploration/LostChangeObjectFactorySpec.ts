@@ -138,11 +138,9 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
-      // This throws "Type 'null' is not assignable to type
-      // 'LostChangeValue | undefined'". We need to suppress this error
-      // because we are testing validations here.
-      // @ts-ignore
-      old_value: null,
+      // 'old_value' will be undefined/empty when the EndExploration
+      // is newly added.
+      old_value: undefined,
       property_name: 'widget_id'
     });
 
@@ -157,11 +155,9 @@ describe('Lost Change Object Factory', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      // This throws "Type 'null' is not assignable to type
-      // 'LostChangeValue | undefined'". We need to suppress this error
-      // because we are testing validations here.
-      // @ts-ignore
-      new_value: null,
+      // 'new_value' will be undefined/empty when the EndExploration
+      // is deleted or removed.
+      new_value: undefined,
       old_value: 'EndExploration',
       property_name: 'widget_id'
     });
