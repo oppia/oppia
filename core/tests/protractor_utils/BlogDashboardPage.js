@@ -193,7 +193,8 @@ var BlogDashboardPage = function() {
   };
 
   this.selectTags = async function(tags) {
-    await waitFor.blogPostTags.first();
+    await waitFor.visibilityOf(
+      blogPostTags.first(), 'Tags take too long to appear');
     for (i = 0; i < await blogPostTags.count(); i++) {
       var tag = blogPostTags.get(i);
       var tagName = await action.getText(
@@ -206,7 +207,8 @@ var BlogDashboardPage = function() {
   };
 
   this.getMatTab = async function(tabName) {
-    await waitFor.matTabLabels.first();
+    await waitFor.visibilityOf(
+      matTabLabels.first(), 'Mat Tab Toggle options take too long to appear.');
     for (i = 0; i < await matTabLabels.count(); i++) {
       var matTab = matTabLabels.get(i);
       var tabText = await action.getText(
@@ -250,7 +252,8 @@ var BlogDashboardPage = function() {
   };
 
   this.getBlogPostTileEditOption = async function(title) {
-    await waitFor.blogPostTiles.first();
+    await waitFor.visibilityOf(
+      blogPostTiles.first(), 'Blog Post tiles take too long to be visible.');
     for (i = 0; i < await blogPostTiles.count(); i++) {
       var blogPostTile = blogPostTiles.get(i);
       var blogPostTitleContainer = blogPostTile.element(
@@ -277,7 +280,8 @@ var BlogDashboardPage = function() {
   };
 
   this.navigateToBlogPostEditorWithTitleFromList = async function(title) {
-    await waitFor.blogPostListItems.first();
+    await waitFor.visibilityOf(
+      blogPostListItems.first(), 'Blog post list take too long to be visible.');
     for (i = 0; i < await blogPostListItems.count(); i++) {
       var blogPostRow = blogPostListItems.get(i);
       var blogPostTitleContainer = blogPostRow.element(
