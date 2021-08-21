@@ -55,7 +55,7 @@ export interface StateBackendDict {
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
-  // This property is null if no skill is linked to an State.
+  // This property is null if no skill is linked to a State.
   'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
