@@ -15,14 +15,72 @@
 /**
  * @fileoverview Unit tests for StateObjectFactory.
  */
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
 describe('State Object Factory', () => {
   let sof: StateObjectFactory;
   let stateObject: StateBackendDict;
+  let TextInputInteraction = {
+    classifier_model_id: null,
+    content: {
+      html: '',
+      content_id: 'content'
+    },
+    interaction: {
+      id: 'TextInput',
+      customization_args: {
+        rows: {
+          value: 1
+        },
+        placeholder: {
+          value: {
+            unicode_str: 'Type your answer here.',
+            content_id: ''
+          }
+        }
+      },
+      answer_groups: [],
+      default_outcome: {
+        dest: 'Introduction',
+        feedback: {
+          content_id: 'default_outcome',
+          html: ''
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      },
+      confirmed_unclassified_answers: [],
+      hints: [],
+      solution: null
+    },
+    linked_skill_id: null,
+    next_content_id_index: 0,
+    param_changes: [],
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {}
+      }
+    },
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+        hint_1: {},
+        rule_input_2: {}
+      }
+    }
+  };
+
+  type DefaultOutcome = (
+    typeof TextInputInteraction.interaction['default_outcome']);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -30,61 +88,8 @@ describe('State Object Factory', () => {
     });
     sof = TestBed.inject(StateObjectFactory);
 
-    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
-      classifier_model_id: null,
-      content: {
-        html: '',
-        content_id: 'content'
-      },
-      interaction: {
-        id: 'TextInput',
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: 'Type your answer here.',
-              content_id: ''
-            }
-          }
-        },
-        answer_groups: [],
-        default_outcome: {
-          dest: 'Introduction',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        },
-        confirmed_unclassified_answers: [],
-        hints: [],
-        solution: null
-      },
-      linked_skill_id: null,
-      next_content_id_index: 0,
-      param_changes: [],
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      solicit_answer_details: false,
-      card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {}
-        }
-      }
-    });
+    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get')
+      .and.returnValue(TextInputInteraction);
 
     stateObject = {
       classifier_model_id: null,
@@ -173,12 +178,9 @@ describe('State Object Factory', () => {
   it('should create a default state object', () => {
     const stateName = 'Default state';
     const stateObjectDefault = sof.createDefaultState(stateName);
-    // 'default_outcome' does not exist for an EndExploration Interaction,
-    // but it is not the case here, we're testing it for a TextInput interaction
-    // and default_outcome exists. Non-null assertion is done here to
-    // only satisfy typechecking.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const outcome = stateObject.interaction.default_outcome!;
+
+    const outcome = (
+      stateObject.interaction.default_outcome as DefaultOutcome);
     outcome.dest = stateName;
 
     expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);
