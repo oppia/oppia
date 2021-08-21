@@ -46,14 +46,14 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
     await blogDashboardPage.expectCurrUsernameToBeVisible();
 
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(1);
 
     await blogDashboardPage.navigateToBlogPostEditorWithTitle('Untitled');
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample blog Title', await forms.toRichText(
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(1);
     await blogDashboardPage.deleteBlogPostWithTitle('Sample blog Title');
     await blogDashboardPage.blogDashboardIntroMessageIsVisible();
@@ -66,7 +66,7 @@ describe('Blog dashboard functionality', function() {
       'Sample blog post Title', await forms.toRichText(
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
       ['News', 'International', 'Educators', 'Learners']);
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.navigateToDraftsTab();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(0);
 
@@ -79,7 +79,7 @@ describe('Blog dashboard functionality', function() {
   it('should create, publish, check for thumbnail uploading error,' +
   ' unpublish and delete the blog post', async function() {
     await blogDashboardPage.createNewBlogPost();
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(1);
 
     await blogDashboardPage.navigateToBlogPostEditorWithTitle('Untitled');
@@ -94,7 +94,7 @@ describe('Blog dashboard functionality', function() {
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!')
       , ['News', 'Learners']);
 
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.navigateToPublishTab();
     await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
     await blogDashboardPage.unpublishBlogPostWithTitle('Sample Blog Post');
@@ -112,19 +112,19 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title1', await forms.toRichText(
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title2', await forms.toRichText(
         'Hi there, I’m Oppia! I’m a tutor for everybody!'));
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title3', await forms.toRichText(
         'Hi there, I’m Oppia! I’m a tutor for everybody here!'));
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
 
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(3);
 
@@ -135,7 +135,7 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.publishDraftBlogPost(
       ['News', 'International', 'Educators', 'Learners',
         'Software development', 'Content']);
-    await blogDashboardPage.navigateToBlogDashboardPage();
+    await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.navigateToDraftsTab();
 
     await blogDashboardPage.getListView();

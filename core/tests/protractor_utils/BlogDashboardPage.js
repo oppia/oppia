@@ -104,13 +104,13 @@ var BlogDashboardPage = function() {
     await waitFor.urlRedirection('http://localhost:9001/blog-dashboard');
   };
 
-  this.navigateToBlogDashboardPage = async function() {
+  this.navigateToBlogDashboardPageWithBackButton = async function() {
     await action.click(
       'Navigate back to blog dashboard button', navigateToBlogDashboardButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.waitForDraftsBlogPostsToLoad = async function() {
+  this.waitForDraftBlogPostsToLoad = async function() {
     await waitFor.visibilityOf(
       draftBlogPostsTable, 'Blog posts table taking too long to appear.');
   };
@@ -193,6 +193,7 @@ var BlogDashboardPage = function() {
   };
 
   this.selectTags = async function(tags) {
+    await waitFor.blogPostTags.first();
     for (i = 0; i < await blogPostTags.count(); i++) {
       var tag = blogPostTags.get(i);
       var tagName = await action.getText(
@@ -205,12 +206,14 @@ var BlogDashboardPage = function() {
   };
 
   this.getMatTab = async function(tabName) {
+    await waitFor.matTabLabels.first();
     for (i = 0; i < await matTabLabels.count(); i++) {
       var matTab = matTabLabels.get(i);
       var tabText = await action.getText(
         `Blog Dashboard tab ${i}`, matTab);
       if (tabText.startsWith(tabName)) {
         await action.click(`${tabName} tab`, matTab);
+        break;
       }
     }
   };
@@ -226,7 +229,7 @@ var BlogDashboardPage = function() {
   };
 
   this.expectNumberOfDraftBlogPostsToBe = async function(number) {
-    await this.waitForDraftsBlogPostsToLoad();
+    await this.waitForDraftBlogPostsToLoad();
     expect(await draftBlogPostTiles.count()).toBe(number);
   };
 
@@ -242,11 +245,12 @@ var BlogDashboardPage = function() {
   };
 
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
-    await this.waitForDraftsBlogPostsToLoad();
+    await this.waitForDraftBlogPostsToLoad();
     expect(await blogPostListItems.count()).toBe(number);
   };
 
   this.getBlogPostTileEditOption = async function(title) {
+    await waitFor.blogPostTiles.first();
     for (i = 0; i < await blogPostTiles.count(); i++) {
       var blogPostTile = blogPostTiles.get(i);
       var blogPostTitleContainer = blogPostTile.element(
@@ -273,6 +277,7 @@ var BlogDashboardPage = function() {
   };
 
   this.navigateToBlogPostEditorWithTitleFromList = async function(title) {
+    await waitFor.blogPostListItems.first();
     for (i = 0; i < await blogPostListItems.count(); i++) {
       var blogPostRow = blogPostListItems.get(i);
       var blogPostTitleContainer = blogPostRow.element(
