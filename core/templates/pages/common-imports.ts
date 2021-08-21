@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the release-coordinator panel.
+ * @fileoverview Common imports required in all oppia pages.
  */
 
 import 'core-js/es7/reflect';
@@ -22,23 +22,5 @@ import 'zone.js';
 // TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 import 'pages/mock-ajs';
 import 'Polyfills.ts';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppConstants } from 'app.constants';
-import { enableProdMode } from '@angular/core';
-import { ReleaseCoordinatorPageModule } from './release-coordinator-page.module';
-import { LoggerService } from 'services/contextual/logger.service';
 
-if (!AppConstants.DEV_MODE) {
-  enableProdMode();
-}
-
-const loggerService = new LoggerService();
-
-platformBrowserDynamic().bootstrapModule(ReleaseCoordinatorPageModule).catch(
-  (err) => loggerService.error(err)
-);
-
-// This prevents angular pages to cause side effects to hybrid pages.
-// TODO(#13080): Remove window.name statement from import.ts files
-// after migration is complete.
-window.name = '';
+require('google-analytics.initializer.ts');
