@@ -210,7 +210,7 @@ class BuildTests(test_utils.GenericTestBase):
                 hash dict.
         """
         # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
-        file_hashes = dict()
+        file_hashes = {}
         base_filename = 'base.html'
         with self.assertRaisesRegexp(ValueError, 'Hash dict is empty'):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
@@ -393,7 +393,7 @@ class BuildTests(test_utils.GenericTestBase):
         """
         # Prevent getting hashes of HTML files.
         with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
-            file_hashes = dict()
+            file_hashes = {}
             self.assertEqual(len(file_hashes), 0)
             file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
             self.assertGreater(len(file_hashes), 0)
@@ -663,7 +663,7 @@ class BuildTests(test_utils.GenericTestBase):
         """
         delete_tasks = collections.deque()
         # The empty dict means that all files should be removed.
-        file_hashes = dict()
+        file_hashes = {}
 
         self.assertEqual(len(delete_tasks), 0)
         delete_tasks += build.generate_delete_tasks_to_remove_deleted_files(

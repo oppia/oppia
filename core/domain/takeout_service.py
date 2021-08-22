@@ -76,7 +76,7 @@ def export_data_for_user(user_id):
             feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles):
         raise NotImplementedError(
             'Takeout for profile users is not yet supported.')
-    exported_data = dict()
+    exported_data = {}
     models_to_export = get_models_which_should_be_exported()
     for model in models_to_export:
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]

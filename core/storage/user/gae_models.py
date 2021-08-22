@@ -2396,7 +2396,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSkillMasteryModel.
         """
 
-        user_data = dict()
+        user_data = {}
         mastery_models = cast(
             List[UserSkillMasteryModel],
             cls.get_all().filter(cls.user_id == user_id).fetch())
@@ -2468,7 +2468,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserContributionProficiencyModel.
         """
-        user_data = dict()
+        user_data = {}
         scoring_models = cast(
             List[UserContributionProficiencyModel],
             cls.query(cls.user_id == user_id).fetch())

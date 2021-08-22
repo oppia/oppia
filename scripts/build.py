@@ -819,7 +819,7 @@ def get_file_hashes(directory_path):
         dict(str, str). Dictionary with keys specifying file paths and values
         specifying file hashes.
     """
-    file_hashes = dict()
+    file_hashes = {}
 
     python_utils.PRINT(
         'Computing hashes for files in %s'
@@ -855,7 +855,7 @@ def filter_hashes(file_hashes):
         dict(str, str). Filtered dictionary of only filepaths that should be
         provided to the frontend.
     """
-    filtered_hashes = dict()
+    filtered_hashes = {}
     for filepath, file_hash in file_hashes.items():
         if is_file_hash_provided_to_frontend(filepath):
             filtered_hashes['/' + filepath] = file_hash
@@ -1237,7 +1237,7 @@ def generate_hashes():
     # The keys for hashes are filepaths relative to the subfolders of the future
     # /build folder. This is so that the replacing inside the HTML files works
     # correctly.
-    hashes = dict()
+    hashes = {}
 
     # Create hashes for all directories and files.
     hash_dirs = [
@@ -1368,7 +1368,7 @@ def main(args=None):
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 
-    save_hashes_to_file(dict())
+    save_hashes_to_file({})
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
