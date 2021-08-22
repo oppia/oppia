@@ -193,6 +193,8 @@ var BlogDashboardPage = function() {
   };
 
   this.selectTags = async function(tags) {
+    await waitFor.visibilityOf(
+      blogPostTags.first(), 'Tags take too long to appear.');
     for (i = 0; i < await blogPostTags.count(); i++) {
       var tag = blogPostTags.get(i);
       var tagName = await action.getText(
