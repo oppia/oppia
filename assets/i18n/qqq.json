@@ -734,6 +734,7 @@
 	"I18N_TOPNAV_ABOUT_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the about oppia page is loaded which contains a more general description of the site.",
 	"I18N_TOPNAV_ADMIN_PAGE": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the admin page is loaded.",
 	"I18N_TOPNAV_BLOG": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Oppia blog is loaded.\n{{Identical|Blog}}",
+	"I18N_TOPNAV_BLOG_DASHBOARD": "Text displayed in the dropdown on the navbar for reaching the blog dashboard.",
 	"I18N_TOPNAV_CLASSROOM": "Text displayed inside the navigation bar. - When the user hovers over the button, a list with several classroom pages is displayed.",
 	"I18N_TOPNAV_CLASSROOM_BASIC_MATHS": "Text displayed inside drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_CLASSROOM button. When the option is clicked, the Maths Classroom page is loaded.",
 	"I18N_TOPNAV_CONTACT_US": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Contact Us page is loaded.\n{{Identical|Contact us}}",

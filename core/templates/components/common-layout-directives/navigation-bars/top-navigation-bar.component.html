@@ -320,6 +320,14 @@
           </a>
         </li>
         <li class="nav-item">
+          <a *ngIf="(isBlogAdmin || isBlogPostEditor)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/blog-dashboard"
+             class="dropdown-item nav-link protractor-test-blog-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_BLOG_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
              [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"

@@ -117,6 +117,7 @@ RERUN_POLICIES = {
     'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
     'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
     'adminpage': RERUN_POLICY_NEVER,
+    'blogdashboard': RERUN_POLICY_NEVER,
     'classroompage': RERUN_POLICY_KNOWN_FLAKES,
     'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
     'collections': RERUN_POLICY_NEVER,

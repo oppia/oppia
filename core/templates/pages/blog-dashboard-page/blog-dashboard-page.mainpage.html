@@ -24,6 +24,7 @@
           /* !important is necessary otherwise d-none class of base components is not overwritten(!important
           is being used there). */
           display: flex !important;
+          margin-left: -10px;
         }
 
         .ng-cloak {
@@ -64,5 +65,13 @@
 
     </oppia-root>
     @load('pages/footer_js_libs.html')
+    <script>
+      // Use the normal default browser eventlistener without passive
+      // set to false.
+      // TODO(#10749): Remove workaround for passive event listeners when
+      // jQuery supports it.
+      EventTarget.prototype.addEventListener = (
+        EventTarget.prototype.addEventListener._original);
+    </script>
   </body>
 </html>

@@ -24,6 +24,7 @@ module.exports = {
       'http://127.0.0.1:8181/',
       'http://127.0.0.1:8181/about',
       'http://127.0.0.1:8181/admin',
+      'http://127.0.0.1:8181/blog-dashboard',
       'http://127.0.0.1:8181/community-library',
       'http://127.0.0.1:8181/contact',
       'http://127.0.0.1:8181/contributor-dashboard',

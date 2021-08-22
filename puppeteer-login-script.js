@@ -49,6 +49,8 @@ module.exports = async(browser, context) => {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {
     await createExplorations(context, page);
+  } else if (context.url.includes('blog-dashboard')) {
+    await setRole(page, 'BLOG_ADMIN');
   }
   await page.close();
 };

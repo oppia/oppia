@@ -40,6 +40,10 @@ module.exports = {
           'assertions': baseConfig['baseAccessibilityAssertions']
         },
         {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/blog-dashboard$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
           'matchingUrlPattern': '^http://127.0.0.1:8181/community-library$',
           'assertions': baseConfig['baseAccessibilityAssertions']
         },

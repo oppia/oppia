@@ -162,6 +162,7 @@ describe('Blog Post Editor Component', () => {
       sampleBlogPostBackendDict);
     spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sampleBlogId');
     spyOn(preventPageUnloadEventService, 'addListener');
+    spyOn(preventPageUnloadEventService, 'removeListener');
     component.ngOnInit();
   });
 
@@ -242,6 +243,7 @@ describe('Blog Post Editor Component', () => {
     expect(component.title).toEqual('sample_title');
     expect(component.contentEditorIsActive).toBe(false);
     expect(component.lastChangesWerePublished).toBe(true);
+    expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
   }));
 
   it('should display alert when unable to fetch blog post editor data',
@@ -351,7 +353,6 @@ describe('Blog Post Editor Component', () => {
       component.blogPostId = sampleBlogPostData.id;
       spyOn(blogPostUpdateService, 'getBlogPostChangeDict')
         .and.returnValue({});
-      spyOn(preventPageUnloadEventService, 'removeListener');
       spyOn(blogPostUpdateService, 'setBlogPostTags');
       spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
         .and.returnValue(Promise.resolve({blogPostDict: sampleBlogPostData}));
@@ -362,14 +363,14 @@ describe('Blog Post Editor Component', () => {
 
       expect(blogPostUpdateService.setBlogPostTags).toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Saved Succesfully.');
+        'Blog Post Saved Successfully.');
       expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
 
       component.updateBlogPostData(true);
       tick();
 
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Saved and Published Succesfully.');
+        'Blog Post Saved and Published Successfully.');
     }));
 
   it('should display alert when unable to update blog post data',
@@ -492,6 +493,8 @@ describe('Blog Post Editor Component', () => {
 
   it('should successfully place call to post thumbnail to server', fakeAsync(
     () => {
+      component.thumbnailDataUrl = 'sample.png';
+      spyOn(imageLocalStorageService, 'flushStoredImagesData');
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve('sample-url-string')
       } as NgbModalRef);
@@ -502,6 +505,7 @@ describe('Blog Post Editor Component', () => {
 
       expect(component.postImageDataToServer).toHaveBeenCalledWith();
       expect(component.thumbnailDataUrl).toEqual('sample-url-string');
+      expect(imageLocalStorageService.flushStoredImagesData).toHaveBeenCalled();
     }));
 
   it('should change tags for blog post successfully', () => {
