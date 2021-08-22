@@ -57,7 +57,7 @@ export interface LostChangeBackendDict {
   'state_name'?: string;
   // 'new_value' is null when an Exploration is deleted or Removed.
   'new_value'?: LostChangeValue | null;
-  // 'old_value' is null when EndExploration is newly added.
+  // 'old_value' is null when an Exploration is newly added.
   'old_value'?: LostChangeValue | null;
   'property_name'?: string;
   'translation_html'?: string;
