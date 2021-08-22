@@ -35,7 +35,7 @@ export class AttributionGuideComponent implements OnInit {
   iframed: boolean = false;
   generateAttibutionIsAllowed: boolean = false;
   maskIsShown: boolean = false;
-  printAttributionLink: string;
+  printAttributionLink: string = '';
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
