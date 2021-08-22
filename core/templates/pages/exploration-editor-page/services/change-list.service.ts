@@ -93,6 +93,9 @@ export class ChangeListService {
     private loggerService: LoggerService,
     private internetConnectivityService: InternetConnectivityService,
   ) {
+    // We have added subscriptions in the constructor.
+    // Since, ngOnInit does not work in angular services.
+    // Ref: https://github.com/angular/angular/issues/23235.
     this.loaderService.onLoadingMessageChange.subscribe(
       (message: string) => this.loadingMessage = message
     );
