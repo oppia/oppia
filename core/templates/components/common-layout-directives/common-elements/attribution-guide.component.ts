@@ -47,11 +47,11 @@ export class AttributionGuideComponent implements OnInit {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
     this.printAttributionLink = (
-      "<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" " +
-      "rel=\"noopener\" target=\"_blank\"><span " +
-      "class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>" +
-      "<span class=\"material-icons oppia-open-new-tab-icon\">" +
-      "open_in_new</span></a>");
+      '<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" ' +
+      'rel=\"noopener\" target=\"_blank\"><span ' +
+      'class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>' +
+      '<span class=\"material-icons oppia-open-new-tab-icon\">' +
+      'open_in_new</span></a>');
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
     if (this.generateAttibutionIsAllowed) {
