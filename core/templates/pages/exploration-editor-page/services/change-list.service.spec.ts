@@ -308,7 +308,6 @@ describe('Change List Service when internet is available', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let internetConnectivityService: InternetConnectivityService;
   let onInternetStateChangeEventEmitter = new EventEmitter();
 
   let alertsSpy = null;
@@ -349,7 +348,7 @@ describe('Change List Service when internet is available', () => {
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
-    internetConnectivityService = TestBed.inject(InternetConnectivityService);
+    TestBed.inject(InternetConnectivityService);
     alertsService = TestBed.inject(AlertsService);
     alertsSpy = spyOn(alertsService, 'addWarning')
       .and.returnValue(null);
