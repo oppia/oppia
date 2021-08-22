@@ -296,6 +296,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             }
           });
 
+          let selections = this.selectionDetails.languageCodes.selections;
+          selections[
+            this.i18nLanguageCodeService.getCurrentI18nLanguageCode()] = true;
+
           this.updateSelectionDetails('languageCodes');
 
           if (this.urlService.getUrlParams().hasOwnProperty('q')) {
