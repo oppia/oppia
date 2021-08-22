@@ -333,6 +333,15 @@ describe('Change List Service when internet is available', () => {
         {
           provide: AutosaveInfoModalsService,
           useValue: mockAutosaveInfoModalsService
+        },
+        {
+          provide: InternetConnectivityService,
+          useValue: {
+            onInternetStateChange: onInternetStateChangeEventEmitter,
+            isOnline() {
+              return true;
+            }
+          }
         }
       ]
     });
@@ -342,9 +351,6 @@ describe('Change List Service when internet is available', () => {
     changeListService = TestBed.inject(ChangeListService);
     internetConnectivityService = TestBed.inject(InternetConnectivityService);
     alertsService = TestBed.inject(AlertsService);
-
-    spyOnProperty(internetConnectivityService, 'onInternetStateChange')
-      .and.returnValue(onInternetStateChangeEventEmitter);
     alertsSpy = spyOn(alertsService, 'addWarning')
       .and.returnValue(null);
     changeListService.ngOnInit();
