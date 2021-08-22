@@ -699,6 +699,7 @@
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
 /core/templates/services/svg-sanitizer.service.ts @seanlip
 /scripts/linters/warranted_angular_security_bypasses.py @seanlip
+/core/controllers/access_validators*.py @seanlip
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/html*.py @seanlip
