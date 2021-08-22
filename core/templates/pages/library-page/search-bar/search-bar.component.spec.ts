@@ -224,7 +224,7 @@ describe('Search bar component', () => {
         value: 'search'
       }
     };
-    expect(component.searchToBeExec(search)).toBeUndefined();
+    component.searchToBeExec(search);
 
     spyOn(component.searchQueryChanged, 'next');
     component.classroomPageIsActive = false;

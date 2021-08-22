@@ -87,9 +87,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (this.classroomPageIsActive) {
-      return;
-    } else {
+    if (!this.classroomPageIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
   }

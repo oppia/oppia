@@ -41,7 +41,7 @@ describe('SetOfAlgebraicIdentifier', function() {
     component.getSchema();
     component.ngOnInit();
     expect(component.value).toEqual([]);
-    component.updateValue([1]);
-    expect(component.value).toEqual([1]);
+    component.updateValue(['a', 'b', 'c']);
+    expect(component.value).toEqual(['a', 'b', 'c']);
   });
 });
