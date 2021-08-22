@@ -44,18 +44,14 @@ NOT_FULLY_COVERED_FILENAMES = [
     'App.ts',
     'audio-preloader.service.ts',
     'Base.ts',
-    'change-list.service.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
     'collection-footer.component.ts',
     'collection-navbar.component.ts',
-    'collection-node-editor.component.ts',
     'collection-player-page.directive.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
-    'contributions-and-review.component.ts',
-    'contributor-dashboard-admin-page.component.ts',
     'conversation-skin.directive.ts',
     'current-interaction.service.ts',
     'exploration-states.service.ts',
@@ -66,7 +62,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'google-analytics.initializer.ts',
     'language-util.service.ts',
     'learner-answer-info.service.ts',
-    'learner-view-rating.service.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
@@ -91,8 +86,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-card.model.ts',
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'story-editor.directive.ts',
-    'story-node-editor.directive.ts',
     'story-node.model.ts',
     'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
@@ -103,7 +96,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'tutor-card.directive.ts',
     'unit-test-utils.ajs.ts', # Please don't try to cover this file.
     'voiceover-recording.service.ts',
-    'worked-example-editor.directive.ts',
 ]
 
 
