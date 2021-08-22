@@ -248,24 +248,50 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'category': 'missing-outer-parens',
             'language_code': '("en")'
         }, expected_status_int=400)
-        self.assertEqual(response_1['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'category\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object missing-outer-parens'
+        )
+        self.assertEqual(response_1['error'], error_msg)
+
         response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '(missing-inner-quotes)',
             'language_code': '("en")'
         }, expected_status_int=400)
-        self.assertEqual(response_2['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'category\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object (missing-inner-quotes)'
+        )
+        self.assertEqual(response_2['error'], error_msg)
 
     def test_library_handler_with_invalid_language_code(self):
         response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '("A category")',
             'language_code': 'missing-outer-parens'
         }, expected_status_int=400)
-        self.assertEqual(response_1['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object missing-outer-parens'
+        )
+        self.assertEqual(response_1['error'], error_msg)
+
         response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '("A category")',
             'language_code': '(missing-inner-quotes)'
         }, expected_status_int=400)
-        self.assertEqual(response_2['error'], 'Invalid search query.')
+
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation '
+            'failed: is_search_query_string ({}) for '
+            'object (missing-inner-quotes)'
+        )
+        self.assertEqual(response_2['error'], error_msg)
 
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
