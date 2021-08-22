@@ -106,9 +106,8 @@ class MockAutosaveInfoModalsService {
   }
 }
 
-fdescribe('Change List Service when changes are mergable', () => {
+describe('Change List Service when changes are mergable', () => {
   let changeListService: ChangeListService;
-  let loaderService: LoaderService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
@@ -244,7 +243,7 @@ fdescribe('Change List Service when changes are mergable', () => {
   });
 });
 
-fdescribe('Change List Service when changes are not mergable', () => {
+describe('Change List Service when changes are not mergable', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
@@ -305,7 +304,7 @@ fdescribe('Change List Service when changes are not mergable', () => {
   });
 });
 
-fdescribe('Change List Service when internet is available', () => {
+describe('Change List Service when internet is available', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
