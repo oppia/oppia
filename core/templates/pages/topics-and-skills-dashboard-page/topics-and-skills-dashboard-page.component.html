@@ -178,7 +178,7 @@
                 <span>Status</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div *ngIf="select2DropdownIsShown && activeTab === TAB_NAME_TOPICS">
+                <div *ngIf="activeTab === TAB_NAME_TOPICS">
                   <oppia-filtered-choices-field [choices]="statusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
@@ -186,7 +186,7 @@
                                                 (selectionChange)="applyFilters()">
                   </oppia-filtered-choices-field>
                 </div>
-                <div *ngIf="select2DropdownIsShown && activeTab === TAB_NAME_SKILLS">
+                <div *ngIf="activeTab === TAB_NAME_SKILLS">
                   <oppia-filtered-choices-field [choices]="skillStatusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
@@ -201,7 +201,7 @@
                 <span>Classroom</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div *ngIf="select2DropdownIsShown && activeTab === TAB_NAME_TOPICS">
+                <div *ngIf="activeTab === TAB_NAME_TOPICS">
                   <oppia-filtered-choices-field [choices]="classrooms"
                                                 placeholder="Classrooms"
                                                 searchLabel="Search"
@@ -209,7 +209,7 @@
                                                 (selectionChange)="applyFilters()">
                   </oppia-filtered-choices-field>
                 </div>
-                <div *ngIf="select2DropdownIsShown && activeTab === TAB_NAME_SKILLS">
+                <div *ngIf="activeTab === TAB_NAME_SKILLS">
                   <oppia-filtered-choices-field [choices]="skillClassrooms"
                                                 placeholder="Classrooms"
                                                 searchLabel="Search"
@@ -224,7 +224,7 @@
                 <span>Sort</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div *ngIf="select2DropdownIsShown">
+                <div>
                   <oppia-filtered-choices-field [choices]="sortOptions"
                                                 placeholder="Sort Options"
                                                 searchLabel="Search"
@@ -239,16 +239,13 @@
                 <span>Keywords</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div *ngIf="select2DropdownIsShown">
-                  <!-- <select2-dropdown item="filterObject.keywords"
-                                    class="protractor-test-select-keyword-dropdown"
-                                    choices="filterObject.keywords"
-                                    allow-multiple-choices="true"
-                                    new-choice-regex="{{ ::TAG_REGEX_STRING }}"
-                                    placeholder="Multiple allowed"
-                                    width="100%"
-                                    on-selection-change="applyFilters()">
-                  </select2-dropdown> -->
+                <div>
+                  <oppia-multi-selection-field class=""
+                                               label="Keywords"
+                                               [(selections)]="filterObject.keywords"
+                                               placeholder="Multiple allowed"
+                                               (selectionsChange)="applyFilters()">
+                  </oppia-multi-selection-field>
                 </div>
               </div>
             </div>

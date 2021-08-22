@@ -20,17 +20,17 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { CategorizedSkills, TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardFilter } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import debounce from 'lodash/debounce';
 import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/create-new-skill-modal.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
+import { ETopicPublishedOptions, TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboard-page.service';
 
-require('base-components/base-content.component.ts');
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-page',
   templateUrl: './topics-and-skills-dashboard-page.component.html'
@@ -38,13 +38,13 @@ require('base-components/base-content.component.ts');
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
   TOPIC_CLASSROOM_UNASSIGNED: string = 'UNASSIGNED';
-  totalTopicSummaries= [];
-  topicSummaries= [];
+  totalTopicSummaries: CreatorTopicSummary[] = [];
+  topicSummaries: CreatorTopicSummary[] = [];
   totalEntityCountToDisplay: number;
   currentCount: number;
   totalSkillCount: number;
-  skillsCategorizedByTopics;
-  editableTopicSummaries = [];
+  skillsCategorizedByTopics: CategorizedSkills;
+  editableTopicSummaries: CreatorTopicSummary[] = [];
   untriagedSkillSummaries: SkillSummary[] = [];
   totalUntriagedSkillSummaries: SkillSummary[] = [];
   mergeableSkillSummaries: SkillSummary[] = [];
@@ -65,20 +65,18 @@ export class TopicsAndSkillsDashboardPageComponent {
   itemsPerPage: number = 10;
   skillPageNumber: number = 0;
   lastSkillPage: number = 0;
-  selectedIndex = null;
   itemsPerPageChoice: number[] = [10, 15, 20];
   filterBoxIsShown: boolean;
   filterObject: TopicsAndSkillsDashboardFilter;
-  classrooms = [];
-  sortOptions = [];
-  statusOptions = [];
-  select2DropdownIsShown: boolean = true;
+  classrooms: string[] = [];
+  sortOptions: string[] = [];
+  statusOptions: ETopicPublishedOptions[] = [];
   fetchSkillsDebounced;
   lastPage: number;
-  moreSkillsPresent;
+  moreSkillsPresent: boolean;
   nextCursor: string;
-  firstTimeFetchingSkills;
-  displayedTopicSummaries = [];
+  firstTimeFetchingSkills: boolean;
+  displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
 
@@ -171,7 +169,6 @@ export class TopicsAndSkillsDashboardPageComponent {
     }
   }
 
-
   initSkillDashboard(): void {
     this.skillStatusOptions = [];
     this.moreSkillsPresent = true;
@@ -181,6 +178,7 @@ export class TopicsAndSkillsDashboardPageComponent {
       this.skillStatusOptions
         .push(TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS[key]);
     }
+    this.applyFilters();
   }
 
   createTopic(): void {

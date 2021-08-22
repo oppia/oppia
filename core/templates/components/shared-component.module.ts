@@ -25,7 +25,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
@@ -83,6 +83,7 @@ import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-so
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
+import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 
 
 // Pipes.
@@ -99,6 +100,7 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { MultiSelectionFieldComponent } from './filter-fields/filtered-choices-field/multi-selection-field/multi-selection-field.component';
 
 @NgModule({
   imports: [
@@ -114,6 +116,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     NgBootstrapModule,
     DynamicContentModule,
     FormsModule,
+    ReactiveFormsModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -144,6 +147,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FilteredChoicesFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
@@ -152,6 +156,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeFeedbackEditorComponent,
@@ -194,6 +199,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FilteredChoicesFieldComponent,
+    MultiSelectionFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
@@ -259,6 +266,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    MultiSelectionFieldComponent,
+    FilteredChoicesFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,

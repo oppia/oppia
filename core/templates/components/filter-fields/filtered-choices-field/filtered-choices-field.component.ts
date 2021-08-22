@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the status filter.
+ * @fileoverview Component for the filtering choices.
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
@@ -22,15 +22,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'oppia-filtered-choices-field',
   templateUrl: './filtered-choices-field.component.html'
 })
-export class FilteredChoicesFieldComponent<T> {
+export class FilteredChoicesFieldComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() choices!: string[];
-  @Input() selection!: T;
+  @Input() selection!: string;
   @Input() placeholder: string;
   @Input() searchLabel: string;
-  @Output() selectionChange: EventEmitter<T> = (
+  @Output() selectionChange: EventEmitter<string> = (
     new EventEmitter());
   filteredChoices!: string[];
 
@@ -43,7 +43,7 @@ export class FilteredChoicesFieldComponent<T> {
       choice => choice.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
   }
 
-  updateSelection(selection: T): void {
+  updateSelection(selection: string): void {
     this.selection = selection;
     this.selectionChange.emit(selection);
   }
