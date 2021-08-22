@@ -289,6 +289,7 @@ var BlogDashboardPage = function() {
       if (blogPostTitle === title) {
         await action.click('blog post row', blogPostRow);
         await waitFor.pageToFullyLoad();
+        break;
       }
     }
   };
