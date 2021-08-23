@@ -32,6 +32,12 @@ const routes: Route[] = [
       .then(m => m.AboutPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
+    loadChildren: () => import(
+      'pages/about-foundation-page/about-foundation-page.module')
+      .then(m => m.AboutFoundationPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
