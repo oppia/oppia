@@ -237,7 +237,10 @@ export class ContextService {
   getExplorationId(): string {
     if (this.explorationId) {
       return this.explorationId;
-    } else if (!this.isInQuestionPlayerMode()) {
+    } else if (
+      !this.isInQuestionPlayerMode() ||
+      this.getQuestionPlayerIsManuallySet()
+    ) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
       let pathnameArray = this.urlService.getPathname().split('/');
