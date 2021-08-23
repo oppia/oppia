@@ -153,16 +153,19 @@ require('services/bottom-navbar-status.service.ts');
 require('services/internet-connectivity.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
+require('services/ngb-modal.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
     '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ContextService',
+    'ChangeListService', 'ContextService', 'NgbModal',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -186,7 +189,7 @@ angular.module('oppia').component('explorationEditorPage', {
     function(
         $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
-        ChangeListService, ContextService,
+        ChangeListService, ContextService, NgbModal,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -257,7 +260,7 @@ angular.module('oppia').component('explorationEditorPage', {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
-
+          ctrl.showWelcomeExplorationModal();
           ExplorationFeaturesService.init(explorationData, featuresData);
 
           StateClassifierMappingService.init(
@@ -428,13 +431,9 @@ angular.module('oppia').component('explorationEditorPage', {
         }
       };
 
-      ctrl.showWelcomeExplorationModal = function() {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/modal-templates/' +
-            'welcome-modal.template.html'),
+      ctrl.showWelcomeExplorationModal = function () {
+        NgbModal.open(WelcomeModalComponent, {
           backdrop: true,
-          controller: 'WelcomeModalController',
           windowClass: 'oppia-welcome-modal'
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
@@ -445,7 +444,26 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationId);
           StateTutorialFirstTimeService.markEditorTutorialFinished();
         });
-      };
+      }
+
+      // ctrl.showWelcomeExplorationModal = function() {
+      //   $uibModal.open({
+      //     template: require(
+      //       'pages/exploration-editor-page/modal-templates/' +
+      //       'welcome-modal.template.html'),
+      //     backdrop: true,
+      //     controller: 'WelcomeModalController',
+      //     windowClass: 'oppia-welcome-modal'
+      //   }).result.then(function(explorationId) {
+      //     SiteAnalyticsService.registerAcceptTutorialModalEvent(
+      //       explorationId);
+      //     ctrl.startEditorTutorial();
+      //   }, function(explorationId) {
+      //     SiteAnalyticsService.registerDeclineTutorialModalEvent(
+      //       explorationId);
+      //     StateTutorialFirstTimeService.markEditorTutorialFinished();
+      //   });
+      // };
 
       ctrl.getNavbarText = function() {
         return 'Exploration Editor';
