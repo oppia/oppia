@@ -45,6 +45,10 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
+          'matchingUrlPattern': 'http://[^/]+/about-foundation$',
+          'assertions': baseConfig['basePerformanceAssertions']
+        },
+        {
           'matchingUrlPattern': 'http://[^/]+/community-library$',
           'assertions': baseConfig['basePerformanceAssertions']
         },

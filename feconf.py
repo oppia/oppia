@@ -767,9 +767,6 @@ DISABLED_EXPLORATION_IDS = ['5']
 GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
-# External URL for the Foundation site.
-FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
-
 # NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
 # Change to the correct url for internal testing in the testing production
 # environment.
@@ -792,6 +789,7 @@ TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
+ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'
