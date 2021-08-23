@@ -41,6 +41,7 @@ import feconf
 from proto_files import exploration_pb2
 from proto_files import languages_pb2
 from proto_files import state_pb2
+from proto_files import objects_pb2
 import python_utils
 import schema_utils
 import utils
@@ -814,7 +815,13 @@ class Exploration(python_utils.OBJECT):
                     self, state.content
                 ),
                 recorded_voiceovers=self.to_recorded_voiceover_proto(
-                    self, state.recorded_voiceovers)
+                    self, state.recorded_voiceovers),
+                written_translations=self.to_written_translations_proto(
+                    self, state.written_translations
+                ),
+                interaction=self.to_interaction_proto(
+                    self, state.interaction
+                )
             )
             state_protos[state_name] = state_proto
         
@@ -849,7 +856,8 @@ class Exploration(python_utils.OBJECT):
             voiceover_content_mapping_proto = (
                 languages_pb2.VoiceoverContentMapping(
                     voiceover_content_mapping=voiceover_content_mapping_protos
-            ))
+                )
+            )
             voiceover_language_mapping_protos[content_id] = voiceover_content_mapping_proto
         
         return voiceover_language_mapping_protos
@@ -862,6 +870,163 @@ class Exploration(python_utils.OBJECT):
         )
 
         return voiceover_proto
+
+    def to_written_translations_proto(self, written_translations):
+        translation_language_mapping_protos=self.to_translation_language_mapping_proto(
+            self, written_translations.translations_mapping)
+
+        written_translations_proto = languages_pb2.WrittenTranslations(
+            translation_language_mapping=translation_language_mapping_protos
+        )
+
+        return written_translations_proto
+
+    def to_translation_language_mapping_proto(self, translation_mapping):
+        translation_language_mapping_protos = {}
+        translation_content_mapping_protos = {}
+
+        for (content_id, language_code_to_translation) in translation_mapping.items():
+            for (language_code, written_transaltion) in (language_code_to_translation.items()):
+                written_translation_proto=self.to_written_translation_proto(
+                    written_transaltion.data_format, written_transaltion.translation
+                )
+                translation_content_mapping_protos[language_code] = written_translation_proto
+            translation_content_mapping_proto = (
+                languages_pb2.WrittenTranslationContentMapping(
+                    translation_content_mapping=translation_content_mapping_protos
+                )
+            )
+            translation_language_mapping_protos[content_id] = translation_content_mapping_proto
+
+        return translation_language_mapping_protos
+    
+    def to_written_translation_proto(self, data_format, translation):
+        if(data_format == WrittenTranslation.DATA_FORMAT_HTML):
+            return self.to_html_written_translatable(self, translation)
+        
+        if(data_format == WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
+            return self.to_unicode_written_translatable(self, translation)
+        
+        if(data_format == WrittenTranslation.DATA_FORMAT_SET_OF_NORMALIZED_STRING):
+            return self.to_normalized_set_written_translatable(self, translation)
+        
+        if(data_format == WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
+            return self.to_unicode_set_written_translatable(self, translation)
+
+    def to_html_written_translatable(self, translation):
+        written_translatable_html_proto = languages_pb2.WrittenTranslation.data_format.WrittenTranslatableHtml(translation=translation)
+
+        return written_translatable_html_proto
+
+    def to_unicode_written_translatable(self, translation):
+        written_translatable_unicode_proto = languages_pb2.WrittenTranslation.data_format.WrittenTranslatableUnicode(translation=translation)
+
+        return written_translatable_unicode_proto
+
+    def to_normalized_set_written_translatable(self, translation):
+        written_translatable_normalized_set_proto = languages_pb2.WrittenTranslation.data_format.WrittenTranslatableSetOfNormalizedString(translation=translation)
+
+        return written_translatable_normalized_set_proto
+
+    def to_unicode_set_written_translatable(self, translation):
+        written_translatable_unicode_set_proto = languages_pb2.WrittenTranslation.data_format.WrittenTranslatableSetOfUnicodeString(translation=translation)
+
+        return written_translatable_unicode_set_proto
+
+    def to_interaction_proto(self, interaction):
+        interaction_proto = None
+        if(interaction.id == 'Continue'):
+            interaction_proto = state_pb2.InteractionInstance(
+                continue_=self.to_continue_proto(self, interaction)
+            )
+
+        if(interaction.id == 'FractionInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                fraction_input=self.to_fraction_interaction_proto(self, interaction)
+            )
+
+        return interaction_proto
+
+    def to_continue_proto(self, interaction):
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct 
+        ) 
+        continue_proto = state_pb2.ContinueInstance(
+            default_outcome=outcome_proto
+        )
+
+        return continue_proto
+    
+    def to_outcome_proto(self, destination_state, feedback, labelled_as_correct):
+        feedback_proto = self.to_subtitled_html_proto(
+            self, feedback
+        )
+        outcome_proto = state_pb2.Outcome(
+            destination_state=destination_state,
+            feedback=feedback_proto,
+            labelled_as_correct=labelled_as_correct
+        )
+
+        return outcome_proto
+
+    def to_fraction_interaction_proto(self, interaction):
+        customization_args_proto = self.to_fraction_customization_args_proto(
+            self, interaction.customization_args)
+
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct 
+        )
+
+        solution_proto = self.to_fraction_solution_proto(self, interaction.solution)
+
+        fraction_interaction_proto = state_pb2.FractionInputInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto,
+            solution=solution_proto
+        )
+
+        return fraction_interaction_proto
+
+    
+    def to_fraction_customization_args_proto(self, customization_args):
+        customization_arg_proto = state_pb2.FractionInputInstance.CustomizationArgs(
+            requires_simplest_form=customization_args['requireSimplestForm'].value,
+            allow_improper_fractions=customization_args['allowImproperFraction'].value,
+            allow_nonzero_integer_part=customization_args['allowNonzeroIntegerPart'].value,
+            custom_placeholder=self.to_subtitled_html_proto(
+                self, customization_args['customPlaceholder'].value)
+        )
+
+        return customization_arg_proto
+
+    def to_fraction_solution_proto(self, solution):
+        solution_proto = None 
+        if solution is not None:
+            solution_proto = state_pb.FractionInputInstance.Solution(
+                base_solution=self.to_base_solution_proto(self, solution.explanation),
+                correct_answer=self.to_fraction_proto(self, soltuion.correct_answer)
+            )
+
+        return solution_proto
+
+    def to_base_solution_proto(self, explanation):
+        base_solution_proto = state.BaseSolution(
+            explanation=self.to_subtitled_html_proto(self, explanation)
+        )
+
+        return base_solution_proto
+
+    def to_fraction_proto(self, correct_answer):
+        fraction_proto = objects_pb2.Fraction(
+            is_negative=correct_answer.is_negative,
+            whole_number=correct_answer.whole_number,
+            numerator=correct_answer.numerator,
+            denominator=correct_answer.denominator
+        )
+
+        return fraction_proto
 
     def set_continue_interaction(self, content_id, html):
         """Set ContinueInstance of Interaction Message in exploration.proto.
