@@ -9,7 +9,8 @@
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
-          <oppia-subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+          <oppia-subtopic-summary-tile class="subtopic-summary-tile"
+                                       [classroomUrlFragment]="classroomUrlFragment"
                                        [subtopic]="subtopic"
                                        [topicId]="topicId"
                                        [topicUrlFragment]="topicUrlFragment">
@@ -47,7 +48,7 @@
     margin-left: 20px;
   }
 
-  subtopic-summary-tile {
+  .subtopic-summary-tile {
     margin-right: 2vw;
   }
 

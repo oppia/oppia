@@ -16,162 +16,160 @@
  * @fileoverview Unit tests for subtopic viewer page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { PageTitleService } from 'services/page-title.service';
 import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
-
-require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
+import { SubtopicViewerPageComponent } from './subtopic-viewer-page.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { LoaderService } from 'services/loader.service';
+import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Subtopic viewer page', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  var AlertsService = null;
-  var SubtopicViewerBackendApiService = null;
-  var UrlService = null;
-  var WindowDimensionsService = null;
-  var ContextService = null;
+  let component: SubtopicViewerPageComponent;
+  let fixture: ComponentFixture<SubtopicViewerPageComponent>;
+  let pageTitleService: PageTitleService;
+  let contextService: ContextService;
+  let alertsService: AlertsService;
+  let windowDimensionsService: WindowDimensionsService;
+  let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
+  let urlService: UrlService;
+  let loaderService: LoaderService;
 
-  var topicName = 'Topic Name';
-  var abbreviatedTopicName = 'abbrev';
-  var topicId = '1';
-  var subtopicTitle = 'Subtopic Title';
-  var subtopicUrlFragment = 'subtopic-title';
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(() => {
-    OppiaAngularRootComponent.pageTitleService = (
-      TestBed.get(PageTitleService)
-    );
-  });
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    AlertsService = $injector.get('AlertsService');
-    ContextService = $injector.get('ContextService');
-    SubtopicViewerBackendApiService = $injector.get(
-      'SubtopicViewerBackendApiService');
-    UrlService = $injector.get('UrlService');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('subtopicViewerPage', {
-      $scope: $scope
-    });
-  }));
-
-  it('should succesfully get subtopic data and set context', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      abbreviatedTopicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math');
-    spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
-      subtopicUrlFragment);
-    var subtopicDataObject = (
-      ReadOnlySubtopicPageData.createFromBackendDict({
-        topic_id: topicId,
-        topic_name: topicName,
-        subtopic_title: subtopicTitle,
-        page_contents: {
-          subtitled_html: {
-            content_id: '',
-            html: 'This is a html'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          }
+  let topicName = 'Topic Name';
+  let topicId = '1';
+  let subtopicTitle = 'Subtopic Title';
+  let subtopicUrlFragment = 'subtopic-title';
+  let subtopicDataObject: ReadOnlySubtopicPageData = (
+    ReadOnlySubtopicPageData.createFromBackendDict({
+      topic_id: topicId,
+      topic_name: topicName,
+      subtopic_title: subtopicTitle,
+      page_contents: {
+        subtitled_html: {
+          content_id: '',
+          html: 'This is a html'
         },
-        next_subtopic_dict: {
-          id: 1,
-          title: '',
-          skill_ids: [],
-          thumbnail_filename: '',
-          thumbnail_bg_color: '',
-          url_fragment: subtopicUrlFragment
+        recorded_voiceovers: {
+          voiceovers_mapping: {}
         }
-      }));
-    spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
-      .returnValue(
-        $q.resolve(subtopicDataObject));
-    spyOn(
-      OppiaAngularRootComponent.pageTitleService,
-      'setPageTitle').and.callThrough();
-    spyOn(
-      OppiaAngularRootComponent.pageTitleService,
-      'updateMetaTag').and.callThrough();
-    spyOn(ContextService, 'setCustomEntityContext').and.callThrough();
-    spyOn(ContextService, 'removeCustomEntityContext').and.callThrough();
+      },
+      next_subtopic_dict: {
+        id: 1,
+        title: '',
+        skill_ids: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        url_fragment: subtopicUrlFragment
+      }
+    }));
 
-    expect(ctrl.nextSubtopicSummaryIsShown).toBe(false);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        SubtopicViewerPageComponent,
+        MockTranslatePipe
+      ],
+      providers: [
+        AlertsService,
+        ContextService,
+        LoaderService,
+        PageTitleService,
+        SubtopicViewerBackendApiService,
+        UrlService,
+        WindowDimensionsService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-    ctrl.$onInit();
-    $scope.$apply();
-
-    expect(ctrl.pageContents.getHtml()).toBe('This is a html');
-    expect(ctrl.subtopicTitle).toBe(subtopicTitle);
-    expect(
-      OppiaAngularRootComponent.pageTitleService.setPageTitle
-    ).toHaveBeenCalledWith(`Review ${subtopicTitle} | Oppia`);
-    expect(
-      OppiaAngularRootComponent.pageTitleService.updateMetaTag
-    ).toHaveBeenCalledWith(
-      `Review the skill of ${subtopicTitle.toLowerCase()}.`);
-    expect(ContextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'topic', topicId);
-
-    expect(ctrl.parentTopicId).toBe(topicId);
-    expect(ctrl.nextSubtopic).toEqual(subtopicDataObject.getNextSubtopic());
-    expect(ctrl.nextSubtopicSummaryIsShown).toBe(true);
-
-    ctrl.$onDestroy();
-    expect(ContextService.removeCustomEntityContext).toHaveBeenCalled();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SubtopicViewerPageComponent);
+    component = fixture.componentInstance;
+    pageTitleService = TestBed.inject(PageTitleService);
+    contextService = TestBed.inject(ContextService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    alertsService = TestBed.inject(AlertsService);
+    subtopicViewerBackendApiService = TestBed.inject(
+      SubtopicViewerBackendApiService);
+    urlService = TestBed.inject(UrlService);
+    loaderService = TestBed.inject(LoaderService);
   });
 
-  it('should use reject handler when fetching subtopic data fails',
-    function() {
-      spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-        abbreviatedTopicName);
-      spyOn(
-        UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-        'math');
-      spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
-        subtopicUrlFragment);
-      spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
-        .returnValue(
-          $q.reject({
-            status: 404
-          }));
-      spyOn(AlertsService, 'addWarning').and.callThrough();
+  it('should succesfully get subtopic data and set context', fakeAsync(() => {
+    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'updateMetaTag');
+    spyOn(contextService, 'setCustomEntityContext');
+    spyOn(contextService, 'removeCustomEntityContext');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic-url');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom-url');
+    spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'subtopic-url');
+    spyOn(loaderService, 'showLoadingScreen');
 
-      expect(ctrl.nextSubtopicSummaryIsShown).toBe(false);
+    expect(component.nextSubtopicSummaryIsShown).toBe(false);
+    spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
+      .and.returnValue(Promise.resolve(subtopicDataObject));
 
-      ctrl.$onInit();
-      $scope.$apply();
+    component.ngOnInit();
+    tick();
 
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+    expect(component.pageContents).toEqual(
+      subtopicDataObject.getPageContents());
+    expect(component.subtopicTitle).toEqual(
+      subtopicDataObject.getSubtopicTitle());
+    expect(component.parentTopicId).toEqual(
+      subtopicDataObject.getParentTopicId());
+    expect(component.nextSubtopic).toEqual(
+      subtopicDataObject.getNextSubtopic());
+    expect(component.nextSubtopicSummaryIsShown).toBeTrue();
+
+    expect(contextService.setCustomEntityContext).toHaveBeenCalled();
+    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.updateMetaTag).toHaveBeenCalled();
+
+    component.ngOnDestroy();
+    expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+  }));
+
+  it(
+    'should use reject handler when fetching subtopic data fails',
+    fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic-url');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('classroom-url');
+      spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'subtopic-url');
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
+        .returnValue(Promise.reject({
+          status: 404
+        }));
+      spyOn(alertsService, 'addWarning');
+      component.ngOnInit();
+      tick();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get subtopic data');
-      expect(ctrl.nextSubtopicSummaryIsShown).toBe(false);
-    });
+    }));
 
   it('should check if the view is mobile or not', function() {
-    var widthSpy = spyOn(WindowDimensionsService, 'getWidth');
+    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(400);
-    expect(ctrl.checkMobileView()).toBe(true);
+    expect(component.checkMobileView()).toBe(true);
 
     widthSpy.and.returnValue(700);
-    expect(ctrl.checkMobileView()).toBe(false);
+    expect(component.checkMobileView()).toBe(false);
   });
 });
