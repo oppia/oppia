@@ -477,11 +477,11 @@ class BaseModel(datastore_services.Model):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
+        start_cursor: Optional[datastore_services.Cursor] = (
+            datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor
+            ) if urlsafe_start_cursor else None
+        )
 
         last_updated_query = query.order(-cls.last_updated)
         query_models, next_cursor, _ = last_updated_query.fetch_page(
