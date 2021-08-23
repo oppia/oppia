@@ -16,25 +16,18 @@
  * @fileoverview Module for the participation playbook page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-
+import { NgModule } from '@angular/core';
 import { PlaybookPageComponent } from './playbook.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlaybookPageRootComponent } from './playbook-page-root.component';
+import { CommonModule } from '@angular/common';
+import { PlaybookPageRoutingModule } from './playbook-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    PlaybookPageRoutingModule
   ],
   declarations: [
     PlaybookPageComponent,
@@ -43,20 +36,6 @@ import { PlaybookPageRootComponent } from './playbook-page-root.component';
   entryComponents: [
     PlaybookPageComponent,
     PlaybookPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [PlaybookPageRootComponent]
+  ]
 })
 export class PlaybookPageModule {}

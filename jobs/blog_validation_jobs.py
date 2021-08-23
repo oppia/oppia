@@ -27,9 +27,13 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import
+from typing import Any  # isort:skip
 
-(blog_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
+
+(blog_models,) = models.Registry.import_models(
     [models.NAMES.blog, ])
 
 
@@ -37,7 +41,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
     """Helper class to retrive models with duplicate properties."""
 
     def __init__(self, property_name):
-        # type: (Text) -> None
+        # type: (str) -> None
         super(GetModelsWithDuplicatePropertyValues, self).__init__()
         self._property_name = property_name
 
@@ -51,7 +55,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
                 beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
             | 'Group pairs by their %s' % self._property_name >> (
                 beam.GroupByKey())
-            | 'Discard %s key' % self._property_name >> beam.Values()
+            | 'Discard %s key' % self._property_name >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self._property_name >> (
                 beam.Filter(lambda models: len(models) > 1))
         )
@@ -79,8 +83,7 @@ class BlogPostTitleUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostModel.query(), self.datastoreio_stub
-                ))
+                    blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
@@ -99,8 +102,7 @@ class BlogPostUrlUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Post Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostModel.query(), self.datastoreio_stub
-                ))
+                    blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('url_fragment')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
@@ -119,9 +121,7 @@ class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Summary Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostSummaryModel.query(),
-                    self.datastoreio_stub
-                ))
+                    blog_models.BlogPostSummaryModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
@@ -140,9 +140,7 @@ class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
             self.pipeline
             | 'Get every Blog Post Summary Model' >> (
                 ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    blog_models.BlogPostSummaryModel.query(),
-                    self.datastoreio_stub
-                ))
+                    blog_models.BlogPostSummaryModel.query()))
             | GetModelsWithDuplicatePropertyValues('url_fragment')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [

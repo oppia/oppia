@@ -75,7 +75,6 @@ class MockWindowRef {
         if (this._hashChange === null) {
           return;
         }
-        this._hashChange();
       },
       get href() {
         return this._href;
@@ -83,7 +82,7 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      reload: (val) => val
+      reload: (val: string) => val
     },
     get onhashchange() {
       return this.location._hashChange;
@@ -192,30 +191,28 @@ describe('Exploration Summary Tile Component', () => {
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlService = TestBed.inject(UrlService);
 
-    component.getCollectionId = '1';
-    component.getExplorationId = '1';
-    component.getExplorationTitle = 'Title';
-    component.getStoryNodeId = '1';
-    component.getLastUpdatedMsec = 1000;
-    component.getNumViews = '100';
-    component.getObjective = 'objective';
-    component.getCategory = 'category';
-    component.getRatings = {
-      1: 1,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 1
+    component.collectionId = '1';
+    component.explorationId = '1';
+    component.explorationTitle = 'Title';
+    component.storyNodeId = '1';
+    component.numViews = '100';
+    component.objective = 'objective';
+    component.category = 'category';
+    component.contributorsSummary = {
+      username1: {
+        num_commits: 1,
+      },
+      username2: {
+        num_commits: 2,
+      }
     };
-    component.getContributorsSummary = 'summary';
-    component.getThumbnailIconUrl = '/subjects/Welcome';
-    component.getThumbnailBgColor = 'blue';
+    component.thumbnailIconUrl = '/subjects/Welcome';
+    component.thumbnailBgColor = 'blue';
     component.openInNewWindow = 'true';
     component.isCommunityOwned = true;
     component.isCollectionPreviewTile = true;
-    component.mobileCutoffPx = 500;
     component.isPlaylistTile = true;
-    component.getParentExplorationIds = '123';
+    component.parentExplorationIds = '123';
     component.showLearnerDashboardIconsIfPossible = 'true';
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
@@ -254,7 +251,6 @@ describe('Exploration Summary Tile Component', () => {
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
 
-    component.mobileCutoffPx = null;
     component.ngOnInit();
     tick();
     fixture.detectChanges();
@@ -314,6 +310,13 @@ describe('Exploration Summary Tile Component', () => {
   }));
 
   it('should get the average ratings of the exploration', fakeAsync(() => {
+    component.ratings = {
+      1: 1,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 1
+    };
     const ratingsSpy = spyOn(
       ratingComputationService, 'computeAverageRating')
       .and.returnValue(3);
@@ -330,15 +333,14 @@ describe('Exploration Summary Tile Component', () => {
     ' if rating are undefined', fakeAsync(() => {
     const ratingsSpy = spyOn(
       ratingComputationService, 'computeAverageRating')
-      .and.returnValue(3);
+      .and.returnValue(null);
 
-    component.getRatings = null;
     let averageRatings = component.getAverageRating();
     tick();
     fixture.detectChanges();
 
     expect(ratingsSpy).not.toHaveBeenCalled();
-    expect(averageRatings).toBe(null);
+    expect(averageRatings).toBeNull();
   }));
 
   it('should get last updated Date & time', () => {
@@ -346,6 +348,7 @@ describe('Exploration Summary Tile Component', () => {
       dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
       .and.returnValue('1:30 am');
 
+    component.lastUpdatedMsec = 1000;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
@@ -354,16 +357,10 @@ describe('Exploration Summary Tile Component', () => {
   });
 
   it('should fail to get last updated Date & time', () => {
-    const dateTimeSpy = spyOn(
-      dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-      .and.returnValue('1:30 am');
-
-    component.getLastUpdatedMsec = null;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
-    expect(dateTime).toBe(null);
-    expect(dateTimeSpy).not.toHaveBeenCalled();
+    expect(dateTime).toBeNull();
   });
 
   it('should get the thumbnail url', () => {
@@ -371,15 +368,15 @@ describe('Exploration Summary Tile Component', () => {
       urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('thumbnailUrl');
 
-    component.getThumbnailIconUrl = 'thumbnailUrl';
+    component.thumbnailIconUrl = 'thumbnailUrl';
     component.getCompleteThumbnailIconUrl();
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
   });
 
-  it('should return to the same page if ExplorationId is null', () => {
-    component.getExplorationId = null;
+  it('should return to the same page if ExplorationId is empty', () => {
+    component.explorationId = '';
     const result = component.getExplorationLink();
     fixture.detectChanges();
 
@@ -436,7 +433,7 @@ describe('Exploration Summary Tile Component', () => {
       '/story/fhfhvhgvhvvh');
     const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
 
-    component.getStoryNodeId = null;
+    component.storyNodeId = '';
     const result = component.getExplorationLink();
 
     tick();

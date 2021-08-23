@@ -24,11 +24,11 @@ from jobs import blog_validation_errors
 from jobs.types import base_validation_errors_test
 import utils
 
-(blog_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
-    [models.NAMES.blog, ])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
 
-datastore_services = (
-    models.Registry.import_datastore_services()) # type: ignore[no-untyped-call]
+(blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 
 class DuplicateBlogTitleErrorTests(
@@ -106,8 +106,8 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
             author_id='user',
             url_fragment='url_fragment_1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.YEAR_AGO)
+            last_updated=self.YEAR_AGO,
+            published_on=self.NOW)
         error = (
             blog_validation_errors
             .InconsistentPublishLastUpdatedTimestampsError(model))
@@ -115,7 +115,7 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
         self.assertEqual(
             error.stderr,
             'InconsistentPublishLastUpdatedTimestampsError in BlogPostModel'
-            '(id="validblogid1"): last_updated=%r is later than published_on=%r'
+            '(id="validblogid1"): published_on=%r is later than last_updated=%r'
             % (self.NOW, self.YEAR_AGO))
 
 

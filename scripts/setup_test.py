@@ -140,7 +140,7 @@ class SetupTests(test_utils.GenericTestBase):
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor'])
         with self.swap(
-            sys, 'version_info', version_info(major=2, minor=7)):
+            sys, 'version_info', version_info(major=3, minor=7)):
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(self):

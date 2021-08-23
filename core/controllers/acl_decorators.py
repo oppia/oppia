@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import functools
 import logging
+import re
 
 from constants import constants
 from core.controllers import base
@@ -151,10 +152,18 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
-            _redirect_based_on_return_type(
-                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            # This decorator should only be used for JSON handlers, since all
+            # HTML page handlers are expected to be migrated to the Angular
+            # router and access validation for such pages should be done using
+            # the access validation handler endpoint.
+            if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+                raise self.PageNotFoundException
+            else:
+                # As this decorator is not expected to be used with other
+                # handler types, raising an error here.
+                raise Exception(
+                    'does_classroom_exist decorator is only expected to '
+                    'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
@@ -1297,8 +1306,12 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         entity_type = feedback_services.get_thread(thread_id).entity_type
         entity_types_with_unrestricted_view_suggestion_access = (
@@ -1355,8 +1368,12 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
@@ -1997,6 +2014,48 @@ def can_modify_exploration_roles(handler):
     return test_can_modify
 
 
+def can_perform_tasks_in_taskqueue(handler):
+    """Decorator to ensure that the handler is being called by task scheduler or
+    by a superadmin of the application.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also ensures that
+        the handler can only be executed if it is called by task scheduler or by
+        a superadmin of the application.
+    """
+
+    def test_can_perform(self, **kwargs):
+        """Checks if the handler is called by task scheduler or by a superadmin
+        of the application.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        # The X-AppEngine-QueueName header is set inside AppEngine and if
+        # a request from outside comes with this header AppEngine will get
+        # rid of it.
+        # https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_app_engine_task_request_headers
+        if (self.request.headers.get('X-AppEngine-QueueName') is None and
+                not self.current_user_is_super_admin):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        else:
+            return handler(self, **kwargs)
+    test_can_perform.__wrapped__ = True
+
+    return test_can_perform
+
+
 def can_perform_cron_tasks(handler):
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
@@ -2024,12 +2083,15 @@ def can_perform_cron_tasks(handler):
             UnauthorizedUserException. The user does not have
                 credentials to access the page.
         """
+        # The X-AppEngine-Cron header is set inside AppEngine and if a request
+        # from outside comes with this header AppEngine will get rid of it.
+        # https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#validating_cron_requests
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        else:
-            return handler(self, **kwargs)
+
+        return handler(self, **kwargs)
     test_can_perform.__wrapped__ = True
 
     return test_can_perform

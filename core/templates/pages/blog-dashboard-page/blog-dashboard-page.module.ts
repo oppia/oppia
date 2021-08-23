@@ -18,7 +18,10 @@
 
 import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -27,31 +30,52 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
+import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
-import { BlogDashboardTileComponent } from './blog-dashboard-tile/blog-dashboard-tile.component';
-import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar-breadcrumb.component';
+import { BlogDashboardTileComponent } from 'pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component';
+import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-
-declare var angular: ng.IAngularStatic;
+import { ToastrModule } from 'ngx-toastr';
+import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
+import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
+import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
+import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
+import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
-    MatTabsModule
+    ToastrModule.forRoot(toastrConfig),
+    MatTabsModule,
+    MatMenuModule,
+    MatButtonToggleModule,
+    BrowserAnimationsModule
   ],
   declarations: [
     BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
+    BlogPostEditorComponent,
+    BlogPostActionConfirmationModalComponent,
+    UploadBlogPostThumbnailModalComponent,
+    BlogCardPreviewModalComponent,
+    UploadBlogPostThumbnailComponent,
+    BlogPostEditorNavbarPreLogoActionComponent
   ],
   entryComponents: [
     BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
+    BlogPostEditorComponent,
+    BlogPostActionConfirmationModalComponent,
+    UploadBlogPostThumbnailModalComponent,
+    BlogCardPreviewModalComponent,
+    UploadBlogPostThumbnailComponent,
+    BlogPostEditorNavbarPreLogoActionComponent
   ],
   providers: [
     {
@@ -73,6 +97,7 @@ class BlogDashboardPageModule implements DoBootstrap {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

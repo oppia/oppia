@@ -57,10 +57,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isCurriculumAdmin: boolean;
   isTopicManager: boolean;
   isSuperAdmin: boolean;
+  isBlogAdmin: boolean;
+  isBlogPostEditor: boolean;
   userIsLoggedIn: boolean;
   username: string;
   currentUrl: string;
-  logoutUrl: string;
   userMenuIsShown: boolean;
   inClassroomPage: boolean;
   showLanguageSelector: boolean;
@@ -93,7 +94,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
-    'story_editor'];
+    'story_editor', 'blog-dashboard'];
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
@@ -133,7 +134,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
-    this.logoutUrl = AppConstants.LOGOUT_URL;
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
     this.inClassroomPage = false;
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
@@ -186,6 +186,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
+      this.isBlogAdmin = userInfo.isBlogAdmin();
+      this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.username = userInfo.getUsername();
       if (this.username) {

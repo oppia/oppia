@@ -27,6 +27,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let contributionAndReviewService = null;
   let AlertsService = null;
   let userService = null;
+  let languageUtilService = null;
   let userInfoSpy = null;
   let contributionRightsDataSpy = null;
 
@@ -35,11 +36,16 @@ describe('Translation Suggestion Review Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     contributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
+    languageUtilService = $injector.get('LanguageUtilService');
+
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     AlertsService = $injector.get('AlertsService');
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview');
+    spyOn(
+      languageUtilService, 'getAudioLanguageDescription')
+      .and.returnValue('audio_language_description');
   }));
 
   describe('when reviewing suggestion', function() {
@@ -318,7 +324,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       'should update translation when the update button is clicked',
       function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
-        $scope.editedContent.html = '<p>In Hindi</p>';
+        $scope.editedContent = '<p>In Hindi</p>';
         $scope.activeSuggestion.change = {
           cmd: 'add_written_translation',
           state_name: 'State 3',
@@ -338,7 +344,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
         expect(contributionAndReviewService.updateTranslationSuggestionAsync)
           .toHaveBeenCalledWith(
-            'suggestion_1', $scope.editedContent.html,
+            'suggestion_1', $scope.editedContent,
             jasmine.any(Function),
             jasmine.any(Function));
       });

@@ -188,7 +188,7 @@ class BlogPostModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from BlogPostModel.
         """
-        user_data = dict()
+        user_data = {}
         blog_post_models = cls.get_all().filter(
             cls.author_id == user_id).fetch()
 

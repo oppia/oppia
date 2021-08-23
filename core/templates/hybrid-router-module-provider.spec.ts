@@ -17,7 +17,7 @@
  */
 
 import { RouterModule } from '@angular/router';
-import { HybridRouterModuleProvider, MockRouterModule } from './hybrid-router-module-provider';
+import { HybridRouterModuleProvider, MockRouterModule } from 'hybrid-router-module-provider';
 
 describe('Hybrid router module provider', () => {
   it('should provide router module for pages using angular router', () => {

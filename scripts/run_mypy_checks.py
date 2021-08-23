@@ -30,7 +30,6 @@ import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 
-
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
     'proto_files/',
@@ -74,8 +73,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/cron_test.py',
     'core/controllers/custom_landing_pages.py',
     'core/controllers/custom_landing_pages_test.py',
-    'core/controllers/domain_objects_validator.py',
-    'core/controllers/domain_objects_validator_test.py',
     'core/controllers/editor.py',
     'core/controllers/editor_test.py',
     'core/controllers/email_dashboard.py',
@@ -433,99 +430,15 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
-    'core/jobs.py',
-    'core/jobs_registry.py',
-    'core/jobs_test.py',
-    'core/platform/app_identity/gae_app_identity_services.py',
-    'core/platform/app_identity/gae_app_identity_services_test.py',
-    'core/platform/auth/firebase_auth_services.py',
-    'core/platform/auth/firebase_auth_services_test.py',
-    'core/platform/bulk_email/dev_mode_bulk_email_services.py',
-    'core/platform/bulk_email/dev_mode_bulk_email_services_test.py',
-    'core/platform/bulk_email/mailchimp_bulk_email_services.py',
-    'core/platform/bulk_email/mailchimp_bulk_email_services_test.py',
-    'core/platform/cache/redis_cache_services.py',
-    'core/platform/cache/redis_cache_services_test.py',
-    'core/platform/cloud_translate/cloud_translate_emulator.py',
-    'core/platform/cloud_translate/cloud_translate_emulator_test.py',
-    'core/platform/cloud_translate/cloud_translate_services.py',
-    'core/platform/cloud_translate/cloud_translate_services_test.py',
-    'core/platform/cloud_translate/dev_mode_cloud_translate_services.py',
-    'core/platform/cloud_translate/dev_mode_cloud_translate_services_test.py',
-    'core/platform/datastore/gae_datastore_services.py',
-    'core/platform/datastore/gae_datastore_services_test.py',
-    'core/platform/email/dev_mode_email_services.py',
-    'core/platform/email/dev_mode_email_services_test.py',
-    'core/platform/email/mailgun_email_services.py',
-    'core/platform/email/mailgun_email_services_test.py',
-    'core/platform/models.py',
-    'core/platform/models_test.py',
-    'core/platform/search/elastic_search_services.py',
-    'core/platform/search/elastic_search_services_test.py',
-    'core/platform/search/gae_search_services.py',
-    'core/platform/search/gae_search_services_test.py',
-    'core/platform/taskqueue/cloud_taskqueue_services.py',
-    'core/platform/taskqueue/cloud_taskqueue_services_test.py',
-    'core/platform/taskqueue/cloud_tasks_emulator.py',
-    'core/platform/taskqueue/cloud_tasks_emulator_test.py',
-    'core/platform/taskqueue/dev_mode_taskqueue_services.py',
-    'core/platform/taskqueue/dev_mode_taskqueue_services_test.py',
-    'core/platform/transactions/gae_transaction_services.py',
+    'core/platform/storage/cloud_storage_emulator.py',
+    'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
-    'core/storage/activity/gae_models.py',
-    'core/storage/activity/gae_models_test.py',
-    'core/storage/app_feedback_report/gae_models.py',
-    'core/storage/app_feedback_report/gae_models_test.py',
-    'core/storage/audit/gae_models.py',
-    'core/storage/audit/gae_models_test.py',
-    'core/storage/auth/gae_models.py',
-    'core/storage/auth/gae_models_test.py',
-    'core/storage/base_model/gae_models.py',
-    'core/storage/base_model/gae_models_test.py',
     'core/storage/beam_job/gae_models.py',
     'core/storage/beam_job/gae_models_test.py',
     'core/storage/blog/gae_models.py',
     'core/storage/blog/gae_models_test.py',
-    'core/storage/classifier/gae_models.py',
-    'core/storage/classifier/gae_models_test.py',
-    'core/storage/collection/gae_models.py',
-    'core/storage/collection/gae_models_test.py',
-    'core/storage/config/gae_models.py',
-    'core/storage/config/gae_models_test.py',
-    'core/storage/email/gae_models.py',
-    'core/storage/email/gae_models_test.py',
-    'core/storage/exploration/gae_models.py',
-    'core/storage/exploration/gae_models_test.py',
-    'core/storage/feedback/gae_models.py',
-    'core/storage/feedback/gae_models_test.py',
-    'core/storage/improvements/gae_models.py',
-    'core/storage/improvements/gae_models_test.py',
-    'core/storage/job/gae_models.py',
-    'core/storage/job/gae_models_test.py',
-    'core/storage/opportunity/gae_models.py',
-    'core/storage/opportunity/gae_models_test.py',
-    'core/storage/question/gae_models.py',
-    'core/storage/question/gae_models_test.py',
-    'core/storage/recommendations/gae_models.py',
-    'core/storage/recommendations/gae_models_test.py',
-    'core/storage/skill/gae_models.py',
-    'core/storage/skill/gae_models_test.py',
-    'core/storage/statistics/gae_models.py',
-    'core/storage/statistics/gae_models_test.py',
     'core/storage/storage_models_test.py',
-    'core/storage/story/gae_models.py',
-    'core/storage/story/gae_models_test.py',
-    'core/storage/subtopic/gae_models.py',
-    'core/storage/subtopic/gae_models_test.py',
-    'core/storage/suggestion/gae_models.py',
-    'core/storage/suggestion/gae_models_test.py',
-    'core/storage/topic/gae_models.py',
-    'core/storage/topic/gae_models_test.py',
-    'core/storage/translation/gae_models.py',
-    'core/storage/translation/gae_models_test.py',
-    'core/storage/user/gae_models.py',
-    'core/storage/user/gae_models_test.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
     'core/tests/build_sources/extensions/base.py',
@@ -597,8 +510,6 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/io/job_io_test.py',
     'jobs/io/ndb_io.py',
     'jobs/io/ndb_io_test.py',
-    'jobs/io/stub_io.py',
-    'jobs/io/stub_io_test.py',
     'jobs/job_options.py',
     'jobs/job_options_test.py',
     'jobs/job_test_utils.py',
@@ -767,7 +678,7 @@ _PARSER.add_argument(
 )
 
 
-def install_third_party_libraries(skip_install):
+def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
@@ -833,7 +744,7 @@ def install_mypy_prerequisites(install_globally):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
-    if 'can\'t combine user with prefix' in output[1]:
+    if b'can\'t combine user with prefix' in output[1]:
         uextention_text = ['--user', '--prefix=', '--system']
         new_process = subprocess.Popen(
             cmd + uextention_text, stdout=subprocess.PIPE,
@@ -884,8 +795,10 @@ def main(args=None):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = process.communicate()
-    python_utils.PRINT(stdout)
-    python_utils.PRINT(stderr)
+    # Standard and error output is in bytes, we need to decode the line to
+    # print it.
+    python_utils.PRINT(stdout.decode('utf-8'))
+    python_utils.PRINT(stderr.decode('utf-8'))
     if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
@@ -893,7 +806,7 @@ def main(args=None):
             'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
             'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
-        sys.exit(1)
+        sys.exit(2)
     return process.returncode
 
 

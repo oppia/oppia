@@ -53,7 +53,7 @@ def is_exploration_available_for_contribution(exp_id):
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(
         exp_id, strict=False)
 
-    return True if model is not None else False
+    return model is not None
 
 
 def get_exploration_opportunity_summary_from_model(model):
@@ -74,8 +74,8 @@ def get_exploration_opportunity_summary_from_model(model):
         model.incomplete_translation_language_codes +
         model.language_codes_needing_voice_artists +
         model.language_codes_with_assigned_voice_artists)
-    supported_language_codes = set([language['id'] for language in (
-        constants.SUPPORTED_AUDIO_LANGUAGES)])
+    supported_language_codes = set(
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
     missing_language_codes = list(
         supported_language_codes - set_of_all_languages)
     if missing_language_codes:
@@ -147,8 +147,8 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         object.
     """
 
-    audio_language_codes = set([
-        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    audio_language_codes = set(
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
 
     complete_translation_languages = set(
         exploration.get_languages_with_complete_translation())
@@ -199,45 +199,6 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     story = story_fetchers.get_story_by_id(story_id)
     topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
     _create_exploration_opportunities(story, topic, exp_ids)
-
-
-def create_exploration_opportunities_for_story(story_id, topic_id):
-    """Creates exploration opportunities corresponding to the supplied published
-    story ID iff the topic linked to the story is published.
-
-    Args:
-        story_id: str. The ID of the story domain object.
-        topic_id: str. The ID of the topic domain object corresponding to the
-            supplied story.
-
-    Raises:
-        Exception. A topic with the given ID doesn't exist.
-        Exception. The topic rights could not be found.
-    """
-    story = story_fetchers.get_story_by_id(story_id)
-    topic = topic_fetchers.get_topic_by_id(topic_id)
-    topic_rights = topic_fetchers.get_topic_rights(topic.id)
-    if topic_rights.topic_is_published:
-        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-        _create_exploration_opportunities(story, topic, exp_ids_in_story)
-
-
-def create_exploration_opportunities_for_topic(topic_id):
-    """Creates exploration opportunities corresponding to each of the supplied
-    published topic's published stories.
-
-    Args:
-        topic_id: str. The ID of the topic domain object.
-    """
-    topic = topic_fetchers.get_topic_by_id(topic_id)
-    for story_reference in topic.get_all_story_references():
-        if not story_reference.story_is_published:
-            continue
-        story = story_fetchers.get_story_by_id(
-            story_reference.story_id, strict=False)
-        if story is not None:
-            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            _create_exploration_opportunities(story, topic, exp_ids_in_story)
 
 
 def _create_exploration_opportunities(story, topic, exp_ids):
@@ -400,23 +361,6 @@ def delete_exploration_opportunities_corresponding_to_topic(topic_id):
         exp_opportunity_models)
 
 
-def get_exploration_opportunity_ids_corresponding_to_topic(topic_id):
-    """Returns the exploration IDs corresponding to the
-    ExplorationOpportunitySummaryModels that are associated with the supplied
-    topic ID.
-
-    Args:
-        topic_id: str. The ID of the topic.
-
-    Returns:
-        list(str). The exploration IDs.
-    """
-    exp_opportunity_models = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
-            topic_id))
-    return [model.id for model in exp_opportunity_models if model is not None]
-
-
 def update_exploration_opportunities(old_story, new_story):
     """Updates the opportunities models according to the changes made in the
     story.
@@ -522,16 +466,17 @@ def get_voiceover_opportunities(language_code, cursor):
                 this batch.
     """
     page_size = constants.OPPORTUNITIES_PAGE_SIZE
-    exp_opportunity_summary_models, cursor, more = (
+    exp_opportunity_summary_models, new_cursor, more = (
         opportunity_models.ExplorationOpportunitySummaryModel
         .get_all_voiceover_opportunities(page_size, cursor, language_code))
+
     opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
         opportunities.append(exp_opportunity_summary)
-    return opportunities, cursor, more
+    return opportunities, new_cursor, more
 
 
 def get_exploration_opportunity_summaries_by_ids(ids):

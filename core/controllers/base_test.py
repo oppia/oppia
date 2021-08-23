@@ -19,9 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import datetime
-import importlib
 import inspect
+import io
 import json
 import logging
 import os
@@ -42,18 +41,17 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
-from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import main
 import python_utils
 import utils
 
-from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
 auth_services = models.Registry.import_auth_services()
+datastore_services = models.Registry.import_datastore_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
@@ -234,16 +232,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'must-revalidate, no-cache, no-store'
         )
 
-    def test_root_redirect_rules_for_logged_in_learners(self):
-        self.login(self.TEST_LEARNER_EMAIL)
-
-        # Since by default the homepage for all logged in users is the
-        # learner dashboard, going to '/' should redirect to the learner
-        # dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner-dashboard', response.headers['location'])
-        self.logout()
-
     def test_root_redirect_rules_for_deleted_user_prod_mode(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
@@ -255,66 +243,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn('pending-account-deletion', response.headers['location'])
-
-    def test_root_redirect_rules_for_users_with_no_user_contribution_model(
-            self):
-        self.login(self.TEST_LEARNER_EMAIL)
-        # Delete the UserContributionModel.
-        user_id = user_services.get_user_id_from_username(
-            self.TEST_LEARNER_USERNAME)
-        user_contribution_model = user_models.UserContributionsModel.get(
-            user_id)
-        user_contribution_model.delete()
-
-        # Since by default the homepage for all logged in users is the
-        # learner dashboard, going to '/' should redirect to the learner
-        # dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner-dashboard', response.headers['location'])
-        self.logout()
-
-    def test_root_redirect_rules_for_logged_in_creators(self):
-        self.login(self.TEST_CREATOR_EMAIL)
-        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        # Set the default dashboard as creator dashboard.
-        user_services.update_user_default_dashboard(
-            creator_user_id, constants.DASHBOARD_TYPE_CREATOR)
-
-        # Since the default dashboard has been set as creator dashboard, going
-        # to '/' should redirect to the creator dashboard.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('creator-dashboard', response.headers['location'])
-
-    def test_root_redirect_rules_for_logged_in_editors(self):
-        self.login(self.TEST_CREATOR_EMAIL)
-        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.get_user_actions_info(creator_user_id)
-        editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
-        exploration_id = '1_en_test_exploration'
-        self.save_new_valid_exploration(
-            exploration_id, creator_user_id, title='Test',
-            category='Test', language_code='en')
-        rights_manager.assign_role_for_exploration(
-            creator, exploration_id, editor_user_id,
-            rights_domain.ROLE_EDITOR)
-        self.logout()
-        self.login(self.TEST_EDITOR_EMAIL)
-        exp_services.update_exploration(
-            editor_user_id, exploration_id, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'edited title'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'category',
-                'new_value': 'edited category'
-            })], 'Change title and category')
-
-        # Since user has edited one exploration created by another user,
-        # going to '/' should redirect to the dashboard page.
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('dashboard', response.headers['location'])
-        self.logout()
 
     def test_get_with_invalid_return_type_logs_correct_warning(self):
         # Modify the testapp to use the mock handler.
@@ -373,7 +301,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/mock_iframed', expected_status_int=500)
 
         self.assertIn(
-            '<oppia-error-iframed-page-root></oppia-error-iframed-page-root>', response.body)
+            b'<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
+            response.body
+        )
 
     def test_dev_mode_cannot_be_true_on_production(self):
         # We need to delete the existing module else the re-importing
@@ -389,160 +319,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             # 'reimported', 'unused-variable', 'redefined-outer-name' and
             # 'unused-import' would appear if this line was not disabled.
             import feconf  # pylint: disable-all
-
-    def test_valid_pillow_path(self):
-        # We need to re-import appengine_config here to make it look like a
-        # local variable so that we can again re-import appengine_config later.
-        import appengine_config
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'Invalid path for oppia_tools library: invalid_path')
-
-        def mock_os_path_join_for_pillow(*args):
-            """Mocks path for 'Pillow' with an invalid path. This is done by
-            substituting os.path.join to return an invalid path. This is
-            needed to test the scenario where the 'Pillow' path points
-            to a non-existent directory.
-            """
-            path = ''
-            if args[1] == 'Pillow-6.2.2':
-                return 'invalid_path'
-            else:
-                path = '/'.join(args)
-                return path
-
-        pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['appengine_config']
-
-        with assert_raises_regexp_context_manager, pil_path_swap:
-            # This pragma is needed since we are re-importing under
-            # invalid conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import appengine_config  # pylint: disable-all
-
-    def test_valid_third_party_library_path(self):
-        # We need to re-import appengine_config here to make it look like a
-        # local variable so that we can again re-import appengine_config later.
-        import appengine_config
-        # This exception is generated by Google App Engine (GAE). Since GAE
-        # operates its own special virtual environment, when we attempt to
-        # modify its system path with an invalid path, it throws the error
-        # below.
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception,
-            'virtualenv: cannot access invalid_path/python_libs: No such '
-            'virtualenv or site directory')
-
-        def mock_os_path_join_for_third_party_lib(*args):
-            """Mocks path for third_party libs with an invalid path. This is
-            done by substituting os.path.join to return an invalid path. This is
-            needed to test the scenario where the third_party libs path points
-            to a non-existent directory.
-            """
-            path = ''
-            if args[1] == 'third_party':
-                return 'invalid_path'
-            else:
-                path = '/'.join(args)
-                return path
-
-        third_party_lib_path_swap = self.swap(
-            os.path, 'join', mock_os_path_join_for_third_party_lib)
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['appengine_config']
-
-        with assert_raises_regexp_context_manager, third_party_lib_path_swap:
-            # This pragma is needed since we are re-importing under
-            # invalid conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import appengine_config  # pylint: disable-all
-
-    def test_authorization_wrapper_with_x_app_engine_task_name(self):
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
-                name='MockHandlerForTestingAuthorizationWrapper')],
-            debug=feconf.DEBUG,
-        ))
-
-        def mock_create_handlers_map():
-            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
-
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['main']
-        with self.swap(
-            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
-            # This pragma is needed since we are re-importing under
-            # different conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import main  # pylint: disable-all
-
-        headers_dict = {
-            'X-AppEngine-TaskName': b'taskname'
-        }
-        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
-        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
-
-        response = self.testapp.get('/mock', headers=headers_dict)
-        self.assertEqual(response.status_int, 200)
-
-    def test_authorization_wrapper_without_x_app_engine_task_name(self):
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
-                name='MockHandlerForTestingAuthorizationWrapper')],
-            debug=feconf.DEBUG,
-        ))
-
-        def mock_create_handlers_map():
-            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
-
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['main']
-        with self.swap(
-            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
-            # This pragma is needed since we are re-importing under
-            # different conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import main  # pylint: disable-all
-
-        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
-        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
-        self.get_html_response('/mock', expected_status_int=403)
-
-    def test_ui_access_wrapper(self):
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/ui', self.MockHandlerForTestingUiAccessWrapper,
-                name='MockHandlerForTestingUiAccessWrapper')],
-            debug=feconf.DEBUG,
-        ))
-
-        def mock_create_handlers_map():
-            return [('/ui', self.MockHandlerForTestingUiAccessWrapper)]
-
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['main']
-        with self.swap(
-            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
-            # This pragma is needed since we are re-importing under
-            # different conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import main  # pylint: disable-all
-
-        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
-        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/ui')
-        self.get_html_response('/ui')
 
     def test_frontend_error_handler(self):
         observed_log_messages = []
@@ -603,6 +379,33 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             response.location,
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
+    def test_signup_attempt_on_wrong_page_fails(self):
+        with python_utils.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_return(
+                auth_services,
+                'get_auth_claims_from_request',
+                auth_domain.AuthClaims(
+                    'auth_id', self.NEW_USER_EMAIL, role_is_super_admin=False)
+            ))
+            response = self.get_html_response('/', expected_status_int=200)
+            self.assertIn(
+                b'<oppia-root></oppia-root>',
+                response.body
+            )
+
+        self.assert_matches_regexps(
+            logs,
+            [
+                'Cannot find user auth_id with email %s on '
+                'page http://localhost/\nNoneType: None' % self.NEW_USER_EMAIL
+            ]
+        )
+        self.assertEqual(call_counter.times_called, 1)
+
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
     """Tests BaseHandler behavior when maintenance mode is enabled.
@@ -633,8 +436,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/community-library', expected_status_int=503)
 
-        self.assertIn('<oppia-maintenance-page>', response.body)
-        self.assertNotIn('<oppia-library-page-root>', response.body)
+        self.assertIn(b'<oppia-maintenance-page>', response.body)
+        self.assertNotIn(b'<oppia-library-page-root>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -644,8 +447,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<oppia-library-page-root>', response.body)
-        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
+        self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_html_response_is_not_rejected_when_user_is_release_coordinator(
@@ -657,8 +460,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<oppia-library-page-root>', response.body)
-        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
+        self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):
@@ -834,9 +637,9 @@ class EscapingTests(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
         self.assertTrue(response.body.startswith(feconf.XSSI_PREFIX))
-        self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
-        self.assertNotIn('<script>', response.body)
-        self.assertNotIn('马', response.body)
+        self.assertIn(b'\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
+        self.assertNotIn(b'<script>', response.body)
+        self.assertNotIn('马'.encode('utf-8'), response.body)
 
 
 class RenderDownloadableTests(test_utils.GenericTestBase):
@@ -850,7 +653,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
         def get(self):
             """Handles GET requests."""
-            file_contents = 'example'
+            file_contents = io.BytesIO(b'example')
             self.render_downloadable_file(
                 file_contents, 'example.pdf', 'text/plain')
 
@@ -866,9 +669,8 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
     def test_downloadable(self):
         response = self.testapp.get('/mock')
         self.assertEqual(
-            response.content_disposition,
-            'attachment; filename=example.pdf')
-        self.assertEqual(response.body, 'example')
+            response.content_disposition, 'attachment; filename=example.pdf')
+        self.assertEqual(response.body, b'example')
         self.assertEqual(response.content_type, 'text/plain')
 
 
@@ -1100,11 +902,8 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
         fake_urls.append(main.URLS[-1])
         with self.swap(main, 'URLS', fake_urls):
-            transaction_services = models.Registry.import_transaction_services()
-            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+            self.testapp = webtest.TestApp(
                 webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
-            self.testapp = webtest.TestApp(app)
-
             response = self.get_json(
                 '/fake', expected_status_int=500)
             self.assertTrue(isinstance(response, dict))
@@ -1169,7 +968,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         self.assertGreater(len(handlers_checked), 0)
 
         for (name, method, handler_is_decorated) in handlers_checked:
-            self.assertTrue(handler_is_decorated)
+            with self.subTest('%s.%s' % (name, method)):
+                self.assertTrue(handler_is_decorated)
 
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
@@ -1245,7 +1045,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     # of this class ends with 'Page'' - doesn't apply.
                     # It is only called from the bulk email provider via a
                     # webhook to update Oppia's database.
-                    if class_name == "BulkEmailWebhookEndpoint":
+                    if class_name == 'BulkEmailWebhookEndpoint':
                         continue
                     file_name = inspect.getfile(clazz)
                     line_num = inspect.getsourcelines(clazz)[1]
@@ -1260,9 +1060,10 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                         error_message = (
                             '%s --> Line %s: %s'
                             % (file_name, line_num, message))
-                        self.assertTrue(
-                            class_name.endswith(allowed_class_ending),
-                            msg=error_message)
+                        with self.subTest(class_name):
+                            self.assertTrue(
+                                class_name.endswith(allowed_class_ending),
+                                msg=error_message)
 
                     # Check that the name of the class ends with 'Handler'
                     # if it does not has a get function.
@@ -1273,8 +1074,9 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                         error_message = (
                             '%s --> Line %s: %s'
                             % (file_name, line_num, message))
-                        self.assertTrue(class_name.endswith('Handler'),
-                                        msg=error_message)
+                        with self.subTest(class_name):
+                            self.assertTrue(class_name.endswith('Handler'),
+                                            msg=error_message)
 
         self.assertGreater(num_handlers_checked, 150)
 
@@ -1640,7 +1442,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     default_value_schema = {arg: schema}
 
                     _, errors = payload_validator.validate(
-                        default_value, default_value_schema, True)
+                        default_value,
+                        default_value_schema,
+                        allowed_extra_args=True,
+                        allow_string_to_bool_conversion=False
+                    )
                     if len(errors) == 0:
                         continue
                     self.log_line(
@@ -1839,6 +1645,12 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                         'type': 'basestring'
                     },
                     'default_value': 'random_exp_id'
+                },
+                'apply_draft': {
+                    'schema': {
+                        'type': 'bool'
+                    },
+                    'default_value': False
                 }
             }
         }
@@ -1908,7 +1720,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                     expected_status_int=400)
             error_msg = (
                 'Schema validation for \'exploration_id\' failed: Could not '
-                'convert unicode to int: %s' % self.exp_id)
+                'convert str to int: %s' % self.exp_id)
             self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -1929,7 +1741,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp3):
-            self.get_json('/mock_play_exploration')
+            self.get_json('/mock_play_exploration?apply_draft=true')
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp4):
@@ -2106,7 +1918,8 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         with self.swap(self, 'testapp', self.testapp):
             response_dict = self.post_json(
