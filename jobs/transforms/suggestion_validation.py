@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 from jobs.decorators import validation_decorators
 
-from typing import Any, Iterator, Tuple, List, Type # isort:skip # pylint: disable=unused-import
+from typing import Any, Iterator, Tuple, List, Type # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,7 +35,9 @@ if MYPY: # pragma: no cover
 
 @validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
     suggestion_models.GeneralSuggestionModel)
-def general_suggestion_model_relationships(model: Any) -> Iterator[
-    Tuple[Any, List[Type[feedback_models.GeneralFeedbackThreadModel]]]]:
+def general_suggestion_model_relationships(
+        model: Type[suggestion_models.GeneralSuggestionModel]
+) -> Iterator[Tuple[Any, List[Type[
+    feedback_models.GeneralFeedbackThreadModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [feedback_models.GeneralFeedbackThreadModel]

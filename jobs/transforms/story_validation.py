@@ -25,7 +25,7 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-from typing import Any, Optional, Type, Iterator, List, Tuple # isort:skip # pylint: disable=unused-import
+from typing import Any, Optional, Type, Iterator, List, Tuple # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -77,15 +77,17 @@ class ValidateStoryCommitLogEntryModel(
             return None
 
 
-@validation_decorators.RelationshipsOf(story_models.StoryCommitLogEntryModel) # type: ignore[no-untyped-call, misc, name-defined]
-def story_commit_log_entry_model_relationships(model: Any) -> Iterator[
-    Tuple[Any, List[Type[story_models.StoryModel]]]]:
+@validation_decorators.RelationshipsOf(story_models.StoryCommitLogEntryModel) # type: ignore[no-untyped-call, misc]
+def story_commit_log_entry_model_relationships(
+        model: Type[story_models.StoryCommitLogEntryModel]
+) -> Iterator[Tuple[Any, List[Type[story_models.StoryModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.story_id, [story_models.StoryModel]
 
 
-@validation_decorators.RelationshipsOf(story_models.StorySummaryModel) # type: ignore[no-untyped-call, misc, name-defined]
-def story_summary_model_relationships(model: Any) -> Iterator[
-    Tuple[Any, List[Type[story_models.StoryModel]]]]:
+@validation_decorators.RelationshipsOf(story_models.StorySummaryModel) # type: ignore[no-untyped-call, misc]
+def story_summary_model_relationships(
+        model: Type[story_models.StorySummaryModel]
+) -> Iterator[Tuple[Any, List[Type[story_models.StoryModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [story_models.StoryModel]
