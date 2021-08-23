@@ -36,7 +36,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfUnicodeStringEditorComponent
     ).componentInstance;
-    component.value = {};
+    component.value = { unicodeStrSet: '' };
     component.updateValue('random val');
   }));
 

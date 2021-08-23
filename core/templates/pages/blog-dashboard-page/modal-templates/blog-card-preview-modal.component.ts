@@ -48,6 +48,12 @@ export class BlogCardPreviewModalComponent
       this.summaryContent = this.truncatePipe.transform(
         this.blogPostData.content, 300);
       this.profilePicUrl = this.blogDashboardPageService.authorPictureUrl;
+      let dateString;
+      if (this.blogPostData.publishedOn) {
+        dateString = this.blogPostData.publishedOn;
+      } else {
+        dateString = this.blogPostData.lastUpdated;
+      }
       this.blogPostSummary = new BlogPostSummary (
         this.blogPostData.id,
         this.blogPostData.authorUsername,
@@ -57,7 +63,7 @@ export class BlogCardPreviewModalComponent
         this.blogPostData.thumbnailFilename,
         this.blogPostData.urlFragment,
         this.blogPostData.lastUpdated,
-        this.blogPostData.lastUpdated,
+        dateString,
       );
     }
 }
