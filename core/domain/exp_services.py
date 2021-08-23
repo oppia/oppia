@@ -556,8 +556,9 @@ def apply_change_list(exploration_id, change_list):
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
 
-        exp_android_proto = exploration.to_android_proto(
-            exploration)
+        exp_android_proto = exploration.to_exploration_proto(
+            exploration_id, exploration.title, exploration.version,
+            exploration.init_state_name, exploration.states)
         exp_android_proto_size = int(exp_android_proto.ByteSize())
         exploration.update_proto_size_in_bytes(exp_android_proto_size)
         return exploration

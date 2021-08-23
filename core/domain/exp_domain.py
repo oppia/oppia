@@ -651,7 +651,8 @@ class Exploration(python_utils.OBJECT):
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
-        exp_android_proto = cls.to_android_proto(cls, exploration)
+        exp_android_proto = cls.to_exploration_proto(
+            exploration_id, title, 0, init_state_name, exploration.states)
         exp_android_proto_size = int(exp_android_proto.ByteSize())
         cls.update_proto_size_in_bytes(cls, exp_android_proto_size)
         return exploration
@@ -777,83 +778,90 @@ class Exploration(python_utils.OBJECT):
 
         return exploration
 
-    def to_android_proto(self, exploration):
+    @classmethod
+    def to_exploration_proto(
+        self, exploration_id, title, version, init_state_name, states):
         """Calculate the exploration size by setting exploration proto.
 
         Args:
-            exploration: Exploration. The exploration domain object.
+            exploration_id: str. The id of the exploration.
+            title: str. The exploration title.
+            version: int. The version of the exploration.
+            init_state_name: str. The name of the initial state.
 
         Returns:
             exploration_proto: Exploration. The exploration
-            android proto object.
+                proto object.
         """
-        state_protos = {}
-        voiceover_lang_protos = {}
-        written_translation_protos = {}
-        voiceover_language_mapping_list = []
-        written_translation_mapping_list = []
-        recorded_voiceover_proto = languages_pb2.RecordedVoiceovers()
-        written_translations_proto = languages_pb2.WrittenTranslations()
-
-        for (state_name, state) in exploration.states.items():
-            for (_, language_code_to_voiceover) in (
-                    state.recorded_voiceovers.voiceovers_mapping.items()):
-                for (language_code_to_voiceover_item, voiceover) in (
-                        language_code_to_voiceover.items()):
-                    voiceover_proto = languages_pb2.Voiceover(
-                        filename=voiceover.filename,
-                        file_size_bytes=voiceover.file_size_bytes,
-                        duration_secs=voiceover.duration_secs
-                    )
-                    voiceover_lang_protos[
-                        language_code_to_voiceover_item] = voiceover_proto
-                voiceover_content_mapping = (
-                    languages_pb2.VoiceoverContentMapping(
-                        voiceover_content_mapping=voiceover_lang_protos
-                    ))
-                voiceover_language_mapping_list.append(
-                    voiceover_content_mapping)
-            recorded_voiceover_proto.voiceover_language_mapping.extend(
-                voiceover_language_mapping_list)
-
-            for (_, language_code) in (
-                    state.written_translations.translations_mapping.items()):
-                for (language_code_item, written_translation) in (
-                        language_code.items()):
-                    written_translation_proto = (
-                        languages_pb2.WrittenTranslation(
-                            data_format=written_translation.data_format,
-                            translation=written_translation.translation
-                        ))
-                    written_translation_protos[language_code_item] = (
-                        written_translation_proto)
-                translation_mapping = (
-                    languages_pb2.WrittenTranslationContentMapping(
-                        translation_content_mapping=written_translation_protos
-                    ))
-                written_translation_mapping_list.append(translation_mapping)
-            written_translations_proto.translation_language_mapping.extend(
-                written_translation_mapping_list)
-
-            state_proto = state_pb2.State(
-                content=languages_pb2.SubtitledHtml(
-                    content_id=exploration.states[
-                        state_name].content.content_id,
-                    html=exploration.states[state_name].content.html
-                ),
-                recorded_voiceovers=recorded_voiceover_proto,
-                written_translations=written_translations_proto
-            )
-            state_protos[state_name] = state_proto
-
+        state_protos=self.to_state_proto(self, states)
         exploration_proto = exploration_pb2.Exploration(
-            id=exploration.id,
-            content_version=exploration.version,
-            init_state_name=exploration.init_state_name,
-            title=exploration.title,
+            id=exploration_id,
+            content_version=version,
+            init_state_name=init_state_name,
+            title=title,
             states=state_protos
         )
+        print("------------------")
+        print(exploration_proto)
+        print("------------------")
         return exploration_proto
+
+    def to_state_proto(self, states):
+        state_protos = {}
+        for (state_name, state) in states.items():
+            state_proto = state_pb2.State(
+                content=self.to_subtitled_html_proto(
+                    self, state.content
+                ),
+                recorded_voiceovers=self.to_recorded_voiceover_proto(
+                    self, state.recorded_voiceovers)
+            )
+            state_protos[state_name] = state_proto
+        
+        return state_protos
+
+    def to_subtitled_html_proto(self, content):
+        subtitled_html_proto = languages_pb2.SubtitledHtml(
+            content_id=content.content_id,
+            html=content.html
+        )
+
+        return subtitled_html_proto
+
+    def to_recorded_voiceover_proto(self, recorded_voiceovers):
+        voiceover_language_mapping_protos=self.to_voiceovers_language_mapping_protos(
+            self, recorded_voiceovers.voiceovers_mapping)
+
+        recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
+            voiceover_language_mapping=voiceover_language_mapping_protos)
+        
+        return recorded_voiceover_proto
+
+    def to_voiceovers_language_mapping_protos(self, voiceovers_mapping):
+        voiceover_language_mapping_protos = {}
+        voiceover_content_mapping_protos = {}
+        
+        for (content_id, language_code_to_voiceover) in voiceovers_mapping.items():
+            for (language_code, voiceover) in (language_code_to_voiceover.items()):
+                voiceover_proto=self.to_voiceover_proto(
+                    self, voiceover.filename, voiceover.file_size_bytes, voiceover.duration_secs)
+                voiceover_content_mapping_protos[language_code] = voiceover_proto
+            voiceover_content_mapping_proto = (
+                languages_pb2.VoiceoverContentMapping(
+                    voiceover_content_mapping=voiceover_content_mapping_protos
+            ))
+            voiceover_language_mapping_protos[content_id] = voiceover_content_mapping_proto
+        
+        return voiceover_language_mapping_protos
+
+    def to_voiceover_proto(self, filename, file_size_bytes, duration_secs):
+        voiceover_proto = languages_pb2.Voiceover(
+            filename=filename,
+            file_size_bytes=file_size_bytes,
+            duration_secs=duration_secs
+        )
+
+        return voiceover_proto
 
     def set_continue_interaction(self, content_id, html):
         """Set ContinueInstance of Interaction Message in exploration.proto.
