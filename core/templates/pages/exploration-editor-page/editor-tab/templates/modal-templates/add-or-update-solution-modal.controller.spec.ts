@@ -79,7 +79,7 @@ describe('Add Or Update Solution Modal Controller', function() {
       stateSolutionService.init('', answerEditorHtml);
 
       $scope = $rootScope.$new();
-      $controller('AddOrUpdateSolutionModalController', {
+      let ctrl = $controller('AddOrUpdateSolutionModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         CurrentInteractionService: currentInteractionService,
@@ -89,7 +89,7 @@ describe('Add Or Update Solution Modal Controller', function() {
         StateInteractionIdService: stateInteractionIdService,
         StateSolutionService: stateSolutionService
       });
-      $scope.$onInit();
+      ctrl.$onInit();
       currentInteractionService.updateViewWithNewAnswer();
     }));
 
