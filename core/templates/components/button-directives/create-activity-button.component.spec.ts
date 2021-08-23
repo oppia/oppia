@@ -39,7 +39,7 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val) => {}
+      replace: (val: string) => {}
     },
   };
   get nativeWindow() {

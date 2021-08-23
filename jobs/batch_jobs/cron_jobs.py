@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Audit jobs that validate all of the storage models in the datastore."""
+"""Jobs that are ran by CRON scheduler."""
 
 from __future__ import absolute_import
 from __future__ import annotations
@@ -24,6 +24,7 @@ from core.domain import search_services
 from core.platform import models
 from jobs import base_jobs
 from jobs.io import ndb_io
+from jobs.types import job_run_result
 
 import apache_beam as beam
 
@@ -47,7 +48,7 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
     @staticmethod
     def _index_exploration_summaries(
             exp_summary_models: List[datastore_services.Model]
-    ) -> List[str]:
+    ) -> List[job_run_result.JobRunResult]:
         """Index exploration summaries and catch any errors.
 
         Args:
@@ -60,9 +61,13 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
         try:
             search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
                 cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            return ['SUCCESS']
+            return [job_run_result.JobRunResult(
+                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
+            )]
         except platform_search_services.SearchException: # type: ignore[attr-defined]
-            return ['FAILURE']
+            return [job_run_result.JobRunResult(
+                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
+            )]
 
     def run(self) -> beam.PCollection:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
