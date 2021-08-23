@@ -100,7 +100,7 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { MultiSelectionFieldComponent } from './filter-fields/filtered-choices-field/multi-selection-field/multi-selection-field.component';
+import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 
 @NgModule({
   imports: [
