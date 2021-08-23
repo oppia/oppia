@@ -54,6 +54,7 @@ class CronModelsCleanupHandler(base.BaseHandler):
 class CronUserDeletionHandler(base.BaseHandler):
     """Handler for running the user deletion one off job."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -68,6 +69,7 @@ class CronUserDeletionHandler(base.BaseHandler):
 class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
     """Handler for running the fully complete user deletion one off job."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
