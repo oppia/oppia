@@ -1,6 +1,6 @@
-<div class="nav navbar-nav oppia-navbar-breadcrumb">
+<div class="nav navbar-nav oppia-navbar-breadcrumb" [ngClass]="{'main-blog-dashboard-mobile-breadcrumb': activeTab === 'main'}">
   <span class="oppia-navbar-breadcrumb-separator"></span>
-  <span class="pt-3" *ngIf="activeTab === 'main'">
+  <span class="pt-3 mobile-navbar-blog-dashboard" *ngIf="activeTab === 'main'">
     Blog Dashboard
   </span>
   <div class="d-flex flex-column pt-2" *ngIf="activeTab === 'editor_tab'">
@@ -21,6 +21,10 @@
   }
 
   .oppia-navbar-breadcrumb {
+    display: -webkit-inline-box;
+    flex-flow: column;
+    margin-left: -10px;
+    overflow-wrap: break-word;
     padding-top: 3px;
   }
 
@@ -48,4 +52,16 @@
     }
   }
 
+  @media(max-width:500px) {
+    .mobile-navbar-blog-dashboard {
+      font-size: 14px;
+      line-height: 0px;
+      vertical-align: text-top;
+    }
+
+    .oppia-navbar-breadcrumb.main-blog-dashboard-mobile-breadcrumb {
+      line-height: 12px;
+      padding-top: 15px;
+    }
+  }
 </style>
