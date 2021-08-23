@@ -461,6 +461,14 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('100');
       expect(ecs.getEntityType()).toBe('other');
     });
+
+    it('should remove custom entity id', () => {
+      ecs.setCustomEntityContext('other', '100');
+      expect(ecs.getEntityId()).toBe('100');
+      expect(ecs.getEntityType()).toBe('other');
+      ecs.removeCustomEntityContext();
+      expect(ContextService.customEntityContext).toBeNull();
+    });
   });
 
   describe('behavior in exploration edge cases', () => {

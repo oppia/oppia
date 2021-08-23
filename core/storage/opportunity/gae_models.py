@@ -178,11 +178,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
+        start_cursor = datastore_services.make_cursor(
+            urlsafe_cursor=urlsafe_start_cursor)
 
         language_created_on_query = cls.query(
             cls.language_codes_needing_voice_artists == language_code
@@ -294,11 +291,8 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
+        start_cursor = datastore_services.make_cursor(
+            urlsafe_cursor=urlsafe_start_cursor)
 
         created_on_query = cls.get_all().order(cls.created_on)
         query_models, cursor, _ = (
