@@ -57,6 +57,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isCurriculumAdmin: boolean;
   isTopicManager: boolean;
   isSuperAdmin: boolean;
+  isBlogAdmin: boolean;
+  isBlogPostEditor: boolean;
   userIsLoggedIn: boolean;
   username: string;
   currentUrl: string;
@@ -184,6 +186,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
+      this.isBlogAdmin = userInfo.isBlogAdmin();
+      this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.username = userInfo.getUsername();
       if (this.username) {

@@ -24,6 +24,7 @@ module.exports = {
       'http://127.0.0.1:8181/',
       'http://127.0.0.1:8181/about',
       'http://127.0.0.1:8181/admin',
+      'http://127.0.0.1:8181/blog-dashboard',
       'http://127.0.0.1:8181/community-library',
       'http://127.0.0.1:8181/contact',
       'http://127.0.0.1:8181/contributor-dashboard',
@@ -67,7 +68,6 @@ module.exports = {
       'uses-responsive-images': ['error', {'minScore': 1}],
       'uses-optimized-images': ['error', {'minScore': 1}],
       'uses-rel-preconnect': ['error', {'minScore': 0.5}],
-      'uses-rel-preload': ['error', {'minScore': 1}],
       'efficient-animated-content': ['error',{'minScore': 1}],
       'offscreen-images': ['error', {'minScore': 0.45}],
       'time-to-first-byte': ['off', {}],
@@ -92,6 +92,7 @@ module.exports = {
       'error', {'maxLength': 0, 'strategy': 'pessimistic'}
     ],
     'uses-passive-event-listeners': ['error', {'minScore': 1}],
+    'uses-rel-preload': ['error', {'minScore': 1}],
     'deprecations': ['error', {'minScore': 1}],
     'redirects': ['error', {'minScore': 1}]
   },

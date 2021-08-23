@@ -19,7 +19,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { AppConstants } from 'app.constants';
 import {
   RecordedVoiceovers,
   RecordedVoiceOverBackendDict
@@ -141,22 +140,6 @@ export class ConceptCardObjectFactory {
       return this.workedExampleObjectFactory.createFromBackendDict(
         workedExampleDict);
     });
-  }
-
-  // Create an interstitial concept card that would be displayed in the
-  // editor until the actual skill is fetched from the backend.
-  createInterstitialConceptCard(): ConceptCard {
-    let recordedVoiceoversDict = {
-      voiceovers_mapping: {
-        COMPONENT_NAME_EXPLANATION: {}
-      }
-    };
-    return new ConceptCard(
-      SubtitledHtml.createDefault(
-        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
-      RecordedVoiceovers.createFromBackendDict(
-        recordedVoiceoversDict)
-    );
   }
 
   createFromBackendDict(

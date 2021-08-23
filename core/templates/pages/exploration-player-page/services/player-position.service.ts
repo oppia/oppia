@@ -41,12 +41,15 @@ export class PlayerPositionService {
     new EventEmitter<HelpCardEventResponse>();
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
 
-  displayedCardIndex = null;
-  onChangeCallback = null;
+  // The following property is initialized using the class methods.
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  displayedCardIndex!: number;
+  onChangeCallback!: Function;
   learnerJustSubmittedAnAnswer = false;
 
   init(callback: Function): void {
-    this.displayedCardIndex = null;
+    this.displayedCardIndex = -1;
     this.onChangeCallback = callback;
   }
 
@@ -69,6 +72,9 @@ export class PlayerPositionService {
     this.displayedCardIndex = index;
 
     if (oldIndex !== this.displayedCardIndex) {
+      if (!this.onChangeCallback) {
+        throw new Error('The callback function has not been initialized');
+      }
       this.onChangeCallback();
     }
   }

@@ -22,8 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { RevertChangeList, ExplorationChange } from
-  'domain/exploration/exploration-draft.model';
+import { RevertChangeList, ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 export interface ExplorationSnapshot {
   'commit_message': string;
@@ -42,8 +41,11 @@ interface ExplorationSnapshots {
   providedIn: 'root'
 })
 export class VersionTreeService {
-  private _snapshots: ExplorationSnapshots = null;
-  private _treeParents: {} = null;
+  // These properties are initialized using init method
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _snapshots!: ExplorationSnapshots;
+  private _treeParents!: Record<number, number>;
 
   init(snapshotsData: ExplorationSnapshot[]): void {
     this._treeParents = {};
@@ -81,14 +83,15 @@ export class VersionTreeService {
    * The parent of the root (version 1) is -1.
    */
   getVersionTree(): {} {
-    if (this._treeParents === null) {
+    if (this._treeParents === undefined) {
       throw new Error('version tree not initialized.');
     }
     return this._treeParents;
   }
 
   // Finds lowest common ancestor of v1 and v2 in the version tree.
-  findLCA(v1: number, v2: number): number {
+  // LCA will be null when maxIndex is zero.
+  findLCA(v1: number, v2: number): number | null {
     // Find paths from root to v1 and v2.
     var pathToV1 = [];
     var pathToV2 = [];
@@ -144,7 +147,7 @@ export class VersionTreeService {
    *  - 'version_number': version number reverted to
    */
   getChangeList(version: number): ExplorationChange[] {
-    if (this._snapshots === null) {
+    if (this._snapshots === undefined) {
       throw new Error('snapshots is not initialized');
     } else if (version === 1) {
       throw new Error('Tried to retrieve change list of version 1');
