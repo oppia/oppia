@@ -226,5 +226,5 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
 
         with add_docs_to_index_swap:
             self.assert_job_output_is([ # type: ignore[no-untyped-call]
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')]
-            )
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
+            ])

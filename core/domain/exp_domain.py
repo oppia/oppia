@@ -2386,6 +2386,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 when the exploration model was last updated.
             first_published_msec: int. Time in milliseconds since the Epoch,
                 when the exploration was first published.
+            deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id
         self.title = title
