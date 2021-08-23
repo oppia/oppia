@@ -319,7 +319,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
-        user_data = dict()
+        user_data = {}
         report_models = cast(
             List[AppFeedbackReportModel],
             cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
