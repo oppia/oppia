@@ -185,6 +185,25 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
                     '</oppia-noninteractive-svgdiagram>'
                 ).to_dict()
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            state_domain.SubtitledHtml(
+                                'ca_choices_0',
+                                '<oppia-noninteractive-svgdiagram '
+                                'svg_filename-with-value="&amp;quot;'
+                                'img12.svg&amp;quot;" alt-with-value="'
+                                '&amp;quot;Image&amp;quot;">'
+                                '</oppia-noninteractive-svgdiagram>'
+                            ).to_dict()
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })
         ]
         # Migrate exploration to state schema version 47.

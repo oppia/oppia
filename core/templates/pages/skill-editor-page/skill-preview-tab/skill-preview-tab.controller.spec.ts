@@ -17,6 +17,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -28,6 +31,8 @@ describe('Skill preview tab', function() {
   var ctrl = null;
   var UrlService = null;
   var SkillEditorStateService = null;
+  var currentInteractionService = null;
+  var explorationPlayerStateService = null;
   var $rootScope = null;
   var mockOnSkillChangeEmitter = new EventEmitter();
 
@@ -142,6 +147,9 @@ describe('Skill preview tab', function() {
     $rootScope = $injector.get('$rootScope');
     UrlService = $injector.get('UrlService');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
     var skillId = 'df432fe';
     $scope = $rootScope.$new();
     var MockQuestionBackendApiService = {
@@ -151,7 +159,9 @@ describe('Skill preview tab', function() {
 
     ctrl = $componentController('skillPreviewTab', {
       $scope: $scope,
-      QuestionBackendApiService: MockQuestionBackendApiService
+      QuestionBackendApiService: MockQuestionBackendApiService,
+      CurrentInteractionService: currentInteractionService,
+      ExplorationPlayerStateService: explorationPlayerStateService
     });
     ctrl.$onInit();
   }));
@@ -210,5 +220,16 @@ describe('Skill preview tab', function() {
     ctrl.interactionFilter = 'Text Input';
     ctrl.applyFilters();
     expect(ctrl.displayedQuestions).toEqual([questionDict1]);
+  });
+
+  it('should trigger feedback when an answer is submitted', function() {
+    spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
+
+    ctrl.$onInit();
+    currentInteractionService.onSubmit();
+
+    expect(
+      explorationPlayerStateService.onOppiaFeedbackAvailable.emit
+    ).toHaveBeenCalled();
   });
 });

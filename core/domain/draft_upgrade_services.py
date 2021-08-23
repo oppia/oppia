@@ -135,8 +135,13 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 if 'choices' in new_value.keys():
                     for value_index, value in enumerate(
                             new_value['choices']['value']):
-                        new_value['choices']['value'][value_index] = (
-                            conversion_fn(value))
+                        if isinstance(value, dict) and 'html' in value:
+                            new_value['choices']['value'][value_index][
+                                'html'
+                            ] = conversion_fn(value['html'])
+                        elif isinstance(value, python_utils.BASESTRING):
+                            new_value['choices']['value'][value_index] = (
+                                conversion_fn(value))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 for content_id, language_code_to_written_translation in (
