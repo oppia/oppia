@@ -23,7 +23,7 @@ from constants import constants
 from core.domain import search_services
 from core.platform import models
 from jobs import job_test_utils
-from jobs.batch_jobs import other_jobs
+from jobs.batch_jobs import cron_jobs
 from jobs.types import job_run_result
 import python_utils
 
@@ -39,7 +39,7 @@ platform_search_services = models.Registry.import_search_services()
 
 class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = other_jobs.IndexExplorationsInSearch
+    JOB_CLASS = cron_jobs.IndexExplorationsInSearch
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
@@ -118,7 +118,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
         )
 
         max_batch_size_swap = self.swap(
-            other_jobs.IndexExplorationsInSearch, 'MAX_BATCH_SIZE', 1)
+            cron_jobs.IndexExplorationsInSearch, 'MAX_BATCH_SIZE', 1)
 
         with add_docs_to_index_swap, max_batch_size_swap:
             self.assert_job_output_is([ # type: ignore[no-untyped-call]

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Audit jobs that validate all of the storage models in the datastore."""
+"""Jobs that are ran by CRON scheduler."""
 
 from __future__ import absolute_import
 from __future__ import annotations
