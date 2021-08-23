@@ -55,9 +55,15 @@ export interface LostChangeBackendDict {
   'new_state_name'?: string;
   'old_state_name'?: string;
   'state_name'?: string;
-  // 'new_value' is null when an Exploration is deleted or Removed.
+  // 'new_value' here refers to the new value of an entity
+  // added into an Exploration. Entity here refers to the
+  // Interactions, Translations, Hints, Solutions etc. 'new_value'
+  // will be 'null' when any of these entities are deleted.
   'new_value'?: LostChangeValue | null;
-  // 'old_value' is null when an Exploration is newly added.
+  // 'old_value' here refers to the old value of an entity
+  // present in an Exploration. Entity here refers to the
+  // Interactions, Translations, Hints, Solutions etc. 'old_value'
+  // will be 'null' when any of these entities are newly added.
   'old_value'?: LostChangeValue | null;
   'property_name'?: string;
   'translation_html'?: string;
