@@ -106,12 +106,16 @@ def get_search_rank_from_exp_summary(exp_summary):
     # TODO(sll): Improve this calculation.
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
+    print(exp_summary.contributors_summary)
+    print(exp_summary.ratings)
+    print(exp_summary.tags)
     rank = _DEFAULT_RANK
     if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
+        for rating_value in exp_summary.ratings.keys():
             rank += (
                 exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
+                rating_weightings[rating_value]
+            )
 
     # Ranks must be non-negative.
     return max(rank, 0)

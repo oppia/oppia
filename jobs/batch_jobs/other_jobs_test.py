@@ -24,6 +24,7 @@ from core.domain import search_services
 from core.platform import models
 from jobs import job_test_utils
 from jobs.batch_jobs import other_jobs
+from jobs.types import job_run_result
 import python_utils
 
 from typing import Dict, List, Union # isort:skip
@@ -76,7 +77,9 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is(['SUCCESS']) # type: ignore[no-untyped-call]
+            self.assert_job_output_is([ # type: ignore[no-untyped-call]
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
+            ])
 
     def test_indexes_non_deleted_models(self) -> None:
         for i in python_utils.RANGE(5):
@@ -118,8 +121,13 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
             other_jobs.IndexExplorationsInSearch, 'MAX_BATCH_SIZE', 1)
 
         with add_docs_to_index_swap, max_batch_size_swap:
-            self.assert_job_output_is( # type: ignore[no-untyped-call]
-                ['SUCCESS', 'SUCCESS', 'SUCCESS', 'SUCCESS', 'SUCCESS'])
+            self.assert_job_output_is([ # type: ignore[no-untyped-call]
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
+            ])
 
     def test_reports_failed_when_indexing_fails(self) -> None:
         exp_summary = self.create_model( # type: ignore[no-untyped-call]
@@ -163,7 +171,11 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is(['FAILURE']) # type: ignore[no-untyped-call]
+            self.assert_job_output_is([ # type: ignore[no-untyped-call]
+                job_run_result.JobRunResult(
+                    stderr='FAILURE 1 models not indexed'
+                )
+            ])
 
     def test_skips_deleted_model(self) -> None:
         exp_summary = self.create_model( # type: ignore[no-untyped-call]
@@ -188,7 +200,7 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is([]) # type: ignore[no-untyped-call]
+            self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
 
     def test_skips_private_model(self) -> None:
         exp_summary = self.create_model( # type: ignore[no-untyped-call]
@@ -213,4 +225,6 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is(['SUCCESS']) # type: ignore[no-untyped-call]
+            self.assert_job_output_is([ # type: ignore[no-untyped-call]
+                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')]
+            )

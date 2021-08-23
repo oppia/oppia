@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import json
 
 from core.platform import models
 import feconf
@@ -178,11 +179,12 @@ def get_ndb_model_from_beam_entity(beam_entity):
     for key, value in beam_entity.properties.items():
         # NDB datastore does not accept datetime with timezone info (tzinfo) so
         # it needs to be removed.
-        ndb_properties[key] = (
-            value.replace(tzinfo=None)
-            if isinstance(value, datetime.datetime)
-            else value
-        )
+        if isinstance(value, datetime.datetime):
+            ndb_properties[key] = value.replace(tzinfo=None)
+        elif isinstance(value, bytes):
+            ndb_properties[key] = json.loads(value)
+        else:
+            ndb_properties[key] = value
     return ndb_model_class(key=ndb_key, **ndb_properties)
 
 
