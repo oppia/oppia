@@ -101,6 +101,12 @@ export class UserService {
           return this.userContributionRightsInfo;
         });
     }
+
+    async getUserPreferredDashboardAsync(): Promise<string> {
+      return this.userBackendApiService.getPreferencesAsync().then((data) => {
+        return data.default_dashboard;
+      });
+    }
 }
 
 angular.module('oppia').factory(

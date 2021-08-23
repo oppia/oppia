@@ -10,6 +10,13 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
+
 - kind: ClassifierTrainingJobModel
   properties:
   - name: status

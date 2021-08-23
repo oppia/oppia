@@ -78,7 +78,8 @@ export interface InteractionBackendDict {
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
-  'id': string;
+  // Id is null until populated from the backend,
+  'id': string | null;
   // A null 'solution' indicates that this Interaction does not have a hint
   // or there is a hint, but no solution. A new interaction is initialised with
   // null 'solution' and stays null until the first hint with solution is added.
@@ -91,14 +92,14 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string;
+  id: string | null;
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome | null,
-      hints: Hint[], id: string, solution: Solution | null) {
+      hints: Hint[], id: string | null, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -380,7 +381,7 @@ export class InteractionObjectFactory {
   }
 
   convertFromCustomizationArgsBackendDict(
-      interactionId: string,
+      interactionId: string | null,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
     if (interactionId === null) {
@@ -465,7 +466,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string
+      interactionId: string | null
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {

@@ -38,6 +38,7 @@ import { SaveVersionMismatchModalComponent } from './modal-templates/save-versio
 import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
@@ -46,7 +47,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
@@ -94,7 +96,8 @@ class ExplorationEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

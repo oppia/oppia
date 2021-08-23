@@ -51,7 +51,9 @@ COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 # questions, please talk to @srijanreddy98.
 INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
-    'UpgradedServices' # We don't want this service to be present in the index.
+    'UpgradedServices', # We don't want this service to be present in the index.
+    # Route guards cannot be made injectables until migration is complete.
+    'CanAccessSplashPageGuard',
 ]
 
 
@@ -186,7 +188,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
-        parsed_js_and_ts_files = dict()
+        parsed_js_and_ts_files = {}
         concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
             file_content = self.file_cache.read(filepath)

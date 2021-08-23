@@ -51,16 +51,23 @@ export class Skill {
   _languageCode: string;
   _version: number;
   _nextMisconceptionId: number;
-  _supersedingSkillId: string | null;
+  _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
   SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(
-      id: string, description: string, misconceptions: Misconception[],
-      rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
-      version: number, nextMisconceptionId: number, supersedingSkillId: string,
-      allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
+      id: string,
+      description: string,
+      misconceptions: Misconception[],
+      rubrics: Rubric[],
+      conceptCard: ConceptCard,
+      languageCode: string,
+      version: number,
+      nextMisconceptionId: number,
+      supersedingSkillId: string,
+      allQuestionsMerged: boolean,
+      prerequisiteSkillIds: string[]) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -86,6 +93,7 @@ export class Skill {
     this._allQuestionsMerged = skill.getAllQuestionsMerged();
     this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
   }
+
   getId(): string {
     return this._id;
   }
@@ -183,7 +191,10 @@ export class Skill {
         return this._rubrics[idx].getExplanations();
       }
     }
-    return null;
+    throw new Error(
+      'Unable to get explanation: The given difficulty does ' +
+      'not match any difficulty in the rubrcs'
+    );
   }
 
   getMisconceptionId(index: number): string {
@@ -246,12 +257,6 @@ export class SkillObjectFactory {
     private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private validatorService: ValidatorsService) {
-  }
-  createInterstitialSkill(): Skill {
-    return new Skill(
-      null, 'Skill description loading',
-      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
-      'en', 1, 0, null, false, []);
   }
 
   hasValidDescription(description: string): boolean {

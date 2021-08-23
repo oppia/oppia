@@ -131,7 +131,7 @@ export class PracticeTabComponent implements OnInit {
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment: this.classroomUrlFragment,
-        comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
+        stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds)
       });
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
   }
