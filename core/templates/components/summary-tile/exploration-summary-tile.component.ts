@@ -39,22 +39,22 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() getCollectionId!: string;
-  @Input() getExplorationId!: string;
-  @Input() getExplorationTitle!: string;
-  @Input() getStoryNodeId!: string;
-  @Input() getLastUpdatedMsec!: number;
-  @Input() getNumViews!: string;
-  @Input() getObjective!: string;
-  @Input() getCategory!: string;
-  @Input() getRatings!: ExplorationRatings;
-  @Input() getContributorsSummary!: HumanReadableContributorsSummary;
-  @Input() getThumbnailIconUrl!: string;
-  @Input() getThumbnailBgColor!: string;
+  @Input() collectionId!: string;
+  @Input() explorationId!: string;
+  @Input() explorationTitle!: string;
+  @Input() storyNodeId!: string;
+  @Input() lastUpdatedMsec!: number;
+  @Input() numViews!: string;
+  @Input() objective!: string;
+  @Input() category!: string;
+  @Input() ratings!: ExplorationRatings;
+  @Input() contributorsSummary!: HumanReadableContributorsSummary;
+  @Input() thumbnailIconUrl!: string;
+  @Input() thumbnailBgColor!: string;
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;
-  @Input() getParentExplorationIds!: string;
+  @Input() parentExplorationIds!: string;
   // If the screen width is below the threshold defined here, the mobile
   // version of the summary tile is displayed. This attribute is optional:
   // if it is not specified, it is treated as 0, which means that the
@@ -78,7 +78,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   contributors!: object;
   // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
   // received after component interactions is empty or does not exist.
-  lastUpdatedDateTime: string | null = '';
+  lastUpdatedDateTime: string | null = null;
   // 'avgRating' will be null if the exploration has no ratings.
   avgRating!: number | null;
   thumbnailIcon!: string;
@@ -99,7 +99,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     });
     this.activityType = constants.ACTIVITY_TYPE_EXPLORATION;
     let contributorsSummary: HumanReadableContributorsSummary = (
-      this.getContributorsSummary || {});
+      this.contributorsSummary || {});
     this.contributors = Object.keys(
       contributorsSummary).sort(
       (contributorUsername1, contributorUsername2) => {
@@ -112,9 +112,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     );
 
     this.isRefresherExploration = false;
-    if (this.getParentExplorationIds) {
+    if (this.parentExplorationIds) {
       this.isRefresherExploration = (
-        this.getParentExplorationIds.length > 0);
+        this.parentExplorationIds.length > 0);
     }
 
     if (!this.mobileCutoffPx) {
@@ -149,32 +149,32 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   // Function will return null when Exploration Ratings are not present.
   getAverageRating(): number | null {
-    if (this.getRatings) {
+    if (this.ratings) {
       return this.ratingComputationService.computeAverageRating(
-        this.getRatings);
+        this.ratings);
     }
     return null;
   }
 
-  // Function will return null when the property 'getLastUpdatedMsec' is null
+  // Function will return null when the property 'lastUpdatedMsecs' is null
   // or undefined.
   getLastUpdatedDatetime(): string | null {
-    if (this.getLastUpdatedMsec) {
+    if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-        this.getLastUpdatedMsec);
+        this.lastUpdatedMsec);
     }
     return null;
   }
 
   getExplorationLink(): string {
-    if (!this.getExplorationId) {
+    if (!this.explorationId) {
       return '#';
     } else {
-      let result = '/explore/' + this.getExplorationId;
+      let result = '/explore/' + this.explorationId;
       let urlParams = this.urlService.getUrlParams();
-      let parentExplorationIds = this.getParentExplorationIds;
+      let parentExplorationIds = this.parentExplorationIds;
 
-      let collectionIdToAdd = this.getCollectionId;
+      let collectionIdToAdd = this.collectionId;
       let storyIdToAdd = null;
       let storyNodeIdToAdd = null;
       // Replace the collection ID with the one in the URL if it exists
@@ -184,14 +184,14 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         collectionIdToAdd = urlParams.collection_id;
       } else if (
         this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-        this.getStoryNodeId) {
+        this.storyNodeId) {
         storyIdToAdd = this.urlService.getStoryIdFromViewerUrl();
-        storyNodeIdToAdd = this.getStoryNodeId;
+        storyNodeIdToAdd = this.storyNodeId;
       } else if (
         urlParams.hasOwnProperty('story_id') &&
         urlParams.hasOwnProperty('node_id')) {
         storyIdToAdd = urlParams.story_id;
-        storyNodeIdToAdd = this.getStoryNodeId;
+        storyNodeIdToAdd = this.storyNodeId;
       }
 
       if (collectionIdToAdd) {
@@ -215,7 +215,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.getThumbnailIconUrl);
+      this.thumbnailIconUrl);
   }
 }
 

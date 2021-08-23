@@ -47,22 +47,25 @@ interface LanguageIdAndText {
   templateUrl: './search-bar.component.html'
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
-  @Input() enableDropup: boolean = false;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  searchBarPlaceholder!: string;
+  categoryButtonText!: string;
+  languageButtonText!: string;
+  ACTION_OPEN!: string;
+  ACTION_CLOSE!: string;
+  SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
+  selectionDetails!: SelectionDetails;
+  SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownCategories[];
+  KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
-  classroomPageIsActive: boolean;
-  ACTION_OPEN: string;
-  ACTION_CLOSE: string;
-  SEARCH_DROPDOWN_CATEGORIES: SearchDropDownCategories[];
-  KEYBOARD_EVENT_TO_KEY_CODES: {};
+  classroomPageIsActive: boolean = false;
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
-  SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
-  selectionDetails: SelectionDetails;
-  translationData = {};
+  translationData: Record<string, number> = {};
   activeMenuName: string = '';
-  searchBarPlaceholder: string;
-  categoryButtonText: string;
-  languageButtonText: string;
+  @Input() enableDropup: boolean = false;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -84,9 +87,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (this.classroomPageIsActive) {
-      return null;
-    } else {
+    if (!this.classroomPageIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
   }

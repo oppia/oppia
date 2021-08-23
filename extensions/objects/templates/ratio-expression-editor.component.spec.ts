@@ -35,8 +35,15 @@ describe('RatioExpression', () => {
   }));
 
   it('should initialize @Input() value with a default value', () => {
+    // This throws "Type 'null' is not assignable to type
+    // 'number[]'". We need to suppress this error
+    // because we are testing validations here.
+    // @ts-ignore
+    component.value = null;
+
     component.ngOnInit();
-    expect(component.value).not.toBeNull();
+    expect(component.value).toEqual([1, 1]);
+    expect(component.localValue).toEqual({ label: '1:1' });
   });
 
   it('should initialize warningText with non-integer ratio', () => {

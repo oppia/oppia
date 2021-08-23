@@ -136,7 +136,7 @@ describe('State classifier mapping service', () => {
         var stateNameNonexistent = 'stateName2';
         var nonExistentClassifier = mappingService.getClassifier(
           stateNameNonexistent);
-        expect(nonExistentClassifier).toBe(undefined);
+        expect(nonExistentClassifier).toBeNull();
       });
 
       it('should return true when it has classifier data.', () => {
@@ -154,8 +154,9 @@ describe('State classifier mapping service', () => {
 
       it('should not return correct classifier details when init is not ' +
         'called', () => {
+        mappingService.stateClassifierMapping = {};
         var retrievedClassifier = mappingService.getClassifier(stateName);
-        expect(retrievedClassifier).toBe(undefined);
+        expect(retrievedClassifier).toBeNull();
       });
     });
 
@@ -182,7 +183,7 @@ describe('State classifier mapping service', () => {
       it('should not return classifier data.', () => {
         mappingService.init(expId, expVersion);
         expect(mappingService.hasClassifierData(stateName)).toBe(false);
-        expect(mappingService.getClassifier(stateName)).toBe(undefined);
+        expect(mappingService.getClassifier(stateName)).toBeNull();
       });
     });
 });

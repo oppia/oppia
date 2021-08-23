@@ -69,10 +69,10 @@ export class StateEditorService {
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
+  activeStateName: string | null = null;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  activeStateName!: string;
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
@@ -138,7 +138,7 @@ export class StateEditorService {
       this.stateEditorDirectiveInitialised);
   }
 
-  getActiveStateName(): string {
+  getActiveStateName(): string | null {
     return this.activeStateName;
   }
 
@@ -303,10 +303,16 @@ export class StateEditorService {
   }
 
   isCurrentSolutionValid(): boolean {
+    if (this.activeStateName === null) {
+      return false;
+    }
     return this.solutionValidityService.isSolutionValid(this.activeStateName);
   }
 
   deleteCurrentSolutionValidity(): void {
+    if (this.activeStateName === null) {
+      throw new Error('Active State for this solution is not set');
+    }
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 

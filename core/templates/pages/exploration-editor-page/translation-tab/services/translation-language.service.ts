@@ -61,8 +61,7 @@ export class TranslationLanguageService {
     this._activeLanguageChangedEventEmitter.emit();
   }
 
-  // The function will return null for invalid languages and
-  // a language with no description.
+  // Function returns null when active language code is not set.
   getActiveLanguageDescription(): string | null {
     if (!this.activeLanguageCode) {
       return null;

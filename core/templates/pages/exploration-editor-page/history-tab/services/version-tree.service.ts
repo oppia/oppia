@@ -90,8 +90,7 @@ export class VersionTreeService {
   }
 
   // Finds lowest common ancestor of v1 and v2 in the version tree.
-  // LCA will be null when maxIndex is zero.
-  findLCA(v1: number, v2: number): number | null {
+  findLCA(v1: number, v2: number): number {
     // Find paths from root to v1 and v2.
     var pathToV1 = [];
     var pathToV2 = [];
@@ -117,7 +116,10 @@ export class VersionTreeService {
 
     // ---- Compare paths ----
     var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
-    var lca = null;
+    // Default value for lowest common ancestor will be equal to
+    // root node of the tree when pathToV1[i] !== pathToV2[i] or
+    // 'maxIndex' is zero.
+    var lca = pathToV1[0];
     for (var i = maxIndex; i >= 0; i--) {
       if (pathToV1[i] === pathToV2[i]) {
         lca = pathToV1[i];

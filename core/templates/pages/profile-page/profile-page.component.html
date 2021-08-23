@@ -118,15 +118,15 @@
     <div class="oppia-profile-portfolio-container">
       <mat-card-content class="oppia-profile-portfolio-container">
         <oppia-exploration-summary-tile *ngFor="let expl of getExplorationsToDisplay()"
-                                        [getExplorationId]="expl.id"
-                                        [getExplorationTitle]="expl.title"
-                                        [getLastUpdatedMsec]="expl.lastUpdatedMsec"
-                                        [getObjective]="expl.objective"
-                                        [getCategory]="expl.category"
-                                        [getRatings]="expl.ratings"
-                                        [getThumbnailIconUrl]="expl.thumbnailIconUrl"
-                                        [getThumbnailBgColor]="expl.thumbnailBgColor"
-                                        [getNumViews]="expl.numViews"
+                                        [explorationId]="expl.id"
+                                        [explorationTitle]="expl.title"
+                                        [lastUpdatedMsec]="expl.lastUpdatedMsec"
+                                        [objective]="expl.objective"
+                                        [category]="expl.category"
+                                        [ratings]="expl.ratings"
+                                        [thumbnailIconUrl]="expl.thumbnailIconUrl"
+                                        [thumbnailBgColor]="expl.thumbnailBgColor"
+                                        [numViews]="expl.numViews"
                                         [isCommunityOwned]="expl.communityOwned"
                                         [mobileCutoffPx]="610">
         </oppia-exploration-summary-tile>

@@ -149,7 +149,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   private resizeRegion() {
     const labeledRegions = this.value.labeledRegions;
-    const resizedRegion = labeledRegions[<number> this.selectedRegion].region;
+    let resizedRegion = null;
+    if (this.selectedRegion !== null) {
+      resizedRegion = labeledRegions[this.selectedRegion].region;
+    }
     const deltaX = this.mouseX - this.originalMouseX;
     const deltaY = this.mouseY - this.originalMouseY;
     let x = this.originalRectArea.x;
@@ -190,8 +193,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     }
     // Whenever the direction changes the value of newHeight and
     // newWidth computed is negative, hence the absolute value is taken.
-    resizedRegion.area = this.regionAreaFromCornerAndDimensions(
-      x, y, Math.abs(newWidth), Math.abs(newHeight));
+    if (resizedRegion !== null) {
+      resizedRegion.area = this.regionAreaFromCornerAndDimensions(
+        x, y, Math.abs(newWidth), Math.abs(newHeight));
+    }
   }
 
   ngOnInit(): void {
@@ -317,7 +322,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   regionLabelSetter(label: string): void {
     if (this.utilsService.isDefined(label)) {
-      this.value.labeledRegions[<number> this.selectedRegion].label = label;
+      if (this.selectedRegion !== null) {
+        this.value.labeledRegions[this.selectedRegion].label = label;
+      }
       this.valueChanged.emit(this.value);
       const labels = this.value.labeledRegions.map(
         region => {
@@ -347,7 +354,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
         this.originalMouseY - this.mouseY);
     } else if (this.userIsCurrentlyDragging) {
       const labeledRegions = this.value.labeledRegions;
-      const draggedRegion = labeledRegions[<number> this.selectedRegion].region;
+      let draggedRegion = null;
+      if (this.selectedRegion !== null) {
+        draggedRegion = labeledRegions[this.selectedRegion].region;
+      }
       const deltaX = this.mouseX - this.originalMouseX;
       const deltaY = this.mouseY - this.originalMouseY;
       let newX1 = this.originalRectArea.x + deltaX;
@@ -370,12 +380,14 @@ export class ImageWithRegionsEditorComponent implements OnInit {
         newY2 = this.getImageHeight();
         newY1 = newY2 - this.originalRectArea.height;
       }
-      draggedRegion.area = this.regionAreaFromCornerAndDimensions(
-        newX1,
-        newY1,
-        this.originalRectArea.width,
-        this.originalRectArea.height
-      );
+      if (draggedRegion !== null) {
+        draggedRegion.area = this.regionAreaFromCornerAndDimensions(
+          newX1,
+          newY1,
+          this.originalRectArea.width,
+          this.originalRectArea.height
+        );
+      }
     } else if (this.userIsCurrentlyResizing) {
       this.resizeRegion();
     }
@@ -507,9 +519,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.userIsCurrentlyDragging = true;
     }
     this.selectedRegion = this.hoveredRegion;
-    this.originalRectArea = this.cornerAndDimensionsFromRegionArea(
-      this.value.labeledRegions[<number> this.hoveredRegion].region.area
-    );
+    if (this.hoveredRegion !== null) {
+      this.originalRectArea = this.cornerAndDimensionsFromRegionArea(
+        this.value.labeledRegions[this.hoveredRegion].region.area
+      );
+    }
   }
 
   regionLabelEditorMouseUp(): void {

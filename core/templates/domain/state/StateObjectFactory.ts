@@ -42,7 +42,6 @@ import {
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface StateBackendDict {
@@ -56,7 +55,7 @@ export interface StateBackendDict {
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
-  // This property is null if no skill is linked to an interaction.
+  // This property is null if no skill is linked to the State.
   'linked_skill_id': string | null;
   'next_content_id_index': number;
 }
@@ -182,8 +181,10 @@ export class StateObjectFactory {
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
-    let defaultOutcome = <Outcome> newState.interaction.defaultOutcome;
-    defaultOutcome.dest = newStateName;
+    if (newState.interaction.defaultOutcome !== null) {
+      let defaultOutcome = newState.interaction.defaultOutcome;
+      defaultOutcome.dest = newStateName;
+    }
     return newState;
   }
 

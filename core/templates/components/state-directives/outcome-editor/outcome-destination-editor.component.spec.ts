@@ -91,7 +91,7 @@ describe('OutcomeDestinationEditor', () => {
     expect(ctrl.canEditRefresherExplorationId).toBeNull();
     expect(ctrl.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
     expect(ctrl.destChoices).toEqual([{
-      id: undefined,
+      id: null,
       text: '(try again)'
     }, {
       id: 'Introduction',
@@ -201,7 +201,7 @@ describe('OutcomeDestinationEditor', () => {
     $timeout.flush(10);
 
     expect(ctrl.destChoices).toEqual([{
-      id: undefined,
+      id: null,
       text: '(try again)'
     }, {
       id: 'Introduction',
@@ -222,7 +222,7 @@ describe('OutcomeDestinationEditor', () => {
     $scope.$apply();
 
     expect(ctrl.destChoices).toEqual([{
-      id: undefined,
+      id: null,
       text: '(try again)'
     }, {
       id: 'Introduction',

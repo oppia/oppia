@@ -159,19 +159,19 @@ describe('Utils Service', () => {
   });
 
   it('should determine when an element is overflowing', () => {
-    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', [''], {
+    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', [], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 500, scrollHeight: 300,
     });
     expect(uts.isOverflowing(elWithHorizontalOverflow)).toBeTrue();
 
-    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', [''], {
+    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', [], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 600,
     });
     expect(uts.isOverflowing(elWithVerticalOverflow)).toBeTrue();
 
-    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', [''], {
+    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', [], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 300,
     });

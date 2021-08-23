@@ -25,16 +25,18 @@ import { ClassifierDataBackendApiService } from 'services/classifier-data-backen
 import { LoggerService } from 'services/contextual/logger.service';
 
 interface StateClassifierMapping {
-  [state: string]: Classifier;
+  // The classifier corresponding to a state will be null if machine learning
+  // classification is not enabled for that state.
+  [state: string]: Classifier | null;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateClassifierMappingService {
-  _explorationId: string;
-  _explorationVersion: number;
-  stateClassifierMapping: StateClassifierMapping = null;
+  _explorationId!: string;
+  _explorationVersion!: number;
+  stateClassifierMapping!: StateClassifierMapping;
 
   constructor(
     private appService: AppService,
@@ -74,11 +76,14 @@ export class StateClassifierMappingService {
            this.stateClassifierMapping[stateName] !== null;
   }
 
-  getClassifier(stateName: string): Classifier {
-    if (this.appService.isMachineLearningClassificationEnabled() &&
+  // Function returns null if Machine Learning Classification is not enabled.
+  getClassifier(stateName: string): Classifier | null {
+    if (this.stateClassifierMapping[stateName] &&
+        this.appService.isMachineLearningClassificationEnabled() &&
         this.hasClassifierData(stateName)) {
       return this.stateClassifierMapping[stateName];
     }
+    return null;
   }
 
   // NOTE TO DEVELOPERS: This method should only be used for tests.

@@ -172,7 +172,7 @@ describe('Editor state service', () => {
 
   it('should not allow invalid state names to be set', () => {
     ecs.setActiveStateName('');
-    expect(ecs.getActiveStateName()).toBeUndefined();
+    expect(ecs.getActiveStateName()).toBeNull();
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {
@@ -551,6 +551,16 @@ describe('Editor state service', () => {
     solutionValidityService.init(['Hola']);
     expect(ecs.isCurrentSolutionValid()).toBeTrue();
     ecs.deleteCurrentSolutionValidity();
+    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+  });
+
+  it('should throw error on deletion of current solution validity' +
+     ' if activeStateName is null', () => {
+    ecs.activeStateName = null;
+    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+    expect(() => {
+      ecs.deleteCurrentSolutionValidity();
+    }).toThrowError('Active State for this solution is not set');
     expect(ecs.isCurrentSolutionValid()).toBeFalse();
   });
 });

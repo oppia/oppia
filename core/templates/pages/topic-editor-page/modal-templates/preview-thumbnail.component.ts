@@ -52,7 +52,7 @@ export class PreviewThumbnailComponent {
     this.editableThumbnailDataUrl = (
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.filename,
-        <string> entityType,
+        entityType,
         this.contextService.getEntityId()
       )
     );

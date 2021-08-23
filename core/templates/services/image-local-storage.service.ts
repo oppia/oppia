@@ -85,7 +85,7 @@ export class ImageLocalStorageService {
       returnData.push({
         filename: this.storedImageFilenames[idx],
         imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
-          <string> this.windowRef.nativeWindow.sessionStorage.getItem(
+          this.windowRef.nativeWindow.sessionStorage.getItem(
             this.storedImageFilenames[idx]))
       });
     }

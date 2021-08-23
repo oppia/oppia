@@ -85,7 +85,10 @@ export class ComputeGraphService {
     seen[sourceStateName] = true;
     queue.push(sourceStateName);
     while (queue.length > 0) {
-      let currStateName = <string>queue.shift();
+      // '.shift()' here can return an undefined value, but we're already
+      // checking for queue.length > 0, so this is safe.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      let currStateName = queue.shift()!;
       stateNamesInBfsOrder.push(currStateName);
       for (let e = 0; e < stateGraph.links.length; e++) {
         let edge = stateGraph.links[e];
