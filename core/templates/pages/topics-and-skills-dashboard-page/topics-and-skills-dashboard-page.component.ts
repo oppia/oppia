@@ -117,9 +117,6 @@ export class TopicsAndSkillsDashboardPageComponent {
           }
         )
     );
-    // The _initDashboard function is written separately since it is
-    // also called in $scope.$on when some external events are
-    // triggered.
     this._initDashboard(false);
   }
 
