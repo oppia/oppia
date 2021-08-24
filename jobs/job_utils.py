@@ -160,6 +160,7 @@ def get_beam_entity_from_ndb_model(model):
     """
     beam_entity = beam_datastore_types.Entity(
         get_beam_key_from_ndb_key(model.key))
+    model_dict = model._to_dict()
     beam_entity.set_properties(model._to_dict()) # pylint: disable=protected-access
     return beam_entity
 
