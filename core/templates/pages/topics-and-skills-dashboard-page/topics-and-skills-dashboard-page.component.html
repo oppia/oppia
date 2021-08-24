@@ -62,7 +62,7 @@
                 <span>Items Per Page: </span>
                 <select [(ngModel)]="itemsPerPage"
                         (change)="refreshPagination()"
-                        attr.aria-label="Items Per Page">
+                        aria-label="Items Per Page">
                   <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
                 </select>
               </div>
