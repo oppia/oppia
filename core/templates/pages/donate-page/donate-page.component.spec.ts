@@ -47,7 +47,8 @@ describe('Donate page', () => {
             nativeWindow: {
               location: {
                 href: ''
-              }
+              },
+              gtag: () => {}
             }
           }
         }
