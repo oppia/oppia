@@ -182,7 +182,11 @@ def get_ndb_model_from_beam_entity(beam_entity):
         # it needs to be removed.
         if isinstance(value, datetime.datetime):
             ndb_properties[key] = value.replace(tzinfo=None)
-        elif isinstance(value, bytes):
+        # Beam Entity returns JsonProperty as JSON encoded in bytes, so we need
+        # to load it first.
+        elif isinstance(
+            getattr(ndb_model_class, key), datastore_services.JsonProperty
+        ):
             ndb_properties[key] = json.loads(value)
         else:
             ndb_properties[key] = value
