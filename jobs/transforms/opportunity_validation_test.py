@@ -25,13 +25,16 @@ from jobs.transforms import opportunity_validation  # isort:skip # pylint: disab
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-    def test_exploration_opportunity_summary_model_relationship(self):
-        self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'ExplorationOpportunitySummaryModel', 'id'), ['ExplorationModel'])
-        self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'ExplorationOpportunitySummaryModel', 'topic_id'), ['TopicModel'])
-        self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'ExplorationOpportunitySummaryModel', 'story_id'), ['StoryModel'])
+    def test_exploration_opportunity_summary_model_relationship(self) -> None:
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+                'ExplorationOpportunitySummaryModel', 'id'),
+            ['ExplorationModel'])
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+                'ExplorationOpportunitySummaryModel', 'topic_id'),
+            ['TopicModel'])
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+                'ExplorationOpportunitySummaryModel', 'story_id'),
+            ['StoryModel'])
