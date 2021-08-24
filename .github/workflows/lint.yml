@@ -22,6 +22,7 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
+      - uses: ./.github/actions/merge
       - name: Install Third Party Dependencies
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
