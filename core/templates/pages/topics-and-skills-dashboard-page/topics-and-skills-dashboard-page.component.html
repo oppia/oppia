@@ -189,7 +189,8 @@
                   </oppia-filtered-choices-field>
                 </div>
                 <div *ngIf="activeTab === TAB_NAME_SKILLS">
-                  <oppia-filtered-choices-field [choices]="skillStatusOptions"
+                  <oppia-filtered-choices-field class="protractor-test-select-skill-status-dropdown"
+                                                [choices]="skillStatusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
                                                 [(selection)]="filterObject.status"
@@ -204,7 +205,8 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div *ngIf="activeTab === TAB_NAME_TOPICS">
-                  <oppia-filtered-choices-field [choices]="classrooms"
+                  <oppia-filtered-choices-field class="protractor-test-select-classroom-dropdown"
+                                                [choices]="classrooms"
                                                 placeholder="Classrooms"
                                                 searchLabel="Search"
                                                 [(selection)]="filterObject.classroom"
@@ -242,7 +244,8 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div>
-                  <oppia-multi-selection-field label="Keywords"
+                  <oppia-multi-selection-field class="protractor-test-select-keyword-dropdown"
+                                               label="Keywords"
                                                [(selections)]="filterObject.keywords"
                                                placeholder="Multiple allowed"
                                                (selectionsChange)="applyFilters()">
