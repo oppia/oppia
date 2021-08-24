@@ -45,7 +45,7 @@ export class CreateNewSkillModalService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  createNewSkill(topicsIds: string[]): void {
+  createNewSkill(topicsIds: string[] = []): void {
     const modalRef = this.ngbModal.open(
       CreateNewSkillModalComponent, {
         windowClass: 'create-new-skill-modal',
@@ -73,7 +73,7 @@ export class CreateNewSkillModalService {
       let imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.skillCreationBackendApiService.createSkillAsync(
         result.description, rubrics, result.explanation,
-        topicsIds || [], imagesData).then((response) => {
+        topicsIds, imagesData).then((response) => {
         setTimeout(() => {
           this.topicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.emit(true);
