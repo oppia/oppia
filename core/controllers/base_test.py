@@ -99,6 +99,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     TEST_EDITOR_USERNAME = 'testeditoruser'
     DELETED_USER_EMAIL = 'deleted.user@example.com'
     DELETED_USER_USERNAME = 'deleteduser'
+    PARTIALLY_LOGGED_IN_USER_EMAIL = 'partial@example.com'
 
     class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
@@ -161,6 +162,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         deleted_user_model.deleted = True
         deleted_user_model.update_timestamps()
         deleted_user_model.put()
+
+        # Create a new user but do not submit their registration form.
+        user_services.create_new_user(
+            self.get_auth_id_from_email(self.PARTIALLY_LOGGED_IN_USER_EMAIL),
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -343,6 +349,25 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Tests that the old '/splash' URL is redirected to '/'.
         response = self.get_html_response('/splash', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
+
+    def test_partially_logged_in_redirect(self):
+        login_context = self.login_context(
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+
+        with login_context:
+            response = self.get_html_response(
+                '/splash', expected_status_int=302)
+            self.assertEqual(
+                response.location,
+                'http://localhost/logout?redirect_url=http://localhost/splash')
+
+    def test_no_partially_logged_in_redirect_from_logout(self):
+        login_context = self.login_context(
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+
+        with login_context:
+            response = self.get_html_response(
+                '/logout', expected_status_int=200)
 
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
         with python_utils.ExitStack() as exit_stack:
