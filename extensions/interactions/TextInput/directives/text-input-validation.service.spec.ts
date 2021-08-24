@@ -18,14 +18,13 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
+import { TextInputValidationService, Validators } from 'interactions/TextInput/directives/text-input-validation.service';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('TextInputValidationService', () => {
@@ -55,15 +54,7 @@ describe('TextInputValidationService', () => {
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
     let rowsSpecs = customizationArgSpecs[1];
-    const validators = <({
-      'min_value': number;
-      id: string;
-      'max_value'?: undefined;
-    } | {
-      'max_value': number;
-      id: string;
-      'min_value'?: undefined;
-    })[]> rowsSpecs.schema.validators;
+    const validators = <Validators[]>rowsSpecs.schema.validators;
     minRows = validators[0].min_value;
     maxRows = validators[1].max_value;
 
