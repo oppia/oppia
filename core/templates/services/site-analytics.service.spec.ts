@@ -24,10 +24,29 @@ describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
   let ws: WindowRef;
   let gtagSpy: jasmine.Spy;
+  let pathname = 'pathname';
+
+  class MockWindowRef {
+    nativeWindow = {
+      gtag: () => {},
+      location: {
+        pathname
+      }
+    };
+  }
 
   beforeEach(() => {
-    sas = TestBed.get(SiteAnalyticsService);
-    ws = TestBed.get(WindowRef);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ]
+    }).compileComponents();
+
+    sas = TestBed.inject(SiteAnalyticsService);
+    ws = TestBed.inject(WindowRef);
   });
 
   it('should initialize google analytics', () => {
@@ -36,7 +55,7 @@ describe('Site Analytics Service', () => {
 
   describe('when tested using gtag spy', () => {
     beforeEach(() => {
-      gtagSpy = spyOn(ws.nativeWindow, 'gtag').and.stub();
+      gtagSpy = spyOn(ws.nativeWindow, 'gtag');
     });
 
     it('should register start login event', () => {
@@ -45,7 +64,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'LoginButton',
-        event_label: '/context.html LoginEventButton'
+        event_label: pathname + ' LoginEventButton'
       });
     });
 
@@ -63,7 +82,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'BrowseLessonsButton',
-        event_label: '/context.html'
+        event_label: pathname
       });
     });
 
@@ -72,7 +91,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'StartLearningButton',
-        event_label: '/context.html'
+        event_label: pathname
       });
     });
 
@@ -81,7 +100,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'StartContributingButton',
-        event_label: '/context.html'
+        event_label: pathname
       });
     });
 
@@ -109,7 +128,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'CreateExplorationButton',
-        event_label: '/context.html'
+        event_label: pathname
       });
     });
 
@@ -161,7 +180,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share', {
         event_category: network,
-        event_label: '/context.html'
+        event_label: pathname
       });
     });
 
@@ -171,7 +190,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share', {
         event_category: network,
-        event_label: '/context.html'
+        event_label: pathname
       });
     });
 
