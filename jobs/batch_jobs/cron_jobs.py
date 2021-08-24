@@ -102,25 +102,44 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
 
     @staticmethod
     def _create_user_stats_model(user_settings_model):
+        """Creates empty user stats model with id.
+
+        Args:
+            user_settings_model: UserSettingsModel. Model from which to
+                create the user stats model.
+
+        Yields:
+            UserStatsModel. The created user stats model.
+        """
         user_stats_model = user_models.UserStatsModel(id=user_settings_model.id)
         user_stats_model.update_timestamps()
         yield user_stats_model
 
     @staticmethod
-    def _update_dashboard_stats_log(user_stats_models):
-        model = job_utils.clone_model(user_stats_models)
+    def _update_weekly_creator_stats(user_stats_models):
+        """Updates weekly dashboard stats with the current values.
 
-        if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
+        Args:
+            user_stats_models: UserStatsModel. Model for which to update
+                the weekly dashboard stats.
+
+        Yields:
+            UserStatsModel. The updated user stats model.
+        """
+        model = job_utils.clone_model(user_stats_models)
+        schema_version = model.schema_version
+
+        if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
             user_services.migrate_dashboard_stats_to_latest_schema(model)
 
-        weekly_dashboard_stats = {
+        weekly_creator_stats = {
             user_services.get_current_date_as_string(): {
                 'num_ratings': model.num_ratings or 0,
                 'average_ratings': model.average_ratings,
                 'total_plays': model.total_plays or 0
             }
         }
-        model.weekly_creator_stats_list.append(weekly_dashboard_stats)
+        model.weekly_creator_stats_list.append(weekly_creator_stats)
         model.update_timestamps()
         yield model
 
@@ -146,8 +165,9 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             # (model.id, (user_settings_models,)).
             | beam.GroupBy(lambda m: m.id)
             # Discards model.id from the PCollection.
-            | beam.Values()
-            # Only keep groupings that indicate that the UserStatsModel is missing.
+            | beam.Values() # pylint: disable=no-value-for-parameter
+            # Only keep groupings that indicate that
+            # the UserStatsModel is missing.
             | beam.Filter(
                 lambda models: (
                     len(models) == 1 and
@@ -164,7 +184,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             (new_user_stats_models, old_user_stats_models)
             | 'Merge new and old models together' >> beam.Flatten()
             | 'Update the dashboard stats' >> (
-                beam.ParDo(self._update_dashboard_stats_log))
+                beam.ParDo(self._update_weekly_creator_stats))
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 

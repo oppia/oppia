@@ -313,6 +313,7 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
         user_settings_model = self.create_model(
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID_1, email='a@a.com')
+        user_settings_model.update_timestamps()
         user_settings_model.put()
 
         self.assert_job_output_is([
