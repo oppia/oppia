@@ -19,7 +19,7 @@
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -62,6 +62,16 @@ require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
 
+class MockNgbModalRef {
+  componentInstance = {
+    skillSummaries: null,
+    skillsInSameTopicCount: null,
+    categorizedSkills: null,
+    allowSkillsFromOtherTopics: null,
+    untriagedSkillSummaries: null
+  };
+}
+ 
 describe('Exploration editor page component', function() {
   importAllAngularServices();
 
@@ -70,7 +80,6 @@ describe('Exploration editor page component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
   let as: AlertsService = null;
@@ -100,6 +109,8 @@ describe('Exploration editor page component', function() {
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
   var focusManagerService = null;
+
+  let ngbModal: NgbModal;
 
   var refreshGraphEmitter = new EventEmitter();
 
@@ -245,12 +256,12 @@ describe('Exploration editor page component', function() {
     aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     ics = $injector.get('InternetConnectivityService');
@@ -483,21 +494,27 @@ describe('Exploration editor page component', function() {
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('editor')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('editor')
+        }
+      );
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('translation')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('translation')
+        }
+      );
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     });
   });
 
@@ -678,9 +695,12 @@ describe('Exploration editor page component', function() {
     it('should start editor tutorial when closing welcome exploration' +
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve(explorationId)
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve(explorationId)
+        }
+      );
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
@@ -693,9 +713,12 @@ describe('Exploration editor page component', function() {
     it('should dismiss tutorial when dismissing welcome exploration' +
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject(explorationId)
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          componentInstance: new MockNgbModalRef(),
+          result: $q.reject(explorationId)
+        }
+      );
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();

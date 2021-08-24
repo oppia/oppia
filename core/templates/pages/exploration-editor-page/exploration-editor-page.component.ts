@@ -164,7 +164,7 @@ angular.module('oppia').component('explorationEditorPage', {
   controller: [
     '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ContextService', 'NgbModal',
+    'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -176,7 +176,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
     'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
-    'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
+    'LoaderService', 'NgbModal',
+    'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
     'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
@@ -188,7 +189,7 @@ angular.module('oppia').component('explorationEditorPage', {
     function(
         $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
-        ChangeListService, ContextService, NgbModal,
+        ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -200,7 +201,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
         FocusManagerService, GraphDataService, InternetConnectivityService,
-        LoaderService, PageTitleService, ParamChangesObjectFactory,
+        LoaderService, NgbModal, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, PreventPageUnloadEventService,
         RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
@@ -429,7 +430,7 @@ angular.module('oppia').component('explorationEditorPage', {
         }
       };
 
-      ctrl.showWelcomeExplorationModal = function () {
+      ctrl.showWelcomeExplorationModal = function() {
         NgbModal.open(WelcomeModalComponent, {
           backdrop: true,
           windowClass: 'oppia-welcome-modal'
@@ -442,7 +443,7 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationId);
           StateTutorialFirstTimeService.markEditorTutorialFinished();
         });
-      }
+      };
 
       ctrl.getNavbarText = function() {
         return 'Exploration Editor';

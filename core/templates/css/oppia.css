@@ -2552,6 +2552,12 @@ oppia-parameter {
   max-width: 1200px;
   width: 90%;
 }
+
+.oppia-welcome-modal .modal-dialog {
+  height: 70%;
+  width: 70%;
+}
+
 .modal.in .modal-dialog {
   -webkit-transform: translate(0,0);
   -ms-transform: translate(0,0);
@@ -3091,6 +3097,13 @@ md-card.preview-conversation-skin-supplemental-card {
   align-items: center;
   flex-direction: column;
 }
+
+.oppia-welcome-modal .modal-content {
+  border-radius: 0;
+  height: 100%;
+  min-height: 450px;
+}
+
 .oppia-modal-information-card .modal-dialog .modal-content {
   border-radius: 0;
   min-width: 200px;
@@ -4771,17 +4784,6 @@ div.oppia-issues-learner-action {
   min-width: 100px;
 }
 
-.oppia-welcome-modal .modal-content {
-  border-radius: 0;
-  height: 100%;
-  min-height: 450px;
-}
-
-.oppia-welcome-modal .modal-dialog {
-  height: 70%;
-  width: 70%;
-}
-
 @media (max-width: 770px) {
   .oppia-welcome-modal .modal-body {
     top: 5%;
@@ -4796,5 +4798,5 @@ div.oppia-issues-learner-action {
   .oppia-welcome-modal .modal-dialog {
     margin: 1.75rem auto;
     max-width: 900px;
- }
+  }
 }
