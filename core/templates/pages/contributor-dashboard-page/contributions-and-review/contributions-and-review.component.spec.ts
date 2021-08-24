@@ -22,7 +22,7 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts';
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 describe('Contributions and review component', function() {
   var ctrl = null;
