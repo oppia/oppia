@@ -33,7 +33,6 @@ describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
   let contextService: ContextService;
-  let changeDetectorRef: ChangeDetectorRef;
   let skillObjectFactory: SkillObjectFactory;
   let testObj: SubtitledHtml = SubtitledHtml
     .createDefault('test_html', 'test_id');
@@ -62,23 +61,10 @@ describe('Create new skill modal', () => {
     fixture = TestBed.createComponent(CreateNewSkillModalComponent);
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
-    contextService = (contextService as unknown) as
-      jasmine.SpyObj<ContextService>;
-    changeDetectorRef = TestBed.inject(ChangeDetectorRef);
-    changeDetectorRef = (changeDetectorRef as unknown) as
-      jasmine.SpyObj<ChangeDetectorRef>;
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    skillObjectFactory = (skillObjectFactory as unknown) as
-      jasmine.SpyObj<SkillObjectFactory>;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    ngbActiveModal = (ngbActiveModal as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillEditorStateService = (skillEditorStateService as unknown) as
-      jasmine.SpyObj<SkillEditorStateService>;
     skillCreationService = TestBed.inject(SkillCreationService);
-    skillCreationService = (skillCreationService as unknown) as
-      jasmine.SpyObj<SkillCreationService>;
   });
 
   it('should create', () => {

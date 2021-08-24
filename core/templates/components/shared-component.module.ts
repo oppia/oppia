@@ -64,7 +64,6 @@ import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-edito
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
 import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
-
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thumbnail-uploader.component';
@@ -84,6 +83,7 @@ import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.com
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
+import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 
 
 // Pipes.
@@ -100,7 +100,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 
 @NgModule({
   imports: [

@@ -45,7 +45,7 @@ export class CreateNewSkillModalService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  createNewSkill(topicsIds?: string[]): void {
+  createNewSkill(topicsIds: string[]): void {
     const modalRef = this.ngbModal.open(
       CreateNewSkillModalComponent, {
         windowClass: 'create-new-skill-modal',

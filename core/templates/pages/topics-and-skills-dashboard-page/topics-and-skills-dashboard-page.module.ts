@@ -94,10 +94,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    },
-    {
-      provide: '$scope',
-      useExisting: '$rootScope'
     }
   ]
 })

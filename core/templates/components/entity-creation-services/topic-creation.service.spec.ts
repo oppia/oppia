@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for topic creation service.
+ * @fileoverview Unit test for Topic Creation Service.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

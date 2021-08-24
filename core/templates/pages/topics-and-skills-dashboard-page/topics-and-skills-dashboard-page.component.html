@@ -18,10 +18,10 @@
   </div>
   <div class="create-button-mobile">
     <div *ngIf="(activeTab === TAB_NAME_TOPICS) && totalTopicSummaries.length">
-      <i class="fa fa-plus-circle" attr.aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
+      <i class="fa fa-plus-circle" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
     </div>
     <div *ngIf="activeTab === TAB_NAME_SKILLS && skillSummaries.length">
-      <i class="fa fa-plus-circle" attr.aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
+      <i class="fa fa-plus-circle" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
     </div>
   </div>
   <div *ngIf="totalTopicSummaries.length > 0 || untriagedSkillSummaries.length > 0">
@@ -143,8 +143,10 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"  (click)="createTopic()" class="protractor-test-create-topic-button create-topic-button
-            oppia-autofocus" oppiaFocusOn="createTopicBtn">
+            <div *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
+                 (click)="createTopic()"
+                 class="protractor-test-create-topic-button create-topic-button oppia-autofocus"
+                 oppiaFocusOn="createTopicBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
@@ -240,8 +242,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div>
-                  <oppia-multi-selection-field class=""
-                                               label="Keywords"
+                  <oppia-multi-selection-field label="Keywords"
                                                [(selections)]="filterObject.keywords"
                                                placeholder="Multiple allowed"
                                                (selectionsChange)="applyFilters()">
@@ -260,7 +261,7 @@
       <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-topic-button"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text  oppia-create-topic-btn protractor-test-create-topic-button"
               (click)="createTopic()"
               *ngIf="userCanCreateTopic">
         Create Topic
@@ -274,6 +275,9 @@
   </div>
 </div>
 <style>
+  .oppia-create-topic-btn {
+    margin-right: 10px;
+  }
   .oppia-topics-and-skills-dashboard .intro-card-wrapper {
     margin: 0 auto;
     padding-top: 10px;
