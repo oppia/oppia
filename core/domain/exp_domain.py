@@ -802,9 +802,6 @@ class Exploration(python_utils.OBJECT):
             title=title,
             states=state_protos
         )
-        print("------------------")
-        print(exploration_proto)
-        print("------------------")
         return exploration_proto
 
     def to_state_proto(self, states):
@@ -945,6 +942,36 @@ class Exploration(python_utils.OBJECT):
                 fraction_input=self.to_fraction_interaction_proto(self, interaction)
             )
 
+        if(interaction.id == 'ItemSelectionInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                item_selection_input=self.to_item_selection_single_interaction_proto(
+                    self, interaction)
+            )
+
+        if(interaction.id == 'MultipleChoiceInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                multiple_choice_input=self.to_multiple_choice_interaction_proto(
+                    self, interaction)
+            )
+
+        if(interaction.id == 'NumericInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                numeric_input=self.to_numeric_interaction_proto(
+                    self, interaction)
+            )
+
+        if(interaction.id == 'TextInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                text_input=self.to_text_input_interaction_proto(
+                    self, interaction)
+            )
+
+        if(interaction.id == 'RatioExpressionInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                ratio_expression_input=self.to_ratio_expression_interaction_proto(
+                    self, interaction)
+            )
+
         return interaction_proto
 
     def to_continue_proto(self, interaction):
@@ -988,16 +1015,16 @@ class Exploration(python_utils.OBJECT):
         )
 
         return fraction_interaction_proto
-
     
     def to_fraction_customization_args_proto(self, customization_args):
         customization_arg_proto = state_pb2.FractionInputInstance.CustomizationArgs(
             requires_simplest_form=customization_args['requireSimplestForm'].value,
             allow_improper_fractions=customization_args['allowImproperFraction'].value,
-            allow_nonzero_integer_part=customization_args['allowNonzeroIntegerPart'].value,
-            custom_placeholder=self.to_subtitled_html_proto(
-                self, customization_args['customPlaceholder'].value)
+            allow_nonzero_integer_part=customization_args['allowNonzeroIntegerPart'].value
         )
+
+        # custom_placeholder=self.to_subtitled_html_proto(
+        #     self, customization_args['customPlaceholder'].value)
 
         return customization_arg_proto
 
@@ -1028,24 +1055,202 @@ class Exploration(python_utils.OBJECT):
 
         return fraction_proto
 
-    def set_continue_interaction(self, content_id, html):
-        """Set ContinueInstance of Interaction Message in exploration.proto.
+    def to_item_selection_single_interaction_proto(self, interaction):
+        customization_arg_proto = self.to_item_selection_single_customization_arg_proto(
+            self, interaction.customization_args)
 
-        Args:
-            content_id: str. Button text id.
-            html: str. Button text value.
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
 
-        Returns:
-            customization_args_proto. Instance of CustomizationArgs.
-        """
-        customization_args_proto = (
-            exploration_pb2.ContinueInstance.CustomizationArgs(
-                button_text=exploration_pb2.SubtitledHtml(
-                    content_id=content_id,
-                    html=html
-                )
-            ))
-        return customization_args_proto
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        item_selection_single_interaction_proto = state_pb2.ItemSelectionInputInstance(
+            customization_args=customization_arg_proto,
+            default_outcome=outcome_proto,
+            hints=hints_proto
+        )
+
+        return item_selection_single_interaction_proto
+
+    def to_item_selection_single_customization_arg_proto(self, customization_args):
+        choices_list_proto = []
+        for value in customization_args['choices'].value:
+            value_proto=self.to_subtitled_html_proto(self, value)
+            choices_list_proto.append(value_proto)
+            
+        customization_arg_proto = state_pb2.ItemSelectionInputInstance.CustomizationArgs(
+            min_allowable_selection_count=customization_args['minAllowableSelectionCount'].value,
+            max_allowable_selection_count=customization_args['maxAllowableSelectionCount'].value,
+            choices=choices_list_proto
+        )
+
+        return customization_arg_proto
+
+    def to_hints_proto(self, hints):
+        hints_list_proto = []
+
+        for hint in hints:
+            hint_content_proto = self.to_subtitled_html_proto(self, hint.hint_content)
+            hint_proto=state_pb2.Hint(
+                hint_content=hint_content_proto
+            )
+            hints_list_proto.append(hint_proto)
+
+        return hints_list_proto
+
+    def to_multiple_choice_interaction_proto(self, interaction):
+        customization_args_proto = self.to_multiple_choice_customization_args_proto(
+            self, interaction.customization_args)
+
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
+
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        multiple_choice_interaction_proto = state_pb2.MultipleChoiceInputInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto,
+            hints=hints_proto
+        )
+
+        return multiple_choice_interaction_proto
+    
+    def to_multiple_choice_customization_args_proto(self, customization_args):
+        choices_list_proto = []
+
+        for value in customization_args['choices'].value:
+            value_proto=self.to_subtitled_html_proto(self, value)
+            choices_list_proto.append(value_proto)
+        
+        customization_arg_proto = state_pb2.MultipleChoiceInputInstance.CustomizationArgs(
+            choices=choices_list_proto
+        )
+
+        return customization_arg_proto
+
+    def to_numeric_interaction_proto(self, interaction):
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
+
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        solution_proto = self.to_numeric_solution(self, interaction.solution)
+
+        numeric_interaction_proto = state_pb2.NumericInputInstance(
+            default_outcome=outcome_proto,
+            hints=hints_proto,
+            solution=solution_proto
+        )
+
+        return numeric_interaction_proto
+
+    def to_numeric_solution(self, solution):
+        solution_proto = None 
+        if solution is not None:
+            solution_proto = state_pb.NumericInputInstance.Solution(
+                base_solution=self.to_base_solution_proto(self, solution.explanation),
+                correct_answer=solution.correct_answer
+            )
+        
+        return solution_proto
+
+    def to_text_input_interaction_proto(self, interaction):
+        customization_args_proto = self.to_text_input_customization_args_proto(
+            self, interaction.customization_args)
+
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
+
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        solution_proto = self.to_text_input_solution(self, interaction.solution)
+
+        text_input_interaction_proto = state_pb2.TextInputInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto,
+            hints=hints_proto,
+            solution=solution_proto
+        )
+
+        return text_input_interaction_proto
+    
+    def to_text_input_solution(self, solution):
+        solution_proto = None 
+        if solution is not None:
+            solution_proto = state_pb.TextInputInstance.Solution(
+                base_solution=self.to_base_solution_proto(self, solution.explanation),
+                correct_answer=solution.correct_answer
+            )
+
+        return solution_proto
+
+    def to_text_input_customization_args_proto(self, customization_args):
+
+        # placeholder=self.to_subtitled_html_proto(self, customization_args['placeholder'].value),
+
+        customization_arg_proto = state_pb2.TextInputInstance.CustomizationArgs(
+            rows=customization_args['rows'].value
+        )
+
+        return customization_arg_proto
+
+    def to_ratio_expression_interaction_proto(self, interaction):
+        customization_args_proto = self.to_ratio_expression_customization_args_proto(
+            self, interaction.customization_args)
+        
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct 
+        )
+
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        solution_proto = self.to_ratio_expression_solution_proto(self, interaction.solution)
+
+        ratio_expression_interaction_proto = state_pb2.RatioExpressionInputInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto,
+            solution=solution_proto,
+            hints=hints_proto
+        )
+
+        return ratio_expression_interaction_proto
+        
+    def to_ratio_expression_solution_proto(self, solution):
+        solution_proto = None 
+        if solution is not None:
+            solution_proto = state_pb.RatioExpressionInputInstance.Solution(
+                base_solution=self.to_base_solution_proto(self, solution.explanation),
+                correct_answer=self.to_ratio_expression_proto(self, soltuion.correct_answer)
+            )
+
+        return solution_proto        
+    
+    def to_ratio_expression_proto(self, correct_answer):
+        correct_answer_list = []
+
+        for ans in correct_answer:
+            correct_answer_list.append(ans)
+
+        ratio_expression_proto = objects_pb2.RatioExpression(
+            components=correct_answer_list
+        )
+
+        return ratio_expression_proto
+    
+    def to_ratio_expression_customization_args_proto(self, customization_args):
+
+        # placeholder=self.to_subtitled_html_proto(self, customization_args['placeholder'].value),        
+        
+        customization_arg_proto = state_pb2.RatioExpressionInputInstance.CustomizationArgs(
+            number_of_terms=customization_args['numberOfTerms'].value
+        )
+
+        return customization_arg_proto
 
     def set_numeric_input_interaction(self, answer_groups, solution):
         """Set NumericInputInstance of Interaction Message in exploration.proto.
