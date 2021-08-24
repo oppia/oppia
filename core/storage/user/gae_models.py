@@ -2236,15 +2236,16 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
+        start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
 
         created_on_query = cls.query().order(-cls.created_on)
         query_models, next_cursor, _ = (
-            created_on_query.fetch_page(page_size, start_cursor=cursor))
+            created_on_query.fetch_page(page_size, start_cursor=start_cursor))
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
         plus_one_query_models, _, _ = (
-            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+            created_on_query.fetch_page(
+                page_size + 1, start_cursor=start_cursor))
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         next_cursor_str = (
@@ -2390,7 +2391,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSkillMasteryModel.
         """
 
-        user_data = dict()
+        user_data = {}
         mastery_models = cast(
             List[UserSkillMasteryModel],
             cls.get_all().filter(cls.user_id == user_id).fetch())
@@ -2462,7 +2463,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserContributionProficiencyModel.
         """
-        user_data = dict()
+        user_data = {}
         scoring_models = cast(
             List[UserContributionProficiencyModel],
             cls.query(cls.user_id == user_id).fetch())
