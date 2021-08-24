@@ -22,7 +22,7 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts'
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts';
 
 describe('Contributions and review component', function() {
   var ctrl = null;
@@ -504,7 +504,7 @@ describe('Contributions and review component', function() {
               heading: 'Tradução',
               subheading: (
                 ContributorDashboardConstants
-                .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
+                  .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
               labelText: 'Awaiting review',
               labelColor: '#eeeeee',
               actionButtonTitle: 'View'
@@ -536,7 +536,7 @@ describe('Contributions and review component', function() {
           heading: 'Question 1',
           subheading: (
             ContributorDashboardConstants
-            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
+              .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
           labelText: 'Accepted',
           labelColor: '#8ed274',
           actionButtonTitle: 'View'

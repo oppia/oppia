@@ -19,7 +19,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts'
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -69,7 +69,7 @@ export class OpportunitiesListItemComponent {
       this.opportunityDataIsLoading = false;
       if (this.opportunity.subheading ===
           ContributorDashboardConstants
-          .CORRESPONDING_DELETED_OPPORTUNITY_TEXT) {
+            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT) {
         this.isCorrespondingOpportunityDeleted = true;
       }
     } else {
