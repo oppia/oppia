@@ -157,7 +157,6 @@ require('services/ngb-modal.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 angular.module('oppia').component('explorationEditorPage', {
@@ -260,7 +259,6 @@ angular.module('oppia').component('explorationEditorPage', {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
-          ctrl.showWelcomeExplorationModal();
           ExplorationFeaturesService.init(explorationData, featuresData);
 
           StateClassifierMappingService.init(
@@ -445,25 +443,6 @@ angular.module('oppia').component('explorationEditorPage', {
           StateTutorialFirstTimeService.markEditorTutorialFinished();
         });
       }
-
-      // ctrl.showWelcomeExplorationModal = function() {
-      //   $uibModal.open({
-      //     template: require(
-      //       'pages/exploration-editor-page/modal-templates/' +
-      //       'welcome-modal.template.html'),
-      //     backdrop: true,
-      //     controller: 'WelcomeModalController',
-      //     windowClass: 'oppia-welcome-modal'
-      //   }).result.then(function(explorationId) {
-      //     SiteAnalyticsService.registerAcceptTutorialModalEvent(
-      //       explorationId);
-      //     ctrl.startEditorTutorial();
-      //   }, function(explorationId) {
-      //     SiteAnalyticsService.registerDeclineTutorialModalEvent(
-      //       explorationId);
-      //     StateTutorialFirstTimeService.markEditorTutorialFinished();
-      //   });
-      // };
 
       ctrl.getNavbarText = function() {
         return 'Exploration Editor';

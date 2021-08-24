@@ -78,7 +78,7 @@ describe('Welcome Modal Component', () => {
     contextService = TestBed.inject(ContextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     siteAnalyticsServiceSpy = spyOn(
-      siteAnalyticsService, 'registerTutorialModalOpenEvent').and.callThrough();
+      siteAnalyticsService, 'registerTutorialModalOpenEvent');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     fixture.detectChanges();
   });
