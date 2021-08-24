@@ -142,12 +142,16 @@ export class BlogPostEditorComponent implements OnInit {
               this.blogDashboardPageService.imageUploaderIsNarrow = true;
             }
           }
-          if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
-            this.lastChangesWerePublished = true;
+          if (this.blogPostData.publishedOn) {
+            if (this.blogPostData.lastUpdated.slice(0, -8) === (
+              this.blogPostData.publishedOn.slice(0, -8))) {
+              this.lastChangesWerePublished = true;
+            }
           }
           this.blogDashboardPageService.setNavTitle(
             this.lastChangesWerePublished, this.title);
           this.newChangesAreMade = false;
+          this.preventPageUnloadEventService.removeListener();
         }, (errorResponse) => {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -240,12 +244,12 @@ export class BlogPostEditorComponent implements OnInit {
       () => {
         if (isBlogPostPublished) {
           this.alertsService.addSuccessMessage(
-            'Blog Post Saved and Published Succesfully.'
+            'Blog Post Saved and Published Successfully.'
           );
           this.lastChangesWerePublished = true;
         } else {
           this.alertsService.addSuccessMessage(
-            'Blog Post Saved Succesfully.');
+            'Blog Post Saved Successfully.');
           this.lastChangesWerePublished = false;
         }
         this.newChangesAreMade = false;
@@ -308,7 +312,9 @@ export class BlogPostEditorComponent implements OnInit {
     let modalRef = this.ngbModal.open(UploadBlogPostThumbnailModalComponent, {
       backdrop: 'static'
     });
-
+    if (this.thumbnailDataUrl) {
+      this.imageLocalStorageService.flushStoredImagesData();
+    }
     modalRef.result.then((imageDataUrl) => {
       this.saveBlogPostThumbnail(imageDataUrl);
     }, () => {
