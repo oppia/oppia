@@ -23,7 +23,7 @@ require(
 require('components/code-mirror/codemirror-mergeview.component');
 require(
   'pages/exploration-editor-page/modal-templates/' +
-  'state-diff-modal.controller.ts');
+  'state-diff-modal.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 
