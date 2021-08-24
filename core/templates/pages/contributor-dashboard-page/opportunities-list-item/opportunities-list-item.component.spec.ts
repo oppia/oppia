@@ -71,6 +71,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.progressBarStyle).toEqual({
           width: '50%'
         });
+        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
       });
   });
 
@@ -92,6 +93,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.labelText).toBe(undefined);
         expect(component.labelStyle).toBe(undefined);
         expect(component.opportunityHeadingTruncationLength).toBe(40);
+        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
       });
   });
 });
