@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: ./.github/actions/merge
       - name: Github Actions from Oppiabot
         uses: oppia/oppiabot@1.4.0
         with:
