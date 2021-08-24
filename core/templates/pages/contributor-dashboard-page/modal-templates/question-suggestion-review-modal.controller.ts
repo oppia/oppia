@@ -143,7 +143,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.edit = function() {
       SkillBackendApiService.fetchSkillAsync(
         suggestion.change.skill_id).then((skillDict) => {
-        var skill = skillDict.skill;
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/contributor-dashboard-page/modal-templates/' +
@@ -156,7 +155,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
             question: () => question,
             questionId: () => '',
             questionStateData: () => question.getStateData(),
-            skill: () => skill,
+            skill: () => skillDict.skill,
             skillDifficulty: () => skillDifficulty
           },
           controller: 'QuestionSuggestionEditorModalController'

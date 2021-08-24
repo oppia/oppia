@@ -266,7 +266,6 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-
     _update_suggestions([suggestion])
 
 

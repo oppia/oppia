@@ -1001,7 +1001,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             new_solution_dict)
         self.logout()
 
-    def test_update_question_suggestions_with_empty_image_data(self):
+    def test_update_question_suggestion_with_large_image_throws_error(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
@@ -1034,16 +1034,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
-            'question_state_data']
-        question_state_data['content'][
-            'html'] = (
-                '<p>Updated question</p>'
-                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-                '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-                'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-                'ractive-math>')
+        question_state_data = self._create_valid_question_data(
+            'default_state').to_dict()
+        html_with_file = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data['content']['html'] = html_with_file
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
@@ -1065,7 +1065,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response_dict['error'])
         self.logout()
 
-    def test_update_question_suggestions_with_invalid_image_data(self):
+    def test_update_question_suggestion_with_missing_image_data_throws_error(
+            self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
@@ -1085,6 +1086,21 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = self._create_valid_question_data(
+            'default_state').to_dict()
+        html_with_file = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data['content']['html'] = html_with_file
         new_solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -1093,21 +1109,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is the updated solution.</p>',
             },
         }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
-            self.author_id, suggestion_change, 'test description')
-
-        question_state_data = suggestion.change.question_dict[
-            'question_state_data']
-        question_state_data['content'][
-            'html'] = (
-                '<p>Updated question</p>'
-                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-                '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-                'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-                'ractive-math>')
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
@@ -1146,14 +1147,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
-        new_solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'Solution',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is the updated solution.</p>',
-            },
-        }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
@@ -1163,6 +1156,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'question_state_data']
         question_state_data['content'][
             'html'] = '<p>Updated question</p>'
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 

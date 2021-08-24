@@ -71,15 +71,14 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       ImageLocalStorageService.flushStoredImagesData();
       ContextService.resetImageSaveDestination();
       if ($scope.isEditing) {
-        let qcuestionDict = $scope.question.toBackendDict(false);
+        const questionDict = $scope.question.toBackendDict(false);
         ContributionAndReviewService.updateQuestionSuggestionAsync(
           suggestionId,
           $scope.skillDifficulty,
-          qcuestionDict.question_state_data,
+          questionDict.question_state_data,
           imagesData,
           () => {
-            AlertsService.addSuccessMessage(
-              'Question is successfully updated.');
+            AlertsService.addSuccessMessage('Updated question.');
 
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
