@@ -114,8 +114,13 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-skill-description-field'));
 
   this.get = async function() {
-    await browser.get('/');
-    await waitFor.pageToFullyLoad();
+    await waitFor.clientSideRedirection(async() => {
+      await browser.get('/');
+    }, (url) => {
+      return /learner-dashboard/.test(url);
+    }, async() => {
+      await waitFor.pageToFullyLoad();
+    });
     await general.navigateToTopicsAndSkillsDashboardPage();
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/topics-and-skills-dashboard');

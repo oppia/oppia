@@ -601,9 +601,9 @@ describe('Exploration save service ' +
             }
           }
         },
+        FocusManagerService
       ]
     });
-    focusManagerService = TestBed.inject(FocusManagerService);
   });
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -618,6 +618,7 @@ describe('Exploration save service ' +
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
     RouterService = $injector.get('RouterService');
     statesObjectFactory = $injector.get('StatesObjectFactory');
+    focusManagerService = $injector.get('FocusManagerService');
   }));
 
   it('should open exploration save modal', fakeAsync(function() {
@@ -650,6 +651,45 @@ describe('Exploration save service ' +
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
+  }));
+
+  it('should remove focus after exploration save modal ' +
+    'is closed', fakeAsync(function() {
+    let startLoadingCb = jasmine.createSpy('startLoadingCb');
+    let endLoadingCb = jasmine.createSpy('endLoadingCb');
+    let sampleStates = statesObjectFactory.createFromBackendDict(
+      statesBackendDict);
+    let mockEventEmitter = new EventEmitter();
+    spyOn(RouterService, 'savePendingChanges')
+      .and.returnValue(null);
+    spyOn(ExplorationStatesService, 'getStates')
+      .and.returnValue(sampleStates);
+    spyOn(explorationDiffService, 'getDiffGraphData')
+      .and.returnValue({
+        nodes: 'nodes',
+        links: ['links'],
+        finalStateIds: ['finalStaeIds'],
+        originalStateIds: ['Hola'],
+        stateIds: [],
+      });
+    spyOn($uibModal, 'open').and.callThrough();
+    let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
+      .and.returnValue(mockEventEmitter);
+
+    explorationSaveService.saveChanges(
+      startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
+    flush();
+    $rootScope.$apply();
+    $timeout.flush();
+    flush();
+    $rootScope.$apply();
+
+    mockEventEmitter.emit('labelForClearingFocus');
+    tick();
+
+    expect(focusSpy).toHaveBeenCalled();
   }));
 
   it('should not open exploration save modal in case of ' +
