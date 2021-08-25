@@ -134,7 +134,7 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
       languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
-    topicName = (topicName == 'All') ? '' : topicName;
+    topicName = (topicName === 'All') ? '' : topicName;
 
     const params = {
       language_code: languageCode,
