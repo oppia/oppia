@@ -151,7 +151,7 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
 // require('domain/collection/collection-update.service.ts');
 // require('domain/collection/collection-validation.service.ts');
 // require('domain/utilities/url-interpolation.service.ts');
-// require('pages/collection-editor-page/collection-editor-page.directive.ts');
+// require('pages/collection-editor-page/collection-editor-page.component.ts');
 // require(
 //   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 // require('services/alerts.service.ts');

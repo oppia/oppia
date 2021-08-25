@@ -29,6 +29,7 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import { CollectionEditorPrePublishModalComponent } from '../templates/collection-editor-pre-publish-modal.component';
 import { CollectionEditorSaveModalComponent } from '../templates/collection-editor-save-modal.component';
 
 @Component({
@@ -152,22 +153,16 @@ export class CollectionEditorNavbarComponent {
       !this.collection.getCategory());
 
     if (additionalMetadataNeeded) {
-      // $uibModal.open({
-      //   templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      //     '/pages/collection-editor-page/templates/' +
-      //     'collection-editor-pre-publish-modal.directive.html'),
-      //   backdrop: 'static',
-      //   controllerAs: '$ctrl',
-      //   controller: 'CollectionEditorPrePublishModalController'
-      // }).result.then(function(metadataList) {
-      //   var commitMessage = (
-      //     'Add metadata: ' + metadataList.join(', ') + '.');
-      //   CollectionEditorStateService.saveCollection(
-      //     commitMessage, _publishCollection);
-      // }, function() {
-      //   // This callback is triggered when the Cancel button is
-      //   // clicked. No further action is needed.
-      // });
+      let modalRef = this.ngbModal.open(
+        CollectionEditorPrePublishModalComponent, {
+          backdrop: 'static'
+        });
+
+      modalRef.result.then((metadataList) => {
+        let commitMessage = ('Add metadata: ' + metadataList.join(', ') + '.');
+        this.collectionEditorStateService.saveCollection(
+          commitMessage, this._publishCollection);
+      }, () => {});
     } else {
       this._publishCollection();
     }

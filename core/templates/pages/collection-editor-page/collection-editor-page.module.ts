@@ -38,10 +38,11 @@ import { CollectionPermissionsCardComponent } from './settings-tab/collection-pe
 import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-editor-navbar-breadcrumb.component';
 import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
 import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
 import { CollectionEditorTabComponent } from './editor-tab/collection-editor-tab.component';
 import { CollectionEditorSaveModalComponent } from './templates/collection-editor-save-modal.component';
+import { CollectionEditorPrePublishModalComponent } from './templates/collection-editor-pre-publish-modal.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -55,6 +56,8 @@ import { CollectionEditorSaveModalComponent } from './templates/collection-edito
     CollectionNodeCreatorComponent,
     CollectionEditorNavbarBreadcrumbComponent,
     CollectionEditorNavbarComponent,
+    CollectionEditorPageComponent,
+    CollectionEditorPrePublishModalComponent,
     CollectionEditorSaveModalComponent,
     CollectionEditorTabComponent,
     CollectionDetailsEditorComponent,
@@ -68,6 +71,8 @@ import { CollectionEditorSaveModalComponent } from './templates/collection-edito
     CollectionNodeCreatorComponent,
     CollectionEditorNavbarBreadcrumbComponent,
     CollectionEditorNavbarComponent,
+    CollectionEditorPageComponent,
+    CollectionEditorPrePublishModalComponent,
     CollectionEditorSaveModalComponent,
     CollectionEditorTabComponent,
     CollectionDetailsEditorComponent,
@@ -97,6 +102,7 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { CollectionEditorPageComponent } from './collection-editor-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

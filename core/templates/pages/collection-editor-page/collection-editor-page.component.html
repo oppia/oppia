@@ -1,17 +1,17 @@
 <div>
-  <div ng-if="$ctrl.getActiveTabName() === 'edit'">
+  <div *ngIf="getActiveTabName() === 'edit'">
     <oppia-collection-editor-tab></oppia-collection-editor-tab>
   </div>
 
-  <div ng-show="$ctrl.getActiveTabName() === 'settings'">
+  <div *ngIf="getActiveTabName() === 'settings'">
     <collection-settings-tab></collection-settings-tab>
   </div>
 
-  <div ng-show="$ctrl.getActiveTabName() === 'history'">
+  <div *ngIf="getActiveTabName() === 'history'">
     <collection-history-tab></collection-history-tab>
   </div>
 
-  <div ng-show="$ctrl.getActiveTabName() === 'stats'">
+  <div *ngIf="getActiveTabName() === 'stats'">
     <collection-statistics-tab></collection-statistics-tab>
   </div>
 </div>
