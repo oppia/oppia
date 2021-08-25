@@ -1022,8 +1022,9 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
         for url in main.URLS:
             clazz = url.handler
             num_handlers_checked += 1
-            all_base_classes = [base_class.__name__ for base_class in
-                                (inspect.getmro(clazz))]
+            all_base_classes = [
+                base_class.__name__ for base_class in inspect.getmro(clazz)]
+
             # Check that it is a subclass of 'BaseHandler'.
             if 'BaseHandler' in all_base_classes:
                 class_return_type = clazz.GET_HANDLER_ERROR_RETURN_TYPE
@@ -1032,8 +1033,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                 # the allowed values.
                 if 'get' in clazz.__dict__.keys():
                     self.assertIn(
-                        class_return_type,
-                        handler_type_to_name_endings_dict)
+                        class_return_type, handler_type_to_name_endings_dict)
                 class_name = clazz.__name__
                 # BulkEmailWebhookEndpoint is a unique class, compared to
                 # others, since it is never called from the frontend, and so
@@ -1045,8 +1045,8 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     continue
                 file_name = inspect.getfile(clazz)
                 line_num = inspect.getsourcelines(clazz)[1]
-                allowed_class_ending = handler_type_to_name_endings_dict[
-                    class_return_type]
+                allowed_class_ending = (
+                    handler_type_to_name_endings_dict[class_return_type])
                 # Check that the name of the class ends with
                 # the proper word if it has a get function.
                 if 'get' in clazz.__dict__.keys():
@@ -1054,8 +1054,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                         'Please ensure that the name of this class '
                         'ends with \'%s\'' % allowed_class_ending)
                     error_message = (
-                        '%s --> Line %s: %s'
-                        % (file_name, line_num, message))
+                        '%s --> Line %s: %s' % (file_name, line_num, message))
                     with self.subTest(class_name):
                         self.assertTrue(
                             class_name.endswith(allowed_class_ending),
@@ -1071,8 +1070,8 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                         '%s --> Line %s: %s'
                         % (file_name, line_num, message))
                     with self.subTest(class_name):
-                        self.assertTrue(class_name.endswith('Handler'),
-                                        msg=error_message)
+                        self.assertTrue(
+                            class_name.endswith('Handler'), msg=error_message)
 
         self.assertGreater(num_handlers_checked, 275)
 
