@@ -19,6 +19,7 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { CollectionEditorRoutingService } from './services/collection-editor-routing.service';
 import { CollectionEditorStateService } from './services/collection-editor-state.service';
@@ -33,7 +34,8 @@ export class CollectionEditorPageComponent {
   constructor(
     private collectionEditorRoutingService: CollectionEditorRoutingService,
     private collectionEditorStateService: CollectionEditorStateService,
-    private pageTitleService: PageTitleService
+    private pageTitleService: PageTitleService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -42,6 +44,9 @@ export class CollectionEditorPageComponent {
         () => this.setTitle()
       )
     );
+    // Load the collection to be edited.
+    this.collectionEditorStateService.loadCollection(
+      this.urlService.getCollectionIdFromEditorUrl());
   }
 
   ngOnDestroy(): void {

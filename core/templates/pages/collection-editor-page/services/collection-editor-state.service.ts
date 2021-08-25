@@ -72,13 +72,12 @@ export class CollectionEditorStateService {
    * specified collection ID. See setCollection() for more information on
    * additional behavior of this function.
    */
-  loadCollection(collectionId: string, successCallback: () => void): void {
+  loadCollection(collectionId: string): void {
     this._collectionIsLoading = true;
     this.editableCollectionBackendApiService.fetchCollectionAsync(
       collectionId).then(
       (newCollectionObject) => {
         this._updateCollection(newCollectionObject);
-        successCallback();
       },
       (error) => {
         this.alertsService.addWarning(
@@ -89,10 +88,6 @@ export class CollectionEditorStateService {
       collectionId).then((newBackendCollectionRightsObject) => {
       this._setCollectionRights(newBackendCollectionRightsObject);
       this._collectionIsLoading = false;
-      // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-      // once the controller is migrated to angular.
-      // $rootScope.$applyAsync();
-      successCallback();
     }, (error) => {
       this.alertsService.addWarning(
         error ||

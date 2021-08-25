@@ -17,10 +17,8 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { CollectionNode } from 'domain/collection/collection-node.model';
 import { Collection } from 'domain/collection/collection.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
 import { CollectionLinearizerService } from '../services/collection-linearizer.service';
 
@@ -49,8 +47,3 @@ export class CollectionEditorTabComponent {
     return this.collectionEditorStateService.hasLoadedCollection();
   }
 }
-
-angular.module('oppia').directive('oppiaCollectionEditorTab',
-  downgradeComponent({
-    component: CollectionEditorTabComponent
-  }) as angular.IDirectiveFactory);
