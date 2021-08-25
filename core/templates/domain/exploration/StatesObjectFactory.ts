@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import {
   StateBackendDict,
   StateObjectFactory,
-  State,
+  State
 } from 'domain/state/StateObjectFactory';
 import { AppConstants } from 'app.constants';
 import { Voiceover } from 'domain/exploration/voiceover.model';
