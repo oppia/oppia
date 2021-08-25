@@ -26,7 +26,7 @@ from core.platform import models
 from google.cloud import ndb
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
+    Any, ContextManager, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,6 +36,7 @@ if MYPY: # pragma: no cover
 transaction_services = models.Registry.import_transaction_services()
 
 
+Cursor = ndb.Cursor
 Model = ndb.Model
 Key = ndb.Key
 Property = ndb.Property
@@ -53,12 +54,13 @@ TextProperty = ndb.TextProperty
 
 TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)  # pylint: disable=invalid-name
 
-
 CLIENT = ndb.Client()
 
 
-def get_ndb_context(namespace=None, global_cache=None):
-    # type: (Optional[str], Optional[RedisCache]) -> ndb.context.Context
+def get_ndb_context(
+        namespace: Optional[str] = None,
+        global_cache: Optional[RedisCache] = None
+) -> ContextManager[ndb.context.Context]:
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
@@ -75,8 +77,7 @@ def get_ndb_context(namespace=None, global_cache=None):
     )
 
 
-def get_multi(keys):
-    # type: (List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]
+def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
     """Fetches models corresponding to a sequence of keys.
 
     Args:
@@ -89,8 +90,10 @@ def get_multi(keys):
     return ndb.get_multi(keys)
 
 
-def update_timestamps_multi(entities, update_last_updated_time=True):
-    # type: (Sequence[base_models.BaseModel], bool) -> None
+def update_timestamps_multi(
+        entities: 'Sequence[base_models.BaseModel]',
+        update_last_updated_time: bool = True
+) -> None:
     """Update the created_on and last_updated fields of all given entities.
 
     Args:
@@ -104,8 +107,7 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(entities):
-    # type: (List[TYPE_MODEL_SUBCLASS]) -> List[Text]
+def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[Text]:
     """Stores a sequence of Model instances.
 
     Args:
@@ -118,8 +120,7 @@ def put_multi(entities):
 
 
 @transaction_services.run_in_transaction_wrapper
-def delete_multi_transactional(keys):
-    # type: (List[Key]) -> List[None]
+def delete_multi_transactional(keys: List[Key]) -> List[None]:
     """Deletes models corresponding to a sequence of keys and runs it through
     a transaction. Either all models are deleted, or none of them in the case
     when the transaction fails.
@@ -133,8 +134,7 @@ def delete_multi_transactional(keys):
     return ndb.delete_multi(keys)
 
 
-def delete_multi(keys):
-    # type: (List[Key]) -> List[None]
+def delete_multi(keys: List[Key]) -> List[None]:
     """Deletes models corresponding to a sequence of keys.
 
     Args:
@@ -146,14 +146,12 @@ def delete_multi(keys):
     return ndb.delete_multi(keys)
 
 
-def query_everything(**kwargs):
-    # type: (**Dict[str, Any]) -> ndb.Query
+def query_everything(**kwargs: Dict[str, Any]) -> ndb.Query:
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 
 
-def all_of(*nodes):
-    # type: (*ndb.Node) -> ndb.Node
+def all_of(*nodes: ndb.Node) -> ndb.Node:
     """Returns a query node which performs a boolean AND on their conditions.
 
     Args:
@@ -166,8 +164,7 @@ def all_of(*nodes):
     return ndb.AND(*nodes)
 
 
-def any_of(*nodes):
-    # type: (*ndb.Node) -> ndb.Node
+def any_of(*nodes: ndb.Node) -> ndb.Node:
     """Returns a query node which performs a boolean OR on their conditions.
 
     Args:
@@ -180,8 +177,7 @@ def any_of(*nodes):
     return ndb.OR(*nodes)
 
 
-def make_cursor(urlsafe_cursor=None):
-    # type: (Optional[Text]) -> datastore_query.Cursor
+def make_cursor(urlsafe_cursor: Optional[str] = None) -> Cursor:
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
@@ -201,15 +197,14 @@ def make_cursor(urlsafe_cursor=None):
             result of any query.
 
     Returns:
-        datastore_query.Cursor. A cursor into an arbitrary query.
+        Cursor. A cursor into an arbitrary query.
     """
-    return ndb.Cursor(urlsafe=urlsafe_cursor)
+    return Cursor(urlsafe=urlsafe_cursor)
 
 
 def fetch_multiple_entities_by_ids_and_models(
-        ids_and_models # type: List[Tuple[Text, List[Text]]]
-):
-    # type: (...) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
+        ids_and_models: List[Tuple[Text, List[Text]]]
+) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]:
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
 
@@ -222,15 +217,16 @@ def fetch_multiple_entities_by_ids_and_models(
         to the ids and models. The models corresponding to the same tuple in the
         input are grouped together.
     """
-    entity_keys = [] # type: List[Key]
+    entity_keys: List[Key] = []
     for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
         entity_keys = (
             entity_keys +
             [ndb.Key(model_name, entity_id) for entity_id in entity_ids])
 
-    all_models = ndb.get_multi(entity_keys) # type: List[Optional[TYPE_MODEL_SUBCLASS]]
-    all_models_grouped_by_model_type = [] # type: List[List[Optional[TYPE_MODEL_SUBCLASS]]]
+    all_models: List[Optional[TYPE_MODEL_SUBCLASS]] = ndb.get_multi(entity_keys)
+    all_models_grouped_by_model_type: List[
+        List[Optional[TYPE_MODEL_SUBCLASS]]] = []
 
     start_index = 0
     for (_, entity_ids) in ids_and_models:
