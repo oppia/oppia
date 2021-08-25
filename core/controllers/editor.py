@@ -95,16 +95,19 @@ class ExplorationHandler(EditorHandler):
             if user_settings.last_started_state_translation_tutorial:
                 has_seen_translation_tutorial = True
 
-        exploration_data = exp_services.get_user_exploration_data(
-            self.user_id, exploration_id, apply_draft=apply_draft,
-            version=version)
-        exploration_data['show_state_editor_tutorial_on_load'] = (
-            self.user_id and not has_seen_editor_tutorial)
-        exploration_data['show_state_translation_tutorial_on_load'] = (
-            self.user_id and not has_seen_translation_tutorial)
-        exploration_data['exploration_is_linked_to_story'] = (
-            exp_services.get_story_id_linked_to_exploration(
-                exploration_id) is not None)
+        try:
+            exploration_data = exp_services.get_user_exploration_data(
+                self.user_id, exploration_id, apply_draft=apply_draft,
+                version=version)
+            exploration_data['show_state_editor_tutorial_on_load'] = (
+                self.user_id and not has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not has_seen_translation_tutorial)
+            exploration_data['exploration_is_linked_to_story'] = (
+                exp_services.get_story_id_linked_to_exploration(
+                    exploration_id) is not None)
+        except:
+            raise self.PageNotFoundException
 
         self.values.update(exploration_data)
         self.render_json(self.values)
