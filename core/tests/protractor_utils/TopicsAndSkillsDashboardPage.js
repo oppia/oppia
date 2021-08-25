@@ -245,9 +245,10 @@ var TopicsAndSkillsDashboardPage = function() {
   this.filterSkillsByStatus = async function(status) {
     await action.click(
       'Skill Dashboard status filter', skillStatusFilterDropdown);
-    var dropdownOption = element(
+    var dropdownOption = skillStatusFilterDropdown.element(
       by.cssContainingText('mat-option .mat-option-text', status));
-    await action.click('Skill status filter option', dropdownOption);
+    await action.click(
+      'Skill status filter option : ' + status, dropdownOption);
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
@@ -258,15 +259,15 @@ var TopicsAndSkillsDashboardPage = function() {
       keywordFieldInput);
 
     await action.sendKeys(
-      'Topic Dashboard keyword filter', filterKeywordInput, keyword + '\n');
+      'Topic Dashboard keyword filter : ' + keyword,
+      filterKeywordInput, keyword + '\n');
   };
 
   this.filterTopicsByClassroom = async function(keyword) {
     await action.click(
-      'Topic Dashboard classroom filter taking too long to appear.',
-      topicFilterClassroomField);
+      'Topic Dashboard classroom filter', topicFilterClassroomField);
 
-    var dropdownOption = element(
+    var dropdownOption = topicFilterClassroomField.element(
       by.cssContainingText('mat-option .mat-option-text', keyword));
     await action.click(
       'Topic dashboard classroom filter option', dropdownOption);
