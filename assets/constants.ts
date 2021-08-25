@@ -5980,6 +5980,11 @@ export default {
         }
       ]
     },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About foundation | Oppia",
+      "META": []
+    },
     "CLASSROOM": {
       "ROUTE": "learn/:classroom_url_fragment",
       "TITLE": "Oppia",
