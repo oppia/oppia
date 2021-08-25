@@ -789,6 +789,7 @@ class Exploration(python_utils.OBJECT):
             title: str. The exploration title.
             version: int. The version of the exploration.
             init_state_name: str. The name of the initial state.
+            states: State. The state domain object.
 
         Returns:
             exploration_proto: Exploration. The exploration
@@ -972,6 +973,24 @@ class Exploration(python_utils.OBJECT):
                     self, interaction)
             )
 
+        if(interaction.id == 'ImageClickInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                image_click_input=self.to_image_click_interaction_proto(
+                    self, interaction)
+            )
+
+        if(interaction.id == 'DragAndDropSortInput'):
+            interaction_proto = state_pb2.InteractionInstance(
+                drag_and_drop_sort_input=self.to_drag_and_drop_interaction_proto(
+                    self, interaction)
+            )
+
+        if(interaction.id == 'EndExploration'):
+            interaction_proto = state_pb2.InteractionInstance(
+                end_exploration=self.to_end_exploration_proto(
+                    self, interaction)
+            )
+
         return interaction_proto
 
     def to_continue_proto(self, interaction):
@@ -1008,10 +1027,15 @@ class Exploration(python_utils.OBJECT):
 
         solution_proto = self.to_fraction_solution_proto(self, interaction.solution)
 
+        answer_groups_proto = self.to_fraction_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
         fraction_interaction_proto = state_pb2.FractionInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
-            solution=solution_proto
+            solution=solution_proto,
+            answer_groups=answer_groups_proto
         )
 
         return fraction_interaction_proto
@@ -1037,6 +1061,19 @@ class Exploration(python_utils.OBJECT):
             )
 
         return solution_proto
+
+    def to_fraction_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.FractionInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto
 
     def to_base_solution_proto(self, explanation):
         base_solution_proto = state.BaseSolution(
@@ -1065,13 +1102,31 @@ class Exploration(python_utils.OBJECT):
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
 
+        answer_groups_proto = self.to_item_selection_single_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
         item_selection_single_interaction_proto = state_pb2.ItemSelectionInputInstance(
             customization_args=customization_arg_proto,
             default_outcome=outcome_proto,
-            hints=hints_proto
+            hints=hints_proto,
+            answer_groups=answer_groups_proto
         )
 
         return item_selection_single_interaction_proto
+
+    def to_item_selection_single_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.ItemSelectionInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto
 
     def to_item_selection_single_customization_arg_proto(self, customization_args):
         choices_list_proto = []
@@ -1109,14 +1164,32 @@ class Exploration(python_utils.OBJECT):
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
 
+        answer_groups_proto = self.to_multiple_choice_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
         multiple_choice_interaction_proto = state_pb2.MultipleChoiceInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
-            hints=hints_proto
+            hints=hints_proto,
+            answer_groups=answer_groups_proto
         )
 
         return multiple_choice_interaction_proto
-    
+
+    def to_multiple_choice_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.MultipleChoiceInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto   
+
     def to_multiple_choice_customization_args_proto(self, customization_args):
         choices_list_proto = []
 
@@ -1139,6 +1212,10 @@ class Exploration(python_utils.OBJECT):
 
         solution_proto = self.to_numeric_solution(self, interaction.solution)
 
+        answer_groups_proto = self.to_numeric_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
         numeric_interaction_proto = state_pb2.NumericInputInstance(
             default_outcome=outcome_proto,
             hints=hints_proto,
@@ -1146,6 +1223,19 @@ class Exploration(python_utils.OBJECT):
         )
 
         return numeric_interaction_proto
+
+    def to_numeric_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.NumericInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto
 
     def to_numeric_solution(self, solution):
         solution_proto = None 
@@ -1169,15 +1259,33 @@ class Exploration(python_utils.OBJECT):
 
         solution_proto = self.to_text_input_solution(self, interaction.solution)
 
+        answer_groups_proto = self.to_text_input_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
         text_input_interaction_proto = state_pb2.TextInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             hints=hints_proto,
-            solution=solution_proto
+            solution=solution_proto,
+            answer_groups=answer_groups_proto
         )
 
         return text_input_interaction_proto
-    
+
+    def to_text_input_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.TextInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto
+
     def to_text_input_solution(self, solution):
         solution_proto = None 
         if solution is not None:
@@ -1211,15 +1319,33 @@ class Exploration(python_utils.OBJECT):
 
         solution_proto = self.to_ratio_expression_solution_proto(self, interaction.solution)
 
+        answer_groups_proto = self.to_ratio_expression_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
         ratio_expression_interaction_proto = state_pb2.RatioExpressionInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             solution=solution_proto,
-            hints=hints_proto
+            hints=hints_proto,
+            answer_groups=answer_groups_proto
         )
 
         return ratio_expression_interaction_proto
-        
+    
+    def to_ratio_expression_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.RatioExpressionInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto
+
     def to_ratio_expression_solution_proto(self, solution):
         solution_proto = None 
         if solution is not None:
@@ -1252,55 +1378,232 @@ class Exploration(python_utils.OBJECT):
 
         return customization_arg_proto
 
-    def set_numeric_input_interaction(self, answer_groups, solution):
-        """Set NumericInputInstance of Interaction Message in exploration.proto.
+    def to_image_click_interaction_proto(self, interaction):
+        customization_args_proto = self.to_image_click_customization_args_proto(
+            self, interaction.customization_args)
 
-        Args:
-            answer_groups: list(AnswerGroup). List of answer group items.
-            solution: Solution. Solution instance.
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
 
-        Returns:
-            numeric_input. Proto Instance of NumericInputInstance.
-        """
-        answer_groups_list = []
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        answer_groups_proto = self.to_image_click_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
+        image_click_interaction_proto = state_pb2.ImageClickInputInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto,
+            hints=hints_proto,
+            answer_groups=answer_groups_proto
+        )
+
+        return image_click_interaction_proto
+
+    def to_image_click_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
         for answer_group in answer_groups:
-            answer_group_proto = (
-                exploration_pb2.NumericInputInstance.AnswerGroup(
-                    base_answer_group=exploration_pb2.BaseAnswerGroup(
-                        outcome=exploration_pb2.Outcome(
-                            destination_state=answer_group.outcome.dest,
-                            feedback=exploration_pb2.SubtitledHtml(
-                                content_id=(
-                                    answer_group.outcome.feedback.content_id),
-                                html=answer_group.outcome.feedback.html,
-                            ),
-                            labelled_as_correct=(
-                                answer_group.outcome.labelled_as_correct)
-                        )
-                    )
-                )
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.ImageClickInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
             )
-            answer_groups_list.append(answer_group_proto)
+            answer_group_list_proto.append(answer_group_proto)
 
-        numeric_input = exploration_pb2.NumericInputInstance()
-        numeric_input.answer_groups.extend(answer_groups_list)
+        return answer_group_list_proto
 
-        solution_proto = exploration_pb2.NumericInputInstance.Solution()
+    def to_image_click_customization_args_proto(self, customization_args):
+        image_and_regions_proto = self.to_image_and_regions_proto(
+            self, customization_args['imageAndRegions'])
+
+        customization_arg_proto = state_pb2.ImageClickInputInstance.CustomizationArgs(
+            image_and_regions=image_and_regions_proto
+        )
+
+        return customization_arg_proto
+
+    def to_image_and_regions_proto(self, imageAndRegionsList):
+        image_file_path = imageAndRegionsList.value['imagePath']
+
+        labeled_regions_list_proto = self.to_labeled_region_list_proto(
+            self, imageAndRegionsList.value['labeledRegions'])
+
+        image_with_regions_proto = objects_pb2.ImageWithRegions(
+            image_file_path=image_file_path,
+            labeled_regions=labeled_regions_list_proto
+        )
+
+        return image_with_regions_proto
+
+    def to_labeled_region_list_proto(self, labeledRegionsList):
+        labeled_regions_list_proto = []
+
+        for labeled_regions in labeledRegionsList:            
+            labeled_region_proto = self.to_labeled_region_proto(
+                self, labeled_regions['label'], labeled_regions['region']['area'])
+
+            labeled_regions_list_proto.append(labeled_region_proto)
+        
+        return labeled_regions_list_proto
+
+    def to_labeled_region_proto(self, label, area):
+        normalized_rectangle_2d_proto = self.to_normalized_rectangle_2d_proto(
+            self, area)
+
+        labeled_region_proto = objects_pb2.ImageWithRegions.LabeledRegion(
+            label=label,
+            normalized_rectangle_2d=normalized_rectangle_2d_proto
+        )
+
+        return labeled_region_proto
+
+    def to_normalized_rectangle_2d_proto(self, area):
+        normalized_rectangle_2d_proto = objects_pb2.ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
+            upper_left=self.to_point2d_proto(self, area[0]),
+            lower_right=self.to_point2d_proto(self, area[1]),
+        )
+
+        return normalized_rectangle_2d_proto
+
+    def to_point2d_proto(self, area):
+        points_proto = objects_pb2.Point2d(
+            x=area[0],
+            y=area[1]
+        )
+
+        return points_proto
+
+    def to_end_exploration_proto(self, interaction):
+        end_exploration_proto=state_pb2.EndExplorationInstance()
+
+        return end_exploration_proto
+
+    def to_drag_and_drop_interaction_proto(self, interaction):
+        customization_args_proto = self.to_drag_and_drop_customization_args_proto(
+            self, interaction.customization_args)
+
+        outcome_proto = self.to_outcome_proto(
+            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct 
+        )
+
+        hints_proto = self.to_hints_proto(self, interaction.hints)
+
+        solution_proto = self.to_drag_and_drop_solution_proto(self, interaction.solution)
+
+        answer_groups_proto = self.to_drag_and_drop_answer_groups_proto(
+            self, interaction.answer_groups
+        )
+
+        drag_and_drop_interaction_proto = state_pb2.DragAndDropSortInputInstance(
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto,
+            solution=solution_proto,
+            answer_groups=answer_groups_proto
+        )
+
+        return drag_and_drop_interaction_proto
+
+    def to_drag_and_drop_answer_groups_proto(self, answer_groups):
+        answer_group_list_proto = []
+
+        for answer_group in answer_groups:
+            base_answer_group_proto = self.to_base_answer_group_proto(
+                self, answer_group)
+            answer_group_proto=state_pb2.DragAndDropSortInputInstance.AnswerGroup(
+                base_answer_group=base_answer_group_proto
+            )
+            answer_group_list_proto.append(answer_group_proto)
+
+        return answer_group_list_proto
+
+    def to_drag_and_drop_solution_proto(self, solution):
+        solution_proto = None 
         if solution is not None:
-            solution_proto = exploration_pb2.NumericInputInstance.Solution(
-                base_solution=exploration_pb2.BaseSolution(
-                    explanation=exploration_pb2.SubtitledHtml(
-                        content_id=solution.explanation.content_id,
-                        html=solution.explanation.html,
-                    )
-                ),
-                correct_answer=solution.correct_answer,
+            solution_proto = state_pb.DragAndDropSortInputInstance.Solution(
+                base_solution=self.to_base_solution_proto(self, solution.explanation),
+                correct_answer=self.to_list_of_set_of_translatable_html_content_ids(
+                    self, soltuion.correct_answer)
             )
-            numeric_input.solution = solution_proto
-        else:
-            solution_proto = None
 
-        return numeric_input
+        return solution_proto
+
+    def to_list_of_set_of_translatable_html_content_ids(self, correct_answer):
+        content_id_lists_proto = []
+
+        for set_of_content_id in correct_answer:
+            translatable_html_content_id_proto = self.to_set_of_translatable_html_content_ids(
+                self, set_of_content_id)
+            content_id_lists_proto.append(translatable_html_content_id_proto)
+
+        list_of_set_of_translatable_html_content_ids_proto = objects_pb2.ListOfSetsOfTranslatableHtmlContentIds(
+            content_id_lists=content_id_lists_proto
+        )
+
+        return list_of_set_of_translatable_html_content_ids_proto
+
+    def to_set_of_translatable_html_content_ids_proto(self, set_of_content_id):
+        content_ids_list_proto = []
+
+        for translatable_html_content_id in set_of_content_id:
+            translatable_html_content_id_proto = self.to_translatable_html_content_id_proto(
+                self, translatable_html_content_id)
+            content_id_lists_proto.append(translatable_html_content_id_proto)
+
+        set_of_translatable_html_content_ids_proto = objects_pb2.SetOfTranslatableHtmlContentIds(
+            content_ids=content_id_lists_proto
+        )
+
+        return set_of_translatable_html_content_ids_proto
+
+    def to_translatable_html_content_id_proto(self, translatable_html_content_id):
+        translatable_html_content_id_proto = objects_pb2.TranslatableHtmlContentId(
+            content_id=translatable_html_content_id
+        )
+
+        return translatable_html_content_id_proto
+
+    def to_drag_and_drop_customization_args_proto(self, customization_args):
+        choices_list_proto = []
+
+        for value in customization_args['choices'].value:
+            value_proto=self.to_subtitled_html_proto(self, value)
+            choices_list_proto.append(value_proto)
+        
+        customization_arg_proto = state_pb2.DragAndDropSortInputInstance.CustomizationArgs(
+            choices=choices_list_proto,
+            allowMultipleItemsInSamePosition=customization_args['allowMultipleItemsInSamePosition'].value
+        )
+
+        return customization_arg_proto
+
+    def to_base_answer_group_proto(self, answer_group):
+        outcome_proto = self.to_outcome_proto(
+            self, answer_group.outcome.dest, answer_group.outcome.feedback,
+            answer_group.outcome.labelled_as_correct)
+
+        minsconception_proto = None
+        if answer_group.tagged_skill_misconception_id is not None:
+            minsconception_proto = self.to_misconception_proto(
+                self, answer_group.tagged_skill_misconception_id
+            )
+
+        base_answer_proto = state_pb2.BaseAnswerGroup(
+            outcome=outcome_proto,
+            tagged_skill_misconception=minsconception_proto
+        )
+
+        return base_answer_proto
+
+    def to_misconception_proto(self, skill_id, misconception_id):
+        misconception_proto = state_pb2.Misconception(
+            skill_id=skill_id,
+            misconception_id=misconception_id
+        )
+
+        return misconception_proto
 
     @classmethod
     def _validate_state_name(cls, name):
