@@ -18,30 +18,30 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
+import { ExplorationChange, ExplorationDraft, ExplorationDraftDict } from 'domain/exploration/exploration-draft.model';
 import { LocalStorageService } from 'services/local-storage.service';
 
 describe('LocalStorageService', () => {
   describe('behavior in editor', () => {
-    let localStorageService = null;
+    let localStorageService: LocalStorageService;
     const explorationIdOne = '100';
     const draftChangeListIdOne = 2;
-    const changeList = [];
+    const changeList: ExplorationChange[] = [];
     const explorationIdTwo = '101';
     const draftChangeListIdTwo = 1;
-    const draftDictOne = {
+    const draftDictOne: ExplorationDraftDict = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdOne
     };
-    const draftDictTwo = {
+    const draftDictTwo: ExplorationDraftDict = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdTwo
     };
-    let draftOne = null;
-    let draftTwo = null;
+    let draftOne: ExplorationDraft;
+    let draftTwo: ExplorationDraft;
 
     beforeEach(() => {
-      localStorageService = TestBed.get(LocalStorageService);
+      localStorageService = TestBed.inject(LocalStorageService);
 
       draftOne = ExplorationDraft.createFromLocalStorageDict(draftDictOne);
       draftTwo = ExplorationDraft.createFromLocalStorageDict(draftDictTwo);

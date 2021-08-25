@@ -191,14 +191,14 @@ describe('Exploration Summary Tile Component', () => {
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlService = TestBed.inject(UrlService);
 
-    component.getCollectionId = '1';
-    component.getExplorationId = '1';
-    component.getExplorationTitle = 'Title';
-    component.getStoryNodeId = '1';
-    component.getNumViews = '100';
-    component.getObjective = 'objective';
-    component.getCategory = 'category';
-    component.getContributorsSummary = {
+    component.collectionId = '1';
+    component.explorationId = '1';
+    component.explorationTitle = 'Title';
+    component.storyNodeId = '1';
+    component.numViews = '100';
+    component.objective = 'objective';
+    component.category = 'category';
+    component.contributorsSummary = {
       username1: {
         num_commits: 1,
       },
@@ -206,13 +206,13 @@ describe('Exploration Summary Tile Component', () => {
         num_commits: 2,
       }
     };
-    component.getThumbnailIconUrl = '/subjects/Welcome';
-    component.getThumbnailBgColor = 'blue';
+    component.thumbnailIconUrl = '/subjects/Welcome';
+    component.thumbnailBgColor = 'blue';
     component.openInNewWindow = 'true';
     component.isCommunityOwned = true;
     component.isCollectionPreviewTile = true;
     component.isPlaylistTile = true;
-    component.getParentExplorationIds = '123';
+    component.parentExplorationIds = '123';
     component.showLearnerDashboardIconsIfPossible = 'true';
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
@@ -310,7 +310,7 @@ describe('Exploration Summary Tile Component', () => {
   }));
 
   it('should get the average ratings of the exploration', fakeAsync(() => {
-    component.getRatings = {
+    component.ratings = {
       1: 1,
       2: 0,
       3: 0,
@@ -348,7 +348,7 @@ describe('Exploration Summary Tile Component', () => {
       dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
       .and.returnValue('1:30 am');
 
-    component.getLastUpdatedMsec = 1000;
+    component.lastUpdatedMsec = 1000;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
@@ -368,16 +368,15 @@ describe('Exploration Summary Tile Component', () => {
       urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('thumbnailUrl');
 
-    component.getThumbnailIconUrl = 'thumbnailUrl';
+    component.thumbnailIconUrl = 'thumbnailUrl';
     component.getCompleteThumbnailIconUrl();
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
   });
 
-  it('should return to the same page if ExplorationId is undefined' +
-     ' not present', () => {
-    component.getExplorationId = '';
+  it('should return to the same page if ExplorationId is empty', () => {
+    component.explorationId = '';
     const result = component.getExplorationLink();
     fixture.detectChanges();
 
@@ -434,7 +433,7 @@ describe('Exploration Summary Tile Component', () => {
       '/story/fhfhvhgvhvvh');
     const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
 
-    component.getStoryNodeId = '';
+    component.storyNodeId = '';
     const result = component.getExplorationLink();
 
     tick();

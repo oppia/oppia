@@ -251,9 +251,10 @@ class BaseHandler(webapp2.RequestHandler):
             Exception. The CSRF token is missing.
             UnauthorizedUserException. The CSRF token is invalid.
         """
+        request_split = python_utils.url_split(self.request.uri)
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
-        if self.request.uri.startswith('https://oppiaserver.appspot.com'):
+        if request_split.netloc == 'oppiaserver.appspot.com':
             self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
@@ -267,7 +268,7 @@ class BaseHandler(webapp2.RequestHandler):
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
-        if self.partially_logged_in:
+        if self.partially_logged_in and request_split.path != '/logout':
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
@@ -303,7 +304,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_validation_succeeded = True
         try:
-            self.vaidate_and_normalize_args()
+            self.validate_and_normalize_args()
         except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
@@ -318,7 +319,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         super(BaseHandler, self).dispatch()
 
-    def vaidate_and_normalize_args(self):
+    def validate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
 
         Raises:
@@ -397,9 +398,11 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
+        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
             payload_validator.validate(
-                handler_args, schema_for_request_method, extra_args_are_allowed)
+                handler_args, schema_for_request_method, extra_args_are_allowed,
+                allow_string_to_bool_conversion)
         )
 
         self.normalized_payload = {
