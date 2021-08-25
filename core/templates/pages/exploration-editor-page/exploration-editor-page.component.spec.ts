@@ -56,6 +56,7 @@ import { AutosaveInfoModalsService } from './services/autosave-info-modals.servi
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -65,7 +66,7 @@ require(
 class MockNgbModalRef {
   componentInstance = {};
 }
- 
+
 describe('Exploration editor page component', function() {
   importAllAngularServices();
 
@@ -204,7 +205,8 @@ describe('Exploration editor page component', function() {
         NgbModule
       ],
       declarations: [
-        LostChangesModalComponent
+        LostChangesModalComponent,
+        WelcomeModalComponent
       ],
       providers: [
         AlertsService,
@@ -243,7 +245,7 @@ describe('Exploration editor page component', function() {
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [LostChangesModalComponent]
+        entryComponents: [LostChangesModalComponent, WelcomeModalComponent]
       }
     });
 
