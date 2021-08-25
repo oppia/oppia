@@ -101,39 +101,43 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
     """
 
     @staticmethod
-    def _create_user_stats_model(user_settings_model):
+    def _create_user_stats_model(
+            user_settings_model: datastore_services.Model
+    ) -> user_models.UserStatsModel:
         """Creates empty user stats model with id.
 
         Args:
             user_settings_model: UserSettingsModel. Model from which to
                 create the user stats model.
 
-        Yields:
+        Returns:
             UserStatsModel. The created user stats model.
         """
         user_stats_model = user_models.UserStatsModel(id=user_settings_model.id)
         user_stats_model.update_timestamps()
-        yield user_stats_model
+        return user_stats_model
 
     @staticmethod
-    def _update_weekly_creator_stats(user_stats_models):
+    def _update_weekly_creator_stats(
+            user_stats_models: List[datastore_services.Model]
+    ) -> user_models.UserStatsModel:
         """Updates weekly dashboard stats with the current values.
 
         Args:
             user_stats_models: UserStatsModel. Model for which to update
                 the weekly dashboard stats.
 
-        Yields:
+        Returns:
             UserStatsModel. The updated user stats model.
         """
-        model = job_utils.clone_model(user_stats_models)
+        model = job_utils.clone_model(user_stats_models) # type: ignore[no-untyped-call]
         schema_version = model.schema_version
 
         if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
-            user_services.migrate_dashboard_stats_to_latest_schema(model)
+            user_services.migrate_dashboard_stats_to_latest_schema(model) # type: ignore[no-untyped-call]
 
         weekly_creator_stats = {
-            user_services.get_current_date_as_string(): {
+            user_services.get_current_date_as_string(): { # type: ignore[no-untyped-call]
                 'num_ratings': model.num_ratings or 0,
                 'average_ratings': model.average_ratings,
                 'total_plays': model.total_plays or 0
@@ -141,19 +145,19 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
         }
         model.weekly_creator_stats_list.append(weekly_creator_stats)
         model.update_timestamps()
-        yield model
+        return model
 
-    def run(self):
+    def run(self) -> beam.PCollection:
         user_settings_models = (
             self.pipeline
             | 'Get all UserSettingsModels' >> (
-                ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
+                ndb_io.GetModels(user_models.UserSettingsModel.get_all())) # type: ignore[no-untyped-call]
         )
 
         old_user_stats_models = (
             self.pipeline
             | 'Get all UserStatsModels' >> (
-                ndb_io.GetModels(user_models.UserStatsModel.get_all()))
+                ndb_io.GetModels(user_models.UserStatsModel.get_all())) # type: ignore[no-untyped-call]
         )
 
         # Creates UserStatsModels if it does not exists.

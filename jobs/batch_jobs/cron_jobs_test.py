@@ -242,26 +242,28 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
 
-    def setUp(self):
-        super().setUp()
+    def setUp(self) -> None:
+        super().setUp() # type: ignore[no-untyped-call]
         self.formated_datetime = datetime.datetime.utcnow().strftime(
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
 
-    def test_updates_existing_stats_model_when_no_values_are_provided(self):
-        user_settings_model = self.create_model(
+    def test_updates_existing_stats_model_when_no_values_are_provided(
+            self
+    ) -> None:
+        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID_1, email='a@a.com')
-        user_stats_model = self.create_model(
+        user_stats_model = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserStatsModel,
             id=self.VALID_USER_ID_1,
         )
 
-        self.put_multi([user_settings_model, user_stats_model])
+        self.put_multi([user_settings_model, user_stats_model]) # type: ignore[no-untyped-call]
 
-        self.assert_job_output_is([
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
             job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
         ])
 
@@ -278,11 +280,13 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
             }]
         )
 
-    def test_updates_existing_stats_model_when_values_are_provided(self):
-        user_settings_model = self.create_model(
+    def test_updates_existing_stats_model_when_values_are_provided(
+            self
+    ) -> None:
+        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID_1, email='a@a.com')
-        user_stats_model = self.create_model(
+        user_stats_model = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserStatsModel,
             id=self.VALID_USER_ID_1,
             num_ratings=10,
@@ -290,9 +294,9 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
             total_plays=22,
         )
 
-        self.put_multi([user_settings_model, user_stats_model])
+        self.put_multi([user_settings_model, user_stats_model]) # type: ignore[no-untyped-call]
 
-        self.assert_job_output_is([
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
             job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
         ])
 
@@ -309,14 +313,14 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
             }]
         )
 
-    def test_creates_new_stats_model_if_not_existing(self):
-        user_settings_model = self.create_model(
+    def test_creates_new_stats_model_if_not_existing(self) -> None:
+        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID_1, email='a@a.com')
         user_settings_model.update_timestamps()
         user_settings_model.put()
 
-        self.assert_job_output_is([
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
             job_run_result.JobRunResult(stdout='SUCCESS NEW 1')
         ])
 
@@ -333,21 +337,21 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
             }]
         )
 
-    def test_handles_multiple_models(self):
-        user_settings_model_1 = self.create_model(
+    def test_handles_multiple_models(self) -> None:
+        user_settings_model_1 = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID_1, email='a@a.com')
-        user_settings_model_2 = self.create_model(
+        user_settings_model_2 = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID_2, email='b@b.com')
-        user_stats_model_1 = self.create_model(
+        user_stats_model_1 = self.create_model( # type: ignore[no-untyped-call]
             user_models.UserStatsModel,
             id=self.VALID_USER_ID_1)
 
-        self.put_multi([
+        self.put_multi([ # type: ignore[no-untyped-call]
             user_settings_model_1, user_settings_model_2, user_stats_model_1])
 
-        self.assert_job_output_is([
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
             job_run_result.JobRunResult(stdout='SUCCESS OLD 1'),
             job_run_result.JobRunResult(stdout='SUCCESS NEW 1')
         ])
