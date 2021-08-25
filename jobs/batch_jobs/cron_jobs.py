@@ -20,6 +20,8 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+import os
+
 from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
@@ -103,7 +105,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
     @staticmethod
     def _create_user_stats_model(
             user_settings_model: user_models.UserSettingsModel
-    ) -> user_models.UserStatsModel:
+    ) -> List[user_models.UserStatsModel]:
         """Creates empty user stats model with id.
 
         Args:
@@ -113,14 +115,15 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
         Returns:
             UserStatsModel. The created user stats model.
         """
-        user_stats_model = user_models.UserStatsModel(id=user_settings_model.id)
+        with datastore_services.get_ndb_context():
+            user_stats_model = user_models.UserStatsModel(id=user_settings_model.id)
         user_stats_model.update_timestamps()
-        return user_stats_model
+        return [user_stats_model]
 
     @staticmethod
     def _update_weekly_creator_stats(
             user_stats_models: user_models.UserStatsModel
-    ) -> user_models.UserStatsModel:
+    ) -> List[user_models.UserStatsModel]:
         """Updates weekly dashboard stats with the current values.
 
         Args:
@@ -148,7 +151,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
         }
         model.weekly_creator_stats_list.append(weekly_creator_stats)
         model.update_timestamps()
-        return model
+        return [model]
 
     def run(self) -> beam.PCollection:
         user_settings_models = (
@@ -170,21 +173,19 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             # Returns a PCollection of
             # (model.id, (user_settings_models, user_stats_models)) or
             # (model.id, (user_settings_models,)).
-            | beam.GroupBy(lambda m: m.id)
+            | 'Group models with same ID' >> beam.GroupBy(lambda m: m.id)
             # Discards model.id from the PCollection.
-            | beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get rid of key' >> beam.Values() # pylint: disable=no-value-for-parameter
             # Only keep groupings that indicate that
             # the UserStatsModel is missing.
-            | beam.Filter(
-                lambda models: (
-                    len(models) == 1 and
-                    job_utils.get_model_kind(models[0]) == 'UserSettingsModel'
-                )
-            )
+            | 'Filter pairs of models' >> beam.Filter(
+                lambda models: len(list(models)) == 1)
             # Choosing the first element.
-            | beam.Map(lambda model_list: model_list[0])
+            | 'Transform tuples into models' >> beam.Map(
+                lambda models: list(models)[0])
             # Creates the missing UserStatsModels.
-            | beam.ParDo(self._create_user_stats_model)
+            | 'Create new user stat models' >> beam.ParDo(
+                self._create_user_stats_model)
         )
 
         unused_put_result = (
