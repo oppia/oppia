@@ -19,7 +19,7 @@
 import { Subscription } from 'rxjs';
 
 require(
-  'pages/collection-editor-page/editor-tab/collection-editor-tab.directive.ts');
+  'pages/collection-editor-page/editor-tab/collection-editor-tab.component.ts');
 
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');

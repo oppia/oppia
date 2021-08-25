@@ -50,7 +50,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-editor-navbar-breadcrumb.component.ts',
     'collection-editor-navbar.component.ts',
     'collection-editor-page.directive.ts',
-    'collection-editor-tab.directive.ts',
+    'collection-editor-tab.component.ts',
     'collection-footer.component.ts',
     'collection-navbar.component.ts',
     'collection-node-creator.component.ts',

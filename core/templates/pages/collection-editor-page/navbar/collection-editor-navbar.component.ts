@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionRights } from 'domain/collection/collection-rights.model';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
@@ -29,6 +29,7 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import { CollectionEditorSaveModalComponent } from '../templates/collection-editor-save-modal.component';
 
 @Component({
   selector: 'collection-editor-navbar',
@@ -127,25 +128,21 @@ export class CollectionEditorNavbarComponent {
   }
 
   saveChanges(): void {
-    let isPrivate = this.collectionRights.isPrivate();
-    // $uibModal.open({
-    //   templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-    //     '/pages/collection-editor-page/templates/' +
-    //     'collection-editor-save-modal.directive.html'),
-    //   backdrop: 'static',
-    //   resolve: {
-    //     isPrivate: () => isPrivate
-    //   },
-    //   controller: 'CollectionEditorSaveModalController'
-    // }).result.then(function(commitMessage) {
-    //   CollectionEditorStateService.saveCollection(commitMessage, () => {
-    //     $rootScope.$applyAsync();
-    //   });
-    // }, function() {
-    //   // Note to developers:
-    //   // This callback is triggered when the Cancel button is clicked.
-    //   // No further action is needed.
-    // });
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      CollectionEditorSaveModalComponent, {
+        backdrop: 'static'
+      });
+
+    modalRef.componentInstance.isCollectionPrivate = (
+      this.collectionRights.isPrivate());
+
+    modalRef.result.then((commitMessage: string) => {
+      this.collectionEditorStateService.saveCollection(commitMessage);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   publishCollection(): void {

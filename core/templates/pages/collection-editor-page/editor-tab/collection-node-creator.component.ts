@@ -24,8 +24,8 @@ import { Collection } from 'domain/collection/collection.model';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { from, Observable, OperatorFunction } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { Observable, OperatorFunction } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { AlertsService } from 'services/alerts.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -33,7 +33,7 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 import { CollectionLinearizerService } from '../services/collection-linearizer.service';
 
 @Component({
-  selector: 'collection-node-creator',
+  selector: 'oppia-collection-node-creator',
   templateUrl: './collection-node-creator.component.html'
 })
 export class CollectionNodeCreatorComponent {
@@ -67,7 +67,7 @@ export class CollectionNodeCreatorComponent {
    */
   fetchTypeaheadResults(
       searchQuery: string
-  ): Promise<void | string[]> {
+  ): Promise<string[]> {
     const that = this;
     if (this.isValidSearchQuery(searchQuery)) {
       this.searchQueryHasError = false;
@@ -85,6 +85,7 @@ export class CollectionNodeCreatorComponent {
         this.alertsService.addWarning(
           'There was an error when searching for matching ' +
           'explorations.');
+        return [];
       });
     } else {
       this.searchQueryHasError = true;
@@ -135,6 +136,7 @@ export class CollectionNodeCreatorComponent {
             summaries[0].id === newExplorationId) {
           summaryBackendObject = summaries[0];
         }
+
         if (summaryBackendObject) {
           this.collectionLinearizerService.appendCollectionNode(
             this.collection, newExplorationId, summaryBackendObject);
@@ -199,165 +201,7 @@ export class CollectionNodeCreatorComponent {
   }
 }
 
-angular.module('oppia').directive('collectionNodeCreator',
+angular.module('oppia').directive('oppiaCollectionNodeCreator',
   downgradeComponent({
     component: CollectionNodeCreatorComponent
   }) as angular.IDirectiveFactory);
-
-//   'UrlInterpolationService', function(UrlInterpolationService) {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       bindToController: {},
-//       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//         '/pages/collection-editor-page/editor-tab/' +
-//         'collection-node-creator.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: [
-//         '$filter', '$http', '$rootScope', 'AlertsService',
-//         'CollectionEditorStateService', 'CollectionLinearizerService',
-//         'ExplorationSummaryBackendApiService',
-//         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
-//         'ValidatorsService', 'INVALID_NAME_CHARS',
-//         function(
-//             $filter, $http, $rootScope, AlertsService,
-//             CollectionEditorStateService, CollectionLinearizerService,
-//             ExplorationSummaryBackendApiService,
-//             SearchExplorationsBackendApiService, SiteAnalyticsService,
-//             ValidatorsService, INVALID_NAME_CHARS) {
-//           var ctrl = this;
-//           /**
-//            * Fetches a list of exploration metadata dicts from backend, given
-//            * a search query. It then extracts the title and id of the
-//            * exploration to prepare typeahead options.
-//            */
-//           ctrl.fetchTypeaheadResults = function(searchQuery) {
-//             if (isValidSearchQuery(searchQuery)) {
-//               ctrl.searchQueryHasError = false;
-//               return SearchExplorationsBackendApiService.fetchExplorationsAsync(
-//                 searchQuery
-//               ).then(function(explorationMetadataList) {
-//                 var options = [];
-//                 explorationMetadataList.map(function(item) {
-//                   if (!ctrl.collection.containsCollectionNode(item.id)) {
-//                     options.push(item.title + ' (' + item.id + ')');
-//                   }
-//                 });
-//                 return options;
-//               }, function() {
-//                 AlertsService.addWarning(
-//                   'There was an error when searching for matching ' +
-//                   'explorations.');
-//               });
-//             } else {
-//               ctrl.searchQueryHasError = true;
-//             }
-//           };
-
-//           var isValidSearchQuery = function(searchQuery) {
-//             // Allow underscores because they are allowed in exploration IDs.
-//             var INVALID_SEARCH_CHARS = (
-//               INVALID_NAME_CHARS.filter(function(item) {
-//                 return item !== '_';
-//               }));
-//             for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
-//               if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
-//                 return false;
-//               }
-//             }
-//             return true;
-//           };
-
-//           var addExplorationToCollection = function(newExplorationId) {
-//             if (!newExplorationId) {
-//               AlertsService.addWarning('Cannot add an empty exploration ID.');
-//               return;
-//             }
-//             if (ctrl.collection.containsCollectionNode(newExplorationId)) {
-//               AlertsService.addWarning(
-//                 'There is already an exploration in this collection ' +
-//                 'with that id.');
-//               return;
-//             }
-
-//             ExplorationSummaryBackendApiService
-//               .loadPublicAndPrivateExplorationSummariesAsync([newExplorationId])
-//               .then(function(responseObject) {
-//                 var summaries = responseObject.summaries;
-//                 var summaryBackendObject = null;
-//                 if (summaries.length !== 0 &&
-//                     summaries[0].id === newExplorationId) {
-//                   summaryBackendObject = summaries[0];
-//                 }
-//                 if (summaryBackendObject) {
-//                   CollectionLinearizerService.appendCollectionNode(
-//                     ctrl.collection, newExplorationId, summaryBackendObject);
-//                 } else {
-//                   AlertsService.addWarning(
-//                     'That exploration does not exist or you do not have edit ' +
-//                     'access to it.');
-//                 }
-//                 $rootScope.$applyAsync();
-//               }, function() {
-//                 AlertsService.addWarning(
-//                   'There was an error while adding an exploration to the ' +
-//                   'collection.');
-//               });
-//           };
-
-//           var convertTypeaheadToExplorationId = function(typeaheadOption) {
-//             var matchResults = typeaheadOption.match(/\((.*?)\)$/);
-//             if (matchResults === null) {
-//               return typeaheadOption;
-//             }
-//             return matchResults[1];
-//           };
-
-//           // Creates a new exploration, then adds it to the collection.
-//           ctrl.createNewExploration = function() {
-//             var title = $filter('normalizeWhitespace')(
-//               ctrl.newExplorationTitle);
-
-//             if (!ValidatorsService.isValidExplorationTitle(title, true)) {
-//               return;
-//             }
-
-//             // Create a new exploration with the given title.
-//             $http.post('/contributehandler/create_new', {
-//               title: title
-//             }).then(function(response) {
-//               ctrl.newExplorationTitle = '';
-//               var newExplorationId = response.data.exploration_id;
-
-//               SiteAnalyticsService
-//                 .registerCreateNewExplorationInCollectionEvent(
-//                   newExplorationId);
-//               addExplorationToCollection(newExplorationId);
-//             });
-//           };
-
-//           // Checks whether the user has left a '#' at the end of their ID
-//           // by accident (which can happen if it's being copy/pasted from the
-//           // editor page.
-//           ctrl.isMalformedId = function(typedExplorationId) {
-//             return (
-//               typedExplorationId &&
-//               typedExplorationId.lastIndexOf('#') ===
-//               typedExplorationId.length - 1);
-//           };
-
-//           ctrl.addExploration = function() {
-//             addExplorationToCollection(convertTypeaheadToExplorationId(
-//               ctrl.newExplorationId));
-//             ctrl.newExplorationId = '';
-//           };
-//           ctrl.$onInit = function() {
-//             ctrl.collection = CollectionEditorStateService.getCollection();
-//             ctrl.newExplorationId = '';
-//             ctrl.newExplorationTitle = '';
-//             ctrl.searchQueryHasError = false;
-//           };
-//         }
-//       ]
-//     };
-//   }]);

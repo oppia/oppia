@@ -40,6 +40,8 @@ import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navb
 import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
+import { CollectionEditorTabComponent } from './editor-tab/collection-editor-tab.component';
+import { CollectionEditorSaveModalComponent } from './templates/collection-editor-save-modal.component';
 
 @NgModule({
   imports: [
@@ -53,6 +55,8 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     CollectionNodeCreatorComponent,
     CollectionEditorNavbarBreadcrumbComponent,
     CollectionEditorNavbarComponent,
+    CollectionEditorSaveModalComponent,
+    CollectionEditorTabComponent,
     CollectionDetailsEditorComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
@@ -64,6 +68,8 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     CollectionNodeCreatorComponent,
     CollectionEditorNavbarBreadcrumbComponent,
     CollectionEditorNavbarComponent,
+    CollectionEditorSaveModalComponent,
+    CollectionEditorTabComponent,
     CollectionDetailsEditorComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,

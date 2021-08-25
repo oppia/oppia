@@ -173,7 +173,7 @@ export class CollectionEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setCollection(), when it succeeds.
    */
-  saveCollection(commitMessage: string, successCallback: () => void): boolean {
+  saveCollection(commitMessage: string): boolean {
     if (!this._collectionIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a collection before one is loaded.');
@@ -191,9 +191,6 @@ export class CollectionEditorStateService {
         this._updateCollection(collectionObject);
         this.undoRedoService.clearChanges();
         this._collectionIsBeingSaved = false;
-        if (successCallback) {
-          successCallback();
-        }
       }, (error) => {
         this.alertsService.addWarning(
           error || 'There was an error when saving the collection.');

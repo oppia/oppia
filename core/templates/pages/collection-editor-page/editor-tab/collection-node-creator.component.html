@@ -13,7 +13,7 @@
   </button>
 </form>
 or
-<form class="form-inline oppia-add-existing-exploration-form"
+<form class="form-inline oppia-add-existing-exploration-form oppia-typeahead-form"
       [ngClass]="{'has-error': searchQueryHasError}"
       (submit)="addExploration()">
   <input class="form-control protractor-test-add-exploration-input"
@@ -23,8 +23,6 @@ or
          type="text"
          placeholder="Enter exploration id to be added, or search explorations by name"
          [ngbTypeahead]="searchTypeheadResults.bind(this)">
-         <!-- uib-typeahead="exploration for exploration in fetchTypeaheadResults($viewValue)"> -->
-         <!-- [(ngModel)]-options="{ debounce: 300 }"> -->
   <button class="btn btn-success protractor-test-add-exploration-button" type="submit" [disabled]="!newExplorationId">Add Existing Exploration</button>
   <span class="form-text oppia-form-text" *ngIf="isMalformedId(newExplorationId)">
     <em>The trailing '#' is not part of the ID.</em>

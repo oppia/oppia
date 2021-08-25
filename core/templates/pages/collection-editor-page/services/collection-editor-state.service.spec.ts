@@ -243,7 +243,7 @@ describe('Collection editor state service', () => {
       collectionEditorStateService.setCollection(sampleCollection);
 
       let savedChanges = collectionEditorStateService.saveCollection(
-        'commit message', saveCollectionsuccessCb);
+        'commit message');
 
       expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
       expect(savedChanges).toBe(false);
@@ -267,7 +267,7 @@ describe('Collection editor state service', () => {
     collectionEditorStateService.setCollection(sampleCollection);
 
     let savedChanges = collectionEditorStateService.saveCollection(
-      'commit message', saveCollectionsuccessCb);
+      'commit message');
     tick();
 
     expect(saveCollectionsuccessCb).toHaveBeenCalled();
@@ -292,7 +292,7 @@ describe('Collection editor state service', () => {
     collectionEditorStateService.setCollection(sampleCollection);
 
     collectionEditorStateService.saveCollection(
-      'commit message', saveCollectionsuccessCb);
+      'commit message');
     tick();
 
     expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
@@ -302,10 +302,9 @@ describe('Collection editor state service', () => {
 
   it('should fail to save the collection without first loading one',
     () => {
-      const saveCollectionsuccessCb = jasmine.createSpy('success');
       expect(() => {
         collectionEditorStateService.saveCollection(
-          'Commit message', saveCollectionsuccessCb);
+          'Commit message');
       }).toThrowError('Cannot save a collection before one is loaded.');
     }
   );

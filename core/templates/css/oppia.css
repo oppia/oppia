@@ -4731,3 +4731,7 @@ div.oppia-issues-learner-action {
   color: #bdc3c7;
   cursor: default;
 }
+
+.oppia-typeahead-form .dropdown-item.active {
+  color: #212529;
+}
