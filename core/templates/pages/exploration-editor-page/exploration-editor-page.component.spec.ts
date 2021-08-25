@@ -63,13 +63,7 @@ require(
   'state-tutorial-first-time.service.ts');
 
 class MockNgbModalRef {
-  componentInstance = {
-    skillSummaries: null,
-    skillsInSameTopicCount: null,
-    categorizedSkills: null,
-    allowSkillsFromOtherTopics: null,
-    untriagedSkillSummaries: null
-  };
+  componentInstance = {};
 }
  
 describe('Exploration editor page component', function() {
@@ -287,7 +281,9 @@ describe('Exploration editor page component', function() {
     focusManagerService = $injector.get('FocusManagerService');
 
     $scope = $rootScope.$new();
-    ctrl = $componentController('explorationEditorPage');
+    ctrl = $componentController('explorationEditorPage', {
+      NgbModal: ngbModal,
+    });
   }));
 
   afterEach(() => {
