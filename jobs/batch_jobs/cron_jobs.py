@@ -102,7 +102,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
 
     @staticmethod
     def _create_user_stats_model(
-            user_settings_model: datastore_services.Model
+            user_settings_model: user_models.UserSettingsModel
     ) -> user_models.UserStatsModel:
         """Creates empty user stats model with id.
 
@@ -119,7 +119,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
 
     @staticmethod
     def _update_weekly_creator_stats(
-            user_stats_models: List[datastore_services.Model]
+            user_stats_models: user_models.UserStatsModel
     ) -> user_models.UserStatsModel:
         """Updates weekly dashboard stats with the current values.
 
@@ -130,7 +130,10 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
         Returns:
             UserStatsModel. The updated user stats model.
         """
-        model = job_utils.clone_model(user_stats_models) # type: ignore[no-untyped-call]
+        model = cast(
+            user_models.UserStatsModel,
+            job_utils.clone_model(user_stats_models) # type: ignore[no-untyped-call]
+        )
         schema_version = model.schema_version
 
         if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:

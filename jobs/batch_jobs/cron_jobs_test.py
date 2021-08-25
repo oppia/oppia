@@ -325,7 +325,8 @@ class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
         ])
 
         user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
-        self.assertIsNotNone(user_stats_model)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_stats_model is not None
         self.assertEqual(
             user_stats_model.weekly_creator_stats_list,
             [{
