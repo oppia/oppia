@@ -251,9 +251,10 @@ class BaseHandler(webapp2.RequestHandler):
             Exception. The CSRF token is missing.
             UnauthorizedUserException. The CSRF token is invalid.
         """
+        request_split = python_utils.url_split(self.request.uri)
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
-        if self.request.uri.startswith('https://oppiaserver.appspot.com'):
+        if request_split.netloc == 'oppiaserver.appspot.com':
             self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
@@ -267,7 +268,7 @@ class BaseHandler(webapp2.RequestHandler):
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
-        if self.partially_logged_in:
+        if self.partially_logged_in and request_split.path != '/logout':
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
