@@ -21,8 +21,8 @@ or
          [(ngModel)]="newExplorationId"
          [ngModelOptions]="{ standalone: true }"
          type="text"
-         placeholder="Enter exploration id to be added, or search explorations by name">
-         <!-- [ngbTypeahead]="fetchTypeaheadResults"> -->
+         placeholder="Enter exploration id to be added, or search explorations by name"
+         [ngbTypeahead]="searchTypeheadResults.bind(this)">
          <!-- uib-typeahead="exploration for exploration in fetchTypeaheadResults($viewValue)"> -->
          <!-- [(ngModel)]-options="{ debounce: 300 }"> -->
   <button class="btn btn-success protractor-test-add-exploration-button" type="submit" [disabled]="!newExplorationId">Add Existing Exploration</button>

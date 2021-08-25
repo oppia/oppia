@@ -24,8 +24,8 @@ import { Collection } from 'domain/collection/collection.model';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { Observable, of, OperatorFunction } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { from, Observable, OperatorFunction } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { AlertsService } from 'services/alerts.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -68,6 +68,7 @@ export class CollectionNodeCreatorComponent {
   fetchTypeaheadResults(
       searchQuery: string
   ): Promise<void | string[]> {
+    const that = this;
     if (this.isValidSearchQuery(searchQuery)) {
       this.searchQueryHasError = false;
       return this.searchExplorationsBackendApiService.fetchExplorationsAsync(
@@ -75,7 +76,7 @@ export class CollectionNodeCreatorComponent {
       ).then((explorationMetadataList) => {
         let options: string[] = [];
         explorationMetadataList.map(function(item) {
-          if (!this.collection.containsCollectionNode(item.id)) {
+          if (!that.collection.containsCollectionNode(item.id)) {
             options.push(item.title + ' (' + item.id + ')');
           }
         });
@@ -90,10 +91,14 @@ export class CollectionNodeCreatorComponent {
     }
   }
 
-  search(
-      text$: Observable<string>
-  ): OperatorFunction<string, readonly string[]> {
-  }
+  searchTypeheadResults: OperatorFunction<string, readonly string[]>= (
+      searchText$: Observable<string>) => {
+    return searchText$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((text) => this.fetchTypeaheadResults(text))
+    );
+  };
 
   isValidSearchQuery(searchQuery: string): boolean {
     // Allow underscores because they are allowed in exploration IDs.

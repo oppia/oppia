@@ -78,18 +78,6 @@ export class SearchExplorationsBackendApiService {
       this._fetchExplorations(searchQuery, resolve, reject);
     });
   }
-
-  fetchExplorationsAsObservable(
-      searchQuery: string
-  ): Observable<SearchExplorationBackendResponse> {
-    let queryUrl = this.urlInterpolationService.interpolateUrl(
-      LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
-        query: btoa(searchQuery)
-      }
-    );
-    return this.http.get<SearchExplorationBackendResponse>(
-      queryUrl);
-  }
 }
 
 angular.module('oppia').factory(
