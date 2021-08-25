@@ -20,19 +20,34 @@ import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/context.html'
+    },
+    gtag: function() {}
+  };
+}
+
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
-  let ws: WindowRef;
+  let ws: MockWindowRef;
   let gtagSpy: jasmine.Spy;
 
   beforeEach(() => {
+    ws = new MockWindowRef();
+    gtagSpy = spyOn(ws.nativeWindow, 'gtag').and.stub();
+
+    TestBed.configureTestingModule({
+      providers: [
+        SiteAnalyticsService,
+        { provide: WindowRef, useValue: ws },
+      ],
+    });
+
     sas = TestBed.get(SiteAnalyticsService);
-    ws = TestBed.get(WindowRef);
     spyOnProperty(sas, 'CAN_SEND_ANALYTICS_EVENTS', 'get')
       .and.returnValue(true);
-
-    ws.nativeWindow.gtag = function() {};
-    gtagSpy = spyOn(ws.nativeWindow, 'gtag').and.stub();
   });
 
   it('should register start login event', () => {
