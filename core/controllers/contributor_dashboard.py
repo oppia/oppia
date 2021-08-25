@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import json
+import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -150,11 +151,19 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         ]
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
+        logging.error(
+            '#13657: get_skill_opportunities with models: %s, cursor: %s, '
+            'more: %s' % (skill_opportunities, cursor, more))
+        logging.error(
+            '#13657: classroom_topics_with_skills: %s'
+            % (classroom_topics_with_skills))
         id_to_skill_opportunity_dict = {
             opp.id: opp.to_dict() for opp in skill_opportunities}
         opportunities = []
         for topic in classroom_topics_with_skills:
+            logging.error('#13657: topic ID: %s' % (topic.id))
             for skill_id in topic.get_all_skill_ids():
+                logging.error('#13657: topic skill ID: %s' % (skill_id))
                 if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
                     break
                 if skill_id in id_to_skill_opportunity_dict:
