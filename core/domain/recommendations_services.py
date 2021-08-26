@@ -297,12 +297,12 @@ def get_item_similarity(
     returns 0.0 if compared_exp is private.
 
     Args:
-        reference_exp_summary:
-        compared_exp_summary:
-        topic_similarities:
+        reference_exp_summary: ExpSummaryModel.
+        compared_exp_summary: ExpSummaryModel.
+        topic_similarities: dict().
 
     Returns:
-        
+        int. The similarity score.
     """
 
     similarity_score = 0

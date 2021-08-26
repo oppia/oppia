@@ -29,7 +29,7 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import List, cast # isort:skip
+from typing import Dict, List, Union, cast # isort:skip
 
 MYPY = False
 if MYPY:
@@ -39,6 +39,12 @@ if MYPY:
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 platform_search_services = models.Registry.import_search_services()
+
+MAX_RECOMMENDATIONS = 10
+# Note: There is a threshold so that bad recommendations will be
+# discarded even if an exploration has few similar explorations.
+SIMILARITY_SCORE_THRESHOLD = 3.0
+
 
 
 class IndexExplorationsInSearch(base_jobs.JobBase):
@@ -92,8 +98,6 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
 class ComputeExplorationRecommendations(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
-    MAX_BATCH_SIZE = 1000
-
     @staticmethod
     def _compute_similarity(
             reference_exp_summary_model: datastore_services.Model,
@@ -112,25 +116,27 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
             if compared_exp_summary_model.id == reference_exp_summary_model.id:
                 continue
             similarity_score = recommendations_services.get_item_similarity(
-                reference_exp_summary_model.category,
-                reference_exp_summary_model.language_code,
-                reference_exp_summary_model.owner_ids,
-                exp_summary_model.category,
-                exp_summary_model.language_code,
-                exp_summary_model.exploration_model_last_updated,
-                exp_summary_model.owner_ids,
-                exp_summary_model.status
+                reference_exp_summary_model, compared_exp_summary_model
             )
-        try:
-            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
-                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            return [job_run_result.JobRunResult(
-                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
-            )]
-        except platform_search_services.SearchException: # type: ignore[attr-defined]
-            return [job_run_result.JobRunResult(
-                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
-            )]
+            if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
+                yield (
+                    reference_exp_summary_model.id, {
+                        'similarity_score': similarity_score,
+                        'exp_id': compared_exp_summary_model.id
+                    }
+                )
+
+    @staticmethod
+    def _sort_and_slice_similarities(
+            similarities: Dict[str, Union[int, str]]
+    ) -> List[str]:
+        """"""
+        sorted_similarities = sorted(
+            similarities, reverse=True, key=lambda x: x['similarity_score'])
+
+        return [
+            item['exp_id'] for item in sorted_similarities
+        ][:MAX_RECOMMENDATIONS]
 
     def run(self) -> beam.PCollection:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
@@ -148,15 +154,13 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
         )
 
         exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
-        exp_summary_models | beam.ParDo(self._compute_similarity, exp_summary_iter)
 
         return (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
-            | 'Split models into batches' >> beam.transforms.util.BatchElements(
-                max_batch_size=self.MAX_BATCH_SIZE)
-            | 'Index batches of models' >> beam.ParDo(
-                self._index_exploration_summaries)
+            exp_summary_models
+            | 'Compute similarity' >> beam.ParDo(
+                self._compute_similarity, exp_summary_iter)
+            | 'Group similarities per exploration ID' >> beam.GroupByKey()
+            | beam.MapTuple(
+                lambda exp_id, similarities: (exp_id, _sort_and_slice_similarities(similarities)))
+            | 
         )
