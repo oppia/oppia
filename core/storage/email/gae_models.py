@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, List, Optional, cast # isort:skip
+from typing import Dict, List, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

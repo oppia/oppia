@@ -24,7 +24,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Optional, cast # isort:skip
+from typing import Any, Dict, List, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -22,8 +22,7 @@ import datetime
 from core.platform import models
 import feconf
 
-from typing import ( # isort:skip
-    Any, Dict, List, Optional, Tuple, Union, cast)
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

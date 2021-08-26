@@ -31,7 +31,7 @@ from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-from typing import Any, Dict, Optional # isort:skip
+from typing import Any, Dict, Optional
 
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(

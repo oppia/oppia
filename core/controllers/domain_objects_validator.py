@@ -30,7 +30,7 @@ from core.domain import exp_domain
 from core.domain import state_domain
 import python_utils
 
-from typing import Dict, Optional, Union # isort:skip
+from typing import Dict, Optional, Union
 
 
 def validate_exploration_change(obj):

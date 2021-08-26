@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Optional, Tuple, Union # isort:skip
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 # This function recursively uses the schema dictionary and handler_args, and

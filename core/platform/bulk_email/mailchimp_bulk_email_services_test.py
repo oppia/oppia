@@ -24,7 +24,7 @@ import python_utils
 
 from mailchimp3 import mailchimpclient
 
-from typing import Dict # isort:skip
+from typing import Dict
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):

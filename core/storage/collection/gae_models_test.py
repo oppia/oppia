@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Dict, List # isort:skip
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover

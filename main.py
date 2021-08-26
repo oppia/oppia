@@ -76,10 +76,10 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Type, TypeVar  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover

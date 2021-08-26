@@ -37,9 +37,9 @@ from constants import constants
 import feconf
 import python_utils
 
-from typing import ( # isort:skip
-    Any, Callable, Dict, Iterable, Iterator, List, # isort:skip
-    Optional, Tuple, TypeVar, Union) # isort:skip
+from typing import (
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
+    Union)
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')

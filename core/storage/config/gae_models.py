@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List # isort:skip
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover

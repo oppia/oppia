@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import cast, Dict, List, Set, Union  # isort:skip
+from typing import cast, Dict, List, Set, Union
 
 MYPY = False
 if MYPY: # pragma: no cover

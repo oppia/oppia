@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict # isort:skip
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover

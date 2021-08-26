@@ -26,9 +26,8 @@ import feconf
 import python_utils
 import utils
 
-from typing import (  # isort:skip
-    Any, Dict, List, Optional, Sequence, Tuple, Type, Union,
-    TypeVar, cast)
+from typing import (
+    Any, Dict, List, Optional, Sequence, Tuple, Type, Union, TypeVar, cast)
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')
@@ -349,11 +348,8 @@ class BaseModel(datastore_services.Model):
         datastore_services.update_timestamps_multi(
             entities, update_last_updated_time=update_last_updated_time)
 
-    # Untyped decorator in cloud_transaction_services.py makes the function
-    # untyped. This ignore[misc] will be removed when the decorator has been
-    # type annotated.
     @classmethod
-    @transaction_services.run_in_transaction_wrapper # type: ignore[misc]
+    @transaction_services.run_in_transaction_wrapper
     def put_multi_transactional(cls, entities: List[SELF_BASE_MODEL]) -> None:
         """Stores the given datastore_services.Model instances and runs it
         through a transaction. Either all models are stored, or none of them

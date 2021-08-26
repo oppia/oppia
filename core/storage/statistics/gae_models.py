@@ -28,7 +28,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Tuple, cast # isort:skip
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2066,11 +2066,8 @@ class StateAnswersModel(base_models.BaseModel):
         else:
             return None
 
-    # Untyped decorator in cloud_transaction_services.py makes the function
-    # untyped. This ignore[misc] will be removed when the decorator has been
-    # type annotated.
     @classmethod
-    @transaction_services.run_in_transaction_wrapper # type: ignore[misc]
+    @transaction_services.run_in_transaction_wrapper
     def _insert_submitted_answers_unsafe_transactional(
             cls,
             exploration_id: str,

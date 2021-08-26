@@ -23,7 +23,7 @@ from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-from typing import Dict # isort:skip
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover

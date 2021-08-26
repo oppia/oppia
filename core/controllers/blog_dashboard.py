@@ -29,7 +29,7 @@ from core.domain import user_services
 import feconf
 import utils
 
-from typing import Any, Dict, List # isort:skip
+from typing import Any, Dict, List
 
 
 # Here we are using Dict[str, Any] for the return value `summary_dicts` since

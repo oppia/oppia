@@ -26,7 +26,7 @@ import main
 import webapp2
 import webtest
 
-from typing import Any, ContextManager, Dict, cast  # isort:skip
+from typing import Any, ContextManager, Dict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover

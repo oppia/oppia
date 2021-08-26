@@ -25,7 +25,8 @@ from core.platform import models
 
 from google.cloud import ndb
 
-from typing import ContextManager, List, Optional, Tuple, TypeVar # isort:skip
+from typing import (
+    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -90,7 +91,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
 
 
 def update_timestamps_multi(
-        entities: List[TYPE_MODEL_SUBCLASS],
+        entities: 'Sequence[base_models.BaseModel]',
         update_last_updated_time: bool = True
 ) -> None:
     """Update the created_on and last_updated fields of all given entities.
@@ -145,7 +146,9 @@ def delete_multi(keys: List[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-def query_everything(**kwargs):
+# Here Any is used in the type annotation because it mimics the types defined in
+# the stubs for this library.
+def query_everything(**kwargs: Dict[str, Any]) -> ndb.Query:
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 

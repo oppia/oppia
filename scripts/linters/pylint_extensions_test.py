@@ -3640,7 +3640,7 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
     def test_importing_text_from_typing_in_multi_line_raises_error(self):
         node = astroid.extract_node(
             """
-            from typing import ( # isort:skip
+            from typing import (
                 Any, Dict, List, Optional, Sequence, Text, TypeVar)
             """)
         with self.checker_test_object.assertAddsMessages(

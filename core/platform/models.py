@@ -26,7 +26,7 @@ import feconf
 import python_utils
 
 from types import ModuleType # isort:skip # pylint: disable=import-only-modules
-from typing import List, Tuple, Type # isort:skip
+from typing import List, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover

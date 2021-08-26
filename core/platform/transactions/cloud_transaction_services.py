@@ -23,10 +23,13 @@ import functools
 
 from google.cloud import datastore
 
+from typing import Any, Callable
+
 CLIENT = datastore.Client()
 
-
-def run_in_transaction_wrapper(fn):
+# Any is used here because the method `wrapper` is used as a decorator for other
+# functions, and these functions can have almost any types of arguments.
+def run_in_transaction_wrapper(fn: Callable[..., Any]) -> Callable[..., Any]:
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
 
@@ -40,8 +43,10 @@ def run_in_transaction_wrapper(fn):
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
+    # Any is used here because this function is used as a decorator for other
+    # functions, and these functions can have almost any types of arguments.
     @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         """Wrapper for the transaction."""
         with CLIENT.transaction():
             return fn(*args, **kwargs)

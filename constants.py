@@ -25,7 +25,7 @@ import re
 
 import python_utils
 
-from typing import Any, Dict, TextIO # isort:skip
+from typing import Any, Dict, TextIO
 
 
 # Here we use Dict[str, Any] as return type because we need to parse and return

@@ -37,7 +37,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Callable, cast, Dict, List, Optional # isort:skip
+from typing import Any, Callable, cast, Dict, List, Optional
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
