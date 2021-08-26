@@ -37,6 +37,21 @@ import { SubtitledUnicode } from
 import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
 import { UtilsService } from 'services/utils.service';
 
+export interface MinMaxValue {
+  'max_value'?: number;
+  id: string;
+  'min_value'?: number;
+}
+
+export type RequireOnlyOne<T, Keys extends keyof T> =
+  Pick<T, Exclude<keyof T, Keys>>
+   & { [K in Keys]-?:
+       Required<Pick<T, K>>
+       & Partial<Record<Exclude<Keys, K>, undefined>>
+     }[Keys];
+
+export type Validators = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
+
 interface Warning {
   type: string,
   message: string
@@ -46,7 +61,10 @@ interface Warning {
   providedIn: 'root'
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(
+    private bivs: baseInteractionValidationService
+  ) {}
+
   getCustomizationArgsWarnings(
       customizationArgs: TextInputCustomizationArgs): Warning[] {
     let warningsList = [];
@@ -76,18 +94,16 @@ export class TextInputValidationService {
       let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
       let customizationArgSpecs = textSpecs.customization_arg_specs;
       let rowsSpecs = customizationArgSpecs[1];
-      let validators = rowsSpecs.schema.validators;
-      if (validators && validators.length === 2) {
-        let minRows = validators[0].min_value;
-        let maxRows = validators[1].max_value;
-        if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {
-          warningsList.push({
-            type: AppConstants.WARNING_TYPES.ERROR,
-            message: (
-              'Number of rows must be between ' + minRows + ' and ' +
+      let validators = rowsSpecs.schema.validators as Validators[];
+      let minRows = validators[0].min_value;
+      let maxRows = validators[1].max_value;
+      if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Number of rows must be between ' + minRows + ' and ' +
               maxRows + '.')
-          });
-        }
+        });
       }
     } else {
       warningsList.push({
