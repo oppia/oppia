@@ -1618,9 +1618,10 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         correctly_translated_content_ids = []
         for content_id, translations in self.translations_mapping.items():
-            if language_code in translations and (
-                    not translations[language_code].needs_update and
-                    translations[language_code].translation != ''):
+            if (
+                language_code in translations and
+                not translations[language_code].needs_update
+            ):
                 correctly_translated_content_ids.append(content_id)
 
         return correctly_translated_content_ids

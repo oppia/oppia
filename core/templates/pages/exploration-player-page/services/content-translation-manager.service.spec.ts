@@ -201,7 +201,7 @@ describe('Content translation manager service', () => {
   });
 
   it('should switch to a new language', () => {
-    ctms.init('en');
+    ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
 
     const card = pts.transcript[0];
@@ -231,7 +231,7 @@ describe('Content translation manager service', () => {
   });
 
   it('should switch to a new language expect invalid translations', () => {
-    ctms.init('en');
+    ctms.setOriginalTranscript('en');
 
     const card = pts.transcript[0];
     const interaction = card.getInteraction();
@@ -263,7 +263,7 @@ describe('Content translation manager service', () => {
   });
 
   it('should switch back to the original language', () => {
-    ctms.init('en');
+    ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
     ctms.displayTranslations('en');
 
@@ -297,7 +297,7 @@ describe('Content translation manager service', () => {
      'language is changed', () => {
     const onStateCardContentUpdate = spyOn(
       ctms.onStateCardContentUpdate, 'emit');
-    ctms.init('en');
+    ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
     expect(onStateCardContentUpdate).toHaveBeenCalled();
   });
@@ -450,7 +450,7 @@ describe('Content translation manager service', () => {
       )
     );
 
-    ctms.init('en');
+    ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
     expect(newInteraction.answerGroups[0].rules[0].inputs.x).toEqual({
       contentId: 'rule_input_3',
@@ -524,7 +524,7 @@ describe('Content translation manager service', () => {
         }]}
       };
 
-      ctms.init('en');
+      ctms.setOriginalTranscript('en');
       ctms.displayTranslations('fr');
       expect(interaction.customizationArgs).toEqual({
         dummyCustArg: {value: [{
