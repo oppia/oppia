@@ -16,7 +16,7 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import { async, TestBed } from '@angular/core/testing';
+import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeListService } from './change-list.service';
 import { LoaderService } from 'services/loader.service';
@@ -162,7 +162,7 @@ describe('Change List Service when changes are mergable', () => {
   });
 
   it('should save changes after deleting a state ' +
-    'when calling \'deleteState\'', () => {
+    'when calling \'deleteState\'', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = 10;
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
@@ -170,12 +170,13 @@ describe('Change List Service when changes are mergable', () => {
       .and.callThrough();
 
     changeListService.deleteState('state');
+    tick(200);
 
     expect(saveSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should not save changes after deleting a state ' +
-    'if loading message is being shown', () => {
+    'if loading message is being shown', fakeAsync(() => {
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -184,12 +185,13 @@ describe('Change List Service when changes are mergable', () => {
     // Setting loading message.
     changeListService.loadingMessage = 'loadingMessage';
     changeListService.deleteState('state');
+    tick(200);
 
     expect(saveSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should not save changes after deleting a state ' +
-    'if internet is offline', () => {
+    'if internet is offline', fakeAsync(() => {
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -199,9 +201,10 @@ describe('Change List Service when changes are mergable', () => {
       .and.returnValue(false);
 
     changeListService.deleteState('state');
+    tick(200);
 
     expect(saveSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should discard all changes ' +
     'when calling \'discardAllChanges\'', () => {
@@ -214,22 +217,24 @@ describe('Change List Service when changes are mergable', () => {
   });
 
   it('should show alert message if we try to edit ' +
-    'an exploration with invalid property', () => {
+    'an exploration with invalid property', fakeAsync(() => {
     changeListService.editExplorationProperty(
       'prop1', 'oldValue', 'newValue');
+    tick(200);
 
     expect(alertsSpy).toHaveBeenCalledWith(
       'Invalid exploration property: prop1');
-  });
+  }));
 
   it('should show alert message if we try to edit ' +
-    'an state with invalid property', () => {
+    'an state with invalid property', fakeAsync(() => {
     changeListService.editStateProperty(
       'stateName', 'prop1', 'oldValue', 'newValue');
+    tick(200);
 
     expect(alertsSpy).toHaveBeenCalledWith(
       'Invalid state property: prop1');
-  });
+  }));
 
   it('should check whether exploration locked for editing ' +
     'when calling \'isExplorationLockedForEditing\'', () => {
