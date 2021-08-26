@@ -48,7 +48,7 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
     @staticmethod
     def _index_exploration_summaries(
             exp_summary_models: List[datastore_services.Model]
-    ) -> List[job_run_result.JobRunResult]:
+    ) -> job_run_result.JobRunResult:
         """Index exploration summaries and catch any errors.
 
         Args:
@@ -61,13 +61,13 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
         try:
             search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
                 cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            return [job_run_result.JobRunResult(
+            return job_run_result.JobRunResult(
                 stdout='SUCCESS %s models indexed' % len(exp_summary_models)
-            )]
+            )
         except platform_search_services.SearchException: # type: ignore[attr-defined]
-            return [job_run_result.JobRunResult(
+            return job_run_result.JobRunResult(
                 stderr='FAILURE %s models not indexed' % len(exp_summary_models)
-            )]
+            )
 
     def run(self) -> beam.PCollection:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
@@ -84,6 +84,6 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
                     exp_models.ExpSummaryModel.get_all(include_deleted=False)))
             | 'Split models into batches' >> beam.transforms.util.BatchElements(
                 max_batch_size=self.MAX_BATCH_SIZE)
-            | 'Index batches of models' >> beam.ParDo(
+            | 'Index batches of models' >> beam.Map(
                 self._index_exploration_summaries)
         )
