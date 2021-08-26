@@ -176,7 +176,7 @@ def any_of(*nodes: ndb.Node) -> ndb.Node:
     return ndb.OR(*nodes)
 
 
-def make_cursor(urlsafe_cursor: Optional[str] = None) -> Optional[str]:
+def make_cursor(urlsafe_cursor: Optional[str] = None) -> Cursor:
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
