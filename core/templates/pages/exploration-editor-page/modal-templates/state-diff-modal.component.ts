@@ -25,87 +25,9 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
 
-// require(
-//   'components/common-layout-directives/common-elements/' +
-//   'confirm-or-cancel-modal.controller.ts');
-// require('components/code-mirror/codemirror-mergeview.component.ts');
-// require('domain/utilities/url-interpolation.service.ts');
-// require('services/context.service.ts');
-
-// angular.module('oppia').controller('StateDiffModalController', [
-//   '$controller', '$http', '$scope', '$timeout', '$uibModalInstance',
-//   'ContextService', 'UrlInterpolationService', 'headers', 'newState',
-//   'newStateName', 'oldState', 'oldStateName',
-//   function(
-//       $controller, $http, $scope, $timeout, $uibModalInstance,
-//       ContextService, UrlInterpolationService, headers, newState,
-//       newStateName, oldState, oldStateName) {
-//     $controller('ConfirmOrCancelModalController', {
-//       $scope: $scope,
-//       $uibModalInstance: $uibModalInstance
-//     });
-//     var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
-//       '/createhandler/state_yaml/<exploration_id>', {
-//         exploration_id: (
-//           ContextService.getExplorationId())
-//       });
-
-//     $scope.headers = headers;
-//     $scope.newStateName = newStateName;
-//     $scope.oldStateName = oldStateName;
-//     /*
-//      * $scope.yamlStrs is an object with keys 'earlierVersion' and
-//      * 'laterVersion', whose values are the YAML representations of
-//      * the compared versions.
-//      */
-//     $scope.yamlStrs = {};
-
-//     if (oldState) {
-//       $http.post(STATE_YAML_URL, {
-//         state_dict: oldState.toBackendDict(),
-//         width: 50
-//       }).then(function(response) {
-//         $scope.yamlStrs.leftPane = response.data.yaml;
-//       });
-//     } else {
-//       // Note: the timeout is needed or the string will be sent
-//       // before codemirror has fully loaded and will not be
-//       // displayed. This causes issues with the e2e tests.
-//       $timeout(function() {
-//         $scope.yamlStrs.leftPane = '';
-//       }, 200);
-//     }
-
-//     if (newState) {
-//       $http.post(STATE_YAML_URL, {
-//         state_dict: newState.toBackendDict(),
-//         width: 50
-//       }).then(function(response) {
-//         $scope.yamlStrs.rightPane = response.data.yaml;
-//       });
-//     } else {
-//       // Note: the timeout is needed or the string will be sent
-//       // before codemirror has fully loaded and will not be
-//       // displayed. This causes issues with the e2e tests.
-//       $timeout(function() {
-//         $scope.yamlStrs.rightPane = '';
-//       }, 200);
-//     }
-
-//     // Options for the codemirror mergeview.
-//     $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
-//       lineNumbers: true,
-//       readOnly: true,
-//       mode: 'yaml',
-//       viewportMargin: 100
-//     };
-//   }
-// ]);
-
 @Component({
     selector: 'state-diff-modal',
-    templateUrl: './state-diff-modal.template.html',
-    styleUrls: []
+    templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent 
  extends ConfirmOrCancelModal implements OnInit {
@@ -146,6 +68,7 @@ export class StateDiffModalComponent
                 width: 50
             }).toPromise()
             .then(function(response) {
+                console.log(response);
                 this.yamlStrs.leftPane = response.data.yaml;
             });
         } else {
@@ -163,6 +86,7 @@ export class StateDiffModalComponent
                 width: 50
             }).toPromise()
             .then(function(response) {
+                console.log(response);
                 this.yamlStrs.rightPane = response.data.yaml;
             });
         } else {
@@ -173,9 +97,11 @@ export class StateDiffModalComponent
                 this.yamlStrs.rightPane = '';
             }, 200);
         }
+
+        console.log(this.yamlStrs);
     }
 }
 
-angular.module('oppia').directive(
+angular.module('oppia').controller(
  'StateDiffModalController', downgradeComponent(
     {component: StateDiffModalComponent}));
