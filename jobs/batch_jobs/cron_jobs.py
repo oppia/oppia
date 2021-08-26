@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+from core.domain import recommendations_services
 from core.domain import search_services
 from core.platform import models
 from jobs import base_jobs
@@ -77,6 +78,78 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             the Elastic Search.
         """
+        return (
+            self.pipeline
+            | 'Get all non-deleted models' >> (
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all())) # type: ignore[no-untyped-call]
+            | 'Split models into batches' >> beam.transforms.util.BatchElements(
+                max_batch_size=self.MAX_BATCH_SIZE)
+            | 'Index batches of models' >> beam.ParDo(
+                self._index_exploration_summaries)
+        )
+
+
+class ComputeExplorationRecommendations(base_jobs.JobBase):
+    """Job that indexes the explorations in Elastic Search."""
+
+    MAX_BATCH_SIZE = 1000
+
+    @staticmethod
+    def _compute_similarity(
+            reference_exp_summary_model: datastore_services.Model,
+            exp_summary_models: List[datastore_services.Model]
+    ) -> List[job_run_result.JobRunResult]:
+        """Index exploration summaries and catch any errors.
+
+        Args:
+            exp_summary_models: list(Model). Models to index.
+
+        Returns:
+            list(str). List containing one element, which is either SUCCESS,
+            or FAILURE.
+        """
+        for compared_exp_summary_model in exp_summary_models:
+            if compared_exp_summary_model.id == reference_exp_summary_model.id:
+                continue
+            similarity_score = recommendations_services.get_item_similarity(
+                reference_exp_summary_model.category,
+                reference_exp_summary_model.language_code,
+                reference_exp_summary_model.owner_ids,
+                exp_summary_model.category,
+                exp_summary_model.language_code,
+                exp_summary_model.exploration_model_last_updated,
+                exp_summary_model.owner_ids,
+                exp_summary_model.status
+            )
+        try:
+            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
+                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
+            return [job_run_result.JobRunResult(
+                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
+            )]
+        except platform_search_services.SearchException: # type: ignore[attr-defined]
+            return [job_run_result.JobRunResult(
+                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
+            )]
+
+    def run(self) -> beam.PCollection:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        the Elastic Search.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            the Elastic Search.
+        """
+
+        exp_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted models' >> (
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))  # type: ignore[no-untyped-call]
+        )
+
+        exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
+        exp_summary_models | beam.ParDo(self._compute_similarity, exp_summary_iter)
+
         return (
             self.pipeline
             | 'Get all non-deleted models' >> (

@@ -157,7 +157,7 @@ def _create_default_topic_similarities():
     return save_topic_similarities(topic_similarities_dict)
 
 
-def get_topic_similarity(topic_1, topic_2):
+def get_topic_similarity(topic_1, topic_2, topic_similarities):
     """Gets the similarity between two topics, as a float between 0 and 1.
 
     It checks whether the two topics are in the list of default topics. If
@@ -165,9 +165,12 @@ def get_topic_similarity(topic_1, topic_2):
     the topics are the same.
     """
 
-    if (topic_1 in RECOMMENDATION_CATEGORIES and
-            topic_2 in RECOMMENDATION_CATEGORIES):
-        topic_similarities = get_topic_similarities_dict()
+    if (
+            topic_1 in RECOMMENDATION_CATEGORIES and
+            topic_2 in RECOMMENDATION_CATEGORIES
+    ):
+        if topic_similarities is None:
+            topic_similarities = get_topic_similarities_dict()
         return topic_similarities[topic_1][topic_2]
     else:
         if topic_1 == topic_2:
@@ -282,14 +285,8 @@ def update_topic_similarities(data):
 
 
 def get_item_similarity(
-        reference_exp_category,
-        reference_exp_language_code,
-        reference_exp_owner_ids,
-        compared_exp_category,
-        compared_exp_language_code,
-        compared_exp_last_updated,
-        compared_exp_owner_ids,
-        compared_exp_status):
+        reference_exp_summary, compared_exp_summary, topic_similarities
+):
     """Returns the ranking of compared_exp to reference_exp as a
     recommendation. This returns a value between 0.0 to 10.0. A higher value
     indicates the compared_exp is a better recommendation as an exploration to
@@ -298,22 +295,39 @@ def get_item_similarity(
     Comparison of similarity is based on the similarity of exploration topics
     and whether the explorations have the same language or author. It
     returns 0.0 if compared_exp is private.
+
+    Args:
+        reference_exp_summary:
+        compared_exp_summary:
+        topic_similarities:
+
+    Returns:
+        
     """
 
     similarity_score = 0
 
-    if compared_exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+    if compared_exp_summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
         return 0
 
-    similarity_score += get_topic_similarity(
-        reference_exp_category, compared_exp_category) * 5
-    if reference_exp_owner_ids == compared_exp_owner_ids:
+    topic_similarity_score = get_topic_similarity(
+        reference_exp_summary.category,
+        compared_exp_summary.category,
+        topic_similarities
+    )
+
+    similarity_score += 5 * topic_similarity_score
+    if reference_exp_summary.owner_ids == compared_exp_summary.owner_ids:
         similarity_score += 1
-    if reference_exp_language_code == compared_exp_language_code:
+    if (
+            reference_exp_summary.language_code ==
+            compared_exp_summary.language_code
+    ):
         similarity_score += 2
 
     time_now = datetime.datetime.utcnow()
-    time_delta_days = int((time_now - compared_exp_last_updated).days)
+    time_delta_days = int(
+        (time_now - compared_exp_summary.exploration_model_last_updated).days)
     if time_delta_days <= 7:
         similarity_score += 1
 
