@@ -20,8 +20,6 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
-import os
-
 from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
@@ -116,7 +114,8 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             UserStatsModel. The created user stats model.
         """
         with datastore_services.get_ndb_context():
-            user_stats_model = user_models.UserStatsModel(id=user_settings_model.id)
+            user_stats_model = (
+                user_models.UserStatsModel(id=user_settings_model.id))
         user_stats_model.update_timestamps()
         return [user_stats_model]
 
