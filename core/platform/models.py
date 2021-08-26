@@ -20,14 +20,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
-
+from types import ModuleType # pylint: disable=import-only-modules
 from constants import constants
 import feconf
 import python_utils
 
 from typing import List, Tuple, Type
-
-from types import ModuleType # isort:skip # pylint: disable=import-only-modules
 
 MYPY = False
 if MYPY: # pragma: no cover

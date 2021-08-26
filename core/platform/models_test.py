@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import re
 import sys
+from types import ModuleType # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -28,8 +29,6 @@ from core.tests import test_utils
 import feconf
 
 from typing import cast
-
-from types import ModuleType  # isort:skip # pylint: disable=import-only-modules
 
 
 class RegistryUnitTest(test_utils.TestBase):
