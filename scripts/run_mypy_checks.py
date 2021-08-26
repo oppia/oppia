@@ -433,7 +433,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
     'core/platform/datastore/cloud_datastore_services.py',
-    'core/platform/datastore/cloud_datastore_services_test.py',
     'core/platform/storage/cloud_storage_emulator.py',
     'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform/transactions/cloud_transaction_services.py',

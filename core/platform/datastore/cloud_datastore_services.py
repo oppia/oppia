@@ -25,7 +25,7 @@ from core.platform import models
 
 from google.cloud import ndb
 
-from typing import List, Optional, Tuple, TypeVar # isort:skip
+from typing import ContextManager, List, Optional, Tuple, TypeVar # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,6 +35,7 @@ if MYPY: # pragma: no cover
 transaction_services = models.Registry.import_transaction_services()
 
 
+Cursor = ndb.Cursor
 Model = ndb.Model
 Key = ndb.Key
 Property = ndb.Property
@@ -52,14 +53,13 @@ TextProperty = ndb.TextProperty
 
 TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model) # pylint: disable=invalid-name
 
-
 CLIENT = ndb.Client()
 
 
 def get_ndb_context(
         namespace: Optional[str] = None,
         global_cache: Optional[RedisCache] = None
-) -> ndb.context.Context:
+) -> ContextManager[ndb.context.Context]:
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
@@ -176,9 +176,7 @@ def any_of(*nodes: ndb.Node) -> ndb.Node:
     return ndb.OR(*nodes)
 
 
-def make_cursor(
-        urlsafe_cursor: Optional[str] = None
-) -> Optional[str]:
+def make_cursor(urlsafe_cursor: Optional[str] = None) -> Optional[str]:
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
@@ -198,9 +196,9 @@ def make_cursor(
             result of any query.
 
     Returns:
-        datastore_query.Cursor. A cursor into an arbitrary query.
+        Cursor. A cursor into an arbitrary query.
     """
-    return ndb.Cursor(urlsafe=urlsafe_cursor)
+    return Cursor(urlsafe=urlsafe_cursor)
 
 
 def fetch_multiple_entities_by_ids_and_models(

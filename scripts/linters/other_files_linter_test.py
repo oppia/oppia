@@ -287,6 +287,59 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Sorted strict TS config', error_messages.name)
             self.assertTrue(error_messages.failed)
 
+    def test_check_github_workflows_use_merge_action_checks(self):
+        def mock_listdir(unused_path):
+            return ['pass.yml', 'fail.yml', 'README']
+
+        def mock_read(path):
+            if path.endswith('pass.yml'):
+                return '\n'.join([
+                    'name: Passing workflow file',
+                    'on:',
+                    '  push:',
+                    '    branches:',
+                    '      - develop',
+                    '',
+                    'jobs:',
+                    '  run:',
+                    '    steps:',
+                    '      - uses: actions/checkout@v2',
+                    '      - uses: ./.github/actions/merge',
+                    '      - run: echo "oppia"',
+                ])
+            elif path.endswith('fail.yml'):
+                return '\n'.join([
+                    'name: Passing workflow file',
+                    'on:',
+                    '  push:',
+                    '    branches:',
+                    '      - develop',
+                    '',
+                    'jobs:',
+                    '  run:',
+                    '    steps:',
+                    '      - uses: actions/checkout@v2',
+                    '      - run: echo "oppia"',
+                ])
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path)
+
+        listdir_swap = self.swap_with_checks(
+            os, 'listdir', mock_listdir,
+            expected_args=[(other_files_linter.WORKFLOWS_DIR,)])
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            '%s --> Job run does not use the .github/actions/merge action.' %
+            os.path.join(other_files_linter.WORKFLOWS_DIR, 'fail.yml'),
+            'FAILED  Github workflows use merge action check failed',
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_github_workflows_use_merge_action()
+            self.assertEqual(task_results.get_report(), expected)
+
     def test_perform_all_lint_checks(self):
         lint_task_report = other_files_linter.CustomLintChecksManager(
             FILE_CACHE).perform_all_lint_checks()

@@ -184,7 +184,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             dict. Dictionary of the data from GeneralFeedbackThreadModel.
         """
 
-        user_data = dict()
+        user_data = {}
         feedback_models = cast(
             List[GeneralFeedbackThreadModel],
             cls.get_all().filter(cls.original_author_id == user_id).fetch()
@@ -373,7 +373,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             dict. Dictionary of the data from GeneralFeedbackMessageModel.
         """
 
-        user_data = dict()
+        user_data = {}
         feedback_models = cast(
             List[GeneralFeedbackMessageModel],
             cls.get_all().filter(cls.author_id == user_id).fetch()
