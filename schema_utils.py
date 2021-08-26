@@ -35,9 +35,10 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 import feconf
 import python_utils
+
 import utils
 
-from typing import Any, Callable, cast, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, cast
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'

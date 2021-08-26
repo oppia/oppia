@@ -25,8 +25,9 @@ from constants import constants
 import feconf
 import python_utils
 
-from types import ModuleType # isort:skip # pylint: disable=import-only-modules
 from typing import List, Tuple, Type
+
+from types import ModuleType # isort:skip # pylint: disable=import-only-modules
 
 MYPY = False
 if MYPY: # pragma: no cover

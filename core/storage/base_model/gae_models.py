@@ -24,10 +24,12 @@ from constants import constants
 from core.platform import models
 import feconf
 import python_utils
+
 import utils
 
-from typing import (
-    Any, Dict, List, Optional, Sequence, Tuple, Type, Union, TypeVar, cast)
+from typing import ( # isort:skip
+    Any, Dict, List, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
+)
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')

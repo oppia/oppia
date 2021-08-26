@@ -27,8 +27,9 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from types import ModuleType  # isort:skip # pylint: disable=import-only-modules
 from typing import cast
+
+from types import ModuleType  # isort:skip # pylint: disable=import-only-modules
 
 
 class RegistryUnitTest(test_utils.TestBase):
