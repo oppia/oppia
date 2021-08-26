@@ -486,7 +486,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
-    def render_json(self, values):
+    def render_json(self, values: Dict[Any, Any]) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:

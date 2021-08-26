@@ -24,6 +24,10 @@ export interface BeamJobRunResultBackendDict {
 export class BeamJobRunResult {
   constructor(public readonly stdout: string, public readonly stderr: string) {}
 
+  isEmpty(): boolean {
+    return !this.stdout && !this.stderr;
+  }
+
   static createFromBackendDict(
       backendDict: BeamJobRunResultBackendDict): BeamJobRunResult {
     return new BeamJobRunResult(backendDict.stdout, backendDict.stderr);

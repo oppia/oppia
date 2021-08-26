@@ -28,6 +28,9 @@ import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/com
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AlertsService } from 'services/alerts.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('Cancel beam job dialog', () => {
   const beamJobRun = (
@@ -50,8 +53,11 @@ describe('Cancel beam job dialog', () => {
       imports: [
         BrowserDynamicTestingModule,
         MatButtonModule,
+        MatCardModule,
         MatDialogModule,
+        MatIconModule,
         MatProgressBarModule,
+        MatTooltipModule,
         NoopAnimationsModule,
       ],
       providers: [

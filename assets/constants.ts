@@ -5668,8 +5668,6 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
-  "BEAM_JOBS_ARE_ENABLED": false,
-
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.

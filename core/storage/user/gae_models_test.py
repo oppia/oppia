@@ -741,9 +741,9 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         super(UserContributionsModelTests, self).setUp() # type: ignore[no-untyped-call]
         # User A has no created explorations, one edited exploration.
         # User B has two created and edited explorations.
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME) # type: ignore[no-untyped-call]
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL) # type: ignore[no-untyped-call]
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME) # type: ignore[no-untyped-call]
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL) # type: ignore[no-untyped-call]
 
         # Note that creating an exploration counts as editing it.

@@ -80,7 +80,7 @@ BeamJobState = python_utils.create_enum( # pylint: disable=invalid-name
     'UNKNOWN')
 
 
-def _get_new_model_id(model_class):
+def _get_new_model_id(model_class: base_models.BaseModel) -> str:
     """Generates an ID for a new model.
 
     Returns:
@@ -129,7 +129,7 @@ class BeamJobRunModel(base_models.BaseModel):
         ])
 
     @classmethod
-    def get_new_id(cls):
+    def get_new_id(cls) -> str:
         """Generates an ID for a new BeamJobRunModel.
 
         Returns:
@@ -179,7 +179,7 @@ class BeamJobRunResultModel(base_models.BaseModel):
     stderr = datastore_services.TextProperty(required=False, indexed=False)
 
     @classmethod
-    def get_new_id(cls):
+    def get_new_id(cls) -> str:
         """Generates an ID for a new BeamJobRunResultModel.
 
         Returns:

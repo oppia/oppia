@@ -31,6 +31,8 @@ from jobs import registry as jobs_registry
 from scripts import common
 import utils
 
+from typing import List, Optional # isort: skip
+
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -88,7 +90,7 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
 }
 
 
-def get_beam_jobs():
+def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
     """Returns the list of all registered Apache Beam jobs.
 
     Returns:
@@ -97,7 +99,9 @@ def get_beam_jobs():
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
 
 
-def get_beam_job_runs(refresh=False):
+def get_beam_job_runs(
+    refresh: bool = False
+) -> List[beam_job_domain.BeamJobRun]:
     """Returns all of the Apache Beam job runs recorded in the datastore.
 
     Args:
@@ -108,7 +112,7 @@ def get_beam_job_runs(refresh=False):
     """
     beam_job_run_models = _get_all_beam_job_run_models()
     beam_job_runs = [
-        _get_beam_job_run_from_model(m) for m in beam_job_run_models
+        get_beam_job_run_from_model(m) for m in beam_job_run_models
     ]
 
     if refresh:
@@ -119,7 +123,7 @@ def get_beam_job_runs(refresh=False):
                 continue
             _refresh_state_of_beam_job_run_model(beam_job_run_model)
             updated_beam_job_run_models.append(beam_job_run_model)
-            beam_job_runs[i] = _get_beam_job_run_from_model(beam_job_run_model)
+            beam_job_runs[i] = get_beam_job_run_from_model(beam_job_run_model)
 
         if updated_beam_job_run_models:
             datastore_services.put_multi(updated_beam_job_run_models)
@@ -127,7 +131,9 @@ def get_beam_job_runs(refresh=False):
     return beam_job_runs
 
 
-def get_beam_job_run_result(job_id):
+def get_beam_job_run_result(
+    job_id: str
+) -> beam_job_domain.AggregateBeamJobRunResult:
     """Returns the result of the given Apache Beam job run.
 
     Args:
@@ -147,13 +153,40 @@ def get_beam_job_run_result(job_id):
         if beam_job_run_result_model.stderr:
             stderrs.append(beam_job_run_result_model.stderr)
 
-    return (
-        None if not stdouts and not stderrs else
-        beam_job_domain.AggregateBeamJobRunResult(
-            stdout='\n'.join(stdouts), stderr='\n'.join(stderrs)))
+    return beam_job_domain.AggregateBeamJobRunResult(
+        stdout='\n'.join(stdouts), stderr='\n'.join(stderrs))
 
 
-def create_beam_job_run_result_model(job_id, stdout, stderr):
+def create_beam_job_run_model(
+    job_name: str,
+    job_arguments: List[str],
+    dataflow_job_id: Optional[str] = None
+) -> beam_job_models.BeamJobRunModel:
+    """Creates a new BeamJobRunModel without putting it into storage.
+
+    Args:
+        job_name: str. The name of the job class that implements the job's
+            logic.
+        job_arguments: list(str). The arguments provided to the job run.
+        dataflow_job_id: str|None. The ID of the dataflow job this model
+            corresponds to. If the job is run synchronously, then this value
+            should be None.
+
+    Returns:
+        BeamJobRunModel. The model.
+    """
+    model_id = beam_job_models.BeamJobRunModel.get_new_id()
+    model = beam_job_models.BeamJobRunModel(
+        id=model_id, job_name=job_name, job_arguments=job_arguments,
+        dataflow_job_id=dataflow_job_id,
+        latest_job_state=beam_job_models.BeamJobState.PENDING.value)
+    model.update_timestamps()
+    return model
+
+
+def create_beam_job_run_result_model(
+    job_id: str, stdout: str, stderr: str
+) -> beam_job_models.BeamJobRunResultModel:
     """Creates a new BeamJobRunResultModel without putting it into storage.
 
     Args:
@@ -181,7 +214,9 @@ def refresh_state_of_all_beam_job_run_models():
     datastore_services.put_multi(beam_job_run_models)
 
 
-def _get_beam_job_run_from_model(beam_job_run_model):
+def get_beam_job_run_from_model(
+    beam_job_run_model: beam_job_models.BeamJobRunModel
+) -> beam_job_domain.BeamJobRun:
     """Returns a domain object corresponding to the given BeamJobRunModel.
 
     Args:

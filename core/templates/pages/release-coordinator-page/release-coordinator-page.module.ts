@@ -28,6 +28,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -37,7 +38,6 @@ import { BeamJobsTabComponent } from 'pages/release-coordinator-page/beam-jobs-t
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
-import { JobsTabComponent } from 'pages/release-coordinator-page/jobs-tab/jobs-tab.component';
 import { ReleaseCoordinatorNavbarComponent } from 'pages/release-coordinator-page/navbar/release-coordinator-navbar.component';
 import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/release-coordinator-page.component';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
@@ -57,6 +57,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     MatIconModule,
     MatInputModule,
     MatProgressBarModule,
+    MatSortModule,
     MatTabsModule,
     MatTableModule,
     MatTooltipModule,
@@ -68,7 +69,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
   declarations: [
     BeamJobsTabComponent,
     CancelBeamJobDialogComponent,
-    JobsTabComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,
@@ -77,7 +77,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
   ],
   entryComponents: [
     CancelBeamJobDialogComponent,
-    JobsTabComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,

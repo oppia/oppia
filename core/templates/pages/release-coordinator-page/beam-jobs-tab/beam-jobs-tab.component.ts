@@ -39,7 +39,7 @@ import { AlertsService } from 'services/alerts.service';
 export class BeamJobsTabComponent implements OnInit, OnDestroy {
   public dataFailedToLoad = false;
   readonly jobRunTableColumns: readonly string[] = [
-    'run_status', 'job_name', 'started_on', 'ended_on', 'action'];
+    'run_status', 'job_name', 'started_on', 'updated_on', 'action'];
 
   jobNameControl = new FormControl('');
 

@@ -45,6 +45,8 @@ from core.domain import user_services
 import feconf
 import utils
 
+from typing import Any, Callable # isort: skip
+
 
 def _redirect_based_on_return_type(
         handler, redirection_url, expected_return_type):
@@ -799,7 +801,7 @@ def can_manage_memcache(handler):
     return test_can_manage_memcache
 
 
-def can_run_any_job(handler):
+def can_run_any_job(handler: Callable[..., None]) -> Callable[..., None]:
     """Decorator to check whether user can can run any job.
 
     Args:
@@ -810,10 +812,13 @@ def can_run_any_job(handler):
         permission to run any job.
     """
 
-    def test_can_run_any_job(self, **kwargs):
+    def test_can_run_any_job(
+        self: base.BaseHandler, *args: Any, **kwargs: Any
+    ) -> None:
         """Checks if the user is logged in and can run any job.
 
         Args:
+            *args: list(*). Positional arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -828,11 +833,11 @@ def can_run_any_job(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
-            return handler(self, **kwargs)
+            return handler(self, *args, **kwargs)
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to run jobs.')
-    test_can_run_any_job.__wrapped__ = True
+    setattr(test_can_run_any_job, '__wrapped__', True)
 
     return test_can_run_any_job
 
