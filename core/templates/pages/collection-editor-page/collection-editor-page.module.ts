@@ -39,8 +39,8 @@ import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-e
 import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
 import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
 import { CollectionEditorTabComponent } from './editor-tab/collection-editor-tab.component';
-import { CollectionEditorSaveModalComponent } from './templates/collection-editor-save-modal.component';
-import { CollectionEditorPrePublishModalComponent } from './templates/collection-editor-pre-publish-modal.component';
+import { CollectionEditorSaveModalComponent } from './modals/collection-editor-save-modal.component';
+import { CollectionEditorPrePublishModalComponent } from './modals/collection-editor-pre-publish-modal.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 

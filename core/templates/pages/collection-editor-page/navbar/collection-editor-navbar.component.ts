@@ -29,8 +29,8 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionEditorPrePublishModalComponent } from '../templates/collection-editor-pre-publish-modal.component';
-import { CollectionEditorSaveModalComponent } from '../templates/collection-editor-save-modal.component';
+import { CollectionEditorPrePublishModalComponent } from '../modals/collection-editor-pre-publish-modal.component';
+import { CollectionEditorSaveModalComponent } from '../modals/collection-editor-save-modal.component';
 
 @Component({
   selector: 'collection-editor-navbar',
