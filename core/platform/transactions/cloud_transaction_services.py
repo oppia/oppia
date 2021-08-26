@@ -27,6 +27,7 @@ from typing import Any, Callable
 
 CLIENT = datastore.Client()
 
+
 # Any is used here because the method `wrapper` is used as a decorator for other
 # functions, and these functions can have almost any types of arguments.
 def run_in_transaction_wrapper(fn: Callable[..., Any]) -> Callable[..., Any]:
