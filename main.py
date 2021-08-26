@@ -897,6 +897,11 @@ URLS.extend((
     get_redirect_route(
         r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
     get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    get_redirect_route(
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
+    get_redirect_route(
         r'/cron/mail/admins/contributor_dashboard_bottlenecks',
         cron.CronMailAdminContributorDashboardBottlenecksHandler),
     get_redirect_route(
