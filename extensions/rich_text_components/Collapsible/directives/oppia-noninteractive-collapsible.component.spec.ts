@@ -28,7 +28,7 @@ describe('NoninteractiveCollapsible', () => {
   let fixture: ComponentFixture<NoninteractiveCollapsible>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function(answer: string) {
       return answer;
     }
   };
