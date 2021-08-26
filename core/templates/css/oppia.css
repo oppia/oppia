@@ -4169,6 +4169,7 @@ oppia-noninteractive-link {
   height: auto;
   min-height: 80px;
   padding: 8px;
+  text-align: start;
   word-break: break-word;
   word-wrap: break-word;
 }

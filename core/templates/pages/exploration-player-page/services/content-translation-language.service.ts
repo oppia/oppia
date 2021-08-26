@@ -114,10 +114,14 @@ export class ContentTranslationLanguageService {
       allContentLanguageCodesInExploration: string[],
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string): void {
+    // Original transcript needs to be set before initializing the rest of this
+    // service. This ensures that the transcript is restored correctly
+    // when selected language is the same as the exploration language.
+    this.contentTranslationManagerService.setOriginalTranscript(
+      explorationLanguageCode);
     this._init(
       allContentLanguageCodesInExploration, preferredContentLanguageCodes,
       explorationLanguageCode);
-    this.contentTranslationManagerService.init(explorationLanguageCode);
   }
 
   /**
