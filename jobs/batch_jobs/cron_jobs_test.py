@@ -235,9 +235,9 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
             ])
 
 
-class DashboardStatsOneOffJobTests(job_test_utils.JobTestBase):
+class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = cron_jobs.DashboardStatsOneOffJob
+    JOB_CLASS = cron_jobs.CollectWeeklyDashboardStats
 
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)

@@ -95,7 +95,7 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
         )
 
 
-class DashboardStatsOneOffJob(base_jobs.JobBase):
+class CollectWeeklyDashboardStats(base_jobs.JobBase):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
@@ -103,7 +103,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
     @staticmethod
     def _create_user_stats_model(
             user_settings_model: user_models.UserSettingsModel
-    ) -> List[user_models.UserStatsModel]:
+    ) -> user_models.UserStatsModel:
         """Creates empty user stats model with id.
 
         Args:
@@ -117,12 +117,12 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             user_stats_model = (
                 user_models.UserStatsModel(id=user_settings_model.id))
         user_stats_model.update_timestamps()
-        return [user_stats_model]
+        return user_stats_model
 
     @staticmethod
     def _update_weekly_creator_stats(
             user_stats_models: user_models.UserStatsModel
-    ) -> List[user_models.UserStatsModel]:
+    ) -> user_models.UserStatsModel:
         """Updates weekly dashboard stats with the current values.
 
         Args:
@@ -150,7 +150,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
         }
         model.weekly_creator_stats_list.append(weekly_creator_stats)
         model.update_timestamps()
-        return [model]
+        return model
 
     def run(self) -> beam.PCollection:
         user_settings_models = (
@@ -183,7 +183,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             | 'Transform tuples into models' >> beam.Map(
                 lambda models: list(models)[0])
             # Creates the missing UserStatsModels.
-            | 'Create new user stat models' >> beam.ParDo(
+            | 'Create new user stat models' >> beam.Map(
                 self._create_user_stats_model)
         )
 
@@ -191,7 +191,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             (new_user_stats_models, old_user_stats_models)
             | 'Merge new and old models together' >> beam.Flatten()
             | 'Update the dashboard stats' >> (
-                beam.ParDo(self._update_weekly_creator_stats))
+                beam.Map(self._update_weekly_creator_stats))
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
@@ -200,10 +200,9 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             | 'Count all new models' >> beam.combiners.Count.Globally()
             | 'Only create result for new models when > 0' >> (
                 beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.ParDo(
-                lambda x: [
-                    job_run_result.JobRunResult(stdout='SUCCESS NEW %s' % x)
-                ]
+            | 'Create result for new models' >> beam.Map(
+                lambda x: job_run_result.JobRunResult(
+                    stdout='SUCCESS NEW %s' % x)
             )
         )
         old_user_stats_job_result = (
@@ -211,10 +210,9 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             | 'Count all old models' >> beam.combiners.Count.Globally()
             | 'Only create result for old models when > 0' >> (
                 beam.Filter(lambda x: x > 0))
-            | 'Create result for old models' >> beam.ParDo(
-                lambda x: [
-                    job_run_result.JobRunResult(stdout='SUCCESS OLD %s' % x)
-                ]
+            | 'Create result for old models' >> beam.Map(
+                lambda x: job_run_result.JobRunResult(
+                    stdout='SUCCESS OLD %s' % x)
             )
         )
 
