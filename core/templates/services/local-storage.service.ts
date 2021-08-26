@@ -161,7 +161,7 @@ export class LocalStorageService {
 
   /**
    * Save the given topic name to localStorage along.
-   * @param topicName 
+   * @param topicName
    */
   updateLastSelectedTranslationTopicName(topicName: string): void {
     if (this.isStorageAvailable()) {
@@ -182,8 +182,8 @@ export class LocalStorageService {
     if (this.isStorageAvailable()) {
       return (
         // It is possible that storage does not exist or the user does not have
-        // permission to access it but this condition is already being checked by
-        // calling 'isStorageAvailable()' so the typecast is safe.
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
         (<Storage> this.storage).getItem(
           this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
     }
