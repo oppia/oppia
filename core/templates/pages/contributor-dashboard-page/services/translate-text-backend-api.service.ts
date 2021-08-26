@@ -65,8 +65,10 @@ export class TranslateTextBackendApiService {
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
     imagesData.forEach(obj => {
-      const imageBlob = <Blob>obj.imageBlob;
-      body.append(obj.filename, imageBlob);
+      if (obj.imageBlob === null) {
+        throw new Error('No image data found');
+      }
+      body.append(obj.filename, obj.imageBlob);
     });
     return this.http.post(
       '/suggestionhandler/', body).toPromise();

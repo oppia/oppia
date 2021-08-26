@@ -160,6 +160,9 @@ def get_beam_entity_from_ndb_model(model):
     Returns:
         beam_datastore_types.Entity. The Apache Beam entity.
     """
+    # We use private _entity_to_ds_entity here because it provides
+    # a functionality that we need and writing it ourselves would be
+    # too complicated.
     return beam_datastore_types.Entity.from_client_entity(
         ndb_model._entity_to_ds_entity(model) # pylint: disable=protected-access
     )
@@ -175,6 +178,9 @@ def get_ndb_model_from_beam_entity(beam_entity):
         datastore_services.Model. The NDB model.
     """
     ndb_key = get_ndb_key_from_beam_key(beam_entity.key)
+    # We use private _lookup_model and _entity_from_ds_entity here because it
+    # provides a functionality that we need and writing it ourselves would be
+    # too complicated.
     ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind())  # pylint: disable=protected-access
     return ndb_model._entity_from_ds_entity( # pylint: disable=protected-access
         beam_entity.to_client_entity(), model_class=ndb_model_class)

@@ -586,7 +586,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             dict. Dictionary of the data from GeneralSuggestionModel.
         """
 
-        user_data = dict()
+        user_data = {}
         suggestion_models = cast(
             List[GeneralSuggestionModel],
             cls.get_all()
@@ -777,7 +777,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from GeneralVoiceoverApplicationModel.
         """
-        user_data = dict()
+        user_data = {}
 
         voiceover_models = cast(
             List[GeneralVoiceoverApplicationModel],
@@ -1116,7 +1116,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from TranslationContributionStatsModel.
         """
-        user_data = dict()
+        user_data = {}
         stats_models = cast(
             List[TranslationContributionStatsModel],
             cls.get_all()

@@ -547,6 +547,16 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       expect(as.addInfoMessage).toHaveBeenCalled();
     });
+
+    it('should navigate to editor tab when internet disconnects', () => {
+      var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
+      activeTabNameSpy.and.returnValue('settings');
+      spyOn(rs, 'navigateToMainTab');
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect(as.addInfoMessage).toHaveBeenCalled();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
   });
 
   describe('when user permission is false and draft changes are true', () => {
