@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "À propos de la fondation",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Créer une exploration",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "à propos d’un sujet auquel vous tenez.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Collecter des avis",
@@ -734,6 +735,7 @@
 	"I18N_TOPNAV_ABOUT_OPPIA": "À propos d’Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Page d’administration",
 	"I18N_TOPNAV_BLOG": "Blogue",
+	"I18N_TOPNAV_BLOG_DASHBOARD": "Tableau de bord du blog",
 	"I18N_TOPNAV_CLASSROOM": "Salle de cours",
 	"I18N_TOPNAV_CLASSROOM_BASIC_MATHS": "Mathématiques de base",
 	"I18N_TOPNAV_CONTACT_US": "Nous contacter",
