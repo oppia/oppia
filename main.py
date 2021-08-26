@@ -25,6 +25,7 @@ from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import beam_jobs
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
 from core.controllers import blog_homepage
@@ -113,7 +114,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET requests."""
-        self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
+        self.render_json({'is_internet_connected': True})
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -127,7 +128,7 @@ class FrontendErrorHandler(base.BaseHandler):
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
-        self.render_json(self.values) # type: ignore[no-untyped-call]
+        self.render_json(self.values)
 
 
 class WarmupPage(base.BaseHandler):
@@ -828,6 +829,11 @@ URLS = [
         blog_admin.BlogAdminRolesHandler),
     get_redirect_route(
         r'/blogadminhandler', blog_admin.BlogAdminHandler),
+
+    get_redirect_route('/beam_job', beam_jobs.BeamJobHandler),
+    get_redirect_route('/beam_job_run', beam_jobs.BeamJobRunHandler),
+    get_redirect_route(
+        '/beam_job_run_result', beam_jobs.BeamJobRunResultHandler),
 
     get_redirect_route(
         r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
