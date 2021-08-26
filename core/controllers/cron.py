@@ -23,6 +23,7 @@ from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 import feconf
 
@@ -48,6 +49,36 @@ class CronModelsCleanupHandler(base.BaseHandler):
         """
         cron_services.delete_models_marked_as_deleted()
         cron_services.mark_outdated_models_as_deleted()
+
+
+class CronUserDeletionHandler(base.BaseHandler):
+    """Handler for running the user deletion one off job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+
+class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+    """Handler for running the fully complete user deletion one off job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(
