@@ -61,7 +61,7 @@ export class ContentTranslationManagerService {
     private extensionTagAssemblerService: ExtensionTagAssemblerService
   ) {}
 
-  init(explorationLanguageCode: string): void {
+  setOriginalTranscript(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
     this.originalTranscript = cloneDeep(
       this.playerTranscriptService.transcript);
