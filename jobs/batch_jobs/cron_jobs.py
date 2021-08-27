@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that are ran by CRON scheduler."""
+"""Jobs that are run by CRON scheduler."""
 
 from __future__ import absolute_import
 from __future__ import annotations
@@ -69,7 +69,7 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
                 stderr='FAILURE %s models not indexed' % len(exp_summary_models)
             )
 
-    def run(self) -> beam.PCollection:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         the Elastic Search.
 
