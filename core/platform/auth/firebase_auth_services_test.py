@@ -905,7 +905,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     EMAIL = 'foo@bar.com'
 
     def setUp(self) -> None:
-        super(FirebaseAuthServicesTestBase, self).setUp() # type: ignore[no-untyped-call]
+        super(FirebaseAuthServicesTestBase, self).setUp()
         self.firebase_sdk_stub = FirebaseAdminSdkStub()
         self.firebase_sdk_stub.install(self)
 

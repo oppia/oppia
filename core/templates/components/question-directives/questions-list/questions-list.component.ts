@@ -116,10 +116,6 @@ angular.module('oppia').component('questionsList', {
         ctrl.questionEditorIsShown = false;
         ctrl.question = null;
         _reInitializeSelectedSkillIds();
-        QuestionsListService.getQuestionSummariesAsync(
-          ctrl.selectedSkillId, resetHistoryAndFetch,
-          resetHistoryAndFetch
-        );
         ctrl.questionIsBeingUpdated = false;
         ctrl.misconceptionsBySkill = {};
         ctrl.misconceptionIdsForSelectedSkill = [];
@@ -135,6 +131,11 @@ angular.module('oppia').component('questionsList', {
         }
         if (SkillEditorRoutingService.navigateToQuestionEditor()) {
           ctrl.createQuestion();
+        } else {
+          QuestionsListService.getQuestionSummariesAsync(
+            ctrl.selectedSkillId, resetHistoryAndFetch,
+            resetHistoryAndFetch
+          );
         }
       };
       ctrl.getQuestionIndex = function(index) {
@@ -294,7 +295,6 @@ angular.module('oppia').component('questionsList', {
               skillId, '', null));
         });
         ctrl.showDifficultyChoices = true;
-        ctrl.editorIsOpen = true;
         ctrl.initiateQuestionCreation();
       };
 

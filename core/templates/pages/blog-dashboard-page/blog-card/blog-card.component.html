@@ -12,8 +12,11 @@
     <mat-card-header class="mt-2">
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"
-           alt="Profile image of the author of the blog post">
-      <mat-card-subtitle>{{ blogPostSummary.authorUsername }}</mat-card-subtitle>
+           alt="Profile image of the author of the blog post"
+           class="protractor-test-profile-current-user-photo">
+      <mat-card-subtitle class="protractor-test-username-visible">
+        {{ blogPostSummary.authorUsername }}
+      </mat-card-subtitle>
       <mat-card-subtitle class="font-weight-light mobile-published-date">
         {{ publishedDateString }}
       </mat-card-subtitle>
