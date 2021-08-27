@@ -195,4 +195,3 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
                 lambda x: job_run_result.JobRunResult(
                     stdout='SUCCESS %s' % x))
         )
-
