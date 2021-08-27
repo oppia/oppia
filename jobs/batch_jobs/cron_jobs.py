@@ -35,9 +35,11 @@ MYPY = False
 if MYPY:
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import recommendations_models
 
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, recommendations_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.recommendation])
 platform_search_services = models.Registry.import_search_services()
 
 MAX_RECOMMENDATIONS = 10
@@ -138,6 +140,17 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
             item['exp_id'] for item in sorted_similarities
         ][:MAX_RECOMMENDATIONS]
 
+    @staticmethod
+    def _create_recommendation(
+            exp_id: str, recommended_exp_ids: List[str]
+    ) -> recommendations_models.ExplorationRecommendationsModel:
+        """"""
+        with datastore_services.get_ndb_context():
+            exp_recommendation_model = (
+                recommendations_models.ExplorationRecommendationsModel(
+                    id=exp_id, recommended_exploration_ids=recommended_exp_ids))
+        return exp_recommendation_model
+
     def run(self) -> beam.PCollection:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         the Elastic Search.
@@ -155,12 +168,30 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
 
         exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
 
-        return (
+        exp_recommendations_models = (
             exp_summary_models
             | 'Compute similarity' >> beam.ParDo(
                 self._compute_similarity, exp_summary_iter)
             | 'Group similarities per exploration ID' >> beam.GroupByKey()
-            | beam.MapTuple(
-                lambda exp_id, similarities: (exp_id, _sort_and_slice_similarities(similarities)))
-            | 
+            | 'Sort and slice similarities' >> beam.MapTuple(
+                lambda exp_id, similarities: (
+                    exp_id, self._sort_and_slice_similarities(similarities)))
+            | 'Create recommendation models' >> beam.MapTuple(
+                self._create_recommendation)
         )
+
+        unused_put_result = (
+            exp_recommendations_models
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            exp_recommendations_models
+            | 'Count all new models' >> beam.combiners.Count.Globally()
+            | 'Only create result for new models when > 0' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Create result for new models' >> beam.Map(
+                lambda x: job_run_result.JobRunResult(
+                    stdout='SUCCESS %s' % x))
+        )
+
