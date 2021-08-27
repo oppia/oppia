@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
@@ -107,7 +108,11 @@ export class WrittenTranslationObjectFactory {
 
     return new WrittenTranslation(
       <DataFormatToDefaultValuesKey> dataFormat,
-      DATA_FORMAT_TO_DEFAULT_VALUES[<DataFormatToDefaultValuesKey> dataFormat],
+      cloneDeep(
+        DATA_FORMAT_TO_DEFAULT_VALUES[
+          <DataFormatToDefaultValuesKey> dataFormat
+        ]
+      ),
       false
     );
   }
