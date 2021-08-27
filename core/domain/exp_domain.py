@@ -803,9 +803,6 @@ class Exploration(python_utils.OBJECT):
             title=title,
             states=state_protos
         )
-        print('-------------------')
-        print(exploration_proto)
-        print('-------------------')
         return exploration_proto
 
     def to_state_proto(self, states):
@@ -1381,12 +1378,118 @@ class Exploration(python_utils.OBJECT):
         for answer_group in answer_groups:
             base_answer_group_proto = self.to_base_answer_group_proto(
                 self, answer_group)
+            rules_spec_proto = self.to_numeric_rule_specs_proto(
+                self, answer_group.rule_specs)
             answer_group_proto=state_pb2.NumericInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto
+                base_answer_group=base_answer_group_proto,
+                rule_specs=rules_spec_proto
             )
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
+
+    def to_numeric_rule_specs_proto(self, rule_specs_list):
+        rule_specs_list_proto = []
+        rules_specs_proto = {}
+
+        for rule_spec in rule_specs_list:
+            rule_type = rule_spec.rule_type
+            if(rule_type == 'Equals'):
+                equals_to_proto = self.to_numeric_equals_to_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    equals=equals_to_proto
+                )
+
+            if(rule_type == 'IsLessThan'):
+                is_less_than_proto = self.to_numeric_is_less_than_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    is_less_than=is_less_than_proto
+                )
+
+            if(rule_type == 'IsGreaterThan'):
+                is_greater_than_proto = self.to_numeric_is_greater_than_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    is_greater_than=is_greater_than_proto
+                )
+
+            if(rule_type == 'IsLessThanOrEqualTo'):
+                is_less_than_or_equal_to_proto = self.to_numeric_is_less_than_or_equal_to_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    is_less_than_or_equal_to=is_less_than_or_equal_to_proto
+                )
+
+            if(rule_type == 'IsGreaterThanOrEqualTo'):
+                is_greater_than_or_equal_to_proto = self.to_numeric_is_greater_than_or_equal_to_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    is_greater_than_or_equal_to=is_greater_than_or_equal_to_proto
+                )
+
+            if(rule_type == 'IsInclusivelyBetween'):
+                is_inclusively_between_proto = self.to_numeric_is_inclusively_between_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    is_inclusively_between=is_inclusively_between_proto
+                )
+
+            if(rule_type == 'IsWithinToleranceSpec'):
+                is_within_tolerance_proto = self.to_numeric_is_within_tolerance_proto(
+                    self, rule_spec.inputs['x'])
+                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
+                    is_within_tolerance=is_within_tolerance_proto
+                )
+
+            rule_specs_list_proto.append(rules_specs_proto)
+
+        return rule_specs_list_proto
+
+    def to_numeric_equals_to_proto(self, input):
+        equals_to_proto = state_pb2.NumericInputInstance.RuleSpec.EqualsSpec(
+            input=input)
+
+        return equals_to_proto
+
+    def to_numeric_is_less_than_proto(self, input):
+        is_less_than_proto = state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
+            input=input)
+
+        return is_less_than_proto
+
+    def to_numeric_is_greater_than_proto(self, input):
+        is_greater_than_proto = state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
+            input=input)
+
+        return is_greater_than_proto
+
+    def to_numeric_is_less_than_or_equal_to_proto(self, input):
+        is_less_than_or_equal_to_proto = state_pb2.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec(
+            input=input)
+
+        return is_less_than_or_equal_to_proto
+
+    def to_numeric_is_greater_than_or_equal_to_proto(self, input):
+        is_greater_than_or_equal_to_proto = state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec(
+            input=input)
+
+        return is_greater_than_or_equal_to_proto
+
+    def to_numeric_is_inclusively_between_proto(self, input):
+        is_inclusively_between_proto = state_pb2.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec(
+            inputLowerInclusive=input[0],
+            inputUpperInclusive=input[1])
+
+        return is_inclusively_between_proto
+
+    def to_numeric_is_within_tolerance_proto(self, input):
+        is_within_tolerance_proto = state_pb2.NumericInputInstance.RuleSpec.IsWithinToleranceSpec(
+            inputTolerance=input[0],
+            inputComparedValue=input[1])
+
+        return is_within_tolerance_proto
 
     def to_numeric_solution(self, solution):
         solution_proto = None 
