@@ -235,6 +235,7 @@ angular.module('oppia').component('contributionsAndReview', {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
+          $rootScope.$applyAsync();
         });
       };
 
