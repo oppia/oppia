@@ -204,10 +204,8 @@ class UserIdentifiersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(
-            cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -294,10 +292,8 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(
-            cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
