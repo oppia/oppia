@@ -56,4 +56,4 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
             report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
-        return self.render_json({}) # type: ignore[no-untyped-call]
+        return self.render_json({})
