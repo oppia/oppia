@@ -235,7 +235,6 @@
     ],
     "9": [
         "core.storage.app_feedback_report.gae_models_test",
-        "jobs.batch_jobs.dashboard_stats_one_off_test",
         "jobs.batch_jobs.validation_jobs_test",
         "jobs.base_jobs_test",
         "jobs.decorators.validation_decorators_test",
