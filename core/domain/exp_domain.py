@@ -1008,7 +1008,8 @@ class Exploration(python_utils.OBJECT):
                 written translatable html proto object.
         """
         written_translatable_html_proto = languages_pb2
-            .WrittenTranslation.data_format.WrittenTranslatableHtml(translation=translation)
+                .WrittenTranslation.data_format
+                .WrittenTranslatableHtml(translation=translation)
 
         return written_translatable_html_proto
 
