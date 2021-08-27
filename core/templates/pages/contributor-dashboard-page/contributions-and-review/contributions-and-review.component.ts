@@ -48,18 +48,24 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestion-modal.service.ts');
 
+require(
+  // eslint-disable-next-line max-len
+  'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
+
 angular.module('oppia').component('contributionsAndReview', {
   template: require('./contributions-and-review.component.html'),
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
+    'UrlInterpolationService', 'UserService',
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, IMAGE_CONTEXT) {
+        UrlInterpolationService, UserService,
+        CORRESPONDING_DELETED_OPPORTUNITY_TEXT, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
 
@@ -108,7 +114,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
           if (details === null) {
-            subheading = '[The corresponding opportunity has been deleted.]';
+            subheading = CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
           } else {
             subheading = details.skill_description;
           }
@@ -137,7 +143,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
           if (details === null) {
-            subheading = '[The corresponding opportunity has been deleted.]';
+            subheading = CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
           } else {
             subheading = (
               details.topic_name + ' / ' + details.story_title +

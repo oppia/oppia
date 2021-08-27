@@ -43,5 +43,10 @@ export const ContributorDashboardConstants = {
     }
   },
 
+  // The text to display for a submitted suggestion if its corresponding
+  // opportunity was deleted.
+  CORRESPONDING_DELETED_OPPORTUNITY_TEXT: '[The corresponding opportunity ' +
+    'has been deleted.]',
+
   DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi'
 } as const;

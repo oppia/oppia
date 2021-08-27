@@ -37,7 +37,7 @@
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
-            [hidden]="opportunityDataIsLoading"
+            [hidden]="opportunityDataIsLoading || isCorrespondingOpportunityDeleted"
             (click)="clickActionButton.emit(opportunity.id)">
       {{ opportunity?.actionButtonTitle }}
     </button>
