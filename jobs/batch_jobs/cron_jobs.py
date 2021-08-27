@@ -26,10 +26,11 @@ from core.platform import models
 from jobs import base_jobs
 from jobs.io import ndb_io
 from jobs.types import job_run_result
+import python_utils
 
 import apache_beam as beam
 
-from typing import Dict, List, Union, cast # isort:skip
+from typing import Dict, Iterable, List, Tuple, Union, cast # isort:skip
 
 MYPY = False
 if MYPY:
@@ -47,7 +48,6 @@ MAX_RECOMMENDATIONS = 10
 # Note: There is a threshold so that bad recommendations will be
 # discarded even if an exploration has few similar explorations.
 SIMILARITY_SCORE_THRESHOLD = 3.0
-
 
 
 class IndexExplorationsInSearch(base_jobs.JobBase):
@@ -103,48 +103,86 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
 
     @staticmethod
     def _compute_similarity(
-            reference_exp_summary_model: datastore_services.Model,
-            exp_summary_models: List[datastore_services.Model]
-    ) -> List[job_run_result.JobRunResult]:
-        """Index exploration summaries and catch any errors.
+            ref_exp_summary_model: datastore_services.Model,
+            compared_exp_summary_models: List[datastore_services.Model]
+    ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
+        """Compute similarities between exploraitons.
 
         Args:
-            exp_summary_models: list(Model). Models to index.
+            ref_exp_summary_model: ExpSummaryModel. Reference exploration
+                summary. We are trying to find explorations similar to this
+                reference summary.
+            compared_exp_summary_models: list(ExpSummaryModel). List of other
+                explorations summaries against which we compare the reference
+                summary.
 
-        Returns:
-            list(str). List containing one element, which is either SUCCESS,
-            or FAILURE.
+        Yields:
+            (str, dict(str, str|float)). Tuple, the first element is
+            the exploration ID of the reference exploration summary.
+            The second is a dictionary. The structure of the dictionary is:
+                exp_id: str. The ID of the similar exploration.
+                similarity_score: float. The similarity score for
+                    the exploration.
         """
-        for compared_exp_summary_model in exp_summary_models:
-            if compared_exp_summary_model.id == reference_exp_summary_model.id:
-                continue
-            similarity_score = recommendations_services.get_item_similarity(
-                reference_exp_summary_model, compared_exp_summary_model
-            )
-            if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
-                yield (
-                    reference_exp_summary_model.id, {
-                        'similarity_score': similarity_score,
-                        'exp_id': compared_exp_summary_model.id
-                    }
+        ref_exp_summary_model = cast(
+            exp_models.ExpSummaryModel, ref_exp_summary_model)
+        with datastore_services.get_ndb_context():
+            for compared_exp_summary_model in compared_exp_summary_models:
+                compared_exp_summary_model = cast(
+                    exp_models.ExpSummaryModel,
+                    compared_exp_summary_model
                 )
+                if compared_exp_summary_model.id == ref_exp_summary_model.id:
+                    continue
+                similarity_score = recommendations_services.get_item_similarity( # type: ignore[no-untyped-call]
+                    ref_exp_summary_model, compared_exp_summary_model
+                )
+                if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
+                    yield (
+                        ref_exp_summary_model.id, {
+                            'similarity_score': similarity_score,
+                            'exp_id': compared_exp_summary_model.id
+                        }
+                    )
 
     @staticmethod
     def _sort_and_slice_similarities(
-            similarities: Dict[str, Union[int, str]]
+            similarities: Iterable[Dict[str, Union[str, float]]]
     ) -> List[str]:
-        """"""
+        """Sorts similarities of explorations and slices them to
+        a maximum length.
+
+        Args:
+            similarities:iterable(). Iterable of dictionaries. The structure of
+                the dictionaries is:
+                    exp_id: str. The ID of the similar exploration.
+                    similarity_score: float. The similarity score for
+                        the exploration.
+
+        Returns:
+            list(str). List of exploration IDs, sorted by the similarity.
+        """
         sorted_similarities = sorted(
             similarities, reverse=True, key=lambda x: x['similarity_score'])
         return [
-            item['exp_id'] for item in sorted_similarities
+            python_utils.UNICODE(item['exp_id']) for item in sorted_similarities
         ][:MAX_RECOMMENDATIONS]
 
     @staticmethod
     def _create_recommendation(
             exp_id: str, recommended_exp_ids: List[str]
     ) -> recommendations_models.ExplorationRecommendationsModel:
-        """"""
+        """Creates exploration recommendation model.
+
+        Args:
+            exp_id: str. The exploration ID for which the recommendation is
+                created.
+            recommended_exp_ids: list(str). The list of recommended
+                exploration IDs.
+
+        Returns:
+            ExplorationRecommendationsModel. The created model.
+        """
         with datastore_services.get_ndb_context():
             exp_recommendation_model = (
                 recommendations_models.ExplorationRecommendationsModel(

@@ -284,9 +284,7 @@ def update_topic_similarities(data):
     save_topic_similarities(topic_similarities_dict)
 
 
-def get_item_similarity(
-        reference_exp_summary, compared_exp_summary
-):
+def get_item_similarity(reference_exp_summary, compared_exp_summary):
     """Returns the ranking of compared_exp to reference_exp as a
     recommendation. This returns a value between 0.0 to 10.0. A higher value
     indicates the compared_exp is a better recommendation as an exploration to
@@ -297,37 +295,40 @@ def get_item_similarity(
     returns 0.0 if compared_exp is private.
 
     Args:
-        reference_exp_summary: ExpSummaryModel.
-        compared_exp_summary: ExpSummaryModel.
-        topic_similarities: dict().
+        reference_exp_summary: ExpSummaryModel. The reference exploration
+            summary. The similarity score says how similar is
+            the compared summary to this summary.
+        compared_exp_summary: ExpSummaryModel. The compared exploration
+            summary. The similarity score says how similar is this summary to
+            the reference summary.
 
     Returns:
-        int. The similarity score.
+        float. The similarity score.
     """
 
-    similarity_score = 0
+    similarity_score = 0.0
 
     if compared_exp_summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
-        return 0
+        return 0.0
 
     topic_similarity_score = get_topic_similarity(
         reference_exp_summary.category, compared_exp_summary.category
     )
 
-    similarity_score += 5 * topic_similarity_score
+    similarity_score += 5.0 * topic_similarity_score
     if reference_exp_summary.owner_ids == compared_exp_summary.owner_ids:
-        similarity_score += 1
+        similarity_score += 1.0
     if (
             reference_exp_summary.language_code ==
             compared_exp_summary.language_code
     ):
-        similarity_score += 2
+        similarity_score += 2.0
 
     time_now = datetime.datetime.utcnow()
     time_delta_days = int(
         (time_now - compared_exp_summary.exploration_model_last_updated).days)
     if time_delta_days <= 7:
-        similarity_score += 1
+        similarity_score += 1.0
 
     return similarity_score
 
