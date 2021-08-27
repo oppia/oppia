@@ -11,6 +11,7 @@ callbacks==0.3.0
 contextlib2==0.6.0.post1
 firebase-admin==5.0.0
 future==0.18.2
+gunicorn==20.1.0
 google-cloud-storage==1.37.1
 GoogleAppEnginePipeline==1.9.22.1
 Graphy==1.0.0
