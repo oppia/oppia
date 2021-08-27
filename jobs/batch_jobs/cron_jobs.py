@@ -20,8 +20,11 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+from core.domain import opportunity_services
 from core.domain import search_services
+from core.domain import suggestion_services
 from core.platform import models
+import feconf
 from jobs import base_jobs
 from jobs.io import ndb_io
 from jobs.types import job_run_result
@@ -34,9 +37,11 @@ MYPY = False
 if MYPY:
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import suggestion_models
 
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, suggestion_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.suggestion])
 platform_search_services = models.Registry.import_search_services()
 
 
@@ -87,3 +92,56 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
             | 'Index batches of models' >> beam.Map(
                 self._index_exploration_summaries)
         )
+
+
+class GenerateTranslationContributionStats(base_jobs.JobBase):
+    """Job that indexes the explorations in Elastic Search."""
+
+    MAX_BATCH_SIZE = 1000
+
+    @staticmethod
+    def _index_exploration_summaries(
+            exp_summary_models: List[datastore_services.Model]
+    ) -> job_run_result.JobRunResult:
+        """Index exploration summaries and catch any errors.
+
+        Args:
+            exp_summary_models: list(Model). Models to index.
+
+        Returns:
+            list(str). List containing one element, which is either SUCCESS,
+            or FAILURE.
+        """
+        try:
+            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
+                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
+            return job_run_result.JobRunResult(
+                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
+            )
+        except platform_search_services.SearchException: # type: ignore[attr-defined]
+            return job_run_result.JobRunResult(
+                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
+            )
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """"""
+        suggestions = (
+            self.pipeline
+            | 'Get all non-deleted models' >> (
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
+                    suggestion_models.GeneralSuggestionModel.get_all(
+                        include_deleted=False)))
+            | 'Filter translate suggestions' >> beam.transforms.Filter(
+                lambda m: (
+                    m.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ))
+            | 'Transform models into domain objects' >> beam.Map(
+                suggestion_services.get_suggestion_from_model)
+        )
+
+        opportunities = (
+            suggestions
+            | 
+        )
+
+
