@@ -107,7 +107,7 @@ def get_topic_similarities_dict():
         recommendations_models.TopicSimilaritiesModel.get(
             recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
     if topic_similarities_entity is None:
-        topic_similarities_entity = _create_default_topic_similarities()
+        topic_similarities_entity = create_default_topic_similarities()
 
     return json.loads(topic_similarities_entity.content)
 
@@ -133,7 +133,7 @@ def save_topic_similarities(topic_similarities):
     return topic_similarities_entity
 
 
-def _create_default_topic_similarities():
+def create_default_topic_similarities():
     """Creates the default topic similarities, and stores them in the datastore.
     The keys are names of the default categories, and values are
     DEFAULT_TOPIC_SIMILARITY if the keys are different and
@@ -157,7 +157,7 @@ def _create_default_topic_similarities():
     return save_topic_similarities(topic_similarities_dict)
 
 
-def get_topic_similarity(topic_1, topic_2, topic_similarities):
+def get_topic_similarity(topic_1, topic_2, topic_similarities=None):
     """Gets the similarity between two topics, as a float between 0 and 1.
 
     It checks whether the two topics are in the list of default topics. If
@@ -285,7 +285,7 @@ def update_topic_similarities(data):
 
 
 def get_item_similarity(
-        reference_exp_summary, compared_exp_summary, topic_similarities
+        reference_exp_summary, compared_exp_summary
 ):
     """Returns the ranking of compared_exp to reference_exp as a
     recommendation. This returns a value between 0.0 to 10.0. A higher value
@@ -311,9 +311,7 @@ def get_item_similarity(
         return 0
 
     topic_similarity_score = get_topic_similarity(
-        reference_exp_summary.category,
-        compared_exp_summary.category,
-        topic_similarities
+        reference_exp_summary.category, compared_exp_summary.category
     )
 
     similarity_score += 5 * topic_similarity_score

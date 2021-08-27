@@ -19,7 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
+
 from constants import constants
+from core.domain import recommendations_services
 from core.domain import search_services
 from core.platform import models
 from jobs import job_test_utils
@@ -236,66 +239,86 @@ class ComputeExplorationRecommendationsTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = cron_jobs.ComputeExplorationRecommendations
 
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
 
-    def test_creates_empty_recommendations_for_one_exploration(self) -> None:
+    def test_does_nothing_when_only_one_exploration_exists(self) -> None:
         exp_summary = self.create_model( # type: ignore[no-untyped-call]
             exp_models.ExpSummaryModel,
-            id='abcd',
+            id=self.EXP_1_ID,
             deleted=False,
             title='title',
             category='category',
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
         )
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        self.assert_job_output_is([ # type: ignore[no-untyped-call]
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
-        ])
+        self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
 
         exp_recommendations_model = (
-            recommendations_models.ExplorationRecommendationsModel.get('abcd'))
-        self.assertIsNotNone(exp_recommendations_model)
-        self.assertEqual(
-            exp_recommendations_model.recommended_exploration_ids, []
-        )
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False))
+        self.assertIsNone(exp_recommendations_model)
 
-    def test_updates_existing_stats_model_when_values_are_provided(
-            self
-    ) -> None:
-        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
-            user_models.UserSettingsModel,
-            id=self.VALID_USER_ID_1, email='a@a.com')
-        user_stats_model = self.create_model( # type: ignore[no-untyped-call]
-            user_models.UserStatsModel,
-            id=self.VALID_USER_ID_1,
-            num_ratings=10,
-            average_ratings=4.5,
-            total_plays=22,
+    def test_creates_recommendations_for_similar_explorations(self) -> None:
+        recommendations_services.create_default_topic_similarities()
+        exp_summary_1 = self.create_model( # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
         )
-
-        self.put_multi([user_settings_model, user_stats_model]) # type: ignore[no-untyped-call]
+        exp_summary_1.update_timestamps()
+        exp_summary_2 = self.create_model( # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_2_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_2.update_timestamps()
+        self.put_multi([exp_summary_1, exp_summary_2]) # type: ignore[no-untyped-call]
 
         self.assert_job_output_is([ # type: ignore[no-untyped-call]
-            job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+            job_run_result.JobRunResult(stdout='SUCCESS 2')
         ])
 
-        user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
-        self.assertIsNotNone(user_stats_model)
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_1 is not None
         self.assertEqual(
-            user_stats_model.weekly_creator_stats_list,
-            [{
-                self.formated_datetime: {
-                    'num_ratings': 10,
-                    'average_ratings': 4.5,
-                    'total_plays': 22
-                }
-            }]
+            exp_recommendations_model_1.recommended_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_2 is not None
+        self.assertEqual(
+            exp_recommendations_model_2.recommended_exploration_ids,
+            [self.EXP_1_ID]
         )
 
     def test_creates_new_stats_model_if_not_existing(self) -> None:

@@ -40,6 +40,7 @@ if MYPY:
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
+datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()
 
 MAX_RECOMMENDATIONS = 10
@@ -135,7 +136,6 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
         """"""
         sorted_similarities = sorted(
             similarities, reverse=True, key=lambda x: x['similarity_score'])
-
         return [
             item['exp_id'] for item in sorted_similarities
         ][:MAX_RECOMMENDATIONS]
@@ -149,9 +149,10 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
             exp_recommendation_model = (
                 recommendations_models.ExplorationRecommendationsModel(
                     id=exp_id, recommended_exploration_ids=recommended_exp_ids))
+        exp_recommendation_model.update_timestamps()
         return exp_recommendation_model
 
-    def run(self) -> beam.PCollection:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         the Elastic Search.
 
