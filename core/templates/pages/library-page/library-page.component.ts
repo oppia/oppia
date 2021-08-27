@@ -258,8 +258,8 @@ export class LibraryPageComponent {
         this.groupHeaderI18nId = response.header_i18n_id;
         this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
           response.preferred_language_codes);
-
         this.loaderService.hideLoadingScreen();
+        this.initCarousels();
       });
     } else {
       this.libraryPageBackendApiService.fetchLibraryIndexDataAsync()
@@ -311,19 +311,17 @@ export class LibraryPageComponent {
                     });
                   });
                   this.loaderService.hideLoadingScreen();
+                  this.initCarousels();
                 });
             } else {
               this.loaderService.hideLoadingScreen();
+              this.initCarousels();
             }
           });
 
           this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
             response.preferred_language_codes);
 
-
-          // Initialize the carousel(s) on the library index page.
-          // Pause is necessary to ensure all elements have loaded.
-          setTimeout(this.initCarousels.bind(this), 390);
           this.keyboardShortcutService.bindLibraryPageShortcuts();
 
           // Check if actual and expected widths are the same.
