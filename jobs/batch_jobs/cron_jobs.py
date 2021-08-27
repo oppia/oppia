@@ -39,7 +39,7 @@ if MYPY:
 
 
 (exp_models, recommendations_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendation])
+    models.NAMES.exploration, models.NAMES.recommendations])
 platform_search_services = models.Registry.import_search_services()
 
 MAX_RECOMMENDATIONS = 10

@@ -32,8 +32,10 @@ from typing import Dict, List, Union # isort:skip
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models
+    from mypy_imports import recommendations_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, recommendations_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.recommendations])
 platform_search_services = models.Registry.import_search_services()
 
 
@@ -228,3 +230,117 @@ class IndexExplorationsInSearchTests(job_test_utils.JobTestBase):
             self.assert_job_output_is([ # type: ignore[no-untyped-call]
                 job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
             ])
+
+
+class ComputeExplorationRecommendationsTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = cron_jobs.ComputeExplorationRecommendations
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
+
+    def test_creates_empty_recommendations_for_one_exploration(self) -> None:
+        exp_summary = self.create_model( # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id='abcd',
+            deleted=False,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC
+        )
+        exp_summary.update_timestamps()
+        exp_summary.put()
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS 1')
+        ])
+
+        exp_recommendations_model = (
+            recommendations_models.ExplorationRecommendationsModel.get('abcd'))
+        self.assertIsNotNone(exp_recommendations_model)
+        self.assertEqual(
+            exp_recommendations_model.recommended_exploration_ids, []
+        )
+
+    def test_updates_existing_stats_model_when_values_are_provided(
+            self
+    ) -> None:
+        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserSettingsModel,
+            id=self.VALID_USER_ID_1, email='a@a.com')
+        user_stats_model = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserStatsModel,
+            id=self.VALID_USER_ID_1,
+            num_ratings=10,
+            average_ratings=4.5,
+            total_plays=22,
+        )
+
+        self.put_multi([user_settings_model, user_stats_model]) # type: ignore[no-untyped-call]
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+        ])
+
+        user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
+        self.assertIsNotNone(user_stats_model)
+        self.assertEqual(
+            user_stats_model.weekly_creator_stats_list,
+            [{
+                self.formated_datetime: {
+                    'num_ratings': 10,
+                    'average_ratings': 4.5,
+                    'total_plays': 22
+                }
+            }]
+        )
+
+    def test_creates_new_stats_model_if_not_existing(self) -> None:
+        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserSettingsModel,
+            id=self.VALID_USER_ID_1, email='a@a.com')
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS NEW 1')
+        ])
+
+        user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_stats_model is not None
+        self.assertEqual(
+            user_stats_model.weekly_creator_stats_list,
+            [{
+                self.formated_datetime: {
+                    'num_ratings': 0,
+                    'average_ratings': None,
+                    'total_plays': 0
+                }
+            }]
+        )
+
+    def test_handles_multiple_models(self) -> None:
+        user_settings_model_1 = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserSettingsModel,
+            id=self.VALID_USER_ID_1, email='a@a.com')
+        user_settings_model_2 = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserSettingsModel,
+            id=self.VALID_USER_ID_2, email='b@b.com')
+        user_stats_model_1 = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserStatsModel,
+            id=self.VALID_USER_ID_1)
+
+        self.put_multi([ # type: ignore[no-untyped-call]
+            user_settings_model_1, user_settings_model_2, user_stats_model_1])
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS OLD 1'),
+            job_run_result.JobRunResult(stdout='SUCCESS NEW 1')
+        ])
+
+        user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_2)
+        self.assertIsNotNone(user_stats_model)
