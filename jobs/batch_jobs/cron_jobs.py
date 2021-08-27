@@ -152,7 +152,7 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
         model.update_timestamps()
         return model
 
-    def run(self) -> beam.PCollection:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         user_settings_models = (
             self.pipeline
             | 'Get all UserSettingsModels' >> (
