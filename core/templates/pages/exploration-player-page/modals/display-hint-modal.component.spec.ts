@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for DisplayHintModalComponent.
  */
 
+import { Component, Directive } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -32,6 +32,16 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplayHintModalComponent } from './display-hint-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
+
+let MockAngularHtmlBindWrapperDirective = function(
+    options: Component): Directive {
+  const metadata: Directive = {
+    selector: options.selector,
+    inputs: options.inputs,
+    outputs: options.outputs
+  };
+  return <undefined>Directive(metadata)(class _ { });
+};
 
 describe('Display hint modal', () => {
   let fixture: ComponentFixture<DisplayHintModalComponent>;
@@ -48,8 +58,10 @@ describe('Display hint modal', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         DisplayHintModalComponent,
-        AngularHtmlBindWrapperDirective,
-        MockTranslatePipe
+        MockTranslatePipe,
+        MockAngularHtmlBindWrapperDirective({
+          selector: 'angular-html-bind-wrapper',
+          inputs: ['htmlData'] })
       ],
       providers: [
         NgbActiveModal,

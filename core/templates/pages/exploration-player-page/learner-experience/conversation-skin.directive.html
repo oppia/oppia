@@ -63,7 +63,7 @@
       </div>
       <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
-          <span class="conversation-skin-next-lesson-text">Next Lesson</span>
+          <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
           <span><[recommendedExplorationSummaries[0].title]></span>
         </div>
         <div>
@@ -149,8 +149,8 @@
     <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
   <div ng-if="inStoryMode && !isLoggedIn" class="conversation-skin-login-container">
-    <div class="conversation-skin-congratulations-text">Congratulations on completing the chapter!</div>
-    <span class="conversation-skin-login-text text-secondary">Log in or sign up to save your progress and play through the next lesson.</span>
+    <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
+    <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
       <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="signIn()">
         LOGIN

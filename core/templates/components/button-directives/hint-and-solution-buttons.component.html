@@ -1,6 +1,6 @@
 <div *ngIf="isHintButtonVisible(0) && currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-left">
   <ul class="list-inline float-right">
-    <span class="float-left footer-hints-label">HINTS</span>
+    <span class="float-left footer-hints-label" translate="I18N_PLAYER_HINTS"></span>
     <li *ngFor="let hintIndex of hintIndexes; index as idx">
       <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
               *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)"
@@ -165,6 +165,7 @@
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 21px;
+    text-transform: uppercase;
   }
 
   .oppia-hint-and-solution-buttons .list-inline > li {

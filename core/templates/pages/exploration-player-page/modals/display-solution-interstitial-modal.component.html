@@ -1,18 +1,20 @@
-<div class="oppia-learner-solution-interstitial-modal-title">Warning!</div>
+<div class="oppia-learner-solution-interstitial-modal-title">
+  <span [innerHTML]="'I18N_WARNING_MODAL_TITLE' | translate"></span>
+</div>
 
 <div class="modal-body">
   <span class="oppia-learner-solution-interstitial-modal-body">
-    This will show the full solution. Are you sure?
+    <span [innerHTML]="'I18N_WARNING_MODAL_DESCRIPTION' | translate"></span>
   </span>
 </div>
 
 <div class="oppia-learner-solution-container">
   <button class="oppia-modal-cancel-button md-button md-default-theme ml-auto" (click)="cancel()">
-    Cancel
+    <span [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></span>
   </button>
   <button class="oppia-learner-got-it-button protractor-test-learner-got-it-button md-button md-default-theme protractor-test-continue-to-solution-btn"
           (click)="confirm()">
-    Show Solution
+    <span [innerHTML]="'I18N_SHOW_SOLUTION_BUTTON' | translate"></span>
   </button>
 </div>
 <span class="clearfix"></span>

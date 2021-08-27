@@ -34,6 +34,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'content-language-selector',
@@ -48,17 +49,31 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private ngbModal: NgbModal,
-    private imagePreloaderService: ImagePreloaderService
+    private imagePreloaderService: ImagePreloaderService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
   ) {}
 
   selectedLanguageCode: string;
   languageOptions: ExplorationLanguageInfo[];
+  currentGlobalLanguageCode: string;
 
   ngOnInit(): void {
+    this.currentGlobalLanguageCode = (
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.selectedLanguageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     this.languageOptions = (
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
+    for (let option of this.languageOptions) {
+      if (option.value === this.currentGlobalLanguageCode) {
+        this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+          option.value);
+        this.selectedLanguageCode = (
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+        );
+        break;
+      }
+    }
   }
 
   onSelectLanguage(newLanguageCode: string): string {

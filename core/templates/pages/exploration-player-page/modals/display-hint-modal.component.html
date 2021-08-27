@@ -1,37 +1,18 @@
-<div *ngIf="isHint" class="oppia-learner-hint-and-solution-modal-title">
+<div class="oppia-learner-hint-and-solution-modal-title">
   <span [innerHTML]="'I18N_HINT_TITLE' | translate"></span>
-</div>
-<div *ngIf="!isHint" class="oppia-learner-hint-and-solution-modal-title">
-  <span [innerHTML]="'I18N_SOLUTION_TITLE' | translate"></span>
 </div>
 
 <div class="modal-body">
   <span>
-    <angular-html-bind-wrapper *ngIf="isHint" class="oppia-learner-hint-and-solution-modal-body"
+    <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
                                [htmlData]="hint.html">
     </angular-html-bind-wrapper>
   </span>
-  <div *ngIf="!isHint">
-    <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
-    <span>
-      <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
-                                 [htmlData]="shortAnswerHtml.answer">
-      </angular-html-bind-wrapper>
-    </span>
-    <br>
-    <br>
-    <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
-    <span>
-      <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
-                                 [htmlData]="solutionExplanationHtml">
-      </angular-html-bind-wrapper>
-    </span>
-  </div>
 </div>
 
 <button class="oppia-learner-got-it-button protractor-test-learner-got-it-button md-button md-default-theme ml-auto"
         (click)="closeModal()">
-  GOT IT
+  <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
 </button>
 <span class="clearfix"></span>
 

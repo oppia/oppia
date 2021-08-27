@@ -25,6 +25,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { AttributionService } from 'services/attribution.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockAttributionService {
   init() {
@@ -84,7 +85,10 @@ describe('Attribution Guide Component', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AttributionGuideComponent],
+      declarations: [
+        AttributionGuideComponent,
+        MockTranslatePipe
+      ],
       providers: [
         { provide: AttributionService, useClass: MockAttributionService },
         { provide: BrowserCheckerService, useClass: MockBrowserCheckerService },
