@@ -108,7 +108,6 @@ class MockAutosaveInfoModalsService {
 
 describe('Change List Service when changes are mergable', () => {
   let changeListService: ChangeListService;
-  let loaderService: LoaderService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
@@ -116,6 +115,7 @@ describe('Change List Service when changes are mergable', () => {
 
   let alertsSpy = null;
   let mockExplorationDataService = null;
+  let mockEventEmitter = new EventEmitter();
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
@@ -130,6 +130,12 @@ describe('Change List Service when changes are mergable', () => {
         {
           provide: WindowRef,
           useValue: mockWindowRef
+        },
+        {
+          provide: LoaderService,
+          useValue: {
+            onLoadingMessageChange: mockEventEmitter
+          }
         }
       ]
     });
@@ -137,7 +143,6 @@ describe('Change List Service when changes are mergable', () => {
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
-    loaderService = TestBed.inject(LoaderService);
     internetConnectivityService = TestBed.inject(InternetConnectivityService);
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
@@ -151,11 +156,6 @@ describe('Change List Service when changes are mergable', () => {
   });
 
   it('should set loading message when initialized', () => {
-    let mockEventEmitter = new EventEmitter();
-    spyOnProperty(loaderService, 'onLoadingMessageChange')
-      .and.returnValue(mockEventEmitter);
-
-    changeListService.ngOnInit();
     mockEventEmitter.emit('loadingMessage');
 
     expect(changeListService.loadingMessage).toBe('loadingMessage');
@@ -308,7 +308,6 @@ describe('Change List Service when internet is available', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let internetConnectivityService: InternetConnectivityService;
   let onInternetStateChangeEventEmitter = new EventEmitter();
 
   let alertsSpy = null;
@@ -333,6 +332,15 @@ describe('Change List Service when internet is available', () => {
         {
           provide: AutosaveInfoModalsService,
           useValue: mockAutosaveInfoModalsService
+        },
+        {
+          provide: InternetConnectivityService,
+          useValue: {
+            onInternetStateChange: onInternetStateChangeEventEmitter,
+            isOnline() {
+              return true;
+            }
+          }
         }
       ]
     });
@@ -340,14 +348,9 @@ describe('Change List Service when internet is available', () => {
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
-    internetConnectivityService = TestBed.inject(InternetConnectivityService);
     alertsService = TestBed.inject(AlertsService);
-
-    spyOnProperty(internetConnectivityService, 'onInternetStateChange')
-      .and.returnValue(onInternetStateChangeEventEmitter);
     alertsSpy = spyOn(alertsService, 'addWarning')
       .and.returnValue(null);
-    changeListService.ngOnInit();
   });
 
   it('should undo and save changes when calling \'undoLastChange\'', () => {
