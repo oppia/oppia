@@ -16,7 +16,7 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeListService } from './change-list.service';
 import { LoaderService } from 'services/loader.service';
@@ -117,7 +117,7 @@ describe('Change List Service when changes are mergable', () => {
   let mockExplorationDataService = null;
   let mockEventEmitter = new EventEmitter();
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService1();
     TestBed.configureTestingModule({
@@ -139,13 +139,17 @@ describe('Change List Service when changes are mergable', () => {
         }
       ]
     });
+
+    tick(200);
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     changeListService = TestBed.inject(ChangeListService);
     internetConnectivityService = TestBed.inject(InternetConnectivityService);
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
+
+    tick(200);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
@@ -153,13 +157,15 @@ describe('Change List Service when changes are mergable', () => {
       .and.returnValue(null);
     alertsSpy = spyOn(alertsService, 'addWarning')
       .and.returnValue(null);
-  });
+  }));
 
-  it('should set loading message when initialized', () => {
+  it('should set loading message when initialized', fakeAsync(() => {
     mockEventEmitter.emit('loadingMessage');
 
+    tick(200);
+
     expect(changeListService.loadingMessage).toBe('loadingMessage');
-  });
+  }));
 
   it('should save changes after deleting a state ' +
     'when calling \'deleteState\'', fakeAsync(() => {
@@ -207,14 +213,16 @@ describe('Change List Service when changes are mergable', () => {
   }));
 
   it('should discard all changes ' +
-    'when calling \'discardAllChanges\'', () => {
+    'when calling \'discardAllChanges\'', fakeAsync(() => {
     let discardSpy = spyOn(mockExplorationDataService, 'discardDraftAsync')
       .and.callThrough();
 
     changeListService.discardAllChanges();
 
+    tick(200);
+
     expect(discardSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should show alert message if we try to edit ' +
     'an exploration with invalid property', fakeAsync(() => {
@@ -237,15 +245,17 @@ describe('Change List Service when changes are mergable', () => {
   }));
 
   it('should check whether exploration locked for editing ' +
-    'when calling \'isExplorationLockedForEditing\'', () => {
+    'when calling \'isExplorationLockedForEditing\'', fakeAsync(() => {
     changeListService.explorationChangeList.length = 2;
+    tick(200);
     expect(changeListService.isExplorationLockedForEditing())
       .toBe(true);
 
     changeListService.explorationChangeList.length = 0;
+    tick(200);
     expect(changeListService.isExplorationLockedForEditing())
       .toBe(false);
-  });
+  }));
 });
 
 describe('Change List Service when changes are not mergable', () => {
@@ -257,7 +267,7 @@ describe('Change List Service when changes are not mergable', () => {
   let alertsSpy = null;
   let mockExplorationDataService = null;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService2();
     TestBed.configureTestingModule({
@@ -273,12 +283,16 @@ describe('Change List Service when changes are not mergable', () => {
         }
       ]
     });
+
+    tick(200);
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     changeListService = TestBed.inject(ChangeListService);
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
+
+    tick(200);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
@@ -286,27 +300,32 @@ describe('Change List Service when changes are not mergable', () => {
       .and.returnValue(null);
     alertsSpy = spyOn(alertsService, 'addWarning')
       .and.returnValue(null);
-  });
+  }));
 
-  it('should undo and save changes when calling \'undoLastChange\'', () => {
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null);
-    changeListService.explorationChangeList.length = 2;
+  it('should undo and save changes when calling \'undoLastChange\'',
+    fakeAsync(() => {
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter, 'emit')
+        .and.returnValue(null);
+      changeListService.explorationChangeList.length = 2;
 
-    changeListService.undoLastChange();
+      changeListService.undoLastChange();
 
-    expect(saveSpy).toHaveBeenCalled();
-  });
+      tick(200);
 
-  it('should not undo changes when there are no changes', () => {
+      expect(saveSpy).toHaveBeenCalled();
+    }));
+
+  it('should not undo changes when there are no changes', fakeAsync(() => {
     changeListService.explorationChangeList.length = 0;
 
     changeListService.undoLastChange();
 
+    tick(200);
+
     expect(alertsSpy).toHaveBeenCalledWith(
       'There are no changes to undo.');
-  });
+  }));
 });
 
 describe('Change List Service when internet is available', () => {
@@ -319,7 +338,7 @@ describe('Change List Service when internet is available', () => {
   let mockExplorationDataService = null;
   let mockAutosaveInfoModalsService = null;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService3();
     mockAutosaveInfoModalsService = new MockAutosaveInfoModalsService();
@@ -349,40 +368,49 @@ describe('Change List Service when internet is available', () => {
         }
       ]
     });
+    tick(200);
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     changeListService = TestBed.inject(ChangeListService);
     alertsService = TestBed.inject(AlertsService);
+
+    tick(200);
+
     alertsSpy = spyOn(alertsService, 'addWarning')
       .and.returnValue(null);
-  });
+  }));
 
-  it('should undo and save changes when calling \'undoLastChange\'', () => {
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null);
+  it('should undo and save changes when calling \'undoLastChange\'',
+    fakeAsync(() => {
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter, 'emit')
+        .and.returnValue(null);
+      changeListService.temporaryListOfChanges = [{
+        cmd: 'add_state',
+        state_name: 'stateName'
+      }];
+      changeListService.explorationChangeList.length = 2;
+
+      onInternetStateChangeEventEmitter.emit(true);
+      changeListService.undoLastChange();
+
+      tick(200);
+
+      expect(saveSpy).toHaveBeenCalled();
+    }));
+
+  it('should not undo changes when there are no changes', fakeAsync(() => {
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
       state_name: 'stateName'
     }];
-    changeListService.explorationChangeList.length = 2;
-
-    onInternetStateChangeEventEmitter.emit(true);
-    changeListService.undoLastChange();
-
-    expect(saveSpy).toHaveBeenCalled();
-  });
-
-  it('should not undo changes when there are no changes', () => {
-    changeListService.temporaryListOfChanges = [{
-      cmd: 'add_state',
-      state_name: 'stateName'
-    }];
 
     changeListService.undoLastChange();
+
+    tick(200);
 
     expect(alertsSpy).toHaveBeenCalledWith(
       'There are no changes to undo.');
-  });
+  }));
 });
