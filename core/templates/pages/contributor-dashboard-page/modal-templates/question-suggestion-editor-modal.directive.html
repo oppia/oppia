@@ -50,7 +50,7 @@
             class="btn btn-success protractor-test-save-question-button"
             ng-click="done()"
             ng-disabled="!isQuestionValid()">
-      Submit Question
+      <[isEditing ? 'Update' : 'Submit']> Question
     </button>
   </div>
 </div>
