@@ -5668,8 +5668,6 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
-  "BEAM_JOBS_ARE_ENABLED": false,
-
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.
@@ -5979,6 +5977,11 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
+    },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About foundation | Oppia",
+      "META": []
     },
     "CLASSROOM": {
       "ROUTE": "learn/:classroom_url_fragment",

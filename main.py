@@ -25,6 +25,7 @@ from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import beam_jobs
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
 from core.controllers import blog_homepage
@@ -108,7 +109,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
+        self.render_json({'is_internet_connected': True})
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -120,7 +121,7 @@ class FrontendErrorHandler(base.BaseHandler):
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
-        self.render_json(self.values) # type: ignore[no-untyped-call]
+        self.render_json(self.values)
 
 
 class WarmupPage(base.BaseHandler):
@@ -582,7 +583,7 @@ URLS = [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        r'/createhandler/state_interaction_stats/<exploration_id>/<state_name>',
         editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
@@ -816,6 +817,11 @@ URLS = [
     get_redirect_route(
         r'/blogadminhandler', blog_admin.BlogAdminHandler),
 
+    get_redirect_route('/beam_job', beam_jobs.BeamJobHandler),
+    get_redirect_route('/beam_job_run', beam_jobs.BeamJobRunHandler),
+    get_redirect_route(
+        '/beam_job_run_result', beam_jobs.BeamJobRunResultHandler),
+
     get_redirect_route(
         r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
         blog_dashboard.BlogPostHandler),
@@ -896,6 +902,11 @@ URLS.extend((
 URLS.extend((
     get_redirect_route(
         r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    get_redirect_route(
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
     get_redirect_route(
         r'/cron/mail/admins/contributor_dashboard_bottlenecks',
         cron.CronMailAdminContributorDashboardBottlenecksHandler),
