@@ -134,7 +134,7 @@ def delete_multi_transactional(keys: List[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-def delete_multi(keys: List[Key]) -> List[None]:
+def delete_multi(keys: Sequence[Key]) -> List[None]:
     """Deletes models corresponding to a sequence of keys.
 
     Args:

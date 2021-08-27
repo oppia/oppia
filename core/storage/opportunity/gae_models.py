@@ -219,9 +219,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     @classmethod
     def delete_all(cls) -> None:
         """Deletes all entities of this class."""
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query().fetch(keys_only=True))
+        keys = cls.query().fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
 
