@@ -27,7 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Dict, List # isort:skip # pylint: disable=unused-import
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -444,40 +444,40 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         exp_id_1 = 'expid1'
         state_name_1 = 'intro'
         state_reference_1 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_1, state_name_1)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_1, state_name_1)) # pylint: disable=line-too-long
         self.assertEqual(state_reference_1, 'expid1:intro')
         exp_id_2 = 'exp_id_2'
         state_name_2 = 'first state'
         state_reference_2 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_2, state_name_2)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_2, state_name_2)) # pylint: disable=line-too-long
         self.assertEqual(state_reference_2, 'exp_id_2:first state')
         exp_id_3 = 'exp id 1.2.3'
         state_name_3 = 'this_is first_state version 1.1'
         state_reference_3 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_3, state_name_3)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_3, state_name_3)) # pylint: disable=line-too-long
         self.assertEqual(
             state_reference_3, 'exp id 1.2.3:this_is first_state version 1.1')
         exp_id_4 = '123'
         state_name_4 = u'टेक्स्ट'
         state_reference_4 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_4, state_name_4)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_4, state_name_4)) # pylint: disable=line-too-long
         self.assertEqual(
             state_reference_4, '123:%s' % (state_name_4))
         exp_id_5 = '1234'
         state_name_5 = u'Klüft'
         state_reference_5 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)) # pylint: disable=line-too-long
         self.assertEqual(
             state_reference_5, '1234:%s' % (state_name_5))
 
     def test_get_state_reference_for_question(self) -> None:
         question_id_1 = 'first question'
         state_reference_1 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_1)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_1)) # pylint: disable=line-too-long
         self.assertEqual(state_reference_1, 'first question')
         question_id_2 = 'first.question'
         state_reference_2 = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_2)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_2)) # pylint: disable=line-too-long
         self.assertEqual(state_reference_2, 'first.question')
 
     def test_get_instance_id(self) -> None:
@@ -544,7 +544,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         exp_id = '123'
         state_name = u'टेक्स्ट'
         state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) # pylint: disable=line-too-long
         self.assertEqual(
             state_reference, '123:%s' % (state_name))
         entity_type = feconf.ENTITY_TYPE_EXPLORATION

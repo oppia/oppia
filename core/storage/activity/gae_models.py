@@ -23,7 +23,7 @@ from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -44,28 +44,25 @@ class ActivityReferencesModel(base_models.BaseModel):
     activity_references = datastore_services.JsonProperty(repeated=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
-    def get_or_create(cls, list_name):
-         # type: (Text) -> ActivityReferencesModel
+    def get_or_create(cls, list_name: str) -> 'ActivityReferencesModel':
         """This creates the relevant model instance, if it does not already
         exist.
         """

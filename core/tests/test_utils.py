@@ -2891,7 +2891,7 @@ title: Title
                 'outline': (
                     '<p>Value</p>'
                     '<oppia-noninteractive-math math_content-with-value="{'
-                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' #pylint: disable=line-too-long
+                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' # pylint: disable=line-too-long
                     '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
                     '}">'
                     '</oppia-noninteractive-math>'),

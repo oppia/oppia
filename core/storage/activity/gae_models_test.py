@@ -35,28 +35,24 @@ if MYPY: # pragma: no cover
 class ActivityListModelTest(test_utils.GenericTestBase):
     """Tests the ActivityListModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             activity_models.ActivityReferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_featured_activity_list_always_exists(self):
-        # type: () -> None
+    def test_featured_activity_list_always_exists(self) -> None:
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertIsNotNone(featured_model_instance)
         self.assertEqual(featured_model_instance.id, 'featured')
         self.assertEqual(featured_model_instance.activity_references, [])
 
-    def test_retrieving_non_existent_list(self):
-        # type: () -> None
+    def test_retrieving_non_existent_list(self) -> None:
         with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 
-    def test_updating_featured_activity_list(self):
-        # type: () -> None
+    def test_updating_featured_activity_list(self) -> None:
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertEqual(featured_model_instance.activity_references, [])

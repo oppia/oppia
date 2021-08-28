@@ -25,9 +25,7 @@ from core.domain import user_services
 
 import feconf
 
-from typing import Any # pylint: disable=unused-import
-from typing import Dict # pylint: disable=unused-import
-from typing import Text # pylint: disable=unused-import
+from typing import Any, Dict # isort: skip
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
@@ -39,8 +37,12 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {
             'classroom_url_fragment': {
                 'schema': {
@@ -48,11 +50,15 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
                 }
             }
         }
-    } # type: Dict[Text, Any]
+    }
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
+        # Please use type casting here instead of type ignore[union-attr] once
+        # this attribute `normalized_request` has been type annotated in the
+        # parent class BaseHandler.
         classroom_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
             'classroom_url_fragment')
         classroom = classroom_services.get_classroom_by_url_fragment( # type: ignore[no-untyped-call]
@@ -68,15 +74,20 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
 
-    HANDLER_ARGS_SCHEMAS = {
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {}
-    } # type: Dict[Text, Any]
+    }
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.can_manage_own_account # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         pass
 
 
@@ -85,21 +96,26 @@ class ProfileExistsValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {
         'username': {
             'schema': {
                 'type': 'basestring'
             }
         }
-    } # type: Dict[Text, Any]
+    }
 
-    HANDLER_ARGS_SCHEMAS = {
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {}
-    } # type: Dict[Text, Any]
+    }
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self, username):
-        # type: (Text) -> None
+    def get(self, username: str) -> None:
         """Validates access to profile page."""
 
         user_settings = user_services.get_user_settings_from_username( # type: ignore[no-untyped-call]
@@ -114,15 +130,20 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
 
-    HANDLER_ARGS_SCHEMAS = {
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {}
-    } # type: Dict[Text, Any]
+    }
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
             raise self.PageNotFoundException
@@ -133,14 +154,19 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
 
-    HANDLER_ARGS_SCHEMAS = {
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
         'GET': {}
-    } # type: Dict[Text, Any]
+    }
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.can_access_release_coordinator_page # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         pass

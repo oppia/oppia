@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -105,7 +105,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since emails were sent
         to them.
         """
@@ -369,7 +369,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since the emails were sent
         to them.
         """

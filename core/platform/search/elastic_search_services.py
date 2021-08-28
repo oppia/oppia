@@ -26,7 +26,7 @@ import python_utils
 
 import elasticsearch
 
-from typing import Any, Dict, List, Optional, Tuple, Union # isort:skip
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError

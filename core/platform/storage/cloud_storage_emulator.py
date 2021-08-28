@@ -27,7 +27,7 @@ import python_utils
 
 import redis
 
-from typing import Dict, List, Mapping, Optional, TypeVar, Union  # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Mapping, Optional, Union
 
 
 REDIS_CLIENT = redis.StrictRedis(

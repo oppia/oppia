@@ -2392,6 +2392,73 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_inline_comment_with_allowed_pragma_raises_no_error(self):
+        node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # type: ignore[some-rule]
+                """)
+
+        node_inline_comment_with_allowed_pragma.file = filename
+        node_inline_comment_with_allowed_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_inline_comment_with_multiple_allowed_pragmas_raises_no_error(self):
+        node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
+                """)
+
+        node_inline_comment_with_allowed_pragma.file = filename
+        node_inline_comment_with_allowed_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_inline_comment_with_invalid_pragma_raises_error(self):
+        node_inline_comment_with_invalid_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""a = 1 + 2  # not_a_valid_pragma
+                """)
+
+        node_inline_comment_with_invalid_pragma.file = filename
+        node_inline_comment_with_invalid_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inline_comment_with_invalid_pragma))
+
+        message = testutils.Message(
+            msg_id='no-allowed-inline-pragma',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
     def test_variable_name_in_comment(self):
         node_variable_name_in_comment = astroid.scoped_nodes.Module(
             name='test',
@@ -3548,3 +3615,48 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_classdef(
                 schemaless_class_node)
+
+
+class DisallowedImportsCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(DisallowedImportsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowedImportsChecker)
+        self.checker_test_object.setup_method()
+
+    def test_importing_text_from_typing_in_single_line_raises_error(self):
+        node = astroid.extract_node("""from typing import Any, cast, Text""")
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-text-import',
+                node=node,
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node)
+
+    def test_importing_text_from_typing_in_multi_line_raises_error(self):
+        node = astroid.extract_node(
+            """
+            from typing import (
+                Any, Dict, List, Optional, Sequence, Text, TypeVar)
+            """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-text-import',
+                node=node,
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node)
+
+    def test_non_import_of_text_from_typing_does_not_raise_error(self):
+        node = astroid.extract_node(
+            """
+            from typing import Any, Dict, List, Optional
+            """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node)

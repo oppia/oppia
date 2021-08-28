@@ -28,7 +28,7 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional # isort:skip
+from typing import Any, Dict, Optional
 
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):

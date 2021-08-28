@@ -65,9 +65,9 @@ import python_utils
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
+from typing import Dict, List, Optional, Union
 import webapp2
 
-from typing import Dict, List, Optional, Union # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover

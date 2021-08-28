@@ -20,8 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 
-from typing import Dict # pylint: disable=unused-import
-from typing import Text # pylint: disable=unused-import
+from typing import Dict
 
 
 class OppiaRootPage(base.BaseHandler):
@@ -29,9 +28,10 @@ class OppiaRootPage(base.BaseHandler):
        with angular router.
     """
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self, **kwargs): # pylint: disable=unused-argument
-        # type: (Dict[Text, Text]) -> None
+    def get(self, **kwargs: Dict[str, str]) -> None: # pylint: disable=unused-argument
         """Handles GET requests."""
         self.render_template( # type: ignore[no-untyped-call]
             'oppia-root.mainpage.html')

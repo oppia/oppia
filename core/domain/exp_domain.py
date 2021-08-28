@@ -68,7 +68,8 @@ STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
 # Deprecated state properties.
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
-    'content_ids_to_audio_translations')  # Deprecated in state schema v27.
+    # Deprecated in state schema v27.
+    'content_ids_to_audio_translations')
 
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'

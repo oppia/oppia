@@ -25,8 +25,6 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import skill_models
@@ -34,17 +32,16 @@ if MYPY: # pragma: no cover
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-@validation_decorators.AuditsExisting(skill_models.SkillSnapshotMetadataModel)  # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(skill_models.SkillSnapshotMetadataModel)
 class ValidateSkillSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for SkillSnapshotMetadataModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        # type: (Any) -> Type[skill_domain.SkillChange]
+    def _get_change_domain_class(self, unused_input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            unused_input_model: datastore_services.Model. Entity to validate.
 
         Returns:
             skill_domain.SkillChange. A domain object class for the
@@ -53,13 +50,12 @@ class ValidateSkillSnapshotMetadataModel(
         return skill_domain.SkillChange
 
 
-@validation_decorators.AuditsExisting(skill_models.SkillCommitLogEntryModel)  # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(skill_models.SkillCommitLogEntryModel)
 class ValidateSkillCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for SkillCommitLogEntryModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        # type: (Any) -> Optional[Type[skill_domain.SkillChange]]
+    def _get_change_domain_class(self, input_model):
         """Returns a change domain class.
 
         Args:
@@ -69,7 +65,7 @@ class ValidateSkillCommitLogEntryModel(
             skill_domain.SkillChange. A domain object class for the
             changes made by commit commands of the model.
         """
-        model = job_utils.clone_model(input_model)  # type: ignore[no-untyped-call]
+        model = job_utils.clone_model(input_model)
 
         if model.id.startswith('skill'):
             return skill_domain.SkillChange

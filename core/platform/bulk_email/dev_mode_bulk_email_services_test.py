@@ -22,7 +22,7 @@ import logging
 from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils
 
-from typing import Any # isort:skip # pylint: disable=unused-import
+from typing import Any
 
 
 class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
@@ -30,6 +30,9 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
 
     def test_add_or_update_user_status(self) -> None:
         observed_log_messages = []
+        # We are using Any here because the following function mocks
+        # logging.info methods, whose stubs denote the type of args as Any.
+        # https://github.com/python/typeshed/blob/837b57fdd1a814237ef4b15f6ce19c701303aebb/stdlib/logging/__init__.pyi#L76
         def _mock_logging_function(msg: str, *args: Any) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
@@ -54,6 +57,9 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
 
     def test_permanently_delete_user(self) -> None:
         observed_log_messages = []
+        # We are using Any here because the following function mocks
+        # logging.info methods, whose stubs denote the type of args as Any.
+        # https://github.com/python/typeshed/blob/837b57fdd1a814237ef4b15f6ce19c701303aebb/stdlib/logging/__init__.pyi#L76
         def _mock_logging_function(msg: str, *args: Any) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)

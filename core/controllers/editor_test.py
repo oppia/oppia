@@ -996,7 +996,8 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
-        unpublished_exp_id = 'unpub_eid' # Unpublished exploration id.
+        # Unpublished exploration id.
+        unpublished_exp_id = 'unpub_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1025,7 +1026,8 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_published_exploration(self):
         """Test rights management for deletion of published explorations."""
-        published_exp_id = 'pub_eid' # Published exploration id.
+        # Published exploration id.
+        published_exp_id = 'pub_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1084,7 +1086,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         with self.swap(logging, 'info', mock_logging_function), self.swap(
             logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
-            exp_id = 'unpub_eid' # Unpublished exploration id
+
+            # Unpublished exploration id.
+            exp_id = 'unpub_eid'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1103,7 +1107,8 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             # Checking for moderator.
             observed_log_messages = []
-            exp_id = 'unpub_eid3' # Unpublished exploration id.
+            # Unpublished exploration id.
+            exp_id = 'unpub_eid3'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.moderator_id, exploration)

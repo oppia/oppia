@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -42,8 +42,7 @@ class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -61,20 +60,18 @@ class ConfigPropertyModel(base_models.VersionedModel):
     value = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -85,8 +82,11 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # We have ignored [override] here because the signature of this method
     # doesn't match with VersionedModel.commit().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-    def commit(self, committer_id, commit_cmds): # type: ignore[override]
-        # type: (Text, List[Dict[Text, Any]]) -> None
+    def commit( # type: ignore[override]
+            self,
+            committer_id: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
 
 
@@ -102,8 +102,7 @@ class PlatformParameterSnapshotContentModel(
     """Storage model for the content for a platform parameter snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -123,20 +122,18 @@ class PlatformParameterModel(base_models.VersionedModel):
         datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -146,8 +143,12 @@ class PlatformParameterModel(base_models.VersionedModel):
     # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
     # remove Any from type-annotation below.
     @classmethod
-    def create(cls, param_name, rule_dicts, rule_schema_version):
-        # type: (Text, List[Dict[Text, Any]], int) -> PlatformParameterModel
+    def create(
+            cls,
+            param_name: str,
+            rule_dicts: List[Dict[str, Any]],
+            rule_schema_version: int
+    ) -> 'PlatformParameterModel':
         """Creates a PlatformParameterModel instance.
 
         Args:

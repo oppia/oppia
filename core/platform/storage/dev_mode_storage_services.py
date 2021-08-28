@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.storage import cloud_storage_emulator
 
-from typing import Dict, List, Mapping, Optional, Union  # isort:skip # pylint: disable=unused-import
+from typing import List, Union
 
 CLIENT = cloud_storage_emulator.CloudStorageEmulator()
 

@@ -35,8 +35,7 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = blog_validation_jobs.BlogPostTitleUniquenessJob
 
-    def test_run_with_same_titles_for_blog_posts(self):
-        # type: () -> None
+    def test_run_with_same_titles_for_blog_posts(self) -> None:
         blog_post_model_1 = self.create_model( # type: ignore[no-untyped-call]
             blog_models.BlogPostModel,
             id='validblogid1',
@@ -83,8 +82,7 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = blog_validation_jobs.BlogPostSummaryTitleUniquenessJob
 
-    def test_run_with_same_titles_for_blog_posts(self):
-        # type: () -> None
+    def test_run_with_same_titles_for_blog_posts(self) -> None:
         blog_post_summary_model_1 = self.create_model( # type: ignore[no-untyped-call]
             blog_models.BlogPostSummaryModel,
             id='validblogid1',
@@ -129,8 +127,7 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = blog_validation_jobs.BlogPostUrlUniquenessJob
 
-    def test_run_with_same_url_for_blog_posts(self):
-        # type: () -> None
+    def test_run_with_same_url_for_blog_posts(self) -> None:
         blog_post_model_1 = self.create_model( # type: ignore[no-untyped-call]
             blog_models.BlogPostModel,
             id='validblogid1',
@@ -175,8 +172,7 @@ class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = blog_validation_jobs.BlogPostSummaryUrlUniquenessJob
 
-    def test_run_with_same_url_for_blog_posts(self):
-        # type: () -> None
+    def test_run_with_same_url_for_blog_posts(self) -> None:
         blog_post_summary_model_1 = self.create_model( # type: ignore[no-untyped-call]
             blog_models.BlogPostSummaryModel,
             id='validblogid1',

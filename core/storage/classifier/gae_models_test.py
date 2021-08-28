@@ -27,7 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import List, cast # isort:skip # pylint: disable=unused-import
+from typing import List, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,14 +41,12 @@ if MYPY: # pragma: no cover
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJobModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             classifier_models.ClassifierTrainingJobModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_new_training_job_runs_successfully(self):
-        # type: () -> None
+    def test_create_and_get_new_training_job_runs_successfully(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id1', 1,
@@ -75,8 +73,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
         self.assertEqual(training_job.algorithm_version, 1)
 
-    def test_query_new_and_pending_training_jobs(self):
-        # type: () -> None
+    def test_query_new_and_pending_training_jobs(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
         classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id1', 1,
@@ -124,8 +121,9 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
         self.assertEqual(offset, 2)
 
-    def test_query_new_and_pending_training_jobs_with_non_zero_offset(self):
-        # type: () -> None
+    def test_query_new_and_pending_training_jobs_with_non_zero_offset(
+            self
+    ) -> None:
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
             next_scheduled_check_time = (
@@ -211,8 +209,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 feconf.TRAINING_JOB_STATUS_PENDING)
             self.assertEqual(offset, 4)
 
-    def test_create_multi_jobs(self):
-        # type: () -> None
+    def test_create_multi_jobs(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
         job_dicts_list = []
         job_dicts_list.append({
@@ -288,8 +285,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_NEW)
         self.assertEqual(training_job2.algorithm_version, 1)
 
-    def test_raise_exception_by_mocking_collision(self):
-        # type: () -> None
+    def test_raise_exception_by_mocking_collision(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -312,15 +308,13 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
     """Tests for the StateTrainingJobsMappingModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             classifier_models.StateTrainingJobsMappingModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_and_get_new_mapping_runs_successfully(self):
-        # type: () -> None
+    def test_create_and_get_new_mapping_runs_successfully(self) -> None:
         mapping_id = (
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, 'state_name4', {'algorithm_id': 'job_id4'}))
@@ -365,8 +359,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(mapping_id, 'exp_id1.2.%s' % state_name2)
 
-    def test_get_model_from_exploration_attributes(self):
-        # type: () -> None
+    def test_get_model_from_exploration_attributes(self) -> None:
         exp_id = 'exp_id1'
         exp_version = 1
         state_name = 'state_name1'
@@ -387,9 +380,9 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             mappings[0].algorithm_ids_to_job_ids, {'algorithm_id': job_id})
 
-    def test_create_multi_mappings(self):
-        # type: () -> None
-        state_training_jobs_mappings = [] # type: List[classifier_domain.StateTrainingJobsMapping]
+    def test_create_multi_mappings(self) -> None:
+        state_training_jobs_mappings: List[
+            classifier_domain.StateTrainingJobsMapping] = []
         state_training_jobs_mappings.append(
             classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
                 u'1', 1, 'Home', {'algorithm_id': 'job_id1'}))

@@ -30,8 +30,6 @@ from jobs.transforms import base_validation
 
 import apache_beam as beam
 
-from typing import Any # pylint: disable=unused-import
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
@@ -41,14 +39,13 @@ if MYPY: # pragma: no cover
     [models.NAMES.blog, models.NAMES.user])
 
 
-@validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(
     blog_models.BlogPostModel)
 class ValidateBlogPostModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
 
     def _get_model_domain_object_instance(self, blog_post_model):
-        # type: (Any) -> blog_domain.BlogPost
         """Returns blog post domain object instance created from the model.
 
         Args:
@@ -57,7 +54,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
         Returns:
             BlogPost. A domain object to validate.
         """
-        return blog_domain.BlogPost(  # type: ignore[no-untyped-call]
+        return blog_domain.BlogPost(
             blog_post_model.id,
             blog_post_model.author_id,
             blog_post_model.title,
@@ -70,7 +67,6 @@ class ValidateBlogPostModelDomainObjectsInstances(
         )
 
     def _get_domain_object_validation_type(self, unused_item):
-        # type: (Any) -> Any
         """Returns the type of domain object validation to be performed.
 
         Args:
@@ -86,15 +82,14 @@ class ValidateBlogPostModelDomainObjectsInstances(
         return base_validation.VALIDATION_MODES.strict
 
 
-@validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(
     blog_models.BlogPostModel,
     blog_models.BlogPostSummaryModel)
-class ValidateModelPublishTimestamps(beam.DoFn): # type: ignore[misc]
+class ValidateModelPublishTimestamps(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are valid.
     """
 
     def process(self, input_model):
-        # type: (Any) -> Any
         """Function that validates that the published timestamp of the blog post
         models is either None or is greater than created on time, is less than
         current datetime and is equal to or greater than the last updated
@@ -108,7 +103,7 @@ class ValidateModelPublishTimestamps(beam.DoFn): # type: ignore[misc]
             InconsistentTimestampsError. Error for models with inconsistent
             timestamps.
         """
-        model = job_utils.clone_model(input_model) # type: ignore[no-untyped-call]
+        model = job_utils.clone_model(input_model)
         if model.published_on is None:
             return
 
@@ -125,17 +120,16 @@ class ValidateModelPublishTimestamps(beam.DoFn): # type: ignore[misc]
 
         if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
                 model.last_updated):
-            yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) #pylint: disable=line-too-long
+            yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-long
 
 
-@validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
+@validation_decorators.AuditsExisting(
     blog_models.BlogPostSummaryModel)
 class ValidateBlogSummaryModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
 
     def _get_model_domain_object_instance(self, summary_model):
-        # type: (Any) -> blog_domain.BlogPostSummary
         """Returns blog post domain object instance created from the model.
 
         Args:
@@ -144,7 +138,7 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         Returns:
             BlogPost. A domain object to validate.
         """
-        return blog_domain.BlogPostSummary( # type: ignore[no-untyped-call]
+        return blog_domain.BlogPostSummary(
             summary_model.id,
             summary_model.author_id,
             summary_model.title,
@@ -157,7 +151,6 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         )
 
     def _get_domain_object_validation_type(self, unused_item):
-        # type: (Any) -> Any
         """Returns the type of domain object validation to be performed.
 
         Args:
@@ -173,30 +166,27 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         return base_validation.VALIDATION_MODES.strict
 
 
-@validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
+@validation_decorators.RelationshipsOf(
     blog_models.BlogPostModel)
 def blog_post_model_relationships(model):
-    # type: (Any) -> None
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostSummaryModel]
     yield model.id, [blog_models.BlogPostRightsModel]
     yield model.author_id, [user_models.UserSettingsModel]
 
 
-@validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
+@validation_decorators.RelationshipsOf(
     blog_models.BlogPostSummaryModel)
 def blog_post_summary_model_relationships(model):
-    # type: (Any) -> None
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostRightsModel]
     yield model.author_id, [user_models.UserSettingsModel]
 
 
-@validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc]
+@validation_decorators.RelationshipsOf(
     blog_models.BlogPostRightsModel)
 def blog_post_rights_model_relationships(model):
-    # type: (Any) -> None
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostSummaryModel]

@@ -30,7 +30,7 @@ import time
 
 import python_utils
 
-from typing import Any, Callable, Dict, List, Optional # isort:skip
+from typing import Any, Callable, Dict, List, Optional
 
 
 class Task(python_utils.OBJECT):

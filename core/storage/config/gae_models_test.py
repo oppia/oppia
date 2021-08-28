@@ -34,8 +34,7 @@ if MYPY: # pragma: no cover
 
 class ConfigPropertySnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             config_models.ConfigPropertySnapshotContentModel
             .get_deletion_policy(),
@@ -45,20 +44,17 @@ class ConfigPropertySnapshotContentModelTests(test_utils.GenericTestBase):
 class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
     """Test ConfigPropertyModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             config_models.ConfigPropertyModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_model(self):
-        # type: () -> None
+    def test_create_model(self) -> None:
         config_model = config_models.ConfigPropertyModel(
             value='b')
         self.assertEqual(config_model.value, 'b')
 
-    def test_commit(self):
-        # type: () -> None
+    def test_commit(self) -> None:
         config_model1 = config_models.ConfigPropertyModel(
             id='config_model1', value='c')
         config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -80,8 +76,7 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
 
 class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             config_models.PlatformParameterSnapshotContentModel
             .get_deletion_policy(),
@@ -91,14 +86,12 @@ class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
 class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     """Test PlatformParameterModel class."""
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             config_models.PlatformParameterModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_create_model(self):
-        # type: () -> None
+    def test_create_model(self) -> None:
         param_model = config_models.PlatformParameterModel.create(
             param_name='parameter_name',
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
@@ -113,8 +106,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             param_model.rules,
             [{'filters': [], 'value_when_matched': False}])
 
-    def test_commit(self):
-        # type: () -> None
+    def test_commit(self) -> None:
         parameter_name = 'parameter_name'
         rule_dicts = [{'filters': [], 'value_when_matched': False}]
 
@@ -154,8 +146,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_model2.rules, new_rules)
 
-    def test_commit_is_persistent_in_storage(self):
-        # type: () -> None
+    def test_commit_is_persistent_in_storage(self) -> None:
         parameter_name = 'parameter_name'
         rule_dicts = [{'filters': [], 'value_when_matched': False}]
 
@@ -174,8 +165,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
-    def test_commit_with_updated_rules(self):
-        # type: () -> None
+    def test_commit_with_updated_rules(self) -> None:
         parameter_name = 'parameter_name'
         rule_dicts = [{'filters': [], 'value_when_matched': False}]
 
