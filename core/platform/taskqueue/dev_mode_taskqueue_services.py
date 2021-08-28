@@ -27,7 +27,7 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional # isort:skip
+from typing import Any, Dict, Optional
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
