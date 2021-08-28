@@ -30,8 +30,7 @@ import python_utils
 import apache_beam as beam
 from apache_beam import runners
 
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 
 def run_job_sync(

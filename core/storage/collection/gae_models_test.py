@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -44,8 +44,7 @@ if MYPY: # pragma: no cover
 
 class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             collection_models.CollectionSnapshotContentModel
             .get_deletion_policy(),
@@ -55,14 +54,12 @@ class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
 class CollectionModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             collection_models.CollectionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_collection_count(self):
-        # type: () -> None
+    def test_get_collection_count(self) -> None:
         collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
             'id', title='A title',
             category='A Category', objective='An Objective')
@@ -72,8 +69,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
 
-    def test_reconstitute(self):
-        # type: () -> None
+    def test_reconstitute(self) -> None:
         collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
             'id', title='A title',
             category='A Category', objective='An Objective')
@@ -94,15 +90,13 @@ class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'id_2'
     USER_ID_COMMITTER = 'id_committer'
 
-    def test_get_deletion_policy_is_locally_pseudonymize(self):
-        # type: () -> None
+    def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
         self.assertEqual(
             collection_models.CollectionRightsSnapshotContentModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -138,11 +132,16 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     COLLECTION_ID_2 = '2'
     COLLECTION_ID_3 = '3'
     COLLECTION_ID_4 = '4'
-    USER_ID_1 = 'id_1'  # Related to all three collections
-    USER_ID_2 = 'id_2'  # Related to a subset of the three collections
-    USER_ID_3 = 'id_3'  # Related to no collections
-    USER_ID_4 = 'id_4'  # Related to one collection and then removed from it
-    USER_ID_COMMITTER = 'id_5'  # User id used in commits
+    # Related to all three collections.
+    USER_ID_1 = 'id_1'
+    # Related to a subset of the three collections.
+    USER_ID_2 = 'id_2'
+    # Related to no collections.
+    USER_ID_3 = 'id_3'
+    # Related to one collection and then removed from it.
+    USER_ID_4 = 'id_4'
+    # User id used in commits.
+    USER_ID_COMMITTER = 'id_5'
     USER_ID_4_OLD = 'id_4_old'
     USER_ID_4_NEW = 'id_4_new'
     USER_ID_5_OLD = 'id_5_old'
@@ -150,8 +149,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_OLD = 'id_6_old'
     USER_ID_6_NEW = 'id_6_new'
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(CollectionRightsModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
@@ -220,15 +218,13 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionRightsModel.get_by_id(
                 self.COLLECTION_ID_1).to_dict())
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             collection_models.CollectionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
                 collection_models.CollectionRightsModel
@@ -243,8 +239,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
 
-    def test_save(self):
-        # type: () -> None
+    def test_save(self) -> None:
         collection_models.CollectionRightsModel(
             id='id',
             owner_ids=['owner_ids'],
@@ -269,8 +264,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             .get_by_id('id-1').content_user_ids
         )
 
-    def test_export_data_on_highly_involved_user(self):
-        # type: () -> None
+    def test_export_data_on_highly_involved_user(self) -> None:
         """Test export data on user involved in all datastore collections."""
         collection_ids = (
             collection_models.CollectionRightsModel.export_data(
@@ -291,8 +285,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(expected_collection_ids, collection_ids)
 
-    def test_export_data_on_partially_involved_user(self):
-        # type: () -> None
+    def test_export_data_on_partially_involved_user(self) -> None:
         """Test export data on user involved in some datastore collections."""
         collection_ids = (
             collection_models.CollectionRightsModel.export_data(
@@ -306,36 +299,33 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_collection_ids, collection_ids)
 
-    def test_export_data_on_uninvolved_user(self):
-        # type: () -> None
+    def test_export_data_on_uninvolved_user(self) -> None:
         """Test for empty lists when user has no collection involvement."""
         collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 self.USER_ID_3))
-        expected_collection_ids = {
+        expected_collection_ids: Dict[str, List[str]] = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
             'voiced_collection_ids': [],
             'viewable_collection_ids': []
-        } # type: Dict[Text, List[Text]]
+        }
         self.assertEqual(expected_collection_ids, collection_ids)
 
-    def test_export_data_on_invalid_user(self):
-        # type: () -> None
+    def test_export_data_on_invalid_user(self) -> None:
         """Test for empty lists when the user_id is invalid."""
         collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 'fake_user'))
-        expected_collection_ids = {
+        expected_collection_ids: Dict[str, List[str]] = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
             'voiced_collection_ids': [],
             'viewable_collection_ids': []
-        } # type: Dict[Text, List[Text]]
+        }
         self.assertEqual(expected_collection_ids, collection_ids)
 
-    def test_reconstitute(self):
-        # type: () -> None
+    def test_reconstitute(self) -> None:
         collection_models.CollectionRightsModel(
             id='id',
             owner_ids=['owner_ids'],
@@ -375,10 +365,10 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
     USER_ID_3 = 'id_3'
-    USER_ID_COMMITTER = 'id_4'  # User id used in commits
+    # User id used in commits.
+    USER_ID_COMMITTER = 'id_4'
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(CollectionRightsModelRevertUnitTest, self).setUp() # type: ignore[no-untyped-call]
         self.collection_model = collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
@@ -427,8 +417,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             collection_rights_allowed_commands
         )
 
-    def test_revert_to_valid_version_is_successful(self):
-        # type: () -> None
+    def test_revert_to_valid_version_is_successful(self) -> None:
         with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
@@ -441,11 +430,10 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-    def test_revert_to_version_with_invalid_status_is_successful(self):
-        # type: () -> None
+    def test_revert_to_version_with_invalid_status_is_successful(self) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
-        broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
+        broken_dict: Dict[str, Any] = dict(**self.original_dict)
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (
@@ -469,11 +457,12 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-    def test_revert_to_version_with_translator_ids_field_is_successful(self):
-        # type: () -> None
+    def test_revert_to_version_with_translator_ids_field_is_successful(
+            self
+    ) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
-        broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
+        broken_dict: Dict[str, Any] = dict(**self.original_dict)
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]
 
@@ -502,16 +491,14 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             collection_models.CollectionCommitLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -525,8 +512,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
-    def test_get_all_non_private_commits(self):
-        # type: () -> None
+    def test_get_all_non_private_commits(self) -> None:
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
             'a', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
@@ -545,8 +531,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual('collection-b-0', results[0].id)
         self.assertFalse(more)
 
-    def test_get_all_non_private_commits_with_invalid_max_age(self):
-        # type: () -> None
+    def test_get_all_non_private_commits_with_invalid_max_age(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
@@ -558,8 +543,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 .get_all_non_private_commits(
                     2, None, max_age='invalid_max_age')) # type: ignore[arg-type]
 
-    def test_get_all_non_private_commits_with_max_age(self):
-        # type: () -> None
+    def test_get_all_non_private_commits_with_max_age(self) -> None:
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
             'a', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
@@ -599,8 +583,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_OLD = 'id_3_old'
     USER_ID_3_NEW = 'id_3_new'
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(CollectionSummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
@@ -613,15 +596,13 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
 
-    def test_get_deletion_policy(self):
-        # type: () -> None
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             collection_models.CollectionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
-    def test_has_reference_to_user_id(self):
-        # type: () -> None
+    def test_has_reference_to_user_id(self) -> None:
         collection_models.CollectionSummaryModel(
             id='id0',
             title='title',
@@ -650,8 +631,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel
             .has_reference_to_user_id('x_id'))
 
-    def test_get_non_private(self):
-        # type: () -> None
+    def test_get_non_private(self) -> None:
         public_collection_summary_model = (
             collection_models.CollectionSummaryModel(
                 id='id0',
@@ -701,8 +681,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel.get_non_private())
         self.assertEqual(1, len(collection_summary_models))
 
-    def test_get_private_at_least_viewable(self):
-        # type: () -> None
+    def test_get_private_at_least_viewable(self) -> None:
         viewable_collection_summary_model = (
             collection_models.CollectionSummaryModel(
                 id='id0',
@@ -754,8 +733,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(1, len(collection_summary_models))
         self.assertEqual('id0', collection_summary_models[0].id)
 
-    def test_get_at_least_editable(self):
-        # type: () -> None
+    def test_get_at_least_editable(self) -> None:
         editable_collection_summary_model = (
             collection_models.CollectionSummaryModel(
                 id='id0',
