@@ -645,9 +645,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
@@ -1129,9 +1127,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.creator_ids == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
         cls.delete_by_id(user_id)
 
@@ -1510,9 +1506,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @staticmethod
@@ -1952,9 +1946,7 @@ class StoryProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
@@ -2355,9 +2347,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
@@ -2745,12 +2735,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             translations in the given language code.
         """
-        reviewer_keys = cast(
-            List[datastore_services.Key],
-            cls.query(
-                cls.can_review_translation_for_language_codes == language_code
-            ).fetch(keys_only=True)
-        )
+        reviewer_keys = cls.query(
+            cls.can_review_translation_for_language_codes == language_code
+        ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2781,12 +2768,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             questions.
         """
-        reviewer_keys = cast(
-            List[datastore_services.Key],
-            cls.query(
-                cls.can_review_questions == True # pylint: disable=singleton-comparison
-            ).fetch(keys_only=True)
-        )
+        reviewer_keys = cls.query(
+            cls.can_review_questions == True # pylint: disable=singleton-comparison
+        ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod

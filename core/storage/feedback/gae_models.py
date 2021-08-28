@@ -681,9 +681,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
