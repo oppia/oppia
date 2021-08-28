@@ -31,7 +31,8 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 })
 export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue!: string; 
-  answer: any
+  answer: {text?: string;
+            error?: string}={}
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private focusManagerService: FocusManagerService,
