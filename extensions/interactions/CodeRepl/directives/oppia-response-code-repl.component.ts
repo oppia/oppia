@@ -31,12 +31,11 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 })
 export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue!: string; 
-    constructor(
+  answer: any
+  constructor(
     private htmlEscaperService: HtmlEscaperService,
     private focusManagerService: FocusManagerService,
     private errorFocusLabel: string,
-    private answer:any
-
   ) { }
 
   ngOnInit(): void {
