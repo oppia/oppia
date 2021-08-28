@@ -27,6 +27,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let contributionAndReviewService = null;
   let AlertsService = null;
   let userService = null;
+  let languageUtilService = null;
   let userInfoSpy = null;
   let contributionRightsDataSpy = null;
 
@@ -35,11 +36,16 @@ describe('Translation Suggestion Review Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     contributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
+    languageUtilService = $injector.get('LanguageUtilService');
+
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     AlertsService = $injector.get('AlertsService');
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview');
+    spyOn(
+      languageUtilService, 'getAudioLanguageDescription')
+      .and.returnValue('audio_language_description');
   }));
 
   describe('when reviewing suggestion', function() {

@@ -204,7 +204,7 @@ class ReportPassTests(test_utils.GenericTestBase):
     def test_unknown_build_environment(self):
 
         def mock_getenv(variable):
-            environment_vars = dict()
+            environment_vars = {}
             return environment_vars.get(variable)
 
         def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
@@ -246,7 +246,7 @@ class MockResponse(python_utils.OBJECT):
     def __init__(
             self, ok=True, json=None, status_code=200, reason='foo'):
         if json is None:
-            json = dict()
+            json = {}
         self.ok = ok
         self.json_dict = json
         self.status_code = status_code

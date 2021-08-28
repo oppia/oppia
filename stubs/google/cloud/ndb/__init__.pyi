@@ -1,9 +1,18 @@
+from .context import Context
+from redis import StrictRedis
+
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Text,
     Type, TypeVar, Tuple, Union)
 
 TYPE_MODEL = TypeVar('TYPE_MODEL', bound = 'Model')
 
+class Client:
+    def context(
+        self,
+        namespace: Optional[str],
+        global_cache: Optional[RedisCache]
+    ) -> Context: ...
 
 # Model Stubs
 class Model(type):
@@ -24,7 +33,7 @@ class Model(type):
     def _pre_put_hook(self) -> None: ...
 
 
-def transaction(callback: Callable[..., Any], **ctx_options: Any) -> Any: ...
+def get_context(**kwds: Any) -> Context: ...
 def get_multi(
     keys: List[Key], **ctx_options: Any) -> List[Optional[TYPE_MODEL]]: ...
 def put_multi(
@@ -120,6 +129,9 @@ class Query:
     ) -> Tuple[Sequence[Union[Model, Key]], Cursor, bool]: ...
 
 class Cursor:
+    def __init__(
+        self, urlsafe: Optional[str]
+    ) -> None: ...
     def urlsafe(self) -> bytes: ...
 
 # Key Stubs
@@ -133,6 +145,8 @@ class Key:
     def get(self, **ctx_options: Any) -> Optional[Model]: ...
     def delete(self, **ctx_options: Any) -> None: ...
 
+class RedisCache:
+    def __init__(self, redis_instance: StrictRedis[str]): ...
 
 # Transaction Options Stubs
 class TransactionOptions(object):
