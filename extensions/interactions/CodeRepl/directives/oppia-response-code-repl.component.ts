@@ -30,7 +30,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   styleUrls: []
 })
 export class ResponseCodeReplComponent implements OnInit {
-  @Input('answer') answerWithValue!: string;
+  @Input('answer') answerWithValue!: string; 
 
   
   constructor(

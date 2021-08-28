@@ -746,7 +746,8 @@
     "extensions/objects/templates/translatable-set-of-unicode-string-editor.component.ts",
     "extensions/objects/templates/translatable-set-of-unicode-string-editor.component.spec.ts",
     "extensions/objects/templates/unicode-string-editor.component.ts",
-    "extensions/objects/templates/unicode-string-editor.component.spec.ts"
+    "extensions/objects/templates/unicode-string-editor.component.spec.ts",
+    "extensions/interactions/CodeRepl/directives/oppia-response-code-repl.component.ts"
   ],
   "include": [
     "assets/*.ts",
