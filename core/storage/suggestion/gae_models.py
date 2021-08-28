@@ -1098,10 +1098,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         datastore_services.delete_multi(
-            cast(
-                List[datastore_services.Key],
-                cls.query(
-                    cls.contributor_user_id == user_id).fetch(keys_only=True)))
+            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def export_data(
