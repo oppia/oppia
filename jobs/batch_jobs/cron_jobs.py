@@ -34,7 +34,7 @@ import apache_beam as beam
 from typing import List, cast # isort:skip
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import user_models
