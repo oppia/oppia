@@ -131,6 +131,7 @@
         "scripts.common_test"
     ],
     "5": [
+        "core.controllers.beam_jobs_test",
         "core.controllers.contributor_dashboard_admin_test",
         "core.controllers.oppia_root_test",
         "core.domain.subtopic_page_domain_test",
@@ -175,6 +176,7 @@
         "core.storage.user.gae_models_test",
         "core.storage.job.gae_models_test",
         "core.storage.base_model.gae_models_test",
+        "jobs.jobs_manager_test",
         "schema_utils_test"
     ],
     "7": [

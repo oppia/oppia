@@ -9,9 +9,11 @@
   </div>
   <div class="oppia-classroom-details" *ngIf="classroomData">
     <h2>{{ 'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate }}</h2>
-    <p class="course-details"> {{ classroomData.getCourseDetails() }} </p>
+    <!-- The course details and topic list intro texts are hardcoded so that they can be translated.
+    This method should be changed when more classrooms are added in the future. -->
+    <p class="course-details"> {{ 'I18N_MATH_COURSE_DETAILS' | translate }} </p>
     <h2>{{ 'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate }}</h2>
-    <p>{{ classroomData.getTopicListIntro() }}</p>
+    <p>{{ 'I18N_MATH_TOPICS_COVERED' | translate }}</p>
   </div>
   <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
     <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
@@ -41,6 +43,7 @@
     background-color: #d7d7d7;
     bottom: 0;
     margin-left: -22.5vw;
+    margin-right: -22.5vw;
     padding-bottom: 10px;
     position: absolute;
     width: 100vw;
