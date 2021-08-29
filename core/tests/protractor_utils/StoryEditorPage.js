@@ -506,10 +506,13 @@ var StoryEditorPage = function() {
       warningIndicator, 'Warning Indicator taking too long to appear.');
     await browser.actions().mouseMove(warningIndicator).perform();
     var warningElemCount = await warningTextElements.count();
+    console.log(warningElemCount);
     var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
       var text = await action.getText(
         'Warning Text', warningTextElements.get(i));
+      console.log(text);
+      console.log(warning.test(text));
       if (warning.test(text)) {
         matchFound = true;
         break;
