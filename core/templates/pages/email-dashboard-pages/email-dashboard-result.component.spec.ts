@@ -16,205 +16,146 @@
  * @fileoverview Unit tests for emailDashboardResultPage.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
+import { EmailDashboardResultComponent } from './email-dashboard-result.component';
 
-require('pages/email-dashboard-pages/email-dashboard-result.component.ts');
+describe('Email Dashboard Result Component', () => {
+  let fixture: ComponentFixture<EmailDashboardResultComponent>;
+  let componentInstance: EmailDashboardResultComponent;
+  let emailDashboardResultBackendApiService:
+  EmailDashboardResultBackendApiService;
 
-describe('Email Dashboard Result Page', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var CsrfService = null;
-  var $timeout = null;
-  var windowRef = new WindowRef();
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRef);
-  }));
-  beforeEach(angular.mock.inject(function($injector, $q, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
-    $timeout = $injector.get('$timeout');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
-
-    ctrl = $componentController('emailDashboardResultPage');
-
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+  class MockWindowRef {
+    nativeWindow = {
       location: {
-        href: '',
-        pathname: '/0'
+        pathname: ''
       }
-    });
+    };
+  }
+
+  let windowRef = new MockWindowRef();
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        EmailDashboardResultComponent
+      ],
+      providers: [
+        EmailDashboardResultBackendApiService,
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialize correctly ctrl properties after controller' +
-    ' initialization', function() {
-    ctrl.$onInit();
-
-    expect(ctrl.emailOption).toBe('all');
-    expect(ctrl.emailSubject).toBe('');
-    expect(ctrl.emailBody).toBe('');
-    expect(ctrl.invalid).toEqual({
-      subject: false,
-      body: false,
-      maxRecipients: false
-    });
-    expect(ctrl.maxRecipients).toBe(null);
-    expect(ctrl.POSSIBLE_EMAIL_INTENTS).toEqual([
-      'bulk_email_marketing', 'bulk_email_improve_exploration',
-      'bulk_email_create_exploration',
-      'bulk_email_creator_reengagement',
-      'bulk_email_learner_reengagement']);
-    expect(ctrl.emailIntent).toBe('bulk_email_marketing');
-    expect(ctrl.emailSubmitted).toBe(false);
-    expect(ctrl.submitIsInProgress).toBe(false);
-    expect(ctrl.errorHasOccurred).toBe(false);
-    expect(ctrl.testEmailSentSuccesfully).toBe(false);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(EmailDashboardResultComponent);
+    componentInstance = fixture.componentInstance;
+    emailDashboardResultBackendApiService = TestBed.inject(
+      EmailDashboardResultBackendApiService);
   });
 
-  it('should submit an email when fields are populated with valid values.',
-    function() {
-      ctrl.$onInit();
-      ctrl.emailSubject = 'Subject';
-      ctrl.emailBody = 'Body';
-      ctrl.emailOption = 'custom';
-      ctrl.maxRecipients = 10;
-
-      $httpBackend.expect('POST', '/emaildashboardresult/0').respond(200);
-      ctrl.submitEmail();
-
-      expect(ctrl.submitIsInProgress).toBe(true);
-      expect(ctrl.emailSubmitted).toBe(false);
-
-      $httpBackend.flush();
-
-      expect(ctrl.emailSubmitted).toBe(true);
-      $timeout.flush(4000);
-
-      expect(windowRef.nativeWindow.location.href).toBe('/emaildashboard');
-      expect(ctrl.invalid.subject).toBe(false);
-      expect(ctrl.invalid.body).toBe(false);
-      expect(ctrl.invalid.maxRecipients).toBe(false);
-    });
-
-  it('should use reject handler when submit email fails', function() {
-    ctrl.$onInit();
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
-
-    $httpBackend.expectPOST('/emaildashboardresult/0').respond(500);
-    ctrl.submitEmail();
-
-    expect(ctrl.submitIsInProgress).toBe(true);
-
-    $httpBackend.flush();
-
-    expect(ctrl.submitIsInProgress).toBe(false);
-    expect(ctrl.errorHasOccurred).toBe(true);
-    expect(windowRef.nativeWindow.location.href).toBe('');
-    expect(ctrl.invalid.subject).toBe(false);
-    expect(ctrl.invalid.body).toBe(false);
-    expect(ctrl.invalid.maxRecipients).toBe(false);
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
   });
 
-  it('should not submit email when subject email and body email are empty',
-    function() {
-      ctrl.$onInit();
-      ctrl.emailSubject = '';
-      ctrl.emailBody = '';
-      ctrl.submitEmail();
-
-      expect(ctrl.invalid.subject).toBe(true);
-      expect(ctrl.invalid.body).toBe(true);
-      expect(ctrl.invalid.maxRecipients).toBe(false);
-    });
-
-  it('should not submit email when email option is custom and there is' +
-    ' no recipient', function() {
-    ctrl.$onInit();
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
-    ctrl.emailOption = 'custom';
-    ctrl.maxRecipients = null;
-    ctrl.submitEmail();
-
-    expect(ctrl.invalid.subject).toBe(false);
-    expect(ctrl.invalid.body).toBe(false);
-    expect(ctrl.invalid.maxRecipients).toBe(true);
+  it('should get query id', () => {
+    let queryId = 'query_id';
+    windowRef.nativeWindow.location.pathname = '/' + queryId;
+    fixture.detectChanges();
+    expect(componentInstance.getQueryId()).toEqual(queryId);
   });
 
-  it('should clear form when resetting form', function() {
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
-    ctrl.emailOption = 'custom';
-
-    ctrl.resetForm();
-
-    expect(ctrl.emailSubject).toBe('');
-    expect(ctrl.emailBody).toBe('');
-    expect(ctrl.emailOption).toBe('all');
+  it('should validate email subject and body', () => {
+    componentInstance.emailSubject = '';
+    componentInstance.emailBody = '';
+    expect(componentInstance.validateEmailSubjectAndBody()).toBeFalse();
   });
 
-  it('should discard email when canceling email', function() {
-    ctrl.$onInit();
+  it('should submit email', fakeAsync(() => {
+    spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
+      true);
+    componentInstance.emailOption = 'not_custom';
+    spyOn(emailDashboardResultBackendApiService, 'submitEmailAsync')
+      .and.returnValue(Promise.resolve({}));
+    componentInstance.submitEmail();
+    tick();
+    tick(4500);
+    expect(emailDashboardResultBackendApiService.submitEmailAsync)
+      .toHaveBeenCalled();
+    expect(componentInstance.invalid.subject).toBeFalse();
+    expect(componentInstance.invalid.body).toBeFalse();
+    expect(componentInstance.invalid.maxRecipients).toBeFalse();
+  }));
 
-    $httpBackend.expectPOST('/emaildashboardcancelresult/0').respond(200);
-    ctrl.cancelEmail();
-    $httpBackend.flush();
-
-    expect(ctrl.emailCancelled).toBe(true);
-    $timeout.flush(4000);
-
-    expect(windowRef.nativeWindow.location.href).toBe('/emaildashboard');
+  it('should not submit email when max recipents are null', () => {
+    componentInstance.emailOption = 'custom';
+    componentInstance.maxRecipients = 0;
+    spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
+      true);
+    componentInstance.submitEmail();
+    expect(componentInstance.invalid.maxRecipients).toBeTrue();
   });
 
-  it('should use reject handler when canceling email fails', function() {
-    ctrl.$onInit();
+  it('should acknowledge error when request fails while submitting email',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
+        true);
+      componentInstance.emailOption = 'not_custom';
+      spyOn(emailDashboardResultBackendApiService, 'submitEmailAsync')
+        .and.returnValue(Promise.reject({}));
+      componentInstance.submitEmail();
+      tick();
+      expect(componentInstance.errorHasOccurred).toBeTrue();
+      expect(componentInstance.submitIsInProgress).toBeFalse();
+    }));
 
-    $httpBackend.expectPOST('/emaildashboardcancelresult/0').respond(
-      500);
-    ctrl.cancelEmail();
-    $httpBackend.flush();
-
-    expect(ctrl.submitIsInProgress).toBe(false);
-    expect(ctrl.errorHasOccurred).toBe(true);
-    expect(windowRef.nativeWindow.location.href).toBe('');
+  it('should reset form', () => {
+    componentInstance.resetForm();
+    expect(componentInstance.emailSubject).toEqual('');
+    expect(componentInstance.emailBody).toEqual('');
+    expect(componentInstance.emailOption).toEqual('all');
   });
 
-  it('should send test email to backend when testing submissions', function() {
-    ctrl.$onInit();
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
+  it('should cancel email', fakeAsync(() => {
+    spyOn(emailDashboardResultBackendApiService, 'cancelEmailAsync')
+      .and.returnValue(Promise.resolve({}));
+    componentInstance.cancelEmail();
+    tick();
+    tick(4500);
+    expect(componentInstance.emailCancelled).toBeTrue();
+  }));
 
-    $httpBackend.expectPOST('/emaildashboardtestbulkemailhandler/0').respond(
-      200);
-    ctrl.sendTestEmail();
-    $httpBackend.flush();
+  it('should handler error when http call to cancel email fails',
+    fakeAsync(() => {
+      spyOn(emailDashboardResultBackendApiService, 'cancelEmailAsync')
+        .and.returnValue(Promise.reject({}));
+      componentInstance.cancelEmail();
+      tick();
+      expect(componentInstance.errorHasOccurred).toBeTrue();
+      expect(componentInstance.submitIsInProgress).toBeFalse();
+    }));
 
-    expect(ctrl.testEmailSentSuccesfully).toBe(true);
-    expect(ctrl.invalid.subject).toBe(false);
-    expect(ctrl.invalid.body).toBe(false);
-    expect(ctrl.invalid.maxRecipients).toBe(false);
-  });
-
-  it('should not send test email when response is rejected', function() {
-    ctrl.$onInit();
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
-
-    $httpBackend.expectPOST('/emaildashboardtestbulkemailhandler/0').respond(
-      500);
-    ctrl.sendTestEmail();
-    $httpBackend.flush();
-
-    expect(ctrl.testEmailSentSuccesfully).toBe(false);
-    expect(ctrl.invalid.subject).toBe(false);
-    expect(ctrl.invalid.body).toBe(false);
-    expect(ctrl.invalid.maxRecipients).toBe(false);
-  });
+  it('should send test email', fakeAsync(() => {
+    spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
+      true);
+    spyOn(emailDashboardResultBackendApiService, 'sendTestEmailAsync')
+      .and.returnValue(Promise.resolve({}));
+    componentInstance.sendTestEmail();
+    tick();
+    expect(componentInstance.testEmailSentSuccesfully).toBeTrue();
+    expect(componentInstance.invalid.subject).toBeFalse();
+    expect(componentInstance.invalid.body).toBeFalse();
+    expect(componentInstance.invalid.maxRecipients).toBeFalse();
+  }));
 });

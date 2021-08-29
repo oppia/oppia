@@ -29,6 +29,9 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { EmailDashboardPageComponent } from './email-dashboard-page.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -37,6 +40,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     HttpClientModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
+  ],
+  declarations: [
+    EmailDashboardPageComponent
+  ],
+  entryComponents: [
+    EmailDashboardPageComponent
   ],
   providers: [
     {
@@ -59,8 +68,6 @@ class EmailDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -108,6 +108,8 @@ export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() onInputBlur: () => void;
   @Input() onInputFocus: () => void;
   @Input() headersEnabled;
+  @Input() notRequired: () => boolean;
+
   constructor(
       elementRef: ElementRef,
       injector: Injector) {
