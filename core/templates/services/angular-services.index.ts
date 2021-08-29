@@ -376,6 +376,7 @@ import { LibraryPageBackendApiService } from 'pages/library-page/services/librar
 import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PageHeadService } from './page-head.service';
+import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -466,6 +467,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
+  ['EmailDashboardResultBackendApiService',
+    EmailDashboardResultBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationCreationBackendApiService',

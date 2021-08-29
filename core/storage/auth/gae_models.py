@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import feconf
 
-from typing import Dict, List, Optional, cast
+from typing import Dict, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
