@@ -30,7 +30,6 @@ import {
   ExplorationMetaDataBackendDict,
   ExplorationMetadata
 } from 'domain/exploration/exploration-metadata.model';
-import { Observable } from 'rxjs';
 
 interface SearchExplorationBackendResponse {
   'collection_node_metadata_list': ExplorationMetaDataBackendDict[];
