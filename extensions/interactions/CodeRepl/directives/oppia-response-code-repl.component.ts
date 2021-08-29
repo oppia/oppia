@@ -24,19 +24,25 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
+interface Dimension {
+  error?: string;
+}
+
 @Component({
   selector: 'oppiaResponseCodeRepl',
   templateUrl: './code-repl-response.component.html',
   styleUrls: []
 })
+// These properties are initialized using Angular lifecycle hooks
+// and we need to do non-null assertion, for more information see
+// https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue!: string;
-  answer: {text?: string;
-            error?: string}={};
-  errorFocusLabel: string | undefined;
+  answer!:Dimension;
+  errorFocusLabel!: string;
   constructor(
     private htmlEscaperService: HtmlEscaperService,
-    private focusManagerService: FocusManagerService,
+    private focusManagerService: FocusManagerService
   ) { }
 
   ngOnInit(): void {
