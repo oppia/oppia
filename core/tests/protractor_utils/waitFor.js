@@ -116,6 +116,12 @@ var elementAttributeToBe = async function(
     element, attribute, value, errorMessage
 ) {
   await browser.wait(async function() {
+    console.log(attribute);
+    var testing = await element.getAttribute(attribute);
+    console.log(testing);
+    console.log(value);
+    console.log(testing === value);
+    console.log(testing == value);
     return await element.getAttribute(attribute) === value;
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
