@@ -47,7 +47,7 @@ import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exp
 //     };
 //   });
 
-interface IconParametersArray {
+export interface IconParametersArray {
   thumbnailIconUrl: string
   left: string,
   top: string,
@@ -82,29 +82,29 @@ export interface CollectionHandler {
   templateUrl: './collection-player-page.component.html'
 })
 export class CollectionPlayerPageComponent implements OnInit {
-  activeHighlightedIconIndex: number;
-  explorationCardIsShown: boolean;
-  collection: Collection;
+  activeHighlightedIconIndex!: number;
+  collection!: Collection;
   collectionPlaythrough;
-  currentExplorationId: string;
-  summaryToPreview: LearnerExplorationSummaryBackendDict;
-  pathSvgParameters: string;
-  pathIconParameters: IconParametersArray[];
-  svgHeight: number;
-  MIN_HEIGHT_FOR_PATH_SVG_PX: number;
-  EVEN_SVG_HEIGHT_OFFSET_PX: number;
-  ODD_SVG_HEIGHT_OFFSET_PX: number;
-  y: number;
-  ICON_X_MIDDLE_PX: number;
-  ICON_Y_INITIAL_PX: number;
-  ICON_Y_INCREMENT_PX: number;
-  ICON_X_LEFT_PX: number;
-  ICON_X_RIGHT_PX: number;
-  collectionId: string;
-  nextExplorationId: string;
+  currentExplorationId!: string;
+  summaryToPreview!: LearnerExplorationSummaryBackendDict;
+  pathSvgParameters!: string;
+  pathIconParameters!: IconParametersArray[];
+  svgHeight!: number;
+  MIN_HEIGHT_FOR_PATH_SVG_PX!: number;
+  EVEN_SVG_HEIGHT_OFFSET_PX!: number;
+  ODD_SVG_HEIGHT_OFFSET_PX!: number;
+  y!: number;
+  ICON_X_MIDDLE_PX!: number;
+  ICON_Y_INITIAL_PX!: number;
+  ICON_Y_INCREMENT_PX!: number;
+  ICON_X_LEFT_PX!: number;
+  ICON_X_RIGHT_PX!: number;
+  collectionId!: string;
+  nextExplorationId!: string;
   whitelistedCollectionIdsForGuestProgress;
   collectionSummary;
-  isLoggedIn: boolean;
+  isLoggedIn: boolean = false;
+  explorationCardIsShown: boolean = false;
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -159,9 +159,9 @@ export class CollectionPlayerPageComponent implements OnInit {
 
   getNonRecommendedCollectionNodeCount(): number {
     return this.collection.getCollectionNodeCount() - (
-      this.collectionPlaythrough.getNextRecommendedCollectionNodeCount(
-      ) + this.collectionPlaythrough.getCompletedExplorationNodeCount(
-      ));
+      this.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
+      this.collectionPlaythrough.getCompletedExplorationNodeCount()
+    );
   }
 
   updateExplorationPreview(explorationId: string): void {
@@ -339,7 +339,7 @@ export class CollectionPlayerPageComponent implements OnInit {
       }
     });
 
-    // this.collectionPlayerBackendApiService.someFunction(this.collectionId);
+    // This.collectionPlayerBackendApiService.someFunction(this.collectionId);
 
     // this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
     //   this.collectionId);
