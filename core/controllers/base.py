@@ -37,10 +37,9 @@ import python_utils
 import utils
 
 import backports.functools_lru_cache
-from typing import Any # pylint: disable=unused-import
-from typing import Dict # pylint: disable=unused-import
-from typing import Text # pylint: disable=unused-import
 import webapp2
+
+from typing import Any, Dict, Optional # isort: skip
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -150,8 +149,14 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = None # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = None # type: Dict[Text, Any]
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
+    URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
+    HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -176,6 +181,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
+        # Once the attribute `normalized_request` is type annotated here, make
+        # sure to fix all the subclasses using normalized_request.get() method
+        # by removing their type: ignore[union-attr] and using a type cast
+        # instead to eliminate the possibility on union types.
+        # e.g. ClassroomAccessValidationHandler.
         self.normalized_request = None
         self.normalized_payload = None
 

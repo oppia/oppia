@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import feconf
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -57,16 +57,15 @@ class RoleQueryAuditModel(base_models.BaseModel):
     username = datastore_services.StringProperty(default=None, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: user_id and username
         fields, but it isn't deleted because it is needed for auditing purposes.
         """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model contains data corresponding to a user: user_id and username
         fields, but it isn't exported because it is only used for auditing
         purposes.
@@ -74,8 +73,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user: user_id and username
         fields, but it isn't exported because it is only used for auditing
         purposes.
@@ -88,8 +86,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        # type: (Text) -> bool
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether RoleQueryAuditModel exists for the given user.
 
         Args:
@@ -121,8 +118,7 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         datastore_services.StringProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_deletion_policy():
-        # type: () -> base_models.DELETION_POLICY
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: committer_id,
         old_username, and new_username fields but it isn't deleted because it is
         needed for auditing purposes.
@@ -130,14 +126,13 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user():
-        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
-        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user: committer_id,
         old_username, new_username, but this isn't exported because this model
         is only used temporarily for username changes.
@@ -149,8 +144,7 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        # type: (Text) -> bool
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether UsernameChangeAuditModel exists for the given user.
 
         Args:
