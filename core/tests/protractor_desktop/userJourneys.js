@@ -242,6 +242,8 @@ describe('Site language', function() {
     // Spanish is still selected.
     var placeholder = await element(by.css('.protractor-test-float-form-input'))
       .getAttribute('placeholder');
+    await waitFor.visibilityOf(placeholder, 'Placeholder taking too long to appear');
+    await waitFor.textToBePresentInElement(placeholder, 'Ingresa un número');
     expect(placeholder).toEqual('Ingresa un número');
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
