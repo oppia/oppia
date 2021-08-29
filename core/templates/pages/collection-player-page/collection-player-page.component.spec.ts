@@ -32,8 +32,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Collection player page component', () => {
+describe('Collection player page component', () => {
   let alertsService: AlertsService;
   let component: CollectionPlayerPageComponent;
   let fixture: ComponentFixture<CollectionPlayerPageComponent>;
