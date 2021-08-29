@@ -73,4 +73,3 @@ export class CollectionPlayerBackendApiService {
 angular.module('oppia').factory(
   'CollectionPlayerBackendApiService',
   downgradeInjectable(CollectionPlayerBackendApiService));
-
