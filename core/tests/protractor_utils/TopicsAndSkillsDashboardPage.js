@@ -245,7 +245,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.filterSkillsByStatus = async function(status) {
     await action.click(
       'Skill Dashboard status filter', skillStatusFilterDropdown);
-    var dropdownOption = skillStatusFilterDropdown.element(
+    var dropdownOption = element(
       by.cssContainingText('mat-option .mat-option-text', status));
     await action.click(
       'Skill status filter option : ' + status, dropdownOption);
@@ -267,7 +267,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click(
       'Topic Dashboard classroom filter', topicFilterClassroomField);
 
-    var dropdownOption = topicFilterClassroomField.element(
+    var dropdownOption = element(
       by.cssContainingText('mat-option .mat-option-text', keyword));
     await action.click(
       'Topic dashboard classroom filter option', dropdownOption);
