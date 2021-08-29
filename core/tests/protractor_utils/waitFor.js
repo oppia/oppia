@@ -19,6 +19,7 @@
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
+const exports = require('webpack');
 var Constants = require('./ProtractorConstants');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
@@ -207,6 +208,15 @@ var clientSideRedirection = async function(
   await browser.waitForAngularEnabled(true);
 };
 
+/**
+ * Wait for count of element.all Element Locater to be greater than 0
+ */
+var countToBeGreaterThanZero = async function(element, errorMessage) {
+  await browser.wait(async function() {
+    return await warningTextElements.count() > 0;
+  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
@@ -226,3 +236,4 @@ exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;
+exports.countToBeGreaterThanZero = countToBeGreaterThanZero;
