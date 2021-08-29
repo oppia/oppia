@@ -33,10 +33,10 @@ export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue!: string;
   answer: {text?: string;
             error?: string}={};
+  errorFocusLabel: string | undefined;
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private focusManagerService: FocusManagerService,
-    private errorFocusLabel: string,
   ) { }
 
   ngOnInit(): void {
