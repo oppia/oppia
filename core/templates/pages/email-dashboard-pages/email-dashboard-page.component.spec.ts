@@ -80,7 +80,7 @@ describe('Email Dashboard Page Component', () => {
     let username = 'user';
     let userInfo = new UserInfo(
       [], true, true, true, true, true, '', username, '', true);
-    let queries = [];
+    let queries: EmailDashboardQuery[] = [];
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo));
@@ -120,7 +120,7 @@ describe('Email Dashboard Page Component', () => {
   });
 
   it('should reset form', () => {
-    let expectedData = {};
+    let expectedData: Record<string, boolean | null> = {};
     AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
       expectedData[predicate.backend_attr] = predicate.default_value;
     });
@@ -134,7 +134,7 @@ describe('Email Dashboard Page Component', () => {
   });
 
   it('should submit query', fakeAsync(() => {
-    let queries = [];
+    let queries: EmailDashboardQuery[] = [];
     spyOn(emailDashboardDataService, 'submitQueryAsync').and.returnValue(
       Promise.resolve(queries));
     spyOn(componentInstance, 'resetForm');
@@ -145,7 +145,7 @@ describe('Email Dashboard Page Component', () => {
   }));
 
   it('should get next page of queries', fakeAsync(() => {
-    let queries = [];
+    let queries: EmailDashboardQuery[] = [];
     spyOn(emailDashboardDataService, 'isNextPageAvailable').and.returnValue(
       true);
     spyOn(emailDashboardDataService, 'getNextQueriesAsync').and.returnValue(

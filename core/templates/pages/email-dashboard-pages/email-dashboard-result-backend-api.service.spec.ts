@@ -21,6 +21,7 @@ import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
+import { EmailData } from './email-dashboard-result.component';
 
 describe('Email dashboard result backend api service', () => {
   let edrbas: EmailDashboardResultBackendApiService;
@@ -48,7 +49,13 @@ describe('Email dashboard result backend api service', () => {
   });
 
   it('should submit email', fakeAsync(() => {
-    edrbas.submitEmailAsync(null, '').then(successSpy, failSpy);
+    let emailData: EmailData = {
+      email_subject: '',
+      email_body: '',
+      email_intent: '',
+      max_recipients: 0
+    };
+    edrbas.submitEmailAsync(emailData, '').then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne('/emaildashboardresult/');
     expect(req.request.method).toEqual('POST');

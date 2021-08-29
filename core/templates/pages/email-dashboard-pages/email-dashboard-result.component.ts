@@ -41,7 +41,7 @@ export class EmailDashboardResultComponent {
     maxRecipients: false
   };
   emailSubject: string = '';
-  maxRecipients: number;
+  maxRecipients!: number;
   emailOption: string = 'all';
   submitIsInProgress: boolean = false;
   POSSIBLE_EMAIL_INTENTS = [
@@ -95,7 +95,7 @@ export class EmailDashboardResultComponent {
         email_body: this.emailBody,
         email_intent: this.emailIntent,
         max_recipients: (
-          this.emailOption !== 'all' ? this.maxRecipients : null)
+          this.emailOption !== 'all' ? this.maxRecipients : 0)
       };
 
       this.emailDashboardResultBackendApiService.submitEmailAsync(

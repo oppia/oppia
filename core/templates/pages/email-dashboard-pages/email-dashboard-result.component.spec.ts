@@ -100,7 +100,7 @@ describe('Email Dashboard Result Component', () => {
 
   it('should not submit email when max recipents are null', () => {
     componentInstance.emailOption = 'custom';
-    componentInstance.maxRecipients = null;
+    componentInstance.maxRecipients = 0;
     spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
       true);
     componentInstance.submitEmail();

@@ -39,10 +39,10 @@ interface CustomizationArgSpec {
   templateUrl: './email-dashboard-page.component.html'
 })
 export class EmailDashboardPageComponent {
-  data: QueryData;
-  currentPageOfQueries: EmailDashboardQuery[] = [];
+  data!: QueryData;
+  currentPageOfQueries!: EmailDashboardQuery[];
   showSuccessMessage: boolean = false;
-  username: string = '';
+  username!: string | null;
   customizationArgSpecs = AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION;
   isRequired: boolean = false;
 
@@ -54,6 +54,9 @@ export class EmailDashboardPageComponent {
   ) {}
 
   ngOnInit(): void {
+    this.currentPageOfQueries = [];
+    this.username = '';
+
     this.loaderService.showLoadingScreen('Loading');
     this.resetForm();
 
