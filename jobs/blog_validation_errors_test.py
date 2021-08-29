@@ -34,8 +34,7 @@ if MYPY: # pragma: no cover
 class DuplicateBlogTitleErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
-        # type: () -> None
+    def test_message(self) -> None:
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -54,8 +53,7 @@ class DuplicateBlogTitleErrorTests(
 class DuplicateBlogUrlErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
-        # type: () -> None
+    def test_message(self) -> None:
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -74,8 +72,7 @@ class DuplicateBlogUrlErrorTests(
 class InconsistentPublishTimestampsErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
-        # type: () -> None
+    def test_message(self) -> None:
         model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -97,8 +94,7 @@ class InconsistentPublishTimestampsErrorTests(
 class InconsistentPublishLastUpdatedTimestampsErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
-        # type: () -> None
+    def test_message(self) -> None:
         model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -106,8 +102,8 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
             author_id='user',
             url_fragment='url_fragment_1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.YEAR_AGO)
+            last_updated=self.YEAR_AGO,
+            published_on=self.NOW)
         error = (
             blog_validation_errors
             .InconsistentPublishLastUpdatedTimestampsError(model))
@@ -115,15 +111,14 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
         self.assertEqual(
             error.stderr,
             'InconsistentPublishLastUpdatedTimestampsError in BlogPostModel'
-            '(id="validblogid1"): last_updated=%r is later than published_on=%r'
+            '(id="validblogid1"): published_on=%r is later than last_updated=%r'
             % (self.NOW, self.YEAR_AGO))
 
 
 class ModelMutatedDuringJobErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
-        # type: () -> None
+    def test_message(self) -> None:
         model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',

@@ -33,10 +33,13 @@ describe('MathExpressionContentEditorComponent', () => {
   let externalRteSaveService: ExternalRteSaveService;
   let alertsService: AlertsService;
   let mockOnExternalRteSaveEventEmitter = new EventEmitter();
-  let svgElement;
+  let svgElement: {
+    setAttribute: (txt: string, temp: string) => void;
+    outerHTML: string;
+  };
 
   const mockMathJaxHub = {
-    Queue: (func) => {
+    Queue: (func: () => void) => {
       if (typeof func === 'function') {
         func();
       }
@@ -130,7 +133,7 @@ describe('MathExpressionContentEditorComponent', () => {
     };
     window.MathJax = mockMathJs as unknown as typeof MathJax;
     svgElement = {
-      setAttribute: (txt, temp) => {
+      setAttribute: (txt: string, temp: string) => {
         return;
       },
       outerHTML: '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ' +

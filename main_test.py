@@ -22,10 +22,9 @@ import contextlib
 from core.platform import models
 from core.tests import test_utils
 import main
-
+from typing import Any, ContextManager, Dict, cast
+import webapp2
 import webtest
-
-from typing import Any, ContextManager, Dict  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -79,7 +78,10 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
         )
 
         # Create middleware that wraps wsgi_app_mock.
-        middleware = main.NdbWsgiMiddleware(wsgi_app_mock)
+        # The function 'wsgi_app_mock' is casted to be of type WSGIApplication
+        # because we are passing it as a WSGIApplication not as a function.
+        middleware = main.NdbWsgiMiddleware(
+            cast(webapp2.WSGIApplication, wsgi_app_mock))
         test_response = webtest.TestResponse()
 
         # Verify that NdbWsgiMiddleware keeps the test_response the same.

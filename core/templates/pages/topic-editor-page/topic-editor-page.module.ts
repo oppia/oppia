@@ -29,8 +29,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
@@ -46,10 +44,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -57,7 +55,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     TopicEditorNavbarBreadcrumbComponent,
   ],
   entryComponents: [
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -85,6 +82,8 @@ class TopicEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

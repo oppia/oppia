@@ -21,17 +21,19 @@ handler arguments.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
+from core.controllers import base
 from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import state_domain
 import python_utils
 
-from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Dict, Optional, Union
 
 
 def validate_exploration_change(obj):
-    # type: (Dict[String, Any]) -> None
     """Validates exploration change.
 
     Args:
@@ -39,11 +41,10 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj)
+    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
 
 
 def validate_new_config_property_values(obj):
-    # type: (Dict[String, Any]) -> None
     """Validates new config property values.
 
     Args:
@@ -54,7 +55,7 @@ def validate_new_config_property_values(obj):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name)
+        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -62,24 +63,23 @@ def validate_new_config_property_values(obj):
 
 
 def validate_change_dict_for_blog_post(change_dict):
-    # type: (Dict[Any, Any]) -> None
     """Validates change_dict required for updating values of blog post.
 
     Args:
         change_dict: dict. Data that needs to be validated.
     """
     if 'title' in change_dict:
-        blog_domain.BlogPost.require_valid_title(
+        blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
             change_dict['title'], True)
     if 'thumbnail_filename' in change_dict:
-        blog_domain.BlogPost.require_valid_thumbnail_filename(
+        blog_domain.BlogPost.require_valid_thumbnail_filename( # type: ignore[no-untyped-call]
             change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
-        blog_domain.BlogPost.require_valid_tags(
-            change_dict['tags'], True)
+        blog_domain.BlogPost.require_valid_tags( # type: ignore[no-untyped-call]
+            change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property(
+        list_of_default_tags = config_domain.Registry.get_config_property( # type: ignore[no-untyped-call]
             'list_of_default_tags_for_blog_post').value
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
@@ -87,7 +87,6 @@ def validate_change_dict_for_blog_post(change_dict):
 
 
 def validate_collection_change(obj):
-    # type: (Dict[String, Any]) -> None
     """Validates collection change.
 
     Args:
@@ -95,4 +94,54 @@ def validate_collection_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    collection_domain.CollectionChange(obj)
+    collection_domain.CollectionChange(obj) # type: ignore[no-untyped-call]
+
+
+def validate_state_dict(state_dict):
+    """Validates state dict.
+
+    Args:
+        state_dict: dict. Data that needs to be validated.
+    """
+    validation_class = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
+    validation_class.validate(None, True)
+
+
+def validate_email_dashboard_data(
+        data: Dict[str, Optional[Union[bool, int]]]
+) -> None:
+    """Validates email dashboard data.
+
+    Args:
+        data: dict. Data that needs to be validated.
+    """
+    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    possible_keys = [predicate['backend_attr'] for predicate in predicates]
+
+    for key, value in data.items():
+        if value is None:
+            continue
+        if key not in possible_keys:
+            # Raise exception if key is not one of the allowed keys.
+            raise Exception('400 Invalid input for query.')
+
+
+def validate_task_entries(task_entries):
+    """Validates the task entry dict.
+
+    Args:
+        task_entries: dict. Data that needs to be validated.
+    """
+    entity_version = task_entries.get('entity_version', None)
+    if entity_version is None:
+        raise base.BaseHandler.InvalidInputException(
+            'No entity_version provided')
+    task_type = task_entries.get('task_type', None)
+    if task_type is None:
+        raise base.BaseHandler.InvalidInputException('No task_type provided')
+    target_id = task_entries.get('target_id', None)
+    if target_id is None:
+        raise base.BaseHandler.InvalidInputException('No target_id provided')
+    status = task_entries.get('status', None)
+    if status is None:
+        raise base.BaseHandler.InvalidInputException('No status provided')

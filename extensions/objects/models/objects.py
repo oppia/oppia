@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import copy
+import json
 
 from constants import constants
 import python_utils
@@ -1709,3 +1710,25 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         'contentId': None,
         'unicodeStrSet': [],
     }
+
+
+class JsonEncodedInString(BaseObject):
+    """Converts stringified value to its actual data type."""
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: str. Strings to be validated and normalized.
+
+        Returns:
+            *. The normalized value of any type, it depends on the raw value
+            which we want to load from json.
+        """
+        if not isinstance(raw, python_utils.BASESTRING):
+            raise Exception('Expected string received %s of type %s' % (
+                raw, type(raw))
+            )
+
+        return json.loads(raw)

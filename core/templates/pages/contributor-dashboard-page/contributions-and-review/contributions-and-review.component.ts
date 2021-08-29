@@ -48,18 +48,24 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestion-modal.service.ts');
 
+require(
+  // eslint-disable-next-line max-len
+  'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
+
 angular.module('oppia').component('contributionsAndReview', {
   template: require('./contributions-and-review.component.html'),
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
+    'UrlInterpolationService', 'UserService',
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, IMAGE_CONTEXT) {
+        UrlInterpolationService, UserService,
+        CORRESPONDING_DELETED_OPPORTUNITY_TEXT, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
 
@@ -108,7 +114,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
           if (details === null) {
-            subheading = '[The corresponding opportunity has been deleted.]';
+            subheading = CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
           } else {
             subheading = details.skill_description;
           }
@@ -137,17 +143,16 @@ angular.module('oppia').component('contributionsAndReview', {
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
           if (details === null) {
-            subheading = '[The corresponding opportunity has been deleted.]';
+            subheading = CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
           } else {
             subheading = (
               details.topic_name + ' / ' + details.story_title +
               ' / ' + details.chapter_title);
           }
 
-          var change = suggestion.change;
           var requiredData = {
             id: suggestion.suggestion_id,
-            heading: $filter('formatRtePreview')(change.translation_html),
+            heading: getTranslationSuggestionHeading(suggestion),
             subheading: subheading,
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
@@ -157,6 +162,14 @@ angular.module('oppia').component('contributionsAndReview', {
           translationContributionsSummaryList.push(requiredData);
         });
         return translationContributionsSummaryList;
+      };
+
+      var getTranslationSuggestionHeading = function(suggestion) {
+        const changeTranslation = suggestion.change.translation_html;
+        if (Array.isArray(changeTranslation)) {
+          return $filter('formatRtePreview')(changeTranslation.join(', '));
+        }
+        return $filter('formatRtePreview')(changeTranslation);
       };
 
       var resolveSuggestionSuccess = function(suggestionId) {
@@ -228,6 +241,7 @@ angular.module('oppia').component('contributionsAndReview', {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
+          $rootScope.$applyAsync();
         });
       };
 

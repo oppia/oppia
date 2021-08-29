@@ -71,6 +71,8 @@ import elasticsearch
 import requests_mock
 import webtest
 
+from typing import Any, Dict, Optional # isort: skip
+
 (
     auth_models, base_models, exp_models,
     feedback_models, question_models, skill_models,
@@ -113,12 +115,12 @@ def get_filepath_from_filename(filename, rootdir):
     the function returns the complete path of the filename by using
     os.path.join(root, filename).
 
-    For example signup-page.mainpage.html is present in
-    core/templates/pages/signup-page and error-page.mainpage.html is present in
-    core/templates/pages/error-pages. So we walk through core/templates/pages
-    and a match for signup-page.component.html is found in signup-page
-    subdirectory and a match for error-page.directive.html is found in
-    error-pages subdirectory.
+    For example exploration-editor-page.mainpage.html is present in
+    core/templates/pages/exploration-editor-page and error-page.mainpage.html
+    is present in core/templates/pages/error-pages. So we walk through
+    core/templates/pages and a match for exploration-editor-page.component.html
+    is found in exploration-editor-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
 
     Args:
         filename: str. The name of the file.
@@ -1383,7 +1385,7 @@ class AppEngineTestBase(TestBase):
         # satisfies pylint's attribute-defined-outside-init warning.
         self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(AppEngineTestBase, self).setUp()
         # Initialize namespace for the storage emulator.
         storage_services.CLIENT.namespace = self.id()
@@ -1861,7 +1863,7 @@ title: Title
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
 
-    def login(self, email, is_super_admin=False):
+    def login(self, email: str, is_super_admin: Optional[bool] = False) -> None:
         """Sets the environment variables to simulate a login.
 
         Args:
@@ -1872,7 +1874,7 @@ title: Title
         os.environ['USER_EMAIL'] = email
         os.environ['USER_IS_ADMIN'] = ('1' if is_super_admin else '0')
 
-    def logout(self):
+    def logout(self) -> None:
         """Simulates a logout by resetting the environment variables."""
         os.environ['USER_ID'] = ''
         os.environ['USER_EMAIL'] = ''
@@ -1913,8 +1915,7 @@ title: Title
             """Always returns mocked_now as the current UTC time."""
 
             @classmethod
-            def utcnow(cls):
-                # type: () -> datetime.datetime
+            def utcnow(cls) -> datetime.datetime:
                 """Returns the mocked datetime."""
                 return mocked_now
 
@@ -1954,7 +1955,12 @@ title: Title
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username, is_super_admin=False):
+    def signup(
+            self,
+            email: str,
+            username: str,
+            is_super_admin: Optional[bool] = False
+    ) -> None:
         """Complete the signup process for the user with the given username.
 
         Args:
@@ -1997,7 +2003,7 @@ title: Title
                 },
             }, csrf_token=self.get_new_csrf_token())
 
-    def add_user_role(self, username, user_role):
+    def add_user_role(self, username: str, user_role: str) -> None:
         """Adds the given role to the user account with the given username.
 
         Args:
@@ -2260,7 +2266,13 @@ title: Title
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expected_status_int=200, headers=None):
+    def get_json(
+            self,
+            url: str,
+            params: Optional[Dict[str, str]] = None,
+            expected_status_int: int = 200,
+            headers: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
             self.assertIsInstance(params, dict)
@@ -2879,7 +2891,7 @@ title: Title
                 'outline': (
                     '<p>Value</p>'
                     '<oppia-noninteractive-math math_content-with-value="{'
-                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' #pylint: disable=line-too-long
+                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' # pylint: disable=line-too-long
                     '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
                     '}">'
                     '</oppia-noninteractive-math>'),
