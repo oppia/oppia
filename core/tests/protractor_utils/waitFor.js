@@ -212,7 +212,7 @@ var clientSideRedirection = async function(
  */
 var countToBeGreaterThanZero = async function(element, errorMessage) {
   await browser.wait(async function() {
-    return await warningTextElements.count() > 0;
+    return await element.count() > 0;
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
