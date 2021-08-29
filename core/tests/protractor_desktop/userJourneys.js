@@ -242,7 +242,8 @@ describe('Site language', function() {
     // Spanish is still selected.
     var placeholder = await element(by.css('.protractor-test-float-form-input'))
       .getAttribute('placeholder');
-    await waitFor.visibilityOf(placeholder, 'Placeholder taking too long to appear');
+    await waitFor.visibilityOf(
+      placeholder, 'Placeholder taking too long to appear');
     await waitFor.textToBePresentInElement(
       placeholder, 'Ingresa un número',
       'Placeholder text taking too long to change from English to Spanish');
