@@ -240,14 +240,15 @@ describe('Site language', function() {
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholder = await element(by.css('.protractor-test-float-form-input'))
-      .getAttribute('placeholder');
+    var placeholderElement = await element(
+      by.css('.protractor-test-float-form-input'));
     await waitFor.visibilityOf(
-      placeholder, 'Placeholder taking too long to appear');
-    await waitFor.textToBePresentInElement(
-      placeholder, 'Ingresa un número',
+      placeholderElement, 'Placeholder Element taking too long to appear');
+    await waitFor.elementAttributeToBe(
+      placeholderElement, 'placeholder', 'Ingresa un número',
       'Placeholder text taking too long to change from English to Spanish');
-    expect(placeholder).toEqual('Ingresa un número');
+    expect(await placeholderElement.getAttribute('placeholder')).toEqual(
+      'Ingresa un número');
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });
