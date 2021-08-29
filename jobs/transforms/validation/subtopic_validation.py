@@ -23,7 +23,7 @@ from core.domain import subtopic_page_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 from core.platform import models
 from jobs import base_jobs
-from jobs import blog_validation_errors
 from jobs import job_utils
 from jobs.io import ndb_io
+from jobs.types import blog_validation_errors
 
 import apache_beam as beam
 

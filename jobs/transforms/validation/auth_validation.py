@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import feconf
 from jobs.decorators import validation_decorators
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 
 (auth_models, user_models) = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))

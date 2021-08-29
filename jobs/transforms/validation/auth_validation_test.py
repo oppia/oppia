@@ -24,7 +24,7 @@ from core.tests import test_utils
 import feconf
 from jobs import job_test_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import auth_validation
+from jobs.transforms.validation import auth_validation
 from jobs.types import base_validation_errors
 
 import apache_beam as beam
