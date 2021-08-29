@@ -13,5 +13,5 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the learner's view of a collection.
+ * @fileoverview Unit Tests for CollectionPlayerBackendApiService.
  */

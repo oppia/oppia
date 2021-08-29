@@ -21,45 +21,53 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AlertsService } from 'services/alerts.service';
+import { CollectionHandler } from '../collection-player-page.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CollectionPlayerBackendApiService {
-  collectionId;
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private alertsService: AlertsService
   ) {}
 
-  async fetchCollectionSummariesAsync(): Promise<CollectionSummary> {
+  async fetchCollectionSummariesAsync(
+      collectionId: string
+  ): Promise<CollectionSummary> {
     let collectionSummaryUrl = this.urlInterpolationService.interpolateUrl(
       '/collectionsummarieshandler/data', {
-        stringified_collection_ids: JSON.stringify([this.collectionId])
+        stringified_collection_ids: collectionId
       });
     return new Promise((resolve, reject) => {
       this.http.get<CollectionSummary>(
         collectionSummaryUrl).toPromise().then(response => {
         return resolve(response);
       }, errorResponse => {
+        this.alertsService.addWarning(
+          'There was an error while fetching the collection summary.');
         reject(errorResponse.error.error);
       });
     });
   }
 
-  // this.http.get('/collectionsummarieshandler/data', {
-  //   params: {
-  //     stringified_collection_ids: JSON.stringify([this.collectionId])
-  //   }
-  // }).toPromise().then(
-  //   (response: CollectionSummary) => {
-  //     this.collectionSummary = response.summaries[0];
-  //   },
-  //   () => {
-  //     this.alertsService.addWarning(
-  //       'There was an error while fetching the collection summary.');
-  //   }
-  // );
+  someFunction(collectionId: string): void {
+    this.http.get(
+      '/collection_handler/data/' + collectionId).toPromise().then(
+      function(response: CollectionHandler) {
+        angular.element('meta[itemprop="name"]').attr(
+          'content', response.meta_name);
+        angular.element('meta[itemprop="description"]').attr(
+          'content', response.meta_description);
+        angular.element('meta[property="og:title"]').attr(
+          'content', response.meta_name);
+        angular.element('meta[property="og:description"]').attr(
+          'content', response.meta_description);
+      }
+    );
+  }
 }
 
 angular.module('oppia').factory(

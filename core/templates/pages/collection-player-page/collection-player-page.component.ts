@@ -54,7 +54,7 @@ interface IconParametersArray {
   thumbnailBgColor: string
 }
 
-interface CollectionSummary {
+export interface CollectionSummary {
   'is_admin': boolean,
   'summaries': string[],
   'user_email': string,
@@ -62,7 +62,7 @@ interface CollectionSummary {
   'username': boolean
 }
 
-interface CollectionHandler {
+export interface CollectionHandler {
   'can_edit': boolean
   'collection': Collection
   'is_admin': boolean
@@ -105,6 +105,7 @@ export class CollectionPlayerPageComponent implements OnInit {
   whitelistedCollectionIdsForGuestProgress;
   collectionSummary;
   isLoggedIn: boolean;
+
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
     private urlInterpolationService: UrlInterpolationService,
@@ -125,18 +126,14 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   setIconHighlight(index: number): void {
-    console.log('set icon highlight');
-    console.log(index);
     this.activeHighlightedIconIndex = index;
   }
 
   unsetIconHighlight(): void {
-    console.log('mouseleave-unsetIconHighlight');
     this.activeHighlightedIconIndex = -1;
   }
 
   togglePreviewCard(): void {
-    console.log('mouseleave-togglepreviewcard');
     this.explorationCardIsShown = !this.explorationCardIsShown;
   }
 
@@ -168,7 +165,6 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   updateExplorationPreview(explorationId: string): void {
-    console.log('mouseover-event');
     this.explorationCardIsShown = true;
     this.currentExplorationId = explorationId;
     this.summaryToPreview = this.getCollectionNodeForExplorationId(
@@ -297,13 +293,22 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   isCompletedExploration(explorationId: string): boolean {
-    let completedExplorationIds = this.collectionPlaythrough
-      .getCompletedExplorationIds();
-    return completedExplorationIds.indexOf(
-      explorationId) > -1;
+    if (this.collectionPlaythrough) {
+      let completedExplorationIds = (
+        this.collectionPlaythrough.getCompletedExplorationIds());
+      return completedExplorationIds.indexOf(explorationId) > -1;
+    }
+    return false;
   }
 
   ngOnInit(): void {
+    // $scope.$watch('$ctrl.collection', function(newValue) {
+    //   if (
+    //     newValue !== null &&
+    //     ctrl.collection.getCollectionNodeCount()) {
+    //     ctrl.generatePathParameters();
+    //   }
+    // }, true);
     this.loaderService.showLoadingScreen('Loading');
     this.collection = null;
     this.collectionId = this.urlService.getCollectionIdFromUrl();
@@ -333,6 +338,11 @@ export class CollectionPlayerPageComponent implements OnInit {
         this.explorationCardIsShown = false;
       }
     });
+
+    // this.collectionPlayerBackendApiService.someFunction(this.collectionId);
+
+    // this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
+    //   this.collectionId);
     this.http.get(
       '/collection_handler/data/' + this.collectionId).toPromise().then(
       function(response: CollectionHandler) {
@@ -367,7 +377,6 @@ export class CollectionPlayerPageComponent implements OnInit {
           'There was an error while fetching the collection summary.');
       }
     );
-
     // Load the collection the learner wants to view.
     this.readOnlyCollectionBackendApiService.loadCollectionAsync(
       this.collectionId).then(
@@ -418,6 +427,7 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaCollectionPlayerPage', downgradeComponent(
-    {component: CollectionPlayerPageComponent}));
+angular.module('oppia').directive('oppiaCollectionPlayerPage',
+  downgradeComponent({
+    component: CollectionPlayerPageComponent
+  })as angular.IDirectiveFactory);
