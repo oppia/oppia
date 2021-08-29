@@ -16,10 +16,10 @@
  * @fileoverview Component for creating a new collection node.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import { Collection } from 'domain/collection/collection.model';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
@@ -43,10 +43,11 @@ export class CollectionNodeCreatorComponent {
   searchQueryHasError: boolean = false;
 
   constructor(
-    private httpClient: HttpClient,
     private alertsService: AlertsService,
     private collectionEditorStateService: CollectionEditorStateService,
     private collectionLinearizerService: CollectionLinearizerService,
+    private explorationCreationBackendApiService:
+    ExplorationCreationBackendApiService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
     private searchExplorationsBackendApiService:
@@ -170,11 +171,14 @@ export class CollectionNodeCreatorComponent {
     }
 
     // Create a new exploration with the given title.
-    this.httpClient.post('/contributehandler/create_new', {
+    // this.httpClient.post('/contributehandler/create_new', {
+    //   title: title
+    // }).toPromise()
+    this.explorationCreationBackendApiService.registerNewExplorationAsync({
       title: title
-    }).toPromise().then((response) => {
+    }).then((response) => {
       this.newExplorationTitle = '';
-      let newExplorationId = response.exploration_id;
+      let newExplorationId = response.explorationId;
 
       this.siteAnalyticsService
         .registerCreateNewExplorationInCollectionEvent(
