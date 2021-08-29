@@ -83,7 +83,7 @@ export class EmailDashboardResultComponent {
     let dataIsValid = this.validateEmailSubjectAndBody();
 
     if (this.emailOption === 'custom' &&
-      this.maxRecipients === null) {
+      this.maxRecipients === 0) {
       this.invalid.maxRecipients = true;
       dataIsValid = false;
     }
