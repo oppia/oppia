@@ -153,14 +153,12 @@ describe('Collection editor state service', () => {
     let fetchCollectionSpy = spyOn(
       editableCollectionBackendApiService, 'fetchCollectionAsync')
       .and.resolveTo(sampleCollection);
-    const loadCollectionSuccessCb = jasmine.createSpy('success');
 
     // Load initial collection.
     collectionEditorStateService.loadCollection('sample_collection_id');
     tick();
 
     expect(fetchCollectionSpy).toHaveBeenCalled();
-    expect(loadCollectionSuccessCb).toHaveBeenCalled();
   }));
 
   it('should throw error if there was an error while ' +
@@ -184,7 +182,6 @@ describe('Collection editor state service', () => {
     let fetchCollectionSpy = spyOn(
       collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
       .and.resolveTo(sampleCollectionRights);
-    const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
     // Load initial collection.
     collectionEditorStateService.loadCollection('sample_collection_id');
@@ -192,7 +189,6 @@ describe('Collection editor state service', () => {
     tick();
 
     expect(fetchCollectionSpy).toHaveBeenCalled();
-    expect(loadCollectionRightsSuccessCb).toHaveBeenCalled();
   }));
 
   it('should throw error if there was an error while ' +
@@ -247,7 +243,7 @@ describe('Collection editor state service', () => {
     collectionEditorStateService.setCollection(sampleCollection);
 
     let savedChanges = collectionEditorStateService.saveCollection(
-      'commit message');
+      'commit message', saveCollectionsuccessCb);
     tick();
 
     expect(saveCollectionsuccessCb).toHaveBeenCalled();
