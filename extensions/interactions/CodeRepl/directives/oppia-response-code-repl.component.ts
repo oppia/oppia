@@ -38,7 +38,7 @@ interface Dimension {
 // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue!: string;
-  answer!:Dimension;
+  answer!: Dimension;
   errorFocusLabel!: string;
   constructor(
     private htmlEscaperService: HtmlEscaperService,
