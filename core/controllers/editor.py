@@ -66,7 +66,8 @@ SCHEMA_FOR_VERSION = {
     'type': 'int',
     'validators': [{
         'id': 'is_at_least',
-        'min_value': 1 # Version must be greater than zero.
+        # Version must be greater than zero.
+        'min_value': 1
     }]
 }
 
@@ -661,7 +662,8 @@ class StateYamlHandler(EditorHandler):
                     'type': 'int',
                     'validators': [{
                         'id': 'is_at_least',
-                        'min_value': 1 # Width must be greater than zero.
+                        # Width must be greater than zero.
+                        'min_value': 1
                     }]
                 }
             }

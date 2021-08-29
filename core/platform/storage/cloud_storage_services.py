@@ -23,7 +23,7 @@ import functools
 
 from google.cloud import storage
 
-from typing import List, Optional, Union  # isort:skip # pylint: disable=unused-import
+from typing import List, Optional, Union
 
 
 @functools.lru_cache(maxsize=1)
