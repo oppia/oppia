@@ -467,6 +467,7 @@
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
+/core/controllers/beam_jobs*.py @brianrodri
 /core/domain/beam_job*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep

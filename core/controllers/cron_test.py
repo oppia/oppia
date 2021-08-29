@@ -26,6 +26,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -68,6 +69,17 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
+        self.task_status = 'Not Started'
+        def _mock_taskqueue_service_defer(
+                unused_function_id, unused_queue_name):
+            """Mocks taskqueue_services.defer() so that it can be checked
+            if the method is being invoked or not.
+            """
+            self.task_status = 'Started'
+
+        self.taskqueue_service_defer_swap = self.swap(
+            taskqueue_services, 'defer', _mock_taskqueue_service_defer)
 
     def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -126,6 +138,24 @@ class CronJobTests(test_utils.GenericTestBase):
             self.get_html_response('/cron/models/cleanup')
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
+    def test_cron_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_html_response('/cron/users/user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+        self.logout()
+
+    def test_cron_fully_complete_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_html_response('/cron/users/fully_complete_user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+            self.logout()
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(

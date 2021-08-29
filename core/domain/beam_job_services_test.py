@@ -340,6 +340,18 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
                 [m.id for m in initial_beam_job_run_models]))
         self.assertIn('Failed to update the state of job', logs[-1])
 
+    def test_create_beam_job_run_model(self):
+        model = beam_job_services.create_beam_job_run_model(
+            'FooJob', ['num_foos'], dataflow_job_id='123')
+        model.put()
+
+        all_runs = beam_job_services.get_beam_job_runs()
+        self.assertEqual(len(all_runs), 1)
+        run = all_runs[0]
+        self.assertEqual(run.job_name, 'FooJob')
+        self.assertEqual(run.job_arguments, ['num_foos'])
+        self.assertFalse(run.job_is_synchronous)
+
     def test_create_beam_job_run_result_model(self):
         model = beam_job_services.create_beam_job_run_result_model(
             '123', 'abc', '123')
@@ -362,7 +374,10 @@ class GetBeamJobRunResultTests(test_utils.GenericTestBase):
         self.assertEqual(beam_job_run_result.stderr, 'def')
 
     def test_get_beam_run_result_with_no_results(self):
-        self.assertIsNone(beam_job_services.get_beam_job_run_result('123'))
+        beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
+
+        self.assertEqual(beam_job_run_result.stdout, '')
+        self.assertEqual(beam_job_run_result.stderr, '')
 
     def test_get_beam_run_result_with_result_batches(self):
         beam_job_models.BeamJobRunResultModel(job_id='123', stdout='abc').put()
