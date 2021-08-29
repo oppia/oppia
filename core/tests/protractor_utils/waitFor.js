@@ -19,7 +19,6 @@
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
-const exports = require('webpack');
 var Constants = require('./ProtractorConstants');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
