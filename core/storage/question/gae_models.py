@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -69,7 +69,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -141,7 +141,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -295,7 +295,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -641,7 +641,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         question_skill_link_models = cls.query().filter(
             cls.skill_id == skill_id,
-            cls.deleted == False) #pylint: disable=singleton-comparison
+            cls.deleted == False) # pylint: disable=singleton-comparison
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
@@ -685,7 +685,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             List[QuestionSkillLinkModel],
             QuestionSkillLinkModel.query().filter(
                 cls.question_id == question_id,
-                cls.deleted == False).fetch()) #pylint: disable=singleton-comparison
+                cls.deleted == False).fetch()) # pylint: disable=singleton-comparison
 
     @classmethod
     def put_multi_question_skill_links(
@@ -756,7 +756,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the QuestionModel
         export_data function, and thus a new export_data function does not
         need to be defined here.

@@ -24,6 +24,7 @@ import { UrlInterpolationService } from
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Donate page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
@@ -31,7 +32,10 @@ describe('Donate page', () => {
 
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [DonatePageComponent],
+      declarations: [
+        DonatePageComponent,
+        MockTranslatePipe
+      ],
       providers: [
         {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,

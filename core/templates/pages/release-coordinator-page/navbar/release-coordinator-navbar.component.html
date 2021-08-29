@@ -77,8 +77,7 @@
         <ul class="nav oppia-navbar-nav oppia-navbar-profile-release-coordinator">
           <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator oppia-hide-in-small-width-screens">
-              <li *ngIf="BEAM_JOBS_TAB_IS_ENABLED"
-                  class="nav-item oppia-clickable-navbar-element float-right">
+              <li class="nav-item oppia-clickable-navbar-element float-right">
                 <a class="nav-link oppia-navbar-tab"
                    (click)="switchTab(TAB_ID_BEAM_JOBS)"
                    href="#"
@@ -87,17 +86,6 @@
                    placement="bottom"
                    container="body">
                   Beam Jobs
-                </a>
-              </li>
-              <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab"
-                   (click)="switchTab(TAB_ID_JOBS)"
-                   href="#"
-                   [ngClass]="{ 'active': activeTab == TAB_ID_JOBS }"
-                   ngbTooltip="Jobs"
-                   placement="bottom"
-                   container="body">
-                  Jobs
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
