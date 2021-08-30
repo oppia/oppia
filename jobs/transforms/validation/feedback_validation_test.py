@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 from jobs import job_test_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import feedback_validation
+from jobs.transforms.validation import feedback_validation
 from jobs.types import feedback_validation_errors
 
 import apache_beam as beam

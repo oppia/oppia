@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 from core.platform import models
 from core.tests import test_utils
-from jobs import blog_validation_errors
 from jobs import job_test_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import blog_validation
+from jobs.transforms.validation import blog_validation
+from jobs.types import blog_validation_errors
 
 import apache_beam as beam
 

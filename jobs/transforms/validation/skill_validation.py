@@ -14,28 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Beam DoFns and PTransforms to provide validation of story models."""
+"""Beam DoFns and PTransforms to provide validation of skill models."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import story_domain
+from core.domain import skill_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import story_models
+    from mypy_imports import skill_models
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+(skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-@validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)
-class ValidateStorySnapshotMetadataModel(
+@validation_decorators.AuditsExisting(skill_models.SkillSnapshotMetadataModel)
+class ValidateSkillSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
+    """Overrides _get_change_domain_class for SkillSnapshotMetadataModel."""
 
     def _get_change_domain_class(self, unused_input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
@@ -44,16 +44,16 @@ class ValidateStorySnapshotMetadataModel(
             unused_input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            story_domain.StoryChange. A domain object class for the
+            skill_domain.SkillChange. A domain object class for the
             changes made by commit commands of the model.
         """
-        return story_domain.StoryChange
+        return skill_domain.SkillChange
 
 
-@validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel)
-class ValidateStoryCommitLogEntryModel(
+@validation_decorators.AuditsExisting(skill_models.SkillCommitLogEntryModel)
+class ValidateSkillCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
+    """Overrides _get_change_domain_class for SkillCommitLogEntryModel."""
 
     def _get_change_domain_class(self, input_model):
         """Returns a change domain class.
@@ -62,12 +62,12 @@ class ValidateStoryCommitLogEntryModel(
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            story_domain.StoryChange. A domain object class for the
+            skill_domain.SkillChange. A domain object class for the
             changes made by commit commands of the model.
         """
         model = job_utils.clone_model(input_model)
 
-        if model.id.startswith('story'):
-            return story_domain.StoryChange
+        if model.id.startswith('skill'):
+            return skill_domain.SkillChange
         else:
             return None

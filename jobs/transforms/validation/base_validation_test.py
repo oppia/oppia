@@ -27,7 +27,7 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 from jobs import job_test_utils
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 from jobs.types import base_validation_errors
 
 import apache_beam as beam

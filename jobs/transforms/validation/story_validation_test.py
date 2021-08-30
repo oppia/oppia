@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.skill_validation."""
+"""Unit tests for jobs.transforms.story_validation."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from jobs import job_test_utils
-from jobs.transforms import skill_validation
+from jobs.transforms.validation import story_validation
 from jobs.types import base_validation_errors
 
 import apache_beam as beam
@@ -29,20 +29,20 @@ import apache_beam as beam
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
-    from mypy_imports import skill_models
+    from mypy_imports import story_models
 
-(base_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.skill])
+(base_models, story_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.story])
 
 
-class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
+class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self) -> None:
-        valid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+        valid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
+            committer_id='committer_id',
             commit_type='delete',
             commit_cmds=[{
                 'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
@@ -51,25 +51,25 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
 
-    def test_skill_change_object_with_missing_cmd(self) -> None:
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+    def test_story_change_object_with_missing_cmd(self) -> None:
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
-            commit_type='delete',
+            committer_id='committer_id',
+            commit_type='create',
             commit_cmds=[{'invalid': 'data'}])
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(
@@ -80,48 +80,48 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                     'Missing cmd key in change dict')
             ])
 
-    def test_skill_change_object_with_invalid_cmd(self) -> None:
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+    def test_story_change_object_with_invalid_cmd(self) -> None:
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
-            commit_type='delete',
-            commit_cmds=[{'cmd': 'invalid'}])
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{'invalid': 'data'}])
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(
             output, [
                 base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
-                    {'cmd': 'invalid'},
-                    'Command invalid is not allowed')
+                    {'invalid': 'data'},
+                    'Missing cmd key in change dict')
             ])
 
-    def test_skill_change_object_with_missing_attribute_in_cmd(self) -> None:
+    def test_story_change_object_with_missing_attribute_in_cmd(self) -> None:
         commit_dict = {
-            'cmd': 'update_skill_property',
-            'property_name': 'name',
+            'cmd': 'update_story_property',
+            'property_name': 'title',
         }
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
-            commit_type='edit',
+            committer_id='committer_id',
+            commit_type='create',
             commit_cmds=[commit_dict])
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(
@@ -133,53 +133,52 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                     'new_value, old_value')
             ])
 
-    def test_skill_change_object_with_extra_attribute_in_cmd(self) -> None:
-        commit_dict = {
-            'cmd': 'add_skill_misconception',
-            # Key new_misconception_dict stores a string because dict
-            # keeps on rearranging themselves so tests are not passing.
-            'new_misconception_dict': '{u\'id\': 0, u\'notes\': '
-                                      'u\'<p>notes</p>\', u\'feedback\': '
-                                      'u\'<p>default_feedback</p>\', '
-                                      'u\'name\': u\'name\'}',
-            'invalid': 'invalid'
-        }
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+    def test_story_change_object_with_extra_attribute_in_cmd(self) -> None:
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
+            committer_id='committer_id',
             commit_type='create',
-            commit_cmds=[commit_dict]
+            commit_cmds=[{
+                'cmd': 'add_story_node',
+                'node_id': 'node_id',
+                'invalid': 'invalid'
+            }]
         )
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(
             output, [
                 base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
-                    commit_dict,
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_id',
+                        'invalid': 'invalid'
+                    },
+                    'The following required attributes are missing: title, '
                     'The following extra attributes are present: invalid')
             ])
 
-    def test_skill_change_object_with_invalid_skill_property(self) -> None:
+    def test_story_change_object_with_invalid_story_property(self) -> None:
         commit_dict = {
-            'cmd': 'update_skill_property',
+            'cmd': 'update_story_property',
             'property_name': 'invalid',
             'old_value': 'old_value',
-            'new_value': 'new_value',
+            'new_value': 'new_value'
         }
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
+            committer_id='committer_id',
             commit_type='edit',
             commit_cmds=[commit_dict])
 
@@ -187,7 +186,7 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(
@@ -195,36 +194,70 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
-                    'Value for property_name in cmd update_skill_property: '
+                    'Value for property_name in cmd update_story_property: '
                     'invalid is not allowed')
             ])
 
-    def test_skill_change_object_with_invalid_skill_misconceptions(
+    def test_story_change_object_with_invalid_story_node_property(self) -> None:
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='edit',
+            commit_cmds=[{
+                'cmd': 'update_story_node_property',
+                'node_id': 'node_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            }]
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                story_validation.ValidateStorySnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(
+            output, [
+                base_validation_errors.CommitCmdsValidateError(
+                    invalid_commit_cmd_model,
+                    {
+                        'cmd': 'update_story_node_property',
+                        'node_id': 'node_id',
+                        'property_name': 'invalid',
+                        'old_value': 'old_value',
+                        'new_value': 'new_value'
+                    },
+                    'Value for property_name in cmd '
+                    'update_story_node_property: invalid is not allowed')
+            ])
+
+    def test_story_change_object_with_invalid_story_contents_property(
             self
     ) -> None:
         commit_dict = {
-            'cmd': 'update_skill_misconceptions_property',
-            'misconception_id': 'id',
+            'cmd': 'update_story_contents_property',
             'property_name': 'invalid',
             'old_value': 'old_value',
             'new_value': 'new_value',
         }
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            committer_id='committer-id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
+            committer_id='committer_id',
+            commit_type='edit',
             commit_cmds=[commit_dict])
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+                story_validation.ValidateStorySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(
@@ -233,85 +266,54 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                     invalid_commit_cmd_model,
                     commit_dict,
                     'Value for property_name in cmd '
-                    'update_skill_misconceptions_property: invalid is not '
-                    'allowed')
+                    'update_story_contents_property: invalid is not allowed')
             ])
 
-    def test_skill_change_object_with_invalid_skill_contents_property(
-            self
-    ) -> None:
-        commit_dict = {
-            'cmd': 'update_skill_contents_property',
-            'property_name': 'invalid',
-            'old_value': 'old_value',
-            'new_value': 'new_value',
-        }
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
-            id='123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer-id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[commit_dict])
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                skill_validation.ValidateSkillSnapshotMetadataModel())
+class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
+
+    def test_validate_story_model(self) -> None:
+        valid_commit_cmd_model = (
+            story_models.StoryCommitLogEntryModel(
+                id='story_id123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                story_id='story-id',
+                user_id='user-id',
+                commit_type='test-type',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
-
-        self.assert_pcoll_equal(
-            output, [
-                base_validation_errors.CommitCmdsValidateError(
-                    invalid_commit_cmd_model,
-                    commit_dict,
-                    'Value for property_name in cmd '
-                    'update_skill_contents_property: invalid is not allowed')
-            ])
-
-
-class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
-
-    def test_validate_skill_model(self) -> None:
-        valid_commit_cmd_model = skill_models.SkillCommitLogEntryModel(
-            id='skill_id123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            skill_id='skill-id',
-            user_id='user-id',
-            commit_type='test-type',
-            post_commit_status='private',
-            commit_cmds=[{'cmd': 'create_new'}])
 
         output = (
             self.pipeline
             | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillCommitLogEntryModel())
+                story_validation.ValidateStoryCommitLogEntryModel())
         )
 
         self.assert_pcoll_equal(output, [])
 
     def test_raises_commit_cmd_none_error(self) -> None:
-        invalid_commit_cmd_model = skill_models.SkillCommitLogEntryModel(
-            id='model_id123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            skill_id='skill-id',
-            user_id='user-id',
-            commit_type='test-type',
-            post_commit_status='private',
-            commit_cmds=[{'cmd': 'create_new'}])
+        invalid_commit_cmd_model = (
+            story_models.StoryCommitLogEntryModel(
+                id='model_id123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                story_id='story-id',
+                user_id='user-id',
+                commit_type='test-type',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                skill_validation.ValidateSkillCommitLogEntryModel())
+                story_validation.ValidateStoryCommitLogEntryModel())
         )
 
         self.assert_pcoll_equal(

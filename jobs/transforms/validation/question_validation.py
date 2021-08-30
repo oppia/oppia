@@ -23,7 +23,7 @@ from core.domain import question_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])

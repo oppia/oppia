@@ -24,7 +24,7 @@ from core.domain import rights_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 
 (
     exp_models, story_models

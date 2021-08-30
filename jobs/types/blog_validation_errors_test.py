@@ -20,8 +20,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core.platform import models
-from jobs import blog_validation_errors
 from jobs.types import base_validation_errors_test
+from jobs.types import blog_validation_errors
 import utils
 
 MYPY = False
