@@ -248,7 +248,7 @@ var TopicsAndSkillsDashboardPage = function() {
     var dropdownOption = element(
       by.cssContainingText('mat-option .mat-option-text', status));
     await action.click(
-      'Skill status filter option : ' + status, dropdownOption);
+      'Skill status filter option: ' + status, dropdownOption);
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
@@ -259,7 +259,7 @@ var TopicsAndSkillsDashboardPage = function() {
       keywordFieldInput);
 
     await action.sendKeys(
-      'Topic Dashboard keyword filter : ' + keyword,
+      'Topic Dashboard keyword filter: ' + keyword,
       filterKeywordInput, keyword + '\n');
   };
 
