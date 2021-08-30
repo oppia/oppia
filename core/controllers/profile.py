@@ -238,7 +238,6 @@ class ProfilePictureHandler(base.BaseHandler):
     """
 
     URL_PATH_ARGS_SCHEMAS = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     }
