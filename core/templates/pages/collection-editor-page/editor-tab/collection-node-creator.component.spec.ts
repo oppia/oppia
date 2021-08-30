@@ -1,0 +1,163 @@
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for collection node creator component.
+ */
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
+import { Collection } from 'domain/collection/collection.model';
+import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
+import { ExplorationMetadata } from 'domain/exploration/exploration-metadata.model';
+import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { AlertsService } from 'services/alerts.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { ValidatorsService } from 'services/validators.service';
+import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import { CollectionLinearizerService } from '../services/collection-linearizer.service';
+import { CollectionNodeCreatorComponent } from './collection-node-creator.component';
+
+describe('Collection node creator component', () => {
+  let fixture: ComponentFixture<CollectionNodeCreatorComponent>;
+  let componentInstance: CollectionNodeCreatorComponent;
+  let collectionEditorStateService: CollectionEditorStateService;
+  let searchExplorationsBackendApiService: SearchExplorationsBackendApiService;
+  let alertsService: AlertsService;
+  let mockCollection = new Collection(
+    'collection_id', 'collection_title', 'collection_objective', 'en', [],
+    null, '', 2, 3, []);
+  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let collectionLinearizerService: CollectionLinearizerService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        CollectionNodeCreatorComponent
+      ],
+      providers: [
+        AlertsService,
+        CollectionEditorStateService,
+        CollectionLinearizerService,
+        ExplorationCreationBackendApiService,
+        ExplorationSummaryBackendApiService,
+        SearchExplorationsBackendApiService,
+        SiteAnalyticsService,
+        ValidatorsService,
+        NormalizeWhitespacePipe
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(CollectionNodeCreatorComponent);
+    componentInstance = fixture.componentInstance;
+    collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
+    searchExplorationsBackendApiService = TestBed.inject(
+      SearchExplorationsBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
+    explorationSummaryBackendApiService = TestBed.inject(
+      ExplorationSummaryBackendApiService);
+    collectionLinearizerService = TestBed.inject(CollectionLinearizerService);
+  });
+
+  it('should initialize', () => {
+    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
+      mockCollection);
+    componentInstance.ngOnInit();
+    expect(componentInstance.collection).toEqual(mockCollection);
+  });
+
+  it('should fetch typeahead results', fakeAsync(() => {
+    let explorationTitle = 'Exploration Title';
+    let explorationId = 'id';
+    let isValidSearchQuerySpy = spyOn(
+      componentInstance, 'isValidSearchQuery').and.returnValue(true);
+    let sebasSpy = spyOn(
+      searchExplorationsBackendApiService, 'fetchExplorationsAsync')
+      .and.returnValue(Promise.resolve(
+        [ExplorationMetadata.createFromBackendDict({
+          id: explorationId,
+          objective: '',
+          title: explorationTitle
+        })]));
+
+    componentInstance.collection = mockCollection;
+    spyOn(componentInstance.collection, 'containsCollectionNode')
+      .and.returnValue(false);
+
+    componentInstance.fetchTypeaheadResults('Explo').then((options) => {
+      expect(options.length).toEqual(1);
+    });
+    tick();
+    expect(componentInstance.searchQueryHasError).toBeFalse();
+
+    isValidSearchQuerySpy.and.returnValue(false);
+    componentInstance.fetchTypeaheadResults('Explo');
+    tick();
+    expect(componentInstance.searchQueryHasError).toBeTrue();
+
+    isValidSearchQuerySpy.and.returnValue(true);
+    sebasSpy.and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
+    componentInstance.fetchTypeaheadResults('Explo').then((options) => {
+      expect(options).toEqual([]);
+    });
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalled();
+  }));
+
+  it('should validate search query', () => {
+    expect(componentInstance.isValidSearchQuery(
+      'invalid<search>query:')).toBeFalse();
+    expect(componentInstance.isValidSearchQuery('valid search')).toBeTrue();
+  });
+
+  it('should add exploration to colelction', fakeAsync(() => {
+    componentInstance.collection = mockCollection;
+    let expId = 'new_id';
+    spyOn(
+      explorationSummaryBackendApiService,
+      'loadPublicAndPrivateExplorationSummariesAsync')
+      .and.returnValue(Promise.resolve({
+        summaries: [{
+          category: '',
+          community_owned: true,
+          human_readable_contributors_summary: null,
+          id: expId,
+          language_code: '',
+          num_views: 1,
+          objective: '',
+          status: '',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+          title: ''
+        }]
+      }));
+    spyOn(collectionLinearizerService, 'appendCollectionNode');
+    spyOn(componentInstance.collection, 'containsCollectionNode')
+      .and.returnValue(false);
+    componentInstance.addExplorationToCollection(expId);
+    tick();
+    expect(collectionLinearizerService.appendCollectionNode).toHaveBeenCalled();
+  }));
+});

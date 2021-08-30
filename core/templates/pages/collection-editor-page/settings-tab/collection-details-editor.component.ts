@@ -37,15 +37,15 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   collection: Collection;
   COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
     CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-  CATEGORY_LIST_FOR_SELECT2 =
-  AppConstants.ALL_CATEGORIES.map(
-    (category) => {
-      return {
-        id: category,
-        text: category
-      };
-    }
-  );
+  // CATEGORY_LIST_FOR_SELECT2 =
+  // AppConstants.ALL_CATEGORIES.map(
+  //   (category) => {
+  //     return {
+  //       id: category,
+  //       text: category
+  //     };
+  //   }
+  // );
   languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
   TAG_REGEX = AppConstants.TAG_REGEX;
   displayedCollectionTitle;
@@ -76,20 +76,20 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
     this.displayedCollectionLanguage = this.collection.getLanguageCode();
     this.displayedCollectionTags = this.collection.getTags();
 
-    let categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
-      (categoryItem) => {
-        return categoryItem.id === this.collection.getCategory();
-      }
-    );
+    // let categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
+    //   (categoryItem) => {
+    //     return categoryItem.id === this.collection.getCategory();
+    //   }
+    // );
 
     // If the current category is not in the dropdown, add it
     // as the first option.
-    if (!categoryIsInSelect2 && this.collection.getCategory()) {
-      this.CATEGORY_LIST_FOR_SELECT2.unshift({
-        id: this.collection.getCategory(),
-        text: this.collection.getCategory()
-      });
-    }
+    // if (!categoryIsInSelect2 && this.collection.getCategory()) {
+    //   this.CATEGORY_LIST_FOR_SELECT2.unshift({
+    //     id: this.collection.getCategory(),
+    //     text: this.collection.getCategory()
+    //   });
+    // }
   }
 
   hasPageLoaded(): boolean {

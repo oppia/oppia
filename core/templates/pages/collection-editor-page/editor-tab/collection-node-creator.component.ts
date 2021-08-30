@@ -66,9 +66,7 @@ export class CollectionNodeCreatorComponent {
    * a search query. It then extracts the title and id of the
    * exploration to prepare typeahead options.
    */
-  fetchTypeaheadResults(
-      searchQuery: string
-  ): Promise<string[]> {
+  fetchTypeaheadResults(searchQuery: string): Promise<string[]> {
     const that = this;
     if (this.isValidSearchQuery(searchQuery)) {
       this.searchQueryHasError = false;
@@ -76,7 +74,7 @@ export class CollectionNodeCreatorComponent {
         searchQuery
       ).then((explorationMetadataList) => {
         let options: string[] = [];
-        explorationMetadataList.map(function(item) {
+        explorationMetadataList.map((item) => {
           if (!that.collection.containsCollectionNode(item.id)) {
             options.push(item.title + ' (' + item.id + ')');
           }
@@ -131,8 +129,8 @@ export class CollectionNodeCreatorComponent {
     this.explorationSummaryBackendApiService
       .loadPublicAndPrivateExplorationSummariesAsync([newExplorationId])
       .then((responseObject) => {
-        var summaries = responseObject.summaries;
-        var summaryBackendObject = null;
+        let summaries = responseObject.summaries;
+        let summaryBackendObject = null;
         if (summaries.length !== 0 &&
             summaries[0].id === newExplorationId) {
           summaryBackendObject = summaries[0];

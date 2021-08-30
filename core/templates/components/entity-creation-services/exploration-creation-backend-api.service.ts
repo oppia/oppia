@@ -40,7 +40,7 @@ export class ExplorationCreationBackendApiService {
   constructor(private http: HttpClient) {}
 
   private _createExploration(
-      newExplorationData: NewExplorationData,
+      newExplorationData: NewExplorationData | {},
       successCallback: (value: ExplorationCreationResponse) => void,
       errorCallback: (reason: string) => void): void {
     this.http.post<ExplorationCreationBackendDict>(
@@ -59,7 +59,7 @@ export class ExplorationCreationBackendApiService {
   }
 
   async registerNewExplorationAsync(
-      newExplorationData: NewExplorationData
+      newExplorationData: NewExplorationData | {}
   ): Promise<ExplorationCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createExploration(newExplorationData, resolve, reject);
