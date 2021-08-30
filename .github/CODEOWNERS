@@ -508,6 +508,7 @@
 /mypy_requirements.txt @vojtechjelinek
 /python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
+/scripts/run_mypy_checks*.py @vojtechjelinek @sajalasati @hardikkat24
 /stubs/ @vojtechjelinek
 /utils*.py @aks681
 
