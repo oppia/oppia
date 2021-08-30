@@ -30,8 +30,6 @@ from jobs.types import blog_validation_errors
 
 import apache_beam as beam
 
-from typing import Any  # pylint: disable=unused-import
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
