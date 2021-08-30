@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -151,7 +151,7 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users resolve tasks.
         """

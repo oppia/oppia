@@ -25,7 +25,7 @@ import python_utils
 
 import redis
 
-from typing import Dict, List, Optional, cast # isort:skip
+from typing import Dict, List, Optional, cast
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
