@@ -30,7 +30,8 @@ class MockWindowRef {
       protocol: 'https:',
       host: 'www.oppia.org'
     },
-    open: (url: string) => {}
+    open: (url: string) => {},
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;

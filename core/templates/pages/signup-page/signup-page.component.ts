@@ -212,7 +212,7 @@ export class SignupPageComponent {
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = decodeURIComponent(
             this.urlService.getUrlParams().return_url);
-        }, this.siteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+        }, AppConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
       }, (rejection) => {
         if (rejection && rejection.status_code === 401) {
           this.showRegistrationSessionExpiredModal();

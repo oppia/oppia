@@ -36,34 +36,19 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
-  _window = {
+  nativeWindow = {
     location: {
-      _pathname: '/learn/math',
-      _href: '',
-      get href() {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-      get pathname() {
-        return this._pathname;
-      },
-      set pathname(val) {
-        this._pathname = val;
-      },
+      pathname: '/learn/math',
+      href: '',
       reload: () => {}
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
-    }
+    },
+    gtag: () => {}
   };
-  get nativeWindow() {
-    return this._window;
-  }
 }
-
 
 describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;

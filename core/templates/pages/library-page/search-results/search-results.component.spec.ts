@@ -45,7 +45,8 @@ describe('Search Results component', () => {
     nativeWindow = {
       location: {
         href: ''
-      }
+      },
+      gtag: () => {}
     };
   }
 

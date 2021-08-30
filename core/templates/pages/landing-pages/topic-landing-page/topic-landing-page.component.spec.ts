@@ -47,7 +47,8 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       }
-    }
+    },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;

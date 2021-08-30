@@ -25,7 +25,8 @@ class MockWindowRef {
   nativeWindow = {
     location: {
       href: 'pending-account-deletion'
-    }
+    },
+    gtag: () => {}
   };
 }
 
