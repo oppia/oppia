@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Common imports required in all oppia pages.
+ * @fileoverview Root component for Email dashboard result Page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
+import { Component } from '@angular/core';
 
-// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
-import 'pages/mock-ajs';
-import 'Polyfills.ts';
+@Component({
+  selector: 'oppia-email-dashboard-result-page-root',
+  templateUrl: './email-dashboard-result-page-root.component.html'
+})
+export class EmailDashboardResultPageRootComponent {}
