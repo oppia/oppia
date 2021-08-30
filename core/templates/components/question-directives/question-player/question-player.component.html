@@ -46,7 +46,7 @@
         <tr ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping"
             class="list-item"
             ng-click="$ctrl.openSkillMasteryModal(skillId)">
-          <td> <[scorePerSkill.description]> </td>
+          <td class="skill-score-description"> <[scorePerSkill.description]> </td>
           <td>
             <div class="oppia-skill-score-container">
               <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScore(scorePerSkill)}"></div>
@@ -178,6 +178,7 @@
     line-height: normal;
     margin-bottom: 0;
     text-align: center;
+    padding: 10px;
   }
 
   .oppia-question-player-container .oppia-question-player-progress {
@@ -212,6 +213,11 @@
   .oppia-question-player-container .skill-score-table .skill-score-table-headings {
     padding-bottom: 0.5em;
     text-align: center;
+  }
+
+  .skill-score-description {
+    text-align: left;
+    padding-left: 10px;
   }
 
   .oppia-question-player-container .skill-score-table .oppia-skill-score-container {
