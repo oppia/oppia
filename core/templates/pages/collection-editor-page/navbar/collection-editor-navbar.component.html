@@ -43,26 +43,22 @@
        rel="noopener"
        ngbTooltip="Player (new tab)"
        placement="bottom" class="nav-link">
-    <a [href]="'/collection/' + collectionId"
-       target="_blank"
-       rel="noopener"
-       class="nav-link">
       <i class="material-icons">&#xE037;</i>
+      <div *ngIf="getWarningsCount()"
+          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+          (click)="selectMainTab()">
+        <span class="oppia-editor-warnings-count">
+          {{ getWarningsCount() }}
+        </span>
+      </div>
+      <div *ngIf="getChangeListCount() > 0"
+          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+          (click)="selectMainTab()">
+        <span class="oppia-editor-warnings-count">
+          1
+        </span>
+      </div>
     </a>
-    <div *ngIf="getWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-         (click)="selectMainTab()">
-      <span class="oppia-editor-warnings-count">
-        {{ getWarningsCount() }}
-      </span>
-    </div>
-    <div *ngIf="getChangeListCount() > 0"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-         (click)="selectMainTab()">
-      <span class="oppia-editor-warnings-count">
-        1
-      </span>
-    </div>
     <ul ngbDropdownMenu class="dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
       <ng-container *ngIf="getWarningsCount()">
