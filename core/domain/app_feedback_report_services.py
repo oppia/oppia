@@ -29,7 +29,7 @@ import utils
 from mypy_imports import ( # isort:skip
     app_feedback_report_models, transaction_services) # isort:skip
 
-from typing import Dict, Text, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -39,8 +39,9 @@ PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
 PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
 
 
-def get_report_models(report_ids):
-    # type: (List[Text]) -> List[Optional[app_feedback_report_models.AppFeedbackReportModel]]
+def get_report_models(
+        report_ids: List[str]
+) -> List[Optional[app_feedback_report_models.AppFeedbackReportModel]]:
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
@@ -54,8 +55,9 @@ def get_report_models(report_ids):
         app_feedback_report_models.AppFeedbackReportModel.get_multi(report_ids))
 
 
-def create_report_from_json(report_json):
-    # type: (Dict[Text, Any]) -> app_feedback_report_domain.AppFeedbackReport
+def create_report_from_json(
+        report_json: Dict[str, Any]
+) -> app_feedback_report_domain.AppFeedbackReport:
     """Creates an AppFeedbackReport domain object instance from the incoming
     JSON request.
 
@@ -68,8 +70,9 @@ def create_report_from_json(report_json):
     return app_feedback_report_domain.AppFeedbackReport.from_dict(report_json)
 
 
-def store_incoming_report_stats(report_obj):
-    # type: (app_feedback_report_domain.AppFeedbackReport) -> None
+def store_incoming_report_stats(
+        report_obj: app_feedback_report_domain.AppFeedbackReport
+) -> None:
     """Adds a new report's stats to the aggregate stats model.
 
     Args:
@@ -205,8 +208,10 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
 
 
 def calculate_new_stats_count_for_parameter(
-        current_stats_map, current_value, delta):
-    # type: (Dict[Text, int], Text, int) -> Dict[Any, int]
+        current_stats_map: Dict[str, int],
+        current_value: str,
+        delta: int
+) -> Dict[Any, int]:
     """Helper to increment or initialize the stats count for a parameter.
 
     Args:
@@ -234,8 +239,9 @@ def calculate_new_stats_count_for_parameter(
     return current_stats_map
 
 
-def get_report_from_model(report_model):
-    # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
+def get_report_from_model(
+        report_model: app_feedback_report_models.AppFeedbackReportModel
+) -> app_feedback_report_domain.AppFeedbackReport:
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the data.
 
@@ -258,8 +264,9 @@ def get_report_from_model(report_model):
             'Web app feedback report domain objects must be defined.')
 
 
-def get_ticket_from_model(ticket_model):
-    # type: (app_feedback_report_models.AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
+def get_ticket_from_model(
+        ticket_model: app_feedback_report_models.AppFeedbackReportTicketModel
+) -> app_feedback_report_domain.AppFeedbackReportTicket:
     """Create and return a domain object AppFeedbackReportTicket given a model
     loaded from the the data.
 
@@ -278,8 +285,9 @@ def get_ticket_from_model(ticket_model):
         ticket_model.report_ids)
 
 
-def get_stats_from_model(stats_model):
-    # type: (app_feedback_report_models.AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
+def get_stats_from_model(
+        stats_model: app_feedback_report_models.AppFeedbackReportStatsModel
+) -> app_feedback_report_domain.AppFeedbackReportDailyStats:
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the storage.
 
@@ -303,8 +311,9 @@ def get_stats_from_model(stats_model):
         param_stats)
 
 
-def create_app_daily_stats_from_model_json(daily_param_stats):
-    # type: (Dict[Text, Dict[Text, int]]) -> Dict[Text, app_feedback_report_domain.ReportStatsParameterValueCounts]
+def create_app_daily_stats_from_model_json(
+        daily_param_stats: Dict[str, Dict[str, int]]
+) -> Dict[str, app_feedback_report_domain.ReportStatsParameterValueCounts]:
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
@@ -327,8 +336,9 @@ def create_app_daily_stats_from_model_json(daily_param_stats):
     return stats_dict
 
 
-def get_android_report_from_model(android_report_model):
-    # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
+def get_android_report_from_model(
+        android_report_model: app_feedback_report_models.AppFeedbackReportModel
+) -> app_feedback_report_domain.AppFeedbackReport:
     """Creates a domain object that represents an Android feedback report from
     the given model.
 
@@ -392,8 +402,7 @@ def get_android_report_from_model(android_report_model):
         user_supplied_feedback, device_system_context, app_context)
 
 
-def scrub_all_unscrubbed_expiring_reports(scrubbed_by):
-    # type: (Text) -> None
+def scrub_all_unscrubbed_expiring_reports(scrubbed_by: str) -> None:
     """Fetches the reports that are expiring and must be scrubbed.
 
     Args:
@@ -406,8 +415,8 @@ def scrub_all_unscrubbed_expiring_reports(scrubbed_by):
         scrub_single_app_feedback_report(report, scrubbed_by)
 
 
-def get_all_expiring_reports_to_scrub():
-    # type: () -> List[app_feedback_report_domain.AppFeedbackReport]
+def get_all_expiring_reports_to_scrub() -> List[
+        app_feedback_report_domain.AppFeedbackReport]:
     """Fetches the reports that are expiring and must be scrubbed.
 
     Returns:
@@ -420,8 +429,10 @@ def get_all_expiring_reports_to_scrub():
         get_report_from_model(model_entity) for model_entity in model_entities]
 
 
-def scrub_single_app_feedback_report(report, scrubbed_by):
-    # type: (app_feedback_report_domain.AppFeedbackReport, Text) -> None
+def scrub_single_app_feedback_report(
+        report: app_feedback_report_domain.AppFeedbackReport,
+        scrubbed_by: str
+) -> None:
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
     any user-entered input in the entity.
 
@@ -442,8 +453,10 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     save_feedback_report_to_storage(report)
 
 
-def save_feedback_report_to_storage(report, new_incoming_report=False):
-    # type: (app_feedback_report_domain.AppFeedbackReport, bool) -> None
+def save_feedback_report_to_storage(
+        report: app_feedback_report_domain.AppFeedbackReport,
+        new_incoming_report: bool=False
+) -> None:
     """Saves the AppFeedbackReport domain object to persistent storage.
 
     Args:
@@ -517,8 +530,8 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
     model_entity.put()
 
 
-def get_all_filter_options():
-    # type: () -> List[app_feedback_report_domain.AppFeedbackReportFilter]
+def get_all_filter_options() -> List[
+        app_feedback_report_domain.AppFeedbackReportFilter]:
     """Fetches all the possible values that moderators can filter reports or
     tickets by.
 
@@ -535,8 +548,10 @@ def get_all_filter_options():
     return filter_list
 
 
-def reassign_ticket(report, new_ticket):
-    # type: (app_feedback_report_domain.AppFeedbackReport, Optional[app_feedback_report_domain.AppFeedbackReportTicket]) -> None
+def reassign_ticket(
+        report: app_feedback_report_domain.AppFeedbackReport,
+        new_ticket: Optional[app_feedback_report_domain.AppFeedbackReportTicket]
+) -> None:
     """Reassign the ticket the report is associated with.
 
     Args:
@@ -619,8 +634,10 @@ def reassign_ticket(report, new_ticket):
     save_feedback_report_to_storage(report)
 
 
-def edit_ticket_name(ticket, new_name):
-    # type: (app_feedback_report_domain.AppFeedbackReportTicket, Text) -> None
+def edit_ticket_name(
+        ticket: app_feedback_report_domain.AppFeedbackReportTicket,
+        new_name: str
+) -> None:
     """Updates the ticket name.
 
     Returns:
@@ -631,8 +648,9 @@ def edit_ticket_name(ticket, new_name):
     _save_ticket(ticket)
 
 
-def _save_ticket(ticket):
-    # type: (app_feedback_report_domain.AppFeedbackReportTicket) -> None
+def _save_ticket(
+        ticket: app_feedback_report_domain.AppFeedbackReportTicket
+) -> None:
     """Saves the ticket to persistent storage.
 
     Returns:

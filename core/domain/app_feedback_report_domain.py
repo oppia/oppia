@@ -33,7 +33,7 @@ from mypy_imports import app_feedback_report_models
 import python_utils
 import utils
 
-from typing import Dict, Text, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
+from typing import Dict, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -43,10 +43,18 @@ class AppFeedbackReport(python_utils.OBJECT):
     """Domain object for a single feedback report."""
 
     def __init__(
-            self, report_id, schema_version, platform, submitted_on_timestamp,
-            local_timezone_offset_hrs, ticket_id, scrubbed_by,
-            user_supplied_feedback, device_system_context, app_context):
-        # type: (Text, int, Text, datetime.datetime, int, Optional[Text], Optional[Text], UserSuppliedFeedback, DeviceSystemContext, AppContext) -> None
+            self,
+            report_id: str,
+            schema_version: int,
+            platform: str,
+            submitted_on_timestamp: datetime.datetime,
+            local_timezone_offset_hrs: int,
+            ticket_id: Optional[str],
+            scrubbed_by: Optional[str],
+            user_supplied_feedback: 'UserSuppliedFeedback',
+            device_system_context: 'DeviceSystemContext',
+            app_context: 'AppContext'
+    ) -> None:
         """Constructs an AppFeedbackReport domain object.
 
         Args:
@@ -82,8 +90,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         self.device_system_context = device_system_context
         self.app_context = app_context
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AppFeedbackReport domain object.
 
         Returns:
@@ -103,8 +110,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             'app_context': self.app_context.to_dict()
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates all properties of this report and its constituents.
 
         Raises:
@@ -151,8 +157,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         self.app_context.validate()
 
     @classmethod
-    def require_valid_platform(cls, platform):
-        # type: (Text) -> None
+    def require_valid_platform(cls, platform: str) -> None:
         """Checks whether the platform is valid.
 
         Args:
@@ -170,8 +175,8 @@ class AppFeedbackReport(python_utils.OBJECT):
                     constants.PLATFORM_CHOICES, platform))
 
     @classmethod
-    def require_valid_schema_version(cls, platform, schema_version):
-        # type: (Text, int) -> None
+    def require_valid_schema_version(
+            cls, platform: str, schema_version: int) -> None:
         """Checks whether the report schema version is valid for the given
         platform.
 
@@ -198,8 +203,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                     platform, minimum_schema, current_schema, schema_version))
 
     @classmethod
-    def require_valid_scrubber_id(cls, scrubber_id):
-        # type: (Text) -> None
+    def require_valid_scrubber_id(cls, scrubber_id: str) -> None:
         """Checks whether the scrubbed_by user is valid.
 
         Args:
@@ -219,8 +223,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
     @classmethod
-    def from_dict(cls, report_dict):
-        # type: (Dict[Text, Any]) -> AppFeedbackReport
+    def from_dict(cls, report_dict: Dict[str, Any]) -> 'AppFeedbackReport':
         """Returns an AppFeedbackReport object from a dict of the report sent in
         an incoming feedback report request.
 
@@ -239,8 +242,8 @@ class AppFeedbackReport(python_utils.OBJECT):
                 'Domain objects for web reports must be implemented.')
 
     @classmethod
-    def get_android_report_from_dict(cls, report_dict):
-        # type: (Dict[Text, Any]) -> AppFeedbackReport
+    def get_android_report_from_dict(
+            cls, report_dict: Dict[str, Any]) -> 'AppFeedbackReport':
         """Returns an AppFeedbackReport object from a dict for an Android
         report.
 
@@ -303,8 +306,8 @@ class AppFeedbackReport(python_utils.OBJECT):
         return report_obj
 
     @classmethod
-    def get_report_type_from_string(cls, report_type_name):
-        # type: (Text) -> constants.REPORT_TYPE
+    def get_report_type_from_string(
+            cls, report_type_name: str) -> constants.REPORT_TYPE:
         """Determines the report type based on the JSON value.
 
         Args:
@@ -320,8 +323,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             'The given report type %s is invalid.' % report_type_name)
 
     @classmethod
-    def get_category_from_string(cls, category_name):
-        # type: (Text) -> constants.CATEGORY
+    def get_category_from_string(cls, category_name: str) -> constants.CATEGORY:
         """Determines the category based on the JSON value.
 
         Args:
@@ -337,8 +339,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             'The given category %s is invalid.' % category_name)
 
     @classmethod
-    def get_android_text_size_from_string(cls, text_size_name):
-        # type: (Text) -> constants.ANDROID_TEXT_SIZE
+    def get_android_text_size_from_string(
+            cls, text_size_name: str) -> constants.ANDROID_TEXT_SIZE:
         """Determines the app text size based on the JSON value.
 
         Args:
@@ -354,8 +356,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             'The given Android app text size %s is invalid.' % text_size_name)
 
     @classmethod
-    def get_entry_point_from_json(cls, entry_point_json):
-        # type: (Dict[Text, Any]) -> EntryPoint
+    def get_entry_point_from_json(
+            cls, entry_point_json: Dict[str, Any]) -> 'EntryPoint':
         """Determines the entry point type based on the rececived JSON.
 
         Args:
@@ -387,8 +389,8 @@ class AppFeedbackReport(python_utils.OBJECT):
                 'The given entry point %s is invalid.' % entry_point_name)
 
     @classmethod
-    def get_android_network_type_from_string(cls, network_type_name):
-        # type: (Text) -> constants.ANDROID_NETWORK_TYPE
+    def get_android_network_type_from_string(
+            cls, network_type_name: str) -> constants.ANDROID_NETWORK_TYPE:
         """Determines the network type based on the JSON value.
 
         Args:
@@ -408,10 +410,12 @@ class UserSuppliedFeedback(python_utils.OBJECT):
     """Domain object for the user-supplied information in feedback reports."""
 
     def __init__(
-            self, report_type, category, user_feedback_selected_items,
-            user_feedback_other_text_input):
-
-            # type: (constants.REPORT_TYPE, constants.CATEGORY, List[Text], Text) -> None
+            self,
+            report_type: constants.REPORT_TYPE,
+            category: constants.CATEGORY,
+            user_feedback_selected_items: List[str],
+            user_feedback_other_text_input: str
+    ) -> None:
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
@@ -430,8 +434,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         self.user_feedback_selected_items = user_feedback_selected_items
         self.user_feedback_other_text_input = user_feedback_other_text_input
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this UserSuppliedFeedback domain object.
 
         Returns:
@@ -445,8 +448,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 self.user_feedback_other_text_input)
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this UserSuppliedFeedback domain object.
 
         Raises:
@@ -468,8 +470,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             self.user_feedback_other_text_input)
 
     @classmethod
-    def require_valid_report_type(cls, report_type):
-        # type: (constants.REPORT_TYPE) -> None
+    def require_valid_report_type(
+            cls, report_type: constants.REPORT_TYPE) -> None:
         """Checks whether the report_type is valid.
 
         Args:
@@ -488,8 +490,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                     constants.ALLOWED_REPORT_TYPES))
 
     @classmethod
-    def require_valid_category(cls, category):
-        # type: (Text) -> None
+    def require_valid_category(cls, category: str) -> None:
         """Checks whether the category is valid.
 
         Args:
@@ -508,8 +509,11 @@ class UserSuppliedFeedback(python_utils.OBJECT):
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
-            cls, category, selected_items, other_text_input):
-        # type: (Text, List[Text], Text) -> None
+            cls,
+            category: str,
+            selected_items: List[str],
+            other_text_input: str
+    ) -> None:
         """Checks whether the user_feedback_selected_items and
         user_feedback_selected_items are valid for the given cateory and
         selected items.
@@ -544,8 +548,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                         other_text_input))
 
     @classmethod
-    def require_valid_selected_items_for_category(cls, selected_items):
-        # type: (List[Text]) -> None
+    def require_valid_selected_items_for_category(
+        cls, selected_items: List[str]) -> None:
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
@@ -566,8 +570,8 @@ class DeviceSystemContext(python_utils.OBJECT):
     to submit the report.
     """
 
-    def __init__(self, version_name, device_country_locale_code):
-        # type: (Text, Text) -> None
+    def __init__(
+            self, version_name: str, device_country_locale_code: str) -> None:
         """Constructs a DeviceSystemContext domain object.
 
         Args:
@@ -579,8 +583,7 @@ class DeviceSystemContext(python_utils.OBJECT):
         self.version_name = version_name
         self.device_country_locale_code = device_country_locale_code
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Text]
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing this DeviceSystemContext domain object.
         Subclasses should override this to propertly format any additional
         properties.
@@ -593,8 +596,7 @@ class DeviceSystemContext(python_utils.OBJECT):
             'device_country_locale_code': self.device_country_locale_code
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this DeviceSystemContext domain object.
 
         Raises:
@@ -612,10 +614,16 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
     """
 
     def __init__(
-            self, version_name, package_version_code,
-            device_country_locale_code, device_language_locale_code,
-            device_model, sdk_version, build_fingerprint, network_type):
-        # type: (Text, int, Text, Text, Text, int, Text, constants.ANDROID_NETWORK_TYPE) -> None
+            self,
+            version_name: str,
+            package_version_code: int,
+            device_country_locale_code: str,
+            device_language_locale_code: str,
+            device_model: str,
+            sdk_version: int,
+            build_fingerprint: str,
+            network_type: constants.ANDROID_NETWORK_TYPE
+    ) -> None:
         """Constructs an AndroidDeviceSystemContext domain object.
 
         Args:
@@ -645,8 +653,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.build_fingerprint = build_fingerprint
         self.network_type = network_type
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AndroidDeviceSystemContext domain
         object.
 
@@ -665,8 +672,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'network_type': self.network_type.name
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this AndroidDeviceSystemContext domain object.
 
         Raises:
@@ -698,8 +704,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.require_valid_network_type(self.network_type)
 
     @classmethod
-    def require_valid_version_name(cls, version_name):
-        # type: (Text) -> None
+    def require_valid_version_name(cls, version_name: str) -> None:
         """Checks whether the version name is a valid string app version for
         Oppia Android.
 
@@ -721,8 +726,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 '%s.' % version_name)
 
     @classmethod
-    def require_valid_package_version_code(cls, package_version_code):
-        # type: (int) -> None
+    def require_valid_package_version_code(
+            cls, package_version_code: int) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
@@ -746,8 +751,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                     package_version_code))
 
     @classmethod
-    def require_valid_locale_code(cls, locale_type, locale_code):
-        # type: (Text, Text) -> None
+    def require_valid_locale_code(
+            cls, locale_type: str, locale_code: str) -> None:
         """Checks whether the device's locale code is a valid  code.
 
         Args:
@@ -772,8 +777,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 'received: %s.' % (locale_type, locale_code))
 
     @classmethod
-    def _match_locale_code_string(cls, code):
-        # type: (Text) -> Optional[Match[Text]]
+    def _match_locale_code_string(cls, code: str) -> Optional[Match[str]]:
         """Helper that checks whether the given locale code is a valid code.
 
         Args:
@@ -787,8 +791,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         return re.compile(regex_string).match(code.lower())
 
     @classmethod
-    def require_valid_sdk_version(cls, sdk_version):
-        # type: (int) -> None
+    def require_valid_sdk_version(cls, sdk_version: int) -> None:
         """Checks that the Android device's SDK version is a positive integer.
 
         Args:
@@ -808,8 +811,10 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 'Invalid SDK version, received: %s.' % sdk_version)
 
     @classmethod
-    def require_valid_network_type(cls, network_type):
-        # type: (Type[constants.ANDROID_NETWORK_TYPE]) -> None
+    def require_valid_network_type(
+            cls,
+            network_type: Type[constants.ANDROID_NETWORK_TYPE]
+    ) -> None:
         """Checks that the Android device's network type is valid.
 
         Args:
@@ -833,8 +838,12 @@ class AppContext(python_utils.OBJECT):
     at the time they submitted the report.
     """
 
-    def __init__(self, entry_point, text_language_code, audio_language_code):
-        # type: (EntryPoint, Text, Text) -> None
+    def __init__(
+            self,
+            entry_point: 'EntryPoint',
+            text_language_code: str,
+            audio_language_code: str
+    ) -> None:
         """Constructs an AppContext domain object.
 
         Args:
@@ -849,8 +858,7 @@ class AppContext(python_utils.OBJECT):
         self.text_language_code = text_language_code
         self.audio_language_code = audio_language_code
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AppContext domain object. Subclasses
         should override this to propertly format any additional properties.
 
@@ -863,8 +871,7 @@ class AppContext(python_utils.OBJECT):
             'audio_language_code': self.audio_language_code
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this AppContext domain object.
 
         Raises:
@@ -882,11 +889,17 @@ class AndroidAppContext(AppContext):
     """
 
     def __init__(
-            self, entry_point, text_language_code, audio_language_code,
-            text_size, only_allows_wifi_download_and_update,
-            automatically_update_topics, account_is_profile_admin, event_logs,
-            logcat_logs):
-        # type: (EntryPoint, Text, Text, Type[constants.ANDROID_TEXT_SIZE], bool, bool, bool, List[Text], List[Text]) -> None
+            self,
+            entry_point: 'EntryPoint',
+            text_language_code: str,
+            audio_language_code: str,
+            text_size: Type[constants.ANDROID_TEXT_SIZE],
+            only_allows_wifi_download_and_update: bool,
+            automatically_update_topics: bool,
+            account_is_profile_admin: bool,
+            event_logs: List[str],
+            logcat_logs: List[str]
+    ) -> None:
         """Constructs a AndroidAppContext domain object.
 
         Args:
@@ -924,8 +937,7 @@ class AndroidAppContext(AppContext):
         self.event_logs = event_logs
         self.logcat_logs = logcat_logs
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AndroidAppContext domain object.
 
         Returns:
@@ -945,8 +957,7 @@ class AndroidAppContext(AppContext):
             'logcat_logs': self.logcat_logs
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this AndroidAppContext domain object.
 
         Raises:
@@ -982,8 +993,11 @@ class AndroidAppContext(AppContext):
                     self.logcat_logs))
 
     @classmethod
-    def require_valid_language_code(cls, language_type, language_code):
-        # type: (Text, Text) -> None
+    def require_valid_language_code(
+            cls,
+            language_type: str,
+            language_code: str
+    ) -> None:
         """Checks that the language code is valid.
 
         Args:
@@ -1008,8 +1022,7 @@ class AndroidAppContext(AppContext):
                 'received: %s.' % (language_type, language_code))
 
     @classmethod
-    def _match_language_code_string(cls, code):
-        # type: (Text) -> Optional[Match[Text]]
+    def _match_language_code_string(cls, code: str) -> Optional[Match[str]]:
         """Helper that checks whether the given language code is a valid code.
 
         Args:
@@ -1023,8 +1036,8 @@ class AndroidAppContext(AppContext):
         return re.compile(regex_string).match(code)
 
     @classmethod
-    def require_valid_text_size(cls, text_size):
-        # type: (Type[constants.ANDROID_TEXT_SIZE]) -> None
+    def require_valid_text_size(
+            cls, text_size: constants.ANDROID_TEXT_SIZE) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
@@ -1050,9 +1063,13 @@ class EntryPoint(python_utils.OBJECT):
     """
 
     def __init__(
-            self, entry_point, topic_id=None, story_id=None,
-            exploration_id=None, subtopic_id=None):
-        # type: (Type[constants.ENTRY_POINT], Optional[Text], Optional[Text], Optional[Text], Optional[Text]) -> None
+            self,
+            entry_point: Type[constants.ENTRY_POINT],
+            topic_id: Optional[str]=None,
+            story_id: Optional[str]=None,
+            exploration_id: Optional[str]=None,
+            subtopic_id: Optional[str]=None
+    ) -> None:
         """Constructs an EntryPoint domain object.
 
         Args:
@@ -1072,8 +1089,7 @@ class EntryPoint(python_utils.OBJECT):
         self.exploration_id = exploration_id
         self.subtopic_id = subtopic_id
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1085,8 +1101,7 @@ class EntryPoint(python_utils.OBJECT):
             'Subclasses of EntryPoint should implement their own dict '
             'representations.')
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates the EntryPoint domain object.
 
         Raises:
@@ -1098,8 +1113,11 @@ class EntryPoint(python_utils.OBJECT):
             'checks.')
 
     @classmethod
-    def require_valid_entry_point_name(cls, actual_name, expected_entry_point):
-        # type: (Text, Type[constants.ENTRY_POINT]) -> None
+    def require_valid_entry_point_name(
+            cls,
+            actual_name: str,
+            expected_entry_point: Type[constants.ENTRY_POINT]
+    ) -> None:
         """Validates this EntryPoint name.
 
         Args:
@@ -1123,8 +1141,11 @@ class EntryPoint(python_utils.OBJECT):
                     expected_name, actual_name))
 
     @classmethod
-    def require_valid_entry_point_exploration(cls, exploration_id, story_id):
-        # type: (Optional[Text], Optional[Text]) -> None
+    def require_valid_entry_point_exploration(
+            cls,
+            exploration_id: Optional[str],
+            story_id: Optional[str]
+    ) -> None:
         """Checks whether the exploration id is a valid one.
 
         Args:
@@ -1150,15 +1171,13 @@ class EntryPoint(python_utils.OBJECT):
 class NavigationDrawerEntryPoint(EntryPoint):
     """Domain object for the Android navigation drawer entry point."""
 
-    def __init__(self):
-        # type: () -> None
+    def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
             constants.ENTRY_POINT.navigation_drawer, None,
             None, None, None)
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1170,8 +1189,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
             'entry_point_name': self.entry_point_name
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this NavigationDrawerEntryPoint domain object.
 
         Raises:
@@ -1186,8 +1204,8 @@ class NavigationDrawerEntryPoint(EntryPoint):
 class LessonPlayerEntryPoint(EntryPoint):
     """Domain object for the lesson player entry point."""
 
-    def __init__(self, topic_id, story_id, exploration_id):
-        # type: (Text, Text, Text) -> None
+    def __init__(
+            self, topic_id: str, story_id: str, exploration_id: str) -> None:
         """Constructs an LessonPlayerEntryPoint domain object.
 
         Args:
@@ -1202,8 +1220,7 @@ class LessonPlayerEntryPoint(EntryPoint):
             constants.ENTRY_POINT.lesson_player, topic_id=topic_id,
             story_id=story_id, exploration_id=exploration_id)
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this LessonPlayerEntryPoint domain
         object.
 
@@ -1217,8 +1234,7 @@ class LessonPlayerEntryPoint(EntryPoint):
             'exploration_id': self.exploration_id
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this LessonPlayerEntryPoint domain object.
 
         Raises:
@@ -1236,8 +1252,7 @@ class LessonPlayerEntryPoint(EntryPoint):
 class RevisionCardEntryPoint(EntryPoint):
     """Domain object for the Android revision card entry point."""
 
-    def __init__(self, topic_id, subtopic_id):
-        # type: (Text, Text) -> None
+    def __init__(self, topic_id: str, subtopic_id: str) -> None:
         """Constructs an RevisionCardEntryPoint domain object.
 
         Args:
@@ -1250,8 +1265,7 @@ class RevisionCardEntryPoint(EntryPoint):
             constants.ENTRY_POINT.revision_card,
             topic_id, None, None, subtopic_id)
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this RevisionCardEntryPoint domain
         object.
 
@@ -1265,8 +1279,7 @@ class RevisionCardEntryPoint(EntryPoint):
             'subtopic_id': self.subtopic_id
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this RevisionCardEntryPoint domain object.
 
         Raises:
@@ -1286,16 +1299,14 @@ class RevisionCardEntryPoint(EntryPoint):
 class CrashEntryPoint(EntryPoint):
     """Domain object for the Android crash dialog entry point."""
 
-    def __init__(self):
-        # type: () -> None
+    def __init__(self) -> None:
         """Constructs an CrashEntryPoint domain object."""
         super(
             CrashEntryPoint, self).__init__(
                 constants.ENTRY_POINT.crash, None, None,
                 None, None)
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this CrashEntryPoint domain object.
 
         Returns:
@@ -1306,8 +1317,7 @@ class CrashEntryPoint(EntryPoint):
             'entry_point_name': self.entry_point_name
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this CrashEntryPoint domain object.
 
         Raises:
@@ -1323,10 +1333,16 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
     """Domain object for a single ticket created for feedback reports."""
 
     def __init__(
-            self, ticket_id, ticket_name, platform, github_issue_repo_name,
-            github_issue_number, archived, newest_report_creation_timestamp,
-            reports):
-        # type: (Text, Text, Text, Optional[Text], Optional[int], bool, datetime.datetime, List[Text]) -> None
+            self,
+            ticket_id: str,
+            ticket_name: str,
+            platform: str,
+            github_issue_repo_name: Optional[str],
+            github_issue_number: Optional[int],
+            archived: bool,
+            newest_report_creation_timestamp: datetime.datetime,
+            reports: List[str]
+    ) -> None:
         """Constructs a AppFeedbackReportTicket domain object.
 
         Args:
@@ -1353,8 +1369,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         self.newest_report_creation_timestamp = newest_report_creation_timestamp
         self.reports = reports
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AppFeedbackReportTicket domain
         object.
 
@@ -1374,8 +1389,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             'reports': self.reports
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this AppFeedbackReportTicket domain object.
 
         Raises:
@@ -1404,8 +1418,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         self.require_valid_report_ids(self.reports)
 
     @classmethod
-    def require_valid_ticket_id(cls, ticket_id):
-        # type: (Text) -> None
+    def require_valid_ticket_id(cls, ticket_id: str) -> None:
         """Checks whether the ticket id is a valid one.
 
         Args:
@@ -1423,8 +1436,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                 ticket_id))
 
     @classmethod
-    def require_valid_ticket_name(cls, ticket_name):
-        # type: (Text) -> None
+    def require_valid_ticket_name(cls, ticket_name: str) -> None:
         """Checks whether the ticket name is a valid one.
 
         Args:
@@ -1447,8 +1459,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                     constants.MAXIMUM_TICKET_NAME_LENGTH))
 
     @classmethod
-    def require_valid_report_ids(cls, report_ids):
-        # type: (List[Text]) -> None
+    def require_valid_report_ids(cls, report_ids: List[str]) -> None:
         """Checks whether the reports in this ticket are valid.
 
         Args:
@@ -1471,8 +1482,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                     'The report with id %s is invalid.' % report_id)
 
     @classmethod
-    def require_valid_github_repo(cls, repo_name):
-        # type: (Text) -> None
+    def require_valid_github_repo(cls, repo_name: str) -> None:
         """Checks whether the reports in this ticket are valid.
 
         Args:
@@ -1499,9 +1509,14 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
     """
 
     def __init__(
-            self, stats_id, ticket, platform, stats_tracking_date,
-            total_reports_submitted, daily_param_stats):
-        # type: (Text, AppFeedbackReportTicket, Text, datetime.date, int, Dict[Text, ReportStatsParameterValueCounts]) -> None
+            self,
+            stats_id: str,
+            ticket: 'AppFeedbackReportTicket',
+            platform: str,
+            stats_tracking_date: datetime.date,
+            total_reports_submitted: int,
+            daily_param_stats: Dict[str, 'ReportStatsParameterValueCounts']
+    ) -> None:
         """Constructs a AppFeedbackReportDailyStats domain object.
 
         Args:
@@ -1524,8 +1539,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         self.total_reports_submitted = total_reports_submitted
         self.daily_param_stats = daily_param_stats
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AppFeedbackReportDailyStats domain
         object.
 
@@ -1546,8 +1560,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             }
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this AppFeedbackReportDailyStats domain object.
 
         Raises:
@@ -1568,8 +1581,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         self.require_valid_daily_param_stats(self.daily_param_stats)
 
     @classmethod
-    def require_valid_stats_id(cls, stats_id):
-        # type: (Text) -> None
+    def require_valid_stats_id(cls, stats_id: str) -> None:
         """Checks whether the stats id is a valid one.
 
         Args:
@@ -1585,8 +1597,10 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             raise utils.ValidationError('The stats id %s is invalid' % stats_id)
 
     @classmethod
-    def require_valid_daily_param_stats(cls, param_stats):
-        # type: (Dict[Text, ReportStatsParameterValueCounts]) -> None
+    def require_valid_daily_param_stats(
+            cls,
+            param_stats: Dict[str, 'ReportStatsParameterValueCounts']
+    ) -> None:
         """Checks whether the statistics in this domain object are valid.
 
         Args:
@@ -1616,8 +1630,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
     value.
     """
 
-    def __init__(self, parameter_value_counts):
-        # type: (Dict[Text, int]) -> None
+    def __init__(self, parameter_value_counts: Dict[str, int]) -> None:
         """Constructs a ReportStatsParameterValueCounts domain object.
 
         Args:
@@ -1627,8 +1640,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
         """
         self.parameter_value_counts = parameter_value_counts
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this ReportStatsParameterValueCounts
         domain object.
 
@@ -1638,8 +1650,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
         """
         return self.parameter_value_counts
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this ReportStatsParameterValueCounts domain object.
 
         Raises:
@@ -1662,8 +1673,11 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
     feedback reports.
     """
 
-    def __init__(self, filter_field, filter_options):
-        # type: (Type[constants.FILTER_FIELD_NAMES], List[Text]) -> None
+    def __init__(
+            self,
+            filter_field: Type[constants.FILTER_FIELD_NAMES],
+            filter_options: List[str]
+    ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
@@ -1675,8 +1689,7 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
         self.filter_field = filter_field
         self.filter_options = filter_options
 
-    def to_dict(self):
-        # type: () -> Dict[Text, Any]
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this AppFeedbackReportFilter domain
         object.
 
@@ -1690,8 +1703,7 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             'filter_options': self.filter_options
         }
 
-    def validate(self):
-        # type: () -> None
+    def validate(self) -> None:
         """Validates this AppFeedbackReportFilter domain object.
 
         Raises:

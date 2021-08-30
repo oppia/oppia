@@ -289,8 +289,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
 
-    def test_get_filter_options_with_invalid_field_throws_exception(self):
-        # type: () -> None
+    def test_get_filter_options_with_invalid_field_throws_exception(
+            self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
         invalid_filter = python_utils.create_enum('invalid_field') # type: ignore[no-untyped-call]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -304,8 +304,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 model_class.get_filter_options_for_field(
                     invalid_filter.invalid_field)
 
-    def _mock_query_filters_returns_empy_list(self, projection, distinct): # pylint: disable=unused-argument
-        # type: (bool, bool) -> List[Any]
+    def _mock_query_filters_returns_empy_list(
+            self, projection: bool, distinct: bool) -> List[Any]: # pylint: disable=unused-argument
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the
         query function.

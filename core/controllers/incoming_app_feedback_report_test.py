@@ -28,7 +28,7 @@ from core.tests import test_utils
 from mypy_imports import (
     app_feedback_report_models) # pylint: disable=unused-import
 
-from typing import Dict, Any, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, Any, cast # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -85,15 +85,13 @@ ANDROID_APP_VERSION_CODE_STRING = str('2') # pylint: disable=disallowed-function
 
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         super(IncomingAndroidFeedbackReportHandlerTests, self).setUp() # type: ignore[no-untyped-call]
         self.payload = {
             'report': REPORT_JSON
         }
 
-    def test_incoming_report_saves_to_storage(self):
-        # type: () -> None
+    def test_incoming_report_saves_to_storage(self) -> None:
         # Webapp header values must be Python str types otherwise an
         # AssertionError for "not a string" is thrown.
         headers = {
@@ -115,8 +113,8 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             report_model.submitted_on,
             datetime.datetime.fromtimestamp(1615519337))
 
-    def test_incoming_report_with_invalid_headers_raises_exception(self):
-        # type: () -> None
+    def test_incoming_report_with_invalid_headers_raises_exception(
+            self) -> None:
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
         # Webtest requires explicit str-types headers.
         invalid_headers = {
@@ -133,16 +131,18 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             response['error'],
             'The incoming request is not a valid Oppia Android request.')
 
-    def test_incoming_report_with_no_headers_raises_exception(self):
-        # type: () -> None
+    def test_incoming_report_with_no_headers_raises_exception(self) -> None:
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
         self.post_json( # type: ignore[no-untyped-call]
             android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
             self.payload, csrf_token=token, expected_status_int=500)
 
     def _post_json_with_test_headers(
-            self, payload, headers, expected_status=200):
-        # type: (Dict[Text, Any], Dict[Text, str], int) -> Dict[Text, Any]
+            self,
+            payload: Dict[str, Any],
+            headers: Dict[str, Any],
+            expected_status: int=200
+    ) -> Dict[str, Any]:
         """Sends a post request usint str-type representations of the header
         values so that header validation is successful.
 

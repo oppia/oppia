@@ -26,6 +26,9 @@ import utils
 
 from typing import Any, Dict, List, Optional, Sequence, TypeVar, cast
 
+SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
+    'SELF_REPORT_MODEL', bound='AppFeedbackReportModel')
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -157,7 +160,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-
             entity_id: str,
             platform: str,
             submitted_on: datetime.datetime,
@@ -287,9 +289,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unscrubbed_expiring_report_models(
-            cls) -> Sequence[
-                TypeVar(  # pylint: disable=invalid-name
-                'AppFeedbackReportModel', bound='AppFeedbackReportModel')]:
+            cls) -> Sequence['AppFeedbackReportModel']:
         """Fetches the reports that are past their 90-days in storage and must
         be scrubbed.
 
@@ -678,7 +678,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     def calculate_id(
             cls,
             platform: str,
-            ticket_id: str,
+            ticket_id: Optional[str],
             stats_tracking_date: datetime.date
     ) -> str:
         """Generates key for the instance of AppFeedbackReportStatsModel

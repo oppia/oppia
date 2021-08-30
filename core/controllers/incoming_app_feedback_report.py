@@ -22,13 +22,13 @@ from core.controllers import base
 from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 
-from typing import Dict, Text, Any # isort:skip # pylint: disable=unused-import
+from typing import Dict, Any # isort:skip # pylint: disable=unused-import
 
 
 class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'report': {
