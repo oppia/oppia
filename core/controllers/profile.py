@@ -268,7 +268,6 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
             }
         }
     }
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     }
