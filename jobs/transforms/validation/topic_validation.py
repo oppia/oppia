@@ -23,7 +23,7 @@ from core.domain import topic_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 from jobs.types import topic_validation_errors
 
 import apache_beam as beam
