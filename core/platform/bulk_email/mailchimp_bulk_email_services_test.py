@@ -180,9 +180,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages = []
             swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
             with swap_api:
-                mailchimp_bulk_email_services._get_mailchimp_class()
+                mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
                 self.assertItemsEqual(
-                    observed_log_messages, ['Mailchimp username is not set.']) # pylint: disable=protected-access
+                    observed_log_messages, ['Mailchimp username is not set.'])
 
             # For the tests below, the email ID for the user doesn't matter
             # since the function should return earlier if mailchimp api key or
