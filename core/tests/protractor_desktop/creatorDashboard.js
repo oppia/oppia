@@ -19,6 +19,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../protractor_utils/forms.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
@@ -27,6 +28,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+const { require } = require('yargs');
 
 describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
