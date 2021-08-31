@@ -153,7 +153,7 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_3);
     await libraryPage.playExploration(EXPLORATION_TITLE_3);
-    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_3);
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('card 1'));
     await explorationPlayerPage.submitAnswer('Continue', null);
@@ -167,7 +167,7 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_4);
     await libraryPage.playExploration(EXPLORATION_TITLE_4);
-    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_4);
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('card 1'));
     await explorationPlayerPage.submitAnswer('Continue', null);
@@ -232,7 +232,7 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_5);
     await libraryPage.playExploration(EXPLORATION_TITLE_5);
-    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_5);
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('card 1'));
     await explorationPlayerPage.submitAnswer('Continue', null);
@@ -246,7 +246,7 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_6);
     await libraryPage.playExploration(EXPLORATION_TITLE_6);
-    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_6);
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('card 1'));
     await explorationPlayerPage.submitAnswer('Continue', null);
