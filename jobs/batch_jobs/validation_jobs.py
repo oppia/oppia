@@ -25,8 +25,8 @@ from core.platform import models
 from jobs import base_jobs
 from jobs import job_utils
 from jobs.io import ndb_io
-from jobs.transforms import base_validation
-from jobs.transforms import base_validation_registry
+from jobs.transforms.validation import base_validation
+from jobs.transforms.validation import base_validation_registry
 from jobs.types import base_validation_errors
 import python_utils
 
