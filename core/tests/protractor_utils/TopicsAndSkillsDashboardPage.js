@@ -107,7 +107,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var assignedTopicNameInputClass = by.css('.protractor-test-unassign-topic');
   var topicNameFieldElement = element(
     by.css('.protractor-test-topic-name-field'));
-  var searchFieldLocator = by.css('.select2-search__field');
+  var keywordFieldInput = by.css('.protractor-test-multi-selection-input');
   var editor = element(by.css('.protractor-test-concept-card-text'));
   var retLocator = by.css('.protractor-test-rte');
   var skillDescriptionField = element(
@@ -245,9 +245,10 @@ var TopicsAndSkillsDashboardPage = function() {
   this.filterSkillsByStatus = async function(status) {
     await action.click(
       'Skill Dashboard status filter', skillStatusFilterDropdown);
-    await (
-      await browser.driver.switchTo().activeElement()
-    ).sendKeys(status + '\n');
+    var dropdownOption = element(
+      by.cssContainingText('mat-option .mat-option-text', status));
+    await action.click(
+      'Skill status filter option: ' + status, dropdownOption);
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
@@ -255,22 +256,21 @@ var TopicsAndSkillsDashboardPage = function() {
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.');
     var filterKeywordInput = topicFilterKeywordField.element(
-      searchFieldLocator);
+      keywordFieldInput);
 
     await action.sendKeys(
-      'Topic Dashboard keyword filter', filterKeywordInput, keyword + '\n');
+      'Topic Dashboard keyword filter: ' + keyword,
+      filterKeywordInput, keyword + '\n');
   };
 
   this.filterTopicsByClassroom = async function(keyword) {
-    await waitFor.visibilityOf(
-      topicFilterClassroomField,
-      'Topic Dashboard classroom filter taking too long to appear.');
-
     await action.click(
       'Topic Dashboard classroom filter', topicFilterClassroomField);
-    await (
-      await browser.driver.switchTo().activeElement()
-    ).sendKeys(keyword + '\n');
+
+    var dropdownOption = element(
+      by.cssContainingText('mat-option .mat-option-text', keyword));
+    await action.click(
+      'Topic dashboard classroom filter option', dropdownOption);
   };
 
   this.resetTopicFilters = async function() {
