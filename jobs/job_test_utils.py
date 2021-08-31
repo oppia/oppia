@@ -37,7 +37,7 @@ from apache_beam.testing import util as beam_testing_util
 datastore_services = models.Registry.import_datastore_services()
 
 
-class PipelinedTestBase(test_utils.AppEngineTestBase):
+class PipelinedTestBase(test_utils.GenericTestBase):
     """Base class that runs tests within the context of a TestPipeline."""
 
     # TODO(#11464): Find a newer version of Apache Beam that fixes
