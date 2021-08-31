@@ -19,10 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { CollectionHandler } from '../collection-player-page.component';
+import { CollectionHandler, CollectionSummary } from '../collection-player-page.component';
 
 @Injectable({
   providedIn: 'root'
@@ -30,33 +28,28 @@ import { CollectionHandler } from '../collection-player-page.component';
 export class CollectionPlayerBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
   ) {}
 
   async fetchCollectionSummariesAsync(
       collectionId: string
-  ): Promise<CollectionSummary> {
-    let collectionSummaryUrl = this.urlInterpolationService.interpolateUrl(
-      '/collectionsummarieshandler/data', {
-        stringified_collection_ids: collectionId
-      });
-    return new Promise((resolve, reject) => {
-      this.http.get<CollectionSummary>(
-        collectionSummaryUrl).toPromise().then(response => {
-        return resolve(response);
-      }, errorResponse => {
-        this.alertsService.addWarning(
-          'There was an error while fetching the collection summary.');
-        reject(errorResponse.error.error);
-      });
+  ): Promise<void | CollectionSummary> {
+    return this.http.get('/collectionsummarieshandler/data', {
+      params: {
+        stringified_collection_ids: JSON.stringify([collectionId])
+      }
+    }).toPromise().then((response: CollectionSummary) => {
+      return response;
+    }, () => {
+      this.alertsService.addWarning(
+        'There was an error while fetching the collection summary.');
     });
   }
 
-  someFunction(collectionId: string): void {
+  bindAttr(collectionId: string): void {
     this.http.get(
       '/collection_handler/data/' + collectionId).toPromise().then(
-      function(response: CollectionHandler) {
+      (response: CollectionHandler) => {
         angular.element('meta[itemprop="name"]').attr(
           'content', response.meta_name);
         angular.element('meta[itemprop="description"]').attr(

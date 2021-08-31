@@ -29,7 +29,6 @@ import { UserService } from 'services/user.service';
 import { CollectionNode } from 'domain/collection/collection-node.model';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
-import { HttpClient } from '@angular/common/http';
 import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
@@ -117,7 +116,6 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private http: HttpClient,
     private collectionPlayerBackendApiService: CollectionPlayerBackendApiService
   ) {}
 
@@ -301,6 +299,17 @@ export class CollectionPlayerPageComponent implements OnInit {
     return false;
   }
 
+  async fetchSummaryAsync(collectionId: string): Promise<void> {
+    let Summary = (
+      await
+      this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
+        collectionId
+      ));
+    if (Summary) {
+      this.collectionSummary = Summary.summaries[0];
+    }
+  }
+
   ngOnInit(): void {
     // $scope.$watch('$ctrl.collection', function(newValue) {
     //   if (
@@ -339,44 +348,10 @@ export class CollectionPlayerPageComponent implements OnInit {
       }
     });
 
-    // This.collectionPlayerBackendApiService.someFunction(this.collectionId);
+    this.collectionPlayerBackendApiService.bindAttr(this.collectionId);
 
-    // this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
-    //   this.collectionId);
-    this.http.get(
-      '/collection_handler/data/' + this.collectionId).toPromise().then(
-      function(response: CollectionHandler) {
-        angular.element('meta[itemprop="name"]').attr(
-          'content', response.meta_name);
-        angular.element('meta[itemprop="description"]').attr(
-          'content', response.meta_description);
-        angular.element('meta[property="og:title"]').attr(
-          'content', response.meta_name);
-        angular.element('meta[property="og:description"]').attr(
-          'content', response.meta_description);
-      }
-    );
+    this.fetchSummaryAsync(this.collectionId);
 
-    // This.collectionPlayerBackendApiService.fetchCollectionSummaries().then(
-    //   (response: CollectionSummary) => {
-    //     this.collectionSummary = response.summaries[0];
-    //   }, () => {
-    //     this.alertsService.addWarning(
-    //       'There was an error while fetching the collection summary.');
-    //   }
-    // );
-    this.http.get('/collectionsummarieshandler/data', {
-      params: {
-        stringified_collection_ids: JSON.stringify([this.collectionId])
-      }
-    }).toPromise().then(
-      (response: CollectionSummary) => {
-      },
-      () => {
-        this.alertsService.addWarning(
-          'There was an error while fetching the collection summary.');
-      }
-    );
     // Load the collection the learner wants to view.
     this.readOnlyCollectionBackendApiService.loadCollectionAsync(
       this.collectionId).then(
