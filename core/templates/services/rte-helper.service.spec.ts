@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Rte Helper Service', function() {
+fdescribe('Rte Helper Service', function() {
   var RteHelperService = null;
   var $q = null;
   var $uibModal = null;
@@ -86,6 +86,10 @@ describe('Rte Helper Service', function() {
         description: 'Caption for image (optional)',
         schema: {
           type: 'unicode',
+          validators: [{
+            id: 'has_length_at_most',
+            max_value: 160
+          }]
         },
         default_value: ''
       }, {
@@ -166,7 +170,11 @@ describe('Rte Helper Service', function() {
         name: 'text',
         description: 'The text to be displayed',
         schema: {
-          type: 'unicode'
+          type: 'unicode',
+          validators: [{
+            id: 'has_length_at_least',
+            min_value: 1
+          }]
         },
         default_value: 'concept card'
       }, {
