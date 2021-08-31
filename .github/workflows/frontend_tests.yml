@@ -28,3 +28,25 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
+      - name: Send mail
+        if: ${{ failure() }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # Required mail server address:
+          server_address: smtp.gmail.com
+          # Required mail server port:
+          server_port: 465
+          # Optional (recommended): mail server username:
+          ## username: ${{secrets.MAIL_USERNAME}}
+          # Optional (recommended) mail server password:
+          ## password: ${{secrets.MAIL_PASSWORD}}
+          # Required mail subject:
+          subject: Frontend test failed on oppia/develop branch
+          # Required recipients' addresses:
+          to: dubeysandeep.in@gmail.com
+          # Required sender full name (address can be skipped):
+          from: Oppia-Github-Action-Script # <user@example.com>
+          # Optional whether this connection use TLS (default is true if server_port is 465)
+          secure: true
+          # Optional plain body:
+          body: Frontend test failed on develop branch ${{$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID}}
