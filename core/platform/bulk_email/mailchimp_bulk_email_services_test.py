@@ -25,7 +25,6 @@ import feconf
 from mailchimp3 import mailchimpclient
 
 import python_utils
-from typing import Any, Dict
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
@@ -154,16 +153,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Invalid type for email. Expected string, received 5'):
             mailchimp_bulk_email_services._get_subscriber_hash(sample_email) # pylint: disable=protected-access
 
-<<<<<<< HEAD
     def test_get_mailchimp_class_error(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Mailchimp API key is not available.'):
-=======
-    def test_get_mailchimp_class_error(self) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(
-                msg: str, *args: Any, **unused_kwargs: Any) -> None:
+        def _mock_logging_function(msg, *args, **unused_kwargs):
             """Mocks logging.exception().
 
             Args:
@@ -175,21 +168,13 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'exception', _mock_logging_function)
         with logging_swap:
->>>>>>> 6f90044d1... Fix #13655 and #13639 (#13715)
             mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
             self.assertItemsEqual( # type: ignore[no-untyped-call]
                 observed_log_messages, ['Mailchimp API key is not available.'])
 
-<<<<<<< HEAD
-        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
-        with swap_api:
-            with self.assertRaisesRegexp(
-                Exception, 'Mailchimp username is not set.'):
-=======
             observed_log_messages = []
             swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
             with swap_api:
->>>>>>> 6f90044d1... Fix #13655 and #13639 (#13715)
                 mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
                 self.assertItemsEqual( # type: ignore[no-untyped-call]
                     observed_log_messages, ['Mailchimp username is not set.'])
