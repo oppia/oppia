@@ -53,8 +53,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-editor-tab.component.ts',
     'collection-footer.component.ts',
     'collection-navbar.component.ts',
-    'collection-node-creator.component.ts',
-    'collection-node-editor.component.ts',
     'collection-player-page.directive.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',

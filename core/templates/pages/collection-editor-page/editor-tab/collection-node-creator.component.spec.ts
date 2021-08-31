@@ -25,6 +25,7 @@ import { SearchExplorationsBackendApiService } from 'domain/collection/search-ex
 import { ExplorationMetadata } from 'domain/exploration/exploration-metadata.model';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { from } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -38,11 +39,17 @@ describe('Collection node creator component', () => {
   let collectionEditorStateService: CollectionEditorStateService;
   let searchExplorationsBackendApiService: SearchExplorationsBackendApiService;
   let alertsService: AlertsService;
+  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let collectionLinearizerService: CollectionLinearizerService;
+  let normalizeWhitespacePipe: NormalizeWhitespacePipe;
+  let validatorsService: ValidatorsService;
+  let explorationCreationBackendApiService:
+    ExplorationCreationBackendApiService;
+  let siteAnalyticsService: SiteAnalyticsService;
+
   let mockCollection = new Collection(
     'collection_id', 'collection_title', 'collection_objective', 'en', [],
     null, '', 2, 3, []);
-  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
-  let collectionLinearizerService: CollectionLinearizerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -77,6 +84,11 @@ describe('Collection node creator component', () => {
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
     collectionLinearizerService = TestBed.inject(CollectionLinearizerService);
+    normalizeWhitespacePipe = TestBed.inject(NormalizeWhitespacePipe);
+    validatorsService = TestBed.inject(ValidatorsService);
+    explorationCreationBackendApiService = TestBed.inject(
+      ExplorationCreationBackendApiService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should initialize', () => {
@@ -225,4 +237,65 @@ describe('Collection node creator component', () => {
     expect(componentInstance.convertTypeaheadToExplorationId(expId))
       .toEqual(expId);
   });
+
+  it('should create new exploration', fakeAsync(() => {
+    let expTitle = 'Exp Title';
+    let expId = 'newExpId';
+    spyOn(normalizeWhitespacePipe, 'transform').and.returnValue(expTitle);
+    spyOn(validatorsService, 'isValidExplorationTitle').and.returnValue(true);
+    spyOn(explorationCreationBackendApiService, 'registerNewExplorationAsync')
+      .and.returnValue(Promise.resolve({
+        explorationId: expId
+      }));
+    spyOn(
+      siteAnalyticsService, 'registerCreateNewExplorationInCollectionEvent');
+    spyOn(componentInstance, 'addExplorationToCollection');
+    componentInstance.createNewExploration();
+    tick();
+    expect(normalizeWhitespacePipe.transform).toHaveBeenCalled();
+    expect(validatorsService.isValidExplorationTitle).toHaveBeenCalled();
+    expect(explorationCreationBackendApiService.registerNewExplorationAsync)
+      .toHaveBeenCalled();
+    expect(componentInstance.newExplorationTitle).toEqual('');
+    expect(siteAnalyticsService.registerCreateNewExplorationInCollectionEvent)
+      .toHaveBeenCalledWith(expId);
+    expect(componentInstance.addExplorationToCollection).toHaveBeenCalledWith(
+      expId);
+  }));
+
+  it('should not create exploration if title is not valid', fakeAsync(() => {
+    spyOn(normalizeWhitespacePipe, 'transform').and.returnValue('');
+    spyOn(validatorsService, 'isValidExplorationTitle').and.returnValue(false);
+    spyOn(explorationCreationBackendApiService, 'registerNewExplorationAsync')
+      .and.returnValue(Promise.resolve({
+        explorationId: ''
+      }));
+    componentInstance.createNewExploration();
+    tick();
+    expect(explorationCreationBackendApiService.registerNewExplorationAsync)
+      .not.toHaveBeenCalled();
+  }));
+
+  it('should check if id is malformed', () => {
+    expect(componentInstance.isMalformedId('adkslajdf#')).toBeTrue();
+  });
+
+  it('should add exploration', () => {
+    componentInstance.newExplorationId = 'not_empty';
+    spyOn(componentInstance, 'addExplorationToCollection');
+    componentInstance.addExploration();
+    expect(componentInstance.newExplorationId).toEqual('');
+  });
+
+  it('should search typeahead results', fakeAsync(() => {
+    let explorations = ['New Exploration'];
+    let resultsSpy = jasmine.createSpy('Results');
+    spyOn(componentInstance, 'fetchTypeaheadResults').and.returnValue(
+      Promise.resolve(explorations));
+    tick();
+    componentInstance.searchTypeheadResults(from('New'))
+      .subscribe(resultsSpy);
+    tick();
+    expect(resultsSpy).toHaveBeenCalledWith(explorations);
+  }));
 });
