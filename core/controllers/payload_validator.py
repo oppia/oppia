@@ -24,15 +24,18 @@ from __future__ import unicode_literals
 import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Text, Tuple, Optional, Union # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
+# This function recursively uses the schema dictionary and handler_args, and
+# passes their values to itself as arguments, so their type is Any.
+# See: https://github.com/python/mypy/issues/731
 def validate(
         handler_args: Any,
         handler_args_schemas: Any,
         allowed_extra_args: bool,
         allow_string_to_bool_conversion: bool = False
-) -> Tuple[Dict[Text, Any], List[Text]]:
+) -> Tuple[Dict[str, Any], List[str]]:
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -91,7 +94,7 @@ def validate(
     return normalized_value, errors
 
 
-def convert_string_to_bool(param: Text) -> Optional[Union[bool, Text]]:
+def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
 
     """Converts a request param of type string into expected bool type.
 

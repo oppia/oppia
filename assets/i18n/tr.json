@@ -625,7 +625,6 @@
 	"I18N_TEACH_TESTIMONIAL_1": "\"Sosyal haklardan yoksun Hintli çocukları eğitme ve kritik matematik kavramlarını anlamada boşlukları doldurabilme şansına sahip olduğum için minnettarım. Bu öğrencilerin öğrenirken öz güvenlerinin arttığını izlemek fazladan saatlere değerdi.\"",
 	"I18N_TEACH_TESTIMONIAL_2": "\"Oppia türünün ilkidir! Öğrencilerin belirli bir konuda tüm öğrenmek istediklerini çekici bir biçimde öğrenmelerine yardımcı olur; ayrıca akıllı cihazları kendi iyilikleri için kullanmalarını teşvik eder.\"",
 	"I18N_TEACH_TESTIMONIAL_3": "\"Öğrencilerin teknolojiyi ve matematik derslerini bu kadar hızlı öğrenmelerini beklememiştim. Bu onların akllı teknolojiyle ilk defa karşı karşıya kaldıkları durumdu ve başta bununla başa çıkmak için gerçekten çabaladılar. Şimdi, ben derse girmeden Oppia derslerini yaptıklarını görünce çok mutlu hissediyorum.\"",
-	"I18N_TEACH_TESTIMONIAL_4": "\"yazılacak3\"",
 	"I18N_THANKS_PAGE_BREADCRUMB": "Teşekkürler",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 ders} other{# ders}}",
 	"I18N_TOPIC_VIEWER_CHAPTER": "Bölüm",
