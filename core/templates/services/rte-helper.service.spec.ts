@@ -85,7 +85,11 @@ describe('Rte Helper Service', function() {
         name: 'caption',
         description: 'Caption for image (optional)',
         schema: {
-          type: 'unicode'
+          type: 'unicode',
+          validators: [{
+            id: 'has_length_at_most',
+            max_value: 160
+          }]
         },
         default_value: ''
       }, {
