@@ -26,7 +26,7 @@ import python_utils
 
 from mailchimp3 import mailchimpclient
 
-from typing import Dict
+from typing import Any, Dict
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
@@ -167,7 +167,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_get_mailchimp_class_error(self) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args, **unused_kwargs):
+        def _mock_logging_function(
+                msg: str, *args: Any, **unused_kwargs: Any) -> None:
             """Mocks logging.exception().
 
             Args:
@@ -193,8 +194,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             # For the tests below, the email ID for the user doesn't matter
             # since the function should return earlier if mailchimp api key or
             # username is not set.
+            # Permanently deletes returns None when mailchimp keys are not set.
             self.assertIsNone(
-                mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                mailchimp_bulk_email_services.permanently_delete_user_from_list( # type: ignore[func-returns-value]
                     'sample_email'))
             self.assertFalse(
                 mailchimp_bulk_email_services.add_or_update_user_status(

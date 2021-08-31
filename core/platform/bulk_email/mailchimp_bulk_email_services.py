@@ -61,9 +61,13 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
         Mailchimp. A mailchimp class instance with the API key and username
         initialized.
     """
+    # The return value ignore pragma is required for this. This is
+    # because adding a Union[] type annotation to handle both None and
+    # mailchimp3.MailChimp causes errors where the return value is called
+    # (for eg: client.lists), since NoneType does not have an attribute lists.
     if not feconf.MAILCHIMP_API_KEY:
         logging.exception('Mailchimp API key is not available.')
-        return None
+        return None # type: ignore[return-value]
 
     if not feconf.MAILCHIMP_USERNAME:
         logging.exception('Mailchimp username is not set.')
