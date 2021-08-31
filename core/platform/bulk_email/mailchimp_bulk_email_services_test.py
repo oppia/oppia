@@ -17,12 +17,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import logging
+
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 import feconf
 from mailchimp3 import mailchimpclient
 
 import python_utils
+from typing import Any, Dict
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
@@ -151,16 +154,56 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Invalid type for email. Expected string, received 5'):
             mailchimp_bulk_email_services._get_subscriber_hash(sample_email) # pylint: disable=protected-access
 
+<<<<<<< HEAD
     def test_get_mailchimp_class_error(self):
         with self.assertRaisesRegexp(
             Exception, 'Mailchimp API key is not available.'):
-            mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+=======
+    def test_get_mailchimp_class_error(self) -> None:
+        observed_log_messages = []
 
+        def _mock_logging_function(
+                msg: str, *args: Any, **unused_kwargs: Any) -> None:
+            """Mocks logging.exception().
+
+            Args:
+                msg: str. The logging message.
+                *args: list(*). A list of arguments.
+                **unused_kwargs: *. Keyword arguments.
+            """
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        with logging_swap:
+>>>>>>> 6f90044d1... Fix #13655 and #13639 (#13715)
+            mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+            self.assertItemsEqual( # type: ignore[no-untyped-call]
+                observed_log_messages, ['Mailchimp API key is not available.'])
+
+<<<<<<< HEAD
         swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
         with swap_api:
             with self.assertRaisesRegexp(
                 Exception, 'Mailchimp username is not set.'):
+=======
+            observed_log_messages = []
+            swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+            with swap_api:
+>>>>>>> 6f90044d1... Fix #13655 and #13639 (#13715)
                 mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+                self.assertItemsEqual( # type: ignore[no-untyped-call]
+                    observed_log_messages, ['Mailchimp username is not set.'])
+
+            # For the tests below, the email ID for the user doesn't matter
+            # since the function should return earlier if mailchimp api key or
+            # username is not set.
+            # Permanently deletes returns None when mailchimp keys are not set.
+            self.assertIsNone(
+                mailchimp_bulk_email_services.permanently_delete_user_from_list( # type: ignore[func-returns-value]
+                    'sample_email'))
+            self.assertFalse(
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'sample_email', True))
 
     def test_add_or_update_mailchimp_user_status(self):
         mailchimp = self.MockMailchimpClass()
