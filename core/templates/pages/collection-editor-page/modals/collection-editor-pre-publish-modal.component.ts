@@ -34,11 +34,11 @@ export class CollectionEditorPrePublishModalComponent
   private _collection: Collection;
   requireTitleToBeSpecified: boolean;
   requireObjectiveToBeSpecified: boolean;
-  requireCategoryToBeSepcified: boolean;
+  requireCategoryToBeSpecified: boolean;
   newTitle: string;
   newObjective: string;
   newCategory: string;
-  CATEGORY_LIST = [];
+  CATEGORY_LIST = AppConstants.ALL_CATEGORIES;
 
   constructor(
     private alertsService: AlertsService,
@@ -53,18 +53,11 @@ export class CollectionEditorPrePublishModalComponent
     this._collection = this.collectionEditorStateService.getCollection();
     this.requireTitleToBeSpecified = !this._collection.getTitle();
     this.requireObjectiveToBeSpecified = !this._collection.getObjective();
-    this.requireCategoryToBeSepcified = !this._collection.getCategory();
+    this.requireCategoryToBeSpecified = !this._collection.getCategory();
 
     this.newTitle = this._collection.getTitle();
     this.newObjective = this._collection.getObjective();
     this.newCategory = this._collection.getCategory();
-
-    for (let i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
-      this.CATEGORY_LIST.push({
-        id: AppConstants.ALL_CATEGORIES[i],
-        text: AppConstants.ALL_CATEGORIES[i]
-      });
-    }
   }
 
   isSavingAllowed(): boolean {

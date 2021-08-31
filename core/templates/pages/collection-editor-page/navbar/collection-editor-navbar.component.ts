@@ -161,7 +161,7 @@ export class CollectionEditorNavbarComponent {
       modalRef.result.then((metadataList) => {
         let commitMessage = ('Add metadata: ' + metadataList.join(', ') + '.');
         this.collectionEditorStateService.saveCollection(
-          commitMessage, this._publishCollection);
+          commitMessage, this._publishCollection.bind(this));
       }, () => {});
     } else {
       this._publishCollection();

@@ -22,14 +22,12 @@
   </p>
   <p *ngIf="requireCategoryToBeSpecified">
     Add a category: how would you categorize your collection?
-    <!-- <select2-dropdown item="newCategory"
-                      choices="CATEGORY_LIST_FOR_SELECT2"
-                      class="protractor-test-collection-editor-category-dropdown"
-                      placeholder="Choose or type new"
-                      new-choice-regex="^[A-Z a-z]+$"
-                      width="100%"
-                      invalid-search-term-message="Invalid category name">
-    </select2-dropdown> -->
+    <oppia-filtered-choices-field class="protractor-test-collection-editor-category-dropdown"
+                                  [(selection)]="newCategory"
+                                  [choices]="CATEGORY_LIST"
+                                  placeholder="Choose or type new"
+                                  noEntriesFoundLabel="Invalid category name">
+    </oppia-filtered-choices-field>
   </p>
 </div>
 
