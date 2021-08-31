@@ -75,21 +75,6 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
     this.displayedCollectionCategory = this.collection.getCategory();
     this.displayedCollectionLanguage = this.collection.getLanguageCode();
     this.displayedCollectionTags = this.collection.getTags();
-
-    // let categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
-    //   (categoryItem) => {
-    //     return categoryItem.id === this.collection.getCategory();
-    //   }
-    // );
-
-    // If the current category is not in the dropdown, add it
-    // as the first option.
-    // if (!categoryIsInSelect2 && this.collection.getCategory()) {
-    //   this.CATEGORY_LIST_FOR_SELECT2.unshift({
-    //     id: this.collection.getCategory(),
-    //     text: this.collection.getCategory()
-    //   });
-    // }
   }
 
   hasPageLoaded(): boolean {
