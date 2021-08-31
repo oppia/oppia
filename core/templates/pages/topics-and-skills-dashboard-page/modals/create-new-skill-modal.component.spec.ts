@@ -43,8 +43,8 @@ describe('Create new skill modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        FormsModule
       ],
       declarations: [
         CreateNewSkillModalComponent,
@@ -52,6 +52,7 @@ describe('Create new skill modal', () => {
       ],
       providers: [
         NgbActiveModal,
+        ChangeDetectorRef,
       ]
     }).compileComponents();
   }));
@@ -60,20 +61,10 @@ describe('Create new skill modal', () => {
     fixture = TestBed.createComponent(CreateNewSkillModalComponent);
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
-    contextService = (contextService as unknown) as
-      jasmine.SpyObj<ContextService>;
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    skillObjectFactory = (skillObjectFactory as unknown) as
-      jasmine.SpyObj<SkillObjectFactory>;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    ngbActiveModal = (ngbActiveModal as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillEditorStateService = (skillEditorStateService as unknown) as
-      jasmine.SpyObj<SkillEditorStateService>;
     skillCreationService = TestBed.inject(SkillCreationService);
-    skillCreationService = (skillCreationService as unknown) as
-      jasmine.SpyObj<SkillCreationService>;
   });
 
   it('should create', () => {
@@ -95,16 +86,8 @@ describe('Create new skill modal', () => {
   });
 
   it('should open concept card explanation editor', () => {
-    const changeDetectorRef =
-     fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-     spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
-    componentInstance.isEditorShown.conceptCardExplanationEditorIsShown = false;
     componentInstance.openConceptCardExplanationEditor();
-    expect(
-      componentInstance.isEditorShown
-        .conceptCardExplanationEditorIsShown).toBe(true);
-    expect(detectChangesSpy).toHaveBeenCalled();
+    expect(componentInstance.conceptCardExplanationEditorIsShown).toBeTrue();
   });
 
   it('should get html schema', () => {

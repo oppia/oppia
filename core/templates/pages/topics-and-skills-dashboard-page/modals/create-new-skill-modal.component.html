@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div *ngIf="isEditorShown.conceptCardExplanationEditorIsShown">
+      <div *ngIf="conceptCardExplanationEditorIsShown">
         <schema-based-editor [schema]="getHtmlSchema.bind(this)" class="protractor-test-concept-card-text"
                              [localValue]="bindableDict.displayedConceptCardExplanation"
                              (localValueChange)="updateExplanation($event)">

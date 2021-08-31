@@ -16,105 +16,175 @@
  * @fileoverview Unit test for Topic Creation Service.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
+import { NewlyCreatedTopic } from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { TopicCreationService } from './topic-creation.service';
 
-describe('Topic Creation Service', () => {
-  let $rootScope = null;
-  let TopicCreationService = null;
-  let TopicEditorStateService = null;
-  let ImageLocalStorageService = null;
-  let TopicCreationBackendApiService = null;
-  let UrlInterpolationService = null;
-  let AlertsService = null;
-  let $uibModal = null;
-  let $q = null;
+describe('Topic creation service', () => {
+  let topicCreationService: TopicCreationService;
+  let contextService: ContextService;
+  let ngbModal: NgbModal;
+  let alertsService: AlertsService;
+  let imageLocalStorageService: ImageLocalStorageService;
+  let topicCreationBackendApiService: TopicCreationBackendApiService;
+  let topicsAndSkillsDashboardBackendApiService:
+  TopicsAndSkillsDashboardBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+  class MockWindowRef {
+    nativeWindow = {
+      open: () => {
+        return {
+          close: () => {},
+          location: {
+            href: ''
+          }
+        };
+      }
+    };
+  }
 
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicCreationService = $injector.get('TopicCreationService');
-    $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    ImageLocalStorageService = $injector.get('ImageLocalStorageService');
-    TopicCreationBackendApiService = $injector
-      .get('TopicCreationBackendApiService');
-    UrlInterpolationService = $injector.get('UrlInterpolationService');
-    AlertsService = $injector.get('AlertsService');
-
-    spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
-      [{
-        filename: 'Image1',
-        imageBlob: new Blob(['data:image/png;base64,xyz'], {type: 'image/png'})
-      }]);
-    spyOn(ImageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
-      '#f00');
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue({
-      getId: () => 'id'
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        NgbModalModule
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        AlertsService,
+        ContextService,
+        ImageLocalStorageService,
+        TopicCreationBackendApiService,
+        TopicsAndSkillsDashboardBackendApiService,
+        UrlInterpolationService
+      ]
+    }).compileComponents();
   }));
 
-  it('should create topic when user clicks on create', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => true
-      })
-    });
-    spyOn(TopicCreationBackendApiService, 'createTopicAsync')
-      .and.returnValue($q.resolve({topicId: 'id'}));
-    spyOn(UrlInterpolationService, 'interpolateUrl');
-
-    TopicCreationService.createNewTopic();
-    $rootScope.$apply();
-
-    expect(UrlInterpolationService.interpolateUrl).toHaveBeenCalled();
+  beforeEach(() => {
+    topicCreationService = TestBed.inject(TopicCreationService);
+    contextService = TestBed.inject(ContextService);
+    ngbModal = TestBed.inject(NgbModal);
+    alertsService = TestBed.inject(AlertsService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    topicCreationBackendApiService = TestBed.inject(
+      TopicCreationBackendApiService);
+    topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
-  it('should show alert message when topic creation fails', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => true
-      })
-    });
-    spyOn(TopicCreationBackendApiService, 'createTopicAsync')
-      .and.returnValue($q.reject({error: 'Topic creation failed'}));
-    spyOn(AlertsService, 'addWarning');
+  it('should create new topic', fakeAsync(() => {
+    topicCreationService.topicCreationInProgress = false;
+    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(new NewlyCreatedTopic('valid', 'valid', 'valid'))
+    } as NgbModalRef);
+    spyOn(alertsService, 'clearWarnings');
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([]);
+    spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
+      'bgColor');
+    spyOn(imageLocalStorageService, 'flushStoredImagesData');
+    spyOn(topicCreationBackendApiService, 'createTopicAsync').and.returnValue(
+      Promise.resolve({ topicId: 'topicId' }));
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized, 'emit');
+    spyOn(contextService, 'resetImageSaveDestination');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('');
+    topicCreationService.createNewTopic();
+    tick();
+    tick();
+    expect(contextService.setImageSaveDestinationToLocalStorage)
+      .toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(imageLocalStorageService.getStoredImagesData).toHaveBeenCalled();
+    expect(imageLocalStorageService.getThumbnailBgColor).toHaveBeenCalled();
+    expect(imageLocalStorageService.flushStoredImagesData).toHaveBeenCalled();
+    expect(topicCreationBackendApiService.createTopicAsync).toHaveBeenCalled();
+    expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
+  }));
 
-    TopicCreationService.createNewTopic();
-    $rootScope.$apply();
-
-    expect(AlertsService.addWarning)
-      .toHaveBeenCalledWith('Topic creation failed');
+  it('should not create topic if creation is already in process', () => {
+    topicCreationService.topicCreationInProgress = true;
+    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    topicCreationService.createNewTopic();
+    expect(contextService.setImageSaveDestinationToLocalStorage)
+      .not.toHaveBeenCalled();
   });
 
-  it('should not initiate new topic creation if another is in process', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => true
-      })
-    });
+  it('should throw error if topic fields are empty', fakeAsync(() => {
+    topicCreationService.topicCreationInProgress = false;
+    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: {
+        then: (successCallback: (arg1) => void, errorCallback) => {
+          successCallback({
+            isValid: () => {
+              return false;
+            }
+          });
+        }
+      }
+    } as NgbModalRef);
+    expect(() => {
+      topicCreationService.createNewTopic();
+      tick();
+    }).toThrowError('Topic fields cannot be empty');
+    expect(contextService.setImageSaveDestinationToLocalStorage)
+      .toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
-    TopicCreationService.createNewTopic();
-    $rootScope.$apply();
+  it('should handle error if topic creation fails', fakeAsync(() => {
+    let error = 'promise rejected';
+    topicCreationService.topicCreationInProgress = false;
+    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(new NewlyCreatedTopic('valid', 'valid', 'valid'))
+    } as NgbModalRef);
+    spyOn(alertsService, 'clearWarnings');
+    spyOn(alertsService, 'addWarning');
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([]);
+    spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
+      'bgColor');
+    spyOn(imageLocalStorageService, 'flushStoredImagesData');
+    spyOn(topicCreationBackendApiService, 'createTopicAsync').and.returnValue(
+      Promise.reject({ error }));
+    topicCreationService.createNewTopic();
+    tick();
+    tick();
+    expect(topicCreationService.topicCreationInProgress).toBeFalse();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(error);
+  }));
 
-    // Creating a new topic while previous was in creation process.
-    expect(TopicCreationService.createNewTopic()).toBe(undefined);
-  });
-
-  it('should throw error if the newly created story is not valid', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => false
-      })
-    });
-
-    try {
-      TopicCreationService.createNewTopic();
-      $rootScope.$apply();
-    } catch (e) {
-      expect(e).toBe(new Error('Topic fields cannot be empty'));
-    }
-  });
+  it('should do nothing when user cancels the topic creation modal',
+    fakeAsync(() => {
+      topicCreationService.topicCreationInProgress = false;
+      spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
+      spyOn(alertsService, 'clearWarnings');
+      topicCreationService.createNewTopic();
+      tick();
+      expect(contextService.setImageSaveDestinationToLocalStorage)
+        .toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
 });
