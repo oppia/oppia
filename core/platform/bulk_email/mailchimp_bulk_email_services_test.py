@@ -17,6 +17,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import logging
+
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 import feconf
@@ -163,15 +165,34 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services._get_subscriber_hash(sample_email_2) # type: ignore[arg-type]  # pylint: disable=protected-access
 
     def test_get_mailchimp_class_error(self) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Mailchimp API key is not available.'):
-            mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+        observed_log_messages = []
 
-        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
-        with swap_api:
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                Exception, 'Mailchimp username is not set.'):
-                mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+        def _mock_logging_function(msg, *args, **unused_kwargs):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        with logging_swap:
+            mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+            self.assertItemsEqual(
+                observed_log_messages, ['Mailchimp API key is not available.'])
+
+            observed_log_messages = []
+            swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+            with swap_api:
+                mailchimp_bulk_email_services._get_mailchimp_class()
+                self.assertItemsEqual(
+                    observed_log_messages, ['Mailchimp username is not set.']) # pylint: disable=protected-access
+
+            # For the tests below, the email ID for the user doesn't matter
+            # since the function should return earlier if mailchimp api key or
+            # username is not set.
+            self.assertIsNone(
+                mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                    'sample_email'))
+            self.assertFalse(
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'sample_email', True))
 
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()

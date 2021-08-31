@@ -259,8 +259,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        email_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        with email_swap, self.swap(logging, 'info', _mock_logging_function):
+        with self.swap(logging, 'info', _mock_logging_function):
             wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
