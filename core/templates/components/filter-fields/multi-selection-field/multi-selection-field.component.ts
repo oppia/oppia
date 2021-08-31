@@ -60,7 +60,7 @@ export class MultiSelectionFieldComponent {
 
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
-      if (!this.validInput(value)) {
+      if (!this.validateInput(value)) {
         this.chipList.errorState = true;
       } else {
         this.chipList.errorState = false;
@@ -69,7 +69,7 @@ export class MultiSelectionFieldComponent {
     this.readOnlySelections = cloneDeep(this.selections);
   }
 
-  validInput(value: string): boolean {
+  validateInput(value: string): boolean {
     if (this.onlyAllowLowercase) {
       if (value.toLowerCase() !== value) {
         return false;
@@ -86,7 +86,7 @@ export class MultiSelectionFieldComponent {
       return;
     }
 
-    if (this.validInput(value)) {
+    if (this.validateInput(value)) {
       this.selections.push(value);
       if (this.readOnlySelections.indexOf(value) < 0) {
         this.readOnlySelections.push(value);
