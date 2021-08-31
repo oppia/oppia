@@ -255,7 +255,8 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if request_split.netloc == 'oppiaserver.appspot.com':
-            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
+            self.redirect(
+                b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
         if not self._is_requested_path_currently_accessible_to_user():
