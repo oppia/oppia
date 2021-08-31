@@ -37,22 +37,14 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   collection: Collection;
   COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
     CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-  // CATEGORY_LIST_FOR_SELECT2 =
-  // AppConstants.ALL_CATEGORIES.map(
-  //   (category) => {
-  //     return {
-  //       id: category,
-  //       text: category
-  //     };
-  //   }
-  // );
+  CATEGORY_LIST: string[] = [...AppConstants.ALL_CATEGORIES];
   languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
   TAG_REGEX = AppConstants.TAG_REGEX;
-  displayedCollectionTitle;
-  displayedCollectionObjective;
-  displayedCollectionCategory;
-  displayedCollectionLanguage;
-  displayedCollectionTags;
+  displayedCollectionTitle: string;
+  displayedCollectionObjective: string;
+  displayedCollectionCategory: string;
+  displayedCollectionLanguage: string;
+  displayedCollectionTags: string[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -75,6 +67,16 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
     this.displayedCollectionCategory = this.collection.getCategory();
     this.displayedCollectionLanguage = this.collection.getLanguageCode();
     this.displayedCollectionTags = this.collection.getTags();
+
+    let categoryIsInList = this.CATEGORY_LIST.some((categoryItem) => {
+      return categoryItem === this.collection.getCategory();
+    });
+
+    // If the current category is not in the dropdown, add it
+    // as the first option.
+    if (!categoryIsInList && this.collection.getCategory()) {
+      this.CATEGORY_LIST.unshift(this.collection.getCategory());
+    }
   }
 
   hasPageLoaded(): boolean {

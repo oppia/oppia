@@ -27,15 +27,13 @@
     <label for="collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div *ngIf="hasPageLoaded()">
-        <!-- <select2-dropdown id="collectionCategory"
-                          item="displayedCollectionCategory"
-                          choices="CATEGORY_LIST_FOR_SELECT2"
-                          placeholder="Choose or type new"
-                          new-choice-regex="^[A-Z a-z]+$"
-                          on-selection-change="updateCollectionCategory()"
-                          width="100%"
-                          invalid-search-term-message="Invalid category name">
-        </select2-dropdown> -->
+        <oppia-filtered-choices-field id="collectionCategory"
+                                      [(selection)]="displayedCollectionCategory"
+                                      [choices]="CATEGORY_LIST"
+                                      placeholder="Choose or type new"
+                                      noEntriesFoundLabel="Invalid category name"
+                                      (selectionChange)="updateCollectionCategory()">
+        </oppia-filtered-choices-field>
       </div>
     </div>
   </div>
@@ -61,6 +59,9 @@
     <label for="collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div *ngIf="hasPageLoaded">
+        <oppia-multi-selection-field [(selections)]="displayedCollectionTags"
+                                     (selectionsChange)="updateCollectionTags()">
+        </oppia-multi-selection-field>
         <!-- <select2-dropdown item="displayedCollectionTags"
                           choices="displayedCollectionTags"
                           allow-multiple-choices="true"

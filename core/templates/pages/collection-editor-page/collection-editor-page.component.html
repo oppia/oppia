@@ -3,7 +3,7 @@
     <oppia-collection-editor-tab></oppia-collection-editor-tab>
   </div>
 
-  <div *ngIf="getActiveTabName() === 'settings'">
+  <div [hidden]="getActiveTabName() !== 'settings'">
     <collection-settings-tab></collection-settings-tab>
   </div>
 
