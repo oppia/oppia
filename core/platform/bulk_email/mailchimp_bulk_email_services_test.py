@@ -171,7 +171,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.exception().
 
             Args:
-                *args: *. Arguments of the function.
+                msg: str. The logging message.
+                *args: list(*). A list of arguments.
                 **unused_kwargs: *. Keyword arguments.
             """
             observed_log_messages.append(msg % args)
