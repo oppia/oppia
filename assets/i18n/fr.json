@@ -680,7 +680,6 @@
 	"I18N_TEACH_TESTIMONIAL_1": "« Je suis reconnaissant d’avoir la possibilité d’éduquer les enfants indiens non privilégiés et de combler les manques dans leur compréhension des concepts mathématiques critiques. Suivre l’accroissement de la confiance de ces étudiants au cours de leur apprentissage valait bien les heures supplémentaires. »",
 	"I18N_TEACH_TESTIMONIAL_2": "« Oppia est le premier de son genre ! Il aide les étudiants à apprendre tout ce dont ils ont besoin sur un sujet spécifique d’une manière attractive et captivante ; il les encourage aussi à utiliser des appareils intelligents pour leur bien. »",
 	"I18N_TEACH_TESTIMONIAL_3": "« Je ne m’étais jamais attendu à ce que les étudiants apprennent les leçons de technologie et de mathématique aussi rapidement. C’est leur premier contact avec les technologies intelligentes, et ils ont eu du mal à les gérer au début. Maintenant, je sens une immense joie à les voir faire les leçons de Oppia avant même que j’entre dans la classe ! »",
-	"I18N_TEACH_TESTIMONIAL_4": "« à écrire »",
 	"I18N_THANKS_PAGE_BREADCRUMB": "Merci",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 leçon} other{# leçons}}",
 	"I18N_TOPIC_VIEWER_CHAPTER": "Chapitre",

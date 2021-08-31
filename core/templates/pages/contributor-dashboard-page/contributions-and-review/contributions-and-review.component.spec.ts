@@ -22,6 +22,8 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+
 describe('Contributions and review component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -500,7 +502,9 @@ describe('Contributions and review component', function() {
             expect(opportunitiesDicts).toEqual([{
               id: 'suggestion_1',
               heading: 'Tradução',
-              subheading: '[The corresponding opportunity has been deleted.]',
+              subheading: (
+                ContributorDashboardConstants
+                  .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
               labelText: 'Awaiting review',
               labelColor: '#eeeeee',
               actionButtonTitle: 'View'
@@ -530,7 +534,9 @@ describe('Contributions and review component', function() {
         expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
           heading: 'Question 1',
-          subheading: '[The corresponding opportunity has been deleted.]',
+          subheading: (
+            ContributorDashboardConstants
+              .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
           labelText: 'Accepted',
           labelColor: '#8ed274',
           actionButtonTitle: 'View'

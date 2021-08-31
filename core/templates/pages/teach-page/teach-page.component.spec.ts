@@ -44,8 +44,7 @@ class MockI18nLanguageCodeService {
 }
 
 describe('Teach Page', () => {
-  const siteAnalyticsServiceStub = new SiteAnalyticsService(
-    new WindowRef());
+  let siteAnalyticsService: SiteAnalyticsService;
   let loaderService: LoaderService = null;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
@@ -65,7 +64,7 @@ describe('Teach Page', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
@@ -73,7 +72,8 @@ describe('Teach Page', () => {
             nativeWindow: {
               location: {
                 href: ''
-              }
+              },
+              gtag: () => {}
             }
           }
         }
@@ -89,6 +89,7 @@ describe('Teach Page', () => {
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   let component;
@@ -148,19 +149,19 @@ describe('Teach Page', () => {
 
   it('should record analytics when Start Learning is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
+      siteAnalyticsService, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
     component.onClickStartLearningButton();
-    expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
+    expect(siteAnalyticsService.registerClickStartLearningButtonEvent)
       .toHaveBeenCalled();
   });
 
   it('should record analytics when Visit Classroom is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
+      siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
-    expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+    expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalled();
   });
 
@@ -175,10 +176,10 @@ describe('Teach Page', () => {
 
   it('should record analytics when Browse Library is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
+      siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
     component.onClickBrowseLibraryButton();
-    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
+    expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalled();
   });
 
@@ -193,10 +194,10 @@ describe('Teach Page', () => {
 
   it('should record analytics when Guide For Parents is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
+      siteAnalyticsService, 'registerClickGuideParentsButtonEvent')
       .and.callThrough();
     component.onClickGuideParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickGuideParentsButtonEvent)
+    expect(siteAnalyticsService.registerClickGuideParentsButtonEvent)
       .toHaveBeenCalled();
   });
 
@@ -211,19 +212,19 @@ describe('Teach Page', () => {
 
   it('should record analytics when Tips For Parents is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
+      siteAnalyticsService, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
     component.onClickTipforParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
+    expect(siteAnalyticsService.registerClickTipforParentsButtonEvent)
       .toHaveBeenCalled();
   });
 
   it('should record analytics when Explore Lessons is clicked', () => {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickExploreLessonsButtonEvent')
+      siteAnalyticsService, 'registerClickExploreLessonsButtonEvent')
       .and.callThrough();
     component.onClickExploreLessonsButton();
-    expect(siteAnalyticsServiceStub.registerClickExploreLessonsButtonEvent)
+    expect(siteAnalyticsService.registerClickExploreLessonsButtonEvent)
       .toHaveBeenCalled();
   });
 

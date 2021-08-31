@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
-from typing import Any, Dict, List # isort:skip
+from typing import Any, Dict, List
 
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
