@@ -131,7 +131,7 @@ describe('Collection node creator component', () => {
     expect(componentInstance.isValidSearchQuery('valid search')).toBeTrue();
   });
 
-  it('should add exploration to colelction', fakeAsync(() => {
+  it('should add exploration to collection', fakeAsync(() => {
     componentInstance.collection = mockCollection;
     let expId = 'new_id';
     spyOn(
@@ -160,4 +160,69 @@ describe('Collection node creator component', () => {
     tick();
     expect(collectionLinearizerService.appendCollectionNode).toHaveBeenCalled();
   }));
+
+  it('should should not add exploration to collection if exploration' +
+  ' id is empty', () => {
+    spyOn(alertsService, 'addWarning');
+    componentInstance.addExplorationToCollection('');
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Cannot add an empty exploration ID.');
+  });
+
+  it('should not add exploration to collection if it is already added', () => {
+    componentInstance.collection = mockCollection;
+    spyOn(alertsService, 'addWarning');
+    spyOn(componentInstance.collection, 'containsCollectionNode')
+      .and.returnValue(true);
+    componentInstance.addExplorationToCollection('exp');
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There is already an exploration in this collection with that id.');
+  });
+
+  it('should show warning if request to backend fails while adding ' +
+    'exploration to collection', fakeAsync(() => {
+    componentInstance.collection = mockCollection;
+    let expId = 'new_id';
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      explorationSummaryBackendApiService,
+      'loadPublicAndPrivateExplorationSummariesAsync')
+      .and.returnValue(Promise.reject());
+    spyOn(collectionLinearizerService, 'appendCollectionNode');
+    spyOn(componentInstance.collection, 'containsCollectionNode')
+      .and.returnValue(false);
+    componentInstance.addExplorationToCollection(expId);
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error while adding an exploration to the collection.');
+  }));
+
+  it('should show an alert if exploration doesnot exist in collection',
+    fakeAsync(() => {
+      componentInstance.collection = mockCollection;
+      let expId = 'new_id';
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        explorationSummaryBackendApiService,
+        'loadPublicAndPrivateExplorationSummariesAsync')
+        .and.returnValue(Promise.resolve({
+          summaries: []
+        }));
+      spyOn(collectionLinearizerService, 'appendCollectionNode');
+      spyOn(componentInstance.collection, 'containsCollectionNode')
+        .and.returnValue(false);
+      componentInstance.addExplorationToCollection(expId);
+      tick();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'That exploration does not exist or you do not have edit access to it.'
+      );
+    }));
+
+  it('should convert typeahead to exploration id', () => {
+    let expId = 'eMMRB6JFLSGM';
+    expect(componentInstance.convertTypeaheadToExplorationId(
+      `Test Exploration (${expId})`)).toEqual(expId);
+    expect(componentInstance.convertTypeaheadToExplorationId(expId))
+      .toEqual(expId);
+  });
 });

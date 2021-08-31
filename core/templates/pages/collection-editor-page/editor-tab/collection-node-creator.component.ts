@@ -169,9 +169,6 @@ export class CollectionNodeCreatorComponent {
     }
 
     // Create a new exploration with the given title.
-    // this.httpClient.post('/contributehandler/create_new', {
-    //   title: title
-    // }).toPromise()
     this.explorationCreationBackendApiService.registerNewExplorationAsync({
       title: title
     }).then((response) => {

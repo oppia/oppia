@@ -357,6 +357,7 @@ import { LearnerViewRatingService } from 'pages/exploration-player-page/services
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
 import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
@@ -379,6 +380,7 @@ import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-p
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PageHeadService } from './page-head.service';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
+import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -470,6 +472,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
+  ['EmailDashboardResultBackendApiService',
+    EmailDashboardResultBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationCreationBackendApiService',
@@ -675,6 +679,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
+  ['SkillCreationService', SkillCreationService],
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
@@ -739,6 +744,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
