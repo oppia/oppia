@@ -63,11 +63,11 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
     """
     if not feconf.MAILCHIMP_API_KEY:
         logging.exception('Mailchimp API key is not available.')
-        return
+        return None
 
     if not feconf.MAILCHIMP_USERNAME:
         logging.exception('Mailchimp username is not set.')
-        return
+        return None
 
     # The following is a class initialized in the library with the API key and
     # username and hence cannot be tested directly. The mailchimp functions are
@@ -134,7 +134,7 @@ def permanently_delete_user_from_list(user_email: str) -> None:
     """
     client = _get_mailchimp_class()
     if not client:
-        return
+        return None
     subscriber_hash = _get_subscriber_hash(user_email)
 
     try:

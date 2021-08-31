@@ -168,20 +168,25 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args, **unused_kwargs):
-            """Mocks logging.exception()."""
+            """Mocks logging.exception().
+
+            Args:
+                *args: *. Arguments of the function.
+                **unused_kwargs: *. Keyword arguments.
+            """
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'exception', _mock_logging_function)
         with logging_swap:
             mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
-            self.assertItemsEqual(
+            self.assertItemsEqual( # type: ignore[no-untyped-call]
                 observed_log_messages, ['Mailchimp API key is not available.'])
 
             observed_log_messages = []
             swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
             with swap_api:
                 mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
-                self.assertItemsEqual(
+                self.assertItemsEqual( # type: ignore[no-untyped-call]
                     observed_log_messages, ['Mailchimp username is not set.'])
 
             # For the tests below, the email ID for the user doesn't matter
