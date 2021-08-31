@@ -59,43 +59,6 @@ class MockWindowRef {
     return this._window;
   }
 }
-
-class MockExplorationDataService1 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
-    successCb({
-      changes_are_mergeable: true,
-      is_version_of_draft_valid: false,
-    });
-  }
-  discardDraftAsync() {
-    return;
-  }
-}
-
-class MockExplorationDataService2 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
-    successCb({
-      changes_are_mergeable: false,
-      is_version_of_draft_valid: false,
-    });
-  }
-  discardDraftAsync() {
-    return;
-  }
-}
-
-class MockExplorationDataService3 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
-    errorCb();
-  }
-  discardDraftAsync() {
-    return;
-  }
-}
-
 class MockAutosaveInfoModalsService {
   isModalOpen() {
     return false;
@@ -114,18 +77,29 @@ describe('Change List Service when changes are mergable', () => {
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
 
   let alertsSpy = null;
-  let mockExplorationDataService = null;
+  let discardSpy = jasmine.createSpy('discard');
   let mockEventEmitter = new EventEmitter();
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
-    mockExplorationDataService = new MockExplorationDataService1();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         {
           provide: ExplorationDataService,
-          useValue: mockExplorationDataService
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync(changeList, successCb, errorCb) {
+              successCb({
+                changes_are_mergeable: true,
+                is_version_of_draft_valid: false,
+              });
+            },
+            discardDraftAsync() {
+              discardSpy();
+              return;
+            }
+          }
         },
         {
           provide: WindowRef,
@@ -205,9 +179,6 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should discard all changes ' +
     'when calling \'discardAllChanges\'', () => {
-    let discardSpy = spyOn(mockExplorationDataService, 'discardDraftAsync')
-      .and.callThrough();
-
     changeListService.discardAllChanges();
 
     expect(discardSpy).toHaveBeenCalled();
@@ -250,17 +221,26 @@ describe('Change List Service when changes are not mergable', () => {
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
 
   let alertsSpy = null;
-  let mockExplorationDataService = null;
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
-    mockExplorationDataService = new MockExplorationDataService2();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         {
           provide: ExplorationDataService,
-          useValue: mockExplorationDataService
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync(changeList, successCb, errorCb) {
+              successCb({
+                changes_are_mergeable: false,
+                is_version_of_draft_valid: false,
+              });
+            },
+            discardDraftAsync() {
+              return;
+            }
+          }
         },
         {
           provide: WindowRef,
@@ -311,19 +291,25 @@ describe('Change List Service when internet is available', () => {
   let onInternetStateChangeEventEmitter = new EventEmitter();
 
   let alertsSpy = null;
-  let mockExplorationDataService = null;
   let mockAutosaveInfoModalsService = null;
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
-    mockExplorationDataService = new MockExplorationDataService3();
     mockAutosaveInfoModalsService = new MockAutosaveInfoModalsService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         {
           provide: ExplorationDataService,
-          useValue: mockExplorationDataService
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync(changeList, successCb, errorCb) {
+              errorCb();
+            },
+            discardDraftAsync() {
+              return;
+            }
+          }
         },
         {
           provide: WindowRef,
