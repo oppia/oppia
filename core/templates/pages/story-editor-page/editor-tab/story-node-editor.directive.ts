@@ -83,7 +83,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             MAX_CHARS_IN_EXPLORATION_TITLE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_EXPLORATION_TITLE = MAX_CHARS_IN_EXPLORATION_TITLE;
+          $scope.MAX_CHARS_IN_EXPLORATION_TITLE = (
+            MAX_CHARS_IN_EXPLORATION_TITLE);
           $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
             MAX_CHARS_IN_CHAPTER_DESCRIPTION);
           var _recalculateAvailableNodes = function() {
