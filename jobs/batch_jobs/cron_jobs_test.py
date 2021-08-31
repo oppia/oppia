@@ -297,7 +297,9 @@ class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
         ):
-            self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
+            self.assert_job_output_is([  # type: ignore[no-untyped-call]
+                job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+            ])
 
         user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
         self.assertIsNotNone(user_stats_model)
