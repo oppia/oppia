@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-fdescribe('Rte Helper Service', function() {
+describe('Rte Helper Service', function() {
   var RteHelperService = null;
   var $q = null;
   var $uibModal = null;
