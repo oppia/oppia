@@ -4742,5 +4742,5 @@ div.oppia-issues-learner-action {
  * are not covered by the it.
  */
 .cdk-global-overlay-wrapper, .cdk-overlay-container {
-z-index: 10000 !important;
+  z-index: 10000 !important;
 }
