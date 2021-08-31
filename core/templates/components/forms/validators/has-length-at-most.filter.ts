@@ -18,8 +18,8 @@
  */
 
 angular.module('oppia').filter('hasLengthAtMost', [function () {
-    return function (input, args) {
-        console.log("LEN AT MOST", input, args);
-        return (input.length <= args.maxValue);
-    };
+  return function (input, args) {
+    console.log("LEN AT MOST", input, args);
+    return (input.length <= args.maxValue);
+  };
 }]);

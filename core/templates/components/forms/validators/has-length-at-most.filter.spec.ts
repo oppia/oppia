@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
@@ -22,27 +22,27 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require('components/forms/validators/has-length-at-most.filter.ts');
 
 describe('hasLengthAtMost filter', function () {
-    var filterName = 'hasLengthAtMost';
+  var filterName = 'hasLengthAtMost';
 
-    beforeEach(angular.mock.module('oppia'));
-    importAllAngularServices();
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
-    it('should have the relevant filters', angular.mock.inject(function ($filter) {
-        expect($filter(filterName)).not.toEqual(null);
-    }));
+  it('should have the relevant filters', angular.mock.inject(function ($filter) {
+    expect($filter(filterName)).not.toEqual(null);
+  }));
 
-    it('should impose maximum length bounds', angular.mock.inject(
-        function ($filter) {
-            var filter = $filter('hasLengthAtMost');
-            var args = {
-                maxValue: 3
-            };
-            expect(filter('12', args)).toBe(true);
-            expect(filter('123', args)).toBe(true);
-            expect(filter('1234', args)).toBe(false);
-            expect(filter(['1', '2'], args)).toBe(true);
-            expect(filter(['1', '2', '3'], args)).toBe(true);
-            expect(filter(['1', '2', '3', '4'], args)).toBe(false);
-        }
-    ));
+  it('should impose maximum length bounds', angular.mock.inject(
+    function ($filter) {
+      var filter = $filter('hasLengthAtMost');
+      var args = {
+        maxValue: 3
+      };
+      expect(filter('12', args)).toBe(true);
+      expect(filter('123', args)).toBe(true);
+      expect(filter('1234', args)).toBe(false);
+      expect(filter(['1', '2'], args)).toBe(true);
+      expect(filter(['1', '2', '3'], args)).toBe(true);
+      expect(filter(['1', '2', '3', '4'], args)).toBe(false);
+    }
+  ));
 });
