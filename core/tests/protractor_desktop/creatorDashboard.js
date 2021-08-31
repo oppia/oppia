@@ -28,7 +28,6 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
-const { require } = require('yargs');
 
 describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
