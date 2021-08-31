@@ -642,7 +642,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
-            called=False  # Func shouldn't be called when emails are disabled.
+            # Func shouldn't be called when emails are disabled.
+            called=False
         )
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
@@ -5010,7 +5011,8 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
-            called=False  # Func shouldn't be called when emails are disabled.
+            # Func shouldn't be called when emails are disabled.
+            called=False
         )
         with send_mail_to_admin_swap, self.cannot_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
@@ -5107,7 +5109,8 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
-            called=False  # Func shouldn't be called when emails are disabled.
+            # Func shouldn't be called when emails are disabled.
+            called=False
         )
         with send_mail_to_admin_swap, self.cannot_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()

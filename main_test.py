@@ -22,11 +22,9 @@ import contextlib
 from core.platform import models
 from core.tests import test_utils
 import main
-
+from typing import Any, ContextManager, Dict, cast
 import webapp2
 import webtest
-
-from typing import Any, ContextManager, Dict, cast  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
