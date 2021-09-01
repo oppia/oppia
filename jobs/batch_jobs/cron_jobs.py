@@ -101,10 +101,54 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
 class ComputeExplorationRecommendations(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        the Elastic Search.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            the Elastic Search.
+        """
+
+        exp_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted models' >> (
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))  # type: ignore[no-untyped-call]
+        )
+
+        exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
+
+        exp_recommendations_models = (
+            exp_summary_models
+            | 'Compute similarity' >> beam.ParDo(
+                self._compute_similarity, exp_summary_iter)
+            | 'Group similarities per exploration ID' >> beam.GroupByKey()
+            | 'Sort and slice similarities' >> beam.MapTuple(
+                lambda exp_id, similarities: (
+                    exp_id, self._sort_and_slice_similarities(similarities)))
+            | 'Create recommendation models' >> beam.MapTuple(
+                self._create_recommendation)
+        )
+
+        unused_put_result = (
+            exp_recommendations_models
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            exp_recommendations_models
+            | 'Count all new models' >> beam.combiners.Count.Globally()
+            | 'Only create result for new models when > 0' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Create result for new models' >> beam.Map(
+                lambda x: job_run_result.JobRunResult(
+                    stdout='SUCCESS %s' % x))
+        )
+
     @staticmethod
     def _compute_similarity(
             ref_exp_summary_model: datastore_services.Model,
-            compared_exp_summary_models: List[datastore_services.Model]
+            compared_exp_summary_models: Iterable[datastore_services.Model]
     ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
         """Compute similarities between exploraitons.
 
@@ -170,7 +214,7 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
 
     @staticmethod
     def _create_recommendation(
-            exp_id: str, recommended_exp_ids: List[str]
+            exp_id: str, recommended_exp_ids: Iterable[str]
     ) -> recommendations_models.ExplorationRecommendationsModel:
         """Creates exploration recommendation model.
 
@@ -189,47 +233,3 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
                     id=exp_id, recommended_exploration_ids=recommended_exp_ids))
         exp_recommendation_model.update_timestamps()
         return exp_recommendation_model
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        the Elastic Search.
-
-        Returns:
-            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            the Elastic Search.
-        """
-
-        exp_summary_models = (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))  # type: ignore[no-untyped-call]
-        )
-
-        exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
-
-        exp_recommendations_models = (
-            exp_summary_models
-            | 'Compute similarity' >> beam.ParDo(
-                self._compute_similarity, exp_summary_iter)
-            | 'Group similarities per exploration ID' >> beam.GroupByKey()
-            | 'Sort and slice similarities' >> beam.MapTuple(
-                lambda exp_id, similarities: (
-                    exp_id, self._sort_and_slice_similarities(similarities)))
-            | 'Create recommendation models' >> beam.MapTuple(
-                self._create_recommendation)
-        )
-
-        unused_put_result = (
-            exp_recommendations_models
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
-
-        return (
-            exp_recommendations_models
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS %s' % x))
-        )
