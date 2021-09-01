@@ -41,11 +41,25 @@ from __future__ import unicode_literals
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
 from jobs import base_jobs
-from jobs import blog_validation_jobs  # pylint: disable=unused-import
-from jobs.batch_jobs import cron_jobs  # pylint: disable=unused-import
-from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
 
 from typing import List
+
+# IMPORTANT: These modules MUST be imported! DO NOT DELETE!
+# We need each module to execute so that the class definitions trigger the
+# metaclass logic. That is, the following code:
+#
+#     class FooJob(base_jobs.JobBase):
+#         pass
+#
+# Will execute the following code:
+#
+#     JobMetaclass.__new__('FooJob', (base_jobs.JobBase,), {})
+#
+# We need this to happen for every job in this registry file, because the
+# registry depends on JobMetaclass to handle the responsibility of keeping track
+# of every job.
+from jobs.batch_jobs import blog_validation_jobs # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import validation_jobs      # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[base_jobs.JobMetaclass]:

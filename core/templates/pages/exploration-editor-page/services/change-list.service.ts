@@ -18,7 +18,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, OnInit, Output } from '@angular/core';
+import { EventEmitter, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -34,7 +34,7 @@ import { InternetConnectivityService } from 'services/internet-connectivity.serv
 @Injectable({
   providedIn: 'root'
 })
-export class ChangeListService implements OnInit {
+export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
   undoneChangeStack: ExplorationChange[] = [];
@@ -92,13 +92,13 @@ export class ChangeListService implements OnInit {
     private loaderService: LoaderService,
     private loggerService: LoggerService,
     private internetConnectivityService: InternetConnectivityService,
-  ) {}
-
-  ngOnInit(): void {
+  ) {
+    // We have added subscriptions in the constructor.
+    // Since, ngOnInit does not work in angular services.
+    // Ref: https://github.com/angular/angular/issues/23235.
     this.loaderService.onLoadingMessageChange.subscribe(
       (message: string) => this.loadingMessage = message
     );
-
     this.internetConnectivityService.onInternetStateChange.subscribe(
       internetAccessible => {
         if (internetAccessible && this.temporaryListOfChanges.length > 0) {

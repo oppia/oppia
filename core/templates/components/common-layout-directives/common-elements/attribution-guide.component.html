@@ -27,7 +27,9 @@
         {{getPageUrl()}}
       </a>.
     </div>
-    <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">Generate Attribution</a>
+    <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">
+      <span [innerHTML]="'I18N_GENERATE_ATTRIBUTION' | translate"></span>
+    </a>
   </div>
   <div *ngIf="getAttributionModalStatus()" class="attribution-modal-container">
     <div (click)="hideAttributionModal()"></div>
@@ -38,12 +40,16 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <div class="container pt-4">
-          <div class="font-weight-bold">How to attribute this lesson for sharing or reusing</div>
+          <div class="font-weight-bold">
+            <span [innerHTML]="'I18N_ATTRIBUTION_TITLE' | translate"></span>
+          </div>
           <div class="attribution-html-section">
-            <div class="font-weight-bold">Attribute in HTML</div>
+            <div class="font-weight-bold">
+              <span [innerHTML]="'I18N_ATTRIBUTION_HTML_TITLE' | translate"></span>
+            </div>
             <ol class="attribute-instructions">
-              <li>Copy and paste the HTML</li>
-              <li>Make sure the link appears as "<u>Oppia</u> // <u>CC BY SA 4.0</u>"</li>
+              <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_ONE' | translate"></span></li>
+              <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_TWO' | translate: { linkText: '<u>Oppia</u> // <u>CC BY SA 4.0</u>' }"></span></li>
             </ol>
             <div data-trigger="manual"
                  data-toggle="tooltip"
@@ -56,16 +62,10 @@
             <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
           </div>
           <div class="attribution-print-section">
-            <div class="font-weight-bold">Attribute in print</div>
+            <div class="font-weight-bold"><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_TITLE' | translate"></span></div>
             <ol class="attribute-instructions">
-              <li>Copy and paste the credit</li>
-              <li>
-                Attach a copy of the
-                <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
-                  <span class="oppia-attribution-licence-link">CC BY SA 4.0 license</span>
-                  <span class="material-icons oppia-open-new-tab-icon">open_in_new</span>
-                </a>
-              </li>
+              <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate"></span></li>
+              <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_TWO' | translate: { link: printAttributionLink }"></span></li>
             </ol>
             <div data-trigger="manual"
                  data-toggle="tooltip"
@@ -78,7 +78,7 @@
             <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
           </div>
           <div class="sharing-section">
-            <div class="font-weight-bold">Share this lesson</div>
+            <div class="font-weight-bold"><span [innerHTML]="'I18N_SHARE_LESSON' | translate"></span></div>
             <sharing-links [layoutType]="'row center'"
                            [layoutAlignType]="'end'"
                            [shareType]="'exploration'"
