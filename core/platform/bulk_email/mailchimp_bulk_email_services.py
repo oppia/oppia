@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import ast
 import hashlib
+import logging
 
 import feconf
 import python_utils
@@ -59,16 +60,18 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
     Returns:
         Mailchimp. A mailchimp class instance with the API key and username
         initialized.
-
-    Raises:
-        Exception. Mailchimp API key is not available.
-        Exception. Mailchimp username is not set.
     """
+    # The return value ignore pragma is required for this. This is
+    # because adding a Union[] type annotation to handle both None and
+    # mailchimp3.MailChimp causes errors where the return value is called
+    # (for eg: client.lists), since NoneType does not have an attribute lists.
     if not feconf.MAILCHIMP_API_KEY:
-        raise Exception('Mailchimp API key is not available.')
+        logging.exception('Mailchimp API key is not available.')
+        return None # type: ignore[return-value]
 
     if not feconf.MAILCHIMP_USERNAME:
-        raise Exception('Mailchimp username is not set.')
+        logging.exception('Mailchimp username is not set.')
+        return None
 
     # The following is a class initialized in the library with the API key and
     # username and hence cannot be tested directly. The mailchimp functions are
@@ -134,6 +137,8 @@ def permanently_delete_user_from_list(user_email: str) -> None:
         Exception. Any error raised by the mailchimp API.
     """
     client = _get_mailchimp_class()
+    if not client:
+        return None
     subscriber_hash = _get_subscriber_hash(user_email)
 
     try:
@@ -180,6 +185,8 @@ def add_or_update_user_status(
             deleted earlier) raised by the mailchimp API.
     """
     client = _get_mailchimp_class()
+    if not client:
+        return False
     subscriber_hash = _get_subscriber_hash(user_email)
 
     subscribed_mailchimp_data = {
