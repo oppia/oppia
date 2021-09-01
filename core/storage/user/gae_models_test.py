@@ -1783,7 +1783,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_fewer_than_n_exps = 5
         has_not_logged_in_for_n_days = 10
         created_collection = True
-        used_logic_proof_interaction = True
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1793,7 +1792,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
             created_collection=created_collection,
-            used_logic_proof_interaction=used_logic_proof_interaction,
             submitter_id=self.USER_ID_1).put()
 
         query_model = user_models.UserQueryModel.get(self.QUERY_1_ID)
@@ -1814,9 +1812,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
         self.assertEqual(query_model.created_collection, created_collection)
-        self.assertEqual(
-            query_model.used_logic_proof_interaction,
-            used_logic_proof_interaction)
 
     def test_fetch_page(self) -> None:
         inactive_in_last_n_days = 5
@@ -1826,7 +1821,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_fewer_than_n_exps = 5
         has_not_logged_in_for_n_days = 10
         created_collection = True
-        used_logic_proof_interaction = True
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1836,7 +1830,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
             created_collection=created_collection,
-            used_logic_proof_interaction=used_logic_proof_interaction,
             submitter_id=self.USER_ID_1).put()
 
         submitter_id = 'submitter_2'
@@ -1848,7 +1841,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_fewer_than_n_exps = 6
         has_not_logged_in_for_n_days = 11
         created_collection = False
-        used_logic_proof_interaction = False
         user_models.UserQueryModel(
             id=query_id,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1858,7 +1850,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
             created_collection=created_collection,
-            used_logic_proof_interaction=used_logic_proof_interaction,
             submitter_id=submitter_id).put()
 
         # Fetch only one entity.
@@ -1875,7 +1866,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
         self.assertFalse(query_models[0].created_collection)
-        self.assertFalse(query_models[0].used_logic_proof_interaction)
 
         # Fetch both entities.
         query_models, _, _ = user_models.UserQueryModel.fetch_page(
@@ -1891,7 +1881,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
         self.assertFalse(query_models[0].created_collection)
-        self.assertFalse(query_models[0].used_logic_proof_interaction)
 
         self.assertEqual(query_models[1].submitter_id, self.USER_ID_1)
         self.assertEqual(query_models[1].id, self.QUERY_1_ID)
@@ -1902,7 +1891,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
         self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
         self.assertTrue(query_models[1].created_collection)
-        self.assertTrue(query_models[1].used_logic_proof_interaction)
 
 
 class UserBulkEmailsModelTests(test_utils.GenericTestBase):

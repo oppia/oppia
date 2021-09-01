@@ -40,7 +40,6 @@ import {
   DragAndDropAnswer,
   FractionAnswer,
   InteractionAnswer,
-  LogicProofAnswer,
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
@@ -98,8 +97,6 @@ export class Solution {
       correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;
     } else if (interactionId === 'MusicNotesInput') {
       correctAnswer = '[Music Notes]';
-    } else if (interactionId === 'LogicProof') {
-      correctAnswer = (<LogicProofAnswer> this.correctAnswer).correct;
     } else if (interactionId === 'FractionInput') {
       correctAnswer = Fraction.fromDict(
         <FractionAnswer> this.correctAnswer).toString();

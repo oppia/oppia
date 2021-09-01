@@ -557,94 +557,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.CheckedProof, mappings, invalid_values_with_error_messages)
 
-    def test_logic_question_validation_for_variables(self):
-        """Tests objects of type LogicQuestion."""
-        p_expression = {
-            'top_kind_name': 'variable',
-            'top_operator_name': 'p',
-            'arguments': [],
-            'dummies': []
-        }
-
-        valid_example = {
-            'assumptions': [p_expression],
-            'results': [p_expression],
-            'default_proof_string': 'a proof'
-        }
-        mappings = [(valid_example, valid_example)]
-
-        invalid_values_with_error_messages = [
-            ({}, 'Cannot convert to a logic question {}'),
-            (None, 'Cannot convert to a logic question None'),
-            (
-                {'assumptions': p_expression},
-                'Cannot convert to a logic question'),
-            ({
-                'assumptions': p_expression,
-                'results': {
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p'
-                }
-            }, 'Cannot convert to a logic question')]
-
-        self.check_normalization(
-            objects.LogicQuestion, mappings, invalid_values_with_error_messages)
-
-    def test_logic_question_validation_for_constants(self):
-        """Tests objects of type LogicQuestion."""
-        numeric_expression = {
-            'top_kind_name': 'constant',
-            'top_operator_name': 1,
-            'arguments': [],
-            'dummies': [],
-            'type': 'integer'
-        }
-
-        valid_example = {
-            'assumptions': [numeric_expression],
-            'results': [numeric_expression],
-            'default_proof_string': 'a proof'
-        }
-        mappings = [(valid_example, valid_example)]
-
-        invalid_values_with_error_messages = [
-            ({}, 'Cannot convert to a logic question {}'),
-            (None, 'Cannot convert to a logic question None'),
-            (
-                {'assumptions': numeric_expression},
-                'Cannot convert to a logic question'),
-            ({
-                'assumptions': numeric_expression,
-                'results': {
-                    'top_kind_name': 'constant',
-                    'top_operator_name': 1
-                }
-            }, 'Cannot convert to a logic question')]
-
-        self.check_normalization(
-            objects.LogicQuestion, mappings, invalid_values_with_error_messages)
-
-    def test_logic_error_category_validation(self):
-        """Tests objects of type LogicErrorCategory."""
-
-        mappings = [
-            ('parsing', 'parsing'), ('typing', 'typing'),
-            ('mistake', 'mistake')]
-
-        invalid_values_with_error_messages = [
-            (None, 'Expected unicode string, received None'),
-            (2, 'Expected unicode string, received 2'),
-            (
-                'string',
-                'Received string which is not in the allowed range of choices'),
-            (
-                'item',
-                'Received item which is not in the allowed range of choices')]
-
-        self.check_normalization(
-            objects.LogicErrorCategory, mappings,
-            invalid_values_with_error_messages)
-
     def test_graph(self):
         """Tests objects of type Graph."""
         empty_graph = {
@@ -975,7 +887,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 54)
+        self.assertEqual(count, 53)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

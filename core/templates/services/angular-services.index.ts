@@ -182,8 +182,6 @@ import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directiv
 import { InteractiveMapValidationService } from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { LogicProofRulesService } from 'interactions/LogicProof/directives/logic-proof-rules.service';
-import { LogicProofValidationService } from 'interactions/LogicProof/directives/logic-proof-validation.service';
 import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -576,8 +574,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
-  ['LogicProofRulesService', LogicProofRulesService],
-  ['LogicProofValidationService', LogicProofValidationService],
   ['LostChangeObjectFactory', LostChangeObjectFactory],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],

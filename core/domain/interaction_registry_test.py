@@ -56,8 +56,8 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
-                ['CodeRepl', 'LogicProof']),
-            ['skulpt', 'codemirror'])
+                ['CodeRepl', 'AlgebraicExpressionInput']),
+            ['skulpt', 'codemirror', 'guppy', 'nerdamer'])
 
     def test_dependency_loads_in_exploration_player_page(self):
         exp_id = '0'

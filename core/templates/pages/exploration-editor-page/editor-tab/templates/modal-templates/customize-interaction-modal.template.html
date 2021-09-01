@@ -18,11 +18,8 @@
                heading="<[category.name]>" active="category.active"
                class="protractor-test-interaction-tab-<[getHyphenatedLowercaseCategoryName(category.name)]>">
         <br>
-          <!-- TODO(#1336): remove ng-if="interactionId !== 'LogicProof'
-              after logic proof interaction is removed. -->
         <div ng-repeat="interactionId in category.interaction_ids"
              ng-click="onChangeInteractionId(interactionId)"
-             ng-if="interactionId !== 'LogicProof'"
              class="oppia-interaction-tile protractor-test-interaction-tile-<[interactionId]>"
              title="<[INTERACTION_SPECS[interactionId].description]>">
           <img ng-src="<[getInteractionThumbnailImageUrl(interactionId)]>">

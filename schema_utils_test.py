@@ -77,7 +77,7 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_BASESTRING,
     SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT]
 ALLOWED_CUSTOM_OBJ_TYPES = [
-    'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
+    'Filepath', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
     'ListOfTabs', 'SkillSelector', 'SubtitledHtml', 'SubtitledUnicode',
     'SvgFilename', 'CustomOskLetters', 'PositiveInt']

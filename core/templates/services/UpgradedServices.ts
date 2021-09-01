@@ -227,10 +227,6 @@ import { LearnerParamsService } from
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { LogicProofRulesService } from
-  'interactions/LogicProof/directives/logic-proof-rules.service';
-import { LogicProofValidationService } from
-  'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { MathEquationInputRulesService } from
@@ -579,7 +575,6 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
-    upgradedServices['LogicProofRulesService'] = new LogicProofRulesService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
@@ -710,9 +705,6 @@ export class UpgradedServices {
       new ItemSelectionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['LocalStorageService'] = new LocalStorageService();
-    upgradedServices['LogicProofValidationService'] =
-      new LogicProofValidationService(
-        upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -939,7 +931,6 @@ export class UpgradedServices {
         upgradedServices['ImageClickInputRulesService'],
         upgradedServices['InteractiveMapRulesService'],
         upgradedServices['ItemSelectionInputRulesService'],
-        upgradedServices['LogicProofRulesService'],
         upgradedServices['MathEquationInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],

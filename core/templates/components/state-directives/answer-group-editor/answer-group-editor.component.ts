@@ -119,7 +119,6 @@ angular.module('oppia').component('answerGroupEditor', {
           case 'Html':
           case 'SanitizedUrl':
           case 'Filepath':
-          case 'LogicErrorCategory':
             return '';
           case 'CodeEvaluation':
             return {
@@ -144,13 +143,6 @@ angular.module('oppia').component('answerGroupEditor', {
               correct: ctrl.getDefaultInputValue('Boolean'),
               proof_string: ctrl.getDefaultInputValue('UnicodeString'),
               target_string: ctrl.getDefaultInputValue('UnicodeString')
-            };
-          case 'LogicQuestion':
-            return {
-              arguments: [],
-              dummies: [],
-              top_kind_name: ctrl.getDefaultInputValue('UnicodeString'),
-              top_operator_name: ctrl.getDefaultInputValue('UnicodeString')
             };
           case 'Graph':
             return {

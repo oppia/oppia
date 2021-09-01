@@ -35,11 +35,11 @@ ruleTester.run('no-to-throw', rule, {
       };
     }]
     );`,
-    `describe('Build questions', function() {
-      it('should forbid the use of reserved words', function() {
+    `describe('Url Service', function() {
+      it('should correctly retrieve topic id from url', function() {
+        mockLocation.pathname = '/topic_editor/abcdefgij';
         expect(function() {
-          logicProofTeacher.buildQuestion('p=q',
-            logicProofData.BASE_VOCABULARY);
+          urlService.getTopicIdFromUrl();
         }).toThrowError( {
           message: 'Checking'
           }
@@ -51,11 +51,11 @@ ruleTester.run('no-to-throw', rule, {
   invalid: [
     {
       code:
-        `describe('Build questions', function() {
-          it('should forbid the use of reserved words', function() {
+        `describe('Url Service', function() {
+          it('should correctly retrieve topic id from url', function() {
+            mockLocation.pathname = '/topic_editor/abcdefgij';
             expect(function() {
-              logicProofTeacher.buildQuestion('p=q',
-                logicProofData.BASE_VOCABULARY);
+              urlService.getTopicIdFromUrl();
             }).toThrow( {
               message: 'Checking'
               }

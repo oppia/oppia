@@ -115,15 +115,6 @@ describe('Solution object factory', () => {
         'One solution is "1/6". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
-        assumptions_string: 'required',
-        target_string: 'required',
-        proof_string: 'required',
-        correct: true
-      });
-      expect(solution.getSummary('LogicProof')).toEqual(
-        'One solution is "true". This is the explanation to the answer.');
-
-      solution.setCorrectAnswer({
         type: 'real',
         real: 1,
         fraction: {

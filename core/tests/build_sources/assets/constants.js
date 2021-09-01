@@ -471,7 +471,6 @@ var constants = {
     "interaction_ids": [
         "FractionInput",
         "GraphInput",
-        "LogicProof",
         "NumericInput",
         "SetInput",
         "NumericExpressionInput",

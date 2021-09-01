@@ -56,7 +56,6 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'ImageClickInput',
     'InteractiveMap',
     'ItemSelectionInput',
-    'LogicProof',
     'MathEquationInput',
     'MultipleChoiceInput',
     'NumericExpressionInput',
