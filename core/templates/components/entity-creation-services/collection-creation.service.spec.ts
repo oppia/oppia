@@ -63,7 +63,8 @@ describe('Collection Creation service', () => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           href: ''
-        }
+        },
+        gtag: () => {}
       });
 
       collectionCreationService.createNewCollection();
@@ -117,7 +118,8 @@ describe('Collection Creation service', () => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           href: ''
-        }
+        },
+        gtag: () => {}
       });
 
       collectionCreationService.createNewCollection();
