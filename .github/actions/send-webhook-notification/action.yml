@@ -10,6 +10,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    run: |
-      curl -X POST -H 'Content-Type: application/json' ${{INPUT_WEBHOOKURL}} -d '{"text": \"${{INPUT_MESSAGE}}\"}'
-    shell: bash
+    - name: 'Send notification'
+      run: curl -X POST -H 'Content-Type: application/json' ${{INPUT_WEBHOOKURL}} -d '{"text": \"${{INPUT_MESSAGE}}\"}'
+      shell: bash
