@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Validator to check if input has length at
- * least some value.
+ * most some value.
  */
 
 angular.module('oppia').filter('hasLengthAtMost', [function() {
