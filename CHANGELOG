@@ -1,5 +1,110 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.1.4 (01 Sep 2021)
+------------------------
+Contributor Pages
+* Fix #12276: Hide action button for submitted suggestions when their corresponding opportunities are deleted (#13738)
+
+Translations
+* Routine update of translations. (#13517)
+
+Developer UX
+* Fix part of #10474: Enables strict typescript checks for some files - (2.5)  (#13532)
+* Update PULL_REQUEST_TEMPLATE.md (#13530)
+* Update oppiabot to v1.4.0 (#13512)
+* Fix part of #10474: Enables strict typescript checks for some files - (2.3) (#13473)
+* Fix part of #10474: Made strict typescript checks for image-upload-helper (#13466)
+* Fix part of #10474: Cover ExplorationImprovementsModel with strict TypeScript checks (#13457)
+* Fix part of #8423: Implement lint check for keeping element selectors at the tops of files. (#13441)
+* Fix Part of #10474: Cover some files with TS strict checks - 11 (#13426)
+* Migrate "disallow bypassSecurity" regex check to eslint (#13424)
+* Fix part of #10474: Enables strict typescript checks for some files - (2.2) (#13394)
+* Fixes part of #10474: add some files in ts-strict (#13369)
+* Fix Part of #10474: Cover some files with TS strict checks - 10   (#13368)
+* Fix part of #10474: Enables strict typescript checks for some files - (2.1) (#13354)
+* Fix #13071: Removes logging unwanted errors in frontend test (#13253)
+* Fix #13326: Removes the unwanted bypass import-only-modules flag (#13495)
+* Updates codeowners for jobs/transforms and jobs/types folder (#13482)
+* Adds schema in custom_landing_pages and pages modules. (#13478)
+* Updating codeowner (#13464)
+* Add frontend-test-reviewers team to codeowners file (#13458)
+* M2.1: Add type annotations (#13413)
+* Added unit tests for the following files (#13409)
+* Allow users to have multiple roles and removes banned role (#12989)
+
+Data handling
+* fixes part of #12792 implement the _get_change_domain_class for topic, subtopic validation (#13384)
+* Adds schema for handler classes creator_dashboard, learner_dashboard, learner_playlist modules (#13355)
+* fixes part of #12792 implement the _get_change_domain_class for skill, story validation (#13307)
+
+Miscellaneous
+* Fix #13723: Do not redirect partially-logged-in users from /logout (#13729)
+* Fix #13447: Removes roles related flags from the response (#13511)
+* Revert "Fix part of #9749: Migrate library page." (#13497)
+
+Bug fixes
+* Fix interpolation of html tags on get started page. (#13433)
+* Fix coverage flake introduced in #13219 (#13419)
+
+Learner/Creator Pages
+* Milestone 2.3: Adds Blog Card And Parts of Blog Dashboard Page  (#13472)
+* Consolidate Image RTE components (#13485)
+* Initialise Carousel after library page data has loaded (#13751)
+* Fix part of #13449: RTE validation for checking if the url for a link begins with https://  (#13536)
+* Components and modals on the exploration editor page will be preloaded. [Milestone2.1] (#13407)
+* Redesigning and Updating the Learner Dashboard Page Milestone-2.2 (#13402)
+* Only include images from the current exp version for download (#13527)
+* Fix refresh of page when hitting enter on a TextInput interaction (#13634)
+* Send CD emails to admins based on suggestion type; Empty translations should show in CD (#13615)
+* Update tsconfig-strict to cover directories (#13551)
+* Fix #13509: Bug fixes related to item select (#13526)
+* Fix #13655 and #13639 (#13715)
+* Fix #13653, #13630, #13666, #13651 (#13713)
+* Fix #13691: Added default init value for position of terms. (#13706)
+* Fix #13545, #13546, #13547: Fixes editor facing bugs (#13583)
+* Fix #13168: dnd rule editor issues (#13558)
+* Fix #13220: Math interaction regex fix for Safari (#13553)
+* Fixed failing skill-mastery test (#13510)
+* Added subtopic mastery handler (#13468)
+* Milestone 2.2: Adds Backend Api services for blog dashboard. (#13439)
+* Add SameSite=None and Secure to cookie options to support iframe (#13623)
+* Add Google Analytics require to mock-ajs (#13620)
+* Logic proof job (#13618)
+
+Angular Migration
+* Fix #13656: Make Topic Landing Pages accessible. (#13671)
+* Migrate Library page (#13498)
+* Migrate 14 static pages to angular router. (#13483)
+* Fix part of #9749: Migrate Stewards landing page (#13415)
+* Fix part of #9749: Migrate Signup page (#13414)
+* Fix part of #9749: Migrate library page. (#13412)
+* Remove angularjs from 9 more pages (#13367)
+* Introduce angular router (#13305)
+
+Automated QA Team
+* Fix #13757: Fix rubric alignment when submitting questions (#13758)
+* Frontend Unit Tests(8): Add frontend tests for multiple files (#13535)
+* Tighten rerun policies based on e2e metrics (#13505)
+* Frontend Unit Tests(7): Add frontend tests for multiple files (#13503)
+* Frontend tests for topic-editor-navbar.component (#13501)
+* Fixing the Embedding flake (#13493)
+* Resolving "Creating topic takes too long" in topicAndStoryEditor.js (#13492)
+* Added units tests for outcome-destination-editor & state-hints-editor (#13479)
+* Frontend Unit Tests(6): Cover multiple component files (#13476)
+* Fix #13421: Run backend tests in core/tests (#13470)
+* Resolving "https://pencilcode.net/lib/pencilcodeembed.js - Failed to load resource: net::ERR_CERT_DATE_INVALID" error  (#13455)
+* Fixing a Flake in Topic and Story Editor File Upload Features (#13446)
+* Fixed the E2E flake introduced in #13325 (#13445)
+* Added tests for question-editor & outcome-editor (#13442)
+* Fix #12993: Restore @U8NWXD as codeowner (#13428)
+* Frontend Unit Tests(5): Cover multiple component files (#13423)
+* Added unit tests for version-diff-visualization & rule-editor (#13418)
+* Add unit test for top-navigation-bar and fix flake (#13286)
+* Fix part of #13467 Fixes frontend test flake in noninteractiveimage.component (#13525)
+* Fix #13249: Fix mypy pre-push checks (#13490)
+* Added unit tests for conversation skin directive (#13432)
+
+
 v3.1.3 (07 Aug 2021)
 ------------------------
 Contributor Pages
