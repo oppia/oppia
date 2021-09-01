@@ -52,8 +52,9 @@
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
-/core/templates/modules/ @srijanreddy98 @darksun27
+/core/templates/components/filter-fields/ @srijanreddy98 @darksun27
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
+/core/templates/modules/ @srijanreddy98 @darksun27
 /core/templates/pages/common-imports.ts @srijanreddy98 @darksun27
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
 /core/templates/pages/oppia-root/ @srijanreddy98 @darksun27
@@ -467,6 +468,7 @@
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
+/core/controllers/beam_jobs*.py @brianrodri
 /core/domain/beam_job*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep

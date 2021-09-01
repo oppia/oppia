@@ -26,6 +26,8 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
+from typing import Optional
+
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -38,7 +40,7 @@ class PutResults(beam.PTransform):
 
     _MAX_RESULT_INSTANCES_PER_MODEL = 1000
 
-    def __init__(self, job_id, label=None):
+    def __init__(self, job_id: str, label: Optional[str] = None):
         """Initializes the GetModels PTransform.
 
         Args:
@@ -48,19 +50,21 @@ class PutResults(beam.PTransform):
         super(PutResults, self).__init__(label=label)
         self.job_id = job_id
 
-    def expand(self, entities):
+    def expand(
+        self, results: beam.PCollection[job_run_result.JobRunResult]
+    ) -> beam.pvalue.PDone:
         """Writes the given job results to the NDB datastore.
 
         This overrides expand from parent class.
 
         Args:
-            entities: PCollection. Models, can also contain just one model.
+            results: PCollection. Models, can also contain just one model.
 
         Returns:
             PCollection. An empty PCollection.
         """
         return (
-            entities
+            results
             # NOTE: Pylint is wrong. WithKeys() is a decorated function with a
             # different signature than the one it's defined with.
             | beam.WithKeys(None)  # pylint: disable=no-value-for-parameter
@@ -71,11 +75,15 @@ class PutResults(beam.PTransform):
             | beam.FlatMap(job_run_result.JobRunResult.accumulate)
             | beam.Map(
                 self.create_beam_job_run_result_model,
-                entities.pipeline.options.namespace)
+                results.pipeline.options.namespace)
             | ndb_io.PutModels()
         )
 
-    def create_beam_job_run_result_model(self, result, namespace):
+    def create_beam_job_run_result_model(
+            self,
+            result: job_run_result.JobRunResult,
+            namespace: Optional[str]
+    ) -> beam_job_models.BeamJobRunResultModel:
         """Returns an NDB model for storing the given JobRunResult.
 
         Args:

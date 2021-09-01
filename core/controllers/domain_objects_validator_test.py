@@ -21,7 +21,6 @@ from core.controllers import domain_objects_validator
 from core.tests import test_utils
 
 import utils
-from typing import Any, Dict # isort:skip
 
 
 class ValidateExplorationChangeTests(test_utils.GenericTestBase):
@@ -210,7 +209,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         domain_objects_validator.validate_state_dict(state_dict)
 
     def test_invalid_object_raises_exception(self) -> None:
-        invalid_state_dict: Dict[str, Any] = {
+        invalid_state_dict = {
             'classifier_model_id': None,
             'written_translations': {
                 'translations_mapping': {

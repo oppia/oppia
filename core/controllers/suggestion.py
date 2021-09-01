@@ -36,59 +36,6 @@ import python_utils
 import utils
 
 
-def _get_target_id_to_exploration_opportunity_dict(suggestions):
-    """Returns a dict of target_id to exploration opportunity summary dict.
-
-    Args:
-        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
-            opportunity dicts.
-
-    Returns:
-        dict. Dict mapping target_id to corresponding exploration opportunity
-        summary dict.
-    """
-    target_ids = set(s.target_id for s in suggestions)
-    opportunity_id_to_opportunity_dict = {
-        opp_id: (opp.to_dict() if opp is not None else None)
-        for opp_id, opp in (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                list(target_ids)).items())
-    }
-    return opportunity_id_to_opportunity_dict
-
-
-def _get_target_id_to_skill_opportunity_dict(suggestions):
-    """Returns a dict of target_id to skill opportunity summary dict.
-
-    Args:
-        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
-            opportunity dicts.
-
-    Returns:
-        dict. Dict mapping target_id to corresponding skill opportunity dict.
-    """
-    target_ids = set(s.target_id for s in suggestions)
-    opportunity_id_to_opportunity_dict = {
-        opp_id: (opp.to_dict() if opp is not None else None)
-        for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
-            list(target_ids)).items()
-    }
-    opportunity_id_to_skill = {
-        skill.id: skill
-        for skill in skill_fetchers.get_multi_skills([
-            opp['id']
-            for opp in opportunity_id_to_opportunity_dict.values()
-            if opp is not None])
-    }
-
-    for opp_id, skill in opportunity_id_to_skill.items():
-        if skill is not None:
-            opportunity_id_to_opportunity_dict[opp_id]['skill_rubrics'] = [
-                rubric.to_dict() for rubric in skill.rubrics]
-
-    return opportunity_id_to_opportunity_dict
-
-
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
@@ -125,43 +72,10 @@ class SuggestionHandler(base.BaseHandler):
             self.render_json(self.values)
             return
 
-        # TODO(#10513) : Find a way to save the images before the suggestion is
-        # created.
-        suggestion_image_context = suggestion.image_context
-
-        new_image_filenames = (
+        _upload_suggestion_images(
+            self.request,
+            suggestion,
             suggestion.get_new_image_filenames_added_in_suggestion())
-        for filename in new_image_filenames:
-            image = self.request.get(filename)
-            if not image:
-                logging.exception(
-                    'Image not provided for file with name %s when the '
-                    ' suggestion with target id %s was created.' % (
-                        filename, suggestion.target_id))
-                raise self.InvalidInputException(
-                    'No image data provided for file with name %s.'
-                    % (filename))
-            try:
-                file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        image, filename))
-            except utils.ValidationError as e:
-                raise self.InvalidInputException('%s' % (e))
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-            fs_services.save_original_and_compressed_versions_of_image(
-                filename, suggestion_image_context, suggestion.target_id,
-                image, 'image', image_is_compressible)
-
-        target_entity_html_list = suggestion.get_target_entity_html_strings()
-        target_image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(
-                target_entity_html_list))
-
-        fs_services.copy_images(
-            suggestion.target_type, suggestion.target_id,
-            suggestion_image_context, suggestion.target_id,
-            target_image_filenames)
 
         self.render_json(self.values)
 
@@ -442,7 +356,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
     """Handles update operations relating to question suggestions."""
 
     @acl_decorators.can_update_suggestion
-    def put(self, suggestion_id):
+    def post(self, suggestion_id):
         """Handles PUT requests.
 
         Raises:
@@ -478,12 +392,120 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
 
         question_state_data_obj = state_domain.State.from_dict(
             self.payload.get('question_state_data'))
-
         question_state_data_obj.validate(None, False)
 
-        suggestion_services.update_question_suggestion(
+        updated_suggestion = suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
             self.payload.get('question_state_data'))
 
+        new_image_filenames = (
+            utils.compute_list_difference(
+                updated_suggestion
+                    .get_new_image_filenames_added_in_suggestion(),
+                suggestion.get_new_image_filenames_added_in_suggestion()
+            )
+        )
+        _upload_suggestion_images(
+            self.request, updated_suggestion, new_image_filenames)
+
         self.render_json(self.values)
+
+
+def _get_target_id_to_exploration_opportunity_dict(suggestions):
+    """Returns a dict of target_id to exploration opportunity summary dict.
+
+    Args:
+        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
+            opportunity dicts.
+
+    Returns:
+        dict. Dict mapping target_id to corresponding exploration opportunity
+        summary dict.
+    """
+    target_ids = set(s.target_id for s in suggestions)
+    opportunity_id_to_opportunity_dict = {
+        opp_id: (opp.to_dict() if opp is not None else None)
+        for opp_id, opp in (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                list(target_ids)).items())
+    }
+    return opportunity_id_to_opportunity_dict
+
+
+def _get_target_id_to_skill_opportunity_dict(suggestions):
+    """Returns a dict of target_id to skill opportunity summary dict.
+
+    Args:
+        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
+            opportunity dicts.
+
+    Returns:
+        dict. Dict mapping target_id to corresponding skill opportunity dict.
+    """
+    target_ids = set(s.target_id for s in suggestions)
+    opportunity_id_to_opportunity_dict = {
+        opp_id: (opp.to_dict() if opp is not None else None)
+        for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
+            list(target_ids)).items()
+    }
+    opportunity_id_to_skill = {
+        skill.id: skill
+        for skill in skill_fetchers.get_multi_skills([
+            opp['id']
+            for opp in opportunity_id_to_opportunity_dict.values()
+            if opp is not None])
+    }
+
+    for opp_id, skill in opportunity_id_to_skill.items():
+        if skill is not None:
+            opportunity_id_to_opportunity_dict[opp_id]['skill_rubrics'] = [
+                rubric.to_dict() for rubric in skill.rubrics]
+
+    return opportunity_id_to_opportunity_dict
+
+
+def _upload_suggestion_images(request, suggestion, filenames):
+    """Saves a suggestion's images to storage.
+
+    Args:
+        request: webapp2.Request. Request object containing a mapping of image
+            filename to image blob.
+        suggestion: BaseSuggestion. The suggestion for which images are being
+            uploaded.
+        filenames: list(str). The image filenames.
+    """
+    suggestion_image_context = suggestion.image_context
+    # TODO(#10513) : Find a way to save the images before the suggestion is
+    # created.
+    for filename in filenames:
+        image = request.get(filename)
+        if not image:
+            logging.exception(
+                'Image not provided for file with name %s when the '
+                ' suggestion with target id %s was created.' % (
+                    filename, suggestion.target_id))
+            raise base.BaseHandler.InvalidInputException(
+                'No image data provided for file with name %s.'
+                % (filename))
+        try:
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    image, filename))
+        except utils.ValidationError as e:
+            raise base.BaseHandler.InvalidInputException('%s' % (e))
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            filename, suggestion_image_context, suggestion.target_id,
+            image, 'image', image_is_compressible)
+
+    target_entity_html_list = suggestion.get_target_entity_html_strings()
+    target_image_filenames = (
+        html_cleaner.get_image_filenames_from_html_strings(
+            target_entity_html_list))
+
+    fs_services.copy_images(
+        suggestion.target_type, suggestion.target_id,
+        suggestion_image_context, suggestion.target_id,
+        target_image_filenames)
