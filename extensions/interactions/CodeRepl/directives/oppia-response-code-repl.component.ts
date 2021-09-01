@@ -33,11 +33,11 @@ interface Dimension {
   templateUrl: './code-repl-response.component.html',
   styleUrls: []
 })
-// These properties are initialized using Angular lifecycle hooks
-// and we need to do non-null assertion, for more information see
-// https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue!: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   answer!: Dimension;
   errorFocusLabel!: string;
   constructor(
