@@ -119,7 +119,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
     def _get_skill_opportunities_with_corresponding_topic_name(self, cursor):
         """Returns a list of skill opportunities available for questions with
-        topic information.
+        a corresponding topic name.
 
         Args:
             cursor: str or None. If provided, the list of returned entities
@@ -161,6 +161,8 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                         skill_opportunity.id
                         in classroom_topic_skill_id_to_topic_name):
                     skill_opportunity_dict = skill_opportunity.to_dict()
+                    # Here we are tying each skill opportunity to one topic.
+                    # TODO(#8912): Display all linked topics.
                     skill_opportunity_dict['topic_name'] = (
                         classroom_topic_skill_id_to_topic_name[
                             skill_opportunity.id])
