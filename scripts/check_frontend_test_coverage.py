@@ -96,7 +96,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
     'tutor-card.directive.ts',
-    'unit-test-utils.ajs.ts', # Please don't try to cover this file.
+    # Please don't try to cover `unit-test-utils.ajs.ts` file.
+    'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
 ]
 
