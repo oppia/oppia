@@ -164,8 +164,7 @@ export default {
       "schema": {
         "type": "unicode",
         "validators": [{
-          "id": "has_length_at_least",
-          "min_value": 1
+          "id": "is_nonempty"
         }]
       },
       "default_value": "concept card"
