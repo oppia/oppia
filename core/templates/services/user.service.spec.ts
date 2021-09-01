@@ -86,7 +86,7 @@ describe('User Api Service', () => {
       preferred_site_language_code: null,
       username: 'tester',
       email: 'test@test.com',
-      user_is_logged_in: false
+      user_is_logged_in: true
     };
     const sampleUserInfo = UserInfo.createFromBackendDict(
       sampleUserInfoBackendObject);
