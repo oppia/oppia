@@ -145,7 +145,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         classroom_topic_skill_id_to_topic_name = {}
         for topic in classroom_topics:
-            if not topic:
+            if topic is None:
                 continue
             for skill_id in topic.get_all_skill_ids():
                 classroom_topic_skill_id_to_topic_name[skill_id] = topic.name
