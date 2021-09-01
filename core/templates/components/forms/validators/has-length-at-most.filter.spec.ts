@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Tests for Validator to check if input has length at
- * least args.
+ * most args.
  */
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
