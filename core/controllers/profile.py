@@ -264,7 +264,10 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
             }
         }
     }

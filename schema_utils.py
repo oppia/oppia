@@ -646,3 +646,34 @@ class _Validators(python_utils.OBJECT):
         if obj and (not obj.startswith('("') or not obj.endswith('")')):
             return False
         return True
+
+    @staticmethod
+    def is_valid_username_string(obj: str) -> bool:
+        """Checks if the given obj (a string) is a valid username string.
+
+        Args:
+            obj: str. The string to verify.
+
+        Returns:
+            bool. Whether the given object is a valid username string.
+        """
+
+        has_max_length = get_validator('has_length_at_most')
+
+        is_regex_matched = get_validator('is_regex_matched')
+
+        if not obj:
+            return False
+        elif not has_max_length(obj, constants.MAX_USERNAME_LENGTH):
+            return False
+        elif not is_regex_matched(obj, feconf.ALPHANUMERIC_REGEX):
+            return False
+        else:
+            # Disallow usernames that contain the system usernames or the
+            # strings "admin" or "oppia".
+            reserved_usernames = set(feconf.SYSTEM_USERS.values()) | set([
+                'admin', 'oppia'])
+            for reserved_username in reserved_usernames:
+                if reserved_username in obj.lower().strip():
+                    return False
+        return True
