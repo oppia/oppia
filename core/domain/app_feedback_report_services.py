@@ -539,7 +539,7 @@ def get_all_filter_options() -> List[
         list(AppFeedbackReportFilter). A list of filters and the possible values
         they can have.
     """
-    filter_list = list()
+    filter_list = []
     model_class = app_feedback_report_models.AppFeedbackReportModel
     for filter_field in constants.ALLOWED_FILTERS:
         filter_values = model_class.get_filter_options_for_field(filter_field)
