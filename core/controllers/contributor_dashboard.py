@@ -143,6 +143,9 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
             classroom_topic_ids.extend(classroom_dict['topic_ids'])
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
+        # Associate each skill with one classroom topic name.
+        # TODO(#8912): Associate each skill/skill opportunity with  all linked
+        # topics.
         classroom_topic_skill_id_to_topic_name = {}
         for topic in classroom_topics:
             if topic is None:
@@ -161,8 +164,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                         skill_opportunity.id
                         in classroom_topic_skill_id_to_topic_name):
                     skill_opportunity_dict = skill_opportunity.to_dict()
-                    # Here we are tying each skill opportunity to one topic.
-                    # TODO(#8912): Display all linked topics.
                     skill_opportunity_dict['topic_name'] = (
                         classroom_topic_skill_id_to_topic_name[
                             skill_opportunity.id])
