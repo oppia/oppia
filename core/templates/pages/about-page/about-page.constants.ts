@@ -309,7 +309,7 @@ export const AboutPageConstants = {
     'Pankaj Dahiya',
     'Parth Bhoiwala',
     'Parul Priyedarshani',
-    'patrycjapraczyk',
+    'Patrycja Praczyk',
     'Pawan Rai',
     'Pawel Borkar',
     'Phil Wagner',
