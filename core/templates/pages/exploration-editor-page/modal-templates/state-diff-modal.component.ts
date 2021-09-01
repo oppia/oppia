@@ -13,17 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for state diff modal.
+ * @fileoverview Component for state diff modal.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { State } from 'domain/state/StateObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
+import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
 
 @Component({
     selector: 'state-diff-modal',
@@ -32,11 +33,17 @@ import { ContextService } from 'services/context.service';
 export class StateDiffModalComponent 
  extends ConfirmOrCancelModal implements OnInit {
     headers: any;
-    yamlStrs: any;
-    newState: any;
-    oldState: any;
+    newState: State | null;
+    oldState: State | null;
     newStateName: string;
     oldStateName: string;
+    yamlStrs: {
+        leftPane: string;
+        rightPane: string;
+    } = {
+        leftPane: '',
+        rightPane: '',
+    };
     CODEMIRROR_MERGEVIEW_OPTIONS = {
         lineNumbers: true,
         readOnly: true,
@@ -48,29 +55,23 @@ export class StateDiffModalComponent
         private ngbActiveModal: NgbActiveModal,
         private contextService: ContextService,
         private urlInterpolationService: UrlInterpolationService,
-        private http: HttpClient
+        private stateDiffModalBackendApiService: StateDiffModalBackendApiService,
     ) {
         super(ngbActiveModal);
     }
 
     ngOnInit(): void {
-        var STATE_YAML_URL = this.urlInterpolationService.interpolateUrl(
+        const url = this.urlInterpolationService.interpolateUrl(
             '/createhandler/state_yaml/<exploration_id>', {
               exploration_id: (
                 this.contextService.getExplorationId())
             });
 
-        this.yamlStrs = {};
-
         if (this.oldState) {
-            this.http.post<any>(STATE_YAML_URL, {
-                state_dict: this.oldState.toBackendDict(),
-                width: 50
-            }).toPromise()
-            .then(function(response) {
-                console.log(response);
-                this.yamlStrs.leftPane = response.data.yaml;
-            });
+            this.stateDiffModalBackendApiService.fetchYaml(
+                this.oldState.toBackendDict(), 50, url).then(response => {
+                    this.yamlStrs.leftPane = response.data.yaml;   
+                })
         } else {
             // Note: the timeout is needed or the string will be sent
             // before codemirror has fully loaded and will not be
@@ -81,14 +82,10 @@ export class StateDiffModalComponent
         }
     
         if (this.newState) {
-            this.http.post<any>(STATE_YAML_URL, {
-                state_dict: this.newState.toBackendDict(),
-                width: 50
-            }).toPromise()
-            .then(function(response) {
-                console.log(response);
-                this.yamlStrs.rightPane = response.data.yaml;
-            });
+            this.stateDiffModalBackendApiService.fetchYaml(
+                this.newState.toBackendDict(), 50, url).then(response => {
+                    this.yamlStrs.rightPane = response.data.yaml;   
+                })
         } else {
             // Note: the timeout is needed or the string will be sent
             // before codemirror has fully loaded and will not be
@@ -97,8 +94,6 @@ export class StateDiffModalComponent
                 this.yamlStrs.rightPane = '';
             }, 200);
         }
-
-        console.log(this.yamlStrs);
     }
 }
 
