@@ -28,7 +28,7 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-      - use: ./.github/actions/send-webhook-notification
+      - uses: ./.github/actions/send-webhook-notification
         with:
           webhookUrl: ${{WEBHOOK_SECRET}}
           message: 'Test message from github-action build: ${{$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID}}'
