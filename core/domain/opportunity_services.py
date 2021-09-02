@@ -560,10 +560,9 @@ def get_skill_opportunities(cursor):
                 this batch. If False, there are no further results after
                 this batch.
     """
-    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel
-        .get_skill_opportunities(page_size, cursor))
+        .get_skill_opportunities(constants.OPPORTUNITIES_PAGE_SIZE, cursor))
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (
