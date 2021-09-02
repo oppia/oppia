@@ -41,6 +41,7 @@ class MockWindowRef {
       },
       replace: (val: string) => {}
     },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
