@@ -33,7 +33,7 @@ import apache_beam as beam
 from typing import Dict, Iterable, List, Tuple, Union, cast # isort:skip
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import recommendations_models
@@ -55,30 +55,6 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
 
     MAX_BATCH_SIZE = 1000
 
-    @staticmethod
-    def _index_exploration_summaries(
-            exp_summary_models: List[datastore_services.Model]
-    ) -> job_run_result.JobRunResult:
-        """Index exploration summaries and catch any errors.
-
-        Args:
-            exp_summary_models: list(Model). Models to index.
-
-        Returns:
-            list(str). List containing one element, which is either SUCCESS,
-            or FAILURE.
-        """
-        try:
-            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
-                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            return job_run_result.JobRunResult(
-                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
-            )
-        except platform_search_services.SearchException: # type: ignore[attr-defined]
-            return job_run_result.JobRunResult(
-                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
-            )
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         the Elastic Search.
@@ -93,9 +69,36 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExpSummaryModel.get_all())) # type: ignore[no-untyped-call]
             | 'Split models into batches' >> beam.transforms.util.BatchElements(
                 max_batch_size=self.MAX_BATCH_SIZE)
-            | 'Index batches of models' >> beam.Map(
-                self._index_exploration_summaries)
+            | 'Index batches of models' >> beam.ParDo(
+                IndexExplorationSummaries())
         )
+
+
+class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
+    """DoFn to to index exploration summaries."""
+
+    def process(
+            self, exp_summary_models: List[datastore_services.Model]
+    ) -> Iterable[job_run_result.JobRunResult]:
+        """Index exploration summaries and catch any errors.
+
+        Args:
+            exp_summary_models: list(Model). Models to index.
+
+        Yields:
+            list(str). List containing one element, which is either SUCCESS,
+            or FAILURE.
+        """
+        try:
+            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
+                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
+            yield job_run_result.JobRunResult(
+                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
+            )
+        except platform_search_services.SearchException: # type: ignore[attr-defined]
+            yield job_run_result.JobRunResult(
+                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
+            )
 
 
 class ComputeExplorationRecommendations(base_jobs.JobBase):
