@@ -77,9 +77,9 @@ describe('Multi Selection Field Component', () => {
 
   it('should validate input', () => {
     componentInstance.selections = [];
-    componentInstance.onlyAllowLowercase = true;
+    componentInstance.allowLowercaseOnly = true;
     expect(componentInstance.validateInput('SELECTION 1')).toBeFalse();
-    componentInstance.onlyAllowLowercase = false;
+    componentInstance.allowLowercaseOnly = false;
     expect(componentInstance.validateInput('SELECTION 1')).toBeTrue();
     expect(componentInstance.validateInput('selection 1')).toBeTrue();
   });

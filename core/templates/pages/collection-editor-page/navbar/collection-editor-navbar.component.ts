@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import { CollectionValidationService } from 'domain/collection/collection-valida
 import { Collection } from 'domain/collection/collection.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
@@ -39,7 +38,7 @@ import { CollectionEditorSaveModalComponent } from '../modals/collection-editor-
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();
   collectionRights: CollectionRights;
-  validationIssues;
+  validationIssues: string[];
   collection: Collection;
   collectionId: string;
   editButtonHovering: boolean = false;
@@ -47,7 +46,6 @@ export class CollectionEditorNavbarComponent {
 
   constructor(
     private ngbModal: NgbModal,
-    private alertsService: AlertsService,
     private collectionEditorRoutingService: CollectionEditorRoutingService,
     private collectionEditorStateService: CollectionEditorStateService,
     private collectionRightsBackendApiService:
@@ -59,14 +57,13 @@ export class CollectionEditorNavbarComponent {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.directiveSubscriptions.add(
-        this.collectionEditorStateService.onCollectionInitialized.subscribe(
-          () => this._validateCollection()
-        )
-      ));
+      this.collectionEditorStateService.onCollectionInitialized.subscribe(
+        () => this._validateCollection()
+      )
+    );
 
     this.directiveSubscriptions.add(
-      this.undoRedoService.onUndoRedoChangeApplied$().subscribe(
+      this.undoRedoService.undoRedoChangeEventEmitter.subscribe(
         () => this._validateCollection()
       )
     );
@@ -95,7 +92,7 @@ export class CollectionEditorNavbarComponent {
     }
   }
 
-  private _publishCollection(): void {
+  private _makeCollectionPublic(): void {
     // TODO(bhenning): This also needs a confirmation of destructive
     // action since it is not reversible.
     this.collectionRightsBackendApiService.setCollectionPublicAsync(
@@ -161,10 +158,10 @@ export class CollectionEditorNavbarComponent {
       modalRef.result.then((metadataList) => {
         let commitMessage = ('Add metadata: ' + metadataList.join(', ') + '.');
         this.collectionEditorStateService.saveCollection(
-          commitMessage, this._publishCollection.bind(this));
+          commitMessage, this._makeCollectionPublic.bind(this));
       }, () => {});
     } else {
-      this._publishCollection();
+      this._makeCollectionPublic();
     }
   }
 

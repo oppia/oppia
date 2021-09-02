@@ -16,7 +16,7 @@
  * @fileoverview Primary component for the collection editor page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
@@ -28,7 +28,7 @@ import { CollectionEditorStateService } from './services/collection-editor-state
   selector: 'oppia-collection-editor-page',
   templateUrl: './collection-editor-page.component.html'
 })
-export class CollectionEditorPageComponent {
+export class CollectionEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   constructor(

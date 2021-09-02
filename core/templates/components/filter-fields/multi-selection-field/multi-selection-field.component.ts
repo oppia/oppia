@@ -38,7 +38,7 @@ export class MultiSelectionFieldComponent {
   @Input() removable = true;
   @Input() separatorKeysCodes: number[] = [ENTER];
   @Input() validationErrorMessage = '';
-  @Input() onlyAllowLowercase: boolean = false;
+  @Input() allowLowercaseOnly: boolean = false;
 
   formCtrl = new FormControl();
   filteredSelections: Observable<string[] | string[]>;
@@ -70,7 +70,7 @@ export class MultiSelectionFieldComponent {
   }
 
   validateInput(value: string): boolean {
-    if (this.onlyAllowLowercase) {
+    if (this.allowLowercaseOnly) {
       if (value.toLowerCase() !== value) {
         return false;
       }
