@@ -283,8 +283,6 @@ describe('URL Interpolation Service', () => {
       '/build/assets/videos/hash_test.' + hashes['/videos/hash_test.mp4'] +
         '.mp4');
 
-    expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
-      '/build/extensions/interactions/LogicProof/static/LogicProof.png');
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
       '/build/extensions/interactions/interTest/static/interTest.' +
         hashes['/interactions/interTest/static/interTest.png'] + '.png');
