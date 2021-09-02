@@ -5681,7 +5681,7 @@ export default {
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
   // A regular expression for allowed characters for thumbnail filename.
-  "VALID_THUMBNAIL_FILENAME":"^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
+  "VALID_THUMBNAIL_FILENAME": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
 
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
