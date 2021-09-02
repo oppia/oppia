@@ -249,10 +249,10 @@ describe('Change List Service when changes are mergable', () => {
       'content', 'ar', 'Introduction');
 
     expect(changeListService.getChangeList()[0]).toEqual({
-      'cmd': 'mark_written_translation_as_needing_update',
-      'content_id': 'content',
-      'language_code': 'ar',
-      'state_name': 'Introduction'
+      cmd: 'mark_written_translation_as_needing_update',
+      content_id: 'content',
+      language_code: 'ar',
+      state_name: 'Introduction'
     });
   });
 });

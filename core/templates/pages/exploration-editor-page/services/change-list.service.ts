@@ -320,10 +320,7 @@ export class ChangeListService {
    * @param {string} stateName - The current state name.
    */
   markTranslationAsNeedingUpdate(
-    contentId: string,
-    languageCode: string,
-    stateName: string
-  ): void {
+      contentId: string, languageCode: string, stateName: string): void {
     this.addChange({
       cmd: 'mark_written_translation_as_needing_update',
       content_id: contentId,
