@@ -165,7 +165,7 @@ describe('topicEditorNavbar', () => {
   it('should validate topic when user undo or redo changes', () => {
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOn(UndoRedoService, 'undoRedoChangeEventEmitter').and
+    spyOnProperty(UndoRedoService, 'undoRedoChangeEventEmitter').and
       .returnValue(undoRedoChangeAppliedEventEmitter);
     spyOn(TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(
       false);
