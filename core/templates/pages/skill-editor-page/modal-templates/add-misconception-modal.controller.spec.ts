@@ -117,6 +117,8 @@ describe('Add Misconception Modal Controller', function() {
     $scope.misconceptionNotes = 'unique notes';
     $scope.misconceptionFeedback = 'unique feedback';
     $scope.misconceptionMustBeAddressed = true;
+    $scope.checkIfMisconceptionNameIsDuplicate();
+    $scope.saveMisconception();
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 });
