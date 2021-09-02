@@ -41,6 +41,16 @@ import utils
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
