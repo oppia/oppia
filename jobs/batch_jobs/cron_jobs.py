@@ -124,7 +124,7 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
         exp_recommendations_models = (
             exp_summary_models
             | 'Compute similarity' >> beam.ParDo(
-                self._compute_similarity, exp_summary_iter)
+                ComputeSimilarity(), exp_summary_iter)
             | 'Group similarities per exploration ID' >> beam.GroupByKey()
             | 'Sort and slice similarities' >> beam.MapTuple(
                 lambda exp_id, similarities: (
@@ -147,50 +147,6 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
                 lambda x: job_run_result.JobRunResult(
                     stdout='SUCCESS %s' % x))
         )
-
-    @staticmethod
-    def _compute_similarity(
-            ref_exp_summary_model: datastore_services.Model,
-            compared_exp_summary_models: Iterable[datastore_services.Model]
-    ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
-        """Compute similarities between exploraitons.
-
-        Args:
-            ref_exp_summary_model: ExpSummaryModel. Reference exploration
-                summary. We are trying to find explorations similar to this
-                reference summary.
-            compared_exp_summary_models: list(ExpSummaryModel). List of other
-                explorations summaries against which we compare the reference
-                summary.
-
-        Yields:
-            (str, dict(str, str|float)). Tuple, the first element is
-            the exploration ID of the reference exploration summary.
-            The second is a dictionary. The structure of the dictionary is:
-                exp_id: str. The ID of the similar exploration.
-                similarity_score: float. The similarity score for
-                    the exploration.
-        """
-        ref_exp_summary_model = cast(
-            exp_models.ExpSummaryModel, ref_exp_summary_model)
-        with datastore_services.get_ndb_context():
-            for compared_exp_summary_model in compared_exp_summary_models:
-                compared_exp_summary_model = cast(
-                    exp_models.ExpSummaryModel,
-                    compared_exp_summary_model
-                )
-                if compared_exp_summary_model.id == ref_exp_summary_model.id:
-                    continue
-                similarity_score = recommendations_services.get_item_similarity( # type: ignore[no-untyped-call]
-                    ref_exp_summary_model, compared_exp_summary_model
-                )
-                if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
-                    yield (
-                        ref_exp_summary_model.id, {
-                            'similarity_score': similarity_score,
-                            'exp_id': compared_exp_summary_model.id
-                        }
-                    )
 
     @staticmethod
     def _sort_and_slice_similarities(
@@ -236,3 +192,51 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
                     id=exp_id, recommended_exploration_ids=recommended_exp_ids))
         exp_recommendation_model.update_timestamps()
         return exp_recommendation_model
+
+
+class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
+    """DoFn to compute similarities between exploration."""
+
+    def process(
+        self,
+        ref_exp_summary_model: datastore_services.Model,
+        compared_exp_summary_models: Iterable[datastore_services.Model]
+    ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
+        """Compute similarities between exploraitons.
+
+        Args:
+            ref_exp_summary_model: ExpSummaryModel. Reference exploration
+                summary. We are trying to find explorations similar to this
+                reference summary.
+            compared_exp_summary_models: list(ExpSummaryModel). List of other
+                explorations summaries against which we compare the reference
+                summary.
+
+        Yields:
+            (str, dict(str, str|float)). Tuple, the first element is
+            the exploration ID of the reference exploration summary.
+            The second is a dictionary. The structure of the dictionary is:
+                exp_id: str. The ID of the similar exploration.
+                similarity_score: float. The similarity score for
+                    the exploration.
+        """
+        ref_exp_summary_model = cast(
+            exp_models.ExpSummaryModel, ref_exp_summary_model)
+        with datastore_services.get_ndb_context():
+            for compared_exp_summary_model in compared_exp_summary_models:
+                compared_exp_summary_model = cast(
+                    exp_models.ExpSummaryModel,
+                    compared_exp_summary_model
+                )
+                if compared_exp_summary_model.id == ref_exp_summary_model.id:
+                    continue
+                similarity_score = recommendations_services.get_item_similarity( # type: ignore[no-untyped-call]
+                    ref_exp_summary_model, compared_exp_summary_model
+                )
+                if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
+                    yield (
+                        ref_exp_summary_model.id, {
+                            'similarity_score': similarity_score,
+                            'exp_id': compared_exp_summary_model.id
+                        }
+                    )
