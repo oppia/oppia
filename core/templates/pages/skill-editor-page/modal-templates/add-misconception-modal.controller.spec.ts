@@ -43,14 +43,14 @@ describe('Add Misconception Modal Controller', function() {
       '$uibModalInstance', ['close', 'dismiss']);
     var misconceptionDict1 = {
       id: '2',
-      name: 'test name',
+      name: 'test name 2',
       notes: 'test notes',
       feedback: 'test feedback',
       must_be_addressed: true
     };
     var misconceptionDict2 = {
       id: '3',
-      name: 'test name',
+      name: 'test name 3',
       notes: 'test notes',
       feedback: 'test feedback',
       must_be_addressed: true
@@ -97,6 +97,8 @@ describe('Add Misconception Modal Controller', function() {
       expect($scope.misconceptionNotes).toBe('');
       expect($scope.misconceptionFeedback).toBe('');
       expect($scope.misconceptionMustBeAddressed).toBe(true);
+      expect($scope.misconceptionNameIsDuplicate).toBe(false);
+      expect($scope.existingMisconceptionNames).toBe(['test name 2', 'test name 3']);
     });
 
   it('should save misconception when closing the modal', function() {
@@ -105,5 +107,14 @@ describe('Add Misconception Modal Controller', function() {
       misconception: MisconceptionObjectFactory.create(
         '3', '', '', '', true)
     });
+  });
+
+  it('should not allow a misconception with a duplicate name', function() {
+    // 'test name 2' is a duplicate name from a previous misconception
+    $scope.misconceptionName = 'test name 2';
+    $scope.misconceptionNotes = 'unique notes';
+    $scope.misconceptionFeedback = 'unique feedback';
+    $scope.misconceptionMustBeAddressed = true;
+    expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 });

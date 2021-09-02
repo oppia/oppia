@@ -62,6 +62,7 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.misconceptionNameIsDuplicate = false;
 
     $scope.saveMisconception = function() {
+      if ($scope.misconceptionNameIsDuplicate) return;
       var newMisconceptionId = $scope.skill.getNextMisconceptionId();
       $uibModalInstance.close({
         misconception: MisconceptionObjectFactory.create(
@@ -77,6 +78,6 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
       $scope.misconceptionNameIsDuplicate = (
         $scope.existingMisconceptionNames.includes($scope.misconceptionName)
       );
-    }
+    };
   }
 ]);
