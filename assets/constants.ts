@@ -19,6 +19,7 @@
 
 export default {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   // The term 'staging' is used instead of the classroom url fragment field
@@ -5458,7 +5459,6 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
-      "LogicProof",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",
@@ -5667,8 +5667,6 @@ export default {
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
-
-  "BEAM_JOBS_ARE_ENABLED": false,
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5935,18 +5933,6 @@ export default {
       "backend_id": "created_collection",
       "backend_attr": "created_collection",
       "description": "Has created collection",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
       "schema": {
         "type": "bool",
         "validators": [{
