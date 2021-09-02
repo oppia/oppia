@@ -71,36 +71,11 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
         )
 
 
-class IndexExplorationsInSearch(base_jobs.JobBase):
-    """Job that indexes the explorations in Elastic Search."""
-
-    MAX_BATCH_SIZE = 1000
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        the Elastic Search.
-
-        Returns:
-            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            the Elastic Search.
-        """
-        return (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
-            | 'Split models into batches' >> beam.transforms.util.BatchElements(
-                max_batch_size=self.MAX_BATCH_SIZE)
-            | 'Index batches of models' >> beam.ParDo(
-                IndexExplorationSummaries())
-        )
-
-
 class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
-    """DoFn to to index exploration summaries."""
+    """DoFn to index exploration summaries."""
 
     def process(
-            self, exp_summary_models: List[datastore_services.Model]
+        self, exp_summary_models: List[datastore_services.Model]
     ) -> Iterable[job_run_result.JobRunResult]:
         """Index exploration summaries and catch any errors.
 
@@ -108,7 +83,7 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
             exp_summary_models: list(Model). Models to index.
 
         Yields:
-            list(str). List containing one element, which is either SUCCESS,
+            iterable(str). List containing one element, which is either SUCCESS,
             or FAILURE.
         """
         try:
@@ -156,21 +131,21 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
             | 'Filter pairs of models' >> beam.Filter(
                 lambda models: (
                     len(list(models)) == 1 and
-                    isinstance(models[0], user_models.UserSettingsModel)
+                    isinstance(list(models)[0], user_models.UserSettingsModel)
                 ))
             # Choosing the first element.
             | 'Transform tuples into models' >> beam.Map(
                 lambda models: list(models)[0])
             # Creates the missing UserStatsModels.
-            | 'Create new user stat models' >> beam.Map(
-                self._create_user_stats_model)
+            | 'Create new user stat models' >> beam.ParDo(
+                CreateUserStatsModel())
         )
 
         unused_put_result = (
             (new_user_stats_models, old_user_stats_models)
             | 'Merge new and old models together' >> beam.Flatten()
-            | 'Update the dashboard stats' >> (
-                beam.Map(self._update_weekly_creator_stats))
+            | 'Update the dashboard stats' >> beam.ParDo(
+                UpdateWeeklyCreatorStats())
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
@@ -200,41 +175,47 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
             | 'Merge new and old results together' >> beam.Flatten()
         )
 
-    @staticmethod
-    def _create_user_stats_model(
-            user_settings_model: user_models.UserSettingsModel
-    ) -> user_models.UserStatsModel:
+
+class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
+    """DoFn to create empty user stats model."""
+
+    def process(
+        self, user_settings_model: user_models.UserSettingsModel
+    ) -> Iterable[user_models.UserStatsModel]:
         """Creates empty user stats model with id.
 
         Args:
             user_settings_model: UserSettingsModel. Model from which to
                 create the user stats model.
 
-        Returns:
-            UserStatsModel. The created user stats model.
+        Yields:
+            iterable(UserStatsModel). The created user stats model.
         """
         with datastore_services.get_ndb_context():
             user_stats_model = (
                 user_models.UserStatsModel(id=user_settings_model.id))
         user_stats_model.update_timestamps()
-        return user_stats_model
+        yield user_stats_model
 
-    @staticmethod
-    def _update_weekly_creator_stats(
-            user_stats_models: user_models.UserStatsModel
-    ) -> user_models.UserStatsModel:
+
+class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
+    """DoFn to update weekly dashboard stats in the user stats model."""
+
+    def process(
+        self, user_stats_model: user_models.UserStatsModel
+    ) -> Iterable[user_models.UserStatsModel]:
         """Updates weekly dashboard stats with the current values.
 
         Args:
-            user_stats_models: UserStatsModel. Model for which to update
+            user_stats_model: UserStatsModel. Model for which to update
                 the weekly dashboard stats.
 
-        Returns:
+        Yields:
             UserStatsModel. The updated user stats model.
         """
         model = cast(
             user_models.UserStatsModel,
-            job_utils.clone_model(user_stats_models) # type: ignore[no-untyped-call]
+            job_utils.clone_model(user_stats_model) # type: ignore[no-untyped-call]
         )
         schema_version = model.schema_version
 
@@ -250,4 +231,4 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
         }
         model.weekly_creator_stats_list.append(weekly_creator_stats)
         model.update_timestamps()
-        return model
+        yield model
