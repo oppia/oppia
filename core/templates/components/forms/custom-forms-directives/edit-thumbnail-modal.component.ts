@@ -135,7 +135,7 @@ export class EditThumbnailModalComponent implements OnInit {
     const VALID_THUMBNAIL_FILENAME = new RegExp(
       constants.VALID_THUMBNAIL_FILENAME);
     if (this.isUploadedImageSvg()) {
-      if(VALID_THUMBNAIL_FILENAME.test( file.name )) {
+      if (VALID_THUMBNAIL_FILENAME.test(file.name)) {
         this.setUploadedFile(file);
       } else {
         this.reset();
