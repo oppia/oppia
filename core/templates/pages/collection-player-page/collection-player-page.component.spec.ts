@@ -43,8 +43,6 @@ describe('Collection player page component', () => {
   let userService: UserService;
   let urlService: UrlService;
   let urlInterpolationService: UrlInterpolationService;
-
-  // Let $anchorScroll = jasmine.createSpy('anchorScroll');
   let alertsSpy: jasmine.Spy<(warning: string) => void>;
   let sampleCollection: Collection;
   let sampleCollectionBackendObject: CollectionBackendDict;
@@ -177,50 +175,6 @@ describe('Collection player page component', () => {
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
   });
 
-  // It('should set properties when initialized', fakeAsync(() => {
-  //   spyOn(userService, 'getUserInfoAsync')
-  //     .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-  //   spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-  //     .and.resolveTo(sampleCollection);
-  //   spyOn(guestCollectionProgressService, 'hasCompletedSomeExploration')
-  //     .and.returnValue(true);
-  //   spyOn(document, 'addEventListener').and.callFake(
-  //   (eventName, handler) => {
-  //     setTimeout(() =>{
-  //       component.explorationCardIsShown = true;
-  //       handler();
-  //     });
-  //   });
-  //   $httpBackend.expect('GET', '/collection_handler/data/collectionId')
-  //     .respond({
-  //       data: {
-  //         meta_name: 'meta_name',
-  //         meta_description: 'meta_description'
-  //       }
-  //     });
-  //   $httpBackend.expect(
-  //     'GET', '/collectionsummarieshandler/data' +
-  //     '?stringified_collection_ids=' +
-  //     encodeURI(JSON.stringify(['collectionId']))).respond({
-  //     data: {
-  //       summaries: []
-  //     }
-  //   });
-
-  //   component.ngOnInit();
-  //   $httpBackend.flush();
-  //   tick();
-
-  //   expect(component.MIN_HEIGHT_FOR_PATH_SVG_PX).toBe(220);
-  //   expect(component.ODD_SVG_HEIGHT_OFFSET_PX).toBe(150);
-  //   expect(component.ICON_Y_INITIAL_PX).toBe(35);
-  //   expect(component.ICON_Y_INCREMENT_PX).toBe(110);
-  //   expect(component.ICON_X_MIDDLE_PX).toBe(225);
-  //   expect(component.ICON_X_LEFT_PX).toBe(55);
-  //   expect(component.ICON_X_RIGHT_PX).toBe(395);
-  //   expect(component.collection).toEqual(sampleCollection);
-  // }));
-
   it('should throw warning message when an invalid collection ' +
     'is fetched from backend', fakeAsync(() => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
@@ -234,40 +188,6 @@ describe('Collection player page component', () => {
     expect(alertsSpy).toHaveBeenCalledWith(
       'There was an error loading the collection.');
   }));
-
-  // It('should throw warning message when an invalid collection summary ' +
-  //   'is fetched from the backend', fakeAsync(() => {
-  //   component.collection = sampleCollection;
-  //   spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-  //     .and.resolveTo(sampleCollection);
-  //   spyOn(userService, 'getUserInfoAsync')
-  //     .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-  //   $httpBackend.expect('GET', '/collection_handler/data/collectionId')
-  //     .respond({
-  //       data: {
-  //         meta_name: 'meta_name',
-  //         meta_description: 'meta_description'
-  //       }
-  //     });
-  //   $httpBackend.expect(
-  //     'GET', '/collectionsummarieshandler/data' +
-  //     '?stringified_collection_ids=' +
-  //     encodeURI(JSON.stringify(['collectionId']))).respond(500);
-
-  //   component.ngOnInit();
-  //   $httpBackend.flush();
-  //   tick();
-
-  //   expect(alertsSpy).toHaveBeenCalledWith(
-  //     'There was an error while fetching the collection summary.');
-  // }));
-
-  // it('should scroll to the given location when calling ' +
-  //   '\scrollToLocation\'', () => {
-  //   component.scrollToLocation('location');
-
-  //   expect($anchorScroll).toHaveBeenCalled();
-  // });
 
   it('should stop event propagation when click event is emitted', () => {
     let eventSpy = jasmine.createSpyObj(
@@ -335,26 +255,6 @@ describe('Collection player page component', () => {
 
     expect(result).toEqual(false);
   }));
-
-  // It('should trigger \'$watch\' when collection is ' +
-  //   'updated', fakeAsync(() => {
-  //   let $watchSpy = spyOn($scope, '$watch').and.callThrough();
-  //   sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
-  //   sampleCollection = Collection.create(
-  //     sampleCollectionBackendObject);
-  //   spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-  //     .and.resolveTo(sampleCollection);
-  //   spyOn(userService, 'getUserInfoAsync')
-  //     .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-
-  //   // Loading collections.
-  //   component.ngOnInit();
-  //   tick();
-
-  //   component.collection = sampleCollection;
-  //   $scope.$digest();
-  //   expect($watchSpy).toHaveBeenCalled();
-  // }));
 
   it('should generate empty path parameters when collection ' +
     'node count is one', fakeAsync(() => {
@@ -540,6 +440,6 @@ describe('Collection player page component', () => {
     tick();
 
     let result = component.getNonRecommendedCollectionNodeCount();
-    expect(result).toEqual(5);
+    expect(result).toEqual(4);
   }));
 });

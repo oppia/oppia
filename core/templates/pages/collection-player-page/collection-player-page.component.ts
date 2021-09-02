@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner's view of a collection.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -33,18 +33,6 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-
-// Angular.module('oppia').animation(
-//   '.oppia-collection-animate-slide', function() {
-//     return {
-//       enter: function(element) {
-//         element.hide().slideDown();
-//       },
-//       leave: function(element) {
-//         element.slideUp();
-//       }
-//     };
-//   });
 
 export interface IconParametersArray {
   thumbnailIconUrl: string
@@ -80,7 +68,7 @@ export interface CollectionHandler {
   selector: 'oppia-collection-player-page',
   templateUrl: './collection-player-page.component.html'
 })
-export class CollectionPlayerPageComponent implements OnInit {
+export class CollectionPlayerPageComponent implements OnInit, OnChanges {
   activeHighlightedIconIndex!: number;
   collection!: Collection;
   collectionPlaythrough;
@@ -310,14 +298,17 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.collection &&
+      changes.collection.currentValue !== null &&
+      this.collection.getCollectionNodeCount()
+    ) {
+      this.generatePathParameters();
+    }
+  }
+
   ngOnInit(): void {
-    // $scope.$watch('$ctrl.collection', function(newValue) {
-    //   if (
-    //     newValue !== null &&
-    //     ctrl.collection.getCollectionNodeCount()) {
-    //     ctrl.generatePathParameters();
-    //   }
-    // }, true);
     this.loaderService.showLoadingScreen('Loading');
     this.collection = null;
     this.collectionId = this.urlService.getCollectionIdFromUrl();
@@ -339,7 +330,9 @@ export class CollectionPlayerPageComponent implements OnInit {
     this.nextExplorationId = null;
     this.whitelistedCollectionIdsForGuestProgress = (
       AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
-    // $anchorScroll.yOffset = -80;
+    setTimeout(() => {
+      this.windowRef.nativeWindow.scrollTo(0, -80);
+    }, 5);
 
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', () => {
