@@ -98,7 +98,7 @@ describe('Add Misconception Modal Controller', function() {
       expect($scope.misconceptionFeedback).toBe('');
       expect($scope.misconceptionMustBeAddressed).toBe(true);
       expect($scope.misconceptionNameIsDuplicate).toBe(false);
-      expect($scope.existingMisconceptionNames).toBe(
+      expect($scope.existingMisconceptionNames).toEqual(
         ['test name 2', 'test name 3']
       );
     });
