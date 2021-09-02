@@ -17,7 +17,6 @@
  */
 
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
@@ -28,7 +27,7 @@ import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
+import { TopicsAndSkillsDashboardPageConstants } from '../topics-and-skills-dashboard-page.constants';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',
@@ -42,7 +41,7 @@ export class CreateNewSkillModalComponent {
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
-  isEditorShown = {conceptCardExplanationEditorIsShown: false};
+  conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
   HTML_SCHEMA: {type: string} = { type: 'html' };
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
@@ -71,10 +70,7 @@ export class CreateNewSkillModalComponent {
   }
 
   openConceptCardExplanationEditor(): void {
-    if (this.isEditorShown.conceptCardExplanationEditorIsShown !== true) {
-      this.isEditorShown.conceptCardExplanationEditorIsShown = true;
-      this.changeDetectorRef.detectChanges();
-    }
+    this.conceptCardExplanationEditorIsShown = true;
   }
 
   getHtmlSchema(): { type: string } {
@@ -151,6 +147,3 @@ export class CreateNewSkillModalComponent {
     this.ngbActiveModal.dismiss('cancel');
   }
 }
-
-angular.module('oppia').directive('oppiaCreateNewSkillModalComponent',
-  downgradeComponent({ component: CreateNewSkillModalComponent }));
