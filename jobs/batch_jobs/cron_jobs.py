@@ -40,6 +40,31 @@ if MYPY: # pragma: no cover
 platform_search_services = models.Registry.import_search_services()
 
 
+class IndexExplorationsInSearch(base_jobs.JobBase):
+    """Job that indexes the explorations in Elastic Search."""
+
+    MAX_BATCH_SIZE = 1000
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        the Elastic Search.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            the Elastic Search.
+        """
+        return (
+            self.pipeline
+            | 'Get all non-deleted models' >> (
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
+                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
+            | 'Split models into batches' >> beam.transforms.util.BatchElements(
+                max_batch_size=self.MAX_BATCH_SIZE)
+            | 'Index batches of models' >> beam.ParDo(
+                IndexExplorationSummaries())
+        )
+
+
 class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
     """DoFn to to index exploration summaries."""
 
@@ -65,28 +90,3 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
             yield job_run_result.JobRunResult(
                 stderr='FAILURE %s models not indexed' % len(exp_summary_models)
             )
-
-
-class IndexExplorationsInSearch(base_jobs.JobBase):
-    """Job that indexes the explorations in Elastic Search."""
-
-    MAX_BATCH_SIZE = 1000
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        the Elastic Search.
-
-        Returns:
-            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            the Elastic Search.
-        """
-        return (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels( # type: ignore[no-untyped-call]
-                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
-            | 'Split models into batches' >> beam.transforms.util.BatchElements(
-                max_batch_size=self.MAX_BATCH_SIZE)
-            | 'Index batches of models' >> beam.ParDo(
-                IndexExplorationSummaries())
-        )
