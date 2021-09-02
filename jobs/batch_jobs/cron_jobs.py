@@ -46,31 +46,29 @@ datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()
 
 
-class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
-    """DoFn to to index exploration summaries."""
+class IndexExplorationsInSearch(base_jobs.JobBase):
+    """Job that indexes the explorations in Elastic Search."""
 
-    def process(
-            self, exp_summary_models: List[datastore_services.Model]
-    ) -> Iterable[job_run_result.JobRunResult]:
-        """Index exploration summaries and catch any errors.
+    MAX_BATCH_SIZE = 1000
 
-        Args:
-            exp_summary_models: list(Model). Models to index.
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        the Elastic Search.
 
-        Yields:
-            list(str). List containing one element, which is either SUCCESS,
-            or FAILURE.
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            the Elastic Search.
         """
-        try:
-            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
-                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            yield job_run_result.JobRunResult(
-                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
-            )
-        except platform_search_services.SearchException: # type: ignore[attr-defined]
-            yield job_run_result.JobRunResult(
-                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
-            )
+        return (
+            self.pipeline
+            | 'Get all non-deleted models' >> (
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
+                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
+            | 'Split models into batches' >> beam.transforms.util.BatchElements(
+                max_batch_size=self.MAX_BATCH_SIZE)
+            | 'Index batches of models' >> beam.ParDo(
+                IndexExplorationSummaries())
+        )
 
 
 class IndexExplorationsInSearch(base_jobs.JobBase):
@@ -96,6 +94,33 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
             | 'Index batches of models' >> beam.ParDo(
                 IndexExplorationSummaries())
         )
+
+
+class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
+    """DoFn to to index exploration summaries."""
+
+    def process(
+            self, exp_summary_models: List[datastore_services.Model]
+    ) -> Iterable[job_run_result.JobRunResult]:
+        """Index exploration summaries and catch any errors.
+
+        Args:
+            exp_summary_models: list(Model). Models to index.
+
+        Yields:
+            list(str). List containing one element, which is either SUCCESS,
+            or FAILURE.
+        """
+        try:
+            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
+                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
+            yield job_run_result.JobRunResult(
+                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
+            )
+        except platform_search_services.SearchException: # type: ignore[attr-defined]
+            yield job_run_result.JobRunResult(
+                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
+            )
 
 
 class CollectWeeklyDashboardStats(base_jobs.JobBase):
