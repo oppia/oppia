@@ -15,3 +15,120 @@
 /**
  * @fileoverview Unit Tests for CollectionPlayerBackendApiService.
  */
+
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
+import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
+import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
+import { CollectionPlayerBackendApiService } from './collection-player-backend-api.service';
+
+describe('Collection Player Backend Api Service', () => {
+  let cpbas: CollectionPlayerBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let sampleCollection: Collection;
+  let sampleCollectionBackendObject: CollectionBackendDict;
+  let collectionNodeBackendObject: CollectionNodeBackendDict;
+  let readOnlyCollectionBackendApiService:
+    ReadOnlyCollectionBackendApiService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    cpbas = TestBed.inject(CollectionPlayerBackendApiService);
+
+    collectionNodeBackendObject = {
+      exploration_id: 'exp_id',
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }
+    };
+
+    sampleCollectionBackendObject = {
+      id: 'collectionId',
+      title: 'title',
+      objective: 'objective',
+      category: 'category',
+      version: 1,
+      nodes: [
+        collectionNodeBackendObject,
+        collectionNodeBackendObject,
+        collectionNodeBackendObject,
+        collectionNodeBackendObject,
+        collectionNodeBackendObject,
+        collectionNodeBackendObject
+      ],
+      language_code: null,
+      schema_version: null,
+      tags: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      }
+    };
+
+    sampleCollection = Collection.create(sampleCollectionBackendObject);
+    sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
+    sampleCollection = Collection.create(
+      sampleCollectionBackendObject);
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should return response for collection summary', fakeAsync(() => {
+    let requestUrl = '/collectionsummarieshandler/data';
+
+    cpbas.fetchCollectionSummariesAsync('collectionId').then(
+      (dataUrl) => {
+        expect(dataUrl).toBe('image data');
+      });
+
+    const req2 = httpTestingController.expectOne(requestUrl);
+    expect(req2.request.method).toEqual('GET');
+    req2.flush({profile_picture_data_url: 'image data'});
+
+    flushMicrotasks();
+  }));
+
+  it('should not return response for collection summary', fakeAsync(() => {
+    let requestUrl = '/collectionsummarieshandler/data';
+
+    cpbas.fetchCollectionSummariesAsync('collectionId').then(
+      (dataUrl) => {
+        expect(dataUrl).toBe('image data');
+      });
+
+    const req2 = httpTestingController.expectOne(requestUrl);
+    expect(req2.request.method).toEqual('GET');
+    req2.flush({profile_picture_data_url: 'image data'});
+
+    flushMicrotasks();
+  }));
+});
