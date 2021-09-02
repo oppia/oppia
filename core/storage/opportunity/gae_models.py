@@ -298,7 +298,8 @@ class SkillOpportunityModel(base_models.BaseModel):
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
         plus_one_query_models, _, _ = (
-            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+            created_on_query.fetch_page(
+                page_size + 1, start_cursor=start_cursor))
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (

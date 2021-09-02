@@ -52,8 +52,9 @@
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
-/core/templates/modules/ @srijanreddy98 @darksun27
+/core/templates/components/filter-fields/ @srijanreddy98 @darksun27
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
+/core/templates/modules/ @srijanreddy98 @darksun27
 /core/templates/pages/common-imports.ts @srijanreddy98 @darksun27
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
 /core/templates/pages/oppia-root/ @srijanreddy98 @darksun27

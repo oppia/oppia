@@ -1,0 +1,32 @@
+<mat-form-field class="oppia-chip-list" appearance="fill">
+  <mat-label>{{ label }}</mat-label>
+  <mat-chip-list #chipList aria-label="Multiple selection field">
+    <mat-chip *ngFor="let selection of selections"
+              [selectable]="selectable"
+              [removable]="removable"
+              (removed)="remove(selection)">
+      {{ selection }}
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+    </mat-chip>
+    <input [placeholder]="placeholder"
+           class="protractor-test-multi-selection-input"
+           #newSelectionInput
+           [formControl]="formCtrl"
+           [matAutocomplete]="auto"
+           [matChipInputFor]="chipList"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           (matChipInputTokenEnd)="add($event)">
+  </mat-chip-list>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let selection of filteredSelections | async" [value]="selection">
+      {{ selection }}
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error>{{ validationErrorMessage }}</mat-error>
+</mat-form-field>
+
+<style>
+  .oppia-chip-list {
+    width: 100%;
+  }
+</style>
