@@ -16,6 +16,11 @@
  * @fileoverview Component for information card modal.
  */
 
+// TODO:
+// 1. Modal animations
+// 2. Tags
+// 3. Contributers
+
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
@@ -86,7 +91,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     this.explorationIsPrivate = (this.expInfo.status === 'private');
   }
 
-  getExplorationTagsSummary(arrayOfTags: []): object {
+  getExplorationTagsSummary(arrayOfTags: string[]): object {
     let tagsToShow = [];
     let tagsInTooltip = [];
     let MAX_CHARS_TO_SHOW = 45;

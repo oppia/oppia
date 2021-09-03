@@ -79,7 +79,7 @@ export class LearnerViewInfoComponent {
       this.contextService.getExplorationId() : 'test_id';
 
     this.explorationTitle = 'Loading...';
-    this.readOnlyExplorationBackendApiService.fetchExploration(
+    this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId, this.urlService.getExplorationVersionFromUrl())
       .then((response) => {
         this.explorationTitle = response.exploration.title;
@@ -109,10 +109,16 @@ export class LearnerViewInfoComponent {
   }
 
   getTopicUrl(): string {
-    let topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    let classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    let topicUrlFragment: string;
+    let classroomUrlFragment: string;
+
+    try {
+      topicUrlFragment = (
+        this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      classroomUrlFragment = (
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    } catch (e) {}
+
     return topicUrlFragment &&
       classroomUrlFragment &&
       this.urlInterpolationService.interpolateUrl(
@@ -143,7 +149,7 @@ export class LearnerViewInfoComponent {
     if (this.expInfo) {
       this.openInformationCardModal();
     } else {
-      this.learnerViewInfoBackendApiService.fetchLearnerInfo(
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
         stringifiedExpIds,
         includePrivateExplorations
       ).then((response) => {
