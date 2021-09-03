@@ -29,7 +29,7 @@ require(
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/' +
+  'pages/topics-and-skills-dashboard-page/modals/' +
   'create-new-skill-modal.component.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');

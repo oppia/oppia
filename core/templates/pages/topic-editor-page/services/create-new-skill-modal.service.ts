@@ -22,7 +22,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -45,7 +45,7 @@ export class CreateNewSkillModalService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  createNewSkill(topicsIds: string[]): void {
+  createNewSkill(topicsIds: string[] = []): void {
     const modalRef = this.ngbModal.open(
       CreateNewSkillModalComponent, {
         windowClass: 'create-new-skill-modal',
@@ -73,7 +73,7 @@ export class CreateNewSkillModalService {
       let imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.skillCreationBackendApiService.createSkillAsync(
         result.description, rubrics, result.explanation,
-        topicsIds || [], imagesData).then((response) => {
+        topicsIds, imagesData).then((response) => {
         setTimeout(() => {
           this.topicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.emit(true);

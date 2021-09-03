@@ -70,8 +70,6 @@ require('services/stateful/focus-manager.service.ts');
 require('services/translation-file-hash-loader-backend-api.service.ts');
 require('services/user.service.ts');
 
-require('google-analytics.initializer.ts');
-
 // Default to passive event listeners.
 require('default-passive-events');
 

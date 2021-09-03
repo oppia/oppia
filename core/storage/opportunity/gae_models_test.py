@@ -224,7 +224,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertFalse(more)
+        self.assertTrue(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
         results, cursor, more = (
@@ -244,7 +244,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
-        self.assertFalse(more)
+        self.assertTrue(more)
 
         opportunity_models.SkillOpportunityModel.delete_all()
 
