@@ -475,7 +475,6 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/interactions/ImageClickInput/ImageClickInput.py',
     'extensions/interactions/InteractiveMap/InteractiveMap.py',
     'extensions/interactions/ItemSelectionInput/ItemSelectionInput.py',
-    'extensions/interactions/LogicProof/LogicProof.py',
     'extensions/interactions/MathEquationInput/MathEquationInput.py',
     'extensions/interactions/MultipleChoiceInput/MultipleChoiceInput.py',
     'extensions/interactions/MusicNotesInput/MusicNotesInput.py',
