@@ -208,7 +208,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
                     the suggestion.
                 last_updated_date: str. When was the suggestion last updated.
         """
-        # When opportunity is not availabe we leave the topic ID empty.
+        # When opportunity is not available we leave the topic ID empty.
         topic_id = ''
         if opportunity is not None:
             topic_id = opportunity.topic_id
@@ -293,8 +293,8 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
             translation['suggestion_status'] ==
             suggestion_models.STATUS_ACCEPTED
         )
-        is_accepted_and_edited = (
-            is_accepted and translation['edited_by_reviewer'])
+        is_accepted_and_not_edited = (
+            is_accepted and not translation['edited_by_reviewer'])
         is_rejected = (
             translation['suggestion_status'] ==
             suggestion_models.STATUS_REJECTED
@@ -312,7 +312,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
             accumulator.accepted_translations_count + int(is_accepted),
             (
                 accumulator.accepted_translations_without_reviewer_edits_count +
-                int(is_accepted_and_edited)
+                int(is_accepted_and_not_edited)
             ),
             (
                 accumulator.accepted_translation_word_count +
