@@ -247,8 +247,6 @@ describe('Site language', function() {
     await waitFor.elementAttributeToBe(
       placeholderElement, 'placeholder', 'Ingresa un número',
       'Placeholder text taking too long to change from English to Spanish');
-    expect(await placeholderElement.getAttribute('placeholder')).toEqual(
-      'Ingresa un número');
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });
