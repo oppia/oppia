@@ -73,9 +73,9 @@ class BeamJobHandlerTests(BeamHandlerTestBase):
 class BeamJobRunHandlerTests(BeamHandlerTestBase):
 
     def test_get_returns_all_runs(self) -> None:
-        beam_job_services.create_beam_job_run_model('FooJob', []).put()
-        beam_job_services.create_beam_job_run_model('FooJob', []).put()
-        beam_job_services.create_beam_job_run_model('FooJob', []).put()
+        beam_job_services.create_beam_job_run_model('FooJob').put()
+        beam_job_services.create_beam_job_run_model('FooJob').put()
+        beam_job_services.create_beam_job_run_model('FooJob').put()
 
         response = self.get_json('/beam_job_run')
 
@@ -89,13 +89,13 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
     def test_put_starts_new_job(self) -> None:
         now = datetime.datetime.utcnow()
         mock_job = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', [], now, now, False)
+            '123', 'FooJob', 'RUNNING', now, now, False)
         run_job_sync_swap = self.swap_to_always_return(
             jobs_manager, 'run_job_sync', value=mock_job)
 
         with run_job_sync_swap:
             response = self.put_json( # type: ignore[no-untyped-call]
-                '/beam_job_run', {'job_name': 'FooJob', 'job_arguments': []},
+                '/beam_job_run', {'job_name': 'FooJob'},
                 csrf_token=self.get_new_csrf_token()) # type: ignore[no-untyped-call]
 
         self.assertEqual(response, mock_job.to_dict())

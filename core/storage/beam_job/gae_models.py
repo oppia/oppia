@@ -109,9 +109,6 @@ class BeamJobRunModel(base_models.BaseModel):
         datastore_services.StringProperty(required=False, indexed=True))
     # The name of the job class that implements the job's logic.
     job_name = datastore_services.StringProperty(required=True, indexed=True)
-    # The arguments provided to the job run.
-    job_arguments = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
     # The state of the job at the time the model was last updated.
     latest_job_state = datastore_services.StringProperty(
         required=True, indexed=True, choices=[
@@ -153,7 +150,6 @@ class BeamJobRunModel(base_models.BaseModel):
         return dict(super(BeamJobRunModel, cls).get_export_policy(), **{
             'dataflow_job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'job_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'job_arguments': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 

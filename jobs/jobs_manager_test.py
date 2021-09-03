@@ -51,8 +51,7 @@ class FailingJob(base_jobs.JobBase):
 class RunJobSyncTests(test_utils.GenericTestBase):
 
     def test_working_job(self) -> None:
-        run = jobs_manager.run_job_sync(
-            'WorkingJob', [], namespace=self.namespace)
+        run = jobs_manager.run_job_sync('WorkingJob', namespace=self.namespace)
 
         self.assertEqual(run.job_state, 'DONE')
 
@@ -66,8 +65,7 @@ class RunJobSyncTests(test_utils.GenericTestBase):
             {'stdout': 'o', 'stderr': 'e'})
 
     def test_failing_job(self) -> None:
-        run = jobs_manager.run_job_sync(
-            'FailingJob', [], namespace=self.namespace)
+        run = jobs_manager.run_job_sync('FailingJob', namespace=self.namespace)
 
         self.assertEqual(run.job_state, 'FAILED')
 

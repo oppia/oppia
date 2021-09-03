@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import beam_job_services
@@ -84,11 +85,10 @@ class BeamJobRunHandler(base.BaseHandler):
         job_name = (
             self.normalized_payload.get('job_name')
             if self.normalized_payload else None)
-        job_arguments = (
-            self.normalized_payload.get('job_arguments')
-            if self.normalized_payload else None)
-
-        beam_job_run = jobs_manager.run_job_sync(job_name, job_arguments)
+        beam_job_run = (
+            jobs_manager.run_job_sync(job_name)
+            if constants.EMULATOR_MODE else
+            jobs_manager.run_job_async(job_name))
         self.render_json(beam_job_run.to_dict())
 
 
