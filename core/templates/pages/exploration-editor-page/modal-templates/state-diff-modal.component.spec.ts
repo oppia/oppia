@@ -63,8 +63,8 @@ describe('State Diff Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule,],
-      declarations: [StateDiffModalComponent,],
+      imports: [HttpClientTestingModule],
+      declarations: [StateDiffModalComponent],
       providers: [
         NgbActiveModal,
         UrlInterpolationService,
@@ -77,7 +77,7 @@ describe('State Diff Modal Component', () => {
           useClass: MockBackendService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA, ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

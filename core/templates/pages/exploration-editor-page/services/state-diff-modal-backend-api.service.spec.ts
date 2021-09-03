@@ -31,7 +31,7 @@ describe('state diff modal backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule,]
+      imports: [HttpClientTestingModule]
     });
     sdmbas = TestBed.inject(StateDiffModalBackendApiService);
     http = TestBed.inject(HttpTestingController);
