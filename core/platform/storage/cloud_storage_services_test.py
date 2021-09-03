@@ -25,8 +25,7 @@ from core.tests import test_utils
 
 from google.cloud import storage
 
-from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
+from typing import Dict, List, Optional
 
 
 class MockClient:

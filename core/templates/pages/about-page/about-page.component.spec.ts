@@ -30,14 +30,14 @@ class MockWindowRef {
     location: {
       href: '',
     },
+    gtag: () => {}
   };
 }
 
 describe('About Page', () => {
   let windowRef: MockWindowRef;
   let component: AboutPageComponent;
-  const siteAnalyticsService = new SiteAnalyticsService(
-    new WindowRef());
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(async() => {
     windowRef = new MockWindowRef();
@@ -47,10 +47,7 @@ describe('About Page', () => {
         MockTranslatePipe
       ],
       providers: [
-        {
-          provide: SiteAnalyticsService,
-          useValue: siteAnalyticsService
-        },
+        SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
@@ -59,6 +56,7 @@ describe('About Page', () => {
       ]
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     component = aboutPageComponent.componentInstance;
   });
   beforeEach(angular.mock.module('oppia'));
