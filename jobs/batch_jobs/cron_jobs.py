@@ -66,7 +66,8 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
         return (
             self.pipeline
             | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all())) # type: ignore[no-untyped-call]
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
+                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
             | 'Split models into batches' >> beam.transforms.util.BatchElements(
                 max_batch_size=self.MAX_BATCH_SIZE)
             | 'Index batches of models' >> beam.ParDo(
