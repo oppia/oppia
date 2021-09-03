@@ -16,50 +16,51 @@
  * @fileoverview Tests for StateDiffModal Backend API Service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } 
- from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController }
+  from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StateDiffModalBackendApiService } 
- from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';  
+import { StateDiffModalBackendApiService }
+  from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';  
 
 
 describe('state diff modal backend api service', () => {
-    let sdmbas: StateDiffModalBackendApiService;
-    let http: HttpTestingController;
-    let sof: StateObjectFactory;
+  let sdmbas: StateDiffModalBackendApiService;
+  let http: HttpTestingController;
+  let sof: StateObjectFactory;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule,]
-        });
-        sdmbas = TestBed.inject(StateDiffModalBackendApiService);
-        http = TestBed.inject(HttpTestingController);
-        sof = TestBed.inject(StateObjectFactory);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, ]
     });
+    sdmbas = TestBed.inject(StateDiffModalBackendApiService);
+    http = TestBed.inject(HttpTestingController);
+    sof = TestBed.inject(StateObjectFactory);
+  });
 
-    afterEach(() => {
-        http.verify();
-    });
+  afterEach(() => {
+    http.verify();
+  });
 
-    it('should successfully fetch yaml data', 
+  it('should successfully fetch yaml data',
     fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let errorHandler = jasmine.createSpy('error');
+      let successHandler = jasmine.createSpy('success');
+      let errorHandler = jasmine.createSpy('error');
 
-        let stateName = 'new state';
-        let state = sof.createDefaultState(stateName);
+      let stateName = 'new state';
+      let state = sof.createDefaultState(stateName);
 
-        sdmbas.fetchYaml(state.toBackendDict(), 50, '/createhandler/state_yaml/exp1')
+      sdmbas.fetchYaml(
+          state.toBackendDict(), 50, '/createhandler/state_yaml/exp1')
         .then(successHandler, errorHandler);
 
-        let req = http.expectOne('/createhandler/state_yaml/exp1');
-        expect(req.request.method).toBe('POST');
-        req.flush('Success');
+      let req = http.expectOne('/createhandler/state_yaml/exp1');
+      expect(req.request.method).toBe('POST');
+      req.flush('Success');
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalled();
-        expect(errorHandler).not.toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalled();
+      expect(errorHandler).not.toHaveBeenCalled();
     }));
 });

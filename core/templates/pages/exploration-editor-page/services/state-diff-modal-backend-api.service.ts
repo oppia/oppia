@@ -25,26 +25,26 @@ interface ResInterface {
     data: {
         yaml: string;
     }
-};
+}
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class StateDiffModalBackendApiService {
-    constructor(
-        private http: HttpClient,
-    ) {}
+  constructor(
+    private http: HttpClient,
+  ) {}
 
-    async fetchYaml(
-        state_dict: StateBackendDict, width: number, url: string
-        ): Promise<ResInterface> {
-        return this.http.post<ResInterface>(url, {
-                state_dict: state_dict,
-                width: width
-            }).toPromise();
-    }
+  async fetchYaml(
+      stateDict: StateBackendDict, width: number, url: string
+  ): Promise<ResInterface> {
+    return this.http.post<ResInterface>(url, {
+      state_dict: stateDict,
+      width: width
+    }).toPromise();
+  }
 }
 
 angular.module('oppia').factory(
-    'StateDiffModalBackendApiService',
-    downgradeInjectable(StateDiffModalBackendApiService));
+  'StateDiffModalBackendApiService',
+  downgradeInjectable(StateDiffModalBackendApiService));

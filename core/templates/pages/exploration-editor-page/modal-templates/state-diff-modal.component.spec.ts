@@ -18,7 +18,7 @@
 
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flushMicrotasks, flush } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateDiffModalComponent } from './state-diff-modal.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -30,134 +30,131 @@ interface ResInterface {
     data: {
         yaml: string;
     }
-};
+}
 
 describe('State Diff Modal Component', () => {
-    let sof: StateObjectFactory;
-    let sdmbas: StateDiffModalBackendApiService;
-    let component: StateDiffModalComponent;
-    let fixture: ComponentFixture<StateDiffModalComponent>;
+  let sof: StateObjectFactory;
+  let component: StateDiffModalComponent;
+  let fixture: ComponentFixture<StateDiffModalComponent>;
 
-    let headers = null;
-    let newState = null;
-    let newStateName = 'New state';
-    let oldState = null;
-    let oldStateName = 'Old state';
+  let headers = null;
+  let newState = null;
+  let newStateName = 'New state';
+  let oldState = null;
+  let oldStateName = 'Old state';
 
-    class MockContextService {
-        getExplorationId() {
-            return 'exp1';
-        }
+  class MockContextService {
+    getExplorationId() {
+      return 'exp1';
     }
+  }
     
-    class MockBackendService {
-        async fetchYaml(
-            state_dict: StateBackendDict, width: number, url: string
-            ): Promise<ResInterface> {
-                return {
-                    data: {
-                        yaml: 'Yaml data',
-                    },
-                }
-        }
+  class MockBackendService {
+    async fetchYaml(
+        stateDict: StateBackendDict, width: number, url: string
+    ): Promise<ResInterface> {
+      return {
+        data: {
+          yaml: 'Yaml data',
+        },
+      };
     }
+  }
 
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, ],
+      declarations: [StateDiffModalComponent, ],
+      providers: [
+        NgbActiveModal,
+        UrlInterpolationService,
+        {
+          provide: ContextService,
+          useClass: MockContextService,
+        },
+        {
+          provide: StateDiffModalBackendApiService,
+          useClass: MockBackendService,
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA,],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StateDiffModalComponent);
+    component = fixture.componentInstance;
+    sof = TestBed.inject(StateObjectFactory);
+  });
+
+  describe('when new state and old state are truthy', () => {
+    beforeEach(() => {
+      newState = sof.createDefaultState(newState);
+      oldState = sof.createDefaultState(oldState);
+
+      component.headers = headers;
+      component.newState = newState;
+      component.newStateName = newStateName;
+      component.oldState = oldState;
+      component.oldStateName = oldStateName;
+    });
+
+    it('should initialize component properties after component is initialized',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick(201);
+        fixture.whenStable()
+          .then(() => {
+            expect(component.headers).toBe(headers);
+            expect(component.newStateName).toBe(newStateName);
+            expect(component.oldStateName).toBe(oldStateName);
+          });
+      }));
+
+    it('should evaluate yaml strings object', fakeAsync(() => {
+      component.ngOnInit();
+      tick(201);
+      fixture.whenStable()
+        .then(() => {
+          expect(component.yamlStrs.leftPane).toBe('Yaml data');
+          expect(component.yamlStrs.rightPane).toBe('Yaml data');
+        });
+    }));
+  });
+
+  describe('when new state and old state are falsy', () => {
     beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule,],
-            declarations: [StateDiffModalComponent,],
-            providers: [
-                NgbActiveModal,
-                UrlInterpolationService,
-                { 
-                    provide: ContextService, 
-                    useClass: MockContextService, 
-                },
-                { 
-                    provide: StateDiffModalBackendApiService, 
-                    useClass: MockBackendService, 
-                },
-            ],
-            schemas: [NO_ERRORS_SCHEMA,],
-        }).compileComponents()
+      oldState = null;
+      newState = null;
+
+      component.headers = headers;
+      component.newState = newState;
+      component.newStateName = newStateName;
+      component.oldState = oldState;
+      component.oldStateName = oldStateName;
     }));
 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(StateDiffModalComponent);
-        component = fixture.componentInstance;
-        sof = TestBed.inject(StateObjectFactory);
-        sdmbas = ((TestBed.inject(StateDiffModalBackendApiService) as unknown) as 
-                    jasmine.SpyObj<StateDiffModalBackendApiService>);
-    });
+    it('should initialize component properties after component is initialized',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick(201);
+        fixture.whenStable()
+          .then(() => {
+            expect(component.headers).toBe(headers);
+            expect(component.newStateName).toBe(newStateName);
+            expect(component.oldStateName).toBe(oldStateName);
+          });
+      }));
 
-    describe('when new state and old state are truthy', () => {
-        beforeEach(() => {
-            newState = sof.createDefaultState(newState);
-            oldState = sof.createDefaultState(oldState);
-            
-            component.headers = headers;
-            component.newState = newState;
-            component.newStateName = newStateName;
-            component.oldState = oldState;
-            component.oldStateName = oldStateName;
-        });
-
-        it('should initialize component properties after component is initialized',
-        fakeAsync(() => {
-            component.ngOnInit();
-            tick(201);
-            fixture.whenStable()
-            .then(() => {
-                expect(component.headers).toBe(headers);
-                expect(component.newStateName).toBe(newStateName);
-                expect(component.oldStateName).toBe(oldStateName);
-            });
-        }));
-
-        it('should evaluate yaml strings object', fakeAsync(() => {
-            component.ngOnInit();
-            tick(201);
-            fixture.whenStable()
-            .then(() => {
-                expect(component.yamlStrs.leftPane).toBe('Yaml data');
-                expect(component.yamlStrs.rightPane).toBe('Yaml data');
-            });
-        }));
-    });
-
-    describe('when new state and old state are falsy', () => {
-        beforeEach(waitForAsync(() => {
-            oldState = null;
-            newState = null;
-
-            component.headers = headers;
-            component.newState = newState;
-            component.newStateName = newStateName;
-            component.oldState = oldState;
-            component.oldStateName = oldStateName;
-        }));
-
-        it('should initialize component properties after component is initialized',
-        fakeAsync(() => {
-            component.ngOnInit();
-            tick(201);
-            fixture.whenStable()
-            .then(() => {
-                expect(component.headers).toBe(headers);
-                expect(component.newStateName).toBe(newStateName);
-                expect(component.oldStateName).toBe(oldStateName);
-            })
-        }));
-
-        it('should evaluate yaml strings object when timeout tasks are flushed',
-        fakeAsync(() => {
-            component.ngOnInit();
-            tick(201);
-            fixture.whenStable()
-            .then(() => {
-                expect(component.yamlStrs.leftPane).toBe('');
-                expect(component.yamlStrs.rightPane).toBe('');
-            });
-        }));
-    });
+    it('should evaluate yaml strings object when timeout tasks are flushed',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick(201);
+        fixture.whenStable()
+          .then(() => {
+            expect(component.yamlStrs.leftPane).toBe('');
+            expect(component.yamlStrs.rightPane).toBe('');
+          });
+      }));
+  });
 });
