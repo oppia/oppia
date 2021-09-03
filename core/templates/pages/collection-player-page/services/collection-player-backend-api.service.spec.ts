@@ -21,9 +21,11 @@ import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
 import { CollectionPlayerBackendApiService } from './collection-player-backend-api.service';
 
-describe('Collection Player Backend Api Service', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Collection Player Backend Api Service', () => {
   let cpbas: CollectionPlayerBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleCollection: Collection;
@@ -31,6 +33,10 @@ describe('Collection Player Backend Api Service', () => {
   let collectionNodeBackendObject: CollectionNodeBackendDict;
   let readOnlyCollectionBackendApiService:
     ReadOnlyCollectionBackendApiService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
+  let alertsService: AlertsService;
+  let collectionHandlerResponse;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,6 +44,26 @@ describe('Collection Player Backend Api Service', () => {
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     cpbas = TestBed.inject(CollectionPlayerBackendApiService);
+    readOnlyCollectionBackendApiService =
+      TestBed.inject(ReadOnlyCollectionBackendApiService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+    alertsService = TestBed.inject(AlertsService);
+
+    collectionHandlerResponse = {
+      can_edit: true,
+      collection: sampleCollection,
+      is_admin: true,
+      is_logged_in: true,
+      is_moderator: true,
+      is_super_admin: true,
+      is_topic_manager: true,
+      meta_description: 'meta_description',
+      meta_name: 'meta_name',
+      session_id: 'session_id',
+      user_email: '123@gmail.com',
+      username: 'username',
+    };
 
     collectionNodeBackendObject = {
       exploration_id: 'exp_id',
@@ -103,32 +129,73 @@ describe('Collection Player Backend Api Service', () => {
   });
 
   it('should return response for collection summary', fakeAsync(() => {
-    let requestUrl = '/collectionsummarieshandler/data';
+    let requestUrl = '/collectionsummarieshandler/data?' +
+    'stringified_collection_ids=%5B%22collectionId%22%5D';
 
     cpbas.fetchCollectionSummariesAsync('collectionId').then(
       (dataUrl) => {
-        expect(dataUrl).toBe('image data');
+        expect(dataUrl).toEqual({ stringified_collection_ids: '' });
       });
 
     const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
+    req2.flush({stringified_collection_ids: ''});
 
     flushMicrotasks();
   }));
 
   it('should not return response for collection summary', fakeAsync(() => {
-    let requestUrl = '/collectionsummarieshandler/data';
+    let requestUrl = '/collectionsummarieshandler/data?' +
+    'stringified_collection_ids=%5B%22collectionId%22%5D';
 
-    cpbas.fetchCollectionSummariesAsync('collectionId').then(
-      (dataUrl) => {
-        expect(dataUrl).toBe('image data');
-      });
+    cpbas.fetchCollectionSummariesAsync(
+      'collectionId').then(successHandler, failHandler);
 
+    spyOn(cpbas, 'fetchCollectionSummariesAsync').and.callThrough();
     const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
 
+    req2.flush({
+      status: 500, statusText: 'Internal Server Error'
+    });
     flushMicrotasks();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error while fetching the collection summary.');
+  }));
+
+  it('should elements with attributes', fakeAsync(() => {
+    let requestUrl = '/collectionsummarieshandler/data/collectionId';
+
+    cpbas.bindAttr('collectionId');
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+
+    var angularElementSpy = spyOn(angular, 'element');
+
+    var elementNameItemProp = $('<div>');
+    angularElementSpy.withArgs(
+      'meta[itemprop="name"]').and.returnValue(elementNameItemProp);
+
+    var elementDescriptionItemProp = $('<div>');
+    angularElementSpy.withArgs(
+      'meta[itemprop="description"]').and.returnValue(
+      elementDescriptionItemProp);
+
+    var elementTitleProperty = $('<div>');
+    angularElementSpy.withArgs(
+      'meta[property="og:title"]').and.returnValue(elementTitleProperty);
+
+    var elementDescriptionProperty = $('<div>');
+    angularElementSpy.withArgs(
+      'meta[property="og:description"]').and.returnValue(
+      elementDescriptionProperty);
+
+    expect(elementNameItemProp.attr('content')).toBe(sampleCollection.title);
+    expect(elementDescriptionItemProp.attr('content')).toBe(
+      sampleCollection.objective);
+    expect(elementTitleProperty.attr('content')).toBe(sampleCollection.title);
+    expect(elementDescriptionProperty.attr('content')).toBe(
+      sampleCollection.objective);
   }));
 });
