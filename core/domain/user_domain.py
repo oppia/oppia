@@ -23,12 +23,9 @@ import re
 
 from constants import constants
 
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class UserSettings(python_utils.OBJECT):
