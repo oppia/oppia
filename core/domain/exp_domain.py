@@ -698,7 +698,8 @@ class Exploration(python_utils.OBJECT):
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
-                sdict['content']['content_id'], sdict['content']['html'])
+                sdict['content']['content_id'], sdict['content']['html'],
+                sdict['content']['image_sizes_in_bytes'])
             state.content.validate()
 
             state.param_changes = [param_domain.ParamChange(
@@ -1925,6 +1926,27 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v47_dict_to_v48_dict(cls, exp_id, states_dict):
+        """Converts from version 47 to 48. Version 48 contains the attribute
+        image_sizes_in_bytes for subtitled_html.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a State
+                domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            state_domain.State.update_image_sizes_in_bytes_in_state(
+                state_dict,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exp_id)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -1961,7 +1983,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 52
+    CURRENT_EXP_SCHEMA_VERSION = 53
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod

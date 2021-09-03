@@ -183,7 +183,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-svgdiagram '
                     'alt-with-value="&amp;quot;Image12345&amp;quot;"'
                     ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
-                    '</oppia-noninteractive-svgdiagram>'
+                    '</oppia-noninteractive-svgdiagram>', {}
                 ).to_dict()
             }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
@@ -198,7 +198,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 'svg_filename-with-value="&amp;quot;'
                                 'img12.svg&amp;quot;" alt-with-value="'
                                 '&amp;quot;Image&amp;quot;">'
-                                '</oppia-noninteractive-svgdiagram>'
+                                '</oppia-noninteractive-svgdiagram>',
+                                {}
                             ).to_dict()
                         ]
                     },

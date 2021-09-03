@@ -192,7 +192,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.subtopic_page.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
-                'content_id': 'content'
+                'content_id': 'content',
+                'image_sizes_in_bytes': {}
             }))
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)

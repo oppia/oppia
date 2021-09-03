@@ -79,7 +79,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>State Feedback</p>'),
+                    'feedback_1', '<p>State Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -283,7 +283,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>', {}
                 )
             )
         ]
@@ -403,7 +403,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>state outcome html</p>'),
+                    'feedback_1', '<p>state outcome html</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -418,18 +418,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )]
         state_default_outcome = state_domain.Outcome(
             'State1', state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for State1</p>'),
+                'default_outcome', '<p>Default outcome for State1</p>', {}),
             False, [], None, None
         )
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                    'hint_1', '<p>Hello, this is html1 for state1</p>', {}
                 )
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                    'hint_2', '<p>Hello, this is html2 for state1</p>', {}
                 )
             ),
         ]
@@ -518,7 +518,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'),
+                    'feedback', '<p>state outcome html</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -562,7 +562,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>', {}
                 )
             )
         ]
@@ -637,7 +637,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'),
+                    'feedback', '<p>state outcome html</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -738,7 +738,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'),
+                    'feedback', '<p>state outcome html</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -814,7 +814,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_sizes_in_bytes': {}
         }
         state_customization_args_dict = {
             'choices': {
@@ -842,7 +843,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>', {}
                 )
             )
         ]
@@ -858,7 +859,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ],
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state1</p>',
+                'image_sizes_in_bytes': {}
             }
         }
 
@@ -1020,7 +1022,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1070,7 +1072,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
                     'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>',
+                    {}
                 )
             )
         )
@@ -1086,7 +1089,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
                     'quot;" heading-with-value="&amp;quot;Sub&amp;quot;">'
-                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>')),
+                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>'), {}),
             False, [], None, None
         )
 
@@ -1105,7 +1108,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                         'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
                         'quot;:&amp;quot;hello&amp;quot;}]\">'
-                        '</oppia-noninteractive-tabs>')),
+                        '</oppia-noninteractive-tabs>'), {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1142,7 +1145,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                     'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
                     'quot;:&amp;quot;hello&amp;quot;}]\">'
-                    '</oppia-noninteractive-tabs>')
+                    '</oppia-noninteractive-tabs>'),
+                'image_sizes_in_bytes': {}
             }))
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
@@ -1152,7 +1156,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>')
+                    ';quot;"></oppia-noninteractive-link></p>'),
+                'image_sizes_in_bytes': {}
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
@@ -1161,7 +1166,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': (
                     '<p><oppia-noninteractive-skillreview text-with-value="'
                     '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
-                    '&amp;quot;"></oppia-noninteractive-skillreview></p>')
+                    '&amp;quot;"></oppia-noninteractive-skillreview></p>'),
+                'image_sizes_in_bytes': {}
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
@@ -1232,7 +1238,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1250,12 +1256,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None
         )
 
@@ -1264,7 +1271,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None, None),
+                    'feedback_1', '<p>Feedback</p>', {}),
+                False, [], None, None),
             [
                 state_domain.RuleSpec(
                     'Contains',
@@ -1283,7 +1291,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [state_answer_group])
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1354,7 +1362,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         init_state.update_interaction_id('TextInput')
         state_interaction_cust_args = {
@@ -1371,7 +1380,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None
         )
 
@@ -1379,7 +1388,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1399,7 +1408,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [state_answer_group])
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1484,14 +1493,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         init_state.update_interaction_id('SetInput')
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1536,7 +1546,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         # Set the multiple choice interaction.
         init_state.update_interaction_id('MultipleChoiceInput')
@@ -1566,7 +1577,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Set the default outcome.
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None
         )
         init_state.update_interaction_default_outcome(default_outcome)
@@ -1612,7 +1623,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
 
         self.assertEqual(init_state.get_translation_counts(), {})
@@ -1626,14 +1638,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
 
         self.set_interaction_for_state(state, 'TextInput')
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {}))]
         state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -3410,7 +3423,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
         subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
+            'content_id', '<p>some html</p>', {})
         subtitled_html.validate()
 
         with self.assertRaisesRegexp(
@@ -3422,7 +3435,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_subtitled_html_validation_with_invalid_content(self):
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
+            'content_id', '<p>some html</p>', {})
         subtitled_html.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected content id to be a string, ' +
@@ -3516,7 +3529,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_written_translation_validation(self):
         """Test validation of translation script."""
         written_translation = state_domain.WrittenTranslation(
-            'html', 'Test.', True)
+            'html', 'Test.', True, {})
         written_translation.validate()
 
         with self.assertRaisesRegexp(
@@ -3552,7 +3565,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -3574,7 +3587,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list.append(
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>')
+                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>', {})
             )
         )
         init_state.update_interaction_hints(hints_list)
@@ -3585,7 +3598,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list.append(
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>')
+                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>', {})
             )
         )
         init_state.update_interaction_hints(hints_list)
@@ -3634,7 +3647,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '')
+                state_domain.SubtitledHtml('hint_1', '', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -3785,7 +3798,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '')
+                state_domain.SubtitledHtml('hint_1', '', {})
             )
         ]
         solution = state_domain.Solution.from_dict(
@@ -3822,7 +3835,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -3843,7 +3856,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'feedback_1',
-                'html': '<p>Feedback</p>'
+                'html': '<p>Feedback</p>',
+                'image_sizes_in_bytes': {}
             }))
 
         with self.assertRaisesRegexp(
@@ -3855,7 +3869,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -3889,7 +3903,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml('default_outcome', ''),
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '', {}),
             False, [], None, None
         )
         exploration.init_state.update_interaction_default_outcome(
@@ -3898,7 +3913,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'default_outcome',
-                'html': ''
+                'html': '',
+                'image_sizes_in_bytes': {}
             }))
 
         with self.assertRaisesRegexp(
@@ -3909,7 +3925,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>some html</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>some html</p>', {})
             )
         ]
 
@@ -3917,7 +3933,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'hint_1',
-                'html': ''
+                'html': '',
+                'image_sizes_in_bytes': {}
             }))
 
         with self.assertRaisesRegexp(
@@ -3926,7 +3943,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', 'some html', {})
 
         hints_list = [state_domain.Hint(subtitled_html)]
 
@@ -3945,7 +3963,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'solution',
-                'html': ''
+                'html': '',
+                'image_sizes_in_bytes': {}
                 }))
 
         with self.assertRaisesRegexp(
@@ -3975,13 +3994,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {})
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', {})
             )
         ]
 
@@ -4016,13 +4035,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {})
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', {})
             )
         ]
 
@@ -4057,13 +4076,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {})
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', {})
             )
         ]
 
@@ -4105,13 +4124,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {})
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', {})
             )
         ]
 
@@ -4153,7 +4172,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {})
             )
         ]
         solution_dict = {
@@ -4183,7 +4202,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {}
                 )
             )
         ]
@@ -4215,7 +4234,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4255,7 +4274,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4278,7 +4297,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None, None
+                    'feedback_1', '<p>Feedback</p>', {}), False, [], None, None
             ), {}, [], None
         )
         state_answer_group.rule_specs = {}
@@ -4293,7 +4312,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4332,7 +4351,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4399,7 +4418,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             }]
         }
         value = {
-            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>', {})
         }
 
         state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
@@ -4421,7 +4440,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             }]
         }
         value = {
-            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>', {})
         }
 
         html = (

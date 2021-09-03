@@ -1725,7 +1725,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
         default_outcome1 = state_domain.Outcome(
             'state2', state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'),
+                'default_outcome', '<p>Default outcome for state1</p>', {}),
             False, [], None, None
         )
         state1.update_interaction_default_outcome(default_outcome1)
@@ -1740,12 +1740,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                         '"&amp;quot;&amp;quot;" alt-with-value='
                         '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    )
+                    ), {}
                 )
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', {})
             ),
         ]
         state2.update_interaction_hints(hint_list2)
@@ -1759,7 +1759,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
+                        '</oppia-noninteractive-image>'), {}
                     ), False, [], None, None), [
                         state_domain.RuleSpec('Equals', {'x': 0}),
                         state_domain.RuleSpec('Equals', {'x': 1})
@@ -1767,7 +1767,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         ), state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state3', state_domain.SubtitledHtml(
-                    'feedback_2', '<p>Outcome2 for state2</p>'),
+                    'feedback_2', '<p>Outcome2 for state2</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec('Equals', {'x': 0})
@@ -1778,7 +1778,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Outcome for state3</p>'),
+                    'feedback_1', '<p>Outcome for state3</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -2101,13 +2101,13 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'New state',
                     'old_value': state_domain.SubtitledHtml(
-                        'content', '').to_dict(),
+                        'content', '', {}).to_dict(),
                     'new_value': state_domain.SubtitledHtml(
                         'content',
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;abc.png&quot;" caption-with-value="&quot;'
                         '&quot;" alt-with-value="&quot;Image&quot;">'
-                        '</oppia-noninteractive-image>').to_dict()
+                        '</oppia-noninteractive-image>', {}).to_dict()
                 })], 'Add state name')
 
         with python_utils.open_file(
@@ -2192,13 +2192,13 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'New state',
                     'old_value': state_domain.SubtitledHtml(
-                        'content', '').to_dict(),
+                        'content', '', {}).to_dict(),
                     'new_value': state_domain.SubtitledHtml(
                         'content',
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;abc.png&quot;" caption-with-value="'
                         '&quot;&quot;" alt-with-value="&quot;Image&quot;">'
-                        '</oppia-noninteractive-image>').to_dict()
+                        '</oppia-noninteractive-image>', {}).to_dict()
                 })], 'Add state name')
 
         with python_utils.open_file(
@@ -2276,13 +2276,13 @@ title: A title
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'New state',
             'old_value': state_domain.SubtitledHtml(
-                'content', '').to_dict(),
+                'content', '', {}).to_dict(),
             'new_value': state_domain.SubtitledHtml(
                 'content',
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;abc.png&quot;" caption-with-value="&quot;&quot;" '
                 'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>').to_dict()
+                '</oppia-noninteractive-image>', {}).to_dict()
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',

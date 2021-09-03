@@ -570,7 +570,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'Second', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -588,7 +588,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'Third', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Feedback</p>'),
+                        'feedback_1', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -611,7 +611,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'End', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -663,7 +663,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'End', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -741,7 +741,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'A', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -759,7 +759,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'B', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Feedback</p>'),
+                        'feedback_1', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -777,7 +777,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'C', state_domain.SubtitledHtml(
-                        'feedback_2', '<p>Feedback</p>'),
+                        'feedback_2', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -800,7 +800,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'D', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -823,7 +823,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'End', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -887,7 +887,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'D', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -949,7 +949,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'D', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        'feedback_0', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -967,7 +967,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'End 2', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Feedback</p>'),
+                        'feedback_1', '<p>Feedback</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -1184,7 +1184,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = destination
 
-        outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
+        outcome.feedback = state_domain.SubtitledHtml('feedback_1', '', {})
         exploration.validate()
 
         outcome.labelled_as_correct = 'hello'
@@ -1362,7 +1362,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'),
+                    'feedback_1', 'Feedback', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1386,7 +1386,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'),
+                    'feedback_1', 'Feedback', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1685,12 +1685,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None
         )
 
@@ -1721,12 +1722,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         new_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         new_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None)
         new_state.update_interaction_default_outcome(default_outcome)
 
@@ -1762,12 +1764,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None
         )
         init_state.update_interaction_default_outcome(default_outcome)
@@ -1803,12 +1806,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_sizes_in_bytes': {}
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', {}),
             False, [], None, None
         )
 
@@ -1860,7 +1864,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'),
+                    'feedback_1', 'Feedback', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1881,7 +1885,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         # Adds 1 to content count to exploration (hint_1).
@@ -1909,7 +1913,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1932,7 +1936,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', {})
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -2205,7 +2209,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome = state_domain.Outcome(
             'DEF', state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'),
+                'default_outcome', '<p>Default outcome for state1</p>', {}),
             False, [], 'refresher_exploration_id', None,
         )
         exploration.init_state.update_interaction_default_outcome(
@@ -2232,7 +2236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'),
+                    'feedback_1', 'Feedback', {}),
                 False, param_changes, None, None),
             [
                 state_domain.RuleSpec(
@@ -4775,7 +4779,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         default_outcome = state_domain.Outcome(
             'state2', state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'),
+                'default_outcome', '<p>Default outcome for state1</p>', {}),
             False, [], None, None
         )
         state1.update_interaction_default_outcome(default_outcome)
@@ -4783,12 +4787,12 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         hint_list2 = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', {}
                 )
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>'
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', {}
                 )
             ),
         ]
@@ -4811,7 +4815,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'state1', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Outcome2 for state2</p>'),
+                        'feedback_1', '<p>Outcome2 for state2</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -4830,7 +4834,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'state3', state_domain.SubtitledHtml(
-                        'feedback_2', '<p>Outcome1 for state2</p>'),
+                        'feedback_2', '<p>Outcome1 for state2</p>', {}),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -4845,7 +4849,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Outcome for state3</p>'),
+                    'feedback_1', '<p>Outcome for state3</p>', {}),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(

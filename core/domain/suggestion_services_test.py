@@ -300,7 +300,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, self.target_id, change_list, 'Add state.')
 
         new_suggestion_content = state_domain.SubtitledHtml(
-            'content', '<p>new suggestion content html</p>').to_dict()
+            'content', '<p>new suggestion content html</p>', {}).to_dict()
         change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -684,7 +684,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
         # Create the new change for the resubmitted suggestion.
         resubmit_change_content = state_domain.SubtitledHtml(
-            'content', '<p>resubmit change content html</p>').to_dict()
+            'content', '<p>resubmit change content html</p>', {}).to_dict()
         resubmit_change = exp_domain.ExplorationChange(
             {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -779,7 +779,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'exploration1', self.author_id, ['state 1'], ['TextInput'],
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content', '<p>old content html</p>', {}).to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
@@ -910,7 +910,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'exploration1', self.author_id, ['state 1'], ['TextInput'],
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content', '<p>old content html</p>', {}).to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
@@ -1555,7 +1555,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 correctness_feedback_enabled=True))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content</p>').to_dict()
+            'content', '<p>old content</p>', {}).to_dict()
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -1595,7 +1595,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             rights_domain.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content</p>').to_dict()
+            'content', '<p>new content</p>', {}).to_dict()
 
         self.change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

@@ -23,6 +23,8 @@ import html
 import json
 import logging
 
+from constants import constants
+from core.domain import fs_domain
 from core.domain import rte_component_registry
 import python_utils
 
@@ -145,6 +147,33 @@ def get_image_filenames_from_html_strings(html_strings):
                     'svg_filename'])
 
     return list(set(filenames))
+
+
+def get_image_sizes_in_bytes_from_html(html_string, entity_type, entity_id):
+    """Calculate the image_sizes_in_bytes dict from an html string.
+
+    Args:
+        html_string: str. The html string from a SubtitledHtml object.
+        entity_type: str. The entity type of the html string.
+        entity_id: str. The entity ID of the html string.
+
+    Returns:
+        dict. The mappings for each rich text image in the html_string
+        to its size in bytes.
+    """
+
+    image_filenames = get_image_filenames_from_html_strings([html_string])
+    image_sizes_in_bytes = {}
+    for image_filename in image_filenames:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                entity_type, entity_id))
+        image_size_in_bytes = len(fs.get(
+            '%s/%s' % (
+                constants.ASSET_TYPE_IMAGE, image_filename)))
+        image_sizes_in_bytes[image_filename] = image_size_in_bytes
+
+    return image_sizes_in_bytes
 
 
 def get_rte_components(html_string):

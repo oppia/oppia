@@ -412,10 +412,10 @@ class WorkedExample(python_utils.OBJECT):
         worked_example = cls(
             state_domain.SubtitledHtml(
                 worked_example_dict['question']['content_id'],
-                worked_example_dict['question']['html']),
+                worked_example_dict['question']['html'], {}),
             state_domain.SubtitledHtml(
                 worked_example_dict['explanation']['content_id'],
-                worked_example_dict['explanation']['html'])
+                worked_example_dict['explanation']['html'], {})
         )
         worked_example.question.validate()
         worked_example.explanation.validate()
@@ -513,7 +513,7 @@ class SkillContents(python_utils.OBJECT):
         skill_contents = cls(
             state_domain.SubtitledHtml(
                 skill_contents_dict['explanation']['content_id'],
-                skill_contents_dict['explanation']['html']),
+                skill_contents_dict['explanation']['html'], {}),
             [WorkedExample.from_dict(example)
              for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
@@ -901,7 +901,9 @@ class Skill(python_utils.OBJECT):
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         skill_contents = SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id,
+                feconf.DEFAULT_SKILL_EXPLANATION,
+                {}), [],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}

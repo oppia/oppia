@@ -3331,7 +3331,8 @@ title: Title
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')),
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>This is a hint.</p>', {})),
         ]
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)

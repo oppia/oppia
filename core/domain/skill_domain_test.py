@@ -36,12 +36,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', {})
         )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
+                '1', '<p>Explanation</p>', {}), [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -268,7 +268,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         example = skill_domain.WorkedExample(
             state_domain.SubtitledHtml(
-                '2', '<p>Example Question 1</p>'), 'explanation')
+                '2', '<p>Example Question 1</p>', {}), 'explanation')
         self.skill.skill_contents.worked_examples = [example]
         self._assert_validation_error(
             'Expected example explanation to be a SubtitledHtml object')
@@ -289,8 +289,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Found a duplicate content id 1')
 
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>', {})
         )
         self.skill.skill_contents.worked_examples = [example_1]
         self._assert_validation_error('Found a duplicate content id 1')
@@ -376,11 +376,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents and misconception object.
         """
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>', {})
         )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>', {}), [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
