@@ -44,9 +44,9 @@ from typing import List
 # We need this to happen for every job in this registry file, because the
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
-from jobs.batch_jobs import blog_validation_jobs  # pylint: disable=unused-import
-from jobs.batch_jobs import cron_jobs  # pylint: disable=unused-import
-from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
+from jobs.batch_jobs import blog_validation_jobs  # isort:skip # pylint: disable=unused-import
+from jobs.batch_jobs import cron_jobs  # isort:skip # pylint: disable=unused-import
+from jobs.batch_jobs import validation_jobs  # isort:skip # pylint: disable=unused-import
 
 
 def get_all_jobs() -> List[base_jobs.JobMetaclass]:

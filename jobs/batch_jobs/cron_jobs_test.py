@@ -32,7 +32,7 @@ from jobs.types import job_run_result
 import python_utils
 
 import apache_beam as beam
-from typing import Dict, Iterable, List, Set, Tuple, Union # isort:skip
+from typing import Dict, List, Set, Tuple, Union # isort:skip
 
 MYPY = False
 if MYPY:
@@ -249,6 +249,13 @@ class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
 
     VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+    TOPIC_2_ID = 'topic_2_id'
+    TOPIC_1_ID = 'topic_1_id'
+    TOPIC_2_ID = 'topic_2_id'
+    LANG_1 = 'lang_1'
+    LANG_2 = 'lang_2'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
@@ -261,18 +268,18 @@ class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
             change_cmd={},
             score_category='irelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='topic',
-            target_id='topic_id',
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
             target_version_at_submission=0,
-            language_code='lang'
+            language_code=self.LANG_1
         )
         suggestion_model.update_timestamps()
         suggestion_model.put()
 
         self.assert_job_output_is_empty()  # type: ignore[no-untyped-call]
 
-    def test_creates_stats_model_from_one_suggestion(self) -> None:
-        exp_summary = self.create_model( # type: ignore[no-untyped-call]
+    def test_creates_stats_model_from_one_in_review_suggestion(self) -> None:
+        suggestion_model = self.create_model( # type: ignore[no-untyped-call]
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
@@ -281,23 +288,263 @@ class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
                 'state_name': 'state',
                 'content_id': 'content_id',
                 'language_code': 'lang',
-                'content_html': '123456789',
-                'translation_html': '123456789',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
                 'data_format': 'format'
             },
             score_category='irelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='topic',
-            target_id='topic_id',
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
             target_version_at_submission=0,
-            language_code='lang'
+            language_code=self.LANG_1
         )
-        exp_summary.update_timestamps()
-        exp_summary.put()
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
 
         self.assert_job_output_is([ # type: ignore[no-untyped-call]
             job_run_result.JobRunResult(stdout='SUCCESS 1')
         ])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+
+        assert translation_stats_model is not None
+        self.assertEqual(translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.accepted_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            0
+        )
+        self.assertEqual(
+            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(
+            translation_stats_model.contribution_dates,
+            [datetime.date.today()]
+        )
+
+    def test_creates_stats_model_from_one_in_review_suggestion_with_opportunity(
+            self
+    ) -> None:
+        suggestion_model = self.create_model( # type: ignore[no-untyped-call]
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'format'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1
+        )
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+        opportunity_model = self.create_model( # type: ignore[no-untyped-call]
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS 1')
+        ])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+
+        assert translation_stats_model is not None
+        self.assertEqual(translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(
+            translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.accepted_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            0
+        )
+        self.assertEqual(
+            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(
+            translation_stats_model.contribution_dates,
+            [datetime.date.today()]
+        )
+
+    def test_creates_stats_model_from_one_accepted_suggestion(self) -> None:
+        suggestion_model = self.create_model( # type: ignore[no-untyped-call]
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'format'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1
+        )
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS 1')
+        ])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+
+        assert translation_stats_model is not None
+        self.assertEqual(translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            1
+        )
+        self.assertEqual(
+            translation_stats_model.accepted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(
+            translation_stats_model.contribution_dates,
+            [datetime.date.today()]
+        )
+
+    def test_creates_stats_model_from_one_multiple_suggestions(self) -> None:
+        suggestion_1_model = self.create_model( # type: ignore[no-untyped-call]
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'format'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1
+        )
+        suggestion_1_model.update_timestamps()
+        suggestion_2_model = self.create_model(  # type: ignore[no-untyped-call]
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333 444 555',
+                'translation_html': '111 222 333 444 555',
+                'data_format': 'format'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_REJECTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1,
+            last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        )
+        suggestion_2_model.update_timestamps(update_last_updated_time=False)
+        suggestion_models.GeneralSuggestionModel.put_multi([
+            suggestion_1_model, suggestion_2_model])
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS 1')
+        ])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+
+        assert translation_stats_model is not None
+        self.assertEqual(translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_stats_model.submitted_translations_count, 2)
+        self.assertEqual(
+            translation_stats_model.submitted_translation_word_count, 8)
+        self.assertEqual(translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            1
+        )
+        self.assertEqual(
+            translation_stats_model.accepted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.rejected_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model.rejected_translation_word_count, 5)
+        self.assertEqual(
+            translation_stats_model.contribution_dates,
+            [
+                datetime.date.today(),
+                datetime.date.today() - datetime.timedelta(days=1)
+            ]
+        )
 
 
 class CombineStatsTests(job_test_utils.PipelinedTestBase):
@@ -305,11 +552,19 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
     def create_test_pipeline(
         self, entry_stats: StatsType
     ) -> beam.PCollection[Dict[str, Union[int, Set[datetime.date]]]]:
+        """Creates testing pipeline with some entry stats.
+
+        Args:
+            entry_stats: StatsType. The stast with which to start the pipeline.
+
+        Returns:
+            PCollection. The testing pipeline to be executed.
+        """
         return (
             self.pipeline
             | beam.Create(entry_stats)
             | beam.CombineValues(cron_jobs.CombineStats())
-            | beam.Values()
+            | beam.Values()  # pylint: disable=no-value-for-parameter
             | beam.Map(lambda stats: stats.to_dict())
         )
 
