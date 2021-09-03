@@ -24,7 +24,7 @@ import { StateDiffModalBackendApiService }
  from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';  
 
 
-fdescribe('state diff modal backend api service', () => {
+describe('state diff modal backend api service', () => {
     let sdmbas: StateDiffModalBackendApiService;
     let http: HttpTestingController;
     let sof: StateObjectFactory;

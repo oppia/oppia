@@ -32,7 +32,7 @@ interface ResInterface {
     }
 };
 
-fdescribe('State Diff Modal Component', () => {
+describe('State Diff Modal Component', () => {
     let sof: StateObjectFactory;
     let sdmbas: StateDiffModalBackendApiService;
     let component: StateDiffModalComponent;
@@ -90,7 +90,7 @@ fdescribe('State Diff Modal Component', () => {
                     jasmine.SpyObj<StateDiffModalBackendApiService>);
     });
 
-    fdescribe('when new state and old state are truthy', () => {
+    describe('when new state and old state are truthy', () => {
         beforeEach(() => {
             newState = sof.createDefaultState(newState);
             oldState = sof.createDefaultState(oldState);
@@ -125,7 +125,7 @@ fdescribe('State Diff Modal Component', () => {
         }));
     });
 
-    fdescribe('when new state and old state are falsy', () => {
+    describe('when new state and old state are falsy', () => {
         beforeEach(waitForAsync(() => {
             oldState = null;
             newState = null;

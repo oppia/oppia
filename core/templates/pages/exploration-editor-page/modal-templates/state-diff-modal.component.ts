@@ -32,11 +32,14 @@ import { StateDiffModalBackendApiService } from '../services/state-diff-modal-ba
 })
 export class StateDiffModalComponent 
  extends ConfirmOrCancelModal implements OnInit {
-    headers: any;
     newState: State | null;
     oldState: State | null;
     newStateName: string;
     oldStateName: string;
+    headers: {
+        leftPane: string;
+        rightPane: string;
+    };
     yamlStrs: {
         leftPane: string;
         rightPane: string;
