@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import json
 import logging
-import xml
 
 from constants import constants
 from core.domain import fs_domain
@@ -34,6 +33,7 @@ import python_utils
 import utils
 
 import bs4
+import defusedxml.ElementTree
 
 
 def escape_html(unescaped_html_data):
@@ -636,9 +636,9 @@ def is_parsable_as_xml(xml_string):
     if not isinstance(xml_string, python_utils.BASESTRING):
         return False
     try:
-        xml.etree.ElementTree.fromstring(xml_string)
+        defusedxml.ElementTree.fromstring(xml_string)
         return True
-    except xml.etree.ElementTree.ParseError:
+    except defusedxml.ElementTree.ParseError:
         return False
 
 

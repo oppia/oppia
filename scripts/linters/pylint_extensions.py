@@ -339,7 +339,12 @@ class HangingIndentChecker(checkers.BaseChecker):
                         if comment_index == 0:
                             continue
                         else:
-                            if split_content[comment_index - 1].endswith('('):
+                            last_content_before_comment = (
+                                split_content[comment_index - 1])
+                            if (
+                                    last_content_before_comment.endswith('(') or
+                                    last_content_before_comment.endswith('[')
+                            ):
                                 continue
                     self.add_message(
                         'no-break-after-hanging-indent', line=line_num)
