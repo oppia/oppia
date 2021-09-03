@@ -33,10 +33,10 @@ import feconf
 from jobs import base_jobs
 from jobs.io import ndb_io
 from jobs.types import job_run_result
+import python_utils
 
 import apache_beam as beam
-
-from typing import Dict, Iterable, List, Optional, Set, Tuple, Union, cast
+from typing import Dict, Iterable, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -51,6 +51,7 @@ if MYPY: # pragma: no cover
 ) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.suggestion
 ])
+datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()
 
 
@@ -109,24 +110,114 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
 class GenerateTranslationContributionStats(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
-    MAX_BATCH_SIZE = 1000
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Generates the translation contributins stats.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS x' results, where x is
+            the number of generated stats..
+        """
+        suggestions_grouped_by_target = (
+            self.pipeline
+            | 'Get all non-deleted suggestion models' >> ndb_io.GetModels( # type: ignore[no-untyped-call]
+                suggestion_models.GeneralSuggestionModel.get_all(
+                    include_deleted=False))
+            # We need to window the models so that CoGroupByKey below
+            # works properly.
+            | 'Window the suggestions' >> beam.WindowInto(
+                beam.window.Sessions(10 * 60))
+            | 'Filter translate suggestions' >> beam.Filter(
+                lambda m: (
+                    m.suggestion_type ==
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ))
+            | 'Transform to suggestion domain object' >> beam.Map(
+                suggestion_services.get_suggestion_from_model)
+            | 'Group by target' >> beam.GroupBy(lambda m: m.target_id)
+        )
+        exp_opportunities = (
+            self.pipeline
+            | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(  # type: ignore[no-untyped-call]
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                    include_deleted=False))
+            # We need to window the models so that CoGroupByKey below
+            # works properly.
+            | 'Window the opportunities' >> beam.WindowInto(
+                beam.window.Sessions(10 * 60))
+            | 'Transform to opportunity domain object' >> beam.Map(
+                opportunity_services.
+                get_exploration_opportunity_summary_from_model)
+            | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
+        )
+
+        new_user_stats_models = (
+            {
+                'suggestion': suggestions_grouped_by_target,
+                'opportunity': exp_opportunities
+            }
+            | 'Merge models' >> beam.CoGroupByKey()
+            | 'Get rid of key' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Generate stats' >> beam.ParDo(
+                lambda x: self._generate_stats(
+                    x['suggestion'][0] if len(x['suggestion']) else [],
+                    x['opportunity'][0][0] if len(x['opportunity']) else None
+                ))
+            | 'Group by key' >> beam.GroupByKey()
+            | 'Combine the stats' >> beam.CombineValues(CombineStats())
+            | 'Generate models from stats' >> beam.MapTuple(
+                self._generate_translation_contribution_model)
+        )
+
+        unused_put_result = (
+            new_user_stats_models
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            new_user_stats_models
+            | 'Count all new models' >> (
+                beam.combiners.Count.Globally().without_defaults())
+            | 'Only create result for new models when > 0' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Create result for new models' >> beam.Map(
+                lambda x: job_run_result.JobRunResult(
+                    stdout='SUCCESS %s' % x)
+                )
+        )
 
     @staticmethod
     def _generate_stats(
-        suggestions: List[suggestion_registry.SuggestionTranslateContent],
+        suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
     ) -> Iterable[Tuple[str, Dict[str, Union[bool, int, str]]]]:
-        """"""
+        """Generates translation contribution stats for each suggestion.
+
+        Args:
+            suggestions: iter(SuggestionTranslateContent). Suggestions for which
+                the stats should be generated.
+            opportunity: ExplorationOpportunitySummary. Opportunity for which
+                were the suggestions generated. Used to extract topic ID.
+
+        Yields:
+            tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
+            The stats dictionary has four fields:
+                suggestion_status: str. What is the status of the suggestion.
+                edited_by_reviewer: bool. Whether the suggestion was edited by
+                    the reviewer.
+                content_word_count: int. The word count of the content of
+                    the suggestion.
+                last_updated_date: str. When was the suggestion last updated.
+        """
         # When opportunity is not availabe we leave the topic ID empty.
         topic_id = ''
         if opportunity is not None:
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            # Count the number of words in the original content, ignoring any HTML
-            # tags and attributes.
-            content_plain_text = html_cleaner.strip_html_tags(
-                suggestion.change.content_html)
+            # Count the number of words in the original content, ignoring any
+            # HTML tags and attributes.
+            content_plain_text = html_cleaner.strip_html_tags( # type: ignore[no-untyped-call]
+                suggestion.change.content_html) # type: ignore[attr-defined]
             content_word_count = len(content_plain_text.split())
 
             key = (
@@ -141,105 +232,122 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
             yield (key, translation_contribution_stats_dict)
 
     @staticmethod
-    def _combine_stats(
-        translations: List[Dict[str, Union[bool, int, str]]]
-    ) -> Dict[str, Union[int, Set[str]]]:
-        """"""
-        is_accepted = lambda trans: (
-            trans['suggestion_status'] == suggestion_models.STATUS_ACCEPTED
-        )
-        accepted_translations = filter(is_accepted, translations)
-        accepted_without_reviewer_edits_translations = filter(
-            lambda trans: trans['edited_by_reviewer'], accepted_translations)
-        is_rejected = lambda trans: (
-            trans['suggestion_status'] == suggestion_models.STATUS_REJECTED
-        )
-        rejected_translations = filter(is_rejected, translations)
-        get_word_count = lambda trans: trans['content_word_count']
-        get_suggestion_date = lambda trans: (
-            datetime.datetime.strptime(
-                trans['last_updated_date'], '%Y-%m-%d').date()
-        )
-        return {
-            'submitted_translations_count': len(translations),
-            'submitted_translation_word_count': sum(
-                map(get_word_count, translations)),
-            'accepted_translations_count': len(accepted_translations),
-            'accepted_translations_without_reviewer_edits_count': len(
-                accepted_without_reviewer_edits_translations),
-            'accepted_translation_word_count': sum(
-                map(get_word_count, accepted_translations)),
-            'rejected_translations_count': len(rejected_translations),
-            'rejected_translation_word_count': sum(
-                map(get_word_count, rejected_translations)),
-            'contribution_dates': set(map(get_suggestion_date, translations)
-            )
-        }
-
-    @staticmethod
     def _generate_translation_contribution_model(
-        key_and_translation_stats: Tuple[str, Dict[str, Union[int, Set[str]]]]
+        entity_id: str,
+        translation: suggestion_registry.TranslationContributionStats
     ) -> suggestion_models.TranslationContributionStatsModel:
-        key, translation_stats = key_and_translation_stats
-        language_code, contributor_user_id, topic_id = key.split('.')
-        suggestion_models.TranslationContributionStatsModel.create(
-            language_code=language_code,
-            contributor_user_id=contributor_user_id,
-            topic_id=topic_id,
-            submitted_translations_count=(
-                translation_stats['submitted_translations_count']),
-            submitted_translation_word_count=submitted_translation_word_count,
-            accepted_translations_count=accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count=(
-                accepted_translations_without_reviewer_edits_count),
-            accepted_translation_word_count=accepted_translation_word_count,
-            rejected_translations_count=rejected_translations_count,
-            rejected_translation_word_count=rejected_translation_word_count,
-            contribution_dates=contribution_dates
+        """Generate translation contribution stats model from the domain object.
+
+        Args:
+            entity_id: str. The ID of the model.
+            translation: TranslationContributionStats. Domain object.
+
+        Returns:
+            TranslationContributionStatsModel. The created model.
+        """
+        language_code, contributor_user_id, topic_id = entity_id.split('.')
+        with datastore_services.get_ndb_context():
+            translation_contributions_stats_model = (
+                suggestion_models.TranslationContributionStatsModel(
+                    id=entity_id,
+                    language_code=language_code,
+                    contributor_user_id=contributor_user_id,
+                    topic_id=topic_id,
+                    submitted_translations_count=(
+                        translation.submitted_translations_count),
+                    submitted_translation_word_count=(
+                        translation.submitted_translation_word_count),
+                    accepted_translations_count=(
+                        translation.accepted_translations_count),
+                    accepted_translations_without_reviewer_edits_count=(
+                        translation
+                        .accepted_translations_without_reviewer_edits_count
+                    ),
+                    accepted_translation_word_count=(
+                        translation.accepted_translation_word_count),
+                    rejected_translations_count=(
+                        translation.rejected_translations_count),
+                    rejected_translation_word_count=(
+                        translation.rejected_translation_word_count),
+                    contribution_dates=translation.contribution_dates
+                )
+            )
+            translation_contributions_stats_model.update_timestamps()
+            return translation_contributions_stats_model
+
+
+class CombineStats(beam.CombineFn):  # type: ignore[misc]
+    """CombineFn for combining the stats."""
+
+    def create_accumulator(
+        self
+    ) -> suggestion_registry.TranslationContributionStats:
+        return suggestion_registry.TranslationContributionStats.create_default()
+
+    def add_input(
+        self,
+        accumulator: suggestion_registry.TranslationContributionStats,
+        translation: Dict[str, Union[bool, int, str]]
+    ) -> suggestion_registry.TranslationContributionStats:
+        is_accepted = (
+            translation['suggestion_status'] ==
+            suggestion_models.STATUS_ACCEPTED
+        )
+        is_accepted_and_edited = (
+            is_accepted and translation['edited_by_reviewer'])
+        is_rejected = (
+            translation['suggestion_status'] ==
+            suggestion_models.STATUS_REJECTED
+        )
+        word_count = translation['content_word_count']
+        suggestion_date = datetime.datetime.strptime(
+            python_utils.UNICODE(translation['last_updated_date']), '%Y-%m-%d'
+        ).date()
+        return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
+            accumulator.language_code,
+            accumulator.contributor_user_id,
+            accumulator.topic_id,
+            accumulator.submitted_translations_count + 1,
+            accumulator.submitted_translation_word_count + word_count,
+            accumulator.accepted_translations_count + int(is_accepted),
+            (
+                accumulator.accepted_translations_without_reviewer_edits_count +
+                int(is_accepted_and_edited)
+            ),
+            (
+                accumulator.accepted_translation_word_count +
+                word_count * int(is_accepted)
+            ),
+            accumulator.rejected_translations_count + int(is_rejected),
+            (
+                accumulator.rejected_translation_word_count +
+                word_count * int(is_rejected)
+            ),
+            accumulator.contribution_dates | {suggestion_date}
         )
 
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """"""
-        suggestions_grouped_by_target = (
-            self.pipeline
-            | 'Get all non-deleted suggestion models' >> ndb_io.GetModels( # type: ignore[no-untyped-call]
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False))
-            | 'Filter translate suggestions' >> beam.Filter(
-                lambda m: (
-                    m.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                ))
-            | 'Transform to suggestion domain object' >> beam.Map(
-                suggestion_services.get_suggestion_from_model)
-            | 'Group by target' >> beam.GroupBy(lambda m: m.target_id)
-        )
-        exp_opportunities = (
-            self.pipeline
-            | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(  # type: ignore[no-untyped-call]
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
-                    include_deleted=False))
-            | 'Transform to opportunity domain object' >> beam.Map(
-                opportunity_services.
-                get_exploration_opportunity_summary_from_model)
-            | beam.GroupBy(lambda m: m.id)
+    def merge_accumulators(
+        self,
+        accumulators: Iterable[suggestion_registry.TranslationContributionStats]
+    ) -> suggestion_registry.TranslationContributionStats:
+        return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
+            list(accumulators)[0].language_code,
+            list(accumulators)[0].contributor_user_id,
+            list(accumulators)[0].topic_id,
+            sum(acc.submitted_translations_count for acc in accumulators),
+            sum(acc.submitted_translation_word_count for acc in accumulators),
+            sum(acc.accepted_translations_count for acc in accumulators),
+            sum(
+                acc.accepted_translations_without_reviewer_edits_count
+                for acc in accumulators
+            ),
+            sum(acc.accepted_translation_word_count for acc in accumulators),
+            sum(acc.rejected_translations_count for acc in accumulators),
+            sum(acc.rejected_translation_word_count for acc in accumulators),
+            set().union(*[acc.contribution_dates for acc in accumulators])
         )
 
-        new_user_stats_models = (
-            {
-                'suggestions': suggestions_grouped_by_target,
-                'opportunities': exp_opportunities
-            }
-            | 'Merge models' >> beam.CoGroupByKey()
-            | 'Get rid of key' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Generate stats' >> beam.ParDo(
-                lambda x: self._generate_stats(
-                    x['suggestions'],
-                    x['opportunities'][0] if len(x['opportunities']) else None
-                ))
-            | 'Group by key' >> beam.CoGroupByKey()
-            | 'Combine the stats' >> beam.CombineValues(self._combine_stats)
-            | ''
-        )
-
-
+    def extract_output(
+        self, accumulator: suggestion_registry.TranslationContributionStats
+    ) -> suggestion_registry.TranslationContributionStats:
+        return accumulator
