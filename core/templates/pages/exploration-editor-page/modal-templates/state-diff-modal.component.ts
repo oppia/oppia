@@ -74,7 +74,7 @@ export class StateDiffModalComponent
       if (this.oldState) {
         this.stateDiffModalBackendApiService.fetchYaml(
           this.oldState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.leftPane = response.data.yaml;   
+          this.yamlStrs.leftPane = response.data.yaml;
         });
       } else {
         // Note: the timeout is needed or the string will be sent
@@ -84,7 +84,7 @@ export class StateDiffModalComponent
           this.yamlStrs.leftPane = '';
         }, 200);
       }
-    
+
       if (this.newState) {
         this.stateDiffModalBackendApiService.fetchYaml(
           this.newState.toBackendDict(), 50, url).then(response => {

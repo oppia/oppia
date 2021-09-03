@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController }
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateDiffModalBackendApiService }
-  from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';  
+  from './state-diff-modal-backend-api.service';
 
 
 describe('state diff modal backend api service', () => {
@@ -31,7 +31,7 @@ describe('state diff modal backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ]
+      imports: [HttpClientTestingModule,]
     });
     sdmbas = TestBed.inject(StateDiffModalBackendApiService);
     http = TestBed.inject(HttpTestingController);
@@ -51,7 +51,7 @@ describe('state diff modal backend api service', () => {
       let state = sof.createDefaultState(stateName);
 
       sdmbas.fetchYaml(
-          state.toBackendDict(), 50, '/createhandler/state_yaml/exp1')
+        state.toBackendDict(), 50, '/createhandler/state_yaml/exp1')
         .then(successHandler, errorHandler);
 
       let req = http.expectOne('/createhandler/state_yaml/exp1');
