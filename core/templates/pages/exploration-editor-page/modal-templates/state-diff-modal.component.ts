@@ -76,7 +76,7 @@ export class StateDiffModalComponent
             // Note: the timeout is needed or the string will be sent
             // before codemirror has fully loaded and will not be
             // displayed. This causes issues with the e2e tests.
-            setTimeout(function() {
+            setTimeout(() => {
                 this.yamlStrs.leftPane = '';
             }, 200);
         }
@@ -90,7 +90,7 @@ export class StateDiffModalComponent
             // Note: the timeout is needed or the string will be sent
             // before codemirror has fully loaded and will not be
             // displayed. This causes issues with the e2e tests.
-            setTimeout(function() {
+            setTimeout(() => {
                 this.yamlStrs.rightPane = '';
             }, 200);
         }

@@ -126,7 +126,7 @@ fdescribe('State Diff Modal Component', () => {
     });
 
     fdescribe('when new state and old state are falsy', () => {
-        beforeEach(() => {
+        beforeEach(waitForAsync(() => {
             oldState = null;
             newState = null;
 
@@ -135,28 +135,29 @@ fdescribe('State Diff Modal Component', () => {
             component.newStateName = newStateName;
             component.oldState = oldState;
             component.oldStateName = oldStateName;
-        });
+        }));
 
-        // it('should initialize component properties after component is initialized',
-        // fakeAsync(() => {
-        //     component.ngOnInit();
-        //     tick(201);
-        //     fixture.whenStable()
-        //     .then(() => {
-        //         expect(component.headers).toBe(headers);
-        //         expect(component.newStateName).toBe(newStateName);
-        //         expect(component.oldStateName).toBe(oldStateName);
-        //     })
-        // }));
+        it('should initialize component properties after component is initialized',
+        fakeAsync(() => {
+            component.ngOnInit();
+            tick(201);
+            fixture.whenStable()
+            .then(() => {
+                expect(component.headers).toBe(headers);
+                expect(component.newStateName).toBe(newStateName);
+                expect(component.oldStateName).toBe(oldStateName);
+            })
+        }));
 
-        // it('should evaluate yaml strings object when timeout tasks are flushed',
-        // fakeAsync(() => {
-        //     flush();
-        //     fixture.whenStable()
-        //     .then(() => {
-        //         expect(component.yamlStrs.leftPane).toBe('');
-        //         expect(component.yamlStrs.rightPane).toBe('');
-        //     })
-        // }));
+        it('should evaluate yaml strings object when timeout tasks are flushed',
+        fakeAsync(() => {
+            component.ngOnInit();
+            tick(201);
+            fixture.whenStable()
+            .then(() => {
+                expect(component.yamlStrs.leftPane).toBe('');
+                expect(component.yamlStrs.rightPane).toBe('');
+            });
+        }));
     });
 });
