@@ -276,17 +276,6 @@ export interface ItemSelectionInputCustomizationArgs {
 }
 
 
-export interface LogicProofCustomizationArgsBackendDict {
-  question: {
-    value: Object;
-  };
-}
-export interface LogicProofCustomizationArgs {
-  question: {
-    value: Object;
-  };
-}
-
 
 export interface MathEquationInputCustomizationArgsBackendDict {
   useFractionForDivision: boolean;
@@ -430,7 +419,6 @@ export type InteractionCustomizationArgsBackendDict = (
   ImageClickInputCustomizationArgsBackendDict |
   InteractiveMapCustomizationArgsBackendDict |
   ItemSelectionInputCustomizationArgsBackendDict |
-  LogicProofCustomizationArgsBackendDict |
   MathEquationInputCustomizationArgsBackendDict |
   MultipleChoiceInputCustomizationArgsBackendDict |
   MusicNotesInputCustomizationArgsBackendDict |
@@ -453,7 +441,6 @@ export type InteractionCustomizationArgs = (
   ImageClickInputCustomizationArgs |
   InteractiveMapCustomizationArgs |
   ItemSelectionInputCustomizationArgs |
-  LogicProofCustomizationArgs |
   MathEquationInputCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |

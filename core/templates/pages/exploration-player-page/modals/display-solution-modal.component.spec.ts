@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for DisplaySolutionModalComponent.
  */
 
+import { Component, Directive } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { AudioPlayerService } from 'services/audio-player.service';
@@ -29,6 +29,17 @@ import { HintsAndSolutionManagerService } from '../services/hints-and-solution-m
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplaySolutionModalComponent } from './display-solution-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+
+let MockAngularHtmlBindWrapperDirective = function(
+    options: Component): Directive {
+  const metadata: Directive = {
+    selector: options.selector,
+    inputs: options.inputs,
+    outputs: options.outputs
+  };
+  return <undefined>Directive(metadata)(class _ { });
+};
 
 describe('Display Solution Modal', () => {
   let fixture: ComponentFixture<DisplaySolutionModalComponent>;
@@ -64,7 +75,10 @@ describe('Display Solution Modal', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         DisplaySolutionModalComponent,
-        AngularHtmlBindWrapperDirective
+        MockTranslatePipe,
+        MockAngularHtmlBindWrapperDirective({
+          selector: 'angular-html-bind-wrapper',
+          inputs: ['htmlData'] })
       ],
       providers: [
         NgbActiveModal,

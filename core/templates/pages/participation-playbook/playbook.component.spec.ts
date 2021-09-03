@@ -55,7 +55,8 @@ class MockWindowRef {
 
     set onhashchange(val) {
       this.location.hashChange = val;
-    }
+    },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
