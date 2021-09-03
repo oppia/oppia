@@ -189,7 +189,7 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
                 create the user stats model.
 
         Yields:
-            iterable(UserStatsModel). The created user stats model.
+            UserStatsModel. The created user stats model.
         """
         with datastore_services.get_ndb_context():
             user_stats_model = (
