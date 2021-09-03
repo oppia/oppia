@@ -177,3 +177,15 @@ class ExplorationOpportunitySummaryModelRegenerationJobTests(job_test_utils.JobT
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS'),
             job_run_result.JobRunResult(stdout='SUCCESS')])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        new_opportunities, _, more = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertFalse(more)
+
+        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
+        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
+        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)
