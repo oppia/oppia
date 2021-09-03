@@ -450,6 +450,15 @@ angular.module('oppia').factory('ExplorationStatesService', [
         }
         _states.setState(stateName, angular.copy(stateData));
       },
+      markWrittenTranslationAsNeedingUpdate: function(
+          contentId, languageCode, stateName) {
+        ChangeListService.markTranslationAsNeedingUpdate(
+          contentId, languageCode, stateName);
+        let stateData = _states.getState(stateName);
+        stateData.writtenTranslations.translationsMapping[contentId][
+          languageCode].markAsNeedingUpdate();
+        _states.setState(stateName, angular.copy(stateData));
+      },
       markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
         ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
         let stateData = _states.getState(stateName);
