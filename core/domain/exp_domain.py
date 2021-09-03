@@ -2362,7 +2362,7 @@ class ExplorationSummary(python_utils.OBJECT):
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
-            first_published_msec):
+            first_published_msec, deleted=False):
         """Initializes a ExplorationSummary domain object.
 
         Args:
@@ -2400,6 +2400,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 when the exploration model was last updated.
             first_published_msec: int. Time in milliseconds since the Epoch,
                 when the exploration was first published.
+            deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id
         self.title = title
@@ -2421,6 +2422,7 @@ class ExplorationSummary(python_utils.OBJECT):
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
+        self.deleted = deleted
 
     def validate(self):
         """Validates various properties of the ExplorationSummary.

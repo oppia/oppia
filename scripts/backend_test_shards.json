@@ -265,6 +265,7 @@
     ],
     "10": [
         "core.domain.moderator_services_test",
+        "jobs.batch_jobs.cron_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
         "scripts.linters.js_ts_linter_test",
