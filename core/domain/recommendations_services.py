@@ -157,7 +157,7 @@ def create_default_topic_similarities():
     return save_topic_similarities(topic_similarities_dict)
 
 
-def get_topic_similarity(topic_1, topic_2, topic_similarities=None):
+def get_topic_similarity(topic_1, topic_2):
     """Gets the similarity between two topics, as a float between 0 and 1.
 
     It checks whether the two topics are in the list of default topics. If
@@ -169,8 +169,7 @@ def get_topic_similarity(topic_1, topic_2, topic_similarities=None):
             topic_1 in RECOMMENDATION_CATEGORIES and
             topic_2 in RECOMMENDATION_CATEGORIES
     ):
-        if topic_similarities is None:
-            topic_similarities = get_topic_similarities_dict()
+        topic_similarities = get_topic_similarities_dict()
         return topic_similarities[topic_1][topic_2]
     else:
         if topic_1 == topic_2:
