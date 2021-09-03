@@ -54,3 +54,5 @@ jobs:
         with:
           name: protractor-video
           path: /home/runner/work/oppia/protractor-video
+      - name: Checking Memory Usage
+        run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
