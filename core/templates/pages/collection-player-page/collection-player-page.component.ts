@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner's view of a collection.
  */
 
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -68,7 +68,7 @@ export interface CollectionHandler {
   selector: 'oppia-collection-player-page',
   templateUrl: './collection-player-page.component.html'
 })
-export class CollectionPlayerPageComponent implements OnInit, OnChanges {
+export class CollectionPlayerPageComponent implements OnInit {
   activeHighlightedIconIndex!: number;
   collection!: Collection;
   collectionPlaythrough;
@@ -298,10 +298,10 @@ export class CollectionPlayerPageComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  updateCollection(collection: Collection): void {
+    this.collection = collection;
     if (
-      changes.collection &&
-      changes.collection.currentValue !== null &&
+      this.collection !== null &&
       this.collection.getCollectionNodeCount()
     ) {
       this.generatePathParameters();
@@ -330,9 +330,6 @@ export class CollectionPlayerPageComponent implements OnInit, OnChanges {
     this.nextExplorationId = null;
     this.whitelistedCollectionIdsForGuestProgress = (
       AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
-    setTimeout(() => {
-      this.windowRef.nativeWindow.scrollTo(0, -80);
-    }, 5);
 
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', () => {
@@ -349,8 +346,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnChanges {
     this.readOnlyCollectionBackendApiService.loadCollectionAsync(
       this.collectionId).then(
       (collection) => {
-        this.collection = collection;
-        this.generatePathParameters();
+        this.updateCollection(collection);
         this.pageTitleService.setPageTitle(
           this.collection.getTitle() + ' - Oppia');
 
