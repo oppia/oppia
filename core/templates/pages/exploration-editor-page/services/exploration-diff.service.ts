@@ -276,6 +276,7 @@ export class ExplorationDiffService {
           change.cmd !== 'AUTO_revert_version_number' &&
           change.cmd !== 'edit_exploration_property' &&
           change.cmd !== 'add_written_translation' &&
+          change.cmd !== 'mark_written_translation_as_needing_update' &&
           change.cmd !== 'mark_written_translations_as_needing_update'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);

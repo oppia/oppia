@@ -506,6 +506,14 @@ def apply_change_list(exploration_id, change_list):
                     change.content_id, change.language_code,
                     change.translation_html, change.data_format)
             elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translation_as_needing_update(
+                    change.content_id,
+                    change.language_code
+                )
+            elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
                 exploration.states[
                     change.state_name
