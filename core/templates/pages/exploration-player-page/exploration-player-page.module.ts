@@ -43,21 +43,26 @@ import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/explorati
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { InformationCardModalComponent } from './templates/information-card-modal.component';
+import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
+    MaterialModule,
+    NgbPopoverModule,
     SharedComponentsModule,
     NgbPopoverModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
@@ -66,12 +71,10 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerViewInfoComponent,
-    LearnerAnswerInfoCard,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
@@ -103,6 +106,8 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

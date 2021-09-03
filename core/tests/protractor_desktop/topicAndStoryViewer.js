@@ -20,6 +20,7 @@ var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -81,13 +82,8 @@ describe('Topic and Story viewer functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
@@ -166,11 +162,10 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    const loginButton = element(by.css('.protractor-test-login-button'));
+    var loginButton = element(by.css('.protractor-test-login-button'));
     await action.click('Login button', loginButton);
-    const useManualNavigation = false;
     await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer', useManualNavigation);
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
@@ -183,7 +178,7 @@ describe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
-      await users.createAndLoginAdminUser(
+      await users.createAndLoginCurriculumAdminUser(
         'creator1@storyViewer.com', 'creatorStoryViewer1');
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.expectTopicInformationToBe('Description');
@@ -202,7 +197,17 @@ describe('Topic and Story viewer functionality', function() {
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.moveToPracticeTab();
       await topicViewerPage.selectSkillForPractice('Subtopic TASV1');
-      await topicViewerPage.startPractice();
+
+      await waitFor.clientSideRedirection(async() => {
+        // Start practice to trigger redirection to practice session page.
+        await topicViewerPage.startPractice();
+      }, (url) => {
+        // Wait until the URL has changed to /practice.
+        return (/practice/.test(url));
+      }, async() => {
+        await topicAndStoryViewerPage.waitForPracticeSessionContainer();
+      });
+
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');
       await explorationPlayerPage.clickThroughToNextCard();
       await topicViewerPage.expectMessageAfterCompletion(

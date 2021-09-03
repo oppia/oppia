@@ -51,9 +51,16 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
     'relyingparty/verifyPassword?key=fake-api-key'),
+  // This error covers the case when the PencilCode site uses an
+  // invalid SSL certificate (which can happen when it expires).
+  // In such cases, we ignore the error since it is out of our control.
+  _.escapeRegExp(
+    'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
+    'load resource: net::ERR_CERT_DATE_INVALID'),
 ];
 
-var checkForConsoleErrors = async function(errorsToIgnore) {
+var checkForConsoleErrors = async function(
+    errorsToIgnore, skipDebugging = true) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
@@ -62,8 +69,8 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  const browserLogs = await browser.manage().logs().get('browser');
-  const browserErrors = browserLogs.filter(logEntry => (
+  var browserLogs = await browser.manage().logs().get('browser');
+  var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
@@ -150,11 +157,17 @@ var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
-    '.oppia-base-container'));
+    '.protractor-test-base-container'));
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
-  var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
+
+  // We try to avoid browser.executeScript whereas possible as it
+  // can introduce flakiness.
+  // The usage here is only allowed because this the recommended approach
+  // by protractor to read innerHTML.
+  let promiseValue = await browser.executeScript(
+    'return arguments[0].innerHTML;', oppiaBaseContainer);
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
@@ -172,7 +185,7 @@ var ensurePageHasNoTranslationIds = async function() {
 
 var acceptPrompt = async function(promptResponse) {
   await waitFor.alertToBePresent();
-  const alert = await browser.switchTo().alert();
+  var alert = await browser.switchTo().alert();
   await alert.sendKeys(promptResponse);
   await alert.accept();
   await waitFor.pageToFullyLoad();
@@ -237,10 +250,47 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await openProfileDropdown();
   var topicsAndSkillsDashboardLink = element(by.css(
     '.protractor-test-topics-and-skills-dashboard-link'));
-  await action.click(
-    'Topics and skills dashboard link from dropdown',
-    topicsAndSkillsDashboardLink);
-  await waitFor.pageToFullyLoad();
+  await waitFor.clientSideRedirection(async() => {
+    await action.click(
+      'Topics and skills dashboard link from dropdown',
+      topicsAndSkillsDashboardLink);
+  }, (url) => {
+    return /topics-and-skills-dashboard/.test(url);
+  },
+  async() => {
+    await waitFor.pageToFullyLoad();
+  });
+};
+
+var goOnline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  // For Oppia, any speed above 150KB/s is considered good. These values
+  // are set to be large enough to download and upload a few files and are
+  // found empirically.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: false,
+      latency: 150,
+      download_throughput: 450 * 1024,
+      upload_throughput: 150 * 1024
+    });
+};
+
+var goOffline = async function() {
+  // Download throughput refers to the maximum number of bytes that can be
+  // downloaded in a given time.
+  // Upload throughput refers to the maximum number of bytes that can be
+  // uploaded in a given time.
+  await browser.driver.setNetworkConditions(
+    {
+      offline: true,
+      latency: 0,
+      download_throughput: 0,
+      upload_throughput: 0
+    });
 };
 
 exports.acceptAlert = acceptAlert;
@@ -276,3 +326,6 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
+
+exports.goOffline = goOffline;
+exports.goOnline = goOnline;

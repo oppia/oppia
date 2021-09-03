@@ -15,8 +15,8 @@
 
 """Unit tests for scripts/run_e2e_tests.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import subprocess
@@ -34,6 +34,11 @@ from scripts import scripts_test_utils
 from scripts import servers
 
 CHROME_DRIVER_VERSION = '77.0.3865.40'
+MOCK_RERUN_POLICIES = {
+    'always': run_e2e_tests.RERUN_POLICY_ALWAYS,
+    'known_flakes': run_e2e_tests.RERUN_POLICY_KNOWN_FLAKES,
+    'never': run_e2e_tests.RERUN_POLICY_NEVER,
+}
 
 
 def mock_managed_process(*unused_args, **unused_kwargs):
@@ -254,6 +259,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
@@ -275,10 +282,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_e2e_tests.main(args=[])
 
     def test_work_with_non_ascii_chars(self):
-        def mock_managed_protractor_server(**unused_kwargs): # pylint: disable=unused-argument
+        def mock_managed_protractor_server(**unused_kwargs):  # pylint: disable=unused-argument
             return python_utils.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
-                    stdout='sample\n✓\noutput\n', alive=False))
+                    stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
+                    alive=False))
 
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
@@ -299,6 +307,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server',
             mock_managed_protractor_server,
             expected_kwargs=[
@@ -314,9 +324,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         lines, _ = run_e2e_tests.run_tests(args)
 
-        self.assertEqual(lines, ['sample', u'✓', 'output'])
+        self.assertEqual(
+            [line.decode('utf-8') for line in lines],
+            ['sample', u'✓', 'output']
+        )
 
-    def test_rerun_when_tests_fail(self):
+    def test_rerun_when_tests_fail_with_always_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
 
@@ -327,18 +340,64 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             flake_checker, 'is_test_output_flaky', lambda *_: False,
             expected_args=[
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
             ]))
         self.exit_stack.enter_context(self.swap(
             flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'always'])
 
-    def test_do_not_rerun_when_tests_fail(self):
+    def test_do_not_rerun_when_tests_fail_with_known_flakes_policy(self):
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky', lambda *_: False,
+            expected_args=[
+                ('sample\noutput', 'known_flakes'),
+            ]))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
+
+        run_e2e_tests.main(args=['--suite', 'known_flakes'])
+
+    def test_do_not_rerun_when_tests_fail_with_never_policy(self):
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky', lambda *_: False,
+            expected_args=[
+                ('sample\noutput', 'never'),
+            ]))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
+
+        run_e2e_tests.main(args=['--suite', 'never'])
+
+    def test_rerun_when_tests_flake_with_always_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
 
@@ -346,39 +405,67 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             flake_checker, 'is_test_output_flaky', lambda *_: False,
-            expected_args=[('sample\noutput', 'mySuite')]))
+            expected_args=[
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
+            ]))
         self.exit_stack.enter_context(self.swap(
             flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
-        self.exit_stack.enter_context(self.swap(
-            run_e2e_tests, 'RERUN_NON_FLAKY', False))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'always'])
 
-    def test_rerun_when_tests_flake(self):
+    def test_rerun_when_tests_flake_with_known_flakes_policy(self):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             flake_checker, 'is_test_output_flaky', lambda *_: True,
             expected_args=[
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
+                ('sample\noutput', 'known_flakes'),
+                ('sample\noutput', 'known_flakes'),
+                ('sample\noutput', 'known_flakes'),
             ]))
         self.exit_stack.enter_context(self.swap(
             flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'known_flakes'])
+
+    def test_do_not_rerun_when_tests_flake_with_never_policy(self):
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky', lambda *_: False,
+            expected_args=[
+                ('sample\noutput', 'never'),
+            ]))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
+
+        run_e2e_tests.main(args=['--suite', 'never'])
 
     def test_no_reruns_off_ci_fail(self):
         def mock_run_tests(unused_args):
@@ -397,8 +484,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'check_if_on_ci', lambda: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'always'])
 
     def test_no_reruns_off_ci_pass(self):
         def mock_run_tests(unused_args):
@@ -417,8 +506,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'check_if_on_ci', lambda: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'always'])
 
     def test_start_tests_skip_build(self):
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -446,6 +537,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_webdriver_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
@@ -489,6 +582,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
@@ -531,6 +626,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_webdriver_server', mock_managed_process,
             expected_kwargs=[{'chrome_version': CHROME_DRIVER_VERSION}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[

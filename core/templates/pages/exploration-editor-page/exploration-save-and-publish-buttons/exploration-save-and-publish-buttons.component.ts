@@ -22,6 +22,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
@@ -32,17 +35,20 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/editability.service.ts');
+require('services/internet-connectivity.service.ts');
 
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$scope', 'ChangeListService', 'EditabilityService',
-    'ExplorationRightsService', 'ExplorationSaveService',
-    'ExplorationWarningsService', 'UserExplorationPermissionsService',
+    '$scope', '$uibModal', 'ChangeListService',
+    'EditabilityService', 'ExplorationRightsService', 'ExplorationSaveService',
+    'ExplorationWarningsService', 'InternetConnectivityService',
+    'UserExplorationPermissionsService',
     function(
-        $scope, ChangeListService, EditabilityService,
-        ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService, UserExplorationPermissionsService) {
+        $scope, $uibModal, ChangeListService,
+        EditabilityService, ExplorationRightsService, ExplorationSaveService,
+        ExplorationWarningsService, InternetConnectivityService,
+        UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.isPrivate = function() {
@@ -66,7 +72,30 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ExplorationSaveService.discardChanges();
       };
 
+      let isModalDisplayed = false;
+
       $scope.getChangeListLength = function() {
+        var countChanges = ChangeListService.getChangeList().length;
+
+        const MIN_CHANGES_DISPLAY_PROMPT = 50;
+
+        if (countChanges >= MIN_CHANGES_DISPLAY_PROMPT && !isModalDisplayed &&
+          !$scope.saveIsInProcess) {
+          isModalDisplayed = true;
+          $uibModal.open({
+            template: require(
+              'pages/exploration-editor-page/modal-templates/' +
+              'exploration-save-prompt-modal.template.html'),
+            backdrop: 'static',
+            controller: 'ConfirmOrCancelModalController'
+          }).result.then(function() {
+            $scope.saveChanges();
+          }, function() {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          });
+        }
         return ChangeListService.getChangeList().length;
       };
 
@@ -75,7 +104,9 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       };
 
       $scope.getPublishExplorationButtonTooltip = function() {
-        if ($scope.countWarnings() > 0) {
+        if (!$scope.connectedToInternet) {
+          return 'You can not publish the exploration when offline.';
+        } else if ($scope.countWarnings() > 0) {
           return 'Please resolve the warnings before publishing.';
         } else if ($scope.isExplorationLockedForEditing()) {
           return 'Please save your changes before publishing.';
@@ -85,7 +116,9 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       };
 
       $scope.getSaveButtonTooltip = function() {
-        if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
+        if (!$scope.connectedToInternet) {
+          return 'You can not save the exploration when offline.';
+        } else if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
           return 'Please resolve the warnings.';
         } else if ($scope.isPrivate()) {
           return 'Save Draft';
@@ -139,6 +172,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
         $scope.explorationCanBePublished = false;
+        $scope.connectedToInternet = true;
 
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
@@ -155,6 +189,13 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
                   });
               }
             )
+        );
+        ctrl.directiveSubscriptions.add(
+          InternetConnectivityService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              $scope.connectedToInternet = internetAccessible;
+              $scope.$applyAsync();
+            })
         );
       };
 

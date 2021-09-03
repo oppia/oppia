@@ -16,8 +16,8 @@
 
 """Tests for suggestion controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 
@@ -64,7 +64,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SuggestionUnitTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -82,7 +82,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.normal_useer_id = self.get_user_id_from_email(
             self.NORMAL_USER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
         user_services.allow_user_to_review_question(self.reviewer_id)
@@ -90,20 +90,20 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        exploration = (
+        self.exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['State 1'].update_content(
+        self.exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exploration.states['State 2'].update_content(
+        self.exploration.states['State 2'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exploration.states['State 3'].update_content(
+        self.exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
+        exp_services._save_exploration(self.editor_id, self.exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
@@ -121,7 +121,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # Create some suggestions in the backend.
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            self.exploration.version,
             self.author_id, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -132,7 +133,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'change to state 1')
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            self.exploration.version,
             self.author_id_2, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -143,7 +145,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'change to state 2')
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            self.exploration.version,
             self.author_id_2, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -160,15 +163,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': 'exp1',
-                'target_version_at_submission': exploration.version,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 3',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>'
+                    'translation_html': '<p>In Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'change to state 3',
             }, csrf_token=csrf_token)
@@ -543,7 +547,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         # Testing admins can accept suggestions.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -687,7 +691,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         self.post_json(
             '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
@@ -723,7 +728,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_id': exp_id,
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content',
                     'language_code': 'hi',
@@ -733,7 +738,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '"&quot;translation_image.png&quot;" '
                         'caption-with-value="&quot;&quot;" '
                         'alt-with-value="&quot;Image&quot;">'
-                        '</oppia-noninteractive-image>')
+                        '</oppia-noninteractive-image>'),
+                    'data_format': 'html'
                 },
             }, csrf_token=csrf_token,
             upload_files=(
@@ -773,6 +779,36 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
 
+    def test_set_of_strings_translation_suggestion_creation(self):
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': ['test1', 'test2'],
+                    'data_format': 'set_of_normalized_string',
+                },
+                'description': 'description',
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        suggestions = self.get_json(
+            '%s?author_id=%s&target_type=%s&target_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.translator_id,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            )['suggestions']
+        self.assertEqual(len(suggestions), 2)
+
     def test_update_suggestion_updates_translation_html(self):
         self.login(self.TRANSLATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -781,7 +817,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             [('author_id', self.translator_id), ('target_id', self.EXP_ID)])[0]
         self.logout()
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json('%s/%s' % (
@@ -797,7 +833,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_update_already_handled_translation(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -828,7 +864,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_update_translations_without_translation_html(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -856,7 +892,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_update_translation_with_invalid_translation_html(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -882,7 +918,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'The parameter \'translation_html\' should be a string.')
+            'The parameter \'translation_html\' should be a string or a list.')
         self.logout()
 
     def test_update_suggestion_updates_question_suggestion_content(self):
@@ -921,19 +957,29 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
         question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
+            'html'] = (
+                '<p>Updated question</p>'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>')
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
 
-        self.put_json('%s/%s' % (
+        self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token)
+            }, csrf_token=csrf_token, upload_files=(
+                ('img.png', 'img.png', raw_image),))
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -943,14 +989,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_question_state_data['content'][
                 'html'],
-            '<p>Updated question</p>')
+            (
+                '<p>Updated question</p>'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>'))
         self.assertEqual(
             new_question_state_data['interaction'][
                 'solution'],
             new_solution_dict)
         self.logout()
 
-    def test_cannot_update_question_with_invalid_skill_difficulty(self):
+    def test_update_question_suggestion_with_large_image_throws_error(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
@@ -983,17 +1034,143 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
+        question_state_data = self._create_valid_question_data(
+            'default_state').to_dict()
+        html_with_file = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data['content']['html'] = html_with_file
+        question_state_data['interaction'][
+            'solution'] = new_solution_dict
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+
+        response_dict = self.post_json('%s/%s' % (
+            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'question_state_data': question_state_data,
+                'skill_difficulty': 0.6
+            }, csrf_token=csrf_token, expected_status_int=400, upload_files=(
+                ('file.svg', 'file.svg', large_image),),)
+
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
+        self.logout()
+
+    def test_update_question_suggestion_with_missing_image_data_throws_error(
+            self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = self._create_valid_question_data(
+            'default_state').to_dict()
+        html_with_file = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data['content']['html'] = html_with_file
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
+        question_state_data['interaction'][
+            'solution'] = new_solution_dict
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.post_json('%s/%s' % (
+            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'question_state_data': question_state_data,
+                'skill_difficulty': 0.6
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertIn(
+            'No image data provided for file with name file.svg.',
+            response_dict['error'])
+        self.logout()
+
+    def test_cannot_update_question_with_invalid_skill_difficulty(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
         question_state_data['content'][
             'html'] = '<p>Updated question</p>'
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
@@ -1045,10 +1222,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'skill_difficulty': 0.6
@@ -1099,10 +1276,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data
@@ -1156,10 +1333,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
@@ -1199,10 +1376,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         invalid_question_state_data = {}
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json('%s/%s' % (
+        self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': invalid_question_state_data,
@@ -1222,11 +1399,11 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(QuestionSuggestionTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_skill(
             self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION)
         self.question_dict = {
@@ -1294,7 +1471,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions'][0]
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
@@ -1316,9 +1493,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
         (
-            questions, merged_question_skill_links, _) = (
+            questions, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    1, [self.SKILL_ID], ''))
+                    1, [self.SKILL_ID], 0))
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,
@@ -1362,8 +1539,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, received <type'
-            ' \'unicode\'>')
+            'Expected target_version_at_submission to be an int, '
+            'received <class \'str\'>'
+        )
         self.assertEqual(len(suggestions), 1)
         self.logout()
 
@@ -1393,7 +1571,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
 
         self.post_json(
@@ -1524,14 +1703,14 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillSuggestionTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         user_services.allow_user_to_review_question(self.reviewer_id)
 
         self.skill_id = skill_services.get_new_skill_id()
@@ -1572,7 +1751,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_access_suggestion_to_skill_handler(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         thread_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_QUESTION, self.skill_id,
@@ -1591,7 +1770,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_skill_handler_with_invalid_target_type(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = 'new_exp_id'
         self.save_new_default_exploration(exp_id, self.admin_id)
@@ -1631,7 +1810,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_skill_handler_with_invalid_target_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1661,7 +1840,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_skill_handler_with_invalid_action(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -1683,7 +1862,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reject_suggestion_to_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
@@ -1712,7 +1891,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_accept_suggestion_to_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -1782,13 +1961,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserSubmittedSuggestionsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -1809,7 +1988,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_333'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -1844,7 +2023,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
-        self.set_admins([self.ADMIN_USERNAME])
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
@@ -1875,12 +2053,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>'
+                    'translation_html': '<p>new content html in Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)
@@ -1989,17 +2168,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         super(ReviewableSuggestionsHandlerTest, self).setUp()
         self.AUTHOR_EMAIL = 'author@example.com'
         self.REVIEWER_EMAIL = 'reviewer@example.com'
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -2022,7 +2201,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_333'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -2079,16 +2258,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>'
+                    'translation_html': '<p>new content html in Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)

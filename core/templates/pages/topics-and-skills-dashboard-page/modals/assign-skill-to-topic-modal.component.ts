@@ -19,14 +19,17 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 @Component({
   selector: 'oppia-assign-skill-to-topic-modal',
   templateUrl: './assign-skill-to-topic-modal.component.html'
 })
 export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
-  topicSummaries: TopicSummary[];
+  // This property is initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicSummaries!: CreatorTopicSummary[];
   selectedTopicIds: string[] = [];
 
   constructor(

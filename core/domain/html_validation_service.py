@@ -16,15 +16,12 @@
 
 """HTML validation service."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 import logging
-import re
-import xml
 
-import bs4
 from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
@@ -34,6 +31,9 @@ from extensions.rich_text_components import components
 import feconf
 import python_utils
 import utils
+
+import bs4
+import defusedxml.ElementTree
 
 
 def escape_html(unescaped_html_data):
@@ -271,15 +271,13 @@ def validate_customization_args(html_list):
 
     tags_to_original_html_strings = {}
     for html_string in html_list:
-        soup = bs4.BeautifulSoup(
-            html_string.encode(encoding='utf-8'), 'html.parser')
+        soup = bs4.BeautifulSoup(html_string, 'html.parser')
 
         for tag_name in rich_text_component_tag_names:
             for tag in soup.findAll(name=tag_name):
                 tags_to_original_html_strings[tag] = html_string
 
-    for tag in tags_to_original_html_strings:
-        html_string = tags_to_original_html_strings[tag]
+    for tag, html_string in tags_to_original_html_strings.items():
         err_msg_list = list(validate_customization_args_in_tag(tag))
         for err_msg in err_msg_list:
             if err_msg:
@@ -353,8 +351,7 @@ def validate_svg_filenames_in_math_rich_text(
     Returns:
         list(str). A list of invalid math tags in the HTML string.
     """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
@@ -369,7 +366,7 @@ def validate_svg_filenames_in_math_rich_text(
             fs = fs_domain.AbstractFileSystem(
                 file_system_class(entity_type, entity_id))
             filepath = 'image/%s' % svg_filename
-            if not fs.isfile(filepath.encode('utf-8')):
+            if not fs.isfile(filepath):
                 error_list.append(python_utils.UNICODE(math_tag))
     return error_list
 
@@ -385,8 +382,7 @@ def validate_math_content_attribute_in_html(html_string):
         list(dict(str, str)). A list of dicts each having the invalid tags in
         the HTML string and the corresponding exception raised.
     """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
@@ -427,29 +423,6 @@ def does_svg_tag_contains_xmlns_attribute(svg_string):
     )
 
 
-def get_svg_with_xmlns_attribute(svg_string):
-    """Returns the svg_string with xmlns attribute if it does not exist in the
-    svg tag.
-
-    Args:
-        svg_string: str. The SVG string.
-
-    Returns:
-        str. The svg_string with xmlns attribute in the svg tag.
-    """
-    soup = bs4.BeautifulSoup(svg_string, 'html.parser')
-    if soup.find(
-            name='svg', attrs={'xmlns': 'http://www.w3.org/2000/svg'}) is None:
-        # Editing svg_string with soup will result in an invalid svg string
-        # which browsers cannot render. We are adding required
-        # attribute using regex search.
-        svg_string = re.sub(
-            '<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ',
-            svg_string.decode(encoding='utf-8')).encode(encoding='utf-8')
-
-    return svg_string
-
-
 def get_invalid_svg_tags_and_attrs(svg_string):
     """Returns a set of all invalid tags and attributes for the provided SVG.
 
@@ -476,60 +449,28 @@ def get_invalid_svg_tags_and_attrs(svg_string):
     invalid_elements = []
     invalid_attrs = []
     for element in soup.find_all():
-        if element.name.lower() in constants.SVG_ATTRS_WHITELIST:
+        if element.name.lower() in constants.SVG_ATTRS_ALLOWLIST:
             for attr in element.attrs:
                 if attr.lower() not in (
-                        constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
+                        constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)
     return (invalid_elements, invalid_attrs)
 
 
-def check_for_math_component_in_html(html_string):
-    """Checks for existence of Math component tags inside an HTML string.
+def check_for_svgdiagram_component_in_html(html_string):
+    """Checks for existence of SvgDiagram component tags inside an HTML string.
 
     Args:
         html_string: str. HTML string to check.
 
     Returns:
-        str. Updated HTML string with all Math component tags having the new
-        attribute.
+        bool. Whether the given HTML string contains SvgDiagram component tag.
     """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
-    math_tags = soup.findAll(name='oppia-noninteractive-math')
-    return bool(math_tags)
-
-
-def get_latex_strings_without_svg_from_html(html_string):
-    """Extract LaTeX strings from math rich-text components whose svg_filename
-    field is empty.
-
-    Args:
-        html_string: str. The HTML string.
-
-    Returns:
-        list(str). List of unique LaTeX strings from math-tags without svg
-        filename.
-    """
-
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
-    latex_strings = set()
-    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
-        math_content_dict = (
-            json.loads(unescape_html(
-                math_tag['math_content-with-value'])))
-        raw_latex = (
-            objects.UnicodeString.normalize(math_content_dict['raw_latex']))
-        svg_filename = (
-            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
-        if svg_filename == '':
-            latex_strings.add(raw_latex.encode('utf-8'))
-
-    unique_latex_strings = list(latex_strings)
-    return unique_latex_strings
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
+    svgdiagram_tags = soup.findAll(name='oppia-noninteractive-svgdiagram')
+    return bool(svgdiagram_tags)
 
 
 def extract_svg_filenames_in_math_rte_components(html_string):
@@ -543,8 +484,7 @@ def extract_svg_filenames_in_math_rte_components(html_string):
         list(str). A list of svg_filenames present in the HTML.
     """
 
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
     filenames = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
@@ -571,8 +511,7 @@ def add_math_content_to_math_rte_components(html_string):
         str. Updated HTML string with all Math component tags having the new
         attribute.
     """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('raw_latex-with-value'):
             # There was a case in prod where the attr value was empty. This was
@@ -635,8 +574,7 @@ def validate_math_tags_in_html(html_string):
         list(str). A list of invalid math tags in the HTML string.
     """
 
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('raw_latex-with-value'):
@@ -667,8 +605,7 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
         list(str). A list of invalid math tags in the HTML string.
     """
 
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('math_content-with-value'):
@@ -699,10 +636,27 @@ def is_parsable_as_xml(xml_string):
     if not isinstance(xml_string, python_utils.BASESTRING):
         return False
     try:
-        xml.etree.ElementTree.fromstring(xml_string)
+        defusedxml.ElementTree.fromstring(xml_string)
         return True
-    except xml.etree.ElementTree.ParseError:
+    except defusedxml.ElementTree.ParseError:
         return False
+
+
+def convert_svg_diagram_to_image_for_soup(soup_context):
+    """"Renames oppia-noninteractive-svgdiagram tag to
+    oppia-noninteractive-image and changes corresponding attributes for a given
+    soup context.
+
+    Args:
+        soup_context: bs4.BeautifulSoup. The bs4 soup context.
+    """
+    for svg_image in soup_context.findAll(
+            name='oppia-noninteractive-svgdiagram'):
+        svg_filepath = svg_image['svg_filename-with-value']
+        del svg_image['svg_filename-with-value']
+        svg_image['filepath-with-value'] = svg_filepath
+        svg_image['caption-with-value'] = escape_html('""')
+        svg_image.name = 'oppia-noninteractive-image'
 
 
 def convert_svg_diagram_tags_to_image_tags(html_string):
@@ -715,18 +669,39 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     Returns:
         str. The updated html string.
     """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
+    # Handle conversion of oppia-noninteractive-svgdiagram tags that are not
+    # nested inside complex components.
+    convert_svg_diagram_to_image_for_soup(soup)
 
-    for image in soup.findAll(name='oppia-noninteractive-svgdiagram'):
-        # All the attribute values should be enclosed in double
-        # quotes(&amp;quot;).
-        escaped_svg_filepath = escape_html(image['svg_filename-with-value'])
-        escaped_svg_alt_value = escape_html(image['alt-with-value'])
-        del image['svg_filename-with-value']
-        del image['alt-with-value']
-        image['filepath-with-value'] = escaped_svg_filepath
-        image['caption-with-value'] = escape_html('""')
-        image['alt-with-value'] = escaped_svg_alt_value
-        image.name = 'oppia-noninteractive-image'
+    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
+    # oppia-noninteractive-collapsible.
+    for collapsible in soup.findAll(
+            name='oppia-noninteractive-collapsible'):
+        if 'content-with-value' in collapsible.attrs:
+            content_html = json.loads(
+                unescape_html(collapsible['content-with-value']))
+            soup_for_collapsible = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            convert_svg_diagram_to_image_for_soup(soup_for_collapsible)
+            collapsible['content-with-value'] = escape_html(
+                json.dumps(
+                    python_utils.UNICODE(soup_for_collapsible).replace(
+                        '<br/>', '<br>')))
+
+    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
+    # oppia-noninteractive-tabs.
+    for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
+        tab_content_json = unescape_html(tabs['tab_contents-with-value'])
+        tab_content_list = json.loads(tab_content_json)
+        for tab_content in tab_content_list:
+            content_html = tab_content['content']
+            soup_for_tabs = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            convert_svg_diagram_to_image_for_soup(soup_for_tabs)
+            tab_content['content'] = (
+                python_utils.UNICODE(soup_for_tabs).replace(
+                    '<br/>', '<br>'))
+        tabs['tab_contents-with-value'] = escape_html(
+            json.dumps(tab_content_list))
     return python_utils.UNICODE(soup)

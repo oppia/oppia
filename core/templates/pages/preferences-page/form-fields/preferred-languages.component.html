@@ -1,0 +1,34 @@
+<mat-form-field class="preferred-languages-chip-list" appearance="fill">
+  <mat-label>Preferred Exploration Languages</mat-label>
+  <mat-chip-list #chipList aria-label="Subject Interests">
+    <mat-chip *ngFor="let language of preferredLanguages"
+              [selectable]="selectable"
+              [removable]="removable"
+              (removed)="remove(language)">
+      <ng-container *ngFor="let choice of choices">
+        <ng-container *ngIf="choice.id === language">
+          {{ choice.text }}
+        </ng-container>
+      </ng-container>
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+    </mat-chip>
+    <input placeholder="Select preferred languages."
+           #languageInput
+           [formControl]="formCtrl"
+           [matAutocomplete]="auto"
+           [matChipInputFor]="chipList"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           (matChipInputTokenEnd)="add($event)">
+  </mat-chip-list>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let language of choices" [value]="language.id">
+      {{ language.text }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
+
+<style>
+  .preferred-languages-chip-list {
+    width: 100%;
+  }
+</style>

@@ -22,11 +22,12 @@ import { SidebarStatusService } from 'services/sidebar-status.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('SidebarStatusService', () => {
-  let sss, $window;
+  let sss: SidebarStatusService;
+  let $window: WindowRef;
 
   beforeEach(() => {
-    $window = TestBed.get(WindowRef);
-    sss = TestBed.get(SidebarStatusService);
+    $window = TestBed.inject(WindowRef);
+    sss = TestBed.inject(SidebarStatusService);
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.

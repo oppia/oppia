@@ -28,7 +28,8 @@ describe('Exploration permissions model', () => {
       can_voiceover: true,
       can_delete: false,
       can_modify_roles: true,
-      can_edit: true
+      can_edit: true,
+      can_manage_voice_artist: true
     };
 
     let permissionsObject = ExplorationPermissions.createFromBackendDict(
@@ -41,5 +42,6 @@ describe('Exploration permissions model', () => {
     expect(permissionsObject.canDelete).toEqual(false);
     expect(permissionsObject.canModifyRoles).toEqual(true);
     expect(permissionsObject.canEdit).toEqual(true);
+    expect(permissionsObject.canManageVoiceArtist).toEqual(true);
   });
 });

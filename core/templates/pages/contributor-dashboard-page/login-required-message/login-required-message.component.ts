@@ -20,9 +20,9 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import constants from 'assets/constants';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'login-required-message',
@@ -30,8 +30,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class LoginRequiredMessageComponent {
-  OPPIA_AVATAR_IMAGE_URL: string;
-  OPPIA_AVATAR_LINK_URL: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  // This constant is defined as null at AppConstants.
+  OPPIA_AVATAR_LINK_URL!: string | null;
 
   constructor(
     private readonly siteAnalyticsService: SiteAnalyticsService,
@@ -40,7 +44,7 @@ export class LoginRequiredMessageComponent {
     private readonly windowRef: WindowRef) {}
 
   ngOnInit(): void {
-    this.OPPIA_AVATAR_LINK_URL = constants.OPPIA_AVATAR_LINK_URL;
+    this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));

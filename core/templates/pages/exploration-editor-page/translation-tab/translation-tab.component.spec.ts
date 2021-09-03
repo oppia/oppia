@@ -56,7 +56,7 @@ import $ from 'jquery';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 describe('Translation tab component', function() {
@@ -444,7 +444,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({
@@ -470,7 +470,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationLanguage')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({
@@ -496,7 +496,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationState')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({
@@ -522,7 +522,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({

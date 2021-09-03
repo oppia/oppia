@@ -38,20 +38,20 @@ import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent
@@ -77,6 +77,9 @@ class SkillEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

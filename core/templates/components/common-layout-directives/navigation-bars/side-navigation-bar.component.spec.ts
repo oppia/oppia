@@ -18,9 +18,10 @@
 
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
 
 describe('Side Navigation Bar Component', () => {
@@ -46,11 +47,14 @@ describe('Side Navigation Bar Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientModule
+        HttpClientModule,
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        MockRouterModule
       ],
       declarations: [
         SideNavigationBarComponent,
-        TranslatePipe
+        MockTranslatePipe
       ],
       providers: [
         {

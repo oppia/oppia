@@ -15,25 +15,17 @@
 /**
  * @fileoverview Unit tests for the learner answer info service.
  */
-import { TestBed } from '@angular/core/testing';
 
-import { AnswerClassificationResult } from
-  'domain/classifier/answer-classification-result.model';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { State, StateBackendDict, StateObjectFactory } from
-  'domain/state/StateObjectFactory';
-import { LearnerAnswerDetailsBackendApiService } from
-  'domain/statistics/learner-answer-details-backend-api.service';
-import { AnswerClassificationService, InteractionRulesService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { LearnerAnswerInfoService } from
-  'pages/exploration-player-page/services/learner-answer-info.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
+import { TestBed } from '@angular/core/testing';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { LearnerAnswerInfoService } from 'pages/exploration-player-page/services/learner-answer-info.service';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Learner answer info service', () =>{
   let sof: StateObjectFactory;
@@ -49,9 +41,11 @@ describe('Learner answer info service', () =>{
   let answerClassificationService: AnswerClassificationService;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
-  importAllAngularServices();
-
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [LearnerAnswerInfoService]
+    });
     stateDict = {
       content: {
         content_id: 'content',

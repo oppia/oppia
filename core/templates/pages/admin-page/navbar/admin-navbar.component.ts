@@ -37,9 +37,11 @@ export class AdminNavbarComponent implements OnInit {
   isSuperAdmin: boolean = null;
   profileUrl: string = '';
   ADMIN_TAB_URLS = AdminPageConstants.ADMIN_TAB_URLS;
-  logoutUrl = AppConstants.LOGOUT_URL;
+  logoutUrl = '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
   profileDropdownIsActive = false;
   dropdownMenuIsActive = false;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private adminRouterService: AdminRouterService,
@@ -53,10 +55,6 @@ export class AdminNavbarComponent implements OnInit {
 
   isActivitiesTabOpen(): boolean {
     return this.adminRouterService.isActivitiesTabOpen();
-  }
-
-  isJobsTabOpen(): boolean {
-    return this.adminRouterService.isJobsTabOpen();
   }
 
   isConfigTabOpen(): boolean {

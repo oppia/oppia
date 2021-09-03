@@ -16,8 +16,8 @@
 
 """Domain object for contribution opportunities."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 import python_utils
@@ -199,7 +199,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'Expected set of all languages available in '
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
-                'received %s' % list(expected_set_of_all_languages))
+                'received %s' % list(sorted(expected_set_of_all_languages)))
 
 
 class SkillOpportunity(python_utils.OBJECT):

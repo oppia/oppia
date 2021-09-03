@@ -71,6 +71,15 @@ export const AppConstants = {
       'There is an answer among the top 10 which has no explicit feedback.',
   },
 
+  CHECKPOINT_ERROR_MESSAGES: {
+    INIT_CARD: 'The first card of the lesson must be a checkpoint.',
+    TERMINAL_CARD:
+      'Checkpoints are not allowed on the last card of the lesson.',
+    CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
+    BYPASSABLE_CARD:
+      'Checkpoints must not be assigned to cards that can be bypassed.'
+  },
+
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',
 
   EXPLORATION_AND_SKILL_ID_PATTERN: /^[a-zA-Z0-9_-]+$/,
@@ -139,12 +148,14 @@ export const AppConstants = {
 
   DEFAULT_PROFILE_IMAGE_PATH: '/avatar/user_blue_72px.webp',
 
-  LOGOUT_URL: '/logout',
-
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (
     '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>'),
+  // This should be synchronized with SUBTOPIC_MASTERY_DATA_URL
+  // in feconf.
+  SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: (
+    '/subtopic_mastery_handler/data'),
   EDITABLE_TOPIC_DATA_URL_TEMPLATE: '/topic_editor_handler/data/<topic_id>',
 
   LABEL_FOR_CLEARING_FOCUS: 'labelForClearingFocus',
@@ -159,12 +170,8 @@ export const AppConstants = {
     SKILL: 'skill',
     STORY: 'story',
     QUESTION: 'question',
+    BLOG_POST: 'blog_post',
   },
-
-  ASSET_TYPE_AUDIO: 'audio',
-  ASSET_TYPE_IMAGE: 'image',
-  ASSET_TYPE_THUMBNAIL: 'thumbnail',
-  ASSET_TYPE_CLASSIFIER_DATA: 'classifier_data',
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
   IMAGE_UPLOAD_URL_TEMPLATE: (

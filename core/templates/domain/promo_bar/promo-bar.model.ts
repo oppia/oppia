@@ -37,11 +37,19 @@ export class PromoBar {
     return new PromoBar(false, '');
   }
 
-  isPromoBarEnabled(): boolean {
+  get promoBarEnabled(): boolean {
     return this._promoBarEnabled;
   }
 
-  getPromoBarMessage(): string {
+  set promoBarEnabled(status: boolean) {
+    this._promoBarEnabled = status;
+  }
+
+  get promoBarMessage(): string {
     return this._promoBarMessage;
+  }
+
+  set promoBarMessage(message: string) {
+    this._promoBarMessage = message;
   }
 }

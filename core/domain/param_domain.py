@@ -16,8 +16,8 @@
 
 """Domain objects relating to parameters."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
 
@@ -210,7 +210,9 @@ class ParamChange(python_utils.OBJECT):
                 'Expected generator ID to be a string, received %s '
                 % self._generator_id)
 
-        if not hasattr(self, 'generator'):
+        try:
+            hasattr(self, 'generator')
+        except KeyError:
             raise utils.ValidationError(
                 'Invalid generator ID %s' % self._generator_id)
 

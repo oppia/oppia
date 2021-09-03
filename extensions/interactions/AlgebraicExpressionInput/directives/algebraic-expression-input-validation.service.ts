@@ -63,7 +63,7 @@ export class AlgebraicExpressionInputValidationService {
       stateName: string,
       customizationArgs: AlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    let warningsList = [];
+    let warningsList: Warning[] = [];
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 

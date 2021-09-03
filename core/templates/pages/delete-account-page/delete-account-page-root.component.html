@@ -1,0 +1,18 @@
+<oppia-angular-root *ngIf="pageIsShown">
+  <oppia-base-content>
+    <navbar-breadcrumb>
+      <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+        <li>
+          <span class="oppia-navbar-breadcrumb-separator"></span>
+          <span>{{ 'I18N_DELETE_ACCOUNT_PAGE_BREADCRUMB' | translate }}</span>
+        </li>
+      </ul>
+    </navbar-breadcrumb>
+
+    <content>
+      <oppia-delete-account-page></oppia-delete-account-page>
+    </content>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

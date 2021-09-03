@@ -18,11 +18,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { PredictionAlgorithmRegistryService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { TextInputPredictionService } from
-  'interactions/TextInput/text-input-prediction.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 describe('Prediction Algorithm Registry Service', () => {
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
@@ -57,7 +55,7 @@ describe('Prediction Algorithm Registry Service', () => {
 
   describe('when trying to mock prediction services in tests', () => {
     class MockPredictionService {
-      predict(classifierData, answer): number {
+      predict(classifierData: ArrayBuffer, answer: InteractionAnswer): number {
         return 1;
       }
     }

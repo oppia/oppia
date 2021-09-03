@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
  * @fileoverview Component to get changes in human readable form.
  */
 
-angular.module('oppia').component('changesInHumanReadableForm', {
-  bindings: {
-    lostChanges: '='
-  },
-  template: require(
-    './changes-in-human-readable-form.component.html')
-});
+import { Component, Input } from '@angular/core';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
+
+@Component({
+  selector: 'oppia-changes-in-human-readable-form',
+  templateUrl: './changes-in-human-readable-form.component.html'
+})
+export class ChangesInHumanReadableFormComponent {
+  @Input() lostChanges: LostChange[];
+}

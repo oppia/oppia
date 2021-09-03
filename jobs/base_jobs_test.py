@@ -16,26 +16,25 @@
 
 """Unit tests for jobs.base_jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
 
 from core.tests import test_utils
 from jobs import base_jobs
 from jobs import job_test_utils
-import python_utils
 
 
-class MockJobMetaclass(base_jobs._JobMetaclass): # pylint: disable=protected-access
-    """Subclass of _JobMetaclass to avoid interacting with the real registry."""
+class MockJobMetaclass(base_jobs.JobMetaclass):
+    """Subclass of JobMetaclass to avoid interacting with the real registry."""
 
     _JOB_REGISTRY = {}
 
     @classmethod
-    def clear(mcs):
+    def clear(cls):
         """Clears the registry of jobs."""
-        mcs._JOB_REGISTRY.clear()
+        cls._JOB_REGISTRY.clear()
 
 
 class JobMetaclassTests(test_utils.TestBase):
@@ -45,34 +44,41 @@ class JobMetaclassTests(test_utils.TestBase):
         super(JobMetaclassTests, self).tearDown()
 
     def test_does_not_put_base_classes_in_registry(self):
-        class FooJobBase(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=unused-variable
+        class FooJobBase(metaclass=MockJobMetaclass): # pylint: disable=unused-variable
             """Job class with name that ends with 'Base'."""
 
             def __init__(self):
                 pass
 
         self.assertEqual(MockJobMetaclass.get_all_jobs(), [])
+        self.assertEqual(MockJobMetaclass.get_all_job_names(), [])
+        self.assertRaisesRegexp(
+            ValueError, 'FooJobBase is not registered as a job',
+            lambda: MockJobMetaclass.get_job_class_by_name('FooJobBase'))
 
     def test_puts_non_base_classes_in_registry(self):
-        class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
+        class FooJob(metaclass=MockJobMetaclass):
             """Job class that does nothing."""
 
             def __init__(self):
                 pass
 
         self.assertEqual(MockJobMetaclass.get_all_jobs(), [FooJob])
+        self.assertEqual(MockJobMetaclass.get_all_job_names(), ['FooJob'])
+        self.assertIs(MockJobMetaclass.get_job_class_by_name('FooJob'), FooJob)
 
     def test_raises_type_error_for_jobs_with_duplicate_names(self):
-        class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
+        class FooJob(metaclass=MockJobMetaclass):
             """Job class that does nothing."""
 
             def __init__(self):
                 pass
 
-        del FooJob # NOTE: Deletes the variable, not the class.
+        # NOTE: Deletes the variable, not the class.
+        del FooJob
 
         with self.assertRaisesRegexp(TypeError, 'name is already used'):
-            class FooJob(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=function-redefined
+            class FooJob(metaclass=MockJobMetaclass): # pylint: disable=function-redefined
                 """Job class with duplicate name."""
 
                 def __init__(self):

@@ -1,0 +1,52 @@
+<div class="start-new-beam-job-dialog">
+  <h2 mat-dialog-title>Start new <span class="job-name">{{beamJob.name}}</span>?</h2>
+
+  <mat-dialog-content>
+    <div *ngIf="DEV_MODE">
+      <p>
+        You are running Oppia in a developer environment, where jobs can only be run synchronously.
+      </p>
+      <p>
+        This has the following <em>developer-only</em> consequences:
+      </p>
+      <ul>
+        <li>Once a job is started, it cannot be canceled.</li>
+        <li>Jobs will be killed after 10 minutes.</li>
+        <li>Jobs will be killed after leaving this tab or navigating away from the page.</li>
+        <li>Killed jobs will not appear in the job history.</li>
+        <li class="warning">Killed jobs will leave the datastore in an undefined state.</li>
+      </ul>
+      <p>
+        If you are OK with these caveats, then click on the <strong>Start New Job</strong> button
+        and wait patiently for its completion.
+      </p>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="actions">
+    <button mat-button [disabled]="isRunning" mat-dialog-close>Close</button>
+    <button mat-raised-button color="primary" (click)="onActionClick()" [disabled]="isRunning">
+      Start New Job
+    </button>
+
+    <mat-progress-bar *ngIf="isRunning" color="primary" mode="indeterminate"></mat-progress-bar>
+
+  </mat-dialog-actions>
+</div>
+
+<style>
+  .start-new-beam-job-dialog .actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .start-new-beam-job-dialog .job-name {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-weight: bold;
+  }
+  .start-new-beam-job-dialog .warning {
+    color: red;
+    font-weight: bold;
+  }
+</style>

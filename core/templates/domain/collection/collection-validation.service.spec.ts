@@ -18,17 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionNode } from
-  'domain/collection/collection-node.model';
-import { CollectionBackendDict, Collection } from
-  'domain/collection/collection.model';
-import { CollectionValidationService } from
-  'domain/collection/collection-validation.service';
+import { CollectionNode } from 'domain/collection/collection-node.model';
+import { CollectionBackendDict, Collection } from 'domain/collection/collection.model';
+import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 
 describe('Collection validation service', function() {
-  let collectionValidationService: CollectionValidationService = null;
-  let sampleCollectionBackendObject: CollectionBackendDict = null;
-  let _sampleCollection: Collection = null;
+  let collectionValidationService: CollectionValidationService;
+  let sampleCollectionBackendObject: CollectionBackendDict;
+  let _sampleCollection: Collection;
 
   let EXISTS: boolean = true;
   let DOES_NOT_EXIST: boolean = false;
@@ -40,7 +37,7 @@ describe('Collection validation service', function() {
       providers: [CollectionValidationService]
     });
 
-    collectionValidationService = TestBed.get(CollectionValidationService);
+    collectionValidationService = TestBed.inject(CollectionValidationService);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -62,54 +59,55 @@ describe('Collection validation service', function() {
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   });
 
-  var _addCollectionNode = (explorationId, exists, isPublic) => {
-    var collectionNode = CollectionNode.createFromExplorationId(
-      explorationId);
-    if (exists) {
-      collectionNode.setExplorationSummaryObject({
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: isPublic ? 'public' : 'private',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      });
-    }
-    return _sampleCollection.addCollectionNode(collectionNode);
-  };
+  let _addCollectionNode =
+   (explorationId: string, exists: boolean, isPublic: boolean) => {
+     let collectionNode = CollectionNode.createFromExplorationId(
+       explorationId);
+     if (exists) {
+       collectionNode.setExplorationSummaryObject({
+         last_updated_msec: 1591296737470.528,
+         community_owned: false,
+         objective: 'Test Objective',
+         id: '44LKoKLlIbGe',
+         num_views: 0,
+         thumbnail_icon_url: '/subjects/Algebra.svg',
+         human_readable_contributors_summary: {},
+         language_code: 'en',
+         thumbnail_bg_color: '#cd672b',
+         created_on_msec: 1591296635736.666,
+         ratings: {
+           1: 0,
+           2: 0,
+           3: 0,
+           4: 0,
+           5: 0
+         },
+         status: isPublic ? 'public' : 'private',
+         tags: [],
+         activity_type: 'exploration',
+         category: 'Algebra',
+         title: 'Test Title'
+       });
+     }
+     return _sampleCollection.addCollectionNode(collectionNode);
+   };
 
-  var _getCollectionNode = (explorationId) => {
+  let _getCollectionNode = (explorationId: string) => {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
-  var _findPrivateValidationIssues = () => {
+  let _findPrivateValidationIssues = () => {
     return collectionValidationService.findValidationIssuesForPrivateCollection(
       _sampleCollection);
   };
 
-  var _findPublicValidationIssues = () => {
+  let _findPublicValidationIssues = () => {
     return collectionValidationService.findValidationIssuesForPublicCollection(
       _sampleCollection);
   };
 
   it('should not find issues with a collection with one node', () => {
-    var issues = _findPrivateValidationIssues();
+    let issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
   });
 
@@ -117,7 +115,7 @@ describe('Collection validation service', function() {
     expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
-    var issues = _findPrivateValidationIssues();
+    let issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
       'There should be at least 1 exploration in the collection.']);
   });
@@ -128,7 +126,7 @@ describe('Collection validation service', function() {
     _getCollectionNode('exp_id0');
     _getCollectionNode('exp_id1');
 
-    var issues = _findPrivateValidationIssues();
+    let issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
       'The following exploration(s) either do not exist, or you do not have ' +
       'edit access to add them to this collection: exp_id1'
@@ -143,7 +141,7 @@ describe('Collection validation service', function() {
       _getCollectionNode('exp_id1');
       _getCollectionNode('exp_id2');
 
-      var issues = _findPrivateValidationIssues();
+      let issues = _findPrivateValidationIssues();
       expect(issues).toEqual([]);
     }
   );
@@ -154,7 +152,7 @@ describe('Collection validation service', function() {
       _getCollectionNode('exp_id1');
       _getCollectionNode('exp_id0');
 
-      var issues = _findPublicValidationIssues();
+      let issues = _findPublicValidationIssues();
       expect(issues).toEqual([
         'Private explorations cannot be added to a public collection: exp_id0'
       ]);
@@ -173,7 +171,7 @@ describe('Collection validation service', function() {
     _getCollectionNode('exp_id1');
     _getCollectionNode('exp_id2');
 
-    var issues = _findPublicValidationIssues();
+    let issues = _findPublicValidationIssues();
     expect(issues).toEqual([
       'Private explorations cannot be added to a public collection: ' +
       'exp_id0, exp_id2'

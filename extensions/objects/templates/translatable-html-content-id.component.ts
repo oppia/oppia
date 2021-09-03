@@ -16,25 +16,47 @@
 /**
  * @fileoverview Component for translatable html content id editor.
  */
-angular.module('oppia').component('translatableHtmlContentIdEditor', {
-  bindings: {
-    getInitArgs: '&',
-    value: '='
-  },
-  template: require('./translatable-html-content-id.component.html'),
-  controller: [
-    function() {
-      const ctrl = this;
 
-      ctrl.$onInit = function() {
-        ctrl.name = Math.random().toString(36).substring(7);
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-        if (!ctrl.value || ctrl.value === '') {
-          ctrl.value = ctrl.choices[0].val;
-        }
-      };
+type TranslatableHtmlContentIdEditorChoices = { val: string }[];
+
+@Component({
+  selector: 'translatable-html-content-id-editor',
+  templateUrl: './translatable-html-content-id.component.html'
+})
+
+export class TranslatableHtmlContentIdEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() value!: string;
+  @Input() initArgs!: { choices: TranslatableHtmlContentIdEditorChoices };
+  @Output() valueChanged = new EventEmitter();
+  name!: string;
+  currentValue!: string;
+  choices: TranslatableHtmlContentIdEditorChoices = [];
+
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    this.name = Math.random().toString(36).substring(7);
+    this.choices = this.initArgs.choices;
+
+    this.currentValue = this.value || this.choices[0].val;
+  }
+
+  updateLocalValue(value: string): void {
+    if (this.value === value) {
+      return;
     }
-  ]
-});
+    this.value = value;
+    this.valueChanged.emit(value);
+    this.changeDetectorRef.detectChanges();
+  }
+}
+angular.module('oppia').directive(
+  'translatableHtmlContentIdEditor', downgradeComponent({
+    component: TranslatableHtmlContentIdEditorComponent
+  }) as angular.IDirectiveFactory);

@@ -20,7 +20,7 @@
 // undo-redo.service.ts is upgraded to Angular 8.
 import { Change } from 'domain/editor/undo_redo/change.model';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 describe('Undo/Redo Service', function() {

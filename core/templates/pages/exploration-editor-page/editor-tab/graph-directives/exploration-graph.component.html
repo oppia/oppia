@@ -3,7 +3,28 @@
     <span class="oppia-exploration-overview-text">
       <strong>Exploration Overview</strong>
     </span>
-
+    <div>
+      <span ng-if="!$ctrl.showCheckpointCountWarningSign()">&#11088;</span>
+      <span uib-tooltip="{{$ctrl.checkpointCountWarning}}"
+            tooltip-placement="top-right"
+            ng-if="$ctrl.showCheckpointCountWarningSign()">
+        <strong class="clickable">⚠️</strong>
+      </span>
+      <span ng-class="{'checkpoint-count-error': $ctrl.showCheckpointCountWarningSign()}">
+        {{$ctrl.getCheckpointCount()}}
+        <span ng-if="$ctrl.getCheckpointCount() <= 1">
+          Checkpoint
+        </span>
+        <span ng-if="$ctrl.getCheckpointCount() > 1">
+          Checkpoints
+        </span>
+      </span>
+      <span uib-tooltip="Learners start at their last saved checkpoint when returning back from the lesson."
+            tooltip-placement="right-top"
+            class="clickable">
+        <strong>&#x24D8;</strong>
+      </span>
+    </div>
     <md-card class="oppia-state-graph-card">
       <div class="oppia-state-graph-container protractor-test-exploration-graph">
         <div state-graph-visualization graph-data="$ctrl.getGraphData()" current-state-id="$ctrl.getActiveStateName()" on-click-function="$ctrl.onClickStateInMinimap" on-delete-function="$ctrl.deleteState" on-maximize-function="$ctrl.openStateGraphModal" allow-panning="true" center-at-current-state="true" class="h-100" is-editable="$ctrl.isEditable()" show-warning-sign="true">
@@ -44,5 +65,11 @@
     exploration-graph .oppia-exp-graph-modal-icon-container span {
       font-size: 26px;
     }
+  }
+  exploration-graph .clickable {
+    cursor: pointer;
+  }
+  exploration-graph span.checkpoint-count-error {
+    color: #C55F45;
   }
 </style>
