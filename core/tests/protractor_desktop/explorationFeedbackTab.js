@@ -31,8 +31,8 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
-  var EXPLORATION_TITLE_2 = 'Exploration for testing feedback status';
-  var EXPLORATION_TITLE_3 = 'Exploration for testing feedback message';
+  var EXPLORATION_TITLE_2 = 'Exploration to test feedback status';
+  var EXPLORATION_TITLE_3 = 'Exploration to test feedback message';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
