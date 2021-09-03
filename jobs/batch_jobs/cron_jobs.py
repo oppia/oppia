@@ -31,7 +31,7 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import List, cast # isort:skip
+from typing import Iterable, List, cast # isort:skip
 
 MYPY = False
 if MYPY:
@@ -96,9 +96,6 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
             yield job_run_result.JobRunResult(
                 stderr='FAILURE %s models not indexed' % len(exp_summary_models)
             )
-            | 'Index batches of models' >> beam.Map(
-                self._index_exploration_summaries)
-        )
 
 
 class CollectWeeklyDashboardStats(base_jobs.JobBase):
