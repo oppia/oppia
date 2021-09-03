@@ -91,11 +91,6 @@ describe('InteractionSpecsService', () => {
         .toBeTrue();
     });
 
-    it('should return false for LogicProof', () => {
-      expect(interactionSpecsService.isInteractionTrainable('LogicProof'))
-        .toBeFalse();
-    });
-
     it('should return false for MultipleChoiceInput', () => {
       expect(
         interactionSpecsService.isInteractionTrainable(
