@@ -26,6 +26,10 @@ from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
 datastore_services = models.Registry.import_datastore_services()
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -82,7 +86,7 @@ def get_model_class(kind):
     return datastore_services.Model._lookup_model(kind)  # pylint: disable=protected-access
 
 
-def get_model_kind(model):
+def get_model_kind(model: datastore_services.Model) -> str:
     """Returns the "kind" of the given model.
 
     NOTE: A model's kind is usually, but not always, the same as a model's class
@@ -95,7 +99,7 @@ def get_model_kind(model):
         model: datastore_services.Model. The model to inspect.
 
     Returns:
-        bytes. The model's kind.
+        str. The model's kind.
 
     Raises:
         TypeError. When the argument is not a model.
