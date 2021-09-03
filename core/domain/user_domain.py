@@ -380,7 +380,7 @@ class UserSettings(python_utils.OBJECT):
         return username.lower() if username else None
 
     @classmethod
-    def require_valid_username(cls, username):
+    def require_valid_username(cls, username: str):
         """Checks if the given username is valid or not.
 
         Args:

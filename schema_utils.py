@@ -33,7 +33,7 @@ import re
 from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
-from core.domain.user_domain import UserSettings
+from core.domain import user_domain
 import feconf
 import python_utils
 
@@ -660,7 +660,7 @@ class _Validators(python_utils.OBJECT):
         """
 
         try:
-            UserSettings.require_valid_username(obj)
+            user_domain.UserSettings.require_valid_username(obj)
             return True
-        except (utils.ValidationError):
+        except utils.ValidationError:
             return False
