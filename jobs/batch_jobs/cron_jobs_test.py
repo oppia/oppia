@@ -280,6 +280,31 @@ class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
             }]
         )
 
+    def test_fails_when_existing_stats_has_wrong_schema_version(self) -> None:
+        user_settings_model = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserSettingsModel,
+            id=self.VALID_USER_ID_1, email='a@a.com')
+        user_stats_model = self.create_model( # type: ignore[no-untyped-call]
+            user_models.UserStatsModel,
+            id=self.VALID_USER_ID_1,
+            schema_version=0
+        )
+
+        self.put_multi([user_settings_model, user_stats_model]) # type: ignore[no-untyped-call]
+
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception,
+            'Sorry, we can only process v1-v%d dashboard stats schemas at '
+            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
+        ):
+            self.assert_job_output_is([  # type: ignore[no-untyped-call]
+                job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+            ])
+
+        user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
+        self.assertIsNotNone(user_stats_model)
+        self.assertEqual(user_stats_model.weekly_creator_stats_list, [])
+
     def test_updates_existing_stats_model_when_values_are_provided(
             self
     ) -> None:

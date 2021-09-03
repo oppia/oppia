@@ -34,7 +34,7 @@ import apache_beam as beam
 from typing import Iterable, List, cast # isort:skip
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import user_models
@@ -72,10 +72,10 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
 
 
 class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
-    """DoFn to to index exploration summaries."""
+    """DoFn to index exploration summaries."""
 
     def process(
-            self, exp_summary_models: List[datastore_services.Model]
+        self, exp_summary_models: List[datastore_services.Model]
     ) -> Iterable[job_run_result.JobRunResult]:
         """Index exploration summaries and catch any errors.
 
@@ -83,7 +83,7 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
             exp_summary_models: list(Model). Models to index.
 
         Yields:
-            list(str). List containing one element, which is either SUCCESS,
+            JobRunResult. List containing one element, which is either SUCCESS,
             or FAILURE.
         """
         try:
@@ -102,58 +102,6 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
-
-    @staticmethod
-    def _create_user_stats_model(
-            user_settings_model: user_models.UserSettingsModel
-    ) -> user_models.UserStatsModel:
-        """Creates empty user stats model with id.
-
-        Args:
-            user_settings_model: UserSettingsModel. Model from which to
-                create the user stats model.
-
-        Returns:
-            UserStatsModel. The created user stats model.
-        """
-        with datastore_services.get_ndb_context():
-            user_stats_model = (
-                user_models.UserStatsModel(id=user_settings_model.id))
-        user_stats_model.update_timestamps()
-        return user_stats_model
-
-    @staticmethod
-    def _update_weekly_creator_stats(
-            user_stats_models: user_models.UserStatsModel
-    ) -> user_models.UserStatsModel:
-        """Updates weekly dashboard stats with the current values.
-
-        Args:
-            user_stats_models: UserStatsModel. Model for which to update
-                the weekly dashboard stats.
-
-        Returns:
-            UserStatsModel. The updated user stats model.
-        """
-        model = cast(
-            user_models.UserStatsModel,
-            job_utils.clone_model(user_stats_models) # type: ignore[no-untyped-call]
-        )
-        schema_version = model.schema_version
-
-        if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
-            user_services.migrate_dashboard_stats_to_latest_schema(model) # type: ignore[no-untyped-call]
-
-        weekly_creator_stats = {
-            user_services.get_current_date_as_string(): { # type: ignore[no-untyped-call]
-                'num_ratings': model.num_ratings or 0,
-                'average_ratings': model.average_ratings,
-                'total_plays': model.total_plays or 0
-            }
-        }
-        model.weekly_creator_stats_list.append(weekly_creator_stats)
-        model.update_timestamps()
-        return model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         user_settings_models = (
@@ -181,20 +129,23 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
             # Only keep groupings that indicate that
             # the UserStatsModel is missing.
             | 'Filter pairs of models' >> beam.Filter(
-                lambda models: len(list(models)) == 1)
+                lambda models: (
+                    len(list(models)) == 1 and
+                    isinstance(list(models)[0], user_models.UserSettingsModel)
+                ))
             # Choosing the first element.
             | 'Transform tuples into models' >> beam.Map(
                 lambda models: list(models)[0])
             # Creates the missing UserStatsModels.
-            | 'Create new user stat models' >> beam.Map(
-                self._create_user_stats_model)
+            | 'Create new user stat models' >> beam.ParDo(
+                CreateUserStatsModel())
         )
 
         unused_put_result = (
             (new_user_stats_models, old_user_stats_models)
             | 'Merge new and old models together' >> beam.Flatten()
-            | 'Update the dashboard stats' >> (
-                beam.Map(self._update_weekly_creator_stats))
+            | 'Update the dashboard stats' >> beam.ParDo(
+                UpdateWeeklyCreatorStats())
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
@@ -223,3 +174,61 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
             (new_user_stats_job_result, old_user_stats_job_result)
             | 'Merge new and old results together' >> beam.Flatten()
         )
+
+
+class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
+    """DoFn to create empty user stats model."""
+
+    def process(
+        self, user_settings_model: user_models.UserSettingsModel
+    ) -> Iterable[user_models.UserStatsModel]:
+        """Creates empty user stats model with id.
+
+        Args:
+            user_settings_model: UserSettingsModel. Model from which to
+                create the user stats model.
+
+        Yields:
+            iterable(UserStatsModel). The created user stats model.
+        """
+        with datastore_services.get_ndb_context():
+            user_stats_model = (
+                user_models.UserStatsModel(id=user_settings_model.id))
+        user_stats_model.update_timestamps()
+        yield user_stats_model
+
+
+class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
+    """DoFn to update weekly dashboard stats in the user stats model."""
+
+    def process(
+        self, user_stats_model: user_models.UserStatsModel
+    ) -> Iterable[user_models.UserStatsModel]:
+        """Updates weekly dashboard stats with the current values.
+
+        Args:
+            user_stats_model: UserStatsModel. Model for which to update
+                the weekly dashboard stats.
+
+        Yields:
+            UserStatsModel. The updated user stats model.
+        """
+        model = cast(
+            user_models.UserStatsModel,
+            job_utils.clone_model(user_stats_model) # type: ignore[no-untyped-call]
+        )
+        schema_version = model.schema_version
+
+        if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
+            user_services.migrate_dashboard_stats_to_latest_schema(model) # type: ignore[no-untyped-call]
+
+        weekly_creator_stats = {
+            user_services.get_current_date_as_string(): { # type: ignore[no-untyped-call]
+                'num_ratings': model.num_ratings or 0,
+                'average_ratings': model.average_ratings,
+                'total_plays': model.total_plays or 0
+            }
+        }
+        model.weekly_creator_stats_list.append(weekly_creator_stats)
+        model.update_timestamps()
+        yield model

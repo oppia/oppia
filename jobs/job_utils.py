@@ -27,7 +27,7 @@ from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
