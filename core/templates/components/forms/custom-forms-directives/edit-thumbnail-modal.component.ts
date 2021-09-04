@@ -91,6 +91,12 @@ export class EditThumbnailModalComponent implements OnInit {
     return this.uploadedImageMimeType === 'image/svg+xml';
   }
 
+  isValidFilename(file: File): boolean {
+    const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
+      constants.VALID_THUMBNAIL_FILENAME_REGEX);
+    return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name)
+  }
+
   updateBackgroundColor(color: string): void {
     this.bgColor = color;
   }
@@ -132,10 +138,14 @@ export class EditThumbnailModalComponent implements OnInit {
       tags: [],
       attrs: []
     };
-    const VALID_THUMBNAIL_FILENAME = new RegExp(
-      constants.VALID_THUMBNAIL_FILENAME);
-    if (this.isUploadedImageSvg() && VALID_THUMBNAIL_FILENAME.test(file.name)) {
-      this.setUploadedFile(file);
+    
+    if (this.isUploadedImageSvg()) {
+      if(this.isValidFilename(file)) {
+        this.setUploadedFile(file);
+      } else {
+        this.reset();
+        this.invalidFilenameWarningIsShown = true;
+      }
     } else {
       this.reset();
       this.invalidImageWarningIsShown = true;
