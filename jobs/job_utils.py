@@ -19,13 +19,16 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import datetime
-
 from core.platform import models
 import feconf
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -83,7 +86,7 @@ def get_model_class(kind):
     return datastore_services.Model._lookup_model(kind)  # pylint: disable=protected-access
 
 
-def get_model_kind(model):
+def get_model_kind(model: datastore_services.Model) -> str:
     """Returns the "kind" of the given model.
 
     NOTE: A model's kind is usually, but not always, the same as a model's class
@@ -96,7 +99,7 @@ def get_model_kind(model):
         model: datastore_services.Model. The model to inspect.
 
     Returns:
-        bytes. The model's kind.
+        str. The model's kind.
 
     Raises:
         TypeError. When the argument is not a model.
@@ -157,10 +160,12 @@ def get_beam_entity_from_ndb_model(model):
     Returns:
         beam_datastore_types.Entity. The Apache Beam entity.
     """
-    beam_entity = beam_datastore_types.Entity(
-        get_beam_key_from_ndb_key(model.key))
-    beam_entity.set_properties(model._to_dict()) # pylint: disable=protected-access
-    return beam_entity
+    # We use private _entity_to_ds_entity here because it provides
+    # a functionality that we need and writing it ourselves would be
+    # too complicated.
+    return beam_datastore_types.Entity.from_client_entity(
+        ndb_model._entity_to_ds_entity(model) # pylint: disable=protected-access
+    )
 
 
 def get_ndb_model_from_beam_entity(beam_entity):
@@ -173,17 +178,12 @@ def get_ndb_model_from_beam_entity(beam_entity):
         datastore_services.Model. The NDB model.
     """
     ndb_key = get_ndb_key_from_beam_key(beam_entity.key)
-    ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind()) # pylint: disable=protected-access
-    ndb_properties = {}
-    for key, value in beam_entity.properties.items():
-        # NDB datastore does not accept datetime with timezone info (tzinfo) so
-        # it needs to be removed.
-        ndb_properties[key] = (
-            value.replace(tzinfo=None)
-            if isinstance(value, datetime.datetime)
-            else value
-        )
-    return ndb_model_class(key=ndb_key, **ndb_properties)
+    # We use private _lookup_model and _entity_from_ds_entity here because it
+    # provides a functionality that we need and writing it ourselves would be
+    # too complicated.
+    ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind())  # pylint: disable=protected-access
+    return ndb_model._entity_from_ds_entity( # pylint: disable=protected-access
+        beam_entity.to_client_entity(), model_class=ndb_model_class)
 
 
 def get_ndb_key_from_beam_key(beam_key):
