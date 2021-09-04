@@ -47,7 +47,6 @@ import {
   InteractiveMapCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
   ItemSelectionInputCustomizationArgsBackendDict,
-  LogicProofCustomizationArgs,
   MathEquationInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
@@ -414,8 +413,6 @@ export class InteractionObjectFactory {
       case 'ItemSelectionInput':
         return this._createFromItemSelectionInputCustomizationArgsBackendDict(
           <ItemSelectionInputCustomizationArgsBackendDict> caBackendDict);
-      case 'LogicProof':
-        return <LogicProofCustomizationArgs> cloneDeep(caBackendDict);
       case 'MathEquationInput':
         return <MathEquationInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'MultipleChoiceInput':

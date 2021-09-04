@@ -9,6 +9,7 @@ beautifulsoup4==4.9.3
 bleach==3.3.0
 callbacks==0.3.0
 contextlib2==0.6.0.post1
+defusedxml==0.7.1
 firebase-admin==5.0.0
 future==0.18.2
 gunicorn==20.1.0
