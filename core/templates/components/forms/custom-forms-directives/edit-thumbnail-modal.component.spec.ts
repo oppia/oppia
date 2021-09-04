@@ -194,6 +194,15 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(result).toBeTrue();
   });
 
+  it('should check for uploaded image to have correct filename', () => {
+    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+    const arrayBuffer = Uint8Array.from(
+      window.atob(dataBase64Mock), c => c.charCodeAt(0));
+    const file = new File([arrayBuffer], 'thumbnail.svg');
+    let result = component.isValidFilename(file);
+    expect(result).toBeTrue();
+  });
+
   it('should set image dimensions', () => {
     component.dimensions = {
       height: 0,
