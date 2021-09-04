@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -43,7 +44,7 @@ export class LearnerViewInfoComponent {
   directiveSubscriptions: Subscription = new Subscription();
   explorationTitle: string;
   isLinkedToTopic: boolean;
-  storyPlaythroughObject;
+  storyPlaythroughObject: StoryPlaythrough;
   topicName: string;
   expInfo: LearnerExplorationSummaryBackendDict;
 

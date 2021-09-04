@@ -18,28 +18,33 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 
+interface ExplorationTagSummary {
+  tagsToShow: string[];
+  tagsInTooltip: string[];
+}
+
 @Component({
   selector: 'oppia-information-card-modal',
   templateUrl: './information-card-modal.component.html'
 })
 export class InformationCardModalComponent extends ConfirmOrCancelModal {
-  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = constants
-    .DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
+  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+    AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
   averageRating: number;
   contributorsSummary = {};
   contributorNames: string[];
   expInfo: LearnerExplorationSummaryBackendDict;
   explorationId: string;
-  explorationTags;
+  explorationTags: ExplorationTagSummary;
   explorationTitle: string;
-  infoCardBackgroundCss: object;
+  infoCardBackgroundCss: { 'background-color': string };
   infoCardBackgroundImageUrl: string;
   lastUpdatedString: string;
   numViews: number;
@@ -86,7 +91,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     this.explorationIsPrivate = (this.expInfo.status === 'private');
   }
 
-  getExplorationTagsSummary(arrayOfTags: string[]): object {
+  getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {
     let tagsToShow = [];
     let tagsInTooltip = [];
     let MAX_CHARS_TO_SHOW = 45;
