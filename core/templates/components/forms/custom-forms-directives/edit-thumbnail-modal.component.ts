@@ -138,16 +138,15 @@ export class EditThumbnailModalComponent implements OnInit {
       tags: [],
       attrs: []
     };
-    if (this.isUploadedImageSvg()) {
-      if (this.isValidFilename(file)) {
-        this.setUploadedFile(file);
-      } else {
-        this.reset();
-        this.invalidFilenameWarningIsShown = true;
-      }
+    if (this.isUploadedImageSvg() && this.isValidFilename(file)) {
+      this.setUploadedFile(file);
     } else {
       this.reset();
-      this.invalidImageWarningIsShown = true;
+      if (!this.isUploadedImageSvg()) {
+        this.invalidImageWarningIsShown = true;
+      } else {
+        this.invalidFilenameWarningIsShown = true;
+      }
     }
   }
 
