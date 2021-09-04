@@ -84,7 +84,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def create_beam_job_run_model(
             self, dataflow_job_id='abc',
-            job_id=None, job_name='FooJob', job_arguments=None,
+            job_id=None, job_name='FooJob',
             job_state=beam_job_models.BeamJobState.RUNNING.value):
         """Returns a new BeamJobRunModel with convenient default values.
 
@@ -98,19 +98,15 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
                 job's logic.
             job_state: str. The state of the job at the time the model was last
                 updated.
-            job_arguments: list(str)|None. The arguments provided to the job
-                run. If None, an empty list will be used instead.
 
         Returns:
             BeamJobRunModel. The new model.
         """
         if job_id is None:
             job_id = python_utils.NEXT(self._id_iter)
-        if job_arguments is None:
-            job_arguments = []
         return beam_job_models.BeamJobRunModel(
             id=job_id, dataflow_job_id=dataflow_job_id, job_name=job_name,
-            job_arguments=job_arguments, latest_job_state=job_state)
+            latest_job_state=job_state)
 
     def assert_domains_equal_models(self, beam_job_runs, beam_job_run_models):
         """Asserts that the domain objects have the same values as the models.
@@ -129,7 +125,6 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             self.assertEqual(domain_obj.job_id, model_obj.id)
             self.assertEqual(domain_obj.job_name, model_obj.job_name)
             self.assertEqual(domain_obj.job_state, model_obj.latest_job_state)
-            self.assertEqual(domain_obj.job_arguments, model_obj.job_arguments)
             self.assertEqual(domain_obj.job_started_on, model_obj.created_on)
             self.assertEqual(domain_obj.job_updated_on, model_obj.last_updated)
             self.assertEqual(
@@ -151,7 +146,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         beam_job_models.BeamJobRunModel.put_multi(beam_job_run_models)
 
         self.assert_domains_equal_models(
-            beam_job_services.get_beam_job_runs(), beam_job_run_models)
+            beam_job_services.get_beam_job_runs(refresh=False),
+            beam_job_run_models)
 
     def test_get_beam_job_runs_with_refresh(self):
         initial_beam_job_run_models = [
@@ -345,11 +341,10 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             'FooJob', dataflow_job_id='123')
         model.put()
 
-        all_runs = beam_job_services.get_beam_job_runs()
+        all_runs = beam_job_services.get_beam_job_runs(refresh=False)
         self.assertEqual(len(all_runs), 1)
         run = all_runs[0]
         self.assertEqual(run.job_name, 'FooJob')
-        self.assertEqual(run.job_arguments, ['num_foos'])
         self.assertFalse(run.job_is_synchronous)
 
     def test_create_beam_job_run_result_model(self):
