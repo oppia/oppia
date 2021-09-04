@@ -102,7 +102,7 @@ describe('Start new beam job dialog', () => {
 
     fixture.detectChanges();
 
-    expect(startNewBeamJobSpy).toHaveBeenCalledWith(beamJob, []);
+    expect(startNewBeamJobSpy).toHaveBeenCalledWith(beamJob);
     expect(closeDialogSpy).toHaveBeenCalledWith(newBeamJobRun);
   });
 
@@ -115,7 +115,7 @@ describe('Start new beam job dialog', () => {
     component.onActionClick();
 
     fixture.detectChanges();
-    expect(startNewBeamJobSpy).toHaveBeenCalledWith(beamJob, []);
+    expect(startNewBeamJobSpy).toHaveBeenCalledWith(beamJob);
     expect(addWarningSpy).toHaveBeenCalled();
   });
 });

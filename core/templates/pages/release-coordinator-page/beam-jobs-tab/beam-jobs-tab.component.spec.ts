@@ -235,7 +235,7 @@ describe('Beam Jobs Tab Component', () => {
     await confirmButton.click();
     await fixture.whenStable();
 
-    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob, []);
+    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
   });
