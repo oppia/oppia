@@ -705,3 +705,26 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
         tabs['tab_contents-with-value'] = escape_html(
             json.dumps(tab_content_list))
     return python_utils.UNICODE(soup)
+
+def fix_html_encoding(html_string):
+    """Renames all the oppia-noninteractive-svgdiagram on the server to
+    oppia-noninteractive-image and changes corresponding attributes.
+
+    Args:
+        html_string: str. The HTML string to check.
+
+    Returns:
+        str. The updated html string.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    fixed_html = python_utils.UNICODE(soup)
+    tuples = [
+        (u'\xc3\u2014', u'\xd7'),
+        (u'\xe2\u02c6\u2014', u'\u2217'),
+        (u'\xe2\u2039\u2026', u'\u22c5'),
+        (u'\xe2\u20ac\u2122', u'\u2019')
+    ]
+    for a, b in tuples:
+        fixed_html = fixed_html.replace(a, b)
+    return fixed_html
