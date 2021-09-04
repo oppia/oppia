@@ -269,6 +269,9 @@ def run_tests(args):
             app_yaml_path,
             port=GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
+            # Automatic restart can be disabled since we don't expect code
+            # changes to happen while the e2e tests are running.
+            automatic_restart=False,
             skip_sdk_update_check=True,
             env={
                 **os.environ,
