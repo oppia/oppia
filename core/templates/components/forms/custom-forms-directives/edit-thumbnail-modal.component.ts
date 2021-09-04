@@ -19,7 +19,6 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface InvalidTagsAndAttributes {
@@ -68,7 +67,6 @@ export class EditThumbnailModalComponent implements OnInit {
   invalidTagsAndAttributes!: InvalidTagsAndAttributes;
 
   invalidImageWarningIsShown = false;
-  invalidFilenameWarningIsShown = false;
   allowedImageFormats = ['svg'];
 
   constructor(
@@ -127,14 +125,11 @@ export class EditThumbnailModalComponent implements OnInit {
   onFileChanged(file: File): void {
     this.uploadedImageMimeType = file.type;
     this.invalidImageWarningIsShown = false;
-    this.invalidFilenameWarningIsShown = false;
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: []
     };
-    const VALID_THUMBNAIL_FILENAME = new RegExp(
-      constants.VALID_THUMBNAIL_FILENAME);
-    if (this.isUploadedImageSvg() && VALID_THUMBNAIL_FILENAME.test(file.name)) {
+    if (this.isUploadedImageSvg()) {
       this.setUploadedFile(file);
     } else {
       this.reset();
