@@ -94,7 +94,7 @@ export class EditThumbnailModalComponent implements OnInit {
   isValidFilename(file: File): boolean {
     const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
       constants.VALID_THUMBNAIL_FILENAME_REGEX);
-    return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name)
+    return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name);
   }
 
   updateBackgroundColor(color: string): void {
@@ -138,9 +138,8 @@ export class EditThumbnailModalComponent implements OnInit {
       tags: [],
       attrs: []
     };
-    
     if (this.isUploadedImageSvg()) {
-      if(this.isValidFilename(file)) {
+      if (this.isValidFilename(file)) {
         this.setUploadedFile(file);
       } else {
         this.reset();
