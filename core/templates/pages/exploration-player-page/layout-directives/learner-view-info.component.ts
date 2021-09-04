@@ -130,7 +130,6 @@ export class LearnerViewInfoComponent {
 
   openInformationCardModal(): void {
     let modalRef = this.ngbModal.open(InformationCardModalComponent, {
-      animation: true,
       windowClass: 'oppia-modal-information-card'
     });
 

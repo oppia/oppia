@@ -16,11 +16,6 @@
  * @fileoverview Component for information card modal.
  */
 
-// TODO:
-// 1. Modal animations
-// 2. Tags
-// 3. Contributers
-
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';

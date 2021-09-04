@@ -55,7 +55,7 @@
     </ul>
 
     <div *ngIf="!explorationIsPrivate" class="oppia-info-card-bottom-row">
-      <div class="row">
+      <div class="row center">
         <div class="oppia-info-card-tag-icon">
           <span class="fas fa-tags oppia-info-card-modal-tooltip"
                 [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"
@@ -63,12 +63,12 @@
             <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_TAGS_TOOLTIP' | translate }}</span>
           </span>
         </div>
-        <div class="center">
+        <div class="exploration-tags">
           <span *ngIf="explorationTags.tagsInTooltip.length > 0"
                 class="oppia-info-card-tooltip-more"
                 [ngbTooltip]="explorationTags.tagsInTooltip.join(', ')"
                 placement="right">
-                {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}"
+                {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}
           </span>
           <span *ngIf="explorationTags.tagsToShow.length > 0">
             {{ explorationTags.tagsToShow.join(", ") }}
@@ -139,5 +139,8 @@
   }
   .oppia-info-card-exploration-contributors-profile {
     justify-content: flex-end;
+  }
+  .exploration-tags {
+    max-width: 90%;
   }
 </style>
