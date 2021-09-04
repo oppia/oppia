@@ -87,7 +87,7 @@ describe('Start new beam job dialog', () => {
 
   it('should lock the dialog and start a job before finally closing', () => {
     const newBeamJobRun = (
-      new BeamJobRun('123', 'FooJob', 'PENDING', [], 0, 0, false));
+      new BeamJobRun('123', 'FooJob', 'PENDING', 0, 0, false));
     const startNewBeamJobSpy = spyOn(backendApiService, 'startNewBeamJob')
       .and.returnValue(of(newBeamJobRun));
     const closeDialogSpy = spyOn(matDialogRef, 'close');

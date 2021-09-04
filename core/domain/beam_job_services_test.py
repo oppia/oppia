@@ -342,7 +342,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_create_beam_job_run_model(self):
         model = beam_job_services.create_beam_job_run_model(
-            'FooJob', ['num_foos'], dataflow_job_id='123')
+            'FooJob', dataflow_job_id='123')
         model.put()
 
         all_runs = beam_job_services.get_beam_job_runs()

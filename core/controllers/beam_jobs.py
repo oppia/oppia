@@ -58,14 +58,6 @@ class BeamJobRunHandler(base.BaseHandler):
                     'type': 'unicode'
                 }
             },
-            'job_arguments': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'unicode'
-                    },
-                }
-            },
         },
     }
 

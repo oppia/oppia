@@ -66,7 +66,7 @@ class BeamJobHandlerTests(BeamHandlerTestBase):
             response = self.get_json('/beam_job')
 
         self.assertEqual(response, {
-            'jobs': [{'name': 'FooJob', 'parameter_names': []}],
+            'jobs': [{'name': 'FooJob'}],
         })
 
 
@@ -83,8 +83,6 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         runs = response['runs']
         self.assertEqual(len(runs), 3)
         self.assertCountEqual([run['job_name'] for run in runs], ['FooJob'] * 3)
-        self.assertCountEqual(
-            [run['job_arguments'] for run in runs], [[], [], []])
 
     def test_put_starts_new_job(self) -> None:
         now = datetime.datetime.utcnow()
