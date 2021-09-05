@@ -2122,9 +2122,8 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
-        """Converts a v51 exploration dict into a v52 exploration dict.
-        Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
-        existing occurences of it to oppia-noninteractive-image tag.
+        """Converts a v52 exploration dict into a v53 exploration dict.
+        Version 53 fixes encoding issues in HTML fields.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
