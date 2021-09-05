@@ -18,9 +18,9 @@
 
 import { destroyPlatform } from '@angular/core';
 import { async } from '@angular/core/testing';
-import { setupAndGetUpgradedComponentAsync } from '../../../templates/tests/unit-test-utils.ajs';
-import { ConceptCardComponent } from './concept-card.directive';
-require('./concept-card.directive.ts');
+import { setupAndGetUpgradedComponentAsync } from '../../tests/unit-test-utils.ajs';
+import { ConceptCardComponent } from './concept-card.component';
+require('./concept-card.component.ts');
 
 describe('ConceptCardDirective', () => {
   let ctrl = null;

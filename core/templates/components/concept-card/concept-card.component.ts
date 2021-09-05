@@ -28,7 +28,7 @@ angular.module('oppia').directive('conceptCard', [function() {
       skillIds: '<',
       index: '<'
     },
-    template: require('./concept-card.template.html'),
+    template: require('./concept-card.component.html'),
     controllerAs: '$ctrl',
     controller: [
       '$rootScope', '$scope', 'ConceptCardBackendApiService',
