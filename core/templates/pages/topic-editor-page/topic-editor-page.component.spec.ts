@@ -229,7 +229,7 @@ describe('Topic editor page', function() {
   it('should load topic based on its id on url when undo or redo action' +
   ' is performed', function() {
     let mockUndoRedoChangeEventEmitter = new EventEmitter();
-    spyOnProperty(UndoRedoService, 'undoRedoChangeEventEmitter')
+    spyOn(UndoRedoService, 'getUndoRedoChangeEventEmitter')
       .and.returnValue(mockUndoRedoChangeEventEmitter);
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');

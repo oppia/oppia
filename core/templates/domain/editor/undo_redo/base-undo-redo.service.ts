@@ -152,7 +152,7 @@ export class BaseUndoRedo {
     this._dispatchMutation();
   }
 
-  get undoRedoChangeEventEmitter(): EventEmitter<void> {
+  getUndoRedoChangeEventEmitter(): EventEmitter<void> {
     return this._undoRedoChangeEventEmitter;
   }
 }

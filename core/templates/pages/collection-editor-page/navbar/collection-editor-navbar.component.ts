@@ -63,7 +63,7 @@ export class CollectionEditorNavbarComponent {
     );
 
     this.directiveSubscriptions.add(
-      this.undoRedoService.undoRedoChangeEventEmitter.subscribe(
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
         () => this._validateCollection()
       )
     );

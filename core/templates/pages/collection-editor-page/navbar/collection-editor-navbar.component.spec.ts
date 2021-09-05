@@ -113,7 +113,7 @@ describe('Collection editor navbar component', () => {
 
     spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
       .and.returnValue(mockOnCollectionEventEmitter);
-    spyOnProperty(undoRedoService, 'undoRedoChangeEventEmitter')
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter')
       .and.returnValue(mockUndoRedoChangeAppliedEventEmitter);
     spyOn(urlService, 'getCollectionIdFromEditorUrl').and.returnValue(
       collectionId);

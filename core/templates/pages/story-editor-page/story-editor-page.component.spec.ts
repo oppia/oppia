@@ -316,7 +316,7 @@ describe('Story editor page', function() {
 
   it('should init page on undo redo change applied', () => {
     let mockUndoRedoChangeEventEmitter = new EventEmitter();
-    spyOnProperty(UndoRedoService, 'undoRedoChangeEventEmitter')
+    spyOn(UndoRedoService, 'getUndoRedoChangeEventEmitter')
       .and.returnValue(
         mockUndoRedoChangeEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
