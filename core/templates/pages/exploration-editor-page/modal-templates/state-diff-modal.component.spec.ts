@@ -58,7 +58,7 @@ describe('State Diff Modal Component', () => {
     component = fixture.componentInstance;
     sof = TestBed.inject(StateObjectFactory);
     sdmbas = TestBed.inject(StateDiffModalBackendApiService);
-    sdmbas = (sdmbas as unknown) as 
+    sdmbas = (sdmbas as unknown) as
      jasmine.SpyObj<StateDiffModalBackendApiService>;
     contextService = TestBed.inject(ContextService);
     contextService = (contextService as unknown) as
@@ -79,7 +79,6 @@ describe('State Diff Modal Component', () => {
 
     it('should initialize component properties after component is initialized',
       fakeAsync(() => {
-
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
           data: {
             yaml: 'Yaml data'
@@ -129,7 +128,6 @@ describe('State Diff Modal Component', () => {
 
     it('should initialize component properties after component is initialized',
       fakeAsync(() => {
-
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
           data: {
             yaml: 'Yaml data'
@@ -149,7 +147,6 @@ describe('State Diff Modal Component', () => {
 
     it('should evaluate yaml strings object when timeout tasks are flushed',
       fakeAsync(() => {
-
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
           data: {
             yaml: 'Yaml data'
