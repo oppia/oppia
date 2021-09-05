@@ -62,8 +62,25 @@ export class FractionInputValidationService {
     };
   }
   getCustomizationArgsWarnings(
-      customizationArgs: FractionInputCustomizationArgs): Warning[] {
-    return [];
+      customizationArgs: FractionInputCustomizationArgs
+  ): (Warning | FractionWarning)[] {
+    let warningsList: (Warning | FractionWarning)[] = [];
+    this.bivs.requireCustomizationArguments(
+      customizationArgs,
+      ['allowImproperFraction', 'allowNonzeroIntegerPart']);
+
+    let allowImproperFraction = customizationArgs.allowImproperFraction.value;
+    let allowNonzeroInteger = customizationArgs.allowNonzeroIntegerPart.value;
+
+    if (allowNonzeroInteger === false && allowImproperFraction === true) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'You cannot choose Improper fractions without choosing ' +
+          'the answer containing an integral part')
+      });
+    }
+    return warningsList;
   }
   getAllWarnings(
       stateName: string, customizationArgs: FractionInputCustomizationArgs,
