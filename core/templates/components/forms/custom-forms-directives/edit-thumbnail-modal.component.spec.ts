@@ -40,7 +40,7 @@ class MockActiveModal {
   }
 }
 
-fdescribe('Edit Thumbnail Modal Component', () => {
+describe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
