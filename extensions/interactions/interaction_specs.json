@@ -284,7 +284,11 @@
         "name": "buttonText",
         "schema": {
           "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "obj_type": "SubtitledUnicode",
+          "validators": [{
+            "id": "isAtMost",
+            "maxValue": 20
+          }]
         },
         "default_value": {
           "content_id": null,
@@ -635,7 +639,7 @@
           "type": "list",
           "validators": [
             {
-              "min_value": 1,
+              "min_value": 4,
               "id": "has_length_at_least"
             }
           ],
@@ -737,7 +741,7 @@
               "id": "is_at_least"
             },
             {
-              "max_value": 200,
+              "max_value": 10,
               "id": "is_at_most"
             }
           ]
