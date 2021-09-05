@@ -40,7 +40,7 @@ class MockActiveModal {
   }
 }
 
-describe('Edit Thumbnail Modal Component', () => {
+fdescribe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -163,7 +163,7 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(component.invalidImageWarningIsShown).toBeTrue();
   });
 
-  it('should not load file if filename has consecutive dots in it', () => {
+  it('should not load file if it does not have a proper filename', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(false);
     expect(component.invalidImageWarningIsShown).toBe(false);
@@ -173,48 +173,20 @@ describe('Edit Thumbnail Modal Component', () => {
     const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
     const arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], 'thumb..nail.svg');
-
+    var file = new File([arrayBuffer], 'thumb..nail.svg');
     component.onFileChanged(file);
-
     expect(component.uploadedImage).toBeNull();
     expect(component.invalidFilenameWarningIsShown).toBeTrue();
     expect(component.invalidImageWarningIsShown).toBeFalse();
-  });
 
-  it('should not load file if filename has a / in it', () => {
-    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
-    spyOn(component, 'isValidFilename').and.returnValue(false);
-    expect(component.invalidImageWarningIsShown).toBe(false);
-    expect(component.invalidFilenameWarningIsShown).toBe(false);
-    // This is just a mocked base 64 in order to test the FileReader event
-    // and its result property.
-    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], 'thumb/nail.svg');
-
+    file = new File([arrayBuffer], 'thumb/nail.svg');
     component.onFileChanged(file);
-
     expect(component.uploadedImage).toBeNull();
     expect(component.invalidFilenameWarningIsShown).toBeTrue();
     expect(component.invalidImageWarningIsShown).toBeFalse();
-  });
 
-  it('should not load file if filename starts with a dot', () => {
-    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
-    spyOn(component, 'isValidFilename').and.returnValue(false);
-    expect(component.invalidImageWarningIsShown).toBe(false);
-    expect(component.invalidFilenameWarningIsShown).toBe(false);
-    // This is just a mocked base 64 in order to test the FileReader event
-    // and its result property.
-    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], '.thumbnail.svg');
-
+    file = new File([arrayBuffer], '.thumbnail.svg');
     component.onFileChanged(file);
-
     expect(component.uploadedImage).toBeNull();
     expect(component.invalidFilenameWarningIsShown).toBeTrue();
     expect(component.invalidImageWarningIsShown).toBeFalse();
