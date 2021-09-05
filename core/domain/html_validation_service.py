@@ -706,12 +706,12 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
             json.dumps(tab_content_list))
     return python_utils.UNICODE(soup)
 
-def fix_html_encoding(html_string):
-    """Renames all the oppia-noninteractive-svgdiagram on the server to
-    oppia-noninteractive-image and changes corresponding attributes.
+def replace_incorrectly_encoded_chars(html_string):
+    """Replaces incorrectly encoded character with the correct one in a given
+    HTML string.
 
     Args:
-        html_string: str. The HTML string to check.
+        html_string: str. The HTML string to modify.
 
     Returns:
         str. The updated html string.
@@ -719,12 +719,131 @@ def fix_html_encoding(html_string):
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
     fixed_html = python_utils.UNICODE(soup)
-    tuples = [
+    char_mapping_tuples = [
+        (u'\xc3\xa3', u'\xe3'),
+        (u'\xc3\xa1', u'\xe1'),
+        (u'\xc3\xa2', u'\xe2'),
+        (u'\xc3\xa4', u'\xe4'),
+        (u'\xc3\xa5', u'\xe5'),
+        (u'\xc3\xa6', u'\xe6'),
+        (u'\xc3\xa7', u'\xe7'),
+        (u'\xc3\xa8', u'\xe8'),
+        (u'\xc3\xa9', u'\xe9'),
+        (u'\xc3\xaa', u'\xea'),
+        (u'\xc3\xab', u'\xeb'),
+        (u'\xc3\xac', u'\xec'),
+        (u'\xc3\xad', u'\xed'),
+        (u'\xc3\xae', u'\xee'),
+        (u'\xc3\xaf', u'\xef'),
+        (u'\xc3\xba', u'\xfa'),
+        (u'\xc3\xbb', u'\xfb'),
+        (u'\xc3\xb6', u'\xf6'),
+        (u'\xc3\xb7', u'\xf7'),
+        (u'\xc3\xbc', u'\xfc'),
+        (u'\xc3\u2022', u'\xd5'),
+        (u'\xc3\u2021', u'\xc7'),
+        (u'\xc3\u2013', u'\xd6'),
+        (u'\xc3\u2018', u'\xd1'),
+        (u'\xc3\u201c', u'\xd3'),
+        (u'\xc3\u201e', u'\xc4'),
+        (u'\xc3\u20ac', u'\xc0'),
+        (u'\xc3\u0153', u'\xdc'),
         (u'\xc3\u2014', u'\xd7'),
-        (u'\xe2\u02c6\u2014', u'\u2217'),
-        (u'\xe2\u2039\u2026', u'\u22c5'),
-        (u'\xe2\u20ac\u2122', u'\u2019')
+        (u'\xc3\u0178', u'\xdf'),
+        (u'\xc3', u'\xe0'),
+        (u'\xc4\u0178', u'\u011f'),
+        (u'\xc4\xab', u'\u012b'),
+        (u'\xc4\xb1', u'\u0131'),
+        (u'\xc4\xb0', u'\u0130'),
+        (u'\xc4\u2021', u'\u0107'),
+        (u'\xc4\u2122', u'\u0119'),
+        (u'\xc4\u2026', u'\u0105'),
+        (u'\xc4\u20ac', u'\u0100'),
+        (u'\xc4\xb0', u'\u0130'),
+        (u'\xc5\xba', u'\u017a'),
+        (u'\xc5\xbe', u'\u017e'),
+        (u'\xc5\u203a', u'\u015b'),
+        (u'\xc5\u0178', u'\u015f'),
+        (u'\xc9\u203a', u'\u025b'),
+        (u'\xd9\u2026', u'\u0645'),
+        (u'\xd1\u02c6', u'\u0448'),
+        (u'\xd8\xb5', u'\u0635'),
+        (u'\xd8\xad', u'\u062d'),
+        (u'\xe1\xba\xbf', u'\u1ebf'),
+        (u'\xe2\u02c6\u2030', u'\u2209'),
+        (u'\xe2\u2026\u02dc', u'\u2158'),
+        (u'\xe2\u02c6\u0161', u'\u221a'),
+        (u'\xe2\u02c6\u02c6', u'\u2208'),
+        (u'\xe2\u2014\xaf', u'\u25ef'),
+        (u'\xe2\u20ac\u201c', u'\u2013'),
+        (u'\xe2\u2026\u2013', u'\u2156'),
+        (u'\xe2\u2026\u201d', u'\u2154'),
+        (u'\xe2\u2030\xa4', u'\u2264'),
+        (u'\xe2\u201a\xac', u'\u20ac'),
+        (u'\xe3\u201a\u201e', u'\u3084'),
+        (u'\xe3\u201a\u201c', u'\u3093'),
+        (u'\xe3\u201a\u201a', u'\u3082'),
+        (u'\xe3\u201a\u2019', u'\u3092'),
+        (u'\xe3\u201a\u0160', u'\u308a'),
+        (u'\xe5\u0152\u2014', u'\u5317'),
+        (u'\xe6\u0153\xa8', u'\u6728'),
+        (u'\xe8\xa5\xbf', u'\u897f'),
+        (u'\ucc9c', u'\xf5'),
+        (u'\u7aef', u'\xfc'),
+        (u'\u8d38', u'\xf3'),
+        (u'\ucc44', u'\xe4'),
+        (u'\uccb4', u'\xfc'),
+        (u'\u5358', u'\xf1'),
+        (u'\u89ba', u'\u0131'),
+        (u'\u0e23\u0e07', u'\xe7'),
+        (u'\u0e23\x97', u'\xd7'),
+        (u'\u0e23\u0e17', u'\xf7'),
+        (u'\u0e23\u0e16', u'\xf6'),
+        (u'\u0e23\u0e13', u'\xf3'),
+        (u'\u043f\u0435', u'\u0628'),
+        (u'\u011f\u0178\u02dc\u2022', u'\U0001f615'),
+        (u'\xf0\u0178\u02dc\u0160', u'\U0001f60a'),
+        (u'\xf0\u0178\u02dc\u2030', u'\U0001f609'),
+        (u'\u011f\u0178\u2122\u201e', u'\U0001f644'),
+        (u'\u011f\u0178\u2122\u201a', u'\U0001f642'),
+        (u'\u011f\u0178\u02dc\u0160', u'\U0001f60a'),
+        (u'\u011f\u0178\u2122\u201a', u'\U0001f642'),
+        (u'\u011f\u0178\u2019\xa1', u'\U0001f4a1'),
+        (u'\u011f\u0178\u02dc\u2018', u'\U0001f611'),
+        (u'\u011f\u0178\u02dc\u0160', u'\U0001f60a'),
+        (u'\u011f\u0178\u201d\u2013', u'\U0001f516'),
+        (u'\u011f\u0178\u02dc\u2030', u'\U0001f609'),
+        (u'\u011f\u0178\u02dc\u0192', u'\U0001f603'),
+        (u'\u011f\u0178\xa4\u2013', u'\U0001f916'),
+        (u'\xf0\u0178\u201c\xb7', u'\U0001f4f7'),
+        (u'\xf0\u0178\u02dc\u201a', u'\U0001f602'),
+        (u'\xf0\u0178\u201c\u20ac', u'\U0001f4c0'),
+        (u'\xf0\u0178\u2019\xbf', u'\U0001f4bf'),
+        (u'\xf0\u0178\u2019\xaf', u'\U0001f4af'),
+        (u'\xf0\u0178\u2019\xa1', u'\U0001f4a1'),
+        (u'\xf0\u0178\u2018\u2039', u'\U0001f44b'),
+        (u'\xf0\u0178\u02dc\xb1', u'\U0001f631'),
+        (u'\xf0\u0178\u02dc\u2018', u'\U0001f611'),
+        (u'\xf0\u0178\u02dc\u0160', u'\U0001f60a'),
+        (u'\xf0\u0178\u017d\xa7', u'\U0001f3a7'),
+        (u'\xf0\u0178\u017d\u2122', u'\U0001f399'),
+        (u'\xf0\u0178\u017d\xbc', u'\U0001f3bc'),
+        (u'\xf0\u0178\u201c\xbb', u'\U0001f4fb'),
+        (u'\xf0\u0178\xa4\xb3', u'\U0001f933'),
+        (u'\xf0\u0178\u2018\u0152', u'\U0001f44c'),
+        (u'\xf0\u0178\u0161\xa6', u'\U0001f6a6'),
+        (u'\xf0\u0178\xa4\u2014', u'\U0001f917'),
+        (u'\u011f\u0178\u02dc\u201e', u'\U0001f604'),
+        (u'\u0628', u'\u043f\u0435'),
+        (u'\u0e23\u0e1b', u'\xfb'),
+        (u'\u0e38\u0e04', u'\u0624'),
+        (u'\xc2\xb2', u'\xb2'),
+        (u'\xc2\xa1', u'\xa1'),
+        (u'\xc2\xb4', u'\xb4'),
+        (u'\xc2\xa0', u'\xa0'),
+        (u'\xa0', u' '),
+        (u'\xc2', u'')
     ]
-    for a, b in tuples:
-        fixed_html = fixed_html.replace(a, b)
+    for bad_char, good_char in char_mapping_tuples:
+        fixed_html = fixed_html.replace(bad_char, good_char)
     return fixed_html

@@ -1926,9 +1926,8 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
-        """Converts from version 46 to 47. Version 52 deprecates
-        oppia-noninteractive-svgdiagram tag and converts existing occurences of
-        it to oppia-noninteractive-image tag.
+        """Converts from version 47 to 48. Version 53 fixes encoding issues in
+        HTML fields.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -1942,7 +1941,7 @@ class Exploration(python_utils.OBJECT):
         for state_dict in states_dict.values():
             state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_validation_service.fix_html_encoding)
+                html_validation_service.replace_incorrectly_encoded_chars)
         return states_dict
 
     @classmethod
