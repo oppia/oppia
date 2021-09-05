@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,96 +13,83 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the concept cards viewer.
+ * @fileoverview Component for the concept cards viewer.
  */
 
-require('domain/skill/concept-card-backend-api.service.ts');
-require('directives/angular-html-bind.directive.ts');
-require('filters/format-rte-preview.filter.ts');
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
-angular.module('oppia').directive('conceptCard', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {
-      skillIds: '<',
-      index: '<'
-    },
-    template: require('./concept-card.component.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$rootScope', '$scope', 'ConceptCardBackendApiService',
-      function(
-          $rootScope, $scope, ConceptCardBackendApiService) {
-        var ctrl = this;
-        ctrl.isLastWorkedExample = function() {
-          return ctrl.numberOfWorkedExamplesShown ===
-              ctrl.currentConceptCard.getWorkedExamples().length;
-        };
-
-        ctrl.showMoreWorkedExamples = function() {
-          ctrl.explanationIsShown = false;
-          ctrl.numberOfWorkedExamplesShown++;
-        };
-
-        ctrl.$onInit = function() {
-          ctrl.conceptCards = [];
-          ctrl.currentConceptCard = null;
-          ctrl.numberOfWorkedExamplesShown = 0;
-          ctrl.loadingMessage = 'Loading';
-          $scope.$watch('$ctrl.index', function(newIndex) {
-            ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-            if (ctrl.currentConceptCard) {
-              ctrl.numberOfWorkedExamplesShown = 0;
-              if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
-                ctrl.numberOfWorkedExamplesShown = 1;
-              }
-            }
-          });
-          ConceptCardBackendApiService.loadConceptCardsAsync(
-            ctrl.skillIds
-          ).then(function(conceptCardObjects) {
-            conceptCardObjects.forEach(function(conceptCardObject) {
-              ctrl.conceptCards.push(conceptCardObject);
-            });
-            ctrl.loadingMessage = '';
-            ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
-            ctrl.numberOfWorkedExamplesShown = 0;
-            if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
-              ctrl.numberOfWorkedExamplesShown = 1;
-            }
-            // TODO(#8521): Remove when this directive is migrated to Angular.
-            $rootScope.$apply();
-          }, function(errorResponse) {
-            ctrl.loadingMessage = '';
-            ctrl.skillDeletedMessage = 'Oops, it looks like this skill has' +
-              ' been deleted.';
-          });
-        };
-      }
-    ]
-  };
-}]);
-
-// Allow $scope to be provided to parent Component.
-export const ScopeProvider = {
-  deps: ['$injector'],
-  provide: '$scope',
-  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
-};
-
-import { Directive, ElementRef, Injector, Input } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
-
-@Directive({
-  selector: 'concept-card',
-  providers: [ScopeProvider]
+@Component({
+  selector: 'oppia-concept-card',
+  templateUrl: './concept-card.component.html',
 })
-export class ConceptCardComponent extends UpgradeComponent {
-  @Input() skillIds;
-  @Input() index;
+export class ConceptCardComponent implements OnInit, OnChanges {
+  @Input() skillIds: string[];
+  @Input() index: string | number;
+  numberOfWorkedExamplesShown: number;
+  currentConceptCard: ConceptCard;
+  explanationIsShown: boolean;
+  conceptCards: ConceptCard[];
+  loadingMessage: string;
+  skillDeletedMessage: string;
 
-  constructor(elementRef: ElementRef, injector: Injector) {
-    super('conceptCard', elementRef, injector);
+  constructor(
+    private conceptCardBackendApiService: ConceptCardBackendApiService
+  ) {}
+
+  isLastWorkedExample(): boolean {
+    return this.numberOfWorkedExamplesShown ===
+        this.currentConceptCard.getWorkedExamples().length;
+  }
+
+  showMoreWorkedExamples(): void {
+    this.explanationIsShown = false;
+    this.numberOfWorkedExamplesShown++;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.index &&
+      changes.index.currentValue !== changes.index.previousValue
+    ) {
+      this.currentConceptCard = this.conceptCards[changes.index.currentValue];
+      if (this.currentConceptCard) {
+        this.numberOfWorkedExamplesShown = 0;
+        if (this.currentConceptCard.getWorkedExamples().length > 0) {
+          this.numberOfWorkedExamplesShown = 1;
+        }
+      }
+    }
+  }
+
+  ngOnInit(): void {
+    this.conceptCards = [];
+    this.currentConceptCard = null;
+    this.numberOfWorkedExamplesShown = 0;
+    this.loadingMessage = 'Loading';
+    this.conceptCardBackendApiService.loadConceptCardsAsync(
+      this.skillIds
+    ).then((conceptCardObjects) => {
+      conceptCardObjects.forEach((conceptCardObject) => {
+        this.conceptCards.push(conceptCardObject);
+      });
+      this.loadingMessage = '';
+      this.currentConceptCard = this.conceptCards[this.index];
+      this.numberOfWorkedExamplesShown = 0;
+      if (this.currentConceptCard.getWorkedExamples().length > 0) {
+        this.numberOfWorkedExamplesShown = 1;
+      }
+    }, () => {
+      this.loadingMessage = '';
+      this.skillDeletedMessage = 'Oops, it looks like this skill has' +
+        ' been deleted.';
+    });
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaConceptCard', downgradeComponent({
+    component: ConceptCardComponent
+  }) as angular.IDirectiveFactory);

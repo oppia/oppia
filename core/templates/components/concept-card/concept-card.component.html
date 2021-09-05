@@ -1,44 +1,49 @@
-<div class="oppia-concept-card-viewer" ng-if="!$ctrl.loadingMessage">
+<div class="oppia-concept-card-viewer" *ngIf="!loadingMessage">
   <div class="concept-card-explanation">
     <div class="oppia-concept-card-explanation-container">
-      <angular-html-bind class="protractor-test-concept-card-explanation"
-                         html-data="$ctrl.currentConceptCard.getExplanation().html">
-      </angular-html-bind>
-      <div ng-if="$ctrl.skillDeletedMessage">
-        <div class="oppia-align-center"><[$ctrl.skillDeletedMessage]></div>
+      <angular-html-bind-wrapper classStr="protractor-test-concept-card-explanation"
+                                 [htmlData]="currentConceptCard.getExplanation().html">
+      </angular-html-bind-wrapper>
+      <div *ngIf="skillDeletedMessage">
+        <div class="oppia-align-center">{{ skillDeletedMessage }}</div>
       </div>
     </div>
   </div>
-  <div class="concept-card-worked-examples" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
+  <div class="concept-card-worked-examples" *ngIf="numberOfWorkedExamplesShown > 0">
     <strong> Worked Examples </strong>
-    <div class="oppia-worked-examples-container"
-         ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
-         ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
-      <strong> Question: </strong>
-      <angular-html-bind class="example-content" html-data="example.getQuestion().html"></angular-html-bind>
+    <div *ngIf="idx < numberOfWorkedExamplesShown">
+      <div class="oppia-worked-examples-container"
+          *ngFor="let example of currentConceptCard.getWorkedExamples(); let idx = index">
+        <strong> Question: </strong>
+        <angular-html-bind-wrapper classStr="example-content"
+                                   [htmlData]="example.getQuestion().html">
+        </angular-html-bind-wrapper>
 
-      <button class="btn btn-secondary show-example-explanation-button"
-              ng-if="!$ctrl.explanationIsShown && $index == $ctrl.numberOfWorkedExamplesShown - 1"
-              ng-click="$ctrl.explanationIsShown = true;">
-        Show Explanation
-      </button>
-      <div ng-if="$ctrl.explanationIsShown || $index < $ctrl.numberOfWorkedExamplesShown - 1">
-        <strong> Explanation: </strong>
-        <angular-html-bind class="example-content" html-data="example.getExplanation().html"></angular-html-bind>
+        <button class="btn btn-secondary show-example-explanation-button"
+                *ngIf="!explanationIsShown && idx == numberOfWorkedExamplesShown - 1"
+                (click)="explanationIsShown = true;">
+          Show Explanation
+        </button>
+        <div *ngIf="explanationIsShown || idx < numberOfWorkedExamplesShown - 1">
+          <strong> Explanation: </strong>
+          <angular-html-bind-wrapper classStr="example-content"
+                                     [htmlData]="example.getExplanation().html">
+          </angular-html-bind-wrapper >
+        </div>
       </div>
     </div>
     <button class="btn btn-secondary show-more-worked-examples-button"
-            ng-if="!$ctrl.isLastWorkedExample()"
-            ng-click="$ctrl.showMoreWorkedExamples()">
+            *ngIf="!isLastWorkedExample()"
+            (click)="showMoreWorkedExamples()">
       + Worked Examples
     </button>
   </div>
 </div>
 
-<div ng-if="$ctrl.loadingMessage">
+<div *ngIf="loadingMessage">
   <div class="oppia-align-center">
-    <span translate="<[$ctrl.loadingMessage]>"></span>
-    <loading-dots></loading-dots>
+    <span [innerHTML]="loadingMessage"></span>
+    <!-- <loading-dots></loading-dots> -->
   </div>
 </div>
 
