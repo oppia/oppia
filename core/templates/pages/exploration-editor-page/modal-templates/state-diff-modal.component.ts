@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,8 +26,20 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ContextService } from 'services/context.service';
 import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
 
+interface headersAndYamlStrs {
+  leftPane: string;
+  rightPane: string;
+}
+
+interface mergeviewOptions {
+  lineNumbers: boolean;
+  readOnly: boolean;
+  mode: string;
+  viewportMargin: number;
+}
+
 @Component({
-  selector: 'state-diff-modal',
+  selector: 'oppia-state-diff-modal',
   templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent
@@ -36,18 +48,12 @@ export class StateDiffModalComponent
     oldState: State | null;
     newStateName: string;
     oldStateName: string;
-    headers: {
-        leftPane: string;
-        rightPane: string;
-    };
-    yamlStrs: {
-        leftPane: string;
-        rightPane: string;
-    } = {
+    headers: headersAndYamlStrs;
+    yamlStrs: headersAndYamlStrs = {
       leftPane: '',
       rightPane: '',
     };
-    CODEMIRROR_MERGEVIEW_OPTIONS = {
+    CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
       lineNumbers: true,
       readOnly: true,
       mode: 'yaml',

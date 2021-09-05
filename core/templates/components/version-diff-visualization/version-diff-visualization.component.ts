@@ -114,9 +114,9 @@ angular.module('oppia').component('versionDiffVisualization', {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/modal-templates/' +
-          'state-diff-modal.template.html'),
+          'state-diff-modal.component.html'),
         backdrop: true,
-        windowClass: 'state-diff-modal',
+        windowClass: 'oppia-state-diff-modal',
         resolve: {
           newStateName: function() {
             return newStateName;

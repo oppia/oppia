@@ -22,9 +22,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 
 interface ResInterface {
-    data: {
-        yaml: string;
-    }
+  data: {
+    yaml: string;
+  }
 }
 
 @Injectable({
