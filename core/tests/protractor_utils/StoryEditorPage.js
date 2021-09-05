@@ -151,11 +151,15 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await publishStoryButton.click();
+    await action.click('Publish Story Button', publishStoryButton);
   };
 
   this.unpublishStory = async function() {
     await unpublishStoryButton.click();
+    await action.click('Close Save Modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Unpublish message modal takes too long to disappear.');
   };
 
   this.deleteChapterWithIndex = async function(index) {
@@ -501,6 +505,9 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       warningIndicator, 'Warning Indicator taking too long to appear.');
     await browser.actions().mouseMove(warningIndicator).perform();
+    await waitFor.visibilityOf(
+      warningTextElements.first(),
+      'Warning Text Elements taking too long to appear');
     var warningElemCount = await warningTextElements.count();
     var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {

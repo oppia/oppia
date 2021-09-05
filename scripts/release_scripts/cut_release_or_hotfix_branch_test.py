@@ -141,7 +141,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_exception_is_raised_if_target_branch_exists(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'new-branch\nbranch-1\nbranch-2'
+            return b'new-branch\nbranch-1\nbranch-2'
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -157,8 +157,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_if_target_branch_exists_on_remote_repo(self):
         def mock_check_output(cmd_tokens):
             if 'ls-remote' in cmd_tokens:
-                return 'refs/heads/new-branch\nrefs/heads/branch-1'
-            return 'branch-1\nbranch-2'
+                return b'refs/heads/new-branch\nrefs/heads/branch-1'
+            return b'branch-1\nbranch-2'
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -172,7 +172,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_no_exception_is_raised_if_target_branch_does_not_exist(self):
         def mock_check_output(unused_cmd_tokens):
-            return 'branch-1\nbranch-2'
+            return b'branch-1\nbranch-2'
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             (
@@ -272,11 +272,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_for_invalid_new_hotfix_number(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nremotes/upstream/branch2\n'
-                'remotes/upstream/release-1.2.3-hotfix-2\n'
-                'remotes/upstream/release-1.2.3-hotfix-1\n'
-                'remotes/upstream/release-1.2.2-hotfix-3\n'
-                'remotes/upstream/release-1.2.3\n')
+                b'branch1\nremotes/upstream/branch2\n'
+                b'remotes/upstream/release-1.2.3-hotfix-2\n'
+                b'remotes/upstream/release-1.2.3-hotfix-1\n'
+                b'remotes/upstream/release-1.2.2-hotfix-3\n'
+                b'remotes/upstream/release-1.2.3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -291,10 +291,10 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_for_missing_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nremotes/upstream/branch2\n'
-                'remotes/upstream/release-1.2.3-hotfix-2\n'
-                'remotes/upstream/release-1.2.3-hotfix-1\n'
-                'remotes/upstream/release-1.2.3-hotfix-3\n')
+                b'branch1\nremotes/upstream/branch2\n'
+                b'remotes/upstream/release-1.2.3-hotfix-2\n'
+                b'remotes/upstream/release-1.2.3-hotfix-1\n'
+                b'remotes/upstream/release-1.2.3-hotfix-3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -308,11 +308,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_no_exception_is_raised_for_valid_new_hotfix_number(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nremotes/upstream/branch2\n'
-                'remotes/upstream/release-1.2.3-hotfix-2\n'
-                'remotes/upstream/release-1.2.3-hotfix-1\n'
-                'remotes/upstream/release-1.2.2-hotfix-3\n'
-                'remotes/upstream/release-1.2.3\n')
+                b'branch1\nremotes/upstream/branch2\n'
+                b'remotes/upstream/release-1.2.3-hotfix-2\n'
+                b'remotes/upstream/release-1.2.3-hotfix-1\n'
+                b'remotes/upstream/release-1.2.2-hotfix-3\n'
+                b'remotes/upstream/release-1.2.3\n')
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             (

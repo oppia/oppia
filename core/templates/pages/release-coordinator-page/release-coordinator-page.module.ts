@@ -18,8 +18,7 @@
 
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,37 +28,27 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { BeamJobsTabComponent } from 'pages/release-coordinator-page/beam-jobs-tab/beam-jobs-tab.component';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
-import { JobsTabComponent } from 'pages/release-coordinator-page/jobs-tab/jobs-tab.component';
 import { ReleaseCoordinatorNavbarComponent } from 'pages/release-coordinator-page/navbar/release-coordinator-navbar.component';
 import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/release-coordinator-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-
+import { ReleaseCoordinatorPageRoutingModule } from './release-coordinator-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
     CommonModule,
     ClipboardModule,
     FormsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
-    // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
     MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
@@ -68,16 +57,18 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MatIconModule,
     MatInputModule,
     MatProgressBarModule,
+    MatSortModule,
     MatTabsModule,
     MatTableModule,
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    ReleaseCoordinatorPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     BeamJobsTabComponent,
     CancelBeamJobDialogComponent,
-    JobsTabComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,
@@ -86,26 +77,11 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
   ],
   entryComponents: [
     CancelBeamJobDialogComponent,
-    JobsTabComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,
     StartNewBeamJobDialogComponent,
     ViewBeamJobOutputDialogComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-  ],
-  bootstrap: [ReleaseCoordinatorPageRootComponent]
+  ]
 })
 export class ReleaseCoordinatorPageModule {}

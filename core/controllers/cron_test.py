@@ -26,6 +26,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -68,6 +69,17 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
+        self.task_status = 'Not Started'
+        def _mock_taskqueue_service_defer(
+                unused_function_id, unused_queue_name):
+            """Mocks taskqueue_services.defer() so that it can be checked
+            if the method is being invoked or not.
+            """
+            self.task_status = 'Started'
+
+        self.taskqueue_service_defer_swap = self.swap(
+            taskqueue_services, 'defer', _mock_taskqueue_service_defer)
 
     def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -126,6 +138,24 @@ class CronJobTests(test_utils.GenericTestBase):
             self.get_html_response('/cron/models/cleanup')
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
+    def test_cron_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_html_response('/cron/users/user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+        self.logout()
+
+    def test_cron_fully_complete_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_html_response('/cron/users/fully_complete_user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+            self.logout()
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
@@ -376,24 +406,30 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def mock_send_mail_to_notify_admins_that_reviewers_are_needed(
-            self, admin_ids, suggestion_types_needing_reviewers):
+            self, admin_ids, translation_admin_ids, question_admin_ids,
+            suggestion_types_needing_reviewers):
         """Mocks
         email_manager.send_mail_to_notify_admins_that_reviewers_are_needed as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main.
         """
         self.admin_ids = admin_ids
+        self.translation_admin_ids = translation_admin_ids
+        self.question_admin_ids = question_admin_ids
         self.suggestion_types_needing_reviewers = (
             suggestion_types_needing_reviewers)
 
     def _mock_send_mail_to_notify_admins_suggestions_waiting(
-            self, admin_ids, reviewable_suggestion_email_infos):
+            self, admin_ids, translation_admin_ids, question_admin_ids,
+            reviewable_suggestion_email_infos):
         """Mocks
         email_manager.send_mail_to_notify_admins_suggestions_waiting_long as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main.
         """
         self.admin_ids = admin_ids
+        self.translation_admin_ids = translation_admin_ids
+        self.question_admin_ids = question_admin_ids
         self.reviewable_suggestion_email_infos = (
             reviewable_suggestion_email_infos)
 
@@ -437,6 +473,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.admin_ids = []
         self.suggestion_types_needing_reviewers = {}
         self.reviewable_suggestion_email_infos = []
+        self.translation_admin_ids = []
+        self.question_admin_ids = []
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

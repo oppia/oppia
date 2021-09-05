@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import logging
 import os
 import re
+from unittest import mock
 
 from constants import constants
 from core.domain import auth_domain
@@ -30,7 +31,6 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-import mock
 import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])

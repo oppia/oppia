@@ -116,7 +116,7 @@ def managed_process(
 def managed_dev_appserver(
         app_yaml_path, env=None, log_level='info',
         host='0.0.0.0', port=8080, admin_host='0.0.0.0', admin_port=8000,
-        enable_host_checking=True, automatic_restart=True,
+        enable_host_checking=True, automatic_restart=False,
         skip_sdk_update_check=False):
     """Returns a context manager to start up and shut down a GAE dev appserver.
 

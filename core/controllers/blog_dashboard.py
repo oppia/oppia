@@ -29,17 +29,22 @@ from core.domain import user_services
 import feconf
 import utils
 
+from typing import Any, Dict, List
 
-def _get_blog_card_summary_dicts_for_dashboard(summaries):
-    # type: (list[BlogPostSummaries]) -> list[BlogPostSummayDicts]
+
+# Here we are using Dict[str, Any] for the return value `summary_dicts` since
+# we have to return a list with each element being domain object converted to
+# a dictionary.
+def _get_blog_card_summary_dicts_for_dashboard(
+        summaries: List[blog_domain.BlogPostSummary]) -> List[Dict[str, Any]]:
     """Creates summary dicts for use in blog dashboard.
 
     Args:
-        summaries: BlogPostSummaries. List of blog post summary
+        summaries: list(BlogPostSummary). List of blog post summary
             domain objects.
 
     Returns:
-        BlogPostSummaryDicts. The list of blog post summary dicts.
+        list(Dict(str, *)). The list of blog post summary dicts.
     """
     summary_dicts = []
     for summary in summaries:
@@ -58,7 +63,7 @@ class BlogDashboardPage(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
 
         self.render_template('blog-dashboard-page.mainpage.html')
@@ -75,8 +80,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
 
@@ -101,7 +105,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
             draft_blog_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_dashboard(
                     draft_blog_post_summaries))
-
         self.values.update({
             'username': user_settings.username,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
@@ -114,8 +117,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_blog_dashboard
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Handles POST requests to create a new blog post draft."""
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
@@ -165,16 +167,14 @@ class BlogPostHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self, blog_post_id):
-        # type: (str) -> None
+    def get(self, blog_post_id: str) -> None:
         """Populates the data on the blog dashboard editor page."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
             raise self.PageNotFoundException(
-                Exception(
-                    'The blog post with the given id or url doesn\'t exist.'))
+                'The blog post with the given id or url doesn\'t exist.')
         user_settings = user_services.get_users_settings(
             [blog_post.author_id], strict=False, include_marked_deleted=True)
         username = user_settings[0].username
@@ -186,6 +186,7 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
+        blog_post_dict['author_username'] = username
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
@@ -199,8 +200,7 @@ class BlogPostHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def put(self, blog_post_id):
-        # type: (str) -> None
+    def put(self, blog_post_id: str) -> None:
         """Updates properties of the given blog post."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
@@ -224,8 +224,7 @@ class BlogPostHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def post(self, blog_post_id):
-        # type: (str) -> None
+    def post(self, blog_post_id: str) -> None:
         """Stores thumbnail of the blog post in the datastore."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         raw_image = self.normalized_request.get('image')
@@ -237,7 +236,7 @@ class BlogPostHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         entity_id = blog_post_id
-        filename_prefix = 'blog_post_thumbnail'
+        filename_prefix = 'thumbnail'
 
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
@@ -248,8 +247,7 @@ class BlogPostHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_blog_post
-    def delete(self, blog_post_id):
-        # type: (str) -> None
+    def delete(self, blog_post_id: str) -> None:
         """Handles Delete requests."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_services.delete_blog_post(blog_post_id)

@@ -987,7 +987,7 @@ describe('QuestionsListComponent', () => {
     spyOn(QuestionsListService, 'getQuestionSummariesAsync');
     spyOn(ctrl, 'saveAndPublishQuestion');
 
-    ctrl.updateSkillLinkage('commit', true);
+    ctrl.updateSkillLinkageAndQuestions('commit');
     $scope.$apply();
     $timeout.flush(500);
 
@@ -996,13 +996,31 @@ describe('QuestionsListComponent', () => {
     expect(ctrl.saveAndPublishQuestion).toHaveBeenCalledWith('commit');
   });
 
+  it('should update skill linkage correctly', () => {
+    ctrl.skillLinkageModificationsArray = [
+      {
+        id: 'skillId1',
+        task: 'update_difficulty',
+        difficulty: 0.9
+      }
+    ];
+    spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
+      .and.returnValue($q.resolve());
+
+    ctrl.updateSkillLinkage();
+    $scope.$apply();
+    $timeout.flush(500);
+
+    expect(ctrl.skillLinkageModificationsArray).toEqual([]);
+  });
+
   it('should open question editor save modal if question' +
     ' is being updated when user click on \'SAVE\' button', () => {
     ctrl.questionIsBeingUpdated = true;
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve('commit')
     });
-    spyOn(ctrl, 'updateSkillLinkage');
+    spyOn(ctrl, 'updateSkillLinkageAndQuestions');
     spyOn(ctrl, 'saveAndPublishQuestion');
 
     // If skillLinkageModificationsArray is present.
@@ -1011,7 +1029,7 @@ describe('QuestionsListComponent', () => {
     ctrl.saveQuestion();
     $scope.$apply();
 
-    expect(ctrl.updateSkillLinkage).toHaveBeenCalledWith('commit', true);
+    expect(ctrl.updateSkillLinkageAndQuestions).toHaveBeenCalledWith('commit');
 
     // If skillLinkageModificationsArray is not present.
     ctrl.skillLinkageModificationsArray = [];

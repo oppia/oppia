@@ -1,42 +1,110 @@
-<mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
-  <mat-card-header class="blog-dashboard-header">
-    <img mat-card-avatar
-         [src]="authorProfilePictureUrl">
-    <mat-card-title class="blog-dashboard-card-title">{{blogDashboardData.username}}</mat-card-title>
-    <mat-card-subtitle>
-      <button mat-button class="new-post-button">
-        <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-        <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
-      </button>
-    </mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-    <mat-tab-group>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{blogDashboardData.numOfDraftBlogPosts}})
-        </ng-template>
-        <div class="blog-dashboard-tiles-container">
-          <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
-            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-            </oppia-blog-dashboard-tile>
+<div *ngIf="activeTab === 'main'">
+  <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
+    <mat-card-header class="blog-dashboard-header">
+      <img mat-card-avatar
+           [src]="authorProfilePictureUrl"
+           alt="Profile image of the author of the blog post"
+           class="protractor-test-profile-current-user-photo">
+      <mat-card-title class="blog-dashboard-card-title protractor-test-username-visible">
+        {{ blogDashboardData.username }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        <button mat-button
+                class="new-post-button protractor-test-create-blog-post-button"
+                (click)="createNewBlogPost()"
+                *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
+          <mat-icon class="new-post-icon position-absolute">+</mat-icon>
+          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
+        </button>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="col-sm-8 mx-auto protractor-test-intro-message-container"
+           *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
+        <blockquote class="blog-dashboard-intro-card">
+          <p class="blog-dashboard-intro-card-message">
+            {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate}}
+          </p>
+          <button mat-button
+                  class="mx-2 my-2 create-new-blog-post-button protractor-test-create-blog-post-button"
+                  (click)="createNewBlogPost()"
+                  aria-label="New blog post button.">
+                  {{ 'I18N_BLOG_DASHBOARD_CREATE_NEW_BLOG_POST_BUTTON' | translate | uppercase }}
+          </button>
+        </blockquote>
+      </div>
+      <mat-tab-group class="protractor-test-mat-tabs" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{ blogDashboardData.numOfDraftBlogPosts }})
+          </ng-template>
+          <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
+            <button mat-icon-button (click)="activeView = 'gridView'" class="protractor-test-tiles-view-button">
+              <mat-icon [ngClass]="{'view-active': activeView === 'gridView'}">grid_view</mat-icon>
+            </button>
+            <button mat-icon-button (click)="activeView = 'listView'" class="protractor-test-list-view-button">
+              <mat-icon [ngClass]="{'view-active': activeView === 'listView'}">view_list</mat-icon>
+            </button>
           </div>
-        </div>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{blogDashboardData.numOfPublishedBlogPosts}})
-        </ng-template>
-        <div class="blog-dashboard-tiles-container">
-          <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
-            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-            </oppia-blog-dashboard-tile>
+          <div class="blog-dashboard-tiles-container protractor-test-drafts-blog-post-table" *ngIf="activeView === 'gridView'">
+            <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
+              <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
+                                         [blogPostIsPublished]="false"
+                                         [activeView]="activeView"
+                                         class="d-flex flex-grow-1 protractor-test-draft-blog-post-tile-item"
+                                         (deletedBlogPost)="removeBlogPost(blogPostSummary, false)">
+              </oppia-blog-dashboard-tile>
+            </div>
           </div>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-content>
-</mat-card>
+          <mat-list class="blog-dashboard-tiles-container protractor-test-drafts-blog-post-table" *ngIf="activeView === 'listView'">
+            <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as last">
+              <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
+                                         [blogPostIsPublished]="false"
+                                         [activeView]="activeView"
+                                         class="d-flex flex-grow-1 blog-tiles-list protractor-test-blog-post-list-item">
+              </oppia-blog-dashboard-tile>
+            </mat-list-item>
+          </mat-list>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label class="protractor-test-publish-tab-button">
+            {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{ blogDashboardData.numOfPublishedBlogPosts }})
+          </ng-template>
+          <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
+            <button mat-icon-button (click)="activeView = 'gridView'" class="protractor-test-tiles-view-button">
+              <mat-icon [ngClass]="{'view-active': activeView === 'gridView'}">grid_view</mat-icon>
+            </button>
+            <button mat-icon-button (click)="activeView = 'listView'" class="protractor-test-list-view-button">
+              <mat-icon [ngClass]="{'view-active': activeView === 'listView'}">view_list</mat-icon>
+            </button>
+          </div>
+          <div class="blog-dashboard-tiles-container protractor-test-published-blog-post-table" *ngIf="activeView === 'gridView'">
+            <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
+              <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
+                                         [blogPostIsPublished]="true"
+                                         [activeView]="activeView"
+                                         class="d-flex flex-grow-1 protractor-test-published-blog-post-tile-item"
+                                         (unpublisedBlogPost)="unpublishedBlogPost(blogPostSummary)"
+                                         (deletedBlogPost)="removeBlogPost(blogPostSummary, true)">
+              </oppia-blog-dashboard-tile>
+            </div>
+          </div>
+          <mat-list class="blog-dashboard-tiles-container protractor-test-published-blog-post-table" *ngIf="activeView === 'listView'">
+            <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts; last as last">
+              <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
+                                         [blogPostIsPublished]="false"
+                                         [activeView]="activeView"
+                                         class="d-flex flex-grow-1 blog-tiles-list protractor-test-blog-post-list-item">
+              </oppia-blog-dashboard-tile>
+            </mat-list-item>
+          </mat-list>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>
+<oppia-blog-post-editor *ngIf="activeTab === 'editor_tab'">
+</oppia-blog-post-editor>
 <style>
   .blog-dashboard-card {
     max-width: 835px;
@@ -67,6 +135,52 @@
     text-align: left;
   }
 
+  .blog-dashboard-intro-card-message {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    margin: 5px;
+  }
+
+  .blog-dashboard-intro-card {
+    border: 1px solid #CCC;
+    border-radius: 11px;
+    box-shadow: 5px 5px 5px #00000029;
+    display: flex;
+    flex-direction: column;
+    padding: 5vw;
+  }
+
+  .blog-dashboard-intro-card:before {
+    background: #fff;
+    border-bottom-right-radius: 80px 50px;
+    border-right: 1px solid #CCC;
+    bottom: -1.88em;
+    box-shadow: 5px 5px 5px #00000029;
+    content: "";
+    display: block;
+    height: 27px;
+    position: absolute;
+    width: 50px;
+    z-index: 10;
+  }
+
+  .blog-dashboard-intro-card:after {
+    background: #fff;
+    border-bottom-right-radius: 40px 50px;
+    border-right: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+    bottom: -1.88em;
+    box-shadow: inset -5px 5px 5px #00000029;
+    content: "";
+    display: block;
+    height: 27px;
+    position: absolute;
+    width: 20px;
+    z-index: 10;
+  }
+
   .new-post-button {
     background-color: #00609C;
     border-radius: 4px;
@@ -78,10 +192,28 @@
     width: 114px;
   }
 
+  .create-new-blog-post-button {
+    background-color: #00609C;
+    border-radius: 4px;
+    color: #FFF;
+    display: flex;
+    font-size: 1.4rem;
+    height: 36px;
+    justify-content: center;
+  }
+
   .new-post-icon {
     align-items: center;
     display: flex;
     margin-left: -8px;
+  }
+
+  .view-active {
+    color: #00645C;
+  }
+
+  .blog-tiles-list {
+    cursor: pointer;
   }
 
   :host /deep/ .mat-tab-label {

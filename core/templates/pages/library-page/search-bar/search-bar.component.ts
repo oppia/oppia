@@ -24,8 +24,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SearchService } from 'services/search.service';
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import { SearchService, SelectionDetails } from 'services/search.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
@@ -42,47 +42,30 @@ interface LanguageIdAndText {
   text: string;
 }
 
-interface SelectionDetails {
-  categories: {
-    description: string,
-    itemsName: string,
-    masterList: SearchDropDownCategories[],
-    numSelections: number,
-    selections: {},
-    summary: string,
-  },
-
-  languageCodes: {
-    description: string,
-    itemsName: string,
-    masterList: LanguageIdAndText[],
-    numSelections: number,
-    selections: {},
-    summary: string,
-  }
-}
-
 @Component({
   selector: 'oppia-search-bar',
   templateUrl: './search-bar.component.html'
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
-  @Input() enableDropup: boolean = false;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  searchBarPlaceholder!: string;
+  categoryButtonText!: string;
+  languageButtonText!: string;
+  ACTION_OPEN!: string;
+  ACTION_CLOSE!: string;
+  SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
+  selectionDetails!: SelectionDetails;
+  SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownCategories[];
+  KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
-  classroomPageIsActive: boolean;
-  ACTION_OPEN: string;
-  ACTION_CLOSE: string;
-  SEARCH_DROPDOWN_CATEGORIES: SearchDropDownCategories[];
-  KEYBOARD_EVENT_TO_KEY_CODES: {};
+  classroomPageIsActive: boolean = false;
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
-  SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
-  selectionDetails: SelectionDetails;
-  translationData = {};
+  translationData: Record<string, number> = {};
   activeMenuName: string = '';
-  searchBarPlaceholder: string;
-  categoryButtonText: string;
-  languageButtonText: string;
+  @Input() enableDropup: boolean = false;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -104,9 +87,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (this.classroomPageIsActive) {
-      return null;
-    } else {
+    if (!this.classroomPageIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
   }
@@ -315,6 +296,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
               selections[languageCode] = !selections[languageCode];
             }
           });
+
+          let selections = this.selectionDetails.languageCodes.selections;
+          selections[
+            this.i18nLanguageCodeService.getCurrentI18nLanguageCode()] = true;
 
           this.updateSelectionDetails('languageCodes');
 

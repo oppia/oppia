@@ -21,13 +21,21 @@ Also contains a list of handler class names which does not contain the schema.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
-def validate(handler_args, handler_args_schemas, allowed_extra_args):
-    # type: (Any, Any, bool) -> Tuple[Dict[Any, Any], List[Text]]
+# This function recursively uses the schema dictionary and handler_args, and
+# passes their values to itself as arguments, so their type is Any.
+# See: https://github.com/python/mypy/issues/731
+def validate(
+        handler_args: Any,
+        handler_args_schemas: Any,
+        allowed_extra_args: bool,
+        allow_string_to_bool_conversion: bool = False
+) -> Tuple[Dict[str, Any], List[str]]:
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -36,6 +44,8 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
         handler_args: *. Object for normalization.
         handler_args_schemas: dict. Schema for args.
         allowed_extra_args: bool. Whether extra args are allowed in handler.
+        allow_string_to_bool_conversion: bool. Whether to allow string to
+            boolean coversion.
 
     Returns:
         *. A two tuple, where the first element represents the normalized value
@@ -59,6 +69,16 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
 
+        # Below normalization is for arguments which are expected to be boolean
+        # but from API request they are received as string type.
+        if (
+                allow_string_to_bool_conversion and
+                arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
+                and isinstance(handler_args[arg_key], python_utils.BASESTRING)
+        ):
+            handler_args[arg_key] = (
+                convert_string_to_bool(handler_args[arg_key]))
+
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
@@ -74,6 +94,28 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
     return normalized_value, errors
 
 
+def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
+
+    """Converts a request param of type string into expected bool type.
+
+    Args:
+        param: str. The params which needs normalization.
+
+    Returns:
+        bool. Converts the string param into its expected bool type.
+    """
+    case_insensitive_param = param.lower()
+
+    if case_insensitive_param == 'true':
+        return True
+    elif case_insensitive_param == 'false':
+        return False
+    else:
+        # String values other than booleans should be returned as it is, so that
+        # schema validation will raise exceptions appropriately.
+        return param
+
+
 # Handlers which require schema validation, but currently they do
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already
@@ -83,7 +125,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AssetDevHandler',
     'AudioUploadHandler',
     'BulkEmailWebhookEndpoint',
-    'CollectionSummariesHandler',
     'DeferredTasksHandler',
     'DeleteAccountHandler',
     'DeleteAccountPage',
@@ -92,56 +133,24 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableStoryDataHandler',
     'EditableSubtopicPageDataHandler',
     'EditableTopicDataHandler',
-    'EditorAutosaveHandler',
-    'EditorHandler',
-    'EmailDashboardDataHandler',
-    'EmailDashboardPage',
-    'EmailDashboardResultPage',
-    'EmailDashboardTestBulkEmailHandler',
-    'EmailDashboardCancelEmailHandler',
     'ExplorationActualStartEventHandler',
     'ExplorationCompleteEventHandler',
     'ExplorationEmbedPage',
-    'ExplorationFeaturesHandler',
-    'ExplorationFileDownloader',
-    'ExplorationHandler',
-    'ExplorationImprovementsConfigHandler',
-    'ExplorationImprovementsHandler',
-    'ExplorationImprovementsHistoryHandler',
     'ExplorationMaybeLeaveHandler',
-    'ExplorationModeratorRightsHandler',
-    'ExplorationPage',
-    'ExplorationRevertHandler',
-    'ExplorationRightsHandler',
-    'ExplorationSnapshotsHandler',
     'ExplorationStartEventHandler',
-    'ExplorationStatisticsHandler',
-    'ExplorationStatusHandler',
-    'ExplorationSummariesHandler',
     'ExportAccountHandler',
-    'FeedbackStatsHandler',
     'FeedbackThreadStatusChangeEmailHandler',
-    'FeedbackThreadViewEventHandler',
-    'FetchIssuesHandler',
-    'FetchPlaythroughHandler',
     'FetchSkillsHandler',
     'FlagExplorationEmailHandler',
     'FlagExplorationHandler',
-    'ImageUploadHandler',
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
     'JobOutputHandler',
     'JobsHandler',
     'LearnerAnswerDetailsSubmissionHandler',
-    'LearnerAnswerInfoHandler',
     'LearnerGoalsHandler',
     'LearnerIncompleteActivityHandler',
     'LeaveForRefresherExpEventHandler',
-    'LibraryGroupIndexHandler',
-    'LibraryGroupPage',
-    'LibraryIndexHandler',
-    'LibraryPage',
-    'LibraryRedirectPage',
     'MemoryCacheAdminHandler',
     'MemoryCacheHandler',
     'MergeSkillHandler',
@@ -151,13 +160,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'NotificationsDashboardHandler',
     'NotificationsDashboardPage',
     'NotificationsHandler',
-    'OldLibraryRedirectPage',
     'OldNotificationsDashboardRedirectPage',
     'PendingAccountDeletionPage',
-    'PlatformFeatureDummyHandler',
-    'PlatformFeaturesEvaluationHandler',
-    'PracticeSessionsPage',
-    'PracticeSessionsPageDataHandler',
     'PreferenceHandler',
     'PreferencesHandler',
     'PreferencesPage',
@@ -168,7 +172,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ProfilePictureHandlerByUsernameHandler',
     'PromoBarHandler',
     'QuebstionsListHandler',
-    'QueryStatusCheckHandler',
     'QuestionCountDataHandler',
     'QuestionCreationHandler',
     'QuestionPlayerHandler',
@@ -177,15 +180,10 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'RatingHandler',
     'ReaderFeedbackHandler',
     'RecentCommitsHandler',
-    'RecentFeedbackMessagesHandler',
     'RecommendationsHandler',
     'ReleaseCoordinatorPage',
-    'ResolveIssueHandler',
     'ResubmitSuggestionHandler',
-    'ReviewTestsPage',
-    'ReviewTestsPageDataHandler',
     'ReviewableSuggestionsHandler',
-    'SearchHandler',
     'SignupHandler',
     'SignupPage',
     'SiteLanguageHandler',
@@ -197,12 +195,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SkillsDashboardPageDataHandler',
     'SolutionHitEventHandler',
     'StartedTranslationTutorialEventHandler',
-    'StartedTutorialEventHandler',
-    'StateAnswerStatisticsHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
-    'StateYamlHandler',
-    'StateInteractionStatsHandler',
     'StatsEventsHandler',
     'StorePlaythroughHandler',
     'StoryEditorPage',
@@ -220,10 +214,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
-    'ThreadHandler',
-    'ThreadListHandler',
-    'ThreadListHandlerForTopicsHandler',
-    'TopUnresolvedAnswersHandler',
     'TopicAssignmentsHandler',
     'TopicEditorPage',
     'TopicEditorStoryHandler',
@@ -241,27 +231,28 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
     'UrlHandler',
-    'UserExplorationEmailsHandler',
-    'UserExplorationPermissionsHandler',
     'UserInfoHandler',
     'UserSubmittedSuggestionsHandler',
     'UsernameCheckHandler',
     'ValidateExplorationsHandler',
     'ValueGeneratorHandler',
-    'VoiceArtistManagementHandler'
+    'VoiceArtistManagementHandler',
+    'OppiaMLVMHandler',
+    # Oppia Root page is the unified entry for page routes to the frontend.
+    # So, it should exempted from schema validation.
+    'OppiaRootPage',
+    'CsrfTokenHandler',
+    'Error404Handler',
+    'FrontendErrorHandler',
+    'WarmupPage',
+    'HomePageRedirectPage',
+    'SplashRedirectPage'
     ]
 
 # These handlers do not require any schema validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'SessionBeginHandler',
     'SessionEndHandler',
-    'OppiaMLVMHandler',
-    'CsrfTokenHandler',
-    'Error404Handler',
-    'FrontendErrorHandler',
-    'WarmupPage',
-    'HomePageRedirectPage',
-    'SplashRedirectPage',
     'SeedFirebaseHandler'
 ]
 
