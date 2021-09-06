@@ -77,10 +77,10 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -102,12 +102,17 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
@@ -117,6 +122,8 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
         """Records errors reported by the frontend."""
@@ -127,6 +134,8 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET warmup requests."""
@@ -136,15 +145,19 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
         self.redirect('/')
 
 
+# Type for `defaults` is set to Dict[str, str] based on the usage in our
+# backend. Should be changed in future as per the requirements.
 def get_redirect_route(
-        regex_route: Text,
+        regex_route: str,
         handler: Type[base.BaseHandler],
-        defaults: Optional[Dict[Any, Any]] = None
+        defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 

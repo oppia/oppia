@@ -244,25 +244,44 @@ describe('Customize Interaction Modal Controller', function() {
 
     it('should update state customization args when changing interaction id' +
       ' that is not in cache', function() {
-      $scope.onChangeInteractionId('LogicProof');
+      $scope.onChangeInteractionId('GraphInput');
 
-      expect($scope.customizationArgSpecs.length).toBe(1);
+      expect($scope.customizationArgSpecs.length).toBe(8);
       expect(stateCustomizationArgsService.displayed).toEqual({
-        question: {value: {
-          assumptions: [{
-            arguments: [],
-            top_kind_name: 'variable',
-            dummies: [],
-            top_operator_name: 'p'
+        graph: {value: {
+          isWeighted: false,
+          edges: [{
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 1
           }],
-          results: [{
-            arguments: [],
-            top_kind_name: 'variable',
-            dummies: [],
-            top_operator_name: 'p'
+          isDirected: false,
+          vertices: [{
+            x: 150,
+            y: 50,
+            label: ''
+          }, {
+            x: 200,
+            y: 50,
+            label: ''
+          }, {
+            x: 150,
+            y: 100,
+            label: ''
           }],
-          default_proof_string: ''
-        }}
+          isLabeled: false,
+        }},
+        canAddVertex: { value: false },
+        canDeleteVertex: { value: false },
+        canMoveVertex: { value: true },
+        canEditVertexLabel: { value: false },
+        canAddEdge: { value: true },
+        canDeleteEdge: { value: true },
+        canEditEdgeWeight: { value: false }
       });
       expect($scope.hasCustomizationArgs).toBe(true);
 
@@ -270,8 +289,8 @@ describe('Customize Interaction Modal Controller', function() {
       // specs.
       stateInteractionIdService.displayed = 'Continue';
       $scope.returnToInteractionSelector();
-      // Remove logicProof from cache in order to not affect other specs.
-      interactionDetailsCacheService.removeDetails('LogicProof');
+      // Remove GraphInput from cache in order to not affect other specs.
+      interactionDetailsCacheService.removeDetails('GraphInput');
     });
 
     it('should save interaction when there are no customization args left',
@@ -301,21 +320,21 @@ describe('Customize Interaction Modal Controller', function() {
 
     it('should update state customization args when changing interaction id' +
       ' that is in cache', function() {
-      // Save logicProof on cache.
-      stateInteractionIdService.displayed = 'LogicProof';
+      // Save GraphInput on cache.
+      stateInteractionIdService.displayed = 'GraphInput';
       $scope.returnToInteractionSelector();
 
-      $scope.onChangeInteractionId('LogicProof');
+      $scope.onChangeInteractionId('GraphInput');
 
-      expect($scope.customizationArgSpecs.length).toBe(1);
+      expect($scope.customizationArgSpecs.length).toBe(8);
       expect($scope.hasCustomizationArgs).toBe(true);
 
       // Change interactionId to the older one in order to not affect other
       // specs.
       stateInteractionIdService.displayed = 'Continue';
       $scope.returnToInteractionSelector();
-      // Remove logicProof from cache in order to not affect other specs.
-      interactionDetailsCacheService.removeDetails('LogicProof');
+      // Remove GraphInput from cache in order to not affect other specs.
+      interactionDetailsCacheService.removeDetails('GraphInput');
     });
 
     it('should have save interaction button enabled and return warning' +
@@ -485,14 +504,14 @@ describe('Customize Interaction Modal Controller', function() {
         imageAndRegions: {value: null},
         highlightRegionsOnHover: {value: false}
       };
-      // Save logicProof on cache.
-      stateInteractionIdService.displayed = 'LogicProof';
+      // Save GraphInput on cache.
+      stateInteractionIdService.displayed = 'GraphInput';
       $scope.returnToInteractionSelector();
 
       // Save customization args.
-      $scope.onChangeInteractionId('LogicProof');
+      $scope.onChangeInteractionId('GraphInput');
 
-      expect($scope.customizationArgSpecs.length).toBe(1);
+      expect($scope.customizationArgSpecs.length).toBe(8);
       expect($scope.hasCustomizationArgs).toBe(true);
 
       // Change interactionId  as empty.
@@ -503,8 +522,8 @@ describe('Customize Interaction Modal Controller', function() {
       expect($scope.getSaveInteractionButtonTooltip()).toBe(
         'No interaction being displayed');
 
-      // Remove logicProof from cache in order to not affect other specs.
-      interactionDetailsCacheService.removeDetails('LogicProof');
+      // Remove GraphInput from cache in order to not affect other specs.
+      interactionDetailsCacheService.removeDetails('GraphInput');
     });
 
     it('should correctly populate null content ids on save', () => {

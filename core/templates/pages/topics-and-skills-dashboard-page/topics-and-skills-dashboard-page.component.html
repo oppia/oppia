@@ -1,132 +1,133 @@
 <background-banner></background-banner>
 <div class="oppia-topics-and-skills-dashboard position-relative">
   <div>
-    <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"
-        ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
+    <h2 class="dashboard-title"
+        *ngIf="(totalTopicSummaries.length === 0 && untriagedSkillSummaries.length === 0)">
+      {{ 'I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD' | translate }}
     </h2>
-    <div class="create-buttons" ng-if="!($ctrl.topicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
-      <button ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"
+    <div class="create-buttons" *ngIf="!(topicSummaries.length === 0 && untriagedSkillSummaries.length === 0)">
+      <button (click)="createTopic()" *ngIf="userCanCreateTopic"
               class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Topic</span>
       </button>
-      <button ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill"
+      <button (click)="createSkill()" *ngIf="userCanCreateSkill"
               class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Skill</span>
       </button>
     </div>
   </div>
   <div class="create-button-mobile">
-    <div ng-if="($ctrl.activeTab === $ctrl.TAB_NAME_TOPICS) && $ctrl.totalTopicSummaries.length">
-      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic" tabindex="-1"></i>
+    <div *ngIf="(activeTab === TAB_NAME_TOPICS) && totalTopicSummaries.length">
+      <i class="fa fa-plus-circle" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
     </div>
-    <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.skillSummaries.length">
-      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill" tabindex="-1"></i>
+    <div *ngIf="activeTab === TAB_NAME_SKILLS && skillSummaries.length">
+      <i class="fa fa-plus-circle" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
     </div>
   </div>
-  <div ng-if="$ctrl.totalTopicSummaries.length > 0 || $ctrl.untriagedSkillSummaries.length > 0">
+  <div *ngIf="totalTopicSummaries.length > 0 || untriagedSkillSummaries.length > 0">
     <div class="dashboard-content">
       <div class="dashboard-content-primary">
         <div>
           <ul class="dashboard-tabs protractor-test-topics-tab">
-            <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS}">
+            <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
               <a class="dashboard-tabs-text protractor-test-topics-tab"
-                 ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_TOPICS)">
+                 (click)="setActiveTab(TAB_NAME_TOPICS)">
                 Topics
               </a>
             </li>
-            <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS}">
+            <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_SKILLS}">
               <a class="dashboard-tabs-text protractor-test-skills-tab"
-                 ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_SKILLS)">
+                 (click)="setActiveTab(TAB_NAME_SKILLS)">
                 Skills
               </a>
             </li>
           </ul>
         </div>
         <div class="filter-mobile-box">
-          <button class="btn btn-default" ng-click="$ctrl.toggleFilterBox()">
-            <span ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">TOPIC FILTERS</span>
-            <span ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">SKILL FILTERS</span>
+          <button class="btn btn-default" (click)="toggleFilterBox()">
+            <span *ngIf="activeTab === TAB_NAME_TOPICS">TOPIC FILTERS</span>
+            <span *ngIf="activeTab === TAB_NAME_SKILLS">SKILL FILTERS</span>
           </button>
         </div>
         <div class="dashboard-list">
-          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 || $ctrl.skillSummaries.length>0">
-            <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-              <span>Displaying <[$ctrl.pageNumber * $ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.currentCount]></span>
+          <div class="dashboard-list-header" *ngIf="topicSummaries.length > 0 || skillSummaries.length > 0">
+            <div class="dashboard-list-header-count" *ngIf="activeTab === TAB_NAME_TOPICS">
+              <span>Displaying {{ pageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of {{ currentCount }}</span>
             </div>
-            <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-              <span>Displaying <[$ctrl.pageNumber * $ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.getTotalCountValueForSkills()]></span>
+            <div class="dashboard-list-header-count" *ngIf="activeTab === TAB_NAME_SKILLS">
+              <span>Displaying {{ pageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of {{ getTotalCountValueForSkills() }}</span>
             </div>
             <div class="dashboard-list-pagination">
               <div>
                 <span>Items Per Page: </span>
-                <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
-                        ng-model="$ctrl.itemsPerPage"
-                        ng-change="$ctrl.refreshPagination()"
+                <select [(ngModel)]="itemsPerPage"
+                        (change)="refreshPagination()"
                         aria-label="Items Per Page">
+                  <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
                 </select>
               </div>
-              <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-                <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <div *ngIf="activeTab === TAB_NAME_TOPICS">
+                <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value"
-                      ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
-                  <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active">
-                    <span><[$index+1]></span>
+                      *ngFor=" let n of generateNumbersTillRange(currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                  <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">
+                    <span>{{ idx + 1 }}</span>
                   </span>
-                  <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
+                  <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
               </div>
-              <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-                <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <div *ngIf="activeTab === TAB_NAME_SKILLS">
+                <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value">
-                  <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+                  <span class="dashboard-list-pagination-active">{{ skillPageNumber + 1 }}</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
               </div>
             </div>
           </div>
 
-          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-            <oppia-topics-list [topic-summaries]="$ctrl.displayedTopicSummaries"
-                               [page-number]="$ctrl.pageNumber"
-                               [items-per-page]="$ctrl.itemsPerPage"
-                               ng-if="$ctrl.topicSummaries.length > 0"
-                               [user-can-delete-topic]="$ctrl.userCanDeleteTopic">
+          <div *ngIf="activeTab === TAB_NAME_TOPICS">
+            <oppia-topics-list [topicSummaries]="displayedTopicSummaries"
+                               [pageNumber]="pageNumber"
+                               [itemsPerPage]="itemsPerPage"
+                               *ngIf="topicSummaries.length > 0"
+                               [userCanDeleteTopic]="userCanDeleteTopic">
             </oppia-topics-list>
-            <p class="intro-card-message" ng-if="!$ctrl.topicSummaries.length">
+            <p class="intro-card-message" *ngIf="!topicSummaries.length">
               No topics to display.
             </p>
           </div>
-          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-            <oppia-skills-list [skill-summaries]="$ctrl.displayedSkillSummaries"
-                               ng-if="$ctrl.displayedSkillSummaries.length > 0"
-                               [page-number]="$ctrl.pageNumber"
-                               [items-per-page]="$ctrl.itemsPerPage"
-                               [editable-topic-summaries]="$ctrl.editableTopicSummaries"
-                               [mergeable-skill-summaries]="$ctrl.mergeableSkillSummaries"
-                               [untriaged-skill-summaries]="$ctrl.untriagedSkillSummaries"
-                               [user-can-create-skill]="$ctrl.userCanCreateSkill"
-                               [user-can-delete-skill]="$ctrl.userCanDeleteSkill"
-                               [skills-categorized-by-topics]="$ctrl.skillsCategorizedByTopics">
+          <div *ngIf="activeTab === TAB_NAME_SKILLS">
+            <oppia-skills-list [skillSummaries]="displayedSkillSummaries"
+                               *ngIf="displayedSkillSummaries.length > 0"
+                               [pageNumber]="pageNumber"
+                               [itemsPerPage]="itemsPerPage"
+                               [editableTopicSummaries]="editableTopicSummaries"
+                               [mergeableSkillSummaries]="mergeableSkillSummaries"
+                               [untriagedSkillSummaries]="untriagedSkillSummaries"
+                               [userCanCreateSkill]="userCanCreateSkill"
+                               [userCanDeleteSkill]="userCanDeleteSkill"
+                               [skillsCategorizedByTopics]="skillsCategorizedByTopics">
             </oppia-skills-list>
-            <p class="intro-card-message protractor-test-no-skills-present-message" ng-if="!$ctrl.displayedSkillSummaries.length">
+            <p class="intro-card-message protractor-test-no-skills-present-message" *ngIf="!displayedSkillSummaries.length">
               No skills to display.
             </p>
           </div>
           <div class="pagination-mobile">
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-              <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+            <div *ngIf="activeTab === TAB_NAME_TOPICS">
+              <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
-                    ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
-                <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active"><[$index+1]></span>
-                <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
+                    *ngFor="let n of generateNumbersTillRange(currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">{{ idx + 1 }}</span>
+                <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
               </span>
-              <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+              <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
             </div>
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-              <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
-              <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
-              <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+            <div *ngIf="activeTab === TAB_NAME_SKILLS">
+              <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
+              <span class="dashboard-list-pagination-active">{{ skillPageNumber + 1 }}</span>
+              <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
             </div>
           </div>
         </div>
@@ -134,41 +135,43 @@
       <div class="dashboard-content-secondary">
         <div class="topic-skill-count">
           <div class="topic-count">
-            <span class="topic-count-value"><[$ctrl.totalTopicSummaries.length]></span>
+            <span class="topic-count-value">{{ totalTopicSummaries.length }}</span>
             <span class="topic-count-text">Topics</span>
           </div>
           <div class="skill-count">
-            <span class="skill-count-value"><[$ctrl.totalSkillCount]></span>
+            <span class="skill-count-value">{{ totalSkillCount }}</span>
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS && $ctrl.userCanCreateTopic"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button create-topic-button
-            oppia-autofocus" focus-on="createTopicBtn">
+            <div *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
+                 (click)="createTopic()"
+                 class="protractor-test-create-topic-button create-topic-button oppia-autofocus"
+                 oppiaFocusOn="createTopicBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.userCanCreateSkill"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle create-skill-button
-            oppia-autofocus" focus-on="createSkillBtn">
+            <div *ngIf="activeTab === TAB_NAME_SKILLS && userCanCreateSkill"  (click)="createSkill()" class="protractor-test-create-skill-button-circle create-skill-button
+            oppia-autofocus" oppiaFocusOn="createSkillBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Skill</span>
             </div>
           </div>
         </div>
-        <div class="topic-skill-filter" ng-if="$ctrl.filterBoxIsShown">
+        <div class="topic-skill-filter" *ngIf="filterBoxIsShown">
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
-              <span class="topic-skill-filter-reset protractor-test-topic-filter-reset" ng-click="$ctrl.resetFilters()">Reset</span>
-              <i class="fa fa-times dashboard-cross-icon" ng-click="$ctrl.toggleFilterBox()"></i>
+              <span class="topic-skill-filter-reset protractor-test-topic-filter-reset" (click)="resetFilters()">Reset</span>
+              <i class="fa fa-times dashboard-cross-icon" (click)="toggleFilterBox()"></i>
             </div>
             <div class="topic-skill-filter-header-mobile">
               <div class="topic-skill-filter-heading">
                 <span>Filter</span>
               </div>
               <div class="topic-skill-filter-action-box">
-                <i class="fa fa-times dashboard-cross-icon" ng-click="$ctrl.toggleFilterBox()"></i>
+                <i class="fa fa-times dashboard-cross-icon" (click)="toggleFilterBox()"></i>
                 <div class="topic-skill-filter-action-reset">
-                  <span ng-click="$ctrl.resetFilters()">Reset</span>
+                  <span (click)="resetFilters()">Reset</span>
                 </div>
               </div>
             </div>
@@ -177,23 +180,22 @@
                 <span>Status</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-                  <select2-dropdown class="protractor-test-select-status-dropdown"
-                                    choices="$ctrl.statusOptions"
-                                    item="$ctrl.filterObject.status"
-                                    placeholder="Status options"
-                                    width="100%"
-                                    on-selection-change="$ctrl.applyFilters()">
-                  </select2-dropdown>
+                <div *ngIf="activeTab === TAB_NAME_TOPICS">
+                  <oppia-filtered-choices-field [choices]="statusOptions"
+                                                placeholder="Status Options"
+                                                searchLabel="Search"
+                                                [(selection)]="filterObject.status"
+                                                (selectionChange)="applyFilters()">
+                  </oppia-filtered-choices-field>
                 </div>
-                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-                  <select2-dropdown class="protractor-test-select-skill-status-dropdown"
-                                    choices="$ctrl.skillStatusOptions"
-                                    item="$ctrl.filterObject.status"
-                                    placeholder="Status options"
-                                    width="100%"
-                                    on-selection-change="$ctrl.applyFilters()">
-                  </select2-dropdown>
+                <div *ngIf="activeTab === TAB_NAME_SKILLS">
+                  <oppia-filtered-choices-field class="protractor-test-select-skill-status-dropdown"
+                                                [choices]="skillStatusOptions"
+                                                placeholder="Status Options"
+                                                searchLabel="Search"
+                                                [(selection)]="filterObject.status"
+                                                (selectionChange)="applyFilters()">
+                  </oppia-filtered-choices-field>
                 </div>
               </div>
             </div>
@@ -202,23 +204,22 @@
                 <span>Classroom</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-                  <select2-dropdown item="$ctrl.filterObject.classroom"
-                                    class="classroom-dropdown protractor-test-select-classroom-dropdown"
-                                    choices="$ctrl.classrooms"
-                                    placeholder="Classrooms"
-                                    width="100%"
-                                    on-selection-change="$ctrl.applyFilters()">
-                  </select2-dropdown>
+                <div *ngIf="activeTab === TAB_NAME_TOPICS">
+                  <oppia-filtered-choices-field class="protractor-test-select-classroom-dropdown"
+                                                [choices]="classrooms"
+                                                placeholder="Classrooms"
+                                                searchLabel="Search"
+                                                [(selection)]="filterObject.classroom"
+                                                (selectionChange)="applyFilters()">
+                  </oppia-filtered-choices-field>
                 </div>
-                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-                  <select2-dropdown item="$ctrl.filterObject.classroom"
-                                    class="classroom-dropdown protractor-test-select-classroom-dropdown"
-                                    choices="$ctrl.skillClassrooms"
-                                    placeholder="Classrooms"
-                                    width="100%"
-                                    on-selection-change="$ctrl.applyFilters()">
-                  </select2-dropdown>
+                <div *ngIf="activeTab === TAB_NAME_SKILLS">
+                  <oppia-filtered-choices-field [choices]="skillClassrooms"
+                                                placeholder="Classrooms"
+                                                searchLabel="Search"
+                                                [(selection)]="filterObject.classroom"
+                                                (selectionChange)="applyFilters()">
+                  </oppia-filtered-choices-field>
                 </div>
               </div>
             </div>
@@ -227,14 +228,13 @@
                 <span>Sort</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div ng-if="$ctrl.select2DropdownIsShown">
-                  <select2-dropdown class="protractor-test-select-sort-dropdown"
-                                    choices="$ctrl.sortOptions"
-                                    item="$ctrl.filterObject.sort"
-                                    placeholder="Status Options"
-                                    width="100%"
-                                    on-selection-change="$ctrl.applyFilters()">
-                  </select2-dropdown>
+                <div>
+                  <oppia-filtered-choices-field [choices]="sortOptions"
+                                                placeholder="Sort Options"
+                                                searchLabel="Search"
+                                                [(selection)]="filterObject.sort"
+                                                (selectionChange)="applyFilters()">
+                  </oppia-filtered-choices-field>
                 </div>
               </div>
             </div>
@@ -243,16 +243,13 @@
                 <span>Keywords</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div ng-if="$ctrl.select2DropdownIsShown">
-                  <select2-dropdown item="$ctrl.filterObject.keywords"
-                                    class="protractor-test-select-keyword-dropdown"
-                                    choices="$ctrl.filterObject.keywords"
-                                    allow-multiple-choices="true"
-                                    new-choice-regex="<[::$ctrl.TAG_REGEX_STRING]>"
-                                    placeholder="Multiple allowed"
-                                    width="100%"
-                                    on-selection-change="$ctrl.applyFilters()">
-                  </select2-dropdown>
+                <div>
+                  <oppia-multi-selection-field class="protractor-test-select-keyword-dropdown"
+                                               label="Keywords"
+                                               [(selections)]="filterObject.keywords"
+                                               placeholder="Multiple allowed"
+                                               (selectionsChange)="applyFilters()">
+                  </oppia-multi-selection-field>
                 </div>
               </div>
             </div>
@@ -262,25 +259,28 @@
     </div>
   </div>
 
-  <div class="col-sm-8 intro-card-wrapper" ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
+  <div class="col-sm-8 intro-card-wrapper" *ngIf="(totalTopicSummaries.length === 0 && untriagedSkillSummaries.length === 0)">
     <blockquote class="intro-card">
       <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-topic-button"
-              ng-click="$ctrl.createTopic()"
-              ng-if="$ctrl.userCanCreateTopic">
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text  oppia-create-topic-btn protractor-test-create-topic-button"
+              (click)="createTopic()"
+              *ngIf="userCanCreateTopic">
         Create Topic
       </button>
       <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-skill-button"
-              ng-click="$ctrl.createSkill()"
-              ng-if="$ctrl.userCanCreateSkill">
+              (click)="createSkill()"
+              *ngIf="userCanCreateSkill">
         Create Skill
       </button>
     </blockquote>
   </div>
 </div>
 <style>
+  .oppia-create-topic-btn {
+    margin-right: 10px;
+  }
   .oppia-topics-and-skills-dashboard .intro-card-wrapper {
     margin: 0 auto;
     padding-top: 10px;

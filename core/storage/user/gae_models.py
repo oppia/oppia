@@ -28,7 +28,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, List, Optional, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -143,7 +143,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -429,7 +429,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -526,7 +526,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -620,7 +620,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user, since a user
         has multiple playthroughs associated with their account.
         """
@@ -645,9 +645,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
@@ -769,7 +767,7 @@ class LearnerGoalsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -846,7 +844,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -924,7 +922,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1031,7 +1029,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1093,7 +1091,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1129,9 +1127,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.creator_ids == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
         cls.delete_by_id(user_id)
 
@@ -1235,7 +1231,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not included because it contains data corresponding to other
         users.
         """
@@ -1292,7 +1288,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1363,7 +1359,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1510,14 +1506,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple explorations (and corresponding data) relevant to a user.
         """
@@ -1728,7 +1722,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there can be
         multiple collections associated with a user.
         """
@@ -1929,7 +1923,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user
         can have multiple stories associated with their account.
         """
@@ -1952,9 +1946,7 @@ class StoryProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
@@ -2130,10 +2122,6 @@ class UserQueryModel(base_models.BaseModel):
     edited_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check if user has created collection.
     created_collection = datastore_services.BooleanProperty(default=False)
-    # Query option to check if user has used LogicProof interaction in any
-    # of the explorations that they created.
-    used_logic_proof_interaction = datastore_services.BooleanProperty(
-        default=False)
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
@@ -2158,7 +2146,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
         """
@@ -2181,8 +2169,6 @@ class UserQueryModel(base_models.BaseModel):
             'edited_fewer_than_n_exps':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'used_logic_proof_interaction':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sent_email_model_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2295,7 +2281,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2332,7 +2318,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user has
         many relevant skill masteries.
         """
@@ -2355,9 +2341,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
     @classmethod
@@ -2438,7 +2422,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user has
         multiple relevant contribution proficiencies.
         """
@@ -2714,7 +2698,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -2745,12 +2729,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             translations in the given language code.
         """
-        reviewer_keys = cast(
-            List[datastore_services.Key],
-            cls.query(
-                cls.can_review_translation_for_language_codes == language_code
-            ).fetch(keys_only=True)
-        )
+        reviewer_keys = cls.query(
+            cls.can_review_translation_for_language_codes == language_code
+        ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2781,12 +2762,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             questions.
         """
-        reviewer_keys = cast(
-            List[datastore_services.Key],
-            cls.query(
-                cls.can_review_questions == True # pylint: disable=singleton-comparison
-            ).fetch(keys_only=True)
-        )
+        reviewer_keys = cls.query(
+            cls.can_review_questions == True # pylint: disable=singleton-comparison
+        ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2856,7 +2834,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not need to be exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
@@ -2913,7 +2891,7 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2949,7 +2927,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
