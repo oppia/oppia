@@ -40,16 +40,19 @@ import utils
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
-
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
+    
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring'
             }
         }
     }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+    
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
