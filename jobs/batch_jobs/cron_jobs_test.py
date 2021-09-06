@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core.domain import recommendations_services
 from core.domain import search_services
 from core.platform import models
 import feconf
@@ -35,10 +36,15 @@ from typing import Dict, List, Union # isort:skip
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models
+    from mypy_imports import recommendations_models
     from mypy_imports import user_models
 
-(exp_models, user_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.user])
+(
+    exp_models, recommendations_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.recommendations, models.NAMES.user
+])
+
 platform_search_services = models.Registry.import_search_services()
 
 
@@ -384,3 +390,250 @@ class CollectWeeklyDashboardStatsTests(job_test_utils.JobTestBase):
 
         user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_2)
         self.assertIsNotNone(user_stats_model)
+
+
+class ComputeExplorationRecommendationsTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = cron_jobs.ComputeExplorationRecommendations
+
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+    EXP_3_ID = 'exp_3_id'
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
+
+    def test_does_nothing_when_only_one_exploration_exists(self) -> None:
+        exp_summary = self.create_model( # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary.update_timestamps()
+        exp_summary.put()
+
+        self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
+
+        exp_recommendations_model = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False))
+        self.assertIsNone(exp_recommendations_model)
+
+    def test_creates_recommendations_for_similar_explorations(self) -> None:
+        recommendations_services.create_default_topic_similarities() # type: ignore[no-untyped-call]
+        exp_summary_1 = self.create_model( # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_1.update_timestamps()
+        exp_summary_2 = self.create_model( # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_2_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_2.update_timestamps()
+        self.put_multi([exp_summary_1, exp_summary_2]) # type: ignore[no-untyped-call]
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS 2')
+        ])
+
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_1 is not None
+        self.assertEqual(
+            exp_recommendations_model_1.recommended_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_2 is not None
+        self.assertEqual(
+            exp_recommendations_model_2.recommended_exploration_ids,
+            [self.EXP_1_ID]
+        )
+
+    def test_skips_private_explorations(self) -> None:
+        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
+        exp_summary_1 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PRIVATE,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_1.update_timestamps()
+        exp_summary_2 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_2_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PRIVATE,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_2.update_timestamps()
+        self.put_multi([exp_summary_1, exp_summary_2])  # type: ignore[no-untyped-call]
+
+        self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
+
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False))
+        self.assertIsNone(exp_recommendations_model_1)
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID, strict=False))
+        self.assertIsNone(exp_recommendations_model_2)
+
+    def test_does_not_create_recommendations_for_different_explorations(
+            self
+    ) -> None:
+        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
+        exp_summary_1 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang1',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_1.update_timestamps()
+        exp_summary_2 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_2_ID,
+            deleted=False,
+            title='title',
+            category='Sport',
+            objective='objective',
+            language_code='lang2',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_2.update_timestamps()
+        self.put_multi([exp_summary_1, exp_summary_2])  # type: ignore[no-untyped-call]
+
+        self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
+
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False))
+        self.assertIsNone(exp_recommendations_model_1)
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID, strict=False))
+        self.assertIsNone(exp_recommendations_model_2)
+
+    def test_creates_recommendations_for_three_explorations(self) -> None:
+        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
+        exp_summary_1 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang1',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_1.update_timestamps()
+        exp_summary_2 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_2_ID,
+            deleted=False,
+            title='title',
+            category='Sport',
+            objective='objective',
+            language_code='lang1',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_2.update_timestamps()
+        exp_summary_3 = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExpSummaryModel,
+            id=self.EXP_3_ID,
+            deleted=False,
+            title='title',
+            category='Architecture',
+            objective='objective',
+            language_code='lang1',
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            exploration_model_last_updated=datetime.datetime.utcnow()
+        )
+        exp_summary_3.update_timestamps()
+        self.put_multi([exp_summary_1, exp_summary_2, exp_summary_3])  # type: ignore[no-untyped-call]
+
+        self.assert_job_output_is([ # type: ignore[no-untyped-call]
+            job_run_result.JobRunResult(stdout='SUCCESS 3')
+        ])
+
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_1 is not None
+        self.assertEqual(
+            exp_recommendations_model_1.recommended_exploration_ids,
+            [self.EXP_3_ID, self.EXP_2_ID]
+        )
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_2 is not None
+        self.assertEqual(
+            exp_recommendations_model_2.recommended_exploration_ids,
+            [self.EXP_1_ID, self.EXP_3_ID]
+        )
+        exp_recommendations_model_3 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_3_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_recommendations_model_3 is not None
+        self.assertEqual(
+            exp_recommendations_model_3.recommended_exploration_ids,
+            [self.EXP_1_ID, self.EXP_2_ID]
+        )
