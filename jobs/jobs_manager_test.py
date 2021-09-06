@@ -22,16 +22,16 @@ from __future__ import unicode_literals
 import contextlib
 from unittest import mock
 
-from apache_beam import runners
-
 from core.domain import beam_job_services
 from core.platform import models
 from core.tests import test_utils
-from jobs import base_jobs, job_options
+from jobs import base_jobs
+from jobs import job_options
 from jobs import jobs_manager
 from jobs.types import job_run_result
 
 import apache_beam as beam
+from apache_beam import runners
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 

@@ -32,7 +32,20 @@ datastore_services = models.Registry.import_datastore_services()
 
 _MAX_ID_GENERATION_ATTEMPTS = 5
 
-# NOTE: The following values are 
+
+def _get_new_model_id(model_class: base_models.BaseModel) -> str:
+    """Generates an ID for a new model.
+
+    Returns:
+        str. The new ID.
+    """
+    for _ in python_utils.RANGE(_MAX_ID_GENERATION_ATTEMPTS):
+        new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
+        if model_class.get(new_id, strict=False) is None:
+            return new_id
+    raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
+        _MAX_ID_GENERATION_ATTEMPTS))
+
 
 class BeamJobState(enum.Enum):
     """Constants from an enum defined by Google Cloud Dataflow, which are thus
@@ -82,20 +95,6 @@ class BeamJobState(enum.Enum):
     FAILED = 'FAILED'
     # The job's run state isn't specified.
     UNKNOWN = 'UNKNOWN'
-
-
-def _get_new_model_id(model_class: base_models.BaseModel) -> str:
-    """Generates an ID for a new model.
-
-    Returns:
-        str. The new ID.
-    """
-    for _ in python_utils.RANGE(_MAX_ID_GENERATION_ATTEMPTS):
-        new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
-        if model_class.get(new_id, strict=False) is None:
-            return new_id
-    raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
-        _MAX_ID_GENERATION_ATTEMPTS))
 
 
 class BeamJobRunModel(base_models.BaseModel):
