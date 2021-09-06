@@ -11,21 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 /**
  * @fileoverview Directive for the visualization of the diff between two
  *   versions of an exploration.
  */
 
+import { StateDiffModalComponent }
+ from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
 require('components/code-mirror/codemirror-mergeview.component');
-require(
-  'pages/exploration-editor-page/modal-templates/' +
-  'state-diff-modal.component.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('versionDiffVisualization', {
   bindings: {
@@ -57,8 +56,7 @@ angular.module('oppia').component('versionDiffVisualization', {
   },
   template: require('./version-diff-visualization.component.html'),
   controllerAs: '$ctrl',
-  controller: ['$uibModal', 'UrlInterpolationService', function(
-      $uibModal, UrlInterpolationService) {
+  controller: ['NgbModal', function(NgbModal) {
     var ctrl = this;
     // Constants for color of nodes in diff graph.
     var COLOR_ADDED = '#4EA24E';
@@ -111,47 +109,34 @@ angular.module('oppia').component('versionDiffVisualization', {
     //   deleted.
     ctrl.showStateDiffModal = function(
         newStateName, oldStateName, stateProperty) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/modal-templates/' +
-          'state-diff-modal.component.html'),
+      let modalRef: NgbModalRef = NgbModal.open(StateDiffModalComponent, {
         backdrop: true,
-        windowClass: 'oppia-state-diff-modal',
-        resolve: {
-          newStateName: function() {
-            return newStateName;
-          },
-          oldStateName: function() {
-            return oldStateName;
-          },
-          newState: function() {
-            if (stateProperty !== STATE_PROPERTY_DELETED &&
-                ctrl.getDiffData().v2States.hasOwnProperty(
-                  newStateName)) {
-              return ctrl.getDiffData().v2States[newStateName];
-            } else {
-              return null;
-            }
-          },
-          oldState: function() {
-            var stateNameToRetrieve = oldStateName || newStateName;
-            if (stateProperty !== STATE_PROPERTY_ADDED &&
-                ctrl.getDiffData().v1States.hasOwnProperty(
-                  stateNameToRetrieve)) {
-              return ctrl.getDiffData().v1States[stateNameToRetrieve];
-            } else {
-              return null;
-            }
-          },
-          headers: function() {
-            return {
-              leftPane: ctrl.getEarlierVersionHeader(),
-              rightPane: ctrl.getLaterVersionHeader()
-            };
-          }
-        },
-        controller: 'StateDiffModalController'
-      }).result.then(function() {}, function() {
+        windowClass: 'state-diff-modal',
+      });
+      modalRef.componentInstance.newStateName = newStateName;
+      modalRef.componentInstance.oldStateName = oldStateName;
+      
+      let newState = null;
+      if (stateProperty !== STATE_PROPERTY_DELETED &&
+          ctrl.getDiffData().v2States.hasOwnProperty(newStateName)) {
+        newState = ctrl.getDiffData().v2States[newStateName];
+      }
+
+      let oldState = null;
+      let stateNameToRetrieve = oldStateName || newStateName;
+      if (stateProperty !== STATE_PROPERTY_ADDED &&
+          ctrl.getDiffData().v1States.hasOwnProperty(stateNameToRetrieve)) {
+        oldState = ctrl.getDiffData().v1States[stateNameToRetrieve];
+      }
+
+      modalRef.componentInstance.newState = newState;
+      modalRef.componentInstance.oldState = oldState;
+      modalRef.componentInstance.headers = {
+        leftPane: ctrl.getEarlierVersionHeader(),
+        rightPane: ctrl.getLaterVersionHeader()
+      }
+
+      modalRef.result.then(() => {}, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.

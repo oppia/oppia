@@ -16,7 +16,7 @@
  * @fileoverview Component for state diff modal.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -44,11 +44,11 @@ interface mergeviewOptions {
 })
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    newState: State | null;
-    oldState: State | null;
-    newStateName: string;
-    oldStateName: string;
-    headers: headersAndYamlStrs;
+    @Input() newState: State | null;
+    @Input() oldState: State | null;
+    @Input() newStateName: string;
+    @Input() oldStateName: string;
+    @Input() headers: headersAndYamlStrs;
     yamlStrs: headersAndYamlStrs = {
       leftPane: '',
       rightPane: '',
@@ -106,7 +106,3 @@ export class StateDiffModalComponent
       }
     }
 }
-
-angular.module('oppia').controller(
-  'StateDiffModalController', downgradeComponent(
-    {component: StateDiffModalComponent}));
