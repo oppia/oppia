@@ -26,20 +26,6 @@ into this file.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-# IMPORTANT: These modules MUST be imported! DO NOT DELETE!
-# We need each module to execute so that the class definitions trigger the
-# metaclass logic. That is, the following code:
-#
-#     class FooJob(base_jobs.JobBase):
-#         pass
-#
-# Will execute the following code:
-#
-#     JobMetaclass.__new__('FooJob', (base_jobs.JobBase,), {})
-#
-# We need this to happen for every job in this registry file, because the
-# registry depends on JobMetaclass to handle the responsibility of keeping track
-# of every job.
 from jobs import base_jobs
 
 from typing import List
