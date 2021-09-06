@@ -135,7 +135,7 @@ export class LearnerViewInfoComponent {
     });
 
     modalRef.componentInstance.expInfo = this.expInfo;
-    modalRef.result.then(null, () => {
+    modalRef.result.then(() => {}, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
