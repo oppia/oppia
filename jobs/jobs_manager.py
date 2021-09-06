@@ -93,9 +93,11 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
 }
 
 
-def run_job_sync(
+def run_job(
     job_name: str,
-    namespace: Optional[str] = None
+    sync: bool,
+    namespace: Optional[str] = None,
+    pipeline: Optional[beam.Pipeline] = None
 ) -> beam_job_domain.BeamJobRun:
     """Runs the specified job synchronously.
 
@@ -104,7 +106,10 @@ def run_job_sync(
 
     Args:
         job_name: str. The name of the job to run.
+        sync: bool. Whether to run the job synchronously.
         namespace: str. The namespace in which models should be created.
+        pipeline: Pipeline. The pipeline to run the job upon. If omitted, then a
+            new pipeline will be used instead.
 
     Returns:
         BeamJobRun. Contains metadata related to the execution status of the
@@ -112,54 +117,24 @@ def run_job_sync(
     """
     cls = registry.get_job_class_by_name(job_name)
 
-    with _job_bookkeeping_context(job_name) as run_model:
+    if pipeline is None:
         pipeline = beam.Pipeline(
-            runner=runners.DirectRunner(),
+            runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
             options=job_options.JobOptions(namespace=namespace))
 
-        job = cls(pipeline)
-
-        unused_pdone = job.run() | job_io.PutResults(run_model.id)
-
-        pipeline.run().wait_until_finish()
-
-        run_model.latest_job_state = beam_job_models.BeamJobState.DONE.value
-
-    return beam_job_services.get_beam_job_run_from_model(run_model)
-
-
-def run_job_async(
-    job_name: str,
-    namespace: Optional[str] = None
-) -> beam_job_domain.BeamJobRun:
-    """Runs the specified job synchronously.
-
-    In other words, the function will wait for the job to finish running before
-    returning a value.
-
-    Args:
-        job_name: str. The name of the job to run.
-        namespace: str. The namespace in which models should be created.
-
-    Returns:
-        BeamJobRun. Contains metadata related to the execution status of the
-        job.
-    """
-    cls = registry.get_job_class_by_name(job_name)
-
     with _job_bookkeeping_context(job_name) as run_model:
-        pipeline = beam.Pipeline(
-            runner=runners.DataflowRunner(),
-            options=job_options.JobOptions(namespace=namespace))
-
         job = cls(pipeline)
 
         unused_pdone = job.run() | job_io.PutResults(run_model.id)
 
         run_result = pipeline.run()
 
-        run_model.dataflow_job_id = run_result.job_id()
-        run_model.latest_job_state = run_result.state
+        if sync:
+            run_result.wait_until_finish()
+            run_model.latest_job_state = beam_job_models.BeamJobState.DONE.value
+        else:
+            run_model.dataflow_job_id = run_result.job_id()
+            run_model.latest_job_state = run_result.state
 
     return beam_job_services.get_beam_job_run_from_model(run_model)
 

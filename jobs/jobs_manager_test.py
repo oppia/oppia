@@ -19,10 +19,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
+from unittest import mock
+
+from apache_beam import runners
+
 from core.domain import beam_job_services
 from core.platform import models
 from core.tests import test_utils
-from jobs import base_jobs
+from jobs import base_jobs, job_options
 from jobs import jobs_manager
 from jobs.types import job_run_result
 
@@ -48,10 +53,16 @@ class FailingJob(base_jobs.JobBase):
         raise Exception('uh-oh')
 
 
-class RunJobSyncTests(test_utils.GenericTestBase):
+class RunJobTests(test_utils.GenericTestBase):
 
-    def test_working_job(self) -> None:
-        run = jobs_manager.run_job_sync('WorkingJob', namespace=self.namespace)
+    def setUp(self) -> None:
+        self.exit_stack = contextlib.ExitStack()
+
+    def tearDown(self) -> None:
+        self.exit_stack.close()
+
+    def test_working_sync_job(self) -> None:
+        run = jobs_manager.run_job('WorkingJob', True, namespace=self.namespace)
 
         self.assertEqual(run.job_state, 'DONE')
 
@@ -64,8 +75,8 @@ class RunJobSyncTests(test_utils.GenericTestBase):
             beam_job_services.get_beam_job_run_result(run.job_id).to_dict(),
             {'stdout': 'o', 'stderr': 'e'})
 
-    def test_failing_job(self) -> None:
-        run = jobs_manager.run_job_sync('FailingJob', namespace=self.namespace)
+    def test_failing_sync_job(self) -> None:
+        run = jobs_manager.run_job('FailingJob', True, namespace=self.namespace)
 
         self.assertEqual(run.job_state, 'FAILED')
 
@@ -77,3 +88,20 @@ class RunJobSyncTests(test_utils.GenericTestBase):
         self.assertIn(
             'uh-oh',
             beam_job_services.get_beam_job_run_result(run.job_id).stderr)
+
+    def test_async_job(self) -> None:
+        mock_run_result = mock.Mock()
+        mock_run_result.job_id.return_value = '123'
+        mock_run_result.state = 'PENDING'
+
+        pipeline = beam.Pipeline(
+            runner=runners.DirectRunner(),
+            options=job_options.JobOptions(namespace=self.namespace))
+
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(pipeline, 'run', value=mock_run_result))
+
+        run = jobs_manager.run_job('WorkingJob', False, pipeline=pipeline)
+
+        self.assertFalse(run.job_is_synchronous)
+        self.assertEqual(run.job_state, 'PENDING')

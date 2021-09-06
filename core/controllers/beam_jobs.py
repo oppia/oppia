@@ -77,10 +77,10 @@ class BeamJobRunHandler(base.BaseHandler):
         job_name = (
             self.normalized_payload.get('job_name')
             if self.normalized_payload else None)
-        beam_job_run = (
-            jobs_manager.run_job_sync(job_name)
-            if constants.EMULATOR_MODE else
-            jobs_manager.run_job_async(job_name))
+
+        run_synchronously = constants.EMULATOR_MODE
+        beam_job_run = jobs_manager.run_job(job_name, run_synchronously)
+
         self.render_json(beam_job_run.to_dict())
 
 
