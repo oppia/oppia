@@ -241,6 +241,20 @@ describe('Change List Service when changes are mergable', () => {
     expect(changeListService.isExplorationLockedForEditing())
       .toBe(false);
   });
+
+  it('should mark translation as needing update', () => {
+    expect(changeListService.getChangeList()[0]).toEqual(undefined);
+
+    changeListService.markTranslationAsNeedingUpdate(
+      'content', 'ar', 'Introduction');
+
+    expect(changeListService.getChangeList()[0]).toEqual({
+      cmd: 'mark_written_translation_as_needing_update',
+      content_id: 'content',
+      language_code: 'ar',
+      state_name: 'Introduction'
+    });
+  });
 });
 
 describe('Change List Service when changes are not mergable', () => {
