@@ -182,6 +182,43 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self.assert_domains_equal_models(
             beam_job_runs, updated_beam_job_run_models)
 
+    def test_get_beam_job_runs_with_refresh_which_reports_failure(self):
+        initial_beam_job_run_models = [
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
+        ]
+
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(
+            initial_beam_job_run_models)
+        beam_job_models.BeamJobRunModel.put_multi(initial_beam_job_run_models)
+
+        gcloud_output_mock = self.swap_check_output_with_gcloud_response(
+            current_state='JOB_STATE_FAILED',
+            current_state_time=self.NANO_RESOLUTION_ISO_8601_STR)
+
+        with gcloud_output_mock:
+            beam_job_runs = beam_job_services.get_beam_job_runs(refresh=True)
+
+        # Only the second model (job_state=RUNNING) should have been updated,
+        # the other two (DONE and CANCELLED) are in terminal states and don't
+        # need to be checked.
+        updated_beam_job_run_models = initial_beam_job_run_models[:]
+        updated_beam_job_run_models[1].latest_job_state = (
+            beam_job_models.BeamJobState.FAILED.value)
+        updated_beam_job_run_models[1].last_updated = (
+            datetime.datetime(2014, 10, 2, 15, 1, 23, 45123))
+        running_job_id = initial_beam_job_run_models[1].id
+
+        self.assert_domains_equal_models(
+            beam_job_runs, updated_beam_job_run_models)
+        self.assertIn(
+            'JOB_STATE_FAILED',
+            beam_job_services.get_beam_job_run_result(running_job_id).stderr)
+
     def test_get_beam_job_runs_with_refresh_of_synchronous_job(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(
