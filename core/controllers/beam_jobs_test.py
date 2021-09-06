@@ -88,10 +88,10 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         now = datetime.datetime.utcnow()
         mock_job = beam_job_domain.BeamJobRun(
             '123', 'FooJob', 'RUNNING', now, now, False)
-        run_job_sync_swap = self.swap_to_always_return(
-            jobs_manager, 'run_job_sync', value=mock_job)
+        run_job_swap = self.swap_to_always_return(
+            jobs_manager, 'run_job', value=mock_job)
 
-        with run_job_sync_swap:
+        with run_job_swap:
             response = self.put_json( # type: ignore[no-untyped-call]
                 '/beam_job_run', {'job_name': 'FooJob'},
                 csrf_token=self.get_new_csrf_token()) # type: ignore[no-untyped-call]
