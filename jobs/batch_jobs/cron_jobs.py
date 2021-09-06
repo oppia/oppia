@@ -46,8 +46,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
     from mypy_imports import recommendations_models
+    from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
 
