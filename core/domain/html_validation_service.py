@@ -135,6 +135,142 @@ INLINE_COMPONENT_TAG_NAMES = (
 BLOCK_COMPONENT_TAG_NAMES = (
     rte_component_registry.Registry.get_block_component_tag_names())
 
+CHAR_MAPPING_TUPLES = [
+    (u'\xc3', u'\xe0'),
+    (u'\xe0\xa3', u'\xe3'),
+    (u'\xe0\xa1', u'\xe1'),
+    (u'\xe0\xa2', u'\xe2'),
+    (u'\xe0\xa4', u'\xe4'),
+    (u'\xe0\xa5', u'\xe5'),
+    (u'\xe0\xa6', u'\xe6'),
+    (u'\xe0\xa7', u'\xe7'),
+    (u'\xe0\xa8', u'\xe8'),
+    (u'\xe0\xa9', u'\xe9'),
+    (u'\xe0\xaa', u'\xea'),
+    (u'\xe0\xab', u'\xeb'),
+    (u'\xe0\xac', u'\xec'),
+    (u'\xe0\xad', u'\xed'),
+    (u'\xe0\xae', u'\xee'),
+    (u'\xe0\xaf', u'\xef'),
+    (u'\xe0\xb1', u'\xf1'),
+    (u'\xe0\xb3', u'\xf3'),
+    (u'\xe0\xba', u'\xfa'),
+    (u'\xe0\xbb', u'\xfb'),
+    (u'\xe0\xbd', u'\xfd'),
+    (u'\xe0\xb5', u'\xf5'),
+    (u'\xe0\xb6', u'\xf6'),
+    (u'\xe0\xb7', u'\xf7'),
+    (u'\xe0\xbc', u'\xfc'),
+    (u'\xe0\u2022', u'\xd5'),
+    (u'\xe0\u2021', u'\xc7'),
+    (u'\xe0\u2013', u'\xd6'),
+    (u'\xe0\u2018', u'\xd1'),
+    (u'\xe0\u201c', u'\xd3'),
+    (u'\xe0\u201e', u'\xc4'),
+    (u'\xe0\u20ac', u'\xc0'),
+    (u'\xe0\u0153', u'\xdc'),
+    (u'\xe0\u2014', u'\xd7'),
+    (u'\xe0\u0178', u'\xdf'),
+    (u'\xc4\u0178', u'\u011f'),
+    (u'\xc4\xab', u'\u012b'),
+    (u'\xc4\xbb', u'\u013b'),
+    (u'\xc4\xb1', u'\u0131'),
+    (u'\xc4\xb0', u'\u0130'),
+    (u'\xc4\u2021', u'\u0107'),
+    (u'\xc4\u2122', u'\u0119'),
+    (u'\xc4\u2026', u'\u0105'),
+    (u'\xc4\u20ac', u'\u0100'),
+    (u'\xc4\xb0', u'\u0130'),
+    (u'\xc5\xba', u'\u017a'),
+    (u'\xc5\xbe', u'\u017e'),
+    (u'\xc5\u203a', u'\u015b'),
+    (u'\xc5\u0178', u'\u015f'),
+    (u'\xc9\u203a', u'\u025b'),
+    (u'\xd9\u2026', u'\u0645'),
+    (u'\xd1\u02c6', u'\u0448'),
+    (u'\xd8\xb5', u'\u0635'),
+    (u'\xd8\xad', u'\u062d'),
+    (u'\xd8\xa4', u'\u0624'),
+    (u'\xe1\xba\xbf', u'\u1ebf'),
+    (u'\xe1\xbb\u0178', u'\u1edf'),
+    (u'\xe2\u20ac\u0153', u'\u201c'),
+    (u'\xe2\u02c6\u2030', u'\u2209'),
+    (u'\xe2\u2026\u02dc', u'\u2158'),
+    (u'\xe2\u02c6\u0161', u'\u221a'),
+    (u'\xe2\u02c6\u02c6', u'\u2208'),
+    (u'\xe2\u2014\xaf', u'\u25ef'),
+    (u'\xe2\u20ac\u201c', u'\u2013'),
+    (u'\xe2\u2026\u2013', u'\u2156'),
+    (u'\xe2\u2026\u201d', u'\u2154'),
+    (u'\xe2\u2030\xa4', u'\u2264'),
+    (u'\xe2\u201a\xac', u'\u20ac'),
+    (u'\xe3\u201a\u201e', u'\u3084'),
+    (u'\xe3\u201a\u201c', u'\u3093'),
+    (u'\xe3\u201a\u201a', u'\u3082'),
+    (u'\xe3\u201a\u2019', u'\u3092'),
+    (u'\xe3\u201a\u0160', u'\u308a'),
+    (u'\xe5\u0152\u2014', u'\u5317'),
+    (u'\xe6\u0153\xa8', u'\u6728'),
+    (u'\xe6\u02c6\u2018', u'\u6211'),
+    (u'\xe6\u02dc\xaf', u'\u662f'),
+    (u'\xe8\xa5\xbf', u'\u897f'),
+    (u'\xe9\u201d\u2122', u'\u9519'),
+    (u'\u7aef', u'\xfc'),
+    (u'\u8d38', u'\xf3'),
+    (u'\ucc44', u'\xe4'),
+    (u'\uccb4', u'\xfc'),
+    (u'\u89ba', u'\u0131'),
+    (u'\uce74', u'\u012b'),
+    (u'\u0e23\u0e07', u'\xe7'),
+    (u'\u0e23\x97', u'\xd7'),
+    (u'\u0e23\u0e17', u'\xf7'),
+    (u'\u0e23\u0e16', u'\xf6'),
+    (u'\u0e23\u0e13', u'\xf3'),
+    (u'\u0e23\u0e1b', u'\xfb'),
+    (u'\xf0\u0178\u02dc\u2022', u'\U0001f615'),
+    (u'\xf0\u0178\u02dc\u0160', u'\U0001f60a'),
+    (u'\xf0\u0178\u02dc\u2030', u'\U0001f609'),
+    (u'\xf0\u0178\u2122\u201e', u'\U0001f644'),
+    (u'\xf0\u0178\u2122\u201a', u'\U0001f642'),
+    (u'\u011f\u0178\u02dc\u0160', u'\U0001f60a'),
+    (u'\u011f\u0178\u2019\xa1', u'\U0001f4a1'),
+    (u'\u011f\u0178\u02dc\u2018', u'\U0001f611'),
+    (u'\u011f\u0178\u02dc\u0160', u'\U0001f60a'),
+    (u'\xf0\u0178\u201d\u2013', u'\U0001f516'),
+    (u'\u011f\u0178\u02dc\u2030', u'\U0001f609'),
+    (u'\xf0\u0178\u02dc\u0192', u'\U0001f603'),
+    (u'\xf0\u0178\xa4\u2013', u'\U0001f916'),
+    (u'\xf0\u0178\u201c\xb7', u'\U0001f4f7'),
+    (u'\xf0\u0178\u02dc\u201a', u'\U0001f602'),
+    (u'\xf0\u0178\u201c\u20ac', u'\U0001f4c0'),
+    (u'\xf0\u0178\u2019\xbf', u'\U0001f4bf'),
+    (u'\xf0\u0178\u2019\xaf', u'\U0001f4af'),
+    (u'\xf0\u0178\u2019\xa1', u'\U0001f4a1'),
+    (u'\xf0\u0178\u2018\u2039', u'\U0001f44b'),
+    (u'\xf0\u0178\u02dc\xb1', u'\U0001f631'),
+    (u'\xf0\u0178\u02dc\u2018', u'\U0001f611'),
+    (u'\xf0\u0178\u02dc\u0160', u'\U0001f60a'),
+    (u'\xf0\u0178\u017d\xa7', u'\U0001f3a7'),
+    (u'\xf0\u0178\u017d\u2122', u'\U0001f399'),
+    (u'\xf0\u0178\u017d\xbc', u'\U0001f3bc'),
+    (u'\xf0\u0178\u201c\xbb', u'\U0001f4fb'),
+    (u'\xf0\u0178\xa4\xb3', u'\U0001f933'),
+    (u'\xf0\u0178\u2018\u0152', u'\U0001f44c'),
+    (u'\xf0\u0178\u0161\xa6', u'\U0001f6a6'),
+    (u'\xf0\u0178\xa4\u2014', u'\U0001f917'),
+    (u'\xf0\u0178\u02dc\u201e', u'\U0001f604'),
+    (u'\xf0\u0178\u2018\u2030', u'\U0001f449'),
+    (u'\xf0\u0178\u201c\xa1', u'\U0001f4e1'),
+    (u'\xf0\u0178\u201c\xa3', u'\U0001f4e3'),
+    (u'\xf0\u0178\u201c\xa2', u'\U0001f4e2'),
+    (u'\xf0\u0178\u201d\u0160', u'\U0001f50a'),
+    (u'\xc2\xb2', u'\xb2'),
+    (u'\xc2\xa1', u'\xa1'),
+    (u'\xc2\xb4', u'\xb4'),
+    (u'\xc2\xa0', u'\xa0'),
+    (u'\xa0', ' '),
+    (u'\xc2', '')
+]
 
 def validate_rte_format(html_list, rte_format):
     """This function checks if html strings in a given list are
@@ -649,6 +785,9 @@ def convert_svg_diagram_to_image_for_soup(soup_context):
 
     Args:
         soup_context: bs4.BeautifulSoup. The bs4 soup context.
+
+    Returns:
+        str. The updated html string.
     """
     for svg_image in soup_context.findAll(
             name='oppia-noninteractive-svgdiagram'):
@@ -657,6 +796,7 @@ def convert_svg_diagram_to_image_for_soup(soup_context):
         svg_image['filepath-with-value'] = svg_filepath
         svg_image['caption-with-value'] = escape_html('""')
         svg_image.name = 'oppia-noninteractive-image'
+    return python_utils.UNICODE(soup_context)
 
 
 def convert_svg_diagram_tags_to_image_tags(html_string):
@@ -669,42 +809,27 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     Returns:
         str. The updated html string.
     """
-    soup = bs4.BeautifulSoup(html_string, 'html.parser')
-    # Handle conversion of oppia-noninteractive-svgdiagram tags that are not
-    # nested inside complex components.
-    convert_svg_diagram_to_image_for_soup(soup)
+    return python_utils.UNICODE(
+        _process_string_with_components(
+            html_string,
+            convert_svg_diagram_to_image_for_soup
+        )
+    )
 
-    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
-    # oppia-noninteractive-collapsible.
-    for collapsible in soup.findAll(
-            name='oppia-noninteractive-collapsible'):
-        if 'content-with-value' in collapsible.attrs:
-            content_html = json.loads(
-                unescape_html(collapsible['content-with-value']))
-            soup_for_collapsible = bs4.BeautifulSoup(
-                content_html.replace('<br>', '<br/>'), 'html.parser')
-            convert_svg_diagram_to_image_for_soup(soup_for_collapsible)
-            collapsible['content-with-value'] = escape_html(
-                json.dumps(
-                    python_utils.UNICODE(soup_for_collapsible).replace(
-                        '<br/>', '<br>')))
+def _replace_incorrectly_encoded_chars(soup_context):
+    """Replaces incorrectly encoded character with the correct one in a given
+    HTML string.
 
-    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
-    # oppia-noninteractive-tabs.
-    for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-        tab_content_json = unescape_html(tabs['tab_contents-with-value'])
-        tab_content_list = json.loads(tab_content_json)
-        for tab_content in tab_content_list:
-            content_html = tab_content['content']
-            soup_for_tabs = bs4.BeautifulSoup(
-                content_html.replace('<br>', '<br/>'), 'html.parser')
-            convert_svg_diagram_to_image_for_soup(soup_for_tabs)
-            tab_content['content'] = (
-                python_utils.UNICODE(soup_for_tabs).replace(
-                    '<br/>', '<br>'))
-        tabs['tab_contents-with-value'] = escape_html(
-            json.dumps(tab_content_list))
-    return python_utils.UNICODE(soup)
+    Args:
+        soup_context: bs4.BeautifulSoup. The bs4 soup context.
+
+    Returns:
+        str. The updated html string.
+    """
+    html_string = python_utils.UNICODE(soup_context)
+    for bad_char, good_char in CHAR_MAPPING_TUPLES:
+        html_string = html_string.replace(bad_char, good_char)
+    return html_string
 
 def fix_incorrectly_encoded_chars(html_string):
     """Replaces incorrectly encoded character with the correct one in a given
@@ -716,145 +841,51 @@ def fix_incorrectly_encoded_chars(html_string):
     Returns:
         str. The updated html string.
     """
+    return python_utils.UNICODE(
+        _process_string_with_components(
+            html_string,
+            _replace_incorrectly_encoded_chars
+        )
+    )
+
+def _process_string_with_components(html_string, conversion_fn):
+    """Executes the provided conversion function after parsing complex RTE
+    components.
+
+    Args:
+        html_string: str. The HTML string to modify.
+        conversion_fn: function. The conversion function to be applied on
+            the HTML.
+
+    Returns:
+        str. The updated html string.
+    """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    fixed_html = python_utils.UNICODE(soup)
-    char_mapping_tuples = [
-        (u'\xc3', u'\xe0'),
-        (u'\xe0\xa3', u'\xe3'),
-        (u'\xe0\xa1', u'\xe1'),
-        (u'\xe0\xa2', u'\xe2'),
-        (u'\xe0\xa4', u'\xe4'),
-        (u'\xe0\xa5', u'\xe5'),
-        (u'\xe0\xa6', u'\xe6'),
-        (u'\xe0\xa7', u'\xe7'),
-        (u'\xe0\xa8', u'\xe8'),
-        (u'\xe0\xa9', u'\xe9'),
-        (u'\xe0\xaa', u'\xea'),
-        (u'\xe0\xab', u'\xeb'),
-        (u'\xe0\xac', u'\xec'),
-        (u'\xe0\xad', u'\xed'),
-        (u'\xe0\xae', u'\xee'),
-        (u'\xe0\xaf', u'\xef'),
-        (u'\xe0\xb1', u'\xf1'),
-        (u'\xe0\xb3', u'\xf3'),
-        (u'\xe0\xba', u'\xfa'),
-        (u'\xe0\xbb', u'\xfb'),
-        (u'\xe0\xbd', u'\xfd'),
-        (u'\xe0\xb5', u'\xf5'),
-        (u'\xe0\xb6', u'\xf6'),
-        (u'\xe0\xb7', u'\xf7'),
-        (u'\xe0\xbc', u'\xfc'),
-        (u'\xe0\u2022', u'\xd5'),
-        (u'\xe0\u2021', u'\xc7'),
-        (u'\xe0\u2013', u'\xd6'),
-        (u'\xe0\u2018', u'\xd1'),
-        (u'\xe0\u201c', u'\xd3'),
-        (u'\xe0\u201e', u'\xc4'),
-        (u'\xe0\u20ac', u'\xc0'),
-        (u'\xe0\u0153', u'\xdc'),
-        (u'\xe0\u2014', u'\xd7'),
-        (u'\xe0\u0178', u'\xdf'),
-        (u'\xc4\u0178', u'\u011f'),
-        (u'\xc4\xab', u'\u012b'),
-        (u'\xc4\xbb', u'\u013b'),
-        (u'\xc4\xb1', u'\u0131'),
-        (u'\xc4\xb0', u'\u0130'),
-        (u'\xc4\u2021', u'\u0107'),
-        (u'\xc4\u2122', u'\u0119'),
-        (u'\xc4\u2026', u'\u0105'),
-        (u'\xc4\u20ac', u'\u0100'),
-        (u'\xc4\xb0', u'\u0130'),
-        (u'\xc5\xba', u'\u017a'),
-        (u'\xc5\xbe', u'\u017e'),
-        (u'\xc5\u203a', u'\u015b'),
-        (u'\xc5\u0178', u'\u015f'),
-        (u'\xc9\u203a', u'\u025b'),
-        (u'\xd9\u2026', u'\u0645'),
-        (u'\xd1\u02c6', u'\u0448'),
-        (u'\xd8\xb5', u'\u0635'),
-        (u'\xd8\xad', u'\u062d'),
-        (u'\xd8\xa4', u'\u0624'),
-        (u'\xe1\xba\xbf', u'\u1ebf'),
-        (u'\xe1\xbb\u0178', u'\u1edf'),
-        (u'\xe2\u20ac\u0153', u'\u201c'),
-        (u'\xe2\u02c6\u2030', u'\u2209'),
-        (u'\xe2\u2026\u02dc', u'\u2158'),
-        (u'\xe2\u02c6\u0161', u'\u221a'),
-        (u'\xe2\u02c6\u02c6', u'\u2208'),
-        (u'\xe2\u2014\xaf', u'\u25ef'),
-        (u'\xe2\u20ac\u201c', u'\u2013'),
-        (u'\xe2\u2026\u2013', u'\u2156'),
-        (u'\xe2\u2026\u201d', u'\u2154'),
-        (u'\xe2\u2030\xa4', u'\u2264'),
-        (u'\xe2\u201a\xac', u'\u20ac'),
-        (u'\xe3\u201a\u201e', u'\u3084'),
-        (u'\xe3\u201a\u201c', u'\u3093'),
-        (u'\xe3\u201a\u201a', u'\u3082'),
-        (u'\xe3\u201a\u2019', u'\u3092'),
-        (u'\xe3\u201a\u0160', u'\u308a'),
-        (u'\xe5\u0152\u2014', u'\u5317'),
-        (u'\xe6\u0153\xa8', u'\u6728'),
-        (u'\xe6\u02c6\u2018', u'\u6211'),
-        (u'\xe6\u02dc\xaf', u'\u662f'),
-        (u'\xe8\xa5\xbf', u'\u897f'),
-        (u'\xe9\u201d\u2122', u'\u9519'),
-        (u'\u7aef', u'\xfc'),
-        (u'\u8d38', u'\xf3'),
-        (u'\ucc44', u'\xe4'),
-        (u'\uccb4', u'\xfc'),
-        (u'\u89ba', u'\u0131'),
-        (u'\uce74', u'\u012b'),
-        (u'\u0e23\u0e07', u'\xe7'),
-        (u'\u0e23\x97', u'\xd7'),
-        (u'\u0e23\u0e17', u'\xf7'),
-        (u'\u0e23\u0e16', u'\xf6'),
-        (u'\u0e23\u0e13', u'\xf3'),
-        (u'\u0e23\u0e1b', u'\xfb'),
-        (u'\xf0\u0178\u02dc\u2022', u'\U0001f615'),
-        (u'\xf0\u0178\u02dc\u0160', u'\U0001f60a'),
-        (u'\xf0\u0178\u02dc\u2030', u'\U0001f609'),
-        (u'\xf0\u0178\u2122\u201e', u'\U0001f644'),
-        (u'\xf0\u0178\u2122\u201a', u'\U0001f642'),
-        (u'\u011f\u0178\u02dc\u0160', u'\U0001f60a'),
-        (u'\u011f\u0178\u2019\xa1', u'\U0001f4a1'),
-        (u'\u011f\u0178\u02dc\u2018', u'\U0001f611'),
-        (u'\u011f\u0178\u02dc\u0160', u'\U0001f60a'),
-        (u'\xf0\u0178\u201d\u2013', u'\U0001f516'),
-        (u'\u011f\u0178\u02dc\u2030', u'\U0001f609'),
-        (u'\xf0\u0178\u02dc\u0192', u'\U0001f603'),
-        (u'\xf0\u0178\xa4\u2013', u'\U0001f916'),
-        (u'\xf0\u0178\u201c\xb7', u'\U0001f4f7'),
-        (u'\xf0\u0178\u02dc\u201a', u'\U0001f602'),
-        (u'\xf0\u0178\u201c\u20ac', u'\U0001f4c0'),
-        (u'\xf0\u0178\u2019\xbf', u'\U0001f4bf'),
-        (u'\xf0\u0178\u2019\xaf', u'\U0001f4af'),
-        (u'\xf0\u0178\u2019\xa1', u'\U0001f4a1'),
-        (u'\xf0\u0178\u2018\u2039', u'\U0001f44b'),
-        (u'\xf0\u0178\u02dc\xb1', u'\U0001f631'),
-        (u'\xf0\u0178\u02dc\u2018', u'\U0001f611'),
-        (u'\xf0\u0178\u02dc\u0160', u'\U0001f60a'),
-        (u'\xf0\u0178\u017d\xa7', u'\U0001f3a7'),
-        (u'\xf0\u0178\u017d\u2122', u'\U0001f399'),
-        (u'\xf0\u0178\u017d\xbc', u'\U0001f3bc'),
-        (u'\xf0\u0178\u201c\xbb', u'\U0001f4fb'),
-        (u'\xf0\u0178\xa4\xb3', u'\U0001f933'),
-        (u'\xf0\u0178\u2018\u0152', u'\U0001f44c'),
-        (u'\xf0\u0178\u0161\xa6', u'\U0001f6a6'),
-        (u'\xf0\u0178\xa4\u2014', u'\U0001f917'),
-        (u'\xf0\u0178\u02dc\u201e', u'\U0001f604'),
-        (u'\xf0\u0178\u2018\u2030', u'\U0001f449'),
-        (u'\xf0\u0178\u201c\xa1', u'\U0001f4e1'),
-        (u'\xf0\u0178\u201c\xa3', u'\U0001f4e3'),
-        (u'\xf0\u0178\u201c\xa2', u'\U0001f4e2'),
-        (u'\xf0\u0178\u201d\u0160', u'\U0001f50a'),
-        (u'\xc2\xb2', u'\xb2'),
-        (u'\xc2\xa1', u'\xa1'),
-        (u'\xc2\xb4', u'\xb4'),
-        (u'\xc2\xa0', u'\xa0'),
-        (u'\xa0', ' '),
-        (u'\xc2', '')
-    ]
-    for bad_char, good_char in char_mapping_tuples:
-        fixed_html = fixed_html.replace(bad_char, good_char)
-    return fixed_html
+
+    for collapsible in soup.findAll(
+            name='oppia-noninteractive-collapsible'):
+        if 'content-with-value' in collapsible.attrs:
+            content_html = json.loads(
+                unescape_html(collapsible['content-with-value']))
+            soup_for_collapsible = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            collapsible['content-with-value'] = escape_html(
+                json.dumps(conversion_fn(
+                    soup_for_collapsible
+                ).replace('<br/>', '<br>')))
+
+    for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
+        tab_content_json = unescape_html(tabs['tab_contents-with-value'])
+        tab_content_list = json.loads(tab_content_json)
+        for tab_content in tab_content_list:
+            content_html = tab_content['content']
+            soup_for_tabs = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            tab_content['content'] = (
+                conversion_fn(soup_for_tabs).replace(
+                    '<br/>', '<br>'))
+        tabs['tab_contents-with-value'] = escape_html(
+            json.dumps(tab_content_list))
+
+    return conversion_fn(soup)
