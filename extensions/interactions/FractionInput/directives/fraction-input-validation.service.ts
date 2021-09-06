@@ -63,8 +63,8 @@ export class FractionInputValidationService {
   }
   getCustomizationArgsWarnings(
       customizationArgs: FractionInputCustomizationArgs
-  ): (Warning | FractionWarning)[] {
-    let warningsList: (Warning | FractionWarning)[] = [];
+  ): Warning[] {
+    let warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
       ['allowImproperFraction', 'allowNonzeroIntegerPart']);
