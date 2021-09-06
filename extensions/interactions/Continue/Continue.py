@@ -47,10 +47,12 @@ class Continue(base.BaseInteraction):
         'schema': {
             'type': 'custom',
             'obj_type': 'SubtitledUnicode',
-            'validators': [{
-                'id': 'isAtMost',
-                'maxValue': 20,
-            }],
+            'validators': [
+            {
+              'max_value': 20,
+              'id': 'is_at_most'
+            }
+          ],
         },
         'default_value': {
             'content_id': None,
