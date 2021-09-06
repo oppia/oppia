@@ -347,7 +347,7 @@ describe('Contribution Opportunities backend API service', function() {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      let emptyResponse: string [] = [];
+      const emptyResponse: string [] = [];
 
       contributionOpportunitiesBackendApiService
         .fetchAllTopicNamesAsync()

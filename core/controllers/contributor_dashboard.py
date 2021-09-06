@@ -178,8 +178,8 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             language_code: str. The language for which translation opportunities
                 should be fetched.
             topic_name: str or None. The topic for which translation
-                opportunities should be fetched. When it is None, fetch
-                translation opportunities from all topics.
+                opportunities should be fetched. If topic_name is None or empty,
+                fetch translation opportunities from all topics.
             search_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise, the
                 returned entities start from the beginning of the full list of
@@ -497,6 +497,10 @@ class AllTopicNamesHandler(base.BaseHandler):
     """Provides names of all existing topics in the datastore."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

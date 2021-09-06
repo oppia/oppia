@@ -419,8 +419,9 @@ def get_translation_opportunities(language_code, topic_name, cursor):
             entities start from the beginning of the full list of entities.
         language_code: str. The language for which translation opportunities
             should be fetched.
-        topic_name: str. The topic for which translation opportunities should
-            be fetched.
+        topic_name: str or None. The topic for which translation opportunities
+            should be fetched. If topic_name is None or empty, fetch
+            translation opportunities from all topics.
 
     Returns:
         3-tuple(opportunities, cursor, more). where:

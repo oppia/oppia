@@ -108,8 +108,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             language_code: str. The language for which translation opportunities
                 are to be fetched.
             topic_name: str or None. The topic for which translation
-                opportunities should be fetched. When it is None, fetch
-                translation opportunities from all topics.
+                opportunities should be fetched. If topic_name is None or empty,
+                fetch translation opportunities from all topics.
 
         Returns:
             3-tuple of (results, cursor, more). As described in fetch_page() at:
@@ -130,15 +130,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         else:
             start_cursor = datastore_services.make_cursor()
 
-        if not topic_name:
-            language_query = cls.query(
-                cls.incomplete_translation_language_codes == language_code
-            ).order(cls.incomplete_translation_language_codes)
-        else:
-            language_query = cls.query(datastore_services.all_of(
-                cls.incomplete_translation_language_codes == language_code,
-                cls.topic_name == topic_name)).order(
-                    cls.incomplete_translation_language_codes)
+        language_query = cls.query(
+            cls.incomplete_translation_language_codes == language_code
+        ).order(cls.incomplete_translation_language_codes)
+
+        if topic_name:
+            language_query = language_query.filter(cls.topic_name == topic_name)
 
         results, cursor, _ = (
             language_query.fetch_page(page_size, start_cursor=start_cursor))

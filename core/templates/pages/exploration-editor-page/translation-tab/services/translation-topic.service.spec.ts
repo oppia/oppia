@@ -52,7 +52,6 @@ describe('Translation topic service', () => {
       .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
   }));
 
-
   describe('Translation topic service', () => {
     it('should correctly set and get topic names', fakeAsync(async() => {
       translationTopicService.setActiveTopicName('Topic 1');

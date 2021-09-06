@@ -160,7 +160,7 @@ export class LocalStorageService {
   }
 
   /**
-   * Save the given topic name to localStorage along.
+   * Save the given active topic name to localStorage.
    * @param topicName
    */
   updateLastSelectedTranslationTopicName(topicName: string): void {

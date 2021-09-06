@@ -35,7 +35,6 @@ export class TranslationTopicSelectorComponent implements OnInit {
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
   options: string[];
-
   dropdownShown = false;
 
   constructor(
