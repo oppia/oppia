@@ -30,7 +30,7 @@ var CollectionEditorPage = function() {
     by.css('.protractor-test-collection-editor-objective-input'));
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
-  var editorCategoryDropdown = element.all(
+  var categoryFilterDropdown = element(
     by.css('.protractor-test-collection-editor-category-dropdown'));
   var editorDeleteNode = element.all(
     by.css('.protractor-test-editor-delete-node'));
@@ -76,9 +76,8 @@ var CollectionEditorPage = function() {
       by.cssContainingText('.dropdown-menu', new RegExp(query)));
     await waitFor.presenceOf(
       dropdownResultElement, 'Unable to find exploration: ' + query);
-
-    var matchingSearchResult = element(by.cssContainingText(
-      '.uib-typeahead-match', new RegExp(query)));
+    var matchingSearchResult = (
+      element(by.cssContainingText('.ngb-highlight', query)));
     await waitFor.presenceOf(
       matchingSearchResult, 'Unable to find search result: ' + query);
     await action.click('Matching search result', matchingSearchResult);
@@ -153,9 +152,11 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = async function(category) {
-    await action.select2(
-      'Editor Category Drop Down', editorCategoryDropdown.first(),
-      category);
+    await action.click('Category filter', categoryFilterDropdown);
+    var dropdownOption = element(
+      by.cssContainingText('mat-option .mat-option-text', category));
+    await action.click(
+      'category option: ' + category, dropdownOption);
   };
 
   // Saves changes and publishes collection.
