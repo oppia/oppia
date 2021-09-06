@@ -39,6 +39,7 @@ from jobs.types import job_run_result
 import python_utils
 
 import apache_beam as beam
+
 from typing import Dict, Iterable, List, Optional, Tuple, Union, cast
 
 MYPY = False
