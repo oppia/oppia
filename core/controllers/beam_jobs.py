@@ -19,12 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import beam_job_services
 import feconf
-from jobs import jobs_manager
 
 from typing import Any, Dict # isort: skip
 
@@ -78,8 +76,7 @@ class BeamJobRunHandler(base.BaseHandler):
             self.normalized_payload.get('job_name')
             if self.normalized_payload else None)
 
-        run_synchronously = constants.EMULATOR_MODE
-        beam_job_run = jobs_manager.run_job(job_name, run_synchronously)
+        beam_job_run = beam_job_services.run_beam_job(job_name)
 
         self.render_json(beam_job_run.to_dict())
 

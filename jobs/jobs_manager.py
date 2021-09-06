@@ -26,12 +26,11 @@ import logging
 import pprint
 import subprocess
 
-from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.storage.beam_job import gae_models as beam_job_models
 import feconf
+from jobs import base_jobs
 from jobs import job_options
-from jobs import registry
 from jobs.io import job_io
 import python_utils
 from scripts import common
@@ -39,7 +38,7 @@ import utils
 
 import apache_beam as beam
 from apache_beam import runners
-from typing import Iterator, Optional
+from typing import Iterator, Optional, Type
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
 # https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#jobstate
@@ -94,18 +93,18 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
 
 
 def run_job(
-    job_name: str,
+    job_class: Type[base_jobs.JobBase],
     sync: bool,
     namespace: Optional[str] = None,
     pipeline: Optional[beam.Pipeline] = None
-) -> beam_job_domain.BeamJobRun:
+) -> beam_job_models.BeamJobRunModel:
     """Runs the specified job synchronously.
 
     In other words, the function will wait for the job to finish running before
     returning a value.
 
     Args:
-        job_name: str. The name of the job to run.
+        job_class: type(base_jobs.JobBase). The type of job to run.
         sync: bool. Whether to run the job synchronously.
         namespace: str. The namespace in which models should be created.
         pipeline: Pipeline. The pipeline to run the job upon. If omitted, then a
@@ -115,15 +114,13 @@ def run_job(
         BeamJobRun. Contains metadata related to the execution status of the
         job.
     """
-    cls = registry.get_job_class_by_name(job_name)
-
     if pipeline is None:
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
             options=job_options.JobOptions(namespace=namespace))
 
-    with _job_bookkeeping_context(job_name) as run_model:
-        job = cls(pipeline)
+    with _job_bookkeeping_context(job_class.__name__) as run_model:
+        job = job_class(pipeline)
 
         unused_pdone = job.run() | job_io.PutResults(run_model.id)
 
@@ -136,7 +133,7 @@ def run_job(
             run_model.dataflow_job_id = run_result.job_id()
             run_model.latest_job_state = run_result.state
 
-    return beam_job_services.get_beam_job_run_from_model(run_model)
+    return run_model
 
 
 def refresh_state_of_beam_job_run_model(

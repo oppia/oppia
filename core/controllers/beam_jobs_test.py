@@ -18,7 +18,6 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import datetime
 
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
@@ -85,18 +84,16 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         self.assertCountEqual([run['job_name'] for run in runs], ['FooJob'] * 3)
 
     def test_put_starts_new_job(self) -> None:
-        now = datetime.datetime.utcnow()
-        mock_job = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', now, now, False)
-        run_job_swap = self.swap_to_always_return(
-            jobs_manager, 'run_job', value=mock_job)
+        model = beam_job_services.create_beam_job_run_model('FooJob')
 
-        with run_job_swap:
+        with self.swap_to_always_return(jobs_manager, 'run_job', value=model):
             response = self.put_json( # type: ignore[no-untyped-call]
                 '/beam_job_run', {'job_name': 'FooJob'},
                 csrf_token=self.get_new_csrf_token()) # type: ignore[no-untyped-call]
 
-        self.assertEqual(response, mock_job.to_dict())
+        self.assertEqual(
+            response,
+            beam_job_services.get_beam_job_run_from_model(model).to_dict())
 
 
 class BeamJobRunResultHandlerTests(BeamHandlerTestBase):

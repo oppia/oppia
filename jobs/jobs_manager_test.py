@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import contextlib
 from unittest import mock
 
 from core.domain import beam_job_services
@@ -55,39 +54,29 @@ class FailingJob(base_jobs.JobBase):
 
 class RunJobTests(test_utils.GenericTestBase):
 
-    def setUp(self) -> None:
-        self.exit_stack = contextlib.ExitStack()
-
-    def tearDown(self) -> None:
-        self.exit_stack.close()
-
     def test_working_sync_job(self) -> None:
-        run = jobs_manager.run_job('WorkingJob', True, namespace=self.namespace)
+        run = jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
 
-        self.assertEqual(run.job_state, 'DONE')
+        self.assertEqual(run.latest_job_state, 'DONE')
 
-        run_model = beam_job_models.BeamJobRunModel.get(run.job_id) # type: ignore[attr-defined]
-        self.assertEqual(
-            run.to_dict(),
-            beam_job_services.get_beam_job_run_from_model(run_model).to_dict())
+        run_model = beam_job_models.BeamJobRunModel.get(run.id) # type: ignore[attr-defined]
+        self.assertEqual(run, run_model)
 
         self.assertEqual(
-            beam_job_services.get_beam_job_run_result(run.job_id).to_dict(),
+            beam_job_services.get_beam_job_run_result(run.id).to_dict(),
             {'stdout': 'o', 'stderr': 'e'})
 
     def test_failing_sync_job(self) -> None:
-        run = jobs_manager.run_job('FailingJob', True, namespace=self.namespace)
+        run = jobs_manager.run_job(FailingJob, True, namespace=self.namespace)
 
-        self.assertEqual(run.job_state, 'FAILED')
+        self.assertEqual(run.latest_job_state, 'FAILED')
 
-        run_model = beam_job_models.BeamJobRunModel.get(run.job_id) # type: ignore[attr-defined]
-        self.assertEqual(
-            run.to_dict(),
-            beam_job_services.get_beam_job_run_from_model(run_model).to_dict())
+        run_model = beam_job_models.BeamJobRunModel.get(run.id) # type: ignore[attr-defined]
+        self.assertEqual(run, run_model)
 
         self.assertIn(
             'uh-oh',
-            beam_job_services.get_beam_job_run_result(run.job_id).stderr)
+            beam_job_services.get_beam_job_run_result(run.id).stderr)
 
     def test_async_job(self) -> None:
         mock_run_result = mock.Mock()
@@ -98,10 +87,8 @@ class RunJobTests(test_utils.GenericTestBase):
             runner=runners.DirectRunner(),
             options=job_options.JobOptions(namespace=self.namespace))
 
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(pipeline, 'run', value=mock_run_result))
+        with self.swap_to_always_return(pipeline, 'run', value=mock_run_result):
+            run = jobs_manager.run_job(WorkingJob, False, pipeline=pipeline)
 
-        run = jobs_manager.run_job('WorkingJob', False, pipeline=pipeline)
-
-        self.assertFalse(run.job_is_synchronous)
-        self.assertEqual(run.job_state, 'PENDING')
+        self.assertEqual(run.dataflow_job_id, '123')
+        self.assertEqual(run.latest_job_state, 'PENDING')

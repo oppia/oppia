@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import itertools
 
+from constants import constants
 from core.domain import beam_job_domain
 from core.platform import models
 from jobs import jobs_manager
@@ -32,6 +33,23 @@ from typing import List, Optional # isort: skip
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+
+
+def run_beam_job(job_name: str) -> beam_job_domain.BeamJobRun:
+    """Starts a new Apache Beam job and returns metadata about its execution.
+
+    Args:
+        job_name: str. The name of the job to run.
+
+    Returns:
+        BeamJobRun. Metadata about the run's execution.
+    """
+    job_class = jobs_registry.get_job_class_by_name(job_name)
+    run_synchronously = constants.EMULATOR_MODE
+
+    run_model = jobs_manager.run_job(job_class, run_synchronously)
+
+    return get_beam_job_run_from_model(run_model)
 
 
 def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
@@ -145,7 +163,7 @@ def create_beam_job_run_result_model(
     return model
 
 
-def refresh_state_of_all_beam_job_run_models():
+def refresh_state_of_all_beam_job_run_models() -> None:
     """Refreshes the state of all BeamJobRunModels that haven't terminated."""
     beam_job_run_models = _get_all_beam_job_run_models(include_terminated=False)
 
@@ -173,7 +191,9 @@ def get_beam_job_run_from_model(
         beam_job_run_model.dataflow_job_id is None)
 
 
-def _get_all_beam_job_run_models(include_terminated=True):
+def _get_all_beam_job_run_models(
+    include_terminated: bool = True
+) -> List[beam_job_models.BeamJobRunModel]:
     """Returns all of the BeamJobRunModels in the datastore.
 
     Args:
