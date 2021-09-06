@@ -28,7 +28,7 @@ from core.tests import test_utils
 import python_utils
 import utils
 
-from typing import List # isort:skip # pylint: disable=unused-import
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover

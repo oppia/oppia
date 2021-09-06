@@ -140,7 +140,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         question_admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_QUESTION_ADMIN)
         translation_admin_ids = user_services.get_user_ids_by_role(
-            feconf.ROLE_ID_QUESTION_ADMIN)
+            feconf.ROLE_ID_TRANSLATION_ADMIN)
 
         if (
                 config_domain

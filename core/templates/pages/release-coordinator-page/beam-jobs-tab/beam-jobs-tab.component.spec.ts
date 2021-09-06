@@ -223,7 +223,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).not.toContain(newPendingFooJob);
 
     const startNewButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'Start New'
+      text: 'play_arrow'
     }));
     await startNewButton.click();
 

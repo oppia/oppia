@@ -26,7 +26,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, List, Tuple, Union # isort:skip
+from typing import Dict, List, Tuple, Union
 
 MailgunQueryType = Tuple[
     str,

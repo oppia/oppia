@@ -35,7 +35,6 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 })
 export class DisplaySolutionModalComponent {
   COMPONENT_NAME_SOLUTION: string;
-  isHint: boolean = false;
   solution: Solution;
   solutionContentId: string;
   displayedCard: StateCard;

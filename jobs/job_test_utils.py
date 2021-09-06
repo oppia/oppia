@@ -166,7 +166,8 @@ class JobTestBase(PipelinedTestBase):
     Subclasses must add the class constant JOB_CLASS to use the helper methods.
     """
 
-    JOB_CLASS = base_jobs.JobBase # NOTE: run() raises a NotImplementedError.
+    # NOTE: run() raises a NotImplementedError.
+    JOB_CLASS = base_jobs.JobBase
 
     def __init__(self, *args, **kwargs):
         super(JobTestBase, self).__init__(*args, **kwargs)
