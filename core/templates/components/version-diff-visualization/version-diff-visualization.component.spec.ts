@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-fdescribe('VersionDiffVisualizationComponent', () => {
+describe('VersionDiffVisualizationComponent', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
