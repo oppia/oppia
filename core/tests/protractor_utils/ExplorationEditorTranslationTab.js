@@ -301,6 +301,9 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectSaveUploadedAudioButtonToBeDisabled = async function() {
+    await waitFor.visibilityOf(
+      saveUploadedAudioButton,
+      'Save uploaded audio button taking too long to appear');
     expect(await saveUploadedAudioButton.getAttribute('disabled')).toBe(
       'true');
   };
@@ -401,6 +404,9 @@ var ExplorationEditorTranslationTab = function() {
       'Language selector label element taking too long to appear');
     expect(await languageSelectorLabelElement.getText()).toBe(
       'Translations for language:');
+    await waitFor.visibilityOf(
+      progressBarLabelElement,
+      'Progress selector lable element taking too long to appear');
     expect(await progressBarLabelElement.getText()).toBe(
       'Exploration translation progress:');
     await waitFor.visibilityOf(
@@ -408,6 +414,9 @@ var ExplorationEditorTranslationTab = function() {
       'Translation mode button taking to long to appear');
     expect(await translationModeButton.getAttribute('class')).toMatch(
       'oppia-active-mode');
+    await waitFor.visibilityOf(
+      voiceoverModeButton,
+      'Voice over mode button taking to long to appear');
     expect(await voiceoverModeButton.getAttribute('class')).not.toMatch(
       'oppia-active-mode');
   };
@@ -418,6 +427,9 @@ var ExplorationEditorTranslationTab = function() {
       'Language selector label element taking too long to appear');
     expect(await languageSelectorLabelElement.getText()).toBe(
       'Voiceovers for language:');
+    await waitFor.visibilityOf(
+      progressBarLabelElement,
+      'Progress bar element taking to long to appear');
     expect(await progressBarLabelElement.getText()).toBe(
       'Exploration voiceover progress:');
     await waitFor.visibilityOf(
@@ -425,6 +437,9 @@ var ExplorationEditorTranslationTab = function() {
       'Translation mode button taking to long to appear');
     expect(await translationModeButton.getAttribute('class')).not.toMatch(
       'oppia-active-mode');
+    await waitFor.visibilityOf(
+      voiceoverModeButton,
+      'Voiceover mode button taking to long to appear');
     expect(await voiceoverModeButton.getAttribute('class')).toMatch(
       'oppia-active-mode');
   };
@@ -461,6 +476,9 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectNumericalStatusToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      numericalStatus,
+      'Numerical status taking too long to appear');
     expect(await numericalStatus.getText()).toMatch(content);
   };
 
@@ -472,31 +490,49 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectContentAccessibilityToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      translationTabContentAccessibility,
+      'Translation tab content taking too long to appear');
     expect(await translationTabContentAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
   this.expectFeedbackAccessibilityToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      translationTabFeedbackAccessibility,
+      'Translation tab feedback taking too long to appear');
     expect(await translationTabFeedbackAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
   this.expectHintAccessibilityToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      translationTabHintAccessibility,
+      'Translation tab hint takint too long to appear');
     expect(await translationTabHintAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
   this.expectSolutionAccessibilityToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      translationTabSolutionAccessibility,
+      'Translation tab solution taking too long to appear');
     expect(await translationTabSolutionAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
   this.expectStartRecordingAccessibilityToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      translationTabStartRecordingAccessibility,
+      'Translation tab start recording taking too long to appear');
     expect(await translationTabStartRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
   this.expectUploadRecordingAccessibilityToMatch = async function(content) {
+    await waitFor.visibilityOf(
+      translationTabUploadRecordingAccessibility,
+      'Translation tab upload recording taking too long to appear');
     expect(await translationTabUploadRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
@@ -551,6 +587,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectCorrectStatusColor = async function(stateName, expectedColor) {
     var listOfNames = await stateNodes.map(async function(stateElement) {
+      await waitFor.visibilityOf(
+        stateElement,
+        'State Element taking too long to appear');
       return await stateNodeLabel(stateElement).getText();
     });
     var matched = false;
