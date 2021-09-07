@@ -40,19 +40,6 @@ import utils
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
-    
-    URL_PATH_ARGS_SCHEMAS = {
-        'username': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
-
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-    
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -390,6 +377,11 @@ class SignupHandler(base.BaseHandler):
 
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def delete(self):
