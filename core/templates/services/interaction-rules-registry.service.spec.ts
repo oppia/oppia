@@ -45,8 +45,6 @@ import { InteractiveMapRulesService } from
 import { ItemSelectionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
-import { LogicProofRulesService } from
-  'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
@@ -90,7 +88,6 @@ describe('Interaction Rules Registry Service', () => {
   let imageClickInputRulesService: ImageClickInputRulesService;
   let interactiveMapRulesService: InteractiveMapRulesService;
   let itemSelectionInputRulesService: ItemSelectionInputRulesService;
-  let logicProofRulesService: LogicProofRulesService;
   let mathEquationInputRulesService: MathEquationInputRulesService;
   let multipleChoiceInputRulesService: MultipleChoiceInputRulesService;
   let musicNotesInputRulesService: MusicNotesInputRulesService;
@@ -126,7 +123,6 @@ describe('Interaction Rules Registry Service', () => {
     interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
     itemSelectionInputRulesService = (
       TestBed.get(ItemSelectionInputRulesService));
-    logicProofRulesService = TestBed.get(LogicProofRulesService);
     mathEquationInputRulesService = (
       TestBed.get(MathEquationInputRulesService));
     multipleChoiceInputRulesService = (
@@ -235,13 +231,6 @@ describe('Interaction Rules Registry Service', () => {
       interactionRulesRegistryService
         .getRulesServiceByInteractionId('ItemSelectionInput')
     ).toBe(itemSelectionInputRulesService);
-  });
-
-  it('should return the correct rules service for LogicProof', () => {
-    expect(
-      interactionRulesRegistryService
-        .getRulesServiceByInteractionId('LogicProof')
-    ).toBe(logicProofRulesService);
   });
 
   it('should return the correct rules service for MathEquationInput', () => {

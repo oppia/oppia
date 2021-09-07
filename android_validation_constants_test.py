@@ -47,8 +47,8 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
             android_validation_constants.MAX_CHARS_IN_STORY_TITLE,
             constants.MAX_CHARS_IN_STORY_TITLE)
         self.assertEqual(
-            android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE,
-            constants.MAX_CHARS_IN_CHAPTER_TITLE)
+            android_validation_constants.MAX_CHARS_IN_EXPLORATION_TITLE,
+            constants.MAX_CHARS_IN_EXPLORATION_TITLE)
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION,
             constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION)
