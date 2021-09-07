@@ -14,8 +14,8 @@ runs:
       run: |
         curl -X POST \
         -H 'Content-Type: application/json' \
-        --url ${{ inputs.webhook-url }} \
-        --data '{
+        '${{ inputs.webhook-url }}' \
+        -d '{
           "text": ${{ inputs.message }}
         }'
       shell: bash
