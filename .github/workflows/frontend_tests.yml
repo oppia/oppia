@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
+      # - uses: ./.github/actions/merge
       # - name: Install third party
       #   run: python -m scripts.install_third_party_libs
       # - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
@@ -31,4 +31,4 @@ jobs:
       - uses: ./.github/actions/send-webhook-notification
         with:
           message: 'Test message from github-action build: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'
-          webhook-url: ${{secrets.WEBHOOK_SECRET}}
+          webhook-url: ${{ secrets.WEBHOOK_SECRET }}
