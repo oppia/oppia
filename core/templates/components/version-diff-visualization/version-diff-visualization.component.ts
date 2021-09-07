@@ -118,7 +118,7 @@ angular.module('oppia').component('versionDiffVisualization', {
       });
       modalRef.componentInstance.newStateName = newStateName;
       modalRef.componentInstance.oldStateName = oldStateName;
-      
+
       var newState = null;
       if (stateProperty !== STATE_PROPERTY_DELETED &&
           ctrl.getDiffData().v2States.hasOwnProperty(newStateName)) {

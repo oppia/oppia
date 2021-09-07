@@ -182,7 +182,7 @@ describe('VersionDiffVisualizationComponent', () => {
           rightPane: undefined,
         }
       };
-    };
+    }
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
       return <NgbModalRef>({
@@ -231,7 +231,7 @@ describe('VersionDiffVisualizationComponent', () => {
           rightPane: undefined,
         }
       };
-    };
+    }
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
       return <NgbModalRef>({
