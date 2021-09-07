@@ -319,7 +319,8 @@ var ExplorationEditorTranslationTab = function() {
   this.expectWrongFileType = async function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    await audioUploadInput.sendKeys(audioAbsolutePath);
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, audioAbsolutePath, false);
     // A fake click to trigger onChange event for audioUploadInput.
     await action.click(
       'Audio upload container element',
@@ -335,7 +336,8 @@ var ExplorationEditorTranslationTab = function() {
       relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    await audioUploadInput.sendKeys(audioAbsolutePath);
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, audioAbsolutePath, false);
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.visibilityOf(
       audioOverFiveMinutesErrorMessageElement, 'Error element is not visible');
