@@ -80,9 +80,7 @@ describe('State Diff Modal Component', () => {
     it('should initialize component properties after component is initialized',
       fakeAsync(() => {
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
-          data: {
-            yaml: 'Yaml data'
-          }
+          yaml: 'Yaml data'
         }));
         spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
 
@@ -98,9 +96,7 @@ describe('State Diff Modal Component', () => {
 
     it('should evaluate yaml strings object', fakeAsync(() => {
       spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
-        data: {
-          yaml: 'Yaml data'
-        }
+        yaml: 'Yaml data'
       }));
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
 
@@ -129,9 +125,7 @@ describe('State Diff Modal Component', () => {
     it('should initialize component properties after component is initialized',
       fakeAsync(() => {
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
-          data: {
-            yaml: 'Yaml data'
-          }
+          yaml: 'Yaml data'
         }));
         spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
 
@@ -148,9 +142,7 @@ describe('State Diff Modal Component', () => {
     it('should evaluate yaml strings object when timeout tasks are flushed',
       fakeAsync(() => {
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
-          data: {
             yaml: 'Yaml data'
-          }
         }));
 
         spyOn(contextService, 'getExplorationId').and.returnValue('exp1');

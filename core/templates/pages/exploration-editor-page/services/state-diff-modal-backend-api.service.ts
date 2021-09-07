@@ -21,10 +21,8 @@ import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 
-interface ResInterface {
-  data: {
-    yaml: string;
-  }
+interface resInterface {
+  yaml: string;
 }
 
 @Injectable({
@@ -37,8 +35,8 @@ export class StateDiffModalBackendApiService {
 
   async fetchYaml(
       stateDict: StateBackendDict, width: number, url: string
-  ): Promise<ResInterface> {
-    return this.http.post<ResInterface>(url, {
+  ): Promise<resInterface> {
+    return this.http.post<resInterface>(url, {
       state_dict: stateDict,
       width: width
     }).toPromise();

@@ -16,9 +16,8 @@
  * @fileoverview Component for state diff modal.
  */
 
-import { Input, OnInit } from '@angular/core';
+import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { State } from 'domain/state/StateObjectFactory';
@@ -39,16 +38,16 @@ interface mergeviewOptions {
 }
 
 @Component({
-  selector: 'oppia-state-diff-modal',
+  selector: 'oppia-state-diff',
   templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    @Input() newState: State | null;
-    @Input() oldState: State | null;
-    @Input() newStateName: string;
-    @Input() oldStateName: string;
-    @Input() headers: headersAndYamlStrs;
+    newState: State | null;
+    oldState: State | null;
+    newStateName: string;
+    oldStateName: string;
+    headers: headersAndYamlStrs;
     yamlStrs: headersAndYamlStrs = {
       leftPane: '',
       rightPane: '',
@@ -80,7 +79,7 @@ export class StateDiffModalComponent
       if (this.oldState) {
         this.stateDiffModalBackendApiService.fetchYaml(
           this.oldState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.leftPane = response.data.yaml;
+          this.yamlStrs.leftPane = response.yaml;
         });
       } else {
         // Note: the timeout is needed or the string will be sent
@@ -94,7 +93,7 @@ export class StateDiffModalComponent
       if (this.newState) {
         this.stateDiffModalBackendApiService.fetchYaml(
           this.newState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.rightPane = response.data.yaml;
+          this.yamlStrs.rightPane = response.yaml;
         });
       } else {
         // Note: the timeout is needed or the string will be sent

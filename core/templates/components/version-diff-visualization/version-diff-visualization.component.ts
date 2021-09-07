@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Directive for the visualization of the diff between two
  *   versions of an exploration.
@@ -19,6 +20,7 @@
 import { StateDiffModalComponent }
  from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
@@ -112,18 +114,19 @@ angular.module('oppia').component('versionDiffVisualization', {
       let modalRef: NgbModalRef = NgbModal.open(StateDiffModalComponent, {
         backdrop: true,
         windowClass: 'state-diff-modal',
+        size: 'lg'
       });
       modalRef.componentInstance.newStateName = newStateName;
       modalRef.componentInstance.oldStateName = oldStateName;
       
-      let newState = null;
+      var newState = null;
       if (stateProperty !== STATE_PROPERTY_DELETED &&
           ctrl.getDiffData().v2States.hasOwnProperty(newStateName)) {
         newState = ctrl.getDiffData().v2States[newStateName];
       }
 
-      let oldState = null;
-      let stateNameToRetrieve = oldStateName || newStateName;
+      var oldState = null;
+      var stateNameToRetrieve = oldStateName || newStateName;
       if (stateProperty !== STATE_PROPERTY_ADDED &&
           ctrl.getDiffData().v1States.hasOwnProperty(stateNameToRetrieve)) {
         oldState = ctrl.getDiffData().v1States[stateNameToRetrieve];
@@ -136,7 +139,7 @@ angular.module('oppia').component('versionDiffVisualization', {
         rightPane: ctrl.getLaterVersionHeader()
       }
 
-      modalRef.result.then(() => {}, () => {
+      modalRef.result.then(function() {}, function() {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
