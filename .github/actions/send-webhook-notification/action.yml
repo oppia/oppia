@@ -1,7 +1,7 @@
 name: 'Send notifications to webhooks'
 description: 'This action sends notifications to the given webhooks.'
 inputs:
-  webhookUrl:
+  webhook-url:
       description: 'The URL of the webhook'
       required: true
   message:
