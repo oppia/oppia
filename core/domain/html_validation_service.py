@@ -272,6 +272,7 @@ CHAR_MAPPING_TUPLES = [
     (u'\xc2', '')
 ]
 
+
 def validate_rte_format(html_list, rte_format):
     """This function checks if html strings in a given list are
     valid for given RTE format.
@@ -816,6 +817,7 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
         )
     )
 
+
 def _replace_incorrectly_encoded_chars(soup_context):
     """Replaces incorrectly encoded character with the correct one in a given
     HTML string.
@@ -830,6 +832,7 @@ def _replace_incorrectly_encoded_chars(soup_context):
     for bad_char, good_char in CHAR_MAPPING_TUPLES:
         html_string = html_string.replace(bad_char, good_char)
     return html_string
+
 
 def fix_incorrectly_encoded_chars(html_string):
     """Replaces incorrectly encoded character with the correct one in a given
@@ -847,6 +850,7 @@ def fix_incorrectly_encoded_chars(html_string):
             _replace_incorrectly_encoded_chars
         )
     )
+
 
 def _process_string_with_components(html_string, conversion_fn):
     """Executes the provided conversion function after parsing complex RTE
