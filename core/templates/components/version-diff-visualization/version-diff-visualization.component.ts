@@ -114,7 +114,7 @@ angular.module('oppia').component('versionDiffVisualization', {
       let modalRef: NgbModalRef = NgbModal.open(StateDiffModalComponent, {
         backdrop: true,
         windowClass: 'state-diff-modal',
-        size: 'lg'
+        size: 'xl'
       });
       modalRef.componentInstance.newStateName = newStateName;
       modalRef.componentInstance.oldStateName = oldStateName;
