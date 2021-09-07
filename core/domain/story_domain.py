@@ -405,7 +405,8 @@ class StoryNode(python_utils.OBJECT):
                 'Chapter description should be less than %d chars, received %s'
                 % (description_length_limit, self.description))
 
-        title_limit = android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE
+        title_limit = (
+            android_validation_constants.MAX_CHARS_IN_EXPLORATION_TITLE)
         if len(self.title) > title_limit:
             raise utils.ValidationError(
                 'Chapter title should be less than %d chars, received %s'

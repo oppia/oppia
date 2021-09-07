@@ -24,7 +24,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -80,7 +80,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -255,7 +255,7 @@ class TopicModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -360,7 +360,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -556,7 +556,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to topics and their rights.
         """

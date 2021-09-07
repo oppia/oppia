@@ -58,7 +58,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
-    'generatedParser.ts',
     'google-analytics.initializer.ts',
     'language-util.service.ts',
     'learner-answer-info.service.ts',
@@ -81,22 +80,19 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-html-viewer.directive.ts',
     'schema-based-list-viewer.directive.ts',
     'select2-dropdown.directive.ts',
-    'shared.ts',
     'state-card.model.ts',
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
     'story-node.model.ts',
-    'student.ts',
     'subtopic.model.ts',
-    'teacher.ts',
-    'teacher2.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
     'tutor-card.directive.ts',
-    'unit-test-utils.ajs.ts', # Please don't try to cover this file.
+    # Please don't try to cover `unit-test-utils.ajs.ts` file.
+    'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
 ]
 

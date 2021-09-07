@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -63,7 +63,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -247,7 +247,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -298,7 +298,8 @@ class SkillOpportunityModel(base_models.BaseModel):
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
         plus_one_query_models, _, _ = (
-            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+            created_on_query.fetch_page(
+                page_size + 1, start_cursor=start_cursor))
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (

@@ -25,8 +25,8 @@ from core.platform import models
 
 from google.cloud import ndb
 
-from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, ContextManager, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
+from typing import (
+    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -52,7 +52,7 @@ JsonProperty = ndb.JsonProperty
 StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
-TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)  # pylint: disable=invalid-name
+TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model) # pylint: disable=invalid-name
 
 CLIENT = ndb.Client()
 
@@ -91,7 +91,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
 
 
 def update_timestamps_multi(
-        entities: 'Sequence[base_models.BaseModel]',
+        entities: Sequence['base_models.BaseModel'],
         update_last_updated_time: bool = True
 ) -> None:
     """Update the created_on and last_updated fields of all given entities.
@@ -107,7 +107,7 @@ def update_timestamps_multi(
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[Text]:
+def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
     """Stores a sequence of Model instances.
 
     Args:
@@ -146,6 +146,8 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
+# Here Any is used in the type annotation because it mimics the types defined in
+# the stubs for this library.
 def query_everything(**kwargs: Dict[str, Any]) -> ndb.Query:
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
@@ -203,7 +205,7 @@ def make_cursor(urlsafe_cursor: Optional[str] = None) -> Cursor:
 
 
 def fetch_multiple_entities_by_ids_and_models(
-        ids_and_models: List[Tuple[Text, List[Text]]]
+        ids_and_models: List[Tuple[str, List[str]]]
 ) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]:
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
