@@ -23,8 +23,6 @@ describe('VersionDiffVisualizationComponent', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
-  let $uibModal = null;
-  let $q = null;
   let ngbModal: NgbModal = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -33,8 +31,6 @@ describe('VersionDiffVisualizationComponent', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
     ngbModal = TestBed.inject(NgbModal);
 
     ctrl = $componentController('versionDiffVisualization', {
@@ -185,8 +181,8 @@ describe('VersionDiffVisualizationComponent', () => {
           leftPane: undefined,
           rightPane: undefined,
         }
-      }
-    }
+      };
+    };
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
       return <NgbModalRef>({
@@ -234,8 +230,8 @@ describe('VersionDiffVisualizationComponent', () => {
           leftPane: undefined,
           rightPane: undefined,
         }
-      }
-    }
+      };
+    };
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
       return <NgbModalRef>({

@@ -17,9 +17,9 @@
  *   versions of an exploration.
  */
 
-import { StateDiffModalComponent }
- from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
-import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { StateDiffModalComponent } from
+  'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -137,7 +137,7 @@ angular.module('oppia').component('versionDiffVisualization', {
       modalRef.componentInstance.headers = {
         leftPane: ctrl.getEarlierVersionHeader(),
         rightPane: ctrl.getLaterVersionHeader()
-      }
+      };
 
       modalRef.result.then(function() {}, function() {
         // Note to developers:

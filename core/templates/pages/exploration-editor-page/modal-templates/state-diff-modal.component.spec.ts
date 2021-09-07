@@ -142,7 +142,7 @@ describe('State Diff Modal Component', () => {
     it('should evaluate yaml strings object when timeout tasks are flushed',
       fakeAsync(() => {
         spyOn(sdmbas, 'fetchYaml').and.returnValue(Promise.resolve({
-            yaml: 'Yaml data'
+          yaml: 'Yaml data'
         }));
 
         spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
