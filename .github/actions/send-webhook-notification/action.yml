@@ -11,5 +11,11 @@ runs:
   using: "composite"
   steps:
     - name: 'Send notification'
-      run: "curl -X POST -H 'Content-Type: application/json' $INPUT_WEBHOOKURL -d '{text: $INPUT_MESSAGE}'"
+      run: |
+        curl -X POST \
+        -H 'Content-Type: application/json' \
+        $INPUT_WEBHOOKURL \
+        --data '{
+          "text": $INPUT_MESSAGE
+        }'
       shell: bash
