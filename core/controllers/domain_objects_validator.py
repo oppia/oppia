@@ -41,7 +41,7 @@ def validate_exploration_change(obj: Dict[str, Any]) -> None:
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
+    return exp_domain.ExplorationChange(obj)
 
 
 def validate_new_config_property_values(obj: Dict[str, Any]) -> None:
@@ -60,6 +60,8 @@ def validate_new_config_property_values(obj: Dict[str, Any]) -> None:
             raise Exception('%s do not have any schema.' % name)
 
         config_property.normalize(value)
+
+    return obj
 
 
 def validate_change_dict_for_blog_post(change_dict: Dict[str, Any]) -> None:
@@ -85,6 +87,8 @@ def validate_change_dict_for_blog_post(change_dict: Dict[str, Any]) -> None:
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
 
+    return change_dict
+
 
 def validate_collection_change(obj: Dict[str, Any]) -> None:
     """Validates collection change.
@@ -94,7 +98,7 @@ def validate_collection_change(obj: Dict[str, Any]) -> None:
     """
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
-    collection_domain.CollectionChange(obj) # type: ignore[no-untyped-call]
+    return collection_domain.CollectionChange(obj)
 
 
 def validate_state_dict(state_dict: Dict[str, Any]) -> None:
