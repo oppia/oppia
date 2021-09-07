@@ -59,7 +59,7 @@ var ExplorationEditorTranslationTab = function() {
       'Finish Tutorial Stage button is not clickable');
     var buttons = finishTutorialButton;
     if (await buttons.count() === 1) {
-      await buttons.get(0).click();
+      await action.click('Finish tutorial stage first button', buttons.get(0));
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -85,7 +85,7 @@ var ExplorationEditorTranslationTab = function() {
         'Next Tutorial Stage button is not clickable');
       var buttons = nextTutorialStageButton;
       if (await buttons.count() === 1) {
-        await buttons.get(0).click();
+        await action.click('Next tutorial stage button', buttons.get(0));
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
@@ -99,7 +99,9 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       translationWelcomeModal,
       'Translation welcome modal takes too long to appear');
-    await translationTabStartTutorialElement.click();
+    await action.click(
+      'Translation tab start tutorial element',
+      translationTabStartTutorialElement);
     await waitFor.visibilityOf(
       titleElement, 'Translation tutorial modal takes too long to appear');
   };
@@ -219,11 +221,13 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       deleteRecordButton,
       'Delete Record button is not clickable');
-    await deleteRecordButton.click();
+    await action.click('Delete record button', deleteRecordButton);
     await waitFor.elementToBeClickable(
       confirmDeleteRecordButton,
       'The confirm record deletion button is not clickable');
-    await confirmDeleteRecordButton.click();
+    await action.click(
+      'Confirm delete record button',
+      confirmDeleteRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -243,7 +247,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       startRecordButton,
       'Add Record button is not clickable');
-    await startRecordButton.click();
+    await action.click('Start record button', startRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -251,7 +255,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       stopRecordButton,
       'Stop Record button is not clickable');
-    await stopRecordButton.click();
+    await action.click('Stop record button', stopRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -259,7 +263,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       confirmRecordButton,
       'Confirm record addition is not clickable');
-    await confirmRecordButton.click();
+    await action.click('Confirm record button', confirmRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -267,7 +271,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       playRecordButton,
       'Play Record button is not clickable');
-    await playRecordButton.click();
+    await action.click('Play record button', playRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -282,7 +286,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       editTranslationButtton,
       'editTranslationButtton taking too long to appear to set content');
-    await editTranslationButtton.click();
+    await action.click('Edit translation button', editTranslationButtton);
     var stateTranslationEditorTag = element(
       by.tagName('state-translation-editor'));
     var stateTranslationEditor = stateTranslationEditorTag.element(
@@ -294,7 +298,7 @@ var ExplorationEditorTranslationTab = function() {
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     expect(await saveTranslationButton.isDisplayed()).toBe(true);
-    await saveTranslationButton.click();
+    await action.click('Save translation button', saveTranslationButton);
     await waitFor.invisibilityOf(
       saveTranslationButton,
       'State translation editor takes too long to disappear');
@@ -321,7 +325,9 @@ var ExplorationEditorTranslationTab = function() {
       __dirname, relativePathOfAudioToUpload);
     await audioUploadInput.sendKeys(audioAbsolutePath);
     // A fake click to trigger onChange event for audioUploadInput.
-    await audioUploadContainerElement.click();
+    await action.click(
+      'Audio upload container element',
+      audioUploadContainerElement);
     await waitFor.visibilityOf(
       audioUploadErrorMessageElement,
       'Audio upload error message element is not visible');
@@ -336,7 +342,7 @@ var ExplorationEditorTranslationTab = function() {
     await audioUploadInput.sendKeys(audioAbsolutePath);
     await waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
-    await saveUploadedAudioButton.click();
+    await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.visibilityOf(
       audioOverFiveMinutesErrorMessageElement, 'Error element is not visible');
     await expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
@@ -351,14 +357,16 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       closeAudioUploaderModalButton,
       'Close audio uploader modal button is not clickable');
-    await closeAudioUploaderModalButton.click();
+    await action.click(
+      'Close audio uploader modal button',
+      closeAudioUploaderModalButton);
   };
 
   this.playOrPauseAudioFile = async function() {
     await waitFor.visibilityOf(
       playPauseAudioButton,
       'Play or pause audio button is taking too long to appear');
-    await playPauseAudioButton.click();
+    await action.click('Play pause audio button', playPauseAudioButton);
     return await this._isAudioPlaying();
   };
 
@@ -391,7 +399,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       voiceoverModeButton,
       'Voiceover Mode switch is taking too long to appear');
-    await voiceoverModeButton.click();
+    await action.click('Voiceover mode button', voiceoverModeButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -399,7 +407,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       translationModeButton,
       'Translation Mode switch is taking too long to appear');
-    await translationModeButton.click();
+    await action.click('Translation mode button', translationModeButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -440,17 +448,19 @@ var ExplorationEditorTranslationTab = function() {
   this.expectContentTabContentToMatch = async function(content) {
     await waitFor.elementToBeClickable(
       contentTabButton, 'Content Tab button is not clickable');
-    await contentTabButton.click();
+    await action.click('Content tab button', contentTabButton);
     expect(await contentTabText.getText()).toMatch(content);
   };
 
   this.expectFeedbackTabContentsToMatch = async function(contents) {
     await waitFor.elementToBeClickable(
       feedbackTabButton, 'Feedback Tab button is not clickable');
-    await feedbackTabButton.click();
+    await action.click('Feedback tab button', feedbackTabButton);
     expect(await feedbackList.count()).toEqual(contents.length);
     for (var index in contents) {
-      await translationFeedback(index).click();
+      await action.click(
+        'Translation feeback button',
+        translationFeedback(index));
       expect(await translationFeedbackText(index).getText()).toMatch(
         contents[index]);
     }
@@ -459,9 +469,9 @@ var ExplorationEditorTranslationTab = function() {
   this.expectHintsTabContentsToMatch = async function(contents) {
     await waitFor.elementToBeClickable(
       hintsTabButton, 'Hints Tab button is not clickable');
-    await hintsTabButton.click();
+    await action.click('Hints tab button', hintsTabButton);
     for (var index in contents) {
-      await translationHint(index).click();
+      await action.click('Translation hint', translationHint(index));
       expect(await translationHintText(index).getText()).toMatch(
         contents[index]);
     }
@@ -470,7 +480,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectSolutionTabContentToMatch = async function(content) {
     await waitFor.elementToBeClickable(
       solutionTabButton, 'Solution Tab button is not clickable');
-    await solutionTabButton.click();
+    await action.click('Solution tab button', solutionTabButton);
     expect(await solutionTabText.getText()).toMatch(content);
   };
 
@@ -537,7 +547,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       feedbackTabButton,
       'Feedback tab of translation page is not clickable');
-    await feedbackTabButton.click();
+    await action.click('Feedback tab button', feedbackTabButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -555,7 +565,7 @@ var ExplorationEditorTranslationTab = function() {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
-        await stateNodes.get(i).click();
+        await action.click('State node', stateNodes.get(i));
         matched = true;
       }
     }
