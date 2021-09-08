@@ -341,9 +341,8 @@ class HangingIndentChecker(checkers.BaseChecker):
                         else:
                             last_content_before_comment = (
                                 split_content[comment_index - 1])
-                            if (
-                                    last_content_before_comment.endswith('(') or
-                                    last_content_before_comment.endswith('[')
+                            if last_content_before_comment.endswith(
+                                    ('(', '[', '{')
                             ):
                                 continue
                     self.add_message(

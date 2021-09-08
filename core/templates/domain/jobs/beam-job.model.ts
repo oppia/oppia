@@ -18,15 +18,12 @@
 
 export interface BeamJobBackendDict {
   'name': string;
-  'parameter_names': string[];
 }
 
 export class BeamJob {
-  constructor(
-      public readonly name: string,
-      public readonly parameterNames: readonly string[] = []) {}
+  constructor(public readonly name: string) {}
 
   static createFromBackendDict(backendDict: BeamJobBackendDict): BeamJob {
-    return new BeamJob(backendDict.name, backendDict.parameter_names);
+    return new BeamJob(backendDict.name);
   }
 }
