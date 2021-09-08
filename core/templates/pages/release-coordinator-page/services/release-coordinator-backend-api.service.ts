@@ -165,11 +165,9 @@ export class ReleaseCoordinatorBackendApiService {
     );
   }
 
-  startNewBeamJob(
-      beamJob: BeamJob, jobArguments: string[]): Observable<BeamJobRun> {
+  startNewBeamJob(beamJob: BeamJob): Observable<BeamJobRun> {
     return this.http.put<BeamJobRunBackendDict>('/beam_job_run', {
-      job_name: beamJob.name,
-      job_arguments: jobArguments,
+      job_name: beamJob.name
     }).pipe(map(BeamJobRun.createFromBackendDict));
   }
 

@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from core.platform import models
 from jobs import base_jobs
-from jobs import job_utils
 from jobs.io import ndb_io
 from jobs.types import blog_validation_errors
 
@@ -65,6 +64,8 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
         Returns:
             value. The value of the property of model.
         """
+        from jobs import job_utils
+
         return job_utils.get_model_property(model, self._property_name)
 
 
@@ -75,8 +76,7 @@ class BlogPostTitleUniquenessJob(base_jobs.JobBase):
         return (
             self.pipeline
             | 'Get every Blog Model' >> (
-                ndb_io.GetModels(
-                    blog_models.BlogPostModel.query()))
+                ndb_io.GetModels(blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [

@@ -63,10 +63,10 @@ describe('Beam Jobs Tab Component', () => {
   const beamJobs = [fooJob, barJob, bazJob];
 
   const runningFooJob = (
-    new BeamJobRun('123', 'FooJob', 'RUNNING', [], 0, 0, false));
+    new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false));
   const pendingBarJob = (
-    new BeamJobRun('456', 'BarJob', 'PENDING', [], 0, 0, false));
-  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', [], 0, 0, false);
+    new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false));
+  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
 
   beforeEach(waitForAsync(async() => {
@@ -212,7 +212,7 @@ describe('Beam Jobs Tab Component', () => {
     const input = await loader.getHarness(MatInputHarness);
 
     const newPendingFooJob = (
-      new BeamJobRun('123', 'FooJob', 'PENDING', [], 0, 0, false));
+      new BeamJobRun('123', 'FooJob', 'PENDING', 0, 0, false));
     const startNewJobSpy = spyOn(backendApiService, 'startNewBeamJob')
       .and.returnValue(of(newPendingFooJob));
 
@@ -235,7 +235,7 @@ describe('Beam Jobs Tab Component', () => {
     await confirmButton.click();
     await fixture.whenStable();
 
-    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob, []);
+    expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
   });
@@ -245,7 +245,7 @@ describe('Beam Jobs Tab Component', () => {
     const input = await loader.getHarness(MatInputHarness);
 
     const cancellingFooJob = (
-      new BeamJobRun('123', 'FooJob', 'CANCELLED', [], 0, 0, false));
+      new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false));
     const cancelBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
       .and.returnValue(of(cancellingFooJob));
 

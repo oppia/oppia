@@ -36,7 +36,6 @@ class BeamJob(python_utils.OBJECT):
 
     Attributes:
         name: str. The name of the class that implements the job's logic.
-        parameter_names: list(str). The names of the job's parameters.
     """
 
     def __init__(self, job_class: Type[base_jobs.JobBase]) -> None:
@@ -57,17 +56,6 @@ class BeamJob(python_utils.OBJECT):
         """
         return self._job_class.__name__
 
-    @property
-    def parameter_names(self) -> List[str]:
-        """Returns the names of the job's parameters.
-
-        Returns:
-            list(str). The names of the job's parameters.
-        """
-        # We don't want to include 'self' in the list; run() being a method
-        # should be considered an implementation detail.
-        return python_utils.get_args_of_function(self._job_class.run)[1:]
-
     def to_dict(self) -> Dict[str, Union[str, List[str]]]:
         """Returns a dict representation of the BeamJob.
 
@@ -75,12 +63,8 @@ class BeamJob(python_utils.OBJECT):
             dict(str: *). The dict has the following structure:
                 name: str. The name of the class that implements the job's
                     logic.
-                parameter_names: list(str). The names of the job's parameters.
         """
-        return {
-            'name': self.name,
-            'parameter_names': self.parameter_names,
-        }
+        return {'name': self.name}
 
 
 class BeamJobRun(python_utils.OBJECT):
@@ -92,7 +76,6 @@ class BeamJobRun(python_utils.OBJECT):
             logic.
         job_state: str. The state of the job at the time the model was last
             updated.
-        job_arguments: list(str). The arguments provided to the job run.
         job_started_on: datetime. The time at which the job was started.
         job_updated_on: datetime. The time at which the job's state was last
             updated.
@@ -108,7 +91,6 @@ class BeamJobRun(python_utils.OBJECT):
             job_id: str,
             job_name: str,
             job_state: str,
-            job_arguments: List[str],
             job_started_on: datetime.datetime,
             job_updated_on: datetime.datetime,
             job_is_synchronous: bool
@@ -121,7 +103,6 @@ class BeamJobRun(python_utils.OBJECT):
                 logic.
             job_state: str. The state of the job at the time the model was last
                 updated.
-            job_arguments: list(str). The arguments provided to the job run.
             job_started_on: datetime. The time at which the job was started.
             job_updated_on: datetime. The time at which the job's state was last
                 updated.
@@ -131,7 +112,6 @@ class BeamJobRun(python_utils.OBJECT):
         self.job_id = job_id
         self.job_name = job_name
         self.job_state = job_state
-        self.job_arguments = job_arguments
         self.job_started_on = job_started_on
         self.job_updated_on = job_updated_on
         self.job_is_synchronous = job_is_synchronous
@@ -162,7 +142,6 @@ class BeamJobRun(python_utils.OBJECT):
                     job's logic.
                 job_state: str. The state of the job at the time the model was
                     last updated.
-                job_arguments: list(str). The arguments provided to the job run.
                 job_started_on_msecs: float. The number of milliseconds since
                     UTC epoch at which the job was created.
                 job_updated_on_msecs: float. The number of milliseconds since
@@ -174,7 +153,6 @@ class BeamJobRun(python_utils.OBJECT):
             'job_id': self.job_id,
             'job_name': self.job_name,
             'job_state': self.job_state,
-            'job_arguments': self.job_arguments,
             'job_started_on_msecs': (
                 utils.get_time_in_millisecs(self.job_started_on)),
             'job_updated_on_msecs': (

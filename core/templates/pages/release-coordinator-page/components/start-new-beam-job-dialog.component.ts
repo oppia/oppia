@@ -46,7 +46,7 @@ export class StartNewBeamJobDialogComponent {
     this.isRunning = true;
     this.matDialogRef.disableClose = true;
 
-    this.backendApiService.startNewBeamJob(this.beamJob, []).pipe(
+    this.backendApiService.startNewBeamJob(this.beamJob).pipe(
       take(1),
       catchError(error => {
         this.alertsService.addWarning(error.message);

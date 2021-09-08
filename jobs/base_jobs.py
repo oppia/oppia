@@ -62,7 +62,7 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Any, Dict, List, Tuple, Type # isort: skip
+from typing import Any, Dict, List, Tuple, Type, cast # isort: skip
 
 
 class JobMetaclass(type):
@@ -75,7 +75,7 @@ class JobMetaclass(type):
     code should simply inherit from the JobBase class, found below.
     """
 
-    _JOB_REGISTRY: Dict[str, JobMetaclass] = {}
+    _JOB_REGISTRY: Dict[str, Type[JobBase]] = {}
 
     def __new__(
             cls: Type[JobMetaclass],
@@ -112,13 +112,19 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
 
+        if name == 'JobBase':
+            return job_cls
+
         if not name.endswith('Base'):
-            cls._JOB_REGISTRY[name] = job_cls
+            if issubclass(job_cls, JobBase):
+                cls._JOB_REGISTRY[name] = cast(Type[JobBase], job_cls)
+            else:
+                raise TypeError('%s must inherit from JobBase' % name)
 
         return job_cls
 
     @classmethod
-    def get_all_jobs(cls) -> List[JobMetaclass]:
+    def get_all_jobs(cls) -> List[Type[JobBase]]:
         """Returns all jobs that have inherited from the JobBase class.
 
         Returns:
@@ -137,7 +143,7 @@ class JobMetaclass(type):
         return list(cls._JOB_REGISTRY.keys())
 
     @classmethod
-    def get_job_class_by_name(cls, job_name: str) -> JobMetaclass:
+    def get_job_class_by_name(cls, job_name: str) -> Type[JobBase]:
         """Returns the class associated with the given job name.
 
         Args:

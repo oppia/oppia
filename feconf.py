@@ -494,6 +494,11 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
+# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
+# buckets. It's OK for them to be the same.
+DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
+DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
+
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'

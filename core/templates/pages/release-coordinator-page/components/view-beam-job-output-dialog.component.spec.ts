@@ -37,7 +37,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('View beam job output dialog', () => {
-  const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', [], 0, 0, false);
+  const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', 0, 0, false);
 
   let fixture: ComponentFixture<ViewBeamJobOutputDialogComponent>;
   let component: ViewBeamJobOutputDialogComponent;
