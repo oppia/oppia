@@ -166,13 +166,18 @@ class ExplorationOpportunitySummaryModelRegenerationJobTests(job_test_utils.JobT
                 'new_value': '1'
             })], 'Changes.')
 
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+
+        opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
+            all_opportunity_models)
+            
+
     def test_regeneration_job_returns_the_initial_opportunity(self):
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        self.assertEqual(len(all_opportunity_models), 2)
-        old_opportunities, _, more = (
-            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS'),
@@ -181,11 +186,3 @@ class ExplorationOpportunitySummaryModelRegenerationJobTests(job_test_utils.JobT
         all_opportunity_models = list(
             opportunity_models.ExplorationOpportunitySummaryModel.get_all())
         self.assertEqual(len(all_opportunity_models), 2)
-
-        new_opportunities, _, more = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertFalse(more)
-
-        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
-        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
-        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)

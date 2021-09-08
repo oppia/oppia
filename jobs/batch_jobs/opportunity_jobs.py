@@ -46,8 +46,34 @@ topic_models, story_models,) = (
         models.NAMES.topic, models.NAMES.story]))
 
 
+class ExplorationOpportunitySummaryModelDeletionJob(base_jobs.JobBase):
+    """Job that deletes ExplorationOpportunitySummaryModel."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        deleting ExplorationOpportunitySummaryModel.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            deleting ExplorationOpportunitySummaryModel.
+        """
+        exp_oppurtunity_models = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                        include_deleted=False))
+        (
+            self.pipeline 
+            | beam.Create([model.key for model in exp_oppurtunity_models])
+            | 'Delete all models' >> ndb_io.DeleteModels()
+        )
+        
+        return beam.Create([job_run_result.JobRunResult(stdout='SUCCESS')])
+
+
 class ExplorationOpportunitySummaryModelRegenerationJob(base_jobs.JobBase):
-    """Job that regenerates ExplorationOpportunitySummaryModel."""
+    """Job that regenerates ExplorationOpportunitySummaryModel.
+    Note: The ExplorationOpportunitySummaryModelDeletionJob has to be run
+    before this job.
+    """
 
     @staticmethod
     def _regenerate_opportunities_related_to_topic(topic, stories_dict, exploration_dict):
@@ -116,7 +142,7 @@ class ExplorationOpportunitySummaryModelRegenerationJob(base_jobs.JobBase):
                 }
         
 
-    def run(self) -> beam.PCollection:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
         generating ExplorationOpportunitySummaryModel.
 
@@ -124,15 +150,6 @@ class ExplorationOpportunitySummaryModelRegenerationJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             generating ExplorationOpportunitySummaryModel.
         """
-        # pre start hook
-        exp_oppurtunity_models = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all(
-                        include_deleted=False))
-        (
-            self.pipeline 
-            | beam.Create([model.key for model in exp_oppurtunity_models])
-            | 'Delete all models' >> ndb_io.DeleteModels()
-        )
 
         topics = (
             self.pipeline
