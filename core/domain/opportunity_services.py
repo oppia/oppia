@@ -30,8 +30,8 @@ from core.domain import topic_fetchers
 from core.platform import models
 import utils
 
-(opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.opportunity])
+(opportunity_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.opportunity, models.NAMES.suggestion])
 
 # NOTE TO DEVELOPERS: The functions:
 #   - delete_all_exploration_opportunity_summary_models()
@@ -86,12 +86,21 @@ def get_exploration_opportunity_summary_from_model(model):
     new_incomplete_translation_language_codes = (
         model.incomplete_translation_language_codes + missing_language_codes)
 
+    
+    translation_in_review_counts = {}
+    for lc in constants.SUPPORTED_CONTENT_LANGUAGES:
+        in_review_count = len(suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_in_review_with_exp_id(
+                model.id, lc['code']))
+        if in_review_count > 0:
+            translation_in_review_counts[lc['code']] = in_review_count
+
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
         new_incomplete_translation_language_codes, model.translation_counts,
         model.language_codes_needing_voice_artists,
-        model.language_codes_with_assigned_voice_artists)
+        model.language_codes_with_assigned_voice_artists, translation_in_review_counts)
 
 
 def _save_multi_exploration_opportunity_summary(
@@ -182,7 +191,7 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
             exploration.id, topic.id, topic.name, story.id, story.title,
             story_node.title, content_count,
             list(incomplete_translation_language_codes), translation_counts,
-            list(language_codes_needing_voice_artists), []))
+            list(language_codes_needing_voice_artists), [], {}))
 
     return exploration_opportunity_summary
 

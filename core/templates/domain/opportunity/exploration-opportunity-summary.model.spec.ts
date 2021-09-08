@@ -34,6 +34,9 @@ describe('Exploration opportunity summary model', () => {
         content_count: 100,
         translation_counts: {
           hi: 15
+        },
+        translation_in_review_counts: {
+          hi: 20
         }
       };
     });
@@ -81,6 +84,55 @@ describe('Exploration opportunity summary model', () => {
       expect(
         explorationOpportunitySummary.getTranslationProgressPercentage('hi'))
         .toEqual(15);
+    });
+
+    it('should return a correct translations in review counts', () => {
+      let explorationOpportunitySummary = (
+        ExplorationOpportunitySummary.createFromBackendDict(
+          backendDict));
+
+      expect(
+        explorationOpportunitySummary.getTranslationsInReviewCount('hi'))
+        .toEqual(20);
+    });
+
+    it('should return a correct translations counts if available', () => {
+      let explorationOpportunitySummary = (
+        ExplorationOpportunitySummary.createFromBackendDict(
+          backendDict));
+
+      expect(
+        explorationOpportunitySummary.getTranslationsCount('hi'))
+        .toEqual(15);
+    });
+
+    it('should return a correct translations counts if not available', () => {
+      let explorationOpportunitySummary = (
+        ExplorationOpportunitySummary.createFromBackendDict(
+          backendDict));
+
+      expect(
+        explorationOpportunitySummary.getTranslationsCount('en'))
+        .toEqual(0);
+    });
+
+    it('should return a correct translations counts if no contents available', () => {
+      const backendDictWithNoContents = {
+        id: 'exp_id',
+        topic_name: 'Topic',
+        story_title: 'A new story',
+        chapter_title: 'Introduction',
+        content_count: 0,
+        translation_counts: {},
+        translation_in_review_counts: {}
+      };
+      let explorationOpportunitySummary = (
+        ExplorationOpportunitySummary.createFromBackendDict(
+          backendDictWithNoContents));
+
+      expect(
+        explorationOpportunitySummary.getTranslationsCount('en'))
+        .toEqual(0);
     });
 
     it('should return a correct translation progress percentage for non ' +

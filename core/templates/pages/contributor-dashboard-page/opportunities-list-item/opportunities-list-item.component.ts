@@ -27,6 +27,9 @@ export interface ExplorationOpportunity {
   labelColor: string;
   progressPercentage: number;
   subheading?: string;
+  inReviewCount: number;
+  totalCount: number;
+  translationsCount: number;
 }
 
 @Component({
@@ -47,7 +50,11 @@ export class OpportunitiesListItemComponent {
   labelStyle: { 'background-color': string; };
   progressPercentage: string;
   progressBarStyle: { width: string; };
+  translatedProgressStyle: { width: string; };
+  inReviewProgressStyle: { width: string; };
+  untranslatedProgressStyle: { width: string; };
   isCorrespondingOpportunityDeleted: boolean = false;
+  isTranslationProgressBar: boolean = false;
 
   ngOnInit(): void {
     if (this.opportunity && this.labelRequired) {
@@ -64,7 +71,18 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage = (
           this.opportunity.progressPercentage + '%');
-        this.progressBarStyle = { width: this.progressPercentage };
+        if(this.opportunity.translationsCount) {
+          this.isTranslationProgressBar = true;
+          const translatedPercentage = (this.opportunity.translationsCount / this.opportunity.totalCount) * 100;
+          const inReviewTranslationsPercentage = (this.opportunity.inReviewCount / this.opportunity.totalCount) * 100;
+          const untranslatedPercentage = (100 - (translatedPercentage + inReviewTranslationsPercentage));
+
+          this.translatedProgressStyle = { width: translatedPercentage + '%' };
+          this.untranslatedProgressStyle = { width: untranslatedPercentage + '%' };
+          this.inReviewProgressStyle = { width: inReviewTranslationsPercentage + '%' };
+        } else {
+          this.progressBarStyle = { width: this.progressPercentage };
+        }
       }
       this.opportunityDataIsLoading = false;
       if (this.opportunity.subheading ===

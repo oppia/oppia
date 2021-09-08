@@ -16,8 +16,13 @@
   </div>
   <div class="oppia-opportunities-progress oppia-animate-fadein" *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
-      <div [hidden]="opportunityDataIsLoading" class="progress">
+      <div [hidden]="opportunityDataIsLoading" *ngIf="!isTranslationProgressBar" class="progress">
         <div class="progress-bar bg-success" role="progressbar" [ngStyle]="progressBarStyle"></div>
+      </div>
+      <div [hidden]="opportunityDataIsLoading"  *ngIf="isTranslationProgressBar" class="progress">
+        <div class="progress-bar bg-success" role="progressbar" [ngStyle]="translatedProgressStyle" ngbTooltip="accepted({{opportunity.translationsCount}}/{{opportunity.totalCount}})" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light-green" role="progressbar" [ngStyle]="inReviewProgressStyle" ngbTooltip="waiting review({{opportunity.inReviewCount}}/{{opportunity.totalCount}})" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light" role="progressbar" [ngStyle]="untranslatedProgressStyle" ngbTooltip="untranslated({{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}})" container="body" placement="bottom"></div>
       </div>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -44,6 +49,9 @@
   </div>
 </div>
 <style>
+  .bg-light-green {
+    background-color: rgb(172, 197, 172);
+  }
   .oppia-opportunities-button {
     background-color: #fff;
     border: 2px solid #009688;

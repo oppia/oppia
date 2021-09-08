@@ -26,6 +26,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
+import { TranslateTextService } from '../services/translate-text.service';
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -41,6 +42,7 @@ export class TranslationOpportunitiesComponent {
     private readonly modalService: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translationLanguageService: TranslationLanguageService,
+    private readonly translateTextService: TranslateTextService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
     private readonly injector: Injector
@@ -69,7 +71,10 @@ export class TranslationOpportunitiesComponent {
         heading: heading,
         subheading: subheading,
         progressPercentage: progressPercentage.toFixed(2),
-        actionButtonTitle: 'Translate'
+        actionButtonTitle: 'Translate',
+        inReviewCount: opportunity.getTranslationsInReviewCount(languageCode),
+        totalCount: opportunity.getContentCount(),
+        translationsCount: opportunity.getTranslationsCount(languageCode)
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       opportunitiesDicts.push(opportunityDict);
