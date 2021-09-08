@@ -39,7 +39,8 @@
 /core/templates/domain/ @kevintab95
 /core/templates/pages/ @srijanreddy98
 /core/templates/services/ @nithusha21
-/extensions/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/extensions/ @seanlip
 /scripts/ @DubeySandeep
 
 
@@ -71,9 +72,13 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
 /core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @darksun27
-/typings/ @vojtechjelinek
-/tsconfig.json @vojtechjelinek
-/tsconfig-strict.json @vojtechjelinek
+
+
+# Typings
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/typings/ @srijanreddy98
+/tsconfig.json @srijanreddy98
+/tsconfig-strict.json @srijanreddy98
 
 
 # Answer classification team.
@@ -118,9 +123,11 @@
 # Contributor Dashboard project.
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
-/core/domain/translation*.py @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/domain/translation*.py @sagangwee
 /core/domain/voiceover_services*.py @sagangwee
-/core/storage/translation/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/storage/translation/ @sagangwee
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 /core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
@@ -134,7 +141,8 @@
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
 /core/templates/pages/about-page/about-page.constants.ts @seanlip
-/core/templates/pages/license-page/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/pages/license-page/ @seanlip
 /core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
@@ -183,7 +191,8 @@
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
-/scripts/typescript_checks*.py @vojtechjelinek @DubeySandeep
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/scripts/typescript_checks*.py @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
 /scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
@@ -194,14 +203,16 @@
 # Exploration project.
 /core/controllers/editor*.py @aks681 @rohitkatlaa
 /core/controllers/reader*.py @aks681
-/core/controllers/resources*.py @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/controllers/resources*.py @aks681
 /core/domain/exp*.py @aks681
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
 /core/domain/rating_services*.py @aks681
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
-/core/domain/value_generators_domain*.py @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/domain/value_generators_domain*.py @aks681
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
@@ -240,8 +251,10 @@
 
 
 # Google-app-engine configurations
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/app_dev.yaml @nithusha21
 /cron.yaml @nithusha21
-/index.yaml @vojtechjelinek
+/index.yaml @nithusha21
 /queue.yaml @nithusha21
 
 
@@ -316,18 +329,23 @@
 /core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
-/core/templates/expressions/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/expressions/ @iamprayush
 /core/templates/services/code-normalizer.service*.ts @iamprayush
 /core/templates/services/guppy-configuration.service.ts @iamprayush
 /core/templates/services/guppy-initialization.service.ts @iamprayush
 /core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @iamprayush
-/extensions/interactions/ @iamprayush @vojtechjelinek
-/extensions/objects/ @iamprayush @vojtechjelinek
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/extensions/interactions/ @iamprayush
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/extensions/objects/ @iamprayush
 /extensions/objects/templates/filepath-editor.component*.ts @kevintab95
 /extensions/objects/templates/filepath-editor.component.html @kevintab95
-/extensions/value_generators/ @iamprayush @vojtechjelinek
-/extensions/__init__.py @iamprayush @vojtechjelinek
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/extensions/value_generators/ @iamprayush
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/extensions/__init__.py @iamprayush
 
 
 # Lesson Analytics team.
@@ -457,10 +475,11 @@
 
 
 # Infrastructure.
-/jobs/ @vojtechjelinek
-/jobs/transforms @rohitkatlaa @vojtechjelinek
-/jobs/types @rohitkatlaa @vojtechjelinek
-/core/templates/domain/jobs/ @vojtechjelinek
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/jobs/ @rohitkatlaa
+/jobs/transforms @rohitkatlaa
+/jobs/types @rohitkatlaa
+/core/templates/domain/jobs/ @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main*.py @DubeySandeep @nithusha21
@@ -469,18 +488,21 @@
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
 /core/controllers/beam_jobs*.py @brianrodri
-/core/domain/beam_job*.py @vojtechjelinek
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/core/domain/beam_job*.py @rohitkatlaa
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
-/core/platform/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/platform/ @seanlip
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
-/core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek
+/core/templates/pages/interaction-specs.constants.ajs.ts @nithusha21
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
-/core/templates/pages/login-page/ @vojtechjelinek
-/core/templates/pages/logout-page/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/pages/login-page/ @seanlip
+/core/templates/pages/logout-page/ @seanlip
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
@@ -490,7 +512,8 @@
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
 /redis.conf @seanlip
 /release_constants.json @nithusha21
-/.firebase.json @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/.firebase.json @seanlip
 
 
 # Miscellaneous.
@@ -503,13 +526,16 @@
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
-/extensions/extensions.module.ts @vojtechjelinek
-/mypy.ini @vojtechjelinek
-/mypy_imports.py @vojtechjelinek
-/mypy_requirements.txt @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/extensions/extensions.module.ts @seanlip
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/mypy.ini @hardikkat24 
+/mypy_imports.py @hardikkat24
+/mypy_requirements.txt @hardikkat24
 /python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
-/stubs/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/stubs/ @hardikkat24
 /utils*.py @aks681
 
 
@@ -528,10 +554,11 @@
 
 
 # Release team.
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
 /.gcloudignore @nithusha21
-/core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
-/core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
-/scripts/release_scripts/ @nithusha21 @vojtechjelinek
+/core/controllers/release_coordinator*.py @nithusha21
+/core/templates/pages/release-coordinator-page/ @nithusha21
+/scripts/release_scripts/ @nithusha21
 
 
 # Rich text editor team.
@@ -552,7 +579,8 @@
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
-/core/domain/rte_component_registry*.py @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/domain/rte_component_registry*.py @aks681
 /extensions/ckeditor_plugins/ @aks681
 /extensions/rich_text_components/ @aks681
 /assets/rich_text_components_definitions.ts @aks681
@@ -578,63 +606,67 @@
 
 
 # Simple pages.
-/core/controllers/pages*.py @vojtechjelinek
-/core/controllers/custom_landing_pages*.py @vojtechjelinek
-/core/templates/pages/contact-page/ @vojtechjelinek
-/core/templates/pages/delete-account-page/ @vojtechjelinek
-/core/templates/pages/donate-page/ @vojtechjelinek
-/core/templates/pages/error-pages/ @vojtechjelinek
-/core/templates/pages/get-started-page/ @vojtechjelinek
-/core/templates/pages/landing-pages/ @vojtechjelinek
-/core/templates/pages/maintenance-page/ @vojtechjelinek
-/core/templates/pages/partnerships-page/ @vojtechjelinek
-/core/templates/pages/pending-account-deletion-page/ @vojtechjelinek
-/core/templates/pages/preferences-page/ @vojtechjelinek
-/core/templates/pages/signup-page/ @vojtechjelinek
-/core/templates/pages/splash-page/ @vojtechjelinek
-/core/templates/pages/teach-page/ @vojtechjelinek
-/core/templates/pages/thanks-page/ @vojtechjelinek
-/core/templates/pages/participation-playbook/ @vojtechjelinek
-/core/templates/pages/about-foundation-page/ @vojtechjelinek
-/core/templates/pages/volunteer-page/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/controllers/pages*.py @kevintab95
+/core/controllers/custom_landing_pages*.py @kevintab95
+/core/templates/pages/contact-page/ @kevintab95
+/core/templates/pages/delete-account-page/ @kevintab95
+/core/templates/pages/donate-page/ @kevintab95
+/core/templates/pages/error-pages/ @kevintab95
+/core/templates/pages/get-started-page/ @kevintab95
+/core/templates/pages/landing-pages/ @kevintab95
+/core/templates/pages/maintenance-page/ @kevintab95
+/core/templates/pages/partnerships-page/ @kevintab95
+/core/templates/pages/pending-account-deletion-page/ @kevintab95
+/core/templates/pages/preferences-page/ @kevintab95
+/core/templates/pages/signup-page/ @kevintab95
+/core/templates/pages/splash-page/ @kevintab95
+/core/templates/pages/teach-page/ @kevintab95
+/core/templates/pages/thanks-page/ @kevintab95
+/core/templates/pages/participation-playbook/ @kevintab95
+/core/templates/pages/about-foundation-page/ @kevintab95
+/core/templates/pages/volunteer-page/ @kevintab95
+
 
 # Speed Improvement team.
-/app_dev.yaml @nithusha21 @vojtechjelinek
-/core/templates/google-analytics.initializer.ts @vojtechjelinek
-/core/templates/base-components/ @vojtechjelinek
-/core/templates/pages/Base.ts @vojtechjelinek
-/core/templates/pages/footer_js_libs.html @vojtechjelinek
-/core/templates/pages/header_css_libs.html @vojtechjelinek
-/core/templates/pages/header_js_libs.html @vojtechjelinek
-/core/templates/services/csrf-token.service*.ts @vojtechjelinek
-/core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
-/.lighthouserc*.js @jimbyo @vojtechjelinek
-/puppeteer-login-script.js @jimbyo @vojtechjelinek
-/scripts/run_lighthouse_tests.py @vojtechjelinek
-/webpack.*.ts @nithusha21 @vojtechjelinek
-
-
-# Typings.
-/typings @vojtechjelinek
-/typings/tests/ @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/google-analytics.initializer.ts @nithusha21
+/core/templates/base-components/ @nithusha21
+/core/templates/pages/Base.ts @nithusha21
+/core/templates/pages/footer_js_libs.html @nithusha21
+/core/templates/pages/header_css_libs.html @nithusha21
+/core/templates/pages/header_js_libs.html @nithusha21
+/core/templates/services/csrf-token.service*.ts @nithusha21
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/third-party-imports/ @nithusha21
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/.lighthouserc*.js @jimbyo
+/puppeteer-login-script.js @jimbyo
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/scripts/run_lighthouse_tests.py @DubeySandeep
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/webpack.*.ts @nithusha21
 
 
 # User Data Takeout.
-/core/domain/takeout_*.py @BenHenning @vojtechjelinek
-/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/core/domain/takeout_*.py @BenHenning
+/core/domain/wipeout_*.py @BenHenning
 
 
 # User’s profile page.
-/core/controllers/profile*.py @vojtechjelinek
-/core/templates/domain/user/ @vojtechjelinek
-/core/templates/pages/profile-page/ @vojtechjelinek
-/core/templates/services/user.service*.ts @vojtechjelinek
-/core/templates/services/user-backend-api.service*.ts @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/controllers/profile*.py @kevintab95
+/core/templates/domain/user/ @kevintab95
+/core/templates/pages/profile-page/ @kevintab95
+/core/templates/services/user.service*.ts @kevintab95
+/core/templates/services/user-backend-api.service*.ts @kevintab95
 
 
 # Service constants
-/core/templates/services/services.constants.ajs.ts @vojtechjelinek
-/core/templates/services/services.constants.ts @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/services/services.constants.ajs.ts @nithusha21
+/core/templates/services/services.constants.ts @nithusha21
 
 
 # Dynamic Feature Gating project
@@ -658,8 +690,9 @@
 
 
 # Data stability.
-/core/controllers/domain_objects_validator*.py @rohitkatlaa @vojtechjelinek
-/core/controllers/payload_validator*.py @rohitkatlaa @vojtechjelinek
+# TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
+/core/controllers/domain_objects_validator*.py @rohitkatlaa
+/core/controllers/payload_validator*.py @rohitkatlaa
 
 
 # QA team.
@@ -667,7 +700,8 @@
 /assets/ @nithusha21
 /data/ @nithusha21
 /core/controllers/android_e2e_config*.py @seanlip @BenHenning
-/core/templates/karma.module.ts @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/templates/karma.module.ts @DubeySandeep
 # TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
 /core/tests/protractor_utils/ @kevintab95 @SAEb-ai @U8NWXD
 /core/tests/protractor_desktop/ @kevintab95 @SAEb-ai @U8NWXD
@@ -683,11 +717,12 @@
 
 
 # Python 3 Migration project.
-/core/domain/auth*.py @vojtechjelinek
-/core/domain/caching*.py @vojtechjelinek
-/core/domain/taskqueue*.py @vojtechjelinek
-/core/templates/services/auth.service*.ts @vojtechjelinek
-/core/templates/services/auth-backend-api.service*.ts @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/core/domain/auth*.py @brianrodri
+/core/domain/caching*.py @brianrodri
+/core/domain/taskqueue*.py @brianrodri
+/core/templates/services/auth.service*.ts @brianrodri
+/core/templates/services/auth-backend-api.service*.ts @brianrodri
 
 
 # Critical files.
@@ -710,14 +745,16 @@
 /core/domain/role_services*.py @seanlip
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
-/requirements.txt @vojtechjelinek
-/requirements.in @vojtechjelinek
-/manifest.json @vojtechjelinek
-/package.json @vojtechjelinek
-/yarn.lock @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/requirements.txt @DubeySandeep
+/requirements.in @DubeySandeep
+/manifest.json @DubeySandeep
+/package.json @DubeySandeep
+/yarn.lock @DubeySandeep
 /scripts/install_third_party_libs.py @DubeySandeep
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
-/.github/stale.yml @vojtechjelinek
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
+/.github/stale.yml @DubeySandeep
 # TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
 /.github/workflows/ @DubeySandeep @SAEb-ai @U8NWXD
