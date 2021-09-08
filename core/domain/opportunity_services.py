@@ -88,7 +88,8 @@ def get_exploration_opportunity_summary_from_model(model):
 
     translation_in_review_counts = {}
     for lc in constants.SUPPORTED_CONTENT_LANGUAGES:
-        in_review_count = len(suggestion_models.GeneralSuggestionModel
+        in_review_count = len(
+            suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_in_review_with_exp_id(
                 model.id,
                 lc['code']))

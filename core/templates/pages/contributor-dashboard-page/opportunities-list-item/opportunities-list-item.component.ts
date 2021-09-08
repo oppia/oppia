@@ -75,10 +75,10 @@ export class OpportunitiesListItemComponent {
           this.isTranslationProgressBar = true;
           const translatedPercentage = (
             this.opportunity.translationsCount / this.opportunity.totalCount
-            ) * 100;
+          ) * 100;
           const inReviewTranslationsPercentage = (
             this.opportunity.inReviewCount / this.opportunity.totalCount
-            ) * 100;
+          ) * 100;
           const untranslatedPercentage = (
             100 - (translatedPercentage + inReviewTranslationsPercentage));
 
