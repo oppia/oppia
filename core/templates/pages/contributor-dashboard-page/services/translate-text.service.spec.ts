@@ -25,8 +25,8 @@ import { StateAndContent, TranslateTextService } from 'pages/contributor-dashboa
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
-  let httpTestingController;
-  const getTranslatableItem = (text) => {
+  let httpTestingController: HttpTestingController;
+  const getTranslatableItem = (text: string) => {
     return {
       data_format: 'html',
       content: text,
@@ -44,7 +44,7 @@ describe('TranslateTextService', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     stateContent = new StateAndContent(
       'stateName', 'contentId', 'contentText', 'pending', 'translation',
-      'html', 'content');
+      'html', 'content','interactionId','ruleType');
   });
 
   afterEach(() => {
