@@ -31,4 +31,5 @@ jobs:
       - uses: ./.github/actions/send-webhook-notification
         with:
           message: 'Test message from github-action build: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'
-          webhook-url: ${{ secrets.WEBHOOK_SECRET }}
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_SECRET }}

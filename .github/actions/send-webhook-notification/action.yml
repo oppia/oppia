@@ -1,9 +1,6 @@
 name: 'Send notifications to webhooks'
 description: 'This action sends notifications to the given webhooks.'
 inputs:
-  webhook-url:
-      description: 'The URL of the webhook'
-      required: true
   message:
     description: 'A message to send through webhook.'
     required: true
@@ -14,7 +11,7 @@ runs:
       run: |
         curl -X POST \
         -H 'Content-Type: application/json' \
-        \'${{ inputs.webhook-url }}\' \
+        \'${{ env.WEBHOOK_URL }}\' \
         -d '{
           "text": ${{ inputs.message }}
         }'
