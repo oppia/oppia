@@ -34,37 +34,37 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
   templateUrl: './thumbnail-uploader.component.html'
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
-  @Input() disabled: boolean;
-  @Input() useLocalStorage: boolean;
-  @Input() allowedBgColors: string[];
-  @Input() aspectRatio: string;
-  @Input() bgColor: string;
-  @Input() filename: string;
-  @Input() previewDescription: string;
-  @Input() previewDescriptionBgColor: string;
-  @Input() previewFooter: string;
-  @Input() previewTitle: string;
+  @Input() disabled!: boolean;
+  @Input() useLocalStorage!: boolean;
+  @Input() allowedBgColors!: string[];
+  @Input() aspectRatio!: string;
+  @Input() bgColor!: string;
+  @Input() filename!: string;
+  @Input() previewDescription!: string;
+  @Input() previewDescriptionBgColor!: string;
+  @Input() previewFooter!: string;
+  @Input() previewTitle!: string;
   @Output() updateBgColor: EventEmitter<string> = new EventEmitter() ;
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
   @Output() imageSave: EventEmitter<void> = new EventEmitter();
-  openInUploadMode: boolean;
-  tempBgColor: string;
-  tempImageName: string;
-  uploadedImage: string;
-  uploadedImageMimeType: string;
-  dimensions: { height: number; width: number; };
-  resampledFile: Blob;
-  newThumbnailDataUrl: string;
-  localStorageBgcolor: string;
-  imageUploadUrlTemplate: string;
+  openInUploadMode!: boolean ;
+  tempBgColor!: string ;
+  tempImageName: string | undefined;
+  uploadedImage: string | undefined ;
+  uploadedImageMimeType!: string ;
+  dimensions!: { height: number; width: number; } ;
+  resampledFile!: Blob | null ;
+  newThumbnailDataUrl!: string ;
+  localStorageBgcolor!: string ;
+  imageUploadUrlTemplate!: string ;
   hidePlaceholder = true;
   placeholderImageUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
-  editableThumbnailDataUrl: string;
-  transformedData: string;
-  parsedResponse;
-  encodedImageURI: string;
+  editableThumbnailDataUrl: string | undefined;
+  transformedData!: string;
+  // parsedResponse: any;
+  encodedImageURI: string | null | undefined;
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -133,7 +133,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     }
   }
 
-  saveThumbnailImageData(imageURI: string, callback: () => void): void {
+  saveThumbnailImageData(imageURI: string | null, callback: () => void): void {
     this.resampledFile = null;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(

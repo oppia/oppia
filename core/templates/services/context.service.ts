@@ -199,7 +199,7 @@ export class ContextService {
   }
 
   // Add constants for entity type.
-  getEntityType(): string | undefined {
+  getEntityType(): string {
     if (ContextService.customEntityContext !== null) {
       return ContextService.customEntityContext.getType();
     }
@@ -230,6 +230,7 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.BLOG_POST;
       }
     }
+    return '';
   }
 
   // Returns a string representing the explorationId (obtained from the

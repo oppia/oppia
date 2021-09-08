@@ -128,7 +128,7 @@ export class AssetsBackendApiService {
   }
 
   postThumbnailFile(
-      resampledFile: Blob, filename: string,
+      resampledFile: Blob, filename: string | undefined,
       entityType: string, entityId: string): Observable<{filename: string}> {
     let form = new FormData();
     form.append('image', resampledFile);

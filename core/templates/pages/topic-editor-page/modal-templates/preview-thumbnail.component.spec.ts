@@ -23,7 +23,7 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PreviewThumbnailComponent } from './preview-thumbnail.component';
 import { ContextService } from 'services/context.service';
 
-describe('Preview Thumbnail Component', function() {
+fdescribe('Preview Thumbnail Component', function() {
   let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;
@@ -68,7 +68,7 @@ describe('Preview Thumbnail Component', function() {
   });
 
   it('should throw error if no image is present for a preview', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+    spyOn(contextService, 'getEntityType').and.returnValue('');
     expect(() => {
       componentInstance.ngOnInit();
     }).toThrowError('No image present for preview');
