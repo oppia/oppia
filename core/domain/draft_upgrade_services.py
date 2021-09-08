@@ -212,6 +212,23 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         return draft_change_list
 
     @classmethod
+    def _convert_states_v47_dict_to_v48_dict(cls, draft_change_list):
+        """Converts draft change list from state version 47 to 48. State
+        version 48 fixes encoding issues in HTML fields.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        conversion_fn = (
+            html_validation_service.fix_incorrectly_encoded_chars)
+        return cls._convert_html_in_draft_change_list(
+            draft_change_list, conversion_fn)
+
+    @classmethod
     def _convert_states_v46_dict_to_v47_dict(cls, draft_change_list):
         """Converts draft change list from state version 46 to 47. State
         version 47 deprecates oppia-noninteractive-svgdiagram tag and converts
