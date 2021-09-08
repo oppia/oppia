@@ -116,7 +116,8 @@ describe('Exploration opportunity summary model', () => {
         .toEqual(0);
     });
 
-    it('should return a correct translations counts if no contents available', () => {
+    it('should return a correct translations counts if no contents ' +
+      'available', () => {
       const backendDictWithNoContents = {
         id: 'exp_id',
         topic_name: 'Topic',

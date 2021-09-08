@@ -101,8 +101,8 @@ export class ExplorationOpportunitySummary {
     let translationsCount = 0;
     if (this.translationCounts.hasOwnProperty(languageCode) && (
       this.contentCount > 0)) {
-        translationsCount = (
-          this.translationCounts[languageCode]);
+      translationsCount = (
+        this.translationCounts[languageCode]);
     }
     return translationsCount;
   }

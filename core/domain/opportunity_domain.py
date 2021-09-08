@@ -33,7 +33,8 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,
             translation_counts, language_codes_needing_voice_artists,
-            language_codes_with_assigned_voice_artists, translation_in_review_counts):
+            language_codes_with_assigned_voice_artists,
+            translation_in_review_counts):
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -54,7 +55,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
             language_codes_with_assigned_voice_artists: list(str). A list of
                 language code for which a voice-artist is already assigned to
                 the exploration.
-            translation_in_review_counts: dict. A dict with language code as a 
+            translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
         """
@@ -194,6 +195,12 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'received %s' % list(sorted(expected_set_of_all_languages)))
 
     def _validate_translation_counts(self, translation_counts):
+        """Validates various translation_counts and translation_in_review_counts
+        of the object.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
         for language_code, count in (
                 translation_counts.items()):
             if not utils.is_supported_audio_language_code(language_code):
@@ -213,6 +220,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                     'Expected translation count for language_code %s to be '
                     'less than or equal to content_count(%s), received %s' % (
                         language_code, self.content_count, count))
+
 
 class SkillOpportunity(python_utils.OBJECT):
     """The domain object for skill opportunities."""

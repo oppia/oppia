@@ -185,7 +185,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.topic_name, 'topic')
         self.assertEqual(opportunity.story_title, 'A story')
 
-    def test_get_translation_opportunities_which_have_no_translations_in_review(self):
+    def test_get_translation_opportunities_for_no_translations_in_review(self):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -198,10 +198,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        languages_of_translations_in_review = opportunity.translation_in_review_counts.keys()
+        languages_of_translations_in_review = (
+            opportunity.translation_in_review_counts.keys())
         self.assertEqual(len(languages_of_translations_in_review), 1)
 
-    def test_get_translation_opportunities_which_have_translations_in_review(self):
+    def test_get_translation_opportunities_for_translations_in_review(self):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
@@ -212,7 +213,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        languages_of_translations_in_review = opportunity.translation_in_review_counts.keys()
+        languages_of_translations_in_review = (
+            opportunity.translation_in_review_counts.keys())
         self.assertEqual(len(languages_of_translations_in_review), 0)
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
