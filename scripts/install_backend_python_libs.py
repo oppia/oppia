@@ -482,7 +482,7 @@ def _run_pip_command(cmd_parts):
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-    elif b'can\'t combine user with prefix' in stderr:
+    elif 'can\'t combine user with prefix' in stderr:
         python_utils.PRINT('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
