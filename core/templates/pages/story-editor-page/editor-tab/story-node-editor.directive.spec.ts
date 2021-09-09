@@ -15,11 +15,9 @@
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
-import { EventEmitter } from '@angular/core';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StoryUpdateService } from 'domain/story/story-update.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 class MockNgbModalRef {
@@ -41,7 +39,6 @@ describe('Story node editor directive', function() {
   var $scope = null;
   var ctrl = null;
   var $q = null;
-  let $timeout = null;
   var $rootScope = null;
   var directive = null;
   var story = null;
@@ -51,7 +48,6 @@ describe('Story node editor directive', function() {
   var AlertsService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
-  let focusManagerService: FocusManagerService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     ngbModal = TestBed.inject(NgbModal);
@@ -64,9 +60,8 @@ describe('Story node editor directive', function() {
     storyUpdateService = $injector.get('StoryUpdateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
-    focusManagerService = $injector.get('FocusManagerService');
     $q = $injector.get('$q');
-    $timeout = $injector.get('$timeout');
+
 
     var sampleStoryBackendObject = {
       id: 'sample_story_id',

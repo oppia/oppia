@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the story editor directive.
  */
 
-import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Story editor Directive having two story nodes', function() {
@@ -37,7 +36,6 @@ describe('Story editor Directive having two story nodes', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
   var WindowRef = null;
-  let fetchSpy = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
@@ -94,7 +92,7 @@ describe('Story editor Directive having two story nodes', function() {
     directive = $injector.get('storyEditorDirective')[0];
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    fetchSpy = spyOn(StoryEditorStateService, 'getStory')
+    spyOn(StoryEditorStateService, 'getStory')
       .and.returnValue(story);
     spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
       'math');

@@ -509,7 +509,6 @@ describe('Contributions and review component', function() {
   });
 
   describe('when user is not allowed to review questions', function() {
-    let fetchSkillSpy = null;
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
@@ -622,7 +621,7 @@ describe('Contributions and review component', function() {
             details: 'skill_1'
           }
         }));
-      fetchSkillSpy = spyOn(skillBackendApiService, 'fetchSkillAsync')
+      spyOn(skillBackendApiService, 'fetchSkillAsync')
         .and.returnValue(
           $q.resolve({
             skill: skillObjectFactory.createFromBackendDict({
