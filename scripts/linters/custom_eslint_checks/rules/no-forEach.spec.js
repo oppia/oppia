@@ -33,8 +33,8 @@ ruleTester.run('no-forEach', rule, {
       code:
         `[].forEach(item);`,
       errors: [{
-        message: 'Please use ".every()" instead of ".forEach()".',
-        type : null
+        message: 'Please use .every() instead of .forEach().',
+        type: null
       }]
     },
   ]

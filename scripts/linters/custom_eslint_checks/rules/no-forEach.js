@@ -29,7 +29,7 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowedforEach: 'Please use ".every()" instead of ".forEach()".'
+      disallowedforEach: 'Please use .every() instead of .forEach().'
     },
   },
 
