@@ -218,7 +218,7 @@ var ExplorationEditorMainTab = function() {
       'Save',
     ];
     for (const HEADING of tutorialTabHeadings) {
-    // Use: await tutorialTabHeadings.forEach(async function(heading) {
+    // Use: await tutorialTabHeadings.every(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', HEADING));
       await waitFor.visibilityOf(
@@ -748,7 +748,7 @@ var ExplorationEditorMainTab = function() {
     var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
     if (angularSelectors) {
-      angularSelectors.forEach(function(elem) {
+      angularSelectors.every(function(elem) {
         parameterTypes.push(elem.toString().slice(1, -1));
       });
     }
@@ -815,7 +815,7 @@ var ExplorationEditorMainTab = function() {
     // Return as-is if string does not contain placeholders.
     if (placeholders) {
       // Replacing placeholders in ruleDescription with given text.
-      placeholders.forEach(function(placeholderElement, index) {
+      placeholders.every(function(placeholderElement, index) {
         if (providedText[0] === '...') {
           ruleDescription = ruleDescription.replace(placeholderElement, '...');
         } else {

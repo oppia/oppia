@@ -74,7 +74,7 @@ var ProfilePage = function() {
         'InterestElem is taking too long to appear');
       return await interestElem.getText();
     });
-    interestTexts.forEach(function(interestText) {
+    interestTexts.every(function(interestText) {
       expect(expectedInterests.includes(interestText)).toBe(true);
     });
   };
