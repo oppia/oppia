@@ -227,9 +227,9 @@ class LearnerDashboardHandlerForExplorations(base.BaseHandler):
 class LearnerDashboardIdsHandler(base.BaseHandler):
     """Gets the progress of the learner.
 
-    Gets the ids of all explorations and collections completed by the user,
-    the activities currently being pursued, and the activities present in
-    the playlist.
+    Gets the ids of all explorations, collections, topics and stories
+    completed by the user, the activities currently being pursued,
+    and the activities present in the playlist.
     """
 
     URL_PATH_ARGS_SCHEMAS = {}

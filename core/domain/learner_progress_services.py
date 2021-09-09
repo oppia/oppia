@@ -2088,7 +2088,7 @@ def get_exploration_progress(user_id):
     _remove_activity_ids_from_playlist(
         user_id, nonexistent_playlist_exp_ids, [])
 
-    learner_progress_in_collection = (
+    learner_progress_in_explorations = (
         learner_progress_domain.LearnerProgressInExplorations(
             filtered_incomplete_exp_summaries,
             filtered_completed_exp_summaries,
@@ -2096,5 +2096,5 @@ def get_exploration_progress(user_id):
         )
 
     return (
-        learner_progress_in_collection,
+        learner_progress_in_explorations,
         number_of_nonexistent_explorations)
