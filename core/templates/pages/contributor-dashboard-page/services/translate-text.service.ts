@@ -140,7 +140,7 @@ export class TranslateTextService {
       contentType: string,
       interactionId: string | null,
       ruleType: string | null
-    } = this.stateAndContent[this.activeIndex] || {};
+    } = this.stateAndContent[this.activeIndex];
     return {
       text: text,
       more: more,
