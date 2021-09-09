@@ -70,9 +70,16 @@ var checkForConsoleErrors = async function(
   }
 
   var browserLogs = await browser.manage().logs().get('browser');
-  var browserErrors = browserLogs.filter(logEntry => (
-    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
-    errorsToIgnore.every(e => logEntry.message.match(e) === null)));
+
+  // Using for loop instead of .filter() function.
+  var browserErrors = [];
+  for (i = 0; i < browserLogs.length; i++) {
+    var logEntry = browserLogs[i];
+    if (logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+      errorsToIgnore.every(e => logEntry.message.match(e) === null)) {
+      browserErrors.push(logEntry);
+    }
+  }
   expect(browserErrors).toEqual([]);
 };
 

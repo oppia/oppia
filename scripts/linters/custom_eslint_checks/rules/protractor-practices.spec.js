@@ -132,6 +132,15 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
+      `genderList.filter(function() {
+        gender = 'female';
+      })`,
+      errors:[{
+        message: 'Please do not use .filter(), consider using a for loop',
+      }]
+    },
+    {
+      code:
       'const Value = 5;',
       errors: [{
         message: 'Please make sure that constant name “Value” are in all-caps',

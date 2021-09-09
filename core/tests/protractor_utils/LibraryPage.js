@@ -61,13 +61,16 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    return await allExplorationSummaryTile.filter(
-      async function(tile) {
-        var tileTitle = await tile.element(
-          expSummaryTileTitleLocator).getText();
-        return (tileTitle === name);
+    // Using for loop instead of .filter() function.
+    var filteredExplorationSummaryTile = [];
+
+    for (i = 0; i < allExplorationSummaryTile.length; i++) {
+      var tileTitle = await allExplorationSummaryTile[i].element(
+        expSummaryTileTitleLocator).getText();
+      if (tileTitle === name) {
+        filteredExplorationSummaryTile.push(tileTitle);
       }
-    );
+    }
   };
 
   var _submitSearchQuery = async function(searchQuery) {

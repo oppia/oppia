@@ -69,14 +69,17 @@ var CreatorDashboardPage = function() {
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    return await allExplorationCards.filter(async function(tile) {
-      var text = await tile.getText();
+    // Using for loop instead of .filter() function.
+    var filteredExplorationCards = [];
+    for (i = 0; i < allExplorationCards.length; i++) {
+      var text = await allExplorationCards[i].getText();
       // Tile text contains title, possibly followed by newline and text.
-      return (
-        text.startsWith(explorationTitle + '\n') ||
-        text === explorationTitle
-      );
-    });
+      if (text.startsWith(explorationTitle + '\n' ||
+      text === explorationTitle)) {
+        filteredExplorationCards.push(text);
+      }
+    }
+    return filteredExplorationCards;
   };
 
   this.get = async function() {
