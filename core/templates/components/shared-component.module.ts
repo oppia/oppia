@@ -85,6 +85,7 @@ import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-ti
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 import { ConceptCardComponent } from './concept-card/concept-card.component';
+import { ScoreRingComponent } from './score-ring/score-ring.component';
 
 
 // Pipes.
@@ -165,6 +166,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
+    ScoreRingComponent,
     SearchBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -226,6 +228,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
+    ScoreRingComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
@@ -283,6 +286,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeFeedbackEditorComponent,
     SearchBarComponent,
     QuestionDifficultySelectorComponent,
+    ScoreRingComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
