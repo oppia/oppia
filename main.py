@@ -382,6 +382,15 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
         learner_dashboard.LearnerDashboardHandler),
     get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
+        learner_dashboard.LearnerDashboardHandlerForTopicsAndStories),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
+        learner_dashboard.LearnerDashboardHandlerForCollections),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
+        learner_dashboard.LearnerDashboardHandlerForExplorations),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
     get_redirect_route(
