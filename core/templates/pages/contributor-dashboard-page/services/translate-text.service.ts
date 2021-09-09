@@ -128,9 +128,8 @@ export class TranslateTextService {
       text: string | string[] | undefined,
       more: boolean,
       status: Status | string,
-      translation: string | string[]
-      
-): TranslatableItem {
+      translation: string | string[]    
+  ): TranslatableItem {
     const {
       dataFormat,
       contentType,
