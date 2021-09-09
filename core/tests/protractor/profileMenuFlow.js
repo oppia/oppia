@@ -36,7 +36,7 @@ describe('Profile menu flow', function() {
 
   it('should visit the topics and skills dashboard from the profile ' +
     'dropdown menu when user is admin', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
     await learnerDashboardPage.get();
     await general.navigateToTopicsAndSkillsDashboardPage();
@@ -94,18 +94,6 @@ describe('Profile menu flow', function() {
         '.protractor-test-topics-and-skills-dashboard-link'));
       expect(await links.count()).toEqual(0);
     });
-
-    it('should visit the notifications page from the profile dropdown menu',
-      async function() {
-        var notificationsDashboardLink = element(by.css(
-          '.protractor-test-notifications-link'));
-        await action.click(
-          'Notifications Dashboard Link',
-          notificationsDashboardLink);
-        await waitFor.pageToFullyLoad();
-        expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/notifications');
-      });
 
     it('should visit the preferences page from the profile dropdown menu',
       async function() {

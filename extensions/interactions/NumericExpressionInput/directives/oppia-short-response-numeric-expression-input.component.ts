@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,18 +20,29 @@
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-angular.module('oppia').component(
-  'oppiaShortResponseNumericExpressionInput', {
-    template: require('./numeric-expression-input-response.component.html'),
-    controller: ['$attrs', 'HtmlEscaperService',
-      function($attrs, HtmlEscaperService) {
-        const ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        };
-      }
-    ]
+@Component({
+  selector: 'oppia-short-response-numeric-expression-input',
+  templateUrl: './numeric-expression-input-short-response.component.html',
+  styleUrls: []
+})
+export class ShortResponseNumericExpressionInput implements OnInit {
+  @Input() answer: string;
+  displayAnswer: Object;
+
+  constructor(
+    private htmlEscaperService: HtmlEscaperService
+  ) {}
+
+  ngOnInit(): void {
+    this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
   }
-);
+}
+
+angular.module('oppia').directive(
+  'oppiaShortResponseNumericExpressionInput', downgradeComponent(
+    {component: ShortResponseNumericExpressionInput}
+  ) as angular.IDirectiveFactory);

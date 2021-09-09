@@ -13,48 +13,82 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for navigating the top navigation bar with
+ * @fileoverview Service for navigating the top navigation bar with
  * tab and shift-tab.
  */
-angular.module('oppia').factory('NavigationService', [function() {
-  var navigation = {
-    activeMenuName: '',
-    ACTION_OPEN: 'open',
-    ACTION_CLOSE: 'close',
-    KEYBOARD_EVENT_TO_KEY_CODES: {
-      enter: {
-        shiftKeyIsPressed: false,
-        keyCode: 13
-      },
-      tab: {
-        shiftKeyIsPressed: false,
-        keyCode: 9
-      },
-      shiftTab: {
-        shiftKeyIsPressed: true,
-        keyCode: 9
-      }
-    },
-    openSubmenu: null,
-    closeSubmenu: null,
-    onMenuKeypress: null
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+interface KeyFunc {
+  shiftKeyIsPressed: boolean;
+  keyCode: number;
+}
+
+interface KeyboardEventToCodes {
+  [keys: string]: KeyFunc;
+  enter: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
   };
+  tab: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
+  };
+  shiftTab: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
+  };
+}
+
+export interface EventToCodes {
+  [keys: string]: string;
+  enter: string;
+  tab: string;
+  shiftTab: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NavigationService {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeMenuName!: string;
+  ACTION_OPEN: string = 'open';
+  ACTION_CLOSE: string = 'close';
+  KEYBOARD_EVENT_TO_KEY_CODES: KeyboardEventToCodes = {
+    enter: {
+      shiftKeyIsPressed: false,
+      keyCode: 13
+    },
+    tab: {
+      shiftKeyIsPressed: false,
+      keyCode: 9
+    },
+    shiftTab: {
+      shiftKeyIsPressed: true,
+      keyCode: 9
+    }
+  };
+
+  constructor() {}
+
   /**
   * Opens the submenu.
   * @param {object} evt
   * @param {String} menuName - name of menu, on which
   * open/close action to be performed (category,language).
   */
-  navigation.openSubmenu = function(evt, menuName) {
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {
     // Focus on the current target before opening its submenu.
-    navigation.activeMenuName = menuName;
-    angular.element(evt.currentTarget).focus();
-  };
-  navigation.closeSubmenu = function(evt) {
-    navigation.activeMenuName = '';
-    angular.element(evt.currentTarget).closest('li')
-      .find('a').blur();
-  };
+    this.activeMenuName = menuName;
+  }
+
+  closeSubmenu(evt: KeyboardEvent): void {
+    this.activeMenuName = '';
+  }
   /**
    * Handles keydown events on menus.
    * @param {object} evt
@@ -66,23 +100,28 @@ angular.module('oppia').factory('NavigationService', [function() {
    * @example
    *  onMenuKeypress($event, 'category', {enter: 'open'})
    */
-  navigation.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-    var targetEvents = Object.keys(eventsTobeHandled);
-    for (var i = 0; i < targetEvents.length; i++) {
-      var keyCodeSpec =
-        navigation.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+  onMenuKeypress(
+      evt: KeyboardEvent,
+      menuName: string,
+      eventsTobeHandled: EventToCodes): void {
+    let targetEvents = Object.keys(eventsTobeHandled);
+    for (let i = 0; i < targetEvents.length; i++) {
+      let keyCodeSpec =
+        this.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
       if (keyCodeSpec.keyCode === evt.keyCode &&
         evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-        if (eventsTobeHandled[targetEvents[i]] === navigation.ACTION_OPEN) {
-          navigation.openSubmenu(evt, menuName);
+        if (eventsTobeHandled[targetEvents[i]] === this.ACTION_OPEN) {
+          this.openSubmenu(evt, menuName);
         } else if (eventsTobeHandled[targetEvents[i]] ===
-          navigation.ACTION_CLOSE) {
-          navigation.closeSubmenu(evt);
+          this.ACTION_CLOSE) {
+          this.closeSubmenu(evt);
         } else {
           throw new Error('Invalid action type.');
         }
       }
     }
-  };
-  return navigation;
-}]);
+  }
+}
+
+angular.module('oppia').factory('NavigationService',
+  downgradeInjectable(NavigationService));

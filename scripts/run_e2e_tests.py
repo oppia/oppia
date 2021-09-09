@@ -14,8 +14,8 @@
 
 """Python execution for running e2e tests."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import os
@@ -31,13 +31,9 @@ from scripts import install_third_party_libs
 from scripts import servers
 
 MAX_RETRY_COUNT = 3
-RERUN_NON_FLAKY = True
-
-OPPIA_SERVER_PORT = 8181
 GOOGLE_APP_ENGINE_PORT = 9001
 ELASTICSEARCH_SERVER_PORT = 9200
 PORTS_USED_BY_OPPIA_PROCESSES = [
-    OPPIA_SERVER_PORT,
     GOOGLE_APP_ENGINE_PORT,
     ELASTICSEARCH_SERVER_PORT,
 ]
@@ -106,6 +102,61 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
+
+
+# Never rerun failing tests, even when they match a known flake.
+RERUN_POLICY_NEVER = 'never'
+# Only rerun failing tests when they match a known flake.
+RERUN_POLICY_KNOWN_FLAKES = 'known flakes'
+# Always rerun failing tests, even when they don't match a known flake.
+RERUN_POLICY_ALWAYS = 'always'
+
+RERUN_POLICIES = {
+    'accessibility': RERUN_POLICY_NEVER,
+    'additionaleditorfeatures': RERUN_POLICY_ALWAYS,
+    'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
+    'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
+    'adminpage': RERUN_POLICY_NEVER,
+    'blogdashboard': RERUN_POLICY_NEVER,
+    'classroompage': RERUN_POLICY_KNOWN_FLAKES,
+    'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
+    'collections': RERUN_POLICY_NEVER,
+    'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'emaildashboard': RERUN_POLICY_ALWAYS,
+    'embedding': RERUN_POLICY_KNOWN_FLAKES,
+    'explorationfeedbacktab': RERUN_POLICY_NEVER,
+    'explorationhistorytab': RERUN_POLICY_KNOWN_FLAKES,
+    'explorationimprovementstab': RERUN_POLICY_ALWAYS,
+    'explorationstatisticstab': RERUN_POLICY_KNOWN_FLAKES,
+    'explorationtranslationtab': RERUN_POLICY_KNOWN_FLAKES,
+    'extensions': RERUN_POLICY_NEVER,
+    'featuregating': RERUN_POLICY_ALWAYS,
+    'fileuploadextensions': RERUN_POLICY_NEVER,
+    'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'learner': RERUN_POLICY_KNOWN_FLAKES,
+    'learnerdashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'library': RERUN_POLICY_KNOWN_FLAKES,
+    'navigation': RERUN_POLICY_KNOWN_FLAKES,
+    'playvoiceovers': RERUN_POLICY_NEVER,
+    'preferences': RERUN_POLICY_NEVER,
+    'profilefeatures': RERUN_POLICY_NEVER,
+    'profilemenu': RERUN_POLICY_NEVER,
+    'publication': RERUN_POLICY_NEVER,
+    'releasecoordinatorpagefeatures': RERUN_POLICY_NEVER,
+    'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
+    'subscriptions': RERUN_POLICY_NEVER,
+    'topicandstoryeditor': RERUN_POLICY_KNOWN_FLAKES,
+    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'topicandstoryviewer': RERUN_POLICY_KNOWN_FLAKES,
+    'topicsandskillsdashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'users': RERUN_POLICY_KNOWN_FLAKES,
+    'wipeout': RERUN_POLICY_NEVER,
+    # The suite name is `full` when no --suite argument is passed. This
+    # indicates that all the tests should be run.
+    'full': RERUN_POLICY_NEVER,
+}
 
 
 def is_oppia_server_already_running():
@@ -190,15 +241,12 @@ def build_js_files(dev_mode, deparallelize_terser=False, source_maps=False):
 
 def run_tests(args):
     """Run the scripts to start end-to-end tests."""
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     if is_oppia_server_already_running():
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)
 
-    with contextlib2.ExitStack() as stack:
+    with python_utils.ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:
@@ -213,15 +261,22 @@ def run_tests(args):
         stack.enter_context(servers.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True))
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
             port=GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
-            clear_datastore=True,
+            # Automatic restart can be disabled since we don't expect code
+            # changes to happen while the e2e tests are running.
+            automatic_restart=False,
             skip_sdk_update_check=True,
-            env={'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH}))
+            env={
+                **os.environ,
+                'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+            }))
 
         stack.enter_context(servers.managed_webdriver_server(
             chrome_version=args.chrome_driver_version))
@@ -248,10 +303,10 @@ def run_tests(args):
                     # Although our unit tests always provide unicode strings,
                     # the actual server needs this failsafe since it can output
                     # non-unicode strings.
-                    line = line.decode('utf-8') # pragma: nocover
+                    line = line.encode('utf-8')  # pragma: nocover
                 output_lines.append(line.rstrip())
                 # Replaces non-ASCII characters with '?'.
-                sys.stdout.write(line.encode('ascii', errors='replace'))
+                common.write_stdout_safe(line.decode('ascii', errors='replace'))
             # The poll() method returns None while the process is running,
             # otherwise it returns the return code of the process (an int).
             if proc.poll() is not None:
@@ -263,11 +318,11 @@ def run_tests(args):
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
+    policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
         for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
             python_utils.PRINT('***Attempt %d.***' % attempt_num)
-
             output, return_code = run_tests(parsed_args)
 
             if not flake_checker.check_if_on_ci():
@@ -280,11 +335,20 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
+            # Check whether we should rerun based on this suite's policy.
             test_is_flaky = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
-            if not test_is_flaky and not RERUN_NON_FLAKY:
-                # Don't rerun if the test was non-flaky and we are not rerunning
-                # non-flaky tests.
+            if policy == RERUN_POLICY_NEVER:
+                python_utils.PRINT(
+                    'Not rerunning because the policy is to never '
+                    'rerun the {} suite'.format(parsed_args.suite))
+                break
+            if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                python_utils.PRINT((
+                    'Not rerunning because the policy is to only '
+                    'rerun the %s suite on known flakes, and this '
+                    'failure did not match any known flakes')
+                    % parsed_args.suite)
                 break
 
     sys.exit(return_code)

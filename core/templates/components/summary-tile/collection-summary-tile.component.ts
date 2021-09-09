@@ -30,24 +30,27 @@ import { UserService } from 'services/user.service';
   templateUrl: './collection-summary-tile.component.html',
 })
 export class CollectionSummaryTileComponent implements OnInit {
-  @Input() getCollectionId: string;
-  @Input() getCollectionTitle: string;
-  @Input() getLastUpdatedMsec: number;
-  @Input() getObjective: string;
-  @Input() getNodeCount: string;
-  @Input() getCategory: string;
-  @Input() getThumbnailIconUrl: string;
-  @Input() getThumbnailBgColor: string;
-  @Input() isPlaylistTile: boolean;
-  @Input() isLinkedToEditorPage: boolean;
-  @Input() showLearnerDashboardIconsIfPossible: string;
-  @Input() isContainerNarrow: boolean;
-  @Input() isOwnedByCurrentUser: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() getCollectionId!: string;
+  @Input() getCollectionTitle!: string;
+  @Input() getLastUpdatedMsec!: number;
+  @Input() getObjective!: string;
+  @Input() getNodeCount!: string;
+  @Input() getCategory!: string;
+  @Input() getThumbnailIconUrl!: string;
+  @Input() getThumbnailBgColor!: string;
+  @Input() isPlaylistTile: boolean = false;
+  @Input() isLinkedToEditorPage: boolean = false;
+  @Input() showLearnerDashboardIconsIfPossible!: string;
+  @Input() isContainerNarrow: boolean = false;
+  @Input() isOwnedByCurrentUser: boolean = false;
 
-  userIsLoggedIn: boolean;
-  collectionIsCurrentlyHoveredOver: boolean;
-  defaultEmptyTitle: string;
-  activityTypeCollection: string;
+  userIsLoggedIn: boolean = false;
+  collectionIsCurrentlyHoveredOver: boolean = false;
+  defaultEmptyTitle!: string;
+  activityTypeCollection!: string;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -68,7 +71,7 @@ export class CollectionSummaryTileComponent implements OnInit {
       this.getLastUpdatedMsec);
   }
 
-  getCollectionLink(): string {
+  getCollectionLink(): string | null {
     let targetUrl = (
       this.isLinkedToEditorPage ?
         CollectionSummaryTileConstants.COLLECTION_EDITOR_URL :

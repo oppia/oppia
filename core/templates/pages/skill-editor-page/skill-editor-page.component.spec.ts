@@ -17,19 +17,24 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // Skill editor page is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 require('pages/skill-editor-page/skill-editor-page.component.ts');
 
 describe('Skill editor page', function() {
   var ctrl = null;
+  var PreventPageUnloadEventService = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
-  var SkillObjectFactory = null;
   var UndoRedoService = null;
   var $uibModal = null;
   var UrlService = null;
@@ -39,10 +44,11 @@ describe('Skill editor page', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     $uibModal = $injector.get('$uibModal');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
     $rootScope = $injector.get('$rootScope');
@@ -70,13 +76,18 @@ describe('Skill editor page', function() {
     expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(SkillEditorStateService, 'loadSkill').and.stub();
+    spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should get active tab name from skill editor routing service',
@@ -118,10 +129,18 @@ describe('Skill editor page', function() {
     });
 
   it('should return warnings count for the skill', function() {
-    ctrl.skill = SkillObjectFactory.createInterstitialSkill();
-    // This is because an interstitial skill has empty rubrics
-    // array, and hence there's a warning. See SkillObjectFactory
-    // for reference.
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [], RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      })
+    );
+    ctrl.skill = new Skill(
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+    );
     expect(ctrl.getWarningsCount()).toEqual(1);
   });
 });

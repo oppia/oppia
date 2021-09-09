@@ -20,7 +20,6 @@
 // question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -38,7 +37,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 require('App.ts');
@@ -48,7 +47,7 @@ require('domain/question/question-update.service.ts');
 require('domain/state/StateObjectFactory.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 
 describe('Question update service', function() {
   var QuestionUpdateService = null;
@@ -68,7 +67,6 @@ describe('Question update service', function() {
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
         new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory());
     $provide.value(
@@ -256,5 +254,22 @@ describe('Question update service', function() {
     expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
     QuestionUndoRedoService.undoChange(sampleQuestion);
     expect(sampleQuestion.getStateData()).toEqual(oldStateData);
+  });
+
+  it('should set question inapplicable skills misconception ids when ' +
+    'calling \'setQuestionInapplicableSkillMisconceptionIds\'', function() {
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toBe(undefined);
+
+    QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
+      sampleQuestion, ['id1']);
+
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toEqual(['id1']);
+
+    QuestionUndoRedoService.undoChange(sampleQuestion);
+
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
+      .toBe(undefined);
   });
 });

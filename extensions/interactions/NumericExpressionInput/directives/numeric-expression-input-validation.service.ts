@@ -48,7 +48,7 @@ export class NumericExpressionInputValidationService {
       stateName: string,
       customizationArgs: NumericExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    let warningsList = [];
+    let warningsList: Warning[] = [];
     let algebraicRulesService = (
       new NumericExpressionInputRulesService());
 

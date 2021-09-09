@@ -16,8 +16,8 @@
 and are created.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -120,7 +120,7 @@ class QuestionCreationHandler(base.BaseHandler):
         for filename in filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging.exception(
                     'Image not provided for file with name %s when the question'
                     ' with id %s was created.' % (filename, question.id))
                 raise self.InvalidInputException(

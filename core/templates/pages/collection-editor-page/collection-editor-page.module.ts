@@ -28,37 +28,34 @@ import { OppiaAngularRootComponent } from
 
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
-import { CollectionDetailsEditor } from
-  // eslint-disable-next-line max-len
-  'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
-import { CollectionPermissionsCard } from
-  // eslint-disable-next-line max-len
-  'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
-import { CollectionSettingsTabComponent } from
-  'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
-import { CollectionStatisticsTabComponent } from
-  // eslint-disable-next-line max-len
-  'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { CollectionDetailsEditor } from 'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+import { CollectionNodeEditorComponent } from './editor-tab/collection-node-editor.component';
+import { CollectionPermissionsCard } from 'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
+import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
-    CollectionHistoryTabComponent,
-    CollectionSettingsTabComponent,
-    CollectionStatisticsTabComponent,
     CollectionDetailsEditor,
-    CollectionPermissionsCard
+    CollectionHistoryTabComponent,
+    CollectionNodeEditorComponent,
+    CollectionPermissionsCard,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CollectionHistoryTabComponent,
+    CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent,
   ],
@@ -83,6 +80,8 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

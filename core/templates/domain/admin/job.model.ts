@@ -21,15 +21,12 @@ export interface JobDataBackendDict {
   'time_finished_msec': number;
   'job_type': string;
   'status_code': string;
-  'error': string;
+  'error': string | null;
   'is_cancelable': boolean;
   'id': string;
   'time_started_msec': number;
   'human_readable_time_started': string;
-  // This property is optional because this object factory is used for
-  // both 'recent_job_data' and 'unfinished_job_data' in admin page.
-  // 'recent_job_data' doesn't have this property.
-  'can_be_canceled'?: boolean;
+  'can_be_canceled': boolean;
 }
 
 export class Job {
@@ -37,7 +34,7 @@ export class Job {
   timeFinishedMsec: number;
   jobType: string;
   statusCode: string;
-  error: string;
+  error: string | null;
   canBeCanceled: boolean;
   isCancelable: boolean;
   id: string;
@@ -46,7 +43,7 @@ export class Job {
 
   constructor(
       humanReadableTimeFinished: string, timeFinishedMsec: number,
-      jobType: string, statusCode: string, error: string,
+      jobType: string, statusCode: string, error: string | null,
       canBeCanceled: boolean, isCancelable: boolean, id: string,
       timeStartedMsec: number, humanReadableTimeStarted: string) {
     this.humanReadableTimeFinished = humanReadableTimeFinished;

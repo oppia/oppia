@@ -40,21 +40,27 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
+import { SupplementalCardComponent } from './learner-experience/supplemental-card.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
+import { MaterialModule } from 'modules/material.module';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
+    MaterialModule,
+    NgbPopoverModule,
     SharedComponentsModule,
-    NgbPopoverModule
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
@@ -62,10 +68,10 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     SupplementalCardComponent,
+    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
@@ -73,6 +79,7 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     SupplementalCardComponent,
+    RefresherExplorationConfirmationModal,
   ],
   providers: [
     {
@@ -95,7 +102,8 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { SupplementalCardComponent } from './learner-experience/supplemental-card.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

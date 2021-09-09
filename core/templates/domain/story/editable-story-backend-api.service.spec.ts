@@ -126,6 +126,27 @@ describe('Editable story backend API service', () => {
     }
     ));
 
+  it('should not delete a story from the backend if ' +
+  'the story Id does not exist', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    editableStoryBackendApiService.deleteStoryAsync('not_valid_id').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/story_editor_handler/data/not_valid_id');
+
+    expect(req.request.method).toEqual('DELETE');
+    req.flush({error: 'Story with given id doesn\'t exist.'}, {
+      status: 404,
+      statusText: 'Story with given id doesn\'t exist.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Story with given id doesn\'t exist.');
+  }));
+
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
@@ -226,6 +247,84 @@ describe('Editable story backend API service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should call success handler if the story is associated ' +
+    'with given url fragment', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    editableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
+      'url_fragment').then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/story_url_fragment_handler/url_fragment');
+    expect(req.request.method).toEqual('GET');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should call rejection handler if the story is not associated ' +
+    'with given url fragment', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    editableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
+      'url_fragment').then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/story_url_fragment_handler/url_fragment');
+    expect(req.request.method).toEqual('GET');
+    req.flush({error: 'Story with given url fragment doesn\'t exist.'}, {
+      status: 404,
+      statusText: 'Story with given url fragment doesn\'t exist.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalledWith();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Story with given url fragment doesn\'t exist.');
+  }));
+
+  it('should call success handler if the exploration ' +
+    'is validated with no errors', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    editableStoryBackendApiService.validateExplorationsAsync(
+      'storyId', ['expId1', 'expId2']).then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/validate_story_explorations/storyId?' +
+      'comma_separated_exp_ids=expId1,expId2');
+    expect(req.request.method).toEqual('GET');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should call rejection handler if the exploration ' +
+    'has validation errors', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    editableStoryBackendApiService.validateExplorationsAsync(
+      'not_valid', ['expId1', 'expId2']).then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/validate_story_explorations/not_valid?' +
+      'comma_separated_exp_ids=expId1,expId2');
+    expect(req.request.method).toEqual('GET');
+    req.flush({error: 'Story has validation errors.'}, {
+      status: 404,
+      statusText: 'Story has validation errors.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Story has validation errors.');
   }));
 
   it('should use the rejection handler if the story to publish doesn\'t exist',

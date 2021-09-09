@@ -23,6 +23,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
+import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-feedback-popup',
@@ -36,6 +37,7 @@ export class FeedbackPopupComponent {
   feedbackPopoverId: string;
   feedbackTitle: string;
   feedbackSubmitted: boolean = false;
+  MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   @Output() closePopover: EventEmitter<void> = new EventEmitter();
 
   constructor(

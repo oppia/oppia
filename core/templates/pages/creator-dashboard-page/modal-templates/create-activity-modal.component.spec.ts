@@ -23,33 +23,20 @@ import { CollectionCreationService } from 'components/entity-creation-services/c
 import { CreateActivityModalComponent } from './create-activity-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Pipe } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  dismiss(): void {
-    return;
-  }
+  dismiss(): void {}
 }
 
 class MockExplorationCreationService {
-  createNewExploration(): void {
-    return null;
-  }
+  createNewExploration(): void {}
 }
 
 class MockCollectionCreationService {
-  createNewCollection(): void {
-    return null;
-  }
+  createNewCollection(): void {}
 }
 
 describe('Create Activity Modal Component', () =>{
@@ -90,8 +77,9 @@ describe('Create Activity Modal Component', () =>{
   it('should evalute component properties after component is initialized',
     fakeAsync(() => {
       const UserInfoObject = {
+        roles: ['USER_ROLE'],
         is_moderator: false,
-        is_admin: false,
+        is_curriculum_admin: false,
         is_super_admin: false,
         is_topic_manager: false,
         can_create_collections: true,

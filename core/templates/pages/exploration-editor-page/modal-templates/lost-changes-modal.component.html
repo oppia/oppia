@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <h3>Error Loading Exploration</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    Sorry! The following changes will be lost. It appears that your
+    draft was overwritten by changes on another machine.
+  </p>
+
+  <p *ngIf="hasLostChanges">
+    The lost changes are displayed below. You may want to export or copy and
+    paste these changes before discarding them.
+  </p>
+
+  <oppia-changes-in-human-readable-form [lostChanges]="lostChanges">
+  </oppia-changes-in-human-readable-form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Close</button>
+  <button class="btn btn-primary" (click)="exportChangesAndClose()">Export Changes and Close</button>
+</div>

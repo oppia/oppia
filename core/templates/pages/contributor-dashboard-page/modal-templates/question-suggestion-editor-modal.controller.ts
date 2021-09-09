@@ -19,31 +19,30 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
-  'question-suggestion.service.ts');
+  'question-suggestion-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'ContextService', 'ImageLocalStorageService',
-  'QuestionSuggestionService', 'QuestionUndoRedoService',
+  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  'ContextService', 'ContributionAndReviewService', 'ImageLocalStorageService',
+  'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
   'QuestionValidationService', 'SiteAnalyticsService',
   'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
-  'skill', 'skillDifficulty', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService,
-      ContextService, ImageLocalStorageService,
-      QuestionSuggestionService, QuestionUndoRedoService,
+      $rootScope, $scope, $uibModal, $uibModalInstance, AlertsService,
+      ContextService, ContributionAndReviewService, ImageLocalStorageService,
+      QuestionSuggestionBackendApiService, QuestionUndoRedoService,
       QuestionValidationService, SiteAnalyticsService,
       UrlInterpolationService, question, questionId, questionStateData,
-      skill, skillDifficulty, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
@@ -51,6 +50,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.questionId = questionId;
     $scope.skill = skill;
     $scope.skillDifficulty = skillDifficulty;
+    $scope.isEditing = suggestionId !== '' ? true : false;
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
@@ -70,11 +70,32 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
       ContextService.resetImageSaveDestination();
-      QuestionSuggestionService.submitSuggestion(
-        $scope.question, $scope.skill, $scope.skillDifficulty, imagesData,
-        function() {
-          AlertsService.addSuccessMessage('Submitted question for review.');
-        });
+      if ($scope.isEditing) {
+        const questionDict = $scope.question.toBackendDict(false);
+        ContributionAndReviewService.updateQuestionSuggestionAsync(
+          suggestionId,
+          $scope.skillDifficulty,
+          questionDict.question_state_data,
+          imagesData,
+          () => {
+            AlertsService.addSuccessMessage('Updated question.');
+
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
+      } else {
+        QuestionSuggestionBackendApiService.submitSuggestionAsync(
+          $scope.question, $scope.skill, $scope.skillDifficulty,
+          imagesData).then(
+          () => {
+            AlertsService.addSuccessMessage('Submitted question for review.');
+
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
+      }
       $uibModalInstance.close();
     };
     // Checking if Question contains all requirements to enable

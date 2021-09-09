@@ -33,7 +33,7 @@ export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = (
   styleUrls: []
 })
 export class SwitchContentLanguageRefreshRequiredModalComponent {
-  @Input() languageCode;
+  @Input() languageCode!: string;
 
   constructor(
     private activeModal: NgbActiveModal,

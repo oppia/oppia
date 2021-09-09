@@ -17,27 +17,23 @@
  * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
  */
 
-import { Component, Directive, Pipe } from '@angular/core';
+import { Component, Directive } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
+// TODO(#9749): Call original AngularHtmlBindWrapperDirective
+// after migration of that directive.
 let MockAngularHtmlBindWrapperDirective = function(
-    options: Component): Directive {
+    options: Component) {
   const metadata: Directive = {
     selector: options.selector,
     inputs: options.inputs,
     outputs: options.outputs
   };
-  return <undefined>Directive(metadata)(class _ { });
+  return Directive(metadata)(class _ { });
 };
 
 class MockActiveModal {

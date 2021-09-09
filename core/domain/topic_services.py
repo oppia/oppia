@@ -16,8 +16,8 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import logging
@@ -72,6 +72,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         url_fragment=topic.url_fragment,
         thumbnail_bg_color=topic.thumbnail_bg_color,
         thumbnail_filename=topic.thumbnail_filename,
+        thumbnail_size_in_bytes=topic.thumbnail_size_in_bytes,
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
@@ -394,6 +395,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.url_fragment = topic.url_fragment
     topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
+    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
     topic_model.canonical_story_references = [
         reference.to_dict() for reference in topic.canonical_story_references
     ]
@@ -466,8 +468,7 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
 
-    for subtopic_page_id in updated_subtopic_pages_dict:
-        subtopic_page = updated_subtopic_pages_dict[subtopic_page_id]
+    for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
             subtopic_page_id]
         subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
@@ -577,8 +578,11 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
-    opportunity_services.create_exploration_opportunities_for_story(
-        story_id, topic_id)
+    # Create exploration opportunities corresponding to the story and linked
+    # explorations.
+    linked_exp_ids = story.story_contents.get_all_linked_exp_ids()
+    opportunity_services.add_new_exploration_opportunities(
+        story_id, linked_exp_ids)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -907,7 +911,6 @@ def publish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds)
-    opportunity_services.create_exploration_opportunities_for_topic(topic.id)
 
 
 def unpublish_topic(topic_id, committer_id):
@@ -938,15 +941,6 @@ def unpublish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
-
-    # Delete the exploration opportunities associated with the topic and reject
-    # the corresponding translation suggestions.
-    exp_ids = (
-        opportunity_services
-        .get_exploration_opportunity_ids_corresponding_to_topic(topic_id)
-    )
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
@@ -1054,6 +1048,32 @@ def deassign_user_from_all_topics(committer, user_id):
             'Removed all assigned topics from %s' % (user_id), commit_cmds)
 
 
+def deassign_manager_role_from_topic(committer, user_id, topic_id):
+    """Deassigns given user from all topics assigned to them.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        user_id: str. The ID of the user.
+        topic_id: str. The ID of the topic.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+    """
+    topic_rights = topic_fetchers.get_topic_rights(topic_id)
+    if user_id not in topic_rights.manager_ids:
+        raise Exception('User does not have manager rights in topic.')
+
+    topic_rights.manager_ids.remove(user_id)
+    commit_cmds = [topic_domain.TopicRightsChange({
+        'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+        'removed_user_id': user_id
+    })]
+    save_topic_rights(
+        topic_rights, committer.user_id,
+        'Removed all assigned topics from %s' % (user_id), commit_cmds)
+
+
 def assign_role(committer, assignee, new_role, topic_id):
     """Assigns a new role to the user.
 
@@ -1074,7 +1094,7 @@ def assign_role(committer, assignee, new_role, topic_id):
     """
     committer_id = committer.user_id
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(
             'User %s tried to allow user %s to be a %s of topic %s '
@@ -1114,3 +1134,19 @@ def assign_role(committer, assignee, new_role, topic_id):
     })]
 
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)
+
+
+def get_story_titles_in_topic(topic):
+    """Returns titles of the stories present in the topic.
+
+    Args:
+        topic: Topic. The topic domain objects.
+
+    Returns:
+        list(str). The list of story titles in the topic.
+    """
+    canonical_story_references = topic.canonical_story_references
+    story_ids = [story.story_id for story in canonical_story_references]
+    stories = story_fetchers.get_stories_by_ids(story_ids)
+    story_titles = [story.title for story in stories if story is not None]
+    return story_titles

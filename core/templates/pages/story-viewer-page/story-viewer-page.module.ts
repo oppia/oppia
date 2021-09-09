@@ -16,75 +16,32 @@
  * @fileoverview Module for the story viewer page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { StoryViewerNavbarBreadcrumbComponent } from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
 import { StoryViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
+import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
+import { CommonModule } from '@angular/common';
+import { StoryViewerPageRoutingModule } from './story-viewer-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    StoryViewerPageRoutingModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
-    StoryViewerPageComponent
+    StoryViewerPageComponent,
+    StoryViewerPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
-    StoryViewerPageComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
+    StoryViewerPageComponent,
+    StoryViewerPageRootComponent
   ]
 })
-class StoryViewerPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(StoryViewerPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class StoryViewerPageModule {}

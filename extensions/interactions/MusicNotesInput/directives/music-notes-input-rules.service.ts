@@ -25,6 +25,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { MusicNotesAnswer } from 'interactions/answer-defs';
 import { UtilsService } from 'services/utils.service';
 
+type ReadableNoteNames = (
+  keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,8 +38,9 @@ export class MusicNotesInputRulesService {
     if (
       InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
         note.readableNoteName)) {
+      const _readableNoteName = note.readableNoteName as ReadableNoteNames;
       return InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES[
-        note.readableNoteName];
+        _readableNoteName];
     } else {
       throw new Error('Invalid music note ' + note);
     }

@@ -51,8 +51,8 @@ Terminology:
         Example values: `24400320` or `AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4`.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -65,6 +65,13 @@ import python_utils
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
+from typing import Dict, List, Optional, Union
+import webapp2
+
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import auth_models
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -72,7 +79,7 @@ auth_models, user_models = (
 transaction_services = models.Registry.import_transaction_services()
 
 
-def establish_firebase_connection():
+def establish_firebase_connection() -> None:
     """Establishes the connection to Firebase needed by the rest of the SDK.
 
     All Firebase operations require an "app", the abstraction used for a
@@ -96,7 +103,10 @@ def establish_firebase_connection():
             raise
 
 
-def establish_auth_session(request, response):
+def establish_auth_session(
+        request: webapp2.Request,
+        response: webapp2.Response
+) -> None:
     """Sets login cookies to maintain a user's sign-in session.
 
     Args:
@@ -130,7 +140,7 @@ def establish_auth_session(request, response):
         httponly=True)
 
 
-def destroy_auth_session(response):
+def destroy_auth_session(response: webapp2.Response) -> None:
     """Clears login cookies from the given response headers.
 
     Args:
@@ -139,7 +149,9 @@ def destroy_auth_session(response):
     response.delete_cookie(feconf.FIREBASE_SESSION_COOKIE_NAME)
 
 
-def get_auth_claims_from_request(request):
+def get_auth_claims_from_request(
+        request: webapp2.Request
+) -> Optional[auth_domain.AuthClaims]:
     """Authenticates the request and returns claims about its authorizer.
 
     Args:
@@ -156,7 +168,7 @@ def get_auth_claims_from_request(request):
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
 
-def mark_user_for_deletion(user_id):
+def mark_user_for_deletion(user_id: str) -> None:
     """Marks the user, and all of their auth associations, as deleted.
 
     This function also disables the user's Firebase account so that they cannot
@@ -206,7 +218,7 @@ def mark_user_for_deletion(user_id):
             '[WIPEOUT] Failed to disable Firebase account! Stack trace:')
 
 
-def delete_external_auth_associations(user_id):
+def delete_external_auth_associations(user_id: str) -> None:
     """Deletes all associations that refer to the user outside of Oppia.
 
     Args:
@@ -228,7 +240,7 @@ def delete_external_auth_associations(user_id):
         logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
 
 
-def verify_external_auth_associations_are_deleted(user_id):
+def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
     """Returns true if and only if we have successfully verified that all
     external associations have been deleted.
 
@@ -261,7 +273,9 @@ def verify_external_auth_associations_are_deleted(user_id):
     return False
 
 
-def get_auth_id_from_user_id(user_id, include_deleted=False):
+def get_auth_id_from_user_id(
+        user_id: str, include_deleted: bool = False
+) -> Optional[str]:
     """Returns the auth ID associated with the given user ID.
 
     Args:
@@ -280,7 +294,9 @@ def get_auth_id_from_user_id(user_id, include_deleted=False):
         assoc_by_user_id_model.firebase_auth_id)
 
 
-def get_multi_auth_ids_from_user_ids(user_ids):
+def get_multi_auth_ids_from_user_ids(
+        user_ids: List[str]
+) -> List[Optional[str]]:
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
@@ -296,7 +312,9 @@ def get_multi_auth_ids_from_user_ids(user_ids):
     ]
 
 
-def get_user_id_from_auth_id(auth_id, include_deleted=False):
+def get_user_id_from_auth_id(
+        auth_id: str, include_deleted: bool = False
+) -> Optional[str]:
     """Returns the user ID associated with the given auth ID.
 
     Args:
@@ -316,7 +334,9 @@ def get_user_id_from_auth_id(auth_id, include_deleted=False):
         assoc_by_auth_id_model.user_id)
 
 
-def get_multi_user_ids_from_auth_ids(auth_ids):
+def get_multi_user_ids_from_auth_ids(
+        auth_ids: List[str]
+) -> List[Optional[str]]:
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
@@ -332,7 +352,9 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     ]
 
 
-def associate_auth_id_with_user_id(auth_id_user_id_pair):
+def associate_auth_id_with_user_id(
+        auth_id_user_id_pair: auth_domain.AuthIdUserIdPair
+) -> None:
     """Commits the association between auth ID and user ID.
 
     Args:
@@ -382,7 +404,9 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
         assoc_by_user_id_model.put()
 
 
-def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
+def associate_multi_auth_ids_with_user_ids(
+        auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]
+) -> None:
     """Commits the associations between auth IDs and user IDs.
 
     Args:
@@ -397,21 +421,21 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
     user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in user_id_collisions):
-        user_id_collisions = ', '.join(
+        user_id_collisions_text = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
             for auth_id, user_id in python_utils.ZIP(
                 auth_ids, user_id_collisions)
             if user_id is not None)
-        raise Exception('already associated: %s' % user_id_collisions)
+        raise Exception('already associated: %s' % user_id_collisions_text)
 
     auth_id_collisions = get_multi_auth_ids_from_user_ids(user_ids)
     if any(auth_id is not None for auth_id in auth_id_collisions):
-        auth_id_collisions = ', '.join(
+        auth_id_collisions_text = ', '.join(
             '{user_id=%r: auth_id=%r}' % (user_id, auth_id)
             for user_id, auth_id in python_utils.ZIP(
                 user_ids, auth_id_collisions)
             if auth_id is not None)
-        raise Exception('already associated: %s' % auth_id_collisions)
+        raise Exception('already associated: %s' % auth_id_collisions_text)
 
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None.
@@ -443,7 +467,7 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
 
 
-def grant_super_admin_privileges(user_id):
+def grant_super_admin_privileges(user_id: str) -> None:
     """Grants the user super admin privileges.
 
     Args:
@@ -459,7 +483,7 @@ def grant_super_admin_privileges(user_id):
     firebase_auth.revoke_refresh_tokens(auth_id)
 
 
-def revoke_super_admin_privileges(user_id):
+def revoke_super_admin_privileges(user_id: str) -> None:
     """Revokes the user's super admin privileges.
 
     Args:
@@ -474,81 +498,7 @@ def revoke_super_admin_privileges(user_id):
     firebase_auth.revoke_refresh_tokens(auth_id)
 
 
-def seed_firebase():
-    """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob.
-
-    NOTE: This function is idempotent.
-
-    TODO(#11462): Delete this handler once the Firebase migration logic is
-    rollback-safe and all backup data is using post-migration data.
-    """
-    seed_model = auth_models.FirebaseSeedModel.get(
-        auth_models.ONLY_FIREBASE_SEED_MODEL_ID, strict=False)
-    if seed_model is None: # Exactly 1 seed model must exist.
-        auth_models.FirebaseSeedModel(
-            id=auth_models.ONLY_FIREBASE_SEED_MODEL_ID).put()
-
-    user_ids_with_admin_email = [
-        key.id() for key in user_models.UserSettingsModel.query(
-            user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
-        ).iter(keys_only=True)
-    ]
-    assoc_by_user_id_models = [
-        model for model in auth_models.UserAuthDetailsModel.get_multi(
-            user_ids_with_admin_email)
-        if model is not None and model.gae_id != feconf.SYSTEM_COMMITTER_ID
-    ]
-    if len(assoc_by_user_id_models) != 1:
-        raise Exception(
-            '%s must correspond to exactly 1 user (excluding user_id=%s), but '
-            'found user_ids=[%s]' % (
-                feconf.ADMIN_EMAIL_ADDRESS, feconf.SYSTEM_COMMITTER_ID,
-                ', '.join(m.id for m in assoc_by_user_id_models)))
-    else:
-        assoc_by_user_id_model = assoc_by_user_id_models[0]
-        user_id = assoc_by_user_id_model.id
-
-    auth_id = assoc_by_user_id_model.firebase_auth_id
-    if auth_id is None:
-        auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
-        assoc_by_user_id_model.firebase_auth_id = auth_id
-        assoc_by_user_id_model.update_timestamps(update_last_updated_time=False)
-        assoc_by_user_id_model.put()
-
-    assoc_by_auth_id_model = (
-        auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
-    if assoc_by_auth_id_model is None:
-        auth_models.UserIdByFirebaseAuthIdModel(
-            id=auth_id, user_id=user_id).put()
-    elif assoc_by_auth_id_model.user_id != user_id:
-        assoc_by_auth_id_model.user_id = user_id
-        assoc_by_auth_id_model.update_timestamps(update_last_updated_time=False)
-        assoc_by_auth_id_model.put()
-
-    custom_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
-
-    try:
-        user = firebase_auth.get_user_by_email(feconf.ADMIN_EMAIL_ADDRESS)
-    except firebase_auth.UserNotFoundError:
-        create_new_firebase_account = True
-    else:
-        if user.uid != auth_id:
-            firebase_auth.update_user(user.uid, disabled=True)
-            firebase_auth.delete_user(user.uid)
-            create_new_firebase_account = True
-        else:
-            firebase_auth.set_custom_user_claims(user.uid, custom_claims)
-            create_new_firebase_account = False
-
-    if create_new_firebase_account:
-        firebase_auth.import_users([
-            firebase_auth.ImportUserRecord(
-                auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
-                custom_claims=custom_claims),
-        ])
-
-
-def _get_session_cookie(request):
+def _get_session_cookie(request: webapp2.Request) -> Optional[str]:
     """Returns the session cookie authorizing the signed in user, if present.
 
     Args:
@@ -561,7 +511,7 @@ def _get_session_cookie(request):
     return request.cookies.get(feconf.FIREBASE_SESSION_COOKIE_NAME)
 
 
-def _get_id_token(request):
+def _get_id_token(request: webapp2.Request) -> Optional[str]:
     """Returns the ID token authorizing a user, or None if missing.
 
     Oppia uses the OAuth 2.0's Bearer authentication scheme to send ID Tokens.
@@ -592,7 +542,9 @@ def _get_id_token(request):
     return token if scheme == 'Bearer' else None
 
 
-def _get_auth_claims_from_session_cookie(cookie):
+def _get_auth_claims_from_session_cookie(
+        cookie: Optional[str]
+) -> Optional[auth_domain.AuthClaims]:
     """Returns claims from the session cookie, or None if invalid.
 
     Args:
@@ -622,7 +574,9 @@ def _get_auth_claims_from_session_cookie(cookie):
         return _create_auth_claims(claims)
 
 
-def _create_auth_claims(firebase_claims):
+def _create_auth_claims(
+        firebase_claims: Dict[str, Optional[Union[str, bool]]]
+) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from Firebase claims.
 
     Args:
@@ -637,5 +591,5 @@ def _create_auth_claims(firebase_claims):
     role_is_super_admin = (
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
-    return auth_domain.AuthClaims(
+    return auth_domain.AuthClaims( # type: ignore[no-untyped-call]
         auth_id, email, role_is_super_admin=role_is_super_admin)

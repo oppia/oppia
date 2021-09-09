@@ -19,7 +19,7 @@
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 
 describe('Testing filters', () => {
-  let pipe: CapitalizePipe = null;
+  let pipe: CapitalizePipe;
   beforeEach(() => {
     pipe = new CapitalizePipe();
   });
@@ -30,8 +30,6 @@ describe('Testing filters', () => {
 
   it('should correctly capitalize strings', () =>{
     expect(pipe.transform('')).toEqual('');
-    expect(pipe.transform(null)).toEqual(null);
-    expect(pipe.transform(undefined)).toEqual(undefined);
 
     expect(pipe.transform('a')).toEqual('A');
     expect(pipe.transform('a  ')).toEqual('A');

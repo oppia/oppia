@@ -20,7 +20,7 @@ import { TruncateAndCapitalizePipe } from
   'filters/string-utility-filters/truncate-and-capitalize.pipe';
 
 describe('Testing filters', function() {
-  let truncateAndCapitalizePipe: TruncateAndCapitalizePipe = null;
+  let truncateAndCapitalizePipe: TruncateAndCapitalizePipe;
   beforeEach(() => {
     truncateAndCapitalizePipe = new TruncateAndCapitalizePipe();
   });
@@ -54,19 +54,9 @@ describe('Testing filters', function() {
       expect(truncateAndCapitalizePipe.transform(' 123456 a bc d', 12))
         .toEqual('123456 a bc...');
 
-      // If the maximum number of characters is not specified, return
-      // the whole input string with the first letter capitalized.
-      expect(truncateAndCapitalizePipe.transform(
-        'capitalize first letter and truncate', null))
-        .toEqual('Capitalize first letter and truncate');
       expect(truncateAndCapitalizePipe.transform(
         'a single sentence with more than twenty one characters', 21
       )).toEqual('A single sentence...');
-
-      expect(truncateAndCapitalizePipe.transform(
-        'a single sentence with more than 21 characters and all will be shown',
-        null)).toEqual(
-        'A single sentence with more than 21 characters and all will be shown');
 
       // If maximum characters is greater than objective length
       // return whole objective.

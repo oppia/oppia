@@ -16,7 +16,7 @@
  * @fileoverview Component for the local navigation in the learner view.
  */
 
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
@@ -34,10 +34,10 @@ import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-
   selector: 'oppia-learner-local-nav',
   templateUrl: './learner-local-nav.component.html'
 })
-export class LearnerLocalNavComponent {
-  explorationId: string;
-  canEdit: boolean;
-  version: number;
+export class LearnerLocalNavComponent implements OnInit {
+  explorationId: string = null;
+  canEdit: boolean = null;
+  version: number = null;
   username: string = '';
   feedbackOptionIsShown: boolean = true;
   @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;

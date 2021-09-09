@@ -115,6 +115,11 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
       $scope.suggestionEditorIsShown = false;
     };
 
+    $scope.updateValue = function(value: string) {
+      $scope.suggestionData.newSuggestionHtml = value;
+      $scope.$applyAsync();
+    };
+
     $scope.resubmitChanges = function() {
       $uibModalInstance.close({
         action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,

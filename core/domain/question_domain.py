@@ -16,8 +16,8 @@
 
 """Domain objects relating to questions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import copy
@@ -1093,6 +1093,44 @@ class Question(python_utils.OBJECT):
 
         question_state_dict['linked_skill_id'] = None
 
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
+        """Converts from version 45 to 46. Version 46 ensures that the written
+        translations in a state containing unicode content do not contain HTML
+        tags and the data_format is unicode. This does not affect questions, so
+        no conversion is required.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v46_dict_to_v47_dict(cls, question_state_dict):
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
         return question_state_dict
 
     @classmethod

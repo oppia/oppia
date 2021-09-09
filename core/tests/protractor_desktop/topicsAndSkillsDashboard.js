@@ -43,7 +43,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDB');
   });
@@ -142,7 +142,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
 
-    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('Math');
+    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('math');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);

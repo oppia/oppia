@@ -24,7 +24,7 @@ import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
@@ -85,6 +85,9 @@ export class ExplorationPlayerStateService {
     private statsReportingService: StatsReportingService,
     private urlService: UrlService
   ) {
+    this.init();
+  }
+  init(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
@@ -102,7 +105,7 @@ export class ExplorationPlayerStateService {
       this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       this.explorationId = this.contextService.getExplorationId();
-      this.version = urlService.getExplorationVersionFromUrl();
+      this.version = this.urlService.getExplorationVersionFromUrl();
 
       if (!this.questionPlayerMode &&
       !('skill_editor' === this.urlService.getPathname()

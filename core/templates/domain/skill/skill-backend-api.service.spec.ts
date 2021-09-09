@@ -35,9 +35,9 @@ describe('Skill backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    skillBackendApiService = TestBed.get(SkillBackendApiService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
       id: '2',
@@ -96,6 +96,23 @@ describe('Skill backend API service', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
+
+  it('should fetch all skills', fakeAsync(() => {
+    const skills: SkillBackendDict[] = [];
+    skills.push(
+      skillObjectFactory.createFromBackendDict(skillBackendDict).toBackendDict()
+    );
+    skillBackendApiService.fetchAllSkills().toPromise().then(
+      res => {
+        expect(res).toEqual(skills);
+      }
+    );
+    let req = httpTestingController.expectOne('/fetch_skills');
+    expect(req.request.method).toEqual('GET');
+    req.flush(skills);
+
+    flushMicrotasks();
+  }));
 
   it(
     'should succesfully fetch an existing skill from the backend.',

@@ -23,26 +23,31 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { SubtopicViewerNavbarBreadcrumbComponent } from
-  // eslint-disable-next-line max-len
-  'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { SubtopicViewerNavbarBreadcrumbComponent } from './navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
+import { SubtopicViewerPageComponent } from './subtopic-viewer-page.component';
+import { SubtopicViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/subtopic-viewer-navbar-pre-logo-action.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
-    SubtopicViewerNavbarBreadcrumbComponent
+    SubtopicViewerNavbarBreadcrumbComponent,
+    SubtopicViewerPageComponent,
+    SubtopicViewerNavbarPreLogoActionComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent,
+    SubtopicViewerPageComponent,
+    SubtopicViewerNavbarPreLogoActionComponent,
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
@@ -66,6 +71,8 @@ class SubtopicViewerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

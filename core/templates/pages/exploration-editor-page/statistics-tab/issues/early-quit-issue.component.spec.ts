@@ -16,6 +16,7 @@ import { TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 /**
  * @fileoverview Unit tests for earlyQuitIssue.
@@ -31,7 +32,7 @@ describe('Early Quit Issue Component', function() {
   var explorationVersion = 1;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);

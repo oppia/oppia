@@ -19,11 +19,13 @@
 import { NgZone, SimpleChanges } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import CodeMirror from 'node_modules/@types/codemirror';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
 
 describe('Oppia CodeMirror Component', () => {
   let component: CodemirrorMergeviewComponent;
   let fixture: ComponentFixture<CodemirrorMergeviewComponent>;
+  let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,27 +37,28 @@ describe('Oppia CodeMirror Component', () => {
     fixture = TestBed.createComponent(CodemirrorMergeviewComponent);
     component = fixture.componentInstance;
     const zone: NgZone = TestBed.inject(NgZone);
+    windowRef = TestBed.inject(WindowRef);
     spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
   }));
 
   it('should throw error if codemirror is undefined', () => {
-    const originalCodeMirror = window.CodeMirror;
-    window.CodeMirror = undefined;
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({});
     expect(() => {
       component.ngOnInit();
     }).toThrowError('CodeMirror not found.');
-    window.CodeMirror = originalCodeMirror;
   });
 
   it('should call merge view', () => {
+    let codeMirrorInstance = component.codeMirrorInstance;
+    expect(codeMirrorInstance).toBe(undefined);
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
-    const mergeView = (...args: unknown[]): void => {
+    const mockMergeView = (element: HTMLElement): void => {
       mergeViewCalled = true;
     };
     const mockCodeMirror: typeof CodeMirror = {
-      MergeView: mergeView
-    } as unknown as typeof CodeMirror;
+      MergeView: mockMergeView
+    } as typeof CodeMirror;
     window.CodeMirror = mockCodeMirror;
     component.ngAfterViewInit();
     expect(mergeViewCalled).toBe(true);
@@ -65,14 +68,21 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    component.codeMirrorInstance = {
-      editor: () => {
-        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
-      },
-      rightOriginal: () => {
-        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      CodeMirror: {
+        MergeView: () => {
+          return {
+            editor: () => {
+              return { setValue: editSetValueSpy };
+            },
+            rightOriginal: () => {
+              return { setValue: rightOrgSetValueSpy };
+            }
+          };
+        }
       }
-    } as unknown as CodeMirror.MergeView.MergeViewEditor;
+    });
+    component.ngAfterViewInit();
     let changes: SimpleChanges = {
       leftValue: {
         currentValue: undefined,
@@ -99,17 +109,24 @@ describe('Oppia CodeMirror Component', () => {
     );
   });
 
-  it('should not allow undefined for left or right pane', () => {
+  it('should watch for changes and set value for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    component.codeMirrorInstance = {
-      editor: () => {
-        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
-      },
-      rightOriginal: () => {
-        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      CodeMirror: {
+        MergeView: () => {
+          return {
+            editor: () => {
+              return { setValue: editSetValueSpy };
+            },
+            rightOriginal: () => {
+              return { setValue: rightOrgSetValueSpy };
+            }
+          };
+        }
       }
-    } as unknown as CodeMirror.MergeView.MergeViewEditor;
+    });
+    component.ngAfterViewInit();
     const changes: SimpleChanges = {
       leftValue: {
         currentValue: 'A',

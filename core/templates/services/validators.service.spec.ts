@@ -17,13 +17,12 @@
  */
 import { TestBed } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
 
 describe('Validators service', () => {
-  let vs: ValidatorsService = null;
+  let vs: ValidatorsService;
   const INVALID_NAME_CHARS_COPY = (
     Array.from(AppConstants.INVALID_NAME_CHARS));
 
@@ -31,7 +30,7 @@ describe('Validators service', () => {
     TestBed.configureTestingModule({
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
-    vs = TestBed.get(ValidatorsService);
+    vs = TestBed.inject(ValidatorsService);
     // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
     // is a read-only property.". We need to suppress this error because
     // we need to change the value of 'INVALID_NAME_CHARS' for testing
@@ -51,59 +50,65 @@ describe('Validators service', () => {
   });
 
   it('should correctly validate entity names', () => {
-    expect(vs.isValidEntityName('b', null, null)).toBe(true);
-    expect(vs.isValidEntityName('b   ', null, null)).toBe(true);
-    expect(vs.isValidEntityName('   b', null, null)).toBe(true);
-    expect(vs.isValidEntityName('bd', null, null)).toBe(true);
+    expect(vs.isValidEntityName('b', false, false)).toBe(true);
+    expect(vs.isValidEntityName('b   ', false, false)).toBe(true);
+    expect(vs.isValidEntityName('   b', false, false)).toBe(true);
+    expect(vs.isValidEntityName('bd', false, false)).toBe(true);
 
-    expect(vs.isValidEntityName('', true, null)).toBe(false);
-    expect(vs.isValidEntityName('   ', null, null)).toBe(false);
-    expect(vs.isValidEntityName('x', null, null)).toBe(false);
-    expect(vs.isValidEntityName('y', null, null)).toBe(false);
-    expect(vs.isValidEntityName('bx', true, null)).toBe(false);
+    expect(vs.isValidEntityName('', true, false)).toBe(false);
+    expect(vs.isValidEntityName('   ', false, false)).toBe(false);
+    expect(vs.isValidEntityName('x', false, false)).toBe(false);
+    expect(vs.isValidEntityName('y', false, false)).toBe(false);
+    expect(vs.isValidEntityName('bx', true, false)).toBe(false);
   });
 
   it('should correctly validate exploration titles', () => {
-    expect(vs.isValidExplorationTitle('b', null)).toBe(true);
-    expect(vs.isValidExplorationTitle('abc def', null)).toBe(true);
+    expect(vs.isValidExplorationTitle('b', false)).toBe(true);
+    expect(vs.isValidExplorationTitle('abc def', false)).toBe(true);
 
-    expect(vs.isValidExplorationTitle('', null)).toBe(false);
-    expect(vs.isValidExplorationTitle(null, null)).toBe(false);
-    expect(vs.isValidExplorationTitle(undefined, null)).toBe(false);
+    expect(vs.isValidExplorationTitle('', false)).toBe(false);
+    expect(vs.isValidExplorationTitle('', false)).toBe(false);
     expect(vs.isValidExplorationTitle(
-      'A title with invalid characters #', null)).toBe(false);
+      'A title with invalid characters #', false)).toBe(false);
     expect(vs.isValidExplorationTitle(
       'A title that is toooooooooooooooooooooooooo too long.', true)).toBe(
       false);
   });
 
   it('should correctly validate non-emptiness', () => {
-    expect(vs.isNonempty('b', null)).toBe(true);
-    expect(vs.isNonempty('abc def', null)).toBe(true);
+    expect(vs.isNonempty('b', false)).toBe(true);
+    expect(vs.isNonempty('abc def', false)).toBe(true);
 
-    expect(vs.isNonempty('', null)).toBe(false);
-    expect(vs.isNonempty(null, null)).toBe(false);
-    expect(vs.isNonempty(undefined, true)).toBe(false);
+    expect(vs.isNonempty('', false)).toBe(false);
+    expect(vs.isNonempty('', false)).toBe(false);
+    expect(vs.isNonempty('', true)).toBe(false);
   });
 
   it('should correctly validate exploration IDs', () => {
-    expect(vs.isValidExplorationId('b', null)).toBe(true);
-    expect(vs.isValidExplorationId('2', null)).toBe(true);
-    expect(vs.isValidExplorationId('asbfjkdAFS-_', null)).toBe(true);
+    expect(vs.isValidExplorationId('b', false)).toBe(true);
+    expect(vs.isValidExplorationId('2', false)).toBe(true);
+    expect(vs.isValidExplorationId('asbfjkdAFS-_', false)).toBe(true);
 
-    expect(vs.isValidExplorationId('abc def', null)).toBe(false);
-    expect(vs.isValidExplorationId('', null)).toBe(false);
+    expect(vs.isValidExplorationId('abc def', false)).toBe(false);
+    expect(vs.isValidExplorationId('', false)).toBe(false);
     expect(vs.isValidExplorationId('abcd;', true)).toBe(false);
   });
 
   it('should correctly validate state name', () => {
-    expect(vs.isValidStateName('abc def', null)).toBe(true);
+    expect(vs.isValidStateName('abc def', false)).toBe(true);
 
-    expect(vs.isValidStateName('', null)).toBe(false);
+    expect(vs.isValidStateName('', false)).toBe(false);
     expect(vs.isValidStateName(
-      'A state name with invalid character x', null)).toBe(false);
+      'A state name with invalid character x', false)).toBe(false);
     expect(vs.isValidStateName(
       'A state name that is toooooooooooooooooooooooo long', true))
       .toBe(false);
+  });
+
+  it('should correctly validate review message', () => {
+    const longReviewText: string = 'a'.repeat(10001);
+    expect(vs.isValidReviewMessage('some review message', false)).toBe(true);
+    expect(vs.isValidReviewMessage('', false)).toBe(true);
+    expect(vs.isValidReviewMessage(longReviewText, true)).toBe(false);
   });
 });

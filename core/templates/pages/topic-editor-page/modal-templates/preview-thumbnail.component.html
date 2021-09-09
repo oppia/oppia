@@ -1,18 +1,18 @@
 <div class="oppia-thumbnail-container protractor-test-thumbnail-container"
-     ng-style="{width: $ctrl.getAspectRatio() === '4:3' ? '248px' : '280px' }">
+     [ngStyle]="{width: aspectRatio === '4:3' ? '248px' : '280px' }">
   <oppia-thumbnail-display [classes]="['oppia-thumbnail-image']"
-                           [img-src]="$ctrl.editableThumbnailDataUrl"
-                           [background]="$ctrl.getThumbnailBgColor()"
-                           [aspect-ratio]="$ctrl.getAspectRatio()">
+                           [imgSrc]="editableThumbnailDataUrl"
+                           [background]="thumbnailBgColor"
+                           [aspectRatio]="'16:9'">
   </oppia-thumbnail-display>
   <div class="oppia-thumbnail-preview-title">
-      <[$ctrl.getName()]>
+      {{ name }}
   </div>
   <div class="oppia-thumbnail-preview-footer">
-    <[$ctrl.getPreviewFooter()]>
+    {{ previewFooter }}
   </div>
   <div class="oppia-thumbnail-preview-description">
-    <[$ctrl.getDescription()]>
+    {{ description }}
   </div>
 </div>
 <style>

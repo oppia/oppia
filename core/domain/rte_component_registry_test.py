@@ -16,8 +16,8 @@
 
 """Unit tests for core.domain.rte_component_registry."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import inspect
 import os
@@ -166,20 +166,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(protractor_file))
 
             main_ts_file = os.path.join(
-                directives_dir, 'oppia-noninteractive-%s.directive.ts'
+                directives_dir, 'oppia-noninteractive-%s.component.ts'
                 % hyphenated_component_id)
             main_html_file = os.path.join(
-                directives_dir, '%s.directive.html' % hyphenated_component_id)
-            # TODO(#9762): Remove this if condition once all the files in the
-            # rich_text_components directory is migrated from directives
-            # to component files.
-            if hyphenated_component_id == 'svgdiagram':
-                main_ts_file = os.path.join(
-                    directives_dir, 'oppia-noninteractive-%s.component.ts'
-                    % hyphenated_component_id)
-                main_html_file = os.path.join(
-                    directives_dir, '%s.component.html'
-                    % hyphenated_component_id)
+                directives_dir, '%s.component.html'
+                % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
@@ -236,9 +227,12 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         """Test get_all_rte_components method."""
         obtained_components = list(
             rte_component_registry.Registry.get_all_rte_components().keys())
-        actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+        actual_components = [
+            name for name in os.listdir('./extensions/rich_text_components')
+            if os.path.isdir(
+                os.path.join('./extensions/rich_text_components', name)
+            ) and name != '__pycache__'
+        ]
 
         self.assertEqual(set(obtained_components), set(actual_components))
 
@@ -258,10 +252,8 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(obtained_tag_list_with_attrs.keys()),
             set(actual_tag_list_with_attrs.keys()))
-        for key in obtained_tag_list_with_attrs:
-            self.assertEqual(
-                set(obtained_tag_list_with_attrs[key]),
-                set(actual_tag_list_with_attrs[key]))
+        for key, attrs in obtained_tag_list_with_attrs.items():
+            self.assertEqual(set(attrs), set(actual_tag_list_with_attrs[key]))
 
     def test_get_component_types_to_component_classes(self):
         """Test get_component_types_to_component_classes method."""

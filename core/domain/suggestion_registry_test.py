@@ -14,8 +14,8 @@
 
 """Tests for suggestion registry classes."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import os
@@ -854,12 +854,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
             'change': {
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p>This is a content.</p>',
-                'translation_html': '<p>This is translated html.</p>'
+                'translation_html': '<p>This is translated html.</p>',
+                'data_format': 'html'
             },
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
@@ -867,7 +868,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'edited_by_reviewer': False
         }
 
-    def test_pre_update_validate_change_cmd(self):
+    def test_pre_update_validate_fails_for_invalid_change_cmd(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -885,7 +886,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'The new change cmd must be equal to %s' % (
-                exp_domain.CMD_ADD_TRANSLATION)
+                exp_domain.CMD_ADD_WRITTEN_TRANSLATION)
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
@@ -900,12 +901,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
         change = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>This is a content.</p>',
-            'translation_html': '<p>This is the updated translated html.</p>'
+            'translation_html': '<p>This is the updated translated html.</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -924,12 +926,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
         change = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'en',
             'content_html': '<p>This is a content.</p>',
-            'translation_html': '<p>This is the updated translated html.</p>'
+            'translation_html': '<p>This is the updated translated html.</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -948,12 +951,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
         change = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'en',
             'content_html': '<p>This is the changed content.</p>',
-            'translation_html': '<p>This is the updated translated html.</p>'
+            'translation_html': '<p>This is the updated translated html.</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -1306,7 +1310,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change.cmd = 'invalid_cmd'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected cmd to be add_translation'
+            utils.ValidationError, 'Expected cmd to be add_written_translation'
         ):
             suggestion.validate()
 
@@ -1455,25 +1459,51 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion_adds_translation_in_exploration(self):
         self.save_new_default_exploration('exp1', self.author_id)
-
         exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {})
-
-        expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
 
+    def test_accept_suggestion_with_set_of_string_adds_translation(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
@@ -1514,8 +1544,34 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
+
         expected_outcome_list = [
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_all_html_content_strings_for_content_lists(self):
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+
+        expected_outcome_list = [
+            'translated text1', 'translated text2', 'text1', 'text2']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_target_entity_html_strings_returns_expected_strings(self):
@@ -1542,12 +1598,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': html_content,
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
@@ -2461,7 +2518,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
                 'question_state_data': self.VERSION_27_STATE_DICT,
-                'question_state_data_schema_version': None,
+                'question_state_data_schema_version': 23,
                 'language_code': 'en',
                 'linked_skill_ids': ['skill_id'],
                 'inapplicable_skill_misconception_ids': []
@@ -2470,7 +2527,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
         self.assertEqual(
-            change['question_dict']['question_state_data_schema_version'], None)
+            change['question_dict']['question_state_data_schema_version'], 23)
 
         with self.assertRaisesRegexp(
             utils.ValidationError,

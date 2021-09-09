@@ -29,9 +29,12 @@ import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.servic
   templateUrl: './promo-bar.component.html'
 })
 export class PromoBarComponent implements OnInit {
-  promoIsVisible: boolean;
-  promoBarIsEnabled: boolean;
-  promoBarMessage: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  promoIsVisible!: boolean;
+  promoBarIsEnabled!: boolean;
+  promoBarMessage!: string;
 
   constructor(
     private promoBarBackendApiService: PromoBarBackendApiService,
@@ -41,8 +44,8 @@ export class PromoBarComponent implements OnInit {
   ngOnInit(): void {
     this.promoBarBackendApiService.getPromoBarDataAsync()
       .then((promoBar) => {
-        this.promoBarIsEnabled = promoBar.isPromoBarEnabled();
-        this.promoBarMessage = promoBar.getPromoBarMessage();
+        this.promoBarIsEnabled = promoBar.promoBarEnabled;
+        this.promoBarMessage = promoBar.promoBarMessage;
       });
     this.promoIsVisible = !this.isPromoDismissed();
   }
@@ -56,6 +59,7 @@ export class PromoBarComponent implements OnInit {
     if (typeof (promoIsDismissed) !== 'undefined') {
       return JSON.parse(promoIsDismissed);
     }
+    return false;
   }
 
   setPromoDismissed(promoIsDismissed: boolean): boolean {
@@ -64,6 +68,7 @@ export class PromoBarComponent implements OnInit {
     }
     this.windowRef.nativeWindow.sessionStorage.promoIsDismissed =
       JSON.stringify(promoIsDismissed);
+    return true;
   }
 
   isSessionStorageAvailable(): boolean {

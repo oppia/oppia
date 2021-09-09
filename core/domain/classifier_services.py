@@ -14,8 +14,8 @@
 
 """Services for classifier data models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import datetime
@@ -41,16 +41,18 @@ def generate_signature(secret, message, vm_id):
     """Generates digital signature for given data.
 
     Args:
-        secret: str. The secret used to communicate with Oppia-ml.
-        message: str. The message payload data.
+        secret: bytes. The secret used to communicate with Oppia-ml.
+        message: bytes. The message payload data.
         vm_id: str. The ID of the VM that generated the message.
 
     Returns:
         str. The signature of the payload data.
     """
-    message = '%s|%s' % (base64.b64encode(message), vm_id)
+    encoded_vm_id = python_utils.convert_to_bytes(vm_id)
+    message = b'%s|%s' % (base64.b64encode(message), encoded_vm_id)
     return hmac.new(
-        secret, msg=message, digestmod=hashlib.sha256).hexdigest()
+        secret, msg=message, digestmod=hashlib.sha256
+    ).hexdigest()
 
 
 def verify_signature(oppia_ml_auth_info):
@@ -72,7 +74,8 @@ def verify_signature(oppia_ml_auth_info):
         return False
 
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
+        secret, python_utils.convert_to_bytes(oppia_ml_auth_info.message),
+        oppia_ml_auth_info.vm_id)
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
@@ -202,9 +205,7 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
                 state_names_to_retrieve[index])
             continue
         new_state_name = state_names[index]
-        algorithm_ids_to_job_ids = {
-            algorithm_id: job_id
-            for algorithm_id, job_id in classifier_training_job_map.items()}
+        algorithm_ids_to_job_ids = dict(classifier_training_job_map.items())
         state_training_jobs_mapping = (
             classifier_domain.StateTrainingJobsMapping(
                 exp_id, current_exp_version, new_state_name,
@@ -652,11 +653,7 @@ def create_classifier_training_job_for_reverted_exploration(
             classifier_training_job_maps_for_old_version):
         if classifier_training_job_map is not None:
             state_name = state_names[index]
-            algorithm_ids_to_job_ids = {
-                algorithm_id: job_id
-                for algorithm_id, job_id in (
-                    classifier_training_job_map.items())
-            }
+            algorithm_ids_to_job_ids = dict(classifier_training_job_map.items())
             state_training_jobs_mapping = (
                 classifier_domain.StateTrainingJobsMapping(
                     exploration.id, exploration.version + 1, state_name,

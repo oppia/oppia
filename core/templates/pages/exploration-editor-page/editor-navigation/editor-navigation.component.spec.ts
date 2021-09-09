@@ -26,7 +26,8 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ChangeListService } from '../services/change-list.service';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -44,8 +45,10 @@ describe('Editor Navigation Component', function() {
   var threadDataBackendApiService = null;
   var userService = null;
   var windowDimensionsService = null;
+  var internetConnectivityService = null;
 
   var mockOpenPostTutorialHelpPopover = new EventEmitter();
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
   var testSubscriptions: Subscription;
 
@@ -56,7 +59,7 @@ describe('Editor Navigation Component', function() {
   var explorationRightsService = null;
   var editabilityService = null;
   var explorationSaveService = null;
-  var changeListService = null;
+  let changeListService: ChangeListService = null;
   var explorationId = 'exp1';
   var userInfo = {
     isLoggedIn: () => true
@@ -65,7 +68,10 @@ describe('Editor Navigation Component', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        ChangeListService
+      ]
     });
   });
 
@@ -74,6 +80,7 @@ describe('Editor Navigation Component', function() {
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     userService = TestBed.get(UserService);
+    changeListService = TestBed.inject(ChangeListService);
   });
 
   describe('when screen is large', function() {
@@ -85,7 +92,6 @@ describe('Editor Navigation Component', function() {
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationRightsService = $injector.get('ExplorationRightsService');
-      changeListService = $injector.get('ChangeListService');
       explorationSaveService = $injector.get('ExplorationSaveService');
       editabilityService = $injector.get('EditabilityService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
@@ -96,6 +102,8 @@ describe('Editor Navigation Component', function() {
         $injector.get('ThreadDataBackendApiService'));
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
+      internetConnectivityService = $injector.get(
+        'InternetConnectivityService');
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -104,6 +112,9 @@ describe('Editor Navigation Component', function() {
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       spyOn(userService, 'getUserInfoAsync').
         and.returnValue(userInfo);
+      spyOnProperty(
+        internetConnectivityService, 'onInternetStateChange').and.returnValue(
+        mockConnectionServiceEmitter);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -127,6 +138,7 @@ describe('Editor Navigation Component', function() {
       ctrl = $componentController('editorNavigation', {
         $scope: $scope,
         WindowDimensionsService: windowDimensionsService,
+        InternetConnectivityService: internetConnectivityService,
         UserExplorationPermissionsService: MockUserExplorationPermissionsService
       });
       ctrl.$onInit();
@@ -351,6 +363,22 @@ describe('Editor Navigation Component', function() {
         $flushPendingTasks();
 
         expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
+      });
+
+    it('should change connnection status to ONLINE when internet is connected',
+      () => {
+        $scope.connectedToInternet = false;
+        mockConnectionServiceEmitter.emit(true);
+        $scope.$apply();
+        expect($scope.connectedToInternet).toBe(true);
+      });
+
+    it('should change connnection status to OFFLINE when internet disconnects',
+      () => {
+        $scope.connectedToInternet = true;
+        mockConnectionServiceEmitter.emit(false);
+        $scope.$apply();
+        expect($scope.connectedToInternet).toBe(false);
       });
   });
 
