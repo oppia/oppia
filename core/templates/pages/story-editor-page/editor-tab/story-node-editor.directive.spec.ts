@@ -256,30 +256,6 @@ describe('Story node editor directive', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should show alert message when we try to ' +
-    'add a prerequisite skill id which already exists', fakeAsync(function() {
-    spyOn(storyUpdateService, 'addPrerequisiteSkillIdToNode')
-      .and.callFake(() => {
-        throw new Error('skill id already exist.');
-      });
-    let alertsSpy = spyOn(AlertsService, 'addInfoMessage')
-      .and.returnValue(null);
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        });
-    });
-
-    $scope.addPrerequisiteSkillId();
-    tick();
-    $scope.$apply();
-
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'Given skill is already a prerequisite skill', 5000);
-  }));
-
   it('should open add skill modal for adding acquired skill', function() {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
@@ -291,30 +267,6 @@ describe('Story node editor directive', function() {
     $scope.addAcquiredSkillId();
     expect(modalSpy).toHaveBeenCalled();
   });
-
-  it('should show alert message when we try to ' +
-    'add a acquired skill id which already exists', fakeAsync(function() {
-    spyOn(storyUpdateService, 'addAcquiredSkillIdToNode')
-      .and.callFake(() => {
-        throw new Error('skill id already exist.');
-      });
-    let alertsSpy = spyOn(AlertsService, 'addInfoMessage')
-      .and.returnValue(null);
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>(
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        });
-    });
-
-    $scope.addAcquiredSkillId();
-    tick();
-    $scope.$apply();
-
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'Given skill is already an acquired skill', 5000);
-  }));
 
   it('should toggle chapter outline', function() {
     $scope.chapterOutlineIsShown = false;
@@ -433,21 +385,6 @@ describe('Story node editor directive', function() {
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should show alert message if we try to update ' +
-    'exploration id with empty value', function() {
-    spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(false);
-    var deferred = $q.defer();
-    deferred.resolve(false);
-    spyOn(storyUpdateService, 'setStoryNodeExplorationId');
-    let alertsSpy = spyOn(AlertsService, 'addInfoMessage')
-      .and.returnValue(null);
-
-    $scope.updateExplorationId('');
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'Please click the delete icon to remove an exploration ' +
-      'from the story.', 5000);
-  });
-
   it('should call StoryUpdate service to set story node title', function() {
     var storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeTitle');
@@ -463,53 +400,5 @@ describe('Story node editor directive', function() {
     $scope.updateTitle('Title 2');
     expect(storyUpdateSpy).not.toHaveBeenCalled();
     expect(alertsSpy).toHaveBeenCalled();
-  });
-
-  it('should focus on story node when story is initialized', () => {
-    let mockEventEmitter = new EventEmitter();
-    spyOnProperty(StoryEditorStateService, 'onStoryInitialized')
-      .and.returnValue(mockEventEmitter);
-    let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
-      .and.returnValue(null);
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-    $timeout.flush();
-    mockEventEmitter.emit();
-
-    expect(focusSpy).toHaveBeenCalled();
-  });
-
-  it('should focus on story node when story is reinitialized', () => {
-    let mockEventEmitter = new EventEmitter();
-    spyOnProperty(StoryEditorStateService, 'onStoryReinitialized')
-      .and.returnValue(mockEventEmitter);
-    let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
-      .and.returnValue(null);
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-    $timeout.flush();
-    mockEventEmitter.emit();
-
-    expect(focusSpy).toHaveBeenCalled();
-  });
-
-  it('should focus on story node after recalculation of available node', () => {
-    $scope.getDestinationNodeIds = () => [];
-    let mockEventEmitter = new EventEmitter();
-    spyOnProperty(StoryEditorStateService, 'onRecalculateAvailableNodes')
-      .and.returnValue(mockEventEmitter);
-    let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
-      .and.returnValue(null);
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-    $timeout.flush();
-
-    $scope.storyNodeIds = ['node1'];
-    mockEventEmitter.emit();
-
-    expect(focusSpy).toHaveBeenCalled();
   });
 });
