@@ -39,8 +39,7 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
           ctrl.$onInit = function() {
             if (ctrl.parentScope) {
               for (let key of Object.keys(ctrl.parentScope)) {
-                // eslint-disable-next-line oppia/disallow-angularjs-properties
-                $scope.$parent[key] = ctrl.parentScope[key];
+                $scope[key] = ctrl.parentScope[key];
               }
             }
             $rootScope.$applyAsync();
