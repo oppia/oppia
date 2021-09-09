@@ -603,6 +603,7 @@ describe('Exploration save service ' +
         },
       ]
     });
+    focusManagerService = TestBed.inject(FocusManagerService);
   });
 
   beforeEach(angular.mock.inject(function($injector) {
