@@ -44,7 +44,7 @@ describe('TranslateTextService', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     stateContent = new StateAndContent(
       'stateName', 'contentId', 'contentText', 'pending', 'translation',
-      'html', 'content','interactionId','ruleType');
+      'html', 'content', 'interactionId', 'ruleType');
   });
 
   afterEach(() => {

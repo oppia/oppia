@@ -27,7 +27,6 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { number, string } from 'mathjs';
 
 export interface TranslatableItem {
   translation: string | string[],
@@ -68,7 +67,7 @@ export class TranslateTextService {
   PENDING = 'pending';
   SUBMITTED = 'submitted';
   stateWiseContents: StateNamesToContentIdMapping = {};
-  stateWiseContentIds: Record<string,string[]> = {};
+  stateWiseContentIds: Record<string, string[]> = {};
   stateNamesList!: string[];
   stateAndContent: StateAndContent[]=[];
   activeIndex = this.STARTING_INDEX;
@@ -131,7 +130,7 @@ export class TranslateTextService {
       status: Status | string,
       translation: string | string[]
       
-  ): TranslatableItem {
+): TranslatableItem {
     const {
       dataFormat,
       contentType,
