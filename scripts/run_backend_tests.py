@@ -506,7 +506,7 @@ def main(args=None):
         python_utils.PRINT(report_stdout)
 
         coverage_result = re.search(
-            rb'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
         if (coverage_result.group('total') != '100'
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
