@@ -20,7 +20,6 @@ import { Type } from '@angular/core';
 
 import { ExternalRteSaveService } from './external-rte-save.service';
 import { ExternalSaveService } from './external-save.service';
-import { ImageLocalStorageService } from './image-local-storage.service';
 import { PlatformFeatureService } from './platform-feature.service';
 import { QuestionValidationService } from './question-validation.service';
 import { MockCsrfTokenService, RequestInterceptor } from './request-interceptor.service';
@@ -30,7 +29,8 @@ import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { WinnowingPreprocessingService } from 'classifiers/winnowing-preprocessing.service';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import { CkEditorInitializerService } from 'components/ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { CollectionCreationBackendService } from 'components/entity-creation-services/collection-creation-backend-api.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
@@ -39,6 +39,7 @@ import { SkillCreationService } from 'components/entity-creation-services/skill-
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
 import { StateLinkedSkillIdService } from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -54,6 +55,9 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
+import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
+import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
@@ -93,7 +97,6 @@ import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboa
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -116,7 +119,6 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
@@ -180,8 +182,6 @@ import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directiv
 import { InteractiveMapValidationService } from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { LogicProofRulesService } from 'interactions/LogicProof/directives/logic-proof-rules.service';
-import { LogicProofValidationService } from 'interactions/LogicProof/directives/logic-proof-validation.service';
 import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -209,8 +209,11 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
+import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service';
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
@@ -246,7 +249,7 @@ import { ContentTranslationManagerService } from 'pages/exploration-player-page/
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
-import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -260,9 +263,9 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service';
+import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
@@ -282,6 +285,7 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -309,6 +313,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
@@ -329,6 +334,7 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SearchService } from 'services/search.service';
+import { ServerConnectionBackendApiService } from 'services/server-connection-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SpeechSynthesisChunkerService } from 'services/speech-synthesis-chunker.service';
@@ -340,23 +346,41 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { TranslateService } from 'services/translate.service';
-import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
-import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
-import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
-import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
-import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
+import { SvgFileFetcherBackendApiService } from 'objects/templates/svg-file-fetcher-backend-api.service';
 import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
+import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
+import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
+import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
+import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { QuestionSuggestionBackendApiService } from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
+import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
+import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { DeleteAccountBackendApiService } from 'pages/delete-account-page/services/delete-account-backend-api.service';
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
+import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
+import { NavigationService } from './navigation.service';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
+import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
+import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
+import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
+import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { PageHeadService } from './page-head.service';
+import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
+  ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],
@@ -381,12 +405,19 @@ export const angularServices: [string, Type<{}>][] = [
   ['AuthService', AuthService],
   ['AutogeneratedAudioPlayerService', AutogeneratedAudioPlayerService],
   ['AutoplayedVideosService', AutoplayedVideosService],
+  ['AutosaveInfoModalsService', AutosaveInfoModalsService],
   ['BackgroundMaskService', BackgroundMaskService],
+  ['BlogAdminBackendApiService', BlogAdminBackendApiService],
+  ['BlogAdminDataService', BlogAdminDataService],
+  ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageService', BlogDashboardPageService],
+  ['BlogPostEditorBackendApiService', BlogPostEditorBackendApiService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
   ['CapitalizePipe', CapitalizePipe],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
+  ['CkEditorInitializerService', CkEditorInitializerService],
   ['ClassifierDataBackendApiService', ClassifierDataBackendApiService],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
   ['CodeNormalizerService', CodeNormalizerService],
@@ -399,6 +430,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
+  ['InternetConnectivityService', InternetConnectivityService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
@@ -410,8 +442,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
+  ['ContributorDashboardAdminBackendApiService',
+    ContributorDashboardAdminBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
+  ['ChangeListService', ChangeListService],
   ['CreateNewSkillModalService', CreateNewSkillModalService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
   ['CsrfTokenService', CsrfTokenService],
@@ -433,6 +468,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
+  ['EmailDashboardResultBackendApiService',
+    EmailDashboardResultBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationCreationBackendApiService',
@@ -442,6 +479,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationPropertyService', ExplorationPropertyService],
   ['ExplorationEngineService', ExplorationEngineService],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
@@ -452,6 +490,8 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
+  ['ExplorationInitStateNameService', ExplorationInitStateNameService],
+  ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
@@ -462,6 +502,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
+  ['ExplorationTagsService', ExplorationTagsService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],
@@ -469,8 +510,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
   ['ExternalRteSaveService', ExternalRteSaveService],
   ['ExternalSaveService', ExternalSaveService],
-  ['ExtractImageFilenamesFromStateService',
-    ExtractImageFilenamesFromStateService],
+  ['ExtractImageFilenamesFromModelService',
+    ExtractImageFilenamesFromModelService],
   ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
@@ -482,7 +523,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
-  ['FractionObjectFactory', FractionObjectFactory],
   ['GenerateContentIdService', GenerateContentIdService],
   ['GraphDetailService', GraphDetailService],
   ['GraphInputRulesService', GraphInputRulesService],
@@ -491,6 +531,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['GuestCollectionProgressService', GuestCollectionProgressService],
   ['GuppyConfigurationService', GuppyConfigurationService],
   ['GuppyInitializationService', GuppyInitializationService],
+  ['HintAndSolutionModalService', HintAndSolutionModalService],
   ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
   ['HintObjectFactory', HintObjectFactory],
   ['HtmlEscaperService', HtmlEscaperService],
@@ -529,11 +570,10 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
   ['LearnerViewRatingBackendApiService', LearnerViewRatingBackendApiService],
   ['LearnerViewRatingService', LearnerViewRatingService],
+  ['LibraryPageBackendApiService', LibraryPageBackendApiService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
-  ['LogicProofRulesService', LogicProofRulesService],
-  ['LogicProofValidationService', LogicProofValidationService],
   ['LostChangeObjectFactory', LostChangeObjectFactory],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],
@@ -549,11 +589,10 @@ export const angularServices: [string, Type<{}>][] = [
   ['MusicNotesInputRulesService', MusicNotesInputRulesService],
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
+  ['NavigationService', NavigationService],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
-  ['NotificationsDashboardPageBackendApiService',
-    NotificationsDashboardPageBackendApiService],
   ['NumberAttemptsService', NumberAttemptsService],
   ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
@@ -564,6 +603,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
+  ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],
@@ -598,6 +638,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditableQuestionBackendApiService', EditableQuestionBackendApiService],
   ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
+  ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
   ['RatingComputationService', RatingComputationService],
@@ -610,6 +651,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RefresherExplorationConfirmationModalService',
     RefresherExplorationConfirmationModalService],
+  ['ReleaseCoordinatorBackendApiService', ReleaseCoordinatorBackendApiService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
@@ -622,13 +664,16 @@ export const angularServices: [string, Type<{}>][] = [
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
   ['SearchBackendApiService', SearchBackendApiService],
   ['SearchService', SearchService],
+  ['ServerConnectionBackendApiService', ServerConnectionBackendApiService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
   ['SidebarStatusService', SidebarStatusService],
+  ['SignupPageBackendApiService', SignupPageBackendApiService],
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
+  ['SkillCreationService', SkillCreationService],
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
@@ -638,7 +683,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],
-  ['StateCardObjectFactory', StateCardObjectFactory],
+  ['StateCardIsCheckpointService', StateCardIsCheckpointService],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
@@ -680,9 +725,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
+  ['SubtopicValidationService', SubtopicValidationService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
+  ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
@@ -691,6 +738,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicCreationService', TopicCreationService],
+  ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
@@ -699,8 +749,6 @@ export const angularServices: [string, Type<{}>][] = [
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
-  ['TranslateService', TranslateService],
-  ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],
   ['TranslationTabActiveContentIdService',

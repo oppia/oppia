@@ -17,25 +17,29 @@
  * component.
  */
 
-require(
-  'interactions/MathEquationInput/directives/' +
-  'oppia-short-response-math-equation-input.component.ts');
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ShortResponseMathEquationInput } from './oppia-short-response-math-equation-input.component';
 
-describe('MathEquationInputShortResponse', function() {
-  let ctrl = null;
+describe('ResponseNumericExpressionInput', function() {
+  let component: ShortResponseMathEquationInput;
+  let fixture: ComponentFixture<ShortResponseMathEquationInput>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$attrs', {
-      answer: '&quot;answer&quot;',
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaShortResponseMathEquationInput');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ShortResponseMathEquationInput]
+      }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ShortResponseMathEquationInput);
+    component = fixture.componentInstance;
+    component.answer = '&quot;answer&quot;';
+    fixture.detectChanges();
+  });
   it('should correctly escape characters in the answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toBe('answer');
+    component.ngOnInit();
+    expect(component.displayAnswer).toBe('answer');
   });
 });

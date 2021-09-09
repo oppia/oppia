@@ -16,8 +16,8 @@
 
 """Commands that can be used to operate on activity summaries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import activity_services
@@ -719,9 +719,8 @@ def get_recently_published_exp_summary_dicts(limit):
             'title': u'Exploration 2 Albert title',
         }, ]
     """
-    recently_published_exploration_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_recently_published_exp_summaries(limit).values()]
+    recently_published_exploration_summaries = list(
+        exp_services.get_recently_published_exp_summaries(limit).values())
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

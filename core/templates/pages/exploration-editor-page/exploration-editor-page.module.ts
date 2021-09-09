@@ -33,28 +33,41 @@ import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-tem
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
+import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
+import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
+import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
-    OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    SaveVersionMismatchModalComponent,
+    SaveValidationFailModalComponent,
+    ChangesInHumanReadableFormComponent,
+    LostChangesModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
-    OppiaAngularRootComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    SaveVersionMismatchModalComponent,
+    SaveValidationFailModalComponent,
+    ChangesInHumanReadableFormComponent,
+    LostChangesModalComponent,
   ],
   providers: [
     {
@@ -77,6 +90,8 @@ class ExplorationEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

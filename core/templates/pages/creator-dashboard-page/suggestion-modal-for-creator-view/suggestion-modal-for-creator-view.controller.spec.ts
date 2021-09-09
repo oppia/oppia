@@ -80,6 +80,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.reviewMessage).toBe(null);
         expect($scope.summaryMessage).toBe(null);
         expect($scope.canReviewActiveThread).toBe(true);
+        $scope.updateValue('New content');
         expect($scope.suggestionData).toEqual(
           {newSuggestionHtml: 'New content'});
         expect($scope.suggestionEditorIsShown).toBe(false);

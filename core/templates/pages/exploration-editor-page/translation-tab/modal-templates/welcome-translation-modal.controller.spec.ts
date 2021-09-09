@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for WelcomeTranslationModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
 describe('Welcome Translation Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
@@ -25,6 +27,7 @@ describe('Welcome Translation Modal Controller', function() {
   const explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     const $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');

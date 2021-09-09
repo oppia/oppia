@@ -1,0 +1,22 @@
+<div>
+  <div class="oppia-overlay-map-response"></div>
+  <div leaflet
+       id="interactiveMap"
+       class="oppia-interactive-map"
+       [leafletOptions]="mapOptions">
+    <div *ngIf="mapMarkers" [leafletLayer]="mapMarkers"></div>
+  </div>
+</div>
+<style>
+  .oppia-overlay-map-response {
+    height: 100%;
+    opacity: 0.5;
+    position: absolute;
+    width: 100%;
+    z-index: 1001;
+  }
+  .oppia-interactive-map {
+    height: 150px;
+    width: 150px;
+  }
+</style>

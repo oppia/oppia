@@ -16,8 +16,8 @@
 suggestions.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import heapq
 import logging
@@ -266,7 +266,6 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-
     _update_suggestions([suggestion])
 
 
@@ -600,19 +599,24 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         list(Suggestion). A list of suggestions which the given user is allowed
         to review.
     """
-    all_suggestions = ([
-        get_suggestion_from_model(s) for s in (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_suggestions_of_suggestion_type(
-                suggestion_type, user_id))
-    ])
-    user_review_rights = user_services.get_user_contribution_rights(user_id)
+    all_suggestions = []
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        contribution_rights = user_services.get_user_contribution_rights(
+            user_id)
         language_codes = (
-            user_review_rights.can_review_translation_for_language_codes)
-        return [
-            suggestion for suggestion in all_suggestions
-            if suggestion.change.language_code in language_codes]
+            contribution_rights.can_review_translation_for_language_codes)
+        all_suggestions = ([
+            get_suggestion_from_model(s) for s in (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_translation_suggestions(
+                    user_id, language_codes))
+        ])
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        all_suggestions = ([
+            get_suggestion_from_model(s) for s in (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_question_suggestions(user_id))
+        ])
 
     return all_suggestions
 
@@ -656,11 +660,12 @@ def get_translation_suggestions_waiting_longest_for_review(language_code):
     ]
 
 
-def get_translation_suggestions_in_review_by_exploration(exp_id):
+def get_translation_suggestions_in_review_by_exploration(exp_id, language_code):
     """Returns translation suggestions in review by exploration ID.
 
     Args:
         exp_id: str. Exploration ID.
+        language_code: str. Language code.
 
     Returns:
         list(Suggestion). A list of translation suggestions in review with
@@ -668,7 +673,8 @@ def get_translation_suggestions_in_review_by_exploration(exp_id):
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
-        .get_translation_suggestions_in_review_with_exp_id(exp_id)
+        .get_translation_suggestions_in_review_with_exp_id(
+            exp_id, language_code)
     )
     return [
         get_suggestion_from_model(model) if model else None
@@ -1173,6 +1179,59 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
+def create_translation_contribution_stats_from_model(
+        translation_contribution_stats_model):
+    """Creates a domain object representing the supplied
+    TranslationContributionStatsModel.
+
+    Args:
+        translation_contribution_stats_model: TranslationContributionStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        TranslationContributionStats. The corresponding
+        TranslationContributionStats domain object.
+    """
+    return suggestion_registry.TranslationContributionStats(
+        translation_contribution_stats_model.language_code,
+        translation_contribution_stats_model.contributor_user_id,
+        translation_contribution_stats_model.topic_id,
+        translation_contribution_stats_model.submitted_translations_count,
+        translation_contribution_stats_model.submitted_translation_word_count,
+        translation_contribution_stats_model.accepted_translations_count,
+        (
+            translation_contribution_stats_model
+            .accepted_translations_without_reviewer_edits_count
+        ),
+        translation_contribution_stats_model.accepted_translation_word_count,
+        translation_contribution_stats_model.rejected_translations_count,
+        translation_contribution_stats_model.rejected_translation_word_count,
+        translation_contribution_stats_model.contribution_dates
+    )
+
+
+def get_all_translation_contribution_stats(user_id):
+    """Gets all TranslationContributionStatsModels corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        list(TranslationContributionStats). TranslationContributionStats domain
+        objects corresponding to the supplied user.
+    """
+    translation_contribution_stats_models = (
+        suggestion_models.TranslationContributionStatsModel.get_all_by_user_id(
+            user_id
+        )
+    )
+    return [
+        create_translation_contribution_stats_from_model(model)
+        for model in translation_contribution_stats_models
+    ]
+
+
 def get_suggestion_types_that_need_reviewers():
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the
@@ -1282,7 +1341,12 @@ def update_translation_suggestion(suggestion_id, translation_html):
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    # Clean the translation HTML if not a list of strings.
+    suggestion.change.translation_html = (
+        html_cleaner.clean(translation_html)
+        if isinstance(translation_html, python_utils.BASESTRING)
+        else translation_html
+    )
     suggestion.edited_by_reviewer = True
     suggestion.pre_update_validate(suggestion.change)
     _update_suggestion(suggestion)
@@ -1297,6 +1361,10 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+
+    Returns:
+        Suggestion|None. The corresponding suggestion, or None if no suggestion
+        is found.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
     new_change_obj = question_domain.QuestionSuggestionChange(
@@ -1323,3 +1391,5 @@ def update_question_suggestion(
     suggestion.change = new_change_obj
 
     _update_suggestion(suggestion)
+
+    return suggestion

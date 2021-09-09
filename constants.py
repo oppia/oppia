@@ -16,8 +16,8 @@
 
 """Loads constants for backend use."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 import os
@@ -25,8 +25,12 @@ import re
 
 import python_utils
 
+from typing import Any, Dict, TextIO
 
-def parse_json_from_js(js_file):
+
+# Here we use Dict[str, Any] as return type because we need to parse and return
+# generic JSON objects.
+def parse_json_from_js(js_file: TextIO) -> Dict[str, Any]:
     """Extracts JSON object from JS file.
 
     Args:
@@ -40,10 +44,12 @@ def parse_json_from_js(js_file):
     json_start = text_without_comments.find('{\n')
     # Add 1 to index returned because the '}' is part of the JSON object.
     json_end = text_without_comments.rfind('}') + 1
-    return json.loads(text_without_comments[json_start:json_end])
+    json_dict: Dict[str, Any] = (
+        json.loads(text_without_comments[json_start:json_end]))
+    return json_dict
 
 
-def remove_comments(text):
+def remove_comments(text: str) -> str:
     """Removes comments from given text.
 
     Args:
@@ -55,14 +61,23 @@ def remove_comments(text):
     return re.sub(r'  //.*\n', r'', text)
 
 
-class Constants(dict):
+class Constants(dict): # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
-    __getattr__ = dict.__getitem__
+    # Here `value` has the type Any because it parses and stores the values of
+    # contants defined in constants.ts file and we cannot define a single type
+    # which works for all of them.
+    def __setattr__(self, name: str, value: Any) -> None:
+        self[name] = value
+
+    # The return value here refers to the `value` in the above method, hence the
+    # type Any is used for it.
+    def __getattr__(self, name: str) -> Any:
+        return self[name]
 
 
-with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
+with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f: # type: ignore[no-untyped-call]
     constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
 
-with python_utils.open_file('release_constants.json', 'r') as f:
+with python_utils.open_file('release_constants.json', 'r') as f: # type: ignore[no-untyped-call]
     release_constants = Constants(json.loads(f.read()))  # pylint:disable=invalid-name

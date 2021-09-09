@@ -17,7 +17,7 @@ app. This file should only contain validations which affect UI display and
 general functionality on Android.
 """
 
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals
 
 # These are the valid interactions that are allowed in an exploration
 # that is to be viewed on the Android app. If, in the future, this is
@@ -46,6 +46,6 @@ MAX_CHARS_IN_TOPIC_DESCRIPTION = 240
 MAX_CHARS_IN_SUBTOPIC_TITLE = 64
 MAX_CHARS_IN_SKILL_DESCRIPTION = 100
 MAX_CHARS_IN_STORY_TITLE = 39
-MAX_CHARS_IN_CHAPTER_TITLE = 36
+MAX_CHARS_IN_EXPLORATION_TITLE = 36
 MAX_CHARS_IN_CHAPTER_DESCRIPTION = 152
 MAX_CHARS_IN_MISCONCEPTION_NAME = 100

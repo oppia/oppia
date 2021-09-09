@@ -17,15 +17,19 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { StoryReferenceObjectFactory } from './StoryReferenceObjectFactory';
+import { Subtopic } from './subtopic.model';
 
 describe('Topic object factory', () => {
   let topicObjectFactory: TopicObjectFactory;
+  let storyReferenceObjectFactory: StoryReferenceObjectFactory;
   let _sampleTopic: Topic;
 
   beforeEach(() => {
     topicObjectFactory = TestBed.get(TopicObjectFactory);
+    storyReferenceObjectFactory = TestBed.get(StoryReferenceObjectFactory);
 
     let sampleTopicBackendObject = {
       id: 'sample_topic_id',
@@ -89,6 +93,50 @@ describe('Topic object factory', () => {
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
+    ]);
+  });
+
+  it('should warn user if url is in the incorrect format', () => {
+    _sampleTopic._urlFragment = '?asd?';
+    expect(_sampleTopic.validate()).toEqual([
+      'Topic url fragment is not valid.'
+    ]);
+  });
+
+  it('should warn user when url entered by the user execceds specified' +
+  ' limit', () => {
+    _sampleTopic._urlFragment = Array(22).join('x');
+    expect(_sampleTopic.validate()).toEqual([
+      'Topic url fragment should not be longer than 20 characters.'
+    ]);
+  });
+
+  it('should warn user if duplicate stories are present', () => {
+    _sampleTopic._canonicalStoryReferences = [
+      storyReferenceObjectFactory.createFromBackendDict({
+        story_id: 'story_1',
+        story_is_published: true
+      }),
+      storyReferenceObjectFactory.createFromBackendDict({
+        story_id: 'story_1',
+        story_is_published: true
+      })];
+
+    _sampleTopic._additionalStoryReferences = [
+      storyReferenceObjectFactory.createFromBackendDict({
+        story_id: 'story_4',
+        story_is_published: true
+      }),
+      storyReferenceObjectFactory.createFromBackendDict({
+        story_id: 'story_4',
+        story_is_published: true
+      })];
+
+    expect(_sampleTopic.validate()).toEqual([
+      'The canonical story with id story_1 is duplicated in the topic.',
+      'The canonical story with id story_1 is duplicated in the topic.',
+      'The additional story with id story_4 is duplicated in the topic.',
+      'The additional story with id story_4 is duplicated in the topic.'
     ]);
   });
 
@@ -163,5 +211,324 @@ describe('Topic object factory', () => {
     _sampleTopic.copyFromTopic(secondTopic);
     expect(_sampleTopic).not.toBe(secondTopic);
     expect(_sampleTopic).toEqual(secondTopic);
+  });
+
+  it('should warn user when topic has no thumbnail', () => {
+    _sampleTopic._thumbnailFilename = '';
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(['Topic should have a thumbnail.']);
+  });
+
+  it('should warn user when subtopic has no thumbnail', () => {
+    spyOn(Subtopic.prototype, 'getSkillSummaries').and.returnValue([]);
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(
+      ['Subtopic with title Title ' +
+      'does not have any skill IDs linked.']);
+  });
+
+  it('should warn user when page title is empty', () => {
+    _sampleTopic._pageTitleFragmentForWeb = '';
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(['Topic should have page title fragment.']);
+  });
+
+  it('should warn user when page title length is more than the' +
+  ' allowed limit', () => {
+    _sampleTopic._pageTitleFragmentForWeb = Array(52).join('a');
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(
+      ['Topic page title fragment should not be longer than ' +
+      '50 characters.']);
+  });
+
+  it('should warn user when meta tag content is empty', () => {
+    _sampleTopic._metaTagContent = '';
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(['Topic should have meta tag content.']);
+  });
+
+  it('should warn user when meta tag content length is more than the' +
+  ' allowed limit', () => {
+    _sampleTopic._metaTagContent = Array(162).join('a');
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(
+      ['Topic meta tag content should not be longer than ' +
+      '160 characters.']);
+  });
+
+  it('should warn user when no subtopic is assigned', () => {
+    _sampleTopic._subtopics = [];
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(['Topic should have at least 1 subtopic.']);
+  });
+
+  it('should return skill Ids when called', () => {
+    expect(_sampleTopic.getSkillIds())
+      .toEqual(['skill_1', 'skill_2', 'skill_3']);
+  });
+
+  it('should return subtopic when called', () => {
+    let subtopic = _sampleTopic.getSubtopicById(1);
+
+    expect(subtopic).toEqual(Subtopic.create({
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_3'],
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'title'
+    }, {
+      skill_3: 'Description 3'
+    }));
+  });
+
+  it('should return null if subtopic id does not exist when called', () => {
+    expect(_sampleTopic.getSubtopicById(0)).toBeNull();
+  });
+
+  it('should add subtopic when user creates a new subtopic', () => {
+    expect(_sampleTopic.getSubtopics()).toEqual([Subtopic.create({
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_3'],
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'title'
+    }, {
+      skill_3: 'Description 3'
+    })]);
+
+    _sampleTopic.addSubtopic('new subtopic');
+
+    expect(_sampleTopic.getSubtopics()).toEqual([Subtopic.create({
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_3'],
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'title'
+    }, {
+      skill_3: 'Description 3'
+    }),
+    Subtopic.createFromTitle(
+      1, 'new subtopic')]);
+  });
+
+  it('should throw error when user deletes a subtopic that does' +
+  ' not exist', () => {
+    expect(_sampleTopic.getSubtopics()).toEqual([Subtopic.create({
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_3'],
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'title'
+    }, {
+      skill_3: 'Description 3'
+    })]);
+
+    expect(() => {
+      _sampleTopic.deleteSubtopic(2, true);
+    }).toThrowError('Subtopic to delete does not exist');
+  });
+
+  it('should delete subtopic when user deletes a subtopic', () => {
+    _sampleTopic._nextSubtopicId = 2;
+    _sampleTopic.addSubtopic('new subtopic');
+    expect(_sampleTopic.getSubtopics()).toEqual([Subtopic.create({
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_3'],
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'title'
+    }, {
+      skill_3: 'Description 3'
+    }), Subtopic.createFromTitle(
+      2, 'new subtopic')]);
+
+    _sampleTopic.deleteSubtopic(1, true);
+
+    expect(_sampleTopic.getSubtopics()).toEqual([Subtopic.createFromTitle(
+      1, 'new subtopic')]);
+  });
+
+  it('should rearrange stories when user drags them', () => {
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1', 'story_4']);
+
+    _sampleTopic.rearrangeCanonicalStory(0, 1);
+
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4', 'story_1']);
+  });
+
+  it('should rearrange skills when user drags them', () => {
+    _sampleTopic._subtopics = [Subtopic.create({
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_1', 'skill_2', 'skill_3'],
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'title'
+    }, {
+      skill_1: 'Description 1',
+      skill_2: 'Description 2',
+      skill_3: 'Description 3'
+    })];
+
+    expect(_sampleTopic._subtopics[0]._skillSummaries).toEqual(
+      [ShortSkillSummary.create('skill_1', 'Description 1'),
+        ShortSkillSummary.create('skill_2', 'Description 2'),
+        ShortSkillSummary.create('skill_3', 'Description 3')]);
+
+    _sampleTopic.rearrangeSkillInSubtopic(1, 0, 1);
+
+    expect(_sampleTopic._subtopics[0]._skillSummaries).toEqual(
+      [ShortSkillSummary.create('skill_2', 'Description 2'),
+        ShortSkillSummary.create('skill_1', 'Description 1'),
+        ShortSkillSummary.create('skill_3', 'Description 3')]);
+  });
+
+  it('should rearrange subtopics when user drags them', () => {
+    _sampleTopic._nextSubtopicId = 2;
+    _sampleTopic.addSubtopic('subtopic2');
+    _sampleTopic.addSubtopic('subtopic3');
+
+    expect(_sampleTopic.getSubtopics()).toEqual([
+      Subtopic.create({
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_3'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
+      }, {
+        skill_3: 'Description 3'
+      }),
+      Subtopic.createFromTitle(2, 'subtopic2'),
+      Subtopic.createFromTitle(3, 'subtopic3')]);
+
+    _sampleTopic.rearrangeSubtopic(0, 2);
+
+    expect(_sampleTopic.getSubtopics()).toEqual([
+      Subtopic.createFromTitle(2, 'subtopic2'),
+      Subtopic.createFromTitle(3, 'subtopic3'),
+      Subtopic.create({
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_3'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
+      }, {
+        skill_3: 'Description 3'
+      })]);
+  });
+
+  it('should add an uncategorized skill when user creates a skill', () => {
+    _sampleTopic.addUncategorizedSkill('skill_4', 'Description 4');
+
+    expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+      [ShortSkillSummary.create('skill_1', 'Description 1'),
+        ShortSkillSummary.create('skill_2', 'Description 2'),
+        ShortSkillSummary.create('skill_4', 'Description 4')]);
+  });
+
+  it('should warn user if skill is present in a subtopic', () => {
+    expect(() => {
+      _sampleTopic.addUncategorizedSkill('skill_3', 'Description 3');
+    })
+      .toThrowError('Given skillId is already present in a subtopic.');
+  });
+
+  it('should warn user if skill is created', () => {
+    expect(() => {
+      _sampleTopic.addUncategorizedSkill('skill_2', 'Description 2');
+    })
+      .toThrowError('Given skillId is already an uncategorized skill.');
+  });
+
+  it('should add Canonical story when user adds it', () => {
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1', 'story_4']);
+
+    _sampleTopic.addCanonicalStory('story_5');
+
+    expect(_sampleTopic.getCanonicalStoryIds())
+      .toEqual(['story_1', 'story_4', 'story_5']);
+  });
+
+  it('should not add Canonical story if already present', () => {
+    expect(() => {
+      _sampleTopic.addCanonicalStory('story_1');
+    }).toThrowError('Given story id already present in canonical story ids.');
+  });
+
+  it('should remove Canonical story when user deletes story', () => {
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1', 'story_4']);
+
+    _sampleTopic.removeCanonicalStory('story_1');
+
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4']);
+  });
+
+  it('should throw error when user deletes a Canonical story that' +
+  ' does not exist', () => {
+    expect(() => {
+      _sampleTopic.removeCanonicalStory('story_2');
+    }).toThrowError('Given story id not present in canonical story ids.');
+  });
+
+  it('should add Additional story when user adds it', () => {
+    expect(_sampleTopic.getAdditionalStoryIds())
+      .toEqual(['story_2', 'story_3']);
+
+    _sampleTopic.addAdditionalStory('story_5');
+
+    expect(_sampleTopic.getAdditionalStoryIds())
+      .toEqual(['story_2', 'story_3', 'story_5']);
+  });
+
+  it('should not add Additional story if already present', () => {
+    expect(() => {
+      _sampleTopic.addAdditionalStory('story_2');
+    }).toThrowError('Given story id already present in additional story ids.');
+  });
+
+  it('should remove Additional story when user deletes story', () => {
+    expect(_sampleTopic.getAdditionalStoryIds())
+      .toEqual(['story_2', 'story_3']);
+
+    _sampleTopic.removeAdditionalStory('story_2');
+
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_3']);
+  });
+
+  it('should throw error when user deletes a Additional story that' +
+  ' does not exist', () => {
+    expect(() => {
+      _sampleTopic.removeAdditionalStory('story_4');
+    }).toThrowError('Given story id not present in additional story ids.');
+  });
+
+  it('should remove Uncategorised skill when user deletes a skill', () => {
+    expect(_sampleTopic.hasUncategorizedSkill('skill_1')).toBeTrue();
+
+    _sampleTopic.removeUncategorizedSkill('skill_1');
+
+    expect(_sampleTopic.hasUncategorizedSkill('skill_1')).toBeFalse();
+  });
+
+  it('should throw error when user deletes Uncategorized skill that' +
+  ' does not exist', () => {
+    expect(() => {
+      _sampleTopic.removeUncategorizedSkill('skill_4');
+    }).toThrowError('Given skillId is not an uncategorized skill.');
   });
 });

@@ -17,5 +17,5 @@
  */
 
 require('objects/templates/math-expression-content-editor.component.ts');
-require('objects/templates/sanitized-url-editor.directive.ts');
+require('objects/templates/sanitized-url-editor.component.ts');
 require('objects/templates/list-of-tabs-editor.component.ts');

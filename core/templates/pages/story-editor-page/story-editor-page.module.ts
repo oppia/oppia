@@ -27,20 +27,36 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
+import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
+import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
+import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
+import { StoryEditorUnpublishModalComponent } from './modal-templates/story-editor-unpublish-modal.component';
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
+    StoryEditorUnpublishModalComponent,
+    StoryEditorNavbarComponent,
     StoryPreviewTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
+    StoryEditorUnpublishModalComponent,
+    StoryEditorNavbarComponent,
     StoryPreviewTabComponent
   ],
   providers: [
@@ -64,6 +80,8 @@ class StoryEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

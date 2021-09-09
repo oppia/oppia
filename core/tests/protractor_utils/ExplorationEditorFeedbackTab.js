@@ -41,6 +41,10 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-suggestion-review-message'));
   var feedbackStatusDropdown = element(
     by.css('.protractor-test-oppia-feedback-status-menu'));
+  var feedbackMessages = element.all(
+    by.css('.protractor-test-exploration-feedback'));
+  var feedbackStatusElement = element(
+    by.css('.protractor-test-oppia-feedback-status-name'));
   /*
    * Buttons
    */
@@ -87,7 +91,7 @@ var ExplorationEditorFeedbackTab = function() {
     var rows = element.all(by.css(suggestionRowClassName));
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
-      var row = await rows.get(i);
+      var row = rows.get(i);
       var subject = (
         await row.element(by.css(feedbackSubjectClassName)).getText());
       threads.push(subject);
@@ -107,7 +111,7 @@ var ExplorationEditorFeedbackTab = function() {
     var rows = element.all(by.css(suggestionRowClassName));
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
-      var row = await rows.get(i);
+      var row = rows.get(i);
       await action.click(`suggestionRow at row index ${i}`, row);
       await waitFor.visibilityOf(
         explorationFeedback, 'Feedback message text is not visible');
@@ -168,16 +172,12 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.readFeedbackMessagesFromThread = async function() {
-    var feedbackMessages = element.all(
-      by.css('.protractor-test-exploration-feedback'));
     await waitFor.visibilityOf(
       feedbackMessages.first(), 'Feedback message text is not visible');
     return feedbackMessages;
   };
 
   this.expectFeedbackStatusNameToBe = async function(feedbackStatus) {
-    var feedbackStatusElement = element(
-      by.css('.protractor-test-oppia-feedback-status-name'));
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
     await waitFor.textToBePresentInElement(

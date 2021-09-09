@@ -24,7 +24,7 @@ import { WrapTextWithEllipsisPipe } from
   'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 describe('Testing filters', function() {
-  let wrapTextWithEllipsis: WrapTextWithEllipsisPipe = null;
+  let wrapTextWithEllipsis: WrapTextWithEllipsisPipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [WrapTextWithEllipsisPipe, NormalizeWhitespacePipe]
@@ -34,10 +34,6 @@ describe('Testing filters', function() {
   });
 
   it('should wrap text with ellipses based on its length', () => {
-    expect(wrapTextWithEllipsis.transform('', 0)).toEqual('');
-    expect(wrapTextWithEllipsis.transform(null, 0)).toEqual(null);
-    expect(wrapTextWithEllipsis.transform(undefined, 0)).toEqual(undefined);
-
     expect(wrapTextWithEllipsis.transform('testing', 0)).toEqual('testing');
     expect(wrapTextWithEllipsis.transform('testing', 1)).toEqual('testing');
     expect(wrapTextWithEllipsis.transform('testing', 2)).toEqual('testing');

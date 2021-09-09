@@ -242,6 +242,8 @@ var SkillSelector = function(elem) {
     setValue: async function(skillDescription) {
       await elem.element(
         by.css('.protractor-test-skill-name-input')).sendKeys(skillDescription);
+      await waitFor.visibilityOf(elem.element(
+        by.css('.protractor-test-rte-skill-selector-item')));
       await elem.element(
         by.css('.protractor-test-rte-skill-selector-item')).click();
     }

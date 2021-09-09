@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for InformationCardModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
 describe('Information Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -24,6 +26,7 @@ describe('Information Card Modal Controller', function() {
   var expInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     DateTimeFormatService = $injector.get('DateTimeFormatService');
@@ -114,8 +117,8 @@ describe('Information Card Modal Controller', function() {
       spyOn(document, 'querySelectorAll')
         // This throws "Type '{ clientWidth: number; }' is missing the following
         // properties from type 'Element': assignedSlot, attributes, classList,
-        // className, and 122 more.". This is because typescript
-        // expects around 120 more properties than just one
+        // className, and 122 more.". We need to suppress this error because
+        // typescript expects around 120 more properties than just one
         // (clientWidth). We need only one 'clientWidth' for
         // testing purposes.
         // @ts-expect-error

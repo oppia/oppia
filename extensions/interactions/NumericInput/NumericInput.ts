@@ -21,10 +21,10 @@ require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require(
   'interactions/NumericInput/directives/' +
-  'oppia-interactive-numeric-input.directive.ts');
+  'oppia-interactive-numeric-input.component.ts');
 require(
   'interactions/NumericInput/directives/' +
-  'oppia-response-numeric-input.directive.ts');
+  'oppia-response-numeric-input.component.ts');
 require(
   'interactions/NumericInput/directives/' +
-  'oppia-short-response-numeric-input.directive.ts');
+  'oppia-short-response-numeric-input.component.ts');

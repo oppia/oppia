@@ -14,15 +14,17 @@
 
 """Controllers for Oppia resources (templates, images)."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import io
 import logging
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import config_services
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
@@ -55,6 +57,7 @@ class AssetDevHandler(base.BaseHandler):
     _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
     _SUPPORTED_PAGE_CONTEXTS = [
         feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
+        feconf.ENTITY_TYPE_BLOG_POST,
         feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
         feconf.ENTITY_TYPE_QUESTION, feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
         feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
@@ -91,8 +94,7 @@ class AssetDevHandler(base.BaseHandler):
             content_type = (
                 'image/svg+xml' if file_format == 'svg' else '%s/%s' % (
                     asset_type, file_format))
-            self.response.headers[b'Content-Type'] = (
-                python_utils.convert_to_bytes(content_type))
+            self.response.headers['Content-Type'] = content_type
 
             if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
                 raise self.InvalidInputException
@@ -104,7 +106,7 @@ class AssetDevHandler(base.BaseHandler):
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
             self.response.cache_control.max_age = 600
-            self.response.write(raw)
+            self.response.body_file = io.BytesIO(raw)
         except Exception as e:
             logging.exception(
                 'File not found: %s. %s' % (encoded_filename, e))
@@ -112,9 +114,7 @@ class AssetDevHandler(base.BaseHandler):
 
 
 class PromoBarHandler(base.BaseHandler):
-    """The handler for checking if Promobar is enabled and fetching
-    promobar message.
-    """
+    """Handler for the promo-bar."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     # This prevents partially logged in user from being logged out
@@ -127,3 +127,18 @@ class PromoBarHandler(base.BaseHandler):
             'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
         })
+
+    @acl_decorators.can_access_release_coordinator_page
+    def put(self):
+        promo_bar_enabled_value = self.payload.get('promo_bar_enabled')
+        promo_bar_message_value = self.payload.get('promo_bar_message')
+
+        logging.info(
+            '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
+            '%s' % (self.user_id, promo_bar_message_value))
+        config_services.set_property(
+            self.user_id, 'promo_bar_enabled', promo_bar_enabled_value)
+        config_services.set_property(
+            self.user_id, 'promo_bar_message', promo_bar_message_value)
+
+        self.render_json({})

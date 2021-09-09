@@ -1,281 +1,293 @@
 <div class="oppia-same-row-container">
   <form class="navbar-form float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group" ng-class="{'classroom-page-input-group': $ctrl.classroomPageIsActive}">
+      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': classroomPageIsActive}">
         <div class="input-group-addon oppia-search-bar-icon">
-          <i class="material-icons oppia-translate-icon-down md-18" ng-if="!$ctrl.isSearchInProgress()">&#xE8B6;</i>
-          <span ng-if="$ctrl.isSearchInProgress()">
+          <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
+          <span *ngIf="isSearchInProgress()">
             <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
           </span>
         </div>
-        <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
-               ng-attr-placeholder="<[$ctrl.searchBarPlaceholder]>" ng-model="$ctrl.searchQuery"
-               ng-change="$ctrl.classroomPageIsActive ? null : $ctrl.onSearchQueryChangeExec()"
-               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
+        <input type="text"
+               class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
+               [placeholder]="searchBarPlaceholder"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="classroomPageIsActive ? null : onSearchQueryChangeExec()"
+               [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+               aria-label="Search bar"
+               (keydown.enter)="$event.target.blur()"
+               (input)="searchToBeExec($event)">
       </div>
     </div>
   </form>
 </div>
 
 <div class="oppia-same-row-container">
-  <div ng-class="{'open' : $ctrl.activeMenuName === 'category', 'dropup' : $ctrl.enableDropup()}" uib-dropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
-    <p class="oppia-dropdown-label">Category</p>
-    <button ng-click="$ctrl.openSubmenu($event, 'category')" ng-keydown="$ctrl.onMenuKeypress($event, 'category', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input ng-cloak dropdown-toggle"
-            title="<[$ctrl.selectionDetails.categories.description | translate]>">
-      <[$ctrl.categoryButtonText|truncate:14]>
+  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector dropdown" autoClose="outside">
+    <button ngbDropdownToggle
+            (click)="openSubmenu($event, 'category')"
+            (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+            type="button"
+            class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
+            title="{{ selectionDetails.categories.description | translate }}">
+      {{categoryButtonText|truncate:14}}
     </button>
-    <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section" role="menu" ng-click="$event.stopPropagation()">
-      <li ng-repeat="item in $ctrl.selectionDetails.categories.masterList track by $index"
-          ng-if="$ctrl.selectionDetails.categories.selections[item.id]">
-        <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="!$first && !$last" class="dropdown-item">
-          <span translate="<[item.text]>" class="protractor-test-selected"></span>
-          <i ng-if="$ctrl.selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="$first" ng-keydown="$ctrl.onMenuKeypress($event, 'category', {shiftTab: $ctrl.ACTION_CLOSE})" class="dropdown-item">
-          <span translate="<[item.text]>" class="protractor-test-selected"></span>
-          <i ng-if="$ctrl.selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="$last" ng-keydown="$ctrl.onMenuKeypress($event, 'category', {tab: $ctrl.ACTION_CLOSE})"
-           class="dropdown-item">
-          <span translate="<[item.text]>" class="protractor-test-selected"></span>
-          <i ng-if="$ctrl.selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
+    <ul ngbDropdownMenu
+        class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+        role="menu">
+      <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+        <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
+          <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
+            <span class="protractor-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+          </a>
+          <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+            <span class="protractor-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+          </a>
+          <a (click)="toggleSelection('categories', item.id)"
+             *ngIf="last"
+             (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="protractor-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+          </a>
+        </li>
+      </ng-container>
+      <li ngbDropdownItem *ngIf="selectionDetails.categories.numSelections > 1">
+        <a (click)="deselectAll('categories')" class="dropdown-item"><i>Deselect All</i></a>
       </li>
-      <li ng-if="$ctrl.selectionDetails.categories.numSelections > 1">
-        <a href="" ng-click="$ctrl.deselectAll('categories')" class="dropdown-item"><i>Deselect All</i></a>
-      </li>
-      <hr ng-if="$ctrl.selectionDetails.categories.numSelections > 0" class="oppia-search-bar-hr">
-      <li ng-repeat="item in $ctrl.selectionDetails.categories.masterList track by $index"
-          ng-if="!$ctrl.selectionDetails.categories.selections[item.id]">
-        <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="!$first && !$last" class="dropdown-item">
-          <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-          <i ng-if="$ctrl.selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="$first" ng-keydown="$ctrl.onMenuKeypress($event, 'category', {shiftTab: $ctrl.ACTION_CLOSE})" class="dropdown-item">
-          <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-          <i ng-if="$ctrl.selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="$last" ng-keydown="$ctrl.onMenuKeypress($event, 'category', {tab: $ctrl.ACTION_CLOSE})"
-           class="dropdown-item">
-          <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-          <i ng-if="$ctrl.selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-      </li>
+      <hr *ngIf="selectionDetails.categories.numSelections > 0" class="oppia-search-bar-hr">
+      <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+        <li ngbDropdownItem *ngIf="!selectionDetails.categories.selections[item.id]">
+          <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
+            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+          </a>
+          <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+          </a>
+          <a (click)="toggleSelection('categories', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+          </a>
+        </li>
+      </ng-container>
     </ul>
   </div>
 </div>
-<div ng-class="{'open' : $ctrl.activeMenuName === 'language', 'dropup' : $ctrl.enableDropup()}" uib-dropdown class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector">
-  <p class="oppia-dropdown-label">Language</p>
-  <button ng-click="$ctrl.openSubmenu($event, 'language')" ng-keydown="$ctrl.onMenuKeypress($event, 'language', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input ng-cloak dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
-          title="<[$ctrl.selectionDetails.languageCodes.description | translate]>">
-    <[$ctrl.languageButtonText|truncate:14]>
+<div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
+  <button ngbDropdownToggle
+          (click)="openSubmenu($event, 'language')"
+          (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+          type="button"
+          class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
+          title="{{selectionDetails.languageCodes.description | translate}}">
+    {{ languageButtonText | truncate:14 }}
   </button>
-  <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-  <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section" role="menu" ng-click="$event.stopPropagation()">
-    <li ng-repeat="item in $ctrl.selectionDetails.languageCodes.masterList track by $index"
-        ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]">
-      <a href="" ng-click="$ctrl.toggleSelection('languageCodes', item.id)" ng-if="!$first && !$last" class="dropdown-item">
-        <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-      </a>
-      <a href="" ng-click="$ctrl.toggleSelection('languageCodes', item.id)" ng-if="$first" ng-keydown="$ctrl.onMenuKeypress($event, 'language', {shiftTab: $ctrl.ACTION_CLOSE})" class="dropdown-item">
-        <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-      </a>
-      <a href="" ng-click="$ctrl.toggleSelection('languageCodes', item.id)" ng-if="$last" ng-keydown="$ctrl.onMenuKeypress($event, 'language', {tab: $ctrl.ACTION_CLOSE})"
-         class="dropdown-item">
-        <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-      </a>
+  <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+      role="menu">
+    <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; trackBy: index">
+      <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
+        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+          <span class="protractor-test-selected">{{ item.text | translate }}</span>
+          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+          <span class="protractor-test-selected">{{ item.text | translate }}</span>
+          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
+           class="dropdown-item">
+          <span class="protractor-test-selected">{{ item.text | translate }}</span>
+          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+      </li>
+    </ng-container>
+    <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.numSelections > 1">
+      <a (click)="deselectAll('languageCodes')" class="dropdown-item"><i>Deselect All</i></a>
     </li>
-    <li ng-if="$ctrl.selectionDetails.languageCodes.numSelections > 1">
-      <a href="" ng-click="$ctrl.deselectAll('languageCodes')" class="dropdown-item"><i>Deselect All</i></a>
-    </li>
-    <hr ng-if="$ctrl.selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
-    <li ng-repeat="item in $ctrl.selectionDetails.languageCodes.masterList track by $index"
-        ng-if="!$ctrl.selectionDetails.languageCodes.selections[item.id]">
-      <a href="" ng-click="$ctrl.toggleSelection('languageCodes', item.id)" ng-if="!$first && !$last" class="dropdown-item">
-        <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-      </a>
-      <a href="" ng-click="$ctrl.toggleSelection('languageCodes', item.id)" ng-if="$first" ng-keydown="$ctrl.onMenuKeypress($event, 'language', {shiftTab: $ctrl.ACTION_CLOSE})" class="dropdown-item">
-        <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-      </a>
-      <a href="" ng-click="$ctrl.toggleSelection('languageCodes', item.id)" ng-if="$last" ng-keydown="$ctrl.onMenuKeypress($event, 'language', {tab: $ctrl.ACTION_CLOSE})"
-         class="dropdown-item">
-        <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="$ctrl.selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-      </a>
-    </li>
+    <hr *ngIf="selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
+    <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
+      <li ngbDropdownItem *ngIf="!selectionDetails.languageCodes.selections[item.id]">
+        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+          <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+          <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
+           class="dropdown-item">
+          <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+      </li>
+    </ng-container>
   </ul>
 </div>
 <div class="oppia-same-row-container">
   <div class="float-left oppia-navbar-button-container">
-    <div ng-if="$ctrl.classroomPageIsActive"
+    <div *ngIf="classroomPageIsActive"
          class="oppia-search-button protractor-test-search-button"
-         ng-click="$ctrl.onSearchQueryChangeExec()"
+         (click)="onSearchQueryChangeExec()"
          title="Click here to search">
          Go!
     </div>
   </div>
 </div>
-
 <style>
-  search-bar .oppia-search-bar-input,
-  search-bar .oppia-search-button {
-    background: #257D76;
+  .dropup .dropdown-menu,
+  .navbar-fixed-bottom .dropdown .dropdown-menu {
+    bottom: auto;
+  }
+  .oppia-search-bar-input,
+  .oppia-search-button {
+    background: #fff;
     border-color: #257D76;
     border-radius: 0;
     border-style: solid;
     border-width: 1px 1px 1px 0;
-    color: white;
+    color: #257D76;
     font-size: 15px;
     height: 35px;
   }
 
-  search-bar .oppia-search-button {
+  .oppia-search-button {
     border-bottom-right-radius: 4px;
     border-top-right-radius: 4px;
     padding: 6px 15px 0 15px;
   }
 
-  search-bar .oppia-search-button:hover {
+  .oppia-search-button:hover {
     cursor: pointer;
   }
 
-  search-bar .oppia-search-bar-form {
+  .oppia-search-bar-form {
     margin-top: 10px;
     padding-right: 0;
   }
-  search-bar .oppia-search-bar-input.btn {
-    color: rgba(255,255,255,0.95);
+  .oppia-search-bar-input.btn {
+    color: #257D76;
   }
-  search-bar .oppia-search-bar-icon {
-    background: #257D76;
+  .oppia-search-bar-icon {
+    background: #fff;
     border-color: #257D76;
     border-style: solid;
     border-width: 1px 0 1px 1px;
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
-  search-bar .oppia-search-bar-input.btn:hover,
-  search-bar .oppia-search-bar-input.btn:focus {
-    color: #fff;
+  .oppia-search-bar-input.btn:hover,
+  .oppia-search-bar-input.btn:focus {
+    color: #257D76;
   }
 
-  search-bar .oppia-search-bar-input.btn:focus {
+  .oppia-search-bar-input.btn:focus {
     outline: 1px dotted #fff;
     outline: auto 5px -webkit-focus-ring-color;
   }
 
-  search-bar .oppia-search-bar-input::-webkit-input-placeholder {
-    color: rgba(255,255,255,0.95);
+  .oppia-search-bar-input::-webkit-input-placeholder {
+    color: #257D76;
   }
-  search-bar .oppia-search-bar-input::-moz-placeholder {
-    color: rgba(255,255,255,0.95);
+  .oppia-search-bar-input::-moz-placeholder {
+    color: #257D76;
   }
-  search-bar .oppia-search-bar-input:-moz-placeholder {
-    color: rgba(255,255,255,0.95);
+  .oppia-search-bar-input:-moz-placeholder {
+    color: #257D76;
   }
-  search-bar .oppia-search-bar-input:-ms-input-placeholder {
-    color: rgba(255,255,255,0.95);
+  .oppia-search-bar-input:-ms-input-placeholder {
+    color: #257D76;
   }
-  search-bar .oppia-input-group {
+  .oppia-input-group {
     max-width: 375px;
     width: 17em;
   }
-  search-bar .oppia-search-bar-dropdown-toggle {
+  .oppia-search-bar-dropdown-toggle {
     border-radius: 0;
     max-width: 150px;
   }
-  search-bar .oppia-search-bar-dropdown-menu-section {
+  .oppia-search-bar-dropdown-menu-section {
     max-height: 400px;
     overflow: auto;
   }
-  search-bar .oppia-search-bar-hr {
+  .oppia-search-bar-hr {
     margin: 2px;
   }
-  search-bar .oppia-search-bar-dropdown-toggle-button {
+  .oppia-search-bar-dropdown-toggle-button {
     border-radius: 0;
     max-width: 150px;
   }
 
-  search-bar .oppia-input-group.classroom-page-input-group {
+  .oppia-input-group.classroom-page-input-group {
     width: 20em;
   }
 
-  search-bar .oppia-dropdown-label {
-    display: none;
-  }
-
   @media (max-width: 1125px) {
-    search-bar .oppia-search-bar-input {
-      background: #fff;
+    .oppia-search-bar-input {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input::-webkit-input-placeholder {
+    .oppia-search-bar-input::-webkit-input-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input::-moz-placeholder {
+    .oppia-search-bar-input::-moz-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input:-moz-placeholder {
+    .oppia-search-bar-input:-moz-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input:-ms-input-placeholder {
+    .oppia-search-bar-input:-ms-input-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-icon {
-      background: #fff;
+    .oppia-search-bar-icon {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input.btn {
+    .oppia-search-bar-input.btn {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input.btn:hover,
-    search-bar .oppia-search-bar-input.btn:focus {
+    .oppia-search-bar-input.btn:hover,
+    .oppia-search-bar-input.btn:focus {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input:focus {
-      background-color: white;
+    .oppia-search-bar-input:focus {
       color: #257D76;
     }
   }
 
   @media (max-width: 767px) {
-    search-bar .oppia-search-bar-input {
-      background: #fff;
+    .oppia-search-bar-input {
       color: #257D76;
       padding-top: 17px;
     }
-    search-bar .oppia-search-button,
-    search-bar .oppia-search-bar-input {
+    .oppia-search-button,
+    .oppia-search-bar-input {
       border-radius: 0;
       height: 45px;
     }
-    search-bar .oppia-search-button {
+    .oppia-search-button {
       border-bottom-right-radius: 4px;
       border-top-right-radius: 4px;
       padding-top: 12px;
     }
-    search-bar .oppia-search-bar-input::-webkit-input-placeholder {
+    .oppia-search-bar-input::-webkit-input-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input::-moz-placeholder {
+    .oppia-search-bar-input::-moz-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input:-moz-placeholder {
+    .oppia-search-bar-input:-moz-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input:-ms-input-placeholder {
+    .oppia-search-bar-input:-ms-input-placeholder {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-icon {
-      background: #fff;
+    .oppia-search-bar-icon {
       color: #257D76;
     }
-    search-bar .oppia-search-bar-input.btn {
+    .oppia-search-bar-input.btn {
       border-left: 1px solid #257D76;
       color: #257D76;
       margin-left: 10px;
@@ -283,17 +295,17 @@
       text-align: left;
       width: 137px;
     }
-    search-bar .oppia-search-bar-input.btn:hover,
-    search-bar .oppia-search-bar-input.btn:focus {
+    .oppia-search-bar-input.btn:hover,
+    .oppia-search-bar-input.btn:focus {
       color: #257D76;
     }
-    search-bar .protractor-test-search-bar-dropdown-menu {
+    .protractor-test-search-bar-dropdown-menu {
       margin-top: -25px;
     }
-    search-bar .oppia-same-row-container {
+    .oppia-same-row-container {
       display: inline-block;
     }
-    search-bar .oppia-search-bar-category-selector {
+    .oppia-search-bar-category-selector {
       margin-top: 95px;
       right: 9px;
       transform: translate(-321px, 1px);
@@ -301,14 +313,14 @@
       z-index: 101;
     }
 
-    search-bar .oppia-search-bar-language-selector {
+    .oppia-search-bar-language-selector {
       margin-top: 95px;
       transform: translate(-194px, 1px);
       width: 0;
       z-index: 101;
     }
 
-    search-bar .oppia-dropdown-label {
+    .oppia-dropdown-label {
       color: #257D76;
       display: block;
       font-size: 10px;
@@ -319,34 +331,27 @@
       top: -35px;
     }
 
-    search-bar .oppia-search-bar-text-input {
+    .oppia-search-bar-text-input {
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
       height: 45px;
       padding-top: 8px;
     }
 
-    search-bar .oppia-search-bar-category-input {
+    .oppia-search-bar-category-input {
       border-bottom-left-radius: 4px;
     }
 
-    search-bar .oppia-search-bar-language-input {
+    .oppia-search-bar-language-input {
       border-bottom-right-radius: 4px;
     }
 
-    search-bar .oppia-translate-icon-down {
+    .oppia-translate-icon-down {
       transform: translate(0,6px);
     }
   }
 
-  @media(min-width: 1126px) {
-    search-bar .oppia-search-bar-input:focus {
-      background-color: #257D76;
-      color: white;
-    }
-  }
-
-  search-bar .oppia-search-bar-input:focus {
+  .oppia-search-bar-input:focus {
     border-color: #66afe9;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
@@ -354,41 +359,40 @@
   }
 
   @media (max-width: 629px) {
-    search-bar .oppia-search-bar-category-selector {
+    .oppia-search-bar-category-selector {
       position: relative;
     }
   }
 
   /* This rule targets only Firefox browsers. */
   @-moz-document url-prefix() {
-    search-bar .oppia-search-bar-category-selection-symbol {
+    .oppia-search-bar-category-selection-symbol {
       margin-top: -18px;
       padding-top: 16px;
     }
   }
 
   @media (max-width: 500px) {
-    search-bar .oppia-input-group.classroom-page-input-group {
+    .oppia-input-group.classroom-page-input-group {
       width: 17em;
     }
-    search-bar .oppia-search-bar-category-selector {
+    .oppia-search-bar-category-selector {
       margin-top: 95px;
       position: relative;
       transform: translate(-273px);
       width: 0;
     }
-    search-bar .oppia-search-bar-language-selector {
+    .oppia-search-bar-language-selector {
       transform: translate(-147px);
     }
-    search-bar .oppia-search-bar-input.btn {
+    .oppia-search-bar-input.btn {
       width: 137px;
     }
   }
 
   @media (max-width: 378px) {
-    search-bar .oppia-search-bar-form {
+    .oppia-search-bar-form {
       padding-left: 0;
     }
   }
-
 </style>

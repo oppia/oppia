@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, async, fakeAsync, tick } from
   '@angular/core/testing';
 
@@ -26,22 +26,7 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateService } from 'services/translate.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
@@ -59,34 +44,19 @@ class MockI18nLanguageCodeService {
 class MockWindowRef {
   _window = {
     location: {
-      _hash: '',
-      _hashChange: null,
-      _href: '',
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
-      get href() {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-      reload: (val) => val
+      hash: '',
+      hashChange: null,
+      href: '',
+      reload: (val: string) => val
     },
     get onhashchange() {
-      return this.location._hashChange;
+      return this.location.hashChange;
     },
 
     set onhashchange(val) {
-      this.location._hashChange = val;
-    }
+      this.location.hashChange = val;
+    },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -104,7 +74,7 @@ let fixture: ComponentFixture<PlaybookPageComponent>;
 
 describe('Playbook Page', () => {
   let windowRef: MockWindowRef;
-  let siteAnalyticsService = null;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -118,10 +88,6 @@ describe('Playbook Page', () => {
         {
           provide: SiteAnalyticsService,
           useClass: MockSiteAnalyticsService
-        },
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService
         },
         UrlInterpolationService,
         {

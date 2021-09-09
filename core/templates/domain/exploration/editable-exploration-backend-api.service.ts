@@ -63,7 +63,7 @@ export class EditableExplorationBackendApiService {
   }
 
   private async _deleteExplorationAsync(explorationId: string): Promise<void> {
-    return this.httpClient['delete']<void>(
+    return this.httpClient.delete<void>(
       this._getExplorationUrl(explorationId, false)).pipe(tap(
       // Delete item from the ReadOnlyExplorationBackendApiService's cache.
       _ => this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(

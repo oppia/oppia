@@ -21,15 +21,15 @@ import { TestBed } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
 
 describe('Subtopic object factory', () => {
-  var _sampleSubtopic = null;
-  var skillIds = ['skill_1', 'skill_2'];
+  let _sampleSubtopic: Subtopic;
+  let skillIds = ['skill_1', 'skill_2'];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [Subtopic]
     });
 
-    var sampleSubtopicBackendObject = {
+    let sampleSubtopicBackendObject = {
       id: 1,
       thumbnail_filename: 'image.png',
       thumbnail_bg_color: '#a33f40',
@@ -37,7 +37,7 @@ describe('Subtopic object factory', () => {
       skill_ids: skillIds,
       url_fragment: 'title'
     };
-    var sampleSkillIdToDesriptionMap = {
+    let sampleSkillIdToDesriptionMap = {
       skill_1: 'Description 1',
       skill_2: 'Description 2'
     };
@@ -70,7 +70,7 @@ describe('Subtopic object factory', () => {
 
   it('should be able to create a subtopic object with given title and id',
     () => {
-      var subtopic = Subtopic.createFromTitle(2, 'Title2');
+      let subtopic = Subtopic.createFromTitle(2, 'Title2');
       expect(subtopic.getId()).toBe(2);
       expect(subtopic.getTitle()).toBe('Title2');
       expect(subtopic.getSkillSummaries()).toEqual([]);

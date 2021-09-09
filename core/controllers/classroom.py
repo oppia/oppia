@@ -14,8 +14,8 @@
 
 """Controllers for the classroom page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -26,25 +26,22 @@ from core.domain import topic_fetchers
 import feconf
 
 
-class ClassroomPage(base.BaseHandler):
-    """Renders the classroom page."""
-
-    @acl_decorators.does_classroom_exist
-    def get(self, _):
-        """Handles GET requests."""
-
-        if not config_domain.CLASSROOM_PAGE_IS_ACCESSIBLE.value:
-            raise self.PageNotFoundException
-
-        self.render_template('classroom-page.mainpage.html')
-
-
 class ClassroomDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the classroom
     page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment):
@@ -80,6 +77,10 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
     # This prevents partially logged in user from being logged out
     # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -91,6 +92,11 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
 
 class DefaultClassroomRedirectPage(base.BaseHandler):
     """Redirects to the default classroom page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

@@ -165,7 +165,7 @@ export class EditableStoryBackendApiService {
         story_id: storyId
       });
 
-    this.http['delete'](
+    this.http.delete(
       storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {

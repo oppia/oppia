@@ -14,22 +14,30 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
-from constants import constants
 
+from constants import constants
+from core.controllers import access_validators
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import beam_jobs
+from core.controllers import blog_admin
+from core.controllers import blog_dashboard
+from core.controllers import blog_homepage
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import concept_card_viewer
 from core.controllers import contributor_dashboard
+from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
+from core.controllers import cron
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
@@ -37,9 +45,11 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
 from core.controllers import learner_dashboard
+from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
+from core.controllers import oppia_root
 from core.controllers import pages
 from core.controllers import platform_feature
 from core.controllers import practice_sessions
@@ -48,6 +58,7 @@ from core.controllers import question_editor
 from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
+from core.controllers import release_coordinator
 from core.controllers import resources
 from core.controllers import review_tests
 from core.controllers import skill_editor
@@ -57,21 +68,28 @@ from core.controllers import story_viewer
 from core.controllers import subscriptions
 from core.controllers import subtopic_viewer
 from core.controllers import suggestion
+from core.controllers import tasks
 from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
-from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
-from mapreduce import main as mapreduce_main
-from mapreduce import parameters as mapreduce_parameters
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
-transaction_services = models.Registry.import_transaction_services()
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
+
+T = TypeVar('T')  # pylint: disable=invalid-name
+
+cache_services = models.Registry.import_cache_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -79,13 +97,35 @@ transaction_services = models.Registry.import_transaction_services()
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
+class InternetConnectivityHandler(base.BaseHandler):
+    """Handles the get request to the server from the
+    frontend to check for internet connection."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self) -> None:
+        """Handles GET requests."""
+        self.render_json({'is_internet_connected': True})
+
+
 class FrontendErrorHandler(base.BaseHandler):
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @acl_decorators.open_access
-    def post(self):
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "post" also untyped.
+    @acl_decorators.open_access # type: ignore[misc]
+    def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
         self.render_json(self.values)
@@ -94,41 +134,31 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
-    @acl_decorators.open_access
-    def get(self):
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self) -> None:
         """Handles GET warmup requests."""
         pass
-
-
-class HomePageRedirectPage(base.BaseHandler):
-    """When a request is made to '/', check the user's login status, and
-    redirect them appropriately.
-    """
-
-    @acl_decorators.open_access
-    def get(self):
-        if self.user_id and user_services.has_fully_registered_account(
-                self.user_id):
-            user_settings = user_services.get_user_settings(
-                self.user_id)
-            default_dashboard = user_settings.default_dashboard
-            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
-                self.redirect(feconf.CREATOR_DASHBOARD_URL)
-            else:
-                self.redirect(feconf.LEARNER_DASHBOARD_URL)
-        else:
-            self.render_template('splash-page.mainpage.html')
 
 
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    @acl_decorators.open_access
-    def get(self):
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.open_access  # type: ignore[misc]
+    def get(self) -> None:
         self.redirect('/')
 
 
-def get_redirect_route(regex_route, handler, defaults=None):
+# Type for `defaults` is set to Dict[str, str] based on the usage in our
+# backend. Should be changed in future as per the requirements.
+def get_redirect_route(
+        regex_route: str,
+        handler: Type[base.BaseHandler],
+        defaults: Optional[Dict[str, str]] = None
+) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs
@@ -150,64 +180,12 @@ def get_redirect_route(regex_route, handler, defaults=None):
         regex_route, handler, name, strict_slash=True, defaults=defaults)
 
 
-def authorization_wrapper(self, *args, **kwargs):
-    """This request handler wrapper only admits internal requests from
-    taskqueue workers. If the request is invalid, it leads to a 403 Error page.
-    """
-    # Internal requests should have an "X-AppEngine-TaskName" header
-    # (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
-    if 'X-AppEngine-TaskName' not in self.request.headers:
-        self.response.out.write('Forbidden')
-        self.response.set_status(403)
-        return
-    self.real_dispatch(*args, **kwargs)
-
-
-def ui_access_wrapper(self, *args, **kwargs):
-    """This request handler wrapper directly serves UI pages
-    for MapReduce dashboards.
-    """
-    self.real_dispatch(*args, **kwargs)
-
-
-MAPREDUCE_HANDLERS = []
-
-for path, handler_class in mapreduce_main.create_handlers_map():
-    if path.startswith('.*/pipeline'):
-        if 'pipeline/rpc/' in path or path == '.*/pipeline(/.+)':
-            path = path.replace('.*/pipeline', '/mapreduce/ui/pipeline')
-        else:
-            path = path.replace('.*/pipeline', '/mapreduce/worker/pipeline')
-    else:
-        if '_callback' in path:
-            path = path.replace('.*', '/mapreduce/worker', 1)
-        elif '/list_configs' in path:
-            continue
-        else:
-            path = path.replace('.*', '/mapreduce/ui', 1)
-
-    if '/ui/' in path or path.endswith('/ui'):
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = ui_access_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-    else:
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = authorization_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-
-# Tell map/reduce internals that this is now the base path to use.
-mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
-
 # Register the URLs with the classes responsible for handling them.
-URLS = MAPREDUCE_HANDLERS + [
+URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
-    get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
-
+    get_redirect_route(
+        r'/internetconnectivityhandler', InternetConnectivityHandler),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
@@ -216,47 +194,66 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
 
+    # Access Validators.
+    get_redirect_route(
+        r'%s/can_access_classroom_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ClassroomAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ManageOwnAccountValidationHandler),
+
+    get_redirect_route(
+        r'%s/does_profile_exist/<username>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ProfileExistsValidationHandler),
+
+    get_redirect_route(
+        r'%s/account_deletion_is_enabled' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.AccountDeletionIsEnabledValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_release_coordinator_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ReleaseCoordinatorAccessValidationHandler
+    ),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
+    get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
+    get_redirect_route(
+        r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler),
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
-    get_redirect_route(
-        r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionrightshandler',
-        admin.AddContributionRightsHandler),
+        r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
     get_redirect_route(
-        r'/removecontributionrightshandler',
-        admin.RemoveContributionRightsHandler),
+        r'/contributionrightshandler/<category>',
+        contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributorusershandler',
-        admin.ContributorUsersListHandler),
+        r'/getcontributorusershandler/<category>',
+        contributor_dashboard_admin.ContributorUsersListHandler),
     get_redirect_route(
         r'/contributionrightsdatahandler',
-        admin.ContributionRightsDataHandler),
+        contributor_dashboard_admin.ContributionRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+        contributor_dashboard_admin.ContributorDashboardAdminPage),
+    get_redirect_route(
+        r'/translationcontributionstatshandler',
+        contributor_dashboard_admin.TranslationContributionStatsHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
-
-    get_redirect_route(
-        '/notifications_dashboard',
-        creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
-    get_redirect_route(
-        feconf.NOTIFICATIONS_DASHBOARD_URL,
-        creator_dashboard.NotificationsDashboardPage),
-    get_redirect_route(
-        r'/notificationsdashboardhandler/data',
-        creator_dashboard.NotificationsDashboardHandler),
-    get_redirect_route(
-        r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
         '/creator_dashboard',
         creator_dashboard.OldCreatorDashboardRedirectPage),
@@ -338,9 +335,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        story_viewer.StoryPage),
+
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
@@ -415,8 +410,23 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.LearnerIncompleteActivityHandler),
 
     get_redirect_route(
+        r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
+        learner_goals.LearnerGoalsHandler),
+
+    get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
+
+    get_redirect_route(
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogHomepageDataHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
@@ -426,36 +436,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_PARTNERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-
     get_redirect_route('/library', library.OldLibraryRedirectPage),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler),
     get_redirect_route(
-        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-        library.LibraryGroupPage),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_TOP_RATED_URL, library.LibraryGroupPage),
-    get_redirect_route(
         r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
         library.LibraryGroupIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
@@ -469,10 +455,11 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
-    get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
+    get_redirect_route(
+        r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+        profile.BulkEmailWebhookEndpoint),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -482,14 +469,10 @@ URLS = MAPREDUCE_HANDLERS + [
         profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
-    get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
     get_redirect_route(
         feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
-    get_redirect_route(
-        feconf.PENDING_ACCOUNT_DELETION_URL,
-        profile.PendingAccountDeletionPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
@@ -501,6 +484,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
+
+    get_redirect_route(
+        r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
@@ -610,7 +596,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        r'/createhandler/state_interaction_stats/<exploration_id>/<state_name>',
         editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
@@ -764,6 +750,10 @@ URLS = MAPREDUCE_HANDLERS + [
         skill_editor.SkillRightsHandler),
 
     get_redirect_route(
+        r'%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+        skill_mastery.SubtopicMasteryDataHandler),
+
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         story_editor.StoryEditorPage),
     get_redirect_route(
@@ -833,6 +823,28 @@ URLS = MAPREDUCE_HANDLERS + [
         improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
+        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+        blog_admin.BlogAdminRolesHandler),
+    get_redirect_route(
+        r'/blogadminhandler', blog_admin.BlogAdminHandler),
+
+    get_redirect_route('/beam_job', beam_jobs.BeamJobHandler),
+    get_redirect_route('/beam_job_run', beam_jobs.BeamJobRunHandler),
+    get_redirect_route(
+        '/beam_job_run_result', beam_jobs.BeamJobRunResultHandler),
+
+    get_redirect_route(
+        r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
+        blog_dashboard.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
+        blog_dashboard.BlogDashboardDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
+
+    get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
 
     get_redirect_route(
@@ -858,21 +870,107 @@ URLS = MAPREDUCE_HANDLERS + [
         platform_feature.PlatformFeatureDummyHandler),
 
     get_redirect_route(
-        r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+        r'/voice_artist_management_handler/<entity_type>/<entity_id>',
+        voice_artist.VoiceArtistManagementHandler),
 ]
 
 # Adding redirects for topic landing pages.
-for subject in feconf.AVAILABLE_LANDING_PAGES:
-    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+for subject, topics in constants.AVAILABLE_LANDING_PAGES.items():
+    for topic in topics:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
-                custom_landing_pages.TopicLandingPage))
+                oppia_root.OppiaRootPage))
+
+if constants.DEV_MODE:
+    URLS.append(
+        get_redirect_route(
+            r'/initialize_android_test_data',
+            android_e2e_config.InitializeAndroidTestDataHandler))
+
+# Adding redirects for all stewards landing pages.
+for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
+    URLS.append(
+        get_redirect_route(
+            r'/%s' % stewards_route, oppia_root.OppiaRootPage))
+
+# Redirect all routes handled using angular router to the oppia root page.
+for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+    if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+        URLS.append(
+            get_redirect_route(
+                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+
+# Manually redirect routes with url fragments to the oppia root page.
+URLS.extend((
+    get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
+))
+
+# Add cron urls.
+URLS.extend((
+    get_redirect_route(
+        r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    get_redirect_route(
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
+    get_redirect_route(
+        r'/cron/mail/admins/contributor_dashboard_bottlenecks',
+        cron.CronMailAdminContributorDashboardBottlenecksHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/contributor_dashboard_suggestions',
+        cron.CronMailReviewersContributorDashboardSuggestionsHandler),
+))
+
+# Add tasks urls.
+URLS.extend((
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
+        tasks.UnsentFeedbackEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
+        tasks.SuggestionEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
+        tasks.FlagExplorationEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
+        tasks.InstantFeedbackMessageEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
+        tasks.FeedbackThreadStatusChangeEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_DEFERRED,
+        tasks.DeferredTasksHandler),
+))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
 
+class NdbWsgiMiddleware:
+    """Wraps the WSGI application into the NDB client context."""
+
+    def __init__(self, wsgi_app: webapp2.WSGIApplication) -> None:
+        self.wsgi_app = wsgi_app
+
+    def __call__(
+            self,
+            environ: Dict[str, str],
+            start_response: webapp2.Response
+    ) -> Any:
+        global_cache = datastore_services.RedisCache(
+            cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
+        with datastore_services.get_ndb_context(global_cache=global_cache):
+            return self.wsgi_app(environ, start_response)
+
+
+app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
+app = NdbWsgiMiddleware(app_without_context)
 firebase_auth_services.establish_firebase_connection()

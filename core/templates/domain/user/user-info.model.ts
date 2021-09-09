@@ -17,35 +17,40 @@
  */
 
 export interface UserInfoBackendDict {
+  'roles': string[];
   'is_moderator': boolean;
-  'is_admin': boolean;
+  'is_curriculum_admin': boolean;
   'is_super_admin': boolean;
   'is_topic_manager': boolean;
   'can_create_collections': boolean;
-  'preferred_site_language_code': string;
-  'username': string;
-  'email': string;
+  'preferred_site_language_code': string | null;
+  'username': string | null;
+  'email': string | null;
   'user_is_logged_in': boolean;
 }
 
 export class UserInfo {
+  _roles: string[];
   _isModerator: boolean;
-  _isAdmin: boolean;
+  _isCurriculumAdmin: boolean;
   _isTopicManager: boolean;
   _isSuperAdmin: boolean;
   _canCreateCollections: boolean;
-  _preferredSiteLanguageCode: string;
-  _username: string;
-  _email: string;
+  // The following three properties are set to null when the
+  // user is not logged in.
+  _preferredSiteLanguageCode: string | null;
+  _username: string | null;
+  _email: string | null;
   _isLoggedIn: boolean;
 
   constructor(
-      isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
-      isTopicManager: boolean, canCreateCollections: boolean,
-      preferredSiteLanguageCode: string, username: string,
-      email: string, isLoggedIn: boolean) {
+      roles: string[], isModerator: boolean, isCurriculumAdmin: boolean,
+      isSuperAdmin: boolean, isTopicManager: boolean,
+      canCreateCollections: boolean, preferredSiteLanguageCode: string | null,
+      username: string | null, email: string | null, isLoggedIn: boolean) {
+    this._roles = roles;
     this._isModerator = isModerator;
-    this._isAdmin = isAdmin;
+    this._isCurriculumAdmin = isCurriculumAdmin;
     this._isTopicManager = isTopicManager;
     this._isSuperAdmin = isSuperAdmin;
     this._canCreateCollections = canCreateCollections;
@@ -58,22 +63,38 @@ export class UserInfo {
   static createFromBackendDict(
       data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
-      data.is_moderator, data.is_admin, data.is_super_admin,
-      data.is_topic_manager, data.can_create_collections,
+      data.roles, data.is_moderator, data.is_curriculum_admin,
+      data.is_super_admin, data.is_topic_manager, data.can_create_collections,
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
   }
   static createDefault(): UserInfo {
     return new UserInfo(
-      false, false, false, false, false, null, null, null, false);
+      ['GUEST'], false, false, false, false, false, null, null, null, false);
   }
 
   isModerator(): boolean {
     return this._isModerator;
   }
 
-  isAdmin(): boolean {
-    return this._isAdmin;
+  isBlogAdmin(): boolean {
+    return (this._roles.includes('BLOG_ADMIN'));
+  }
+
+  isBlogPostEditor(): boolean {
+    return (this._roles.includes('BLOG_POST_EDITOR'));
+  }
+
+  isCurriculumAdmin(): boolean {
+    return this._isCurriculumAdmin;
+  }
+
+  isTranslationAdmin(): boolean {
+    return this._roles.includes('TRANSLATION_ADMIN');
+  }
+
+  isQuestionAdmin(): boolean {
+    return this._roles.includes('QUESTION_ADMIN');
   }
 
   isTopicManager(): boolean {
@@ -88,15 +109,15 @@ export class UserInfo {
     return this._canCreateCollections;
   }
 
-  getPreferredSiteLanguageCode(): string {
+  getPreferredSiteLanguageCode(): string | null {
     return this._preferredSiteLanguageCode;
   }
 
-  getUsername(): string {
+  getUsername(): string | null {
     return this._username;
   }
 
-  getEmail(): string {
+  getEmail(): string | null {
     return this._email;
   }
 

@@ -37,7 +37,7 @@ import { ExplorationImprovementsTaskRegistryService } from
 
 // TODO(#7222): Remove usages of UpgradedServices. Used here because too many
 // indirect AngularJS dependencies are required for the improvements tab.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +

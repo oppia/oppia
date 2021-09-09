@@ -16,8 +16,8 @@
 
 """Decorators for assigning DoFn types to specific storage models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import inspect
@@ -114,7 +114,8 @@ class AuditsExisting(python_utils.OBJECT):
         for kind in self._targeted_kinds:
             registered_do_fn_types = self._DO_FN_TYPES_BY_KIND[kind]
             if any(issubclass(r, do_fn_type) for r in registered_do_fn_types):
-                continue # Always keep the most-derived DoFn type.
+                # Always keep the most-derived DoFn type.
+                continue
             registered_do_fn_types -= base_types_of_do_fn_type
             registered_do_fn_types.add(do_fn_type)
 
@@ -231,6 +232,22 @@ class RelationshipsOf(python_utils.OBJECT):
         """
         return set(itertools.chain.from_iterable(
             cls._ID_REFERENCING_PROPERTIES.values()))
+
+    @classmethod
+    def get_model_kind_references(cls, model_kind, property_name):
+        """Returns the kinds of models referenced by the given property.
+
+        Args:
+            model_kind: str. The kind of model the property belongs to.
+            property_name: str. The property's name.
+
+        Returns:
+            list(str). The kinds of models referenced by the given property.
+        """
+        model_cls = job_utils.get_model_class(model_kind)
+        prop = model_property.ModelProperty(
+            model_cls, getattr(model_cls, property_name))
+        return cls._ID_REFERENCING_PROPERTIES.get(prop, set())
 
     def _get_model_kind(self, model_class):
         """Returns the kind of the model class.

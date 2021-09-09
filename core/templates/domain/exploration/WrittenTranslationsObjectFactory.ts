@@ -21,6 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
+  DataFormatToDefaultValuesKey,
   TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory
@@ -32,6 +33,12 @@ export interface WrittenTranslationsBackendDict {
       [langCode: string]: TranslationBackendDict
     }
   }
+}
+
+interface TranslationMappingDict {
+    [contentId: string]: {
+      [langCode: string]: TranslationBackendDict
+    }
 }
 
 interface WrittenTranslationsMapping {
@@ -60,9 +67,9 @@ export class WrittenTranslations {
   }
 
   markAllTranslationsAsNeedingUpdate(contentId: string): void {
-    var languageCodeToWrittenTranslation = (
+    const languageCodeToWrittenTranslation = (
       this.translationsMapping[contentId]);
-    for (var languageCode in languageCodeToWrittenTranslation) {
+    for (const languageCode in languageCodeToWrittenTranslation) {
       languageCodeToWrittenTranslation[languageCode].markAsNeedingUpdate();
     }
   }
@@ -80,8 +87,8 @@ export class WrittenTranslations {
   }
 
   hasUnflaggedWrittenTranslations(contentId: string): boolean {
-    var writtenTranslations = this.translationsMapping[contentId];
-    for (var languageCode in writtenTranslations) {
+    const writtenTranslations = this.translationsMapping[contentId];
+    for (const languageCode in writtenTranslations) {
       if (!writtenTranslations[languageCode].needsUpdate) {
         return true;
       }
@@ -105,8 +112,10 @@ export class WrittenTranslations {
 
   addWrittenTranslation(
       contentId: string, languageCode: string,
-      dataFormat: string, translation: string|string[]): void {
-    var writtenTranslations = this.translationsMapping[contentId];
+      dataFormat: DataFormatToDefaultValuesKey,
+      translation: string|string[]
+  ): void {
+    const writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
@@ -118,7 +127,7 @@ export class WrittenTranslations {
   updateWrittenTranslation(
       contentId: string, languageCode: string,
       translation: string|string[]): void {
-    var writtenTranslations = this.translationsMapping[contentId];
+    const writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
@@ -128,15 +137,16 @@ export class WrittenTranslations {
   }
 
   toggleNeedsUpdateAttribute(contentId: string, languageCode: string): void {
-    var writtenTranslations = this.translationsMapping[contentId];
+    const writtenTranslations = this.translationsMapping[contentId];
     writtenTranslations[languageCode].toggleNeedsUpdateAttribute();
   }
 
   toBackendDict(): WrittenTranslationsBackendDict {
-    var translationsMappingDict = {};
-    for (var contentId in this.translationsMapping) {
-      var languageToWrittenTranslation = this.translationsMapping[contentId];
-      var languageToWrittenTranslationDict = {};
+    const translationsMappingDict: TranslationMappingDict = {};
+    for (const contentId in this.translationsMapping) {
+      const languageToWrittenTranslation = this.translationsMapping[contentId];
+      const languageToWrittenTranslationDict:
+        Record<string, TranslationBackendDict> = {};
       Object.keys(languageToWrittenTranslation).forEach((lang) => {
         languageToWrittenTranslationDict[lang] = (
           languageToWrittenTranslation[lang].toBackendDict());
@@ -156,13 +166,13 @@ export class WrittenTranslationsObjectFactory {
     private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
 
   createFromBackendDict(
-      writtenTranslationsDict: WrittenTranslationsBackendDict):
-      WrittenTranslations {
-    var translationsMapping = {};
+      writtenTranslationsDict: WrittenTranslationsBackendDict
+  ): WrittenTranslations {
+    const translationsMapping: WrittenTranslationsMapping = {};
     Object.keys(writtenTranslationsDict.translations_mapping).forEach(
       (contentId) => {
         translationsMapping[contentId] = {};
-        var languageCodeToWrittenTranslationDict = (
+        const languageCodeToWrittenTranslationDict = (
           writtenTranslationsDict.translations_mapping[contentId]);
         Object.keys(languageCodeToWrittenTranslationDict).forEach(
           (langCode) => {

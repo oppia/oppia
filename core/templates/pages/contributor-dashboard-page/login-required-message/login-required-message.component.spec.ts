@@ -30,7 +30,7 @@ describe('Login required message component', () => {
   let fixture: ComponentFixture<LoginRequiredMessageComponent>;
   let userService: UserService;
   let windowRef: WindowRef;
-  let httpTestingController;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -47,7 +47,8 @@ describe('Login required message component', () => {
       location: {
         reload: ()=>{},
         href: 'starting-url'
-      }
+      },
+      gtag: () => {}
     });
     component.ngOnInit();
   });
@@ -75,8 +76,7 @@ describe('Login required message component', () => {
   it('should refresh page if login url is not provided when login button is' +
     ' clicked', fakeAsync(() => {
     const reloadSpy = spyOn(windowRef.nativeWindow.location, 'reload');
-    spyOn(userService, 'getLoginUrlAsync')
-      .and.resolveTo(null);
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('');
     component.onLoginButtonClicked();
     flushMicrotasks();
 

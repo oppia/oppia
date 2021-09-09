@@ -34,15 +34,18 @@ import { CollectionPermissionsCard } from 'pages/collection-editor-page/settings
 import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
 import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CollectionDetailsEditor,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
@@ -51,7 +54,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
     CollectionStatisticsTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,
@@ -78,6 +80,8 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

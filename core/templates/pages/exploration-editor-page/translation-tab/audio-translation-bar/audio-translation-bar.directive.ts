@@ -61,6 +61,7 @@ require('services/external-save.service.ts');
 import WaveSurfer from 'wavesurfer.js';
 
 import { Subscription } from 'rxjs';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -74,10 +75,10 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  '$rootScope', 'UrlInterpolationService',
+  '$rootScope',
   'UserExplorationPermissionsService', 'UserService',
   function(
-      $rootScope, UrlInterpolationService,
+      $rootScope,
       UserExplorationPermissionsService, UserService) {
     return {
       restrict: 'E',
@@ -133,8 +134,8 @@ angular.module('oppia').directive('audioTranslationBar', [
           return scope;
         };
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/translation-tab/' +
+      template: require(
+        'pages/exploration-editor-page/translation-tab/' +
         'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
         '$interval', '$q', '$scope', '$uibModal', '$window',
@@ -206,15 +207,19 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.checkingMicrophonePermission = false;
 
               $scope.elapsedTime = 0;
-              $scope.timerInterval = $interval(function() {
-                $scope.elapsedTime++;
-                // $scope.recordingTimeLimit is decremented to
-                // compensate for the audio recording timing inconsistency,
-                // so it allows the server to accept the recording.
-                if ($scope.elapsedTime === $scope.recordingTimeLimit - 1) {
-                  $scope.stopRecording();
-                }
-              }, 1000);
+              OppiaAngularRootComponent.ngZone.runOutsideAngular(() => {
+                $scope.timerInterval = $interval(function() {
+                  OppiaAngularRootComponent.ngZone.run(() => {
+                    $scope.elapsedTime++;
+                    // $scope.recordingTimeLimit is decremented to
+                    // compensate for the audio recording timing inconsistency,
+                    // so it allows the server to accept the recording.
+                    if ($scope.elapsedTime === $scope.recordingTimeLimit - 1) {
+                      $scope.stopRecording();
+                    }
+                  });
+                }, 1000);
+              });
             }, function() {
               // When the user denies microphone access.
               $scope.recordingPermissionDenied = true;
@@ -364,8 +369,8 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           $scope.openTranslationTabBusyModal = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/translation-tab/' +
+              template: require(
+                'pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/translation-tab-busy-modal.template.html'),
               backdrop: true,
               resolve: {
@@ -402,7 +407,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             var audioTranslation = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslation) {
-              (AudioPlayerService.loadAsync(audioTranslation.filename))
+              AudioPlayerService.loadAsync(audioTranslation.filename)
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
                   $scope.audioIsLoading = false;
@@ -454,8 +459,8 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           $scope.openDeleteAudioTranslationModal = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/translation-tab/' +
+              template: require(
+                'pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/delete-audio-translation-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
@@ -474,8 +479,8 @@ angular.module('oppia').directive('audioTranslationBar', [
           $scope.openAddAudioTranslationModal = function(audioFile) {
             SiteAnalyticsService.registerUploadAudioEvent();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/translation-tab/' +
+              template: require(
+                'pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/add-audio-translation-modal.template.html'),
               backdrop: 'static',
               resolve: {

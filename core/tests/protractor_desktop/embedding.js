@@ -104,6 +104,17 @@ describe('Embedding', function() {
     await workflow.publishExploration();
   };
 
+  // These errors are to be ignored as 'idToBeReplaced' is not a valid
+  // exploration id. It appears just after the page loads.
+  var EMBEDDING_ERRORS_TO_IGNORE = [
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
+    '\'X-Frame-Options\' to \'deny\'.',
+    'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
+    'responded with a status of 400 ()',
+  ];
+
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
@@ -147,7 +158,7 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'user1@embedding.com', 'user1Embedding');
 
     // Create exploration.
@@ -159,7 +170,7 @@ describe('Embedding', function() {
     await general.openEditor(explorationId, false);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
-    await explorationEditorPage.saveChanges('demonstration edit');
+    await explorationEditorPage.publishChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
       // This is necessary as the pages are non-angular.
@@ -239,7 +250,7 @@ describe('Embedding', function() {
     expect(embeddingLogs).toEqual(expectedLogs);
 
     await users.logout();
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
   });
 
   it('should use the exploration language as site language.',
@@ -277,7 +288,8 @@ describe('Embedding', function() {
         await browser.switchTo().defaultContent();
       };
 
-      await users.createAndLoginAdminUser('embedder2@example.com', 'Embedder2');
+      await users.createAndLoginSuperAdminUser(
+        'embedder2@example.com', 'Embedder2');
 
       // Create an exploration.
       await workflow.createExploration(true);
@@ -317,7 +329,7 @@ describe('Embedding', function() {
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
-      await explorationEditorPage.saveChanges(
+      await explorationEditorPage.publishChanges(
         'Changing the language to a not supported one.');
       // We expect the default language, English.
       await checkPlaceholder('Type a number');
@@ -326,18 +338,11 @@ describe('Embedding', function() {
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('español');
-      await explorationEditorPage.saveChanges(
+      await explorationEditorPage.publishChanges(
         'Changing the language to a supported one.');
       await checkPlaceholder('Ingresa un número');
 
       await users.logout();
-
-      // This error is to be ignored as 'idToBeReplaced' is not a valid
-      // exploration id. It appears just after the page loads.
-      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
-        'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-        'locale=en#version=0.0.1&secret=';
-      await general.checkForConsoleErrors([errorToIgnore]);
+      await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
     });
 });

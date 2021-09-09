@@ -16,19 +16,12 @@
  * @fileoverview Unit tests for for RemoveActivityModalComponent.
  */
 
-import { Pipe } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { RemoveActivityModalComponent } from './remove-activity-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   close(): void {
@@ -145,6 +138,47 @@ describe('Remove Activity Modal Component', function() {
     component.activityTitle = 'Title';
     component.removeActivityUrl = (
       '/learnerplaylistactivityhandler/colleciton/0');
+
+    component.cancel();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(dismissSpy).toHaveBeenCalled();
+  }
+  ));
+
+  it('should remove topic from current goals when clicking on' +
+    ' remove button', fakeAsync(() => {
+    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    component.sectionNameI18nId = (
+      'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION');
+    component.subsectionName = 'I18N_DASHBOARD_LEARN_TOPIC';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnergoalshandler/topic/0');
+
+    component.remove();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(closeSpy).toHaveBeenCalledWith(
+      '/learnergoalshandler/topic/0');
+  }
+  ));
+
+  it('should not remove topic from current goals' +
+    ' when clicking on cancel button', fakeAsync(() => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
+    component.sectionNameI18nId = (
+      'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION');
+    component.subsectionName = 'I18N_DASHBOARD_LEARN_TOPIC';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnergoalshandler/topic/0');
 
     component.cancel();
     flushMicrotasks();

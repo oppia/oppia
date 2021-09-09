@@ -16,17 +16,18 @@
 
 """HTML sanitizing service."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import html.parser
+import html
 import json
 import logging
 
-import bleach
-import bs4
 from core.domain import rte_component_registry
 import python_utils
+
+import bleach
+import bs4
 
 
 def filter_a(tag, name, value):
@@ -119,7 +120,7 @@ def strip_html_tags(html_string):
 
 def get_image_filenames_from_html_strings(html_strings):
     """Extracts the image filename from the oppia-noninteractive-image and
-    oppia-noninteractive-svgdiagram RTE component from all the html strings
+    oppia-noninteractive-math RTE component from all the html strings
     passed in.
 
     Args:
@@ -137,10 +138,6 @@ def get_image_filenames_from_html_strings(html_strings):
         if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
-        elif ('id' in rte_comp and
-              rte_comp['id'] == 'oppia-noninteractive-svgdiagram'):
-            filenames.append(
-                rte_comp['customization_args']['svg_filename-with-value'])
         elif ('id' in rte_comp and
               rte_comp['id'] == 'oppia-noninteractive-math'):
             filenames.append(
@@ -162,19 +159,18 @@ def get_rte_components(html_string):
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
-    parser = html.parser.HTMLParser()
     components = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
-    for tag_name in oppia_custom_tag_attrs:
+    for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
             component = {'id': tag_name}
             customization_args = {}
-            for attr in oppia_custom_tag_attrs[tag_name]:
+            for attr in tag_attrs:
                 # Unescape special HTML characters such as '&quot;'.
-                attr_val = parser.unescape(component_tag[attr])
+                attr_val = html.unescape(component_tag[attr])
                 customization_args[attr] = json.loads(attr_val)
 
             component['customization_args'] = customization_args

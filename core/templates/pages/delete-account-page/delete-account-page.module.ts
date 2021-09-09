@@ -16,70 +16,31 @@
  * @fileoverview Module for the delete account page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { DeleteAccountPageComponent } from './delete-account-page.component';
 import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
+import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
+import { CommonModule } from '@angular/common';
+import { DeleteAccountPageRoutingModule } from './delete-account-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    DeleteAccountPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
-    OppiaAngularRootComponent
+    DeleteAccountPageRootComponent,
   ],
   entryComponents: [
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
-    OppiaAngularRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
+    DeleteAccountPageRootComponent,
   ]
 })
-class DeleteAccountPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(DeleteAccountPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class DeleteAccountPageModule {}

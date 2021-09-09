@@ -28,7 +28,7 @@ class MockCompA {
   expr: string = '/frac{x}{y}';
 }
 const mockMathJaxHub = {
-  Queue: (...args) => {
+  Queue: () => {
     return;
   }
 };

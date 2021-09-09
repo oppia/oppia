@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class SolutionValidityService {
-  solutionValidities = {};
+  solutionValidities: Record<string, boolean> = {};
 
   init(stateNames: string[]): void {
     stateNames.forEach((stateName: string) => {
@@ -49,6 +49,7 @@ export class SolutionValidityService {
     if (this.solutionValidities.hasOwnProperty(stateName)) {
       return this.solutionValidities[stateName];
     }
+    return false;
   }
 
   getAllValidities(): {} {
