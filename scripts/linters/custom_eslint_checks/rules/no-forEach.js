@@ -22,7 +22,7 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to prohibit the use of "forEach".',
+      description: 'Lint check to prohibit the use of forEach().',
       category: 'Best Practices',
       recommended: true,
     },
