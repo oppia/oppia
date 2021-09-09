@@ -133,7 +133,7 @@ class LearnerDashboardHandlerForCollections(base.BaseHandler):
         """Handles GET requests."""
         (
             learner_progress, number_of_nonexistent_collections) = (
-                learner_progress_services.get_activity_progress(self.user_id))
+                learner_progress_services.get_collection_progress(self.user_id))
 
         completed_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
@@ -170,7 +170,7 @@ class LearnerDashboardHandlerForExplorations(base.BaseHandler):
         """Handles GET requests."""
         (
             learner_progress, number_of_nonexistent_explorations) = (
-                learner_progress_services.get_activity_progress(self.user_id))
+                learner_progress_services.get_exploration_progress(self.user_id))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
@@ -217,121 +217,6 @@ class LearnerDashboardHandlerForExplorations(base.BaseHandler):
             'exploration_playlist': exploration_playlist_summary_dicts,
             'number_of_nonexistent_explorations': (
                 number_of_nonexistent_explorations),
-            'thread_summaries': [s.to_dict() for s in thread_summaries],
-            'number_of_unread_threads': number_of_unread_threads,
-            'subscription_list': subscription_list
-        })
-        self.render_json(self.values)
-
-
-class LearnerDashboardHandler(base.BaseHandler):
-    """Provides data for the user's learner dashboard page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_access_learner_dashboard
-    def get(self):
-        """Handles GET requests."""
-        (
-            learner_progress, number_of_nonexistent_activities) = (
-                learner_progress_services.get_activity_progress(self.user_id))
-
-        completed_exp_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts(
-                learner_progress.completed_exp_summaries))
-
-        incomplete_exp_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts(
-                learner_progress.incomplete_exp_summaries))
-
-        completed_collection_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.completed_collection_summaries))
-        incomplete_collection_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.incomplete_collection_summaries))
-
-        completed_story_summary_dicts = (
-            learner_progress_services.get_displayable_story_summary_dicts(
-                self.user_id, learner_progress.completed_story_summaries))
-
-        learnt_topic_summary_dicts = (
-            learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id, learner_progress.learnt_topic_summaries))
-        partially_learnt_topic_summary_dicts = (
-            learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id,
-                learner_progress.partially_learnt_topic_summaries))
-
-        exploration_playlist_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts(
-                learner_progress.exploration_playlist_summaries))
-        collection_playlist_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.collection_playlist_summaries))
-
-        topics_to_learn_summary_dicts = (
-            learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id, learner_progress.topics_to_learn_summaries))
-        all_topic_summary_dicts = (
-            learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id, learner_progress.all_topic_summaries))
-        untracked_topic_summary_dicts = (
-            learner_progress_services
-            .get_displayable_untracked_topic_summary_dicts(
-                self.user_id, learner_progress.untracked_topic_summaries))
-
-        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-        if len(full_thread_ids) > 0:
-            thread_summaries, number_of_unread_threads = (
-                feedback_services.get_exp_thread_summaries(
-                    self.user_id, full_thread_ids))
-        else:
-            thread_summaries, number_of_unread_threads = [], 0
-
-        creators_subscribed_to = (
-            subscription_services.get_all_creators_subscribed_to(self.user_id))
-        creators_settings = user_services.get_users_settings(
-            creators_subscribed_to)
-        subscription_list = []
-
-        for index, creator_settings in enumerate(creators_settings):
-            subscription_summary = {
-                'creator_picture_data_url': (
-                    creator_settings.profile_picture_data_url),
-                'creator_username': creator_settings.username,
-                'creator_impact': (
-                    user_services.get_user_impact_score(
-                        creators_subscribed_to[index]))
-            }
-
-            subscription_list.append(subscription_summary)
-
-        self.values.update({
-            'completed_explorations_list': completed_exp_summary_dicts,
-            'completed_collections_list': completed_collection_summary_dicts,
-            'completed_stories_list': completed_story_summary_dicts,
-            'learnt_topics_list': learnt_topic_summary_dicts,
-            'incomplete_explorations_list': incomplete_exp_summary_dicts,
-            'incomplete_collections_list': incomplete_collection_summary_dicts,
-            'partially_learnt_topics_list': (
-                partially_learnt_topic_summary_dicts),
-            'exploration_playlist': exploration_playlist_summary_dicts,
-            'collection_playlist': collection_playlist_summary_dicts,
-            'topics_to_learn_list': topics_to_learn_summary_dicts,
-            'all_topics_list': all_topic_summary_dicts,
-            'untracked_topics': untracked_topic_summary_dicts,
-            'number_of_nonexistent_activities': (
-                number_of_nonexistent_activities),
-            'completed_to_incomplete_collections': (
-                learner_progress.completed_to_incomplete_collections),
-            'completed_to_incomplete_stories': (
-                learner_progress.completed_to_incomplete_stories),
-            'learnt_to_partially_learnt_topics': (
-                learner_progress.learnt_to_partially_learnt_topics),
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list
