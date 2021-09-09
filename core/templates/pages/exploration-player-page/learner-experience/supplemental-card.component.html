@@ -1,7 +1,8 @@
 <div class="conversation-skin-supplemental-card">
-  <h1>Supplemental card here</h1>
-  <div *ngIf="helpCardHtml" class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
-       [ngStyle]="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}">
+  <div *ngIf="helpCardHtml"
+       class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
+       [ngStyle]="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}"
+       #helpCard>
     <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
        [href]="OPPIA_AVATAR_LINK_URL"
        target="_blank"
@@ -14,7 +15,7 @@
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback"
+      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback"
                                  [htmlData]="helpCardHtml"
                                  [parentScope]="this"
                                  [ngClass]="getFeedbackAudioHighlightClass()">
@@ -23,7 +24,7 @@
     <br>
     <oppia-continue-button *ngIf="helpCardHasContinueButton"
                            [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
-                           [isLearnAgainButton]="isLearnAgainButton()"
+                           [isLearnAgainButton]="isLearnAgainButton"
                            (clickContinueButton)="clickContinueButton.emit()"
                            class="d-inline-block">
     </oppia-continue-button>
@@ -32,8 +33,8 @@
   <!--This CSS class is essential for auto-scrolling in Drag and drop interaction to work
   correctly. More details about the class can be found in extensions/interactions/
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
-  <div class="conversation-skin-interaction-container">
-    <angular-html-bind-wrapper class="protractor-test-conversation-input"
+  <div class="conversation-skin-interaction-container" #interactionContainer>
+    <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
                                [parentScope]="this"
                                [htmlData]="currentDisplayedCard.getInteractionHtml()">
     </angular-html-bind-wrapper>
