@@ -25,7 +25,8 @@ var ruleTester = new RuleTester();
 ruleTester.run('no-forEach', rule, {
   valid: [
     {
-      code: `[].every(item)`,
+      code:
+        `[].every(item)`,
     }
   ],
   invalid: [
@@ -34,7 +35,6 @@ ruleTester.run('no-forEach', rule, {
         `[].forEach(item);`,
       errors: [{
         message: 'Please use .every() instead of .forEach().',
-        type: null
       }]
     },
   ]
