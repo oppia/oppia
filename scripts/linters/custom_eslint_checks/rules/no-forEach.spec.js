@@ -26,13 +26,13 @@ ruleTester.run('no-forEach', rule, {
   valid: [
     {
       code:
-        `[].every(item)`,
+        '[].every(item);',
     }
   ],
   invalid: [
     {
       code:
-        `[].forEach(item);`,
+        '[].forEach(item);',
       errors: [{
         message: 'Please use .every() instead of .forEach().',
       }]
