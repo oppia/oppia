@@ -160,7 +160,7 @@ module.exports = {
           messageId: 'disallowThen'
         });
       },
-      'CallExpression[callee.property.name=\'filter\']': function(node){
+      'CallExpression[callee.property.name=\'filter\']': function(node) {
         context.report({
           node: node.callee.property,
           loc: node.callee.property.loc,

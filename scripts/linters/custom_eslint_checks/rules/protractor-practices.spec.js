@@ -135,7 +135,7 @@ ruleTester.run('protractor-practices', rule, {
       `genderList.filter(function() {
         gender = 'female';
       })`,
-      errors:[{
+      errors:[ {
         message: 'Please do not use .filter(), consider using a for loop',
       }]
     },
