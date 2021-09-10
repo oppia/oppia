@@ -46,13 +46,7 @@ class Continue(base.BaseInteraction):
         'description': 'Button label',
         'schema': {
             'type': 'custom',
-            'obj_type': 'SubtitledUnicode',
-            'validators': [
-            {
-              'max_value': 20,
-              'id': 'is_at_most'
-            }
-          ],
+            'obj_type': 'SubtitledUnicode'
         },
         'default_value': {
             'content_id': None,
