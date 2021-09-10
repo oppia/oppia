@@ -19,6 +19,7 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import constants from 'assets/constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface InvalidTagsAndAttributes {
@@ -67,6 +68,7 @@ export class EditThumbnailModalComponent implements OnInit {
   invalidTagsAndAttributes!: InvalidTagsAndAttributes;
 
   invalidImageWarningIsShown = false;
+  invalidFilenameWarningIsShown = false;
   allowedImageFormats = ['svg'];
 
   constructor(
@@ -87,6 +89,12 @@ export class EditThumbnailModalComponent implements OnInit {
 
   isUploadedImageSvg(): boolean {
     return this.uploadedImageMimeType === 'image/svg+xml';
+  }
+
+  isValidFilename(file: File): boolean {
+    const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
+      constants.VALID_THUMBNAIL_FILENAME_REGEX);
+    return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name);
   }
 
   updateBackgroundColor(color: string): void {
@@ -125,15 +133,20 @@ export class EditThumbnailModalComponent implements OnInit {
   onFileChanged(file: File): void {
     this.uploadedImageMimeType = file.type;
     this.invalidImageWarningIsShown = false;
+    this.invalidFilenameWarningIsShown = false;
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: []
     };
-    if (this.isUploadedImageSvg()) {
+    if (this.isUploadedImageSvg() && this.isValidFilename(file)) {
       this.setUploadedFile(file);
     } else {
       this.reset();
-      this.invalidImageWarningIsShown = true;
+      if (!this.isUploadedImageSvg()) {
+        this.invalidImageWarningIsShown = true;
+      } else {
+        this.invalidFilenameWarningIsShown = true;
+      }
     }
   }
 

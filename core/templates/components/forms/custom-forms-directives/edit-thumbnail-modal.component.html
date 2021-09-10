@@ -23,6 +23,9 @@
       <div class="oppia-form-error" *ngIf="invalidImageWarningIsShown">
         Please upload a valid SVG image.
       </div>
+      <div class="oppia-form-error" *ngIf="invalidFilenameWarningIsShown">
+        Please upload a valid filename image i.e; The svg file must not start with a dot or have '/' or 2 consecutive dots.
+      </div>
       <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.tags.length">
         Unsupported SVG tags found: {{ invalidTagsAndAttributes.tags }}
       </div>
