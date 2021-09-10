@@ -40,8 +40,8 @@ from core.platform import models
 import feconf
 from proto_files import exploration_pb2
 from proto_files import languages_pb2
-from proto_files import state_pb2
 from proto_files import objects_pb2
+from proto_files import state_pb2
 import python_utils
 import schema_utils
 import utils
@@ -2398,7 +2398,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def to_exploration_proto(
-        self, exploration_id, title, version, init_state_name, states):
+            cls, exploration_id, title, version, init_state_name, states):
         """Calculate the exploration size by setting exploration proto.
 
         Args:
@@ -2412,7 +2412,7 @@ class Exploration(python_utils.OBJECT):
             exploration_proto: Exploration. The exploration
                 proto object.
         """
-        state_protos=self.to_state_proto(self, states)
+        state_protos = cls.to_state_proto(cls, states)
         exploration_proto = exploration_pb2.Exploration(
             id=exploration_id,
             content_version=version,
@@ -2437,19 +2437,15 @@ class Exploration(python_utils.OBJECT):
         for (state_name, state) in states.items():
             state_proto = state_pb2.State(
                 content=self.to_subtitled_html_proto(
-                    self, state.content
-                ),
+                    self, state.content),
                 recorded_voiceovers=self.to_recorded_voiceover_proto(
                     self, state.recorded_voiceovers),
                 written_translations=self.to_written_translations_proto(
-                    self, state.written_translations
-                ),
+                    self, state.written_translations),
                 interaction=self.to_interaction_proto(
-                    self, state.interaction
-                )
-            )
+                    self, state.interaction))
             state_protos[state_name] = state_proto
-        
+
         return state_protos
 
     def to_subtitled_html_proto(self, content):
@@ -2481,8 +2477,9 @@ class Exploration(python_utils.OBJECT):
             recorded_voiceover_proto: proto object. The
                 recorded voiceovers proto object.
         """
-        voiceover_language_mapping_protos=self.to_voiceovers_language_mapping_protos(
-            self, recorded_voiceovers.voiceovers_mapping)
+        voiceover_language_mapping_protos = (
+            self.to_voiceovers_language_mapping_protos(
+                self, recorded_voiceovers.voiceovers_mapping))
 
         recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
             voiceover_language_mapping=voiceover_language_mapping_protos)
@@ -2504,18 +2501,22 @@ class Exploration(python_utils.OBJECT):
         voiceover_language_mapping_protos = {}
         voiceover_content_mapping_protos = {}
 
-        for (content_id, language_code_to_voiceover) in voiceovers_mapping.items():
-            for (language_code, voiceover) in (language_code_to_voiceover.items()):
-                voiceover_proto=self.to_voiceover_proto(
+        for (content_id, language_code_to_voiceover) in (
+            voiceovers_mapping.items()):
+            for (language_code, voiceover) in (
+                language_code_to_voiceover.items()):
+                voiceover_proto = self.to_voiceover_proto(
                     self, voiceover.filename,
-                    voiceover.file_size_bytes, voiceover.duration_secs)
-                voiceover_content_mapping_protos[language_code] = voiceover_proto
+                    voiceover.file_size_bytes,
+                    voiceover.duration_secs)
+                voiceover_content_mapping_protos[language_code] = (
+                    voiceover_proto)
             voiceover_content_mapping_proto = (
                 languages_pb2.VoiceoverContentMapping(
-                    voiceover_content_mapping=voiceover_content_mapping_protos
-                )
-            )
-            voiceover_language_mapping_protos[content_id] = voiceover_content_mapping_proto
+                    voiceover_content_mapping=(
+                        voiceover_content_mapping_protos)))
+            voiceover_language_mapping_protos[content_id] = (
+                voiceover_content_mapping_proto)
 
         return voiceover_language_mapping_protos
 
@@ -2526,7 +2527,7 @@ class Exploration(python_utils.OBJECT):
             filename: str. The corresponding voiceover file path.
             file_size_bytes: int. The file size, in bytes. Used to display
                 potential bandwidth usage to the learner before they download
-                the file. 
+                the file.
             duration_secs: float. The duration in seconds for the voiceover
                 recording.
 
@@ -2552,8 +2553,9 @@ class Exploration(python_utils.OBJECT):
             written_translations_proto: proto object. The
                 written translations proto object.
         """
-        translation_language_mapping_protos=self.to_translation_language_mapping_proto(
-            self, written_translations.translations_mapping)
+        translation_language_mapping_protos = (
+            self.to_translation_language_mapping_proto(
+                self, written_translations.translations_mapping))
 
         written_translations_proto = languages_pb2.WrittenTranslations(
             translation_language_mapping=translation_language_mapping_protos
@@ -2561,7 +2563,7 @@ class Exploration(python_utils.OBJECT):
 
         return written_translations_proto
 
-    def to_translation_language_mapping_proto(self, translation_mapping):
+    def to_translation_language_mapping_proto(self, translations_mapping):
         """Creates a WrittenTranslationContentMapping proto object.
 
         Args:
@@ -2576,21 +2578,25 @@ class Exploration(python_utils.OBJECT):
         translation_language_mapping_protos = {}
         translation_content_mapping_protos = {}
 
-        for (content_id, language_code_to_translation) in translation_mapping.items():
-            for (language_code, written_transaltion) in (language_code_to_translation.items()):
-                written_translation_proto=self.to_written_translation_proto(
-                    written_transaltion.data_format, written_transaltion.translation
-                )
-                translation_content_mapping_protos[language_code] = written_translation_proto
+        for (content_id, language_code_to_translation) in (
+            translations_mapping.items()):
+            for (language_code, written_transaltion) in (
+                language_code_to_translation.items()):
+                written_translation_proto = (
+                    self.to_written_translation_proto(
+                    written_transaltion.data_format,
+                    written_transaltion.translation))
+                translation_content_mapping_protos[language_code] = (
+                    written_translation_proto)
             translation_content_mapping_proto = (
                 languages_pb2.WrittenTranslationContentMapping(
-                    translation_content_mapping=translation_content_mapping_protos
-                )
-            )
-            translation_language_mapping_protos[content_id] = translation_content_mapping_proto
+                    translation_content_mapping=(
+                        translation_content_mapping_protos)))
+            translation_language_mapping_protos[content_id] = (
+                translation_content_mapping_proto)
 
         return translation_language_mapping_protos
-    
+
     def to_written_translation_proto(self, data_format, translation):
         """Creates a WrittenTranslationContentMapping proto object.
 
@@ -2602,17 +2608,21 @@ class Exploration(python_utils.OBJECT):
             written_translation_proto: proto object. The
                 written translation proto object.
         """
-        if(data_format == WrittenTranslation.DATA_FORMAT_HTML):
+        if data_format == WrittenTranslation.DATA_FORMAT_HTML:
             return self.to_html_written_translatable(self, translation)
 
-        if(data_format == WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
+        if data_format == WrittenTranslation.DATA_FORMAT_UNICODE_STRING:
             return self.to_unicode_written_translatable(self, translation)
 
-        if(data_format == WrittenTranslation.DATA_FORMAT_SET_OF_NORMALIZED_STRING):
-            return self.to_normalized_set_written_translatable(self, translation)
+        if data_format == (
+                WrittenTranslation.DATA_FORMAT_SET_OF_NORMALIZED_STRING):
+            return self.to_normalized_set_written_translatable(
+                self, translation)
 
-        if(data_format == WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
-            return self.to_unicode_set_written_translatable(self, translation)
+        if data_format == (
+                WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
+            return self.to_unicode_set_written_translatable(
+                self, translation)
 
     def to_html_written_translatable(self, translation):
         """Creates a WrittenTranslatableHtml proto object.
@@ -2624,9 +2634,9 @@ class Exploration(python_utils.OBJECT):
             written_translatable_html_proto: proto object. The
                 written translatable html proto object.
         """
-        written_translatable_html_proto = languages_pb2
-                .WrittenTranslation.data_format
-                .WrittenTranslatableHtml(translation=translation)
+        written_translatable_html_proto = (
+            languages_pb2.WrittenTranslation.data_format
+            .WrittenTranslatableHtml(translation=translation))
 
         return written_translatable_html_proto
 
@@ -2640,9 +2650,9 @@ class Exploration(python_utils.OBJECT):
             written_translatable_unicode_proto: proto object. The
                 written translatable unicode proto object.
         """
-        written_translatable_unicode_proto = languages_pb2
-            .WrittenTranslation.data_format
-            .WrittenTranslatableUnicode(translation=translation)
+        written_translatable_unicode_proto = (
+            languages_pb2.WrittenTranslation.data_format
+            .WrittenTranslatableUnicode(translation=translation))
 
         return written_translatable_unicode_proto
 
@@ -2656,9 +2666,9 @@ class Exploration(python_utils.OBJECT):
             written_translatable_normalized_set_proto: proto object. The
                 written translatable normalized set proto object.
         """
-        written_translatable_normalized_set_proto = languages_pb2
-            .WrittenTranslation.data_format
-            .WrittenTranslatableSetOfNormalizedString(translation=translation)
+        written_translatable_normalized_set_proto = (
+            languages_pb2.WrittenTranslation.data_format
+            .WrittenTranslatableSetOfNormalizedString(translation=translation))
 
         return written_translatable_normalized_set_proto
 
@@ -2672,9 +2682,9 @@ class Exploration(python_utils.OBJECT):
             written_translatable_unicode_set_proto: proto object. The
                 written translatable unicode set proto object.
         """
-        written_translatable_unicode_set_proto = languages_pb2
-            .WrittenTranslation.data_format
-            .WrittenTranslatableSetOfUnicodeString(translation=translation)
+        written_translatable_unicode_set_proto = (
+            languages_pb2.WrittenTranslation.data_format
+            .WrittenTranslatableSetOfUnicodeString(translation=translation))
 
         return written_translatable_unicode_set_proto
 
@@ -2690,63 +2700,59 @@ class Exploration(python_utils.OBJECT):
                 InteractionInstance proto object.
         """
         interaction_proto = None
-        if(interaction.id == 'Continue'):
+        if interaction.id == 'Continue':
             interaction_proto = state_pb2.InteractionInstance(
-                continue_=self.to_continue_proto(self, interaction)
-            )
+                continue_=self.to_continue_proto(self, interaction))
 
-        if(interaction.id == 'FractionInput'):
+        if interaction.id == 'FractionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                fraction_input=self.to_fraction_interaction_proto(self, interaction)
-            )
+                fraction_input=self.to_fraction_interaction_proto(
+                    self, interaction))
 
-        if(interaction.id == 'ItemSelectionInput'):
+        if interaction.id == 'ItemSelectionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                item_selection_input=self.to_item_selection_single_interaction_proto(
-                    self, interaction)
-            )
+                item_selection_input=(
+                    self.to_item_selection_single_interaction_proto(
+                        self, interaction)))
 
-        if(interaction.id == 'MultipleChoiceInput'):
+        if interaction.id == 'MultipleChoiceInput':
             interaction_proto = state_pb2.InteractionInstance(
-                multiple_choice_input=self.to_multiple_choice_interaction_proto(
-                    self, interaction)
-            )
+                multiple_choice_input=(
+                    self.to_multiple_choice_interaction_proto(
+                        self, interaction)))
 
-        if(interaction.id == 'NumericInput'):
+        if interaction.id == 'NumericInput':
             interaction_proto = state_pb2.InteractionInstance(
                 numeric_input=self.to_numeric_interaction_proto(
-                    self, interaction)
-            )
+                    self, interaction))
 
-        if(interaction.id == 'TextInput'):
+        if interaction.id == 'TextInput':
             interaction_proto = state_pb2.InteractionInstance(
                 text_input=self.to_text_input_interaction_proto(
-                    self, interaction)
-            )
+                    self, interaction))
 
-        if(interaction.id == 'RatioExpressionInput'):
+        if interaction.id == 'RatioExpressionInput':
             interaction_proto = state_pb2.InteractionInstance(
-                ratio_expression_input=self.to_ratio_expression_interaction_proto(
-                    self, interaction)
-            )
+                ratio_expression_input=(
+                    self.to_ratio_expression_interaction_proto(
+                        self, interaction)))
 
-        if(interaction.id == 'ImageClickInput'):
+        if interaction.id == 'ImageClickInput':
             interaction_proto = state_pb2.InteractionInstance(
-                image_click_input=self.to_image_click_interaction_proto(
-                    self, interaction)
-            )
+                image_click_input=(
+                    self.to_image_click_interaction_proto(
+                        self, interaction)))
 
-        if(interaction.id == 'DragAndDropSortInput'):
+        if interaction.id == 'DragAndDropSortInput':
             interaction_proto = state_pb2.InteractionInstance(
-                drag_and_drop_sort_input=self.to_drag_and_drop_interaction_proto(
-                    self, interaction)
-            )
+                drag_and_drop_sort_input=(
+                    self.to_drag_and_drop_interaction_proto(
+                        self, interaction)))
 
-        if(interaction.id == 'EndExploration'):
+        if interaction.id == 'EndExploration':
             interaction_proto = state_pb2.InteractionInstance(
                 end_exploration=self.to_end_exploration_proto(
-                    self, interaction)
-            )
+                    self))
 
         return interaction_proto
 
@@ -2764,15 +2770,14 @@ class Exploration(python_utils.OBJECT):
         outcome_proto = self.to_outcome_proto(
             self, interaction.default_outcome.dest,
             interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct
-        )
+            interaction.default_outcome.labelled_as_correct)
         continue_proto = state_pb2.ContinueInstance(
-            default_outcome=outcome_proto
-        )
+            default_outcome=outcome_proto)
 
         return continue_proto
-    
-    def to_outcome_proto(self, destination_state, feedback, labelled_as_correct):
+
+    def to_outcome_proto(
+            self, destination_state, feedback, labelled_as_correct):
         """Creates a Outcome proto object.
 
         Args:
@@ -2787,13 +2792,11 @@ class Exploration(python_utils.OBJECT):
                 Outcome proto object.
         """
         feedback_proto = self.to_subtitled_html_proto(
-            self, feedback
-        )
+            self, feedback)
         outcome_proto = state_pb2.Outcome(
             destination_state=destination_state,
             feedback=feedback_proto,
-            labelled_as_correct=labelled_as_correct
-        )
+            labelled_as_correct=labelled_as_correct)
 
         return outcome_proto
 
@@ -2808,29 +2811,30 @@ class Exploration(python_utils.OBJECT):
             fraction_interaction_proto: proto object. The
                 FractionInputInstance proto object.
         """
-        customization_args_proto = self.to_fraction_customization_args_proto(
-            self, interaction.customization_args)
+        customization_args_proto = (
+            self.to_fraction_customization_args_proto(
+                self, interaction.customization_args))
 
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct 
-        )
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
 
-        solution_proto = self.to_fraction_solution_proto(self, interaction.solution)
+        solution_proto = self.to_fraction_solution_proto(
+            self, interaction.solution)
 
         answer_groups_proto = self.to_fraction_answer_groups_proto(
-            self, interaction.answer_groups
-        )
+            self, interaction.answer_groups)
 
         fraction_interaction_proto = state_pb2.FractionInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             solution=solution_proto,
-            answer_groups=answer_groups_proto
-        )
+            answer_groups=answer_groups_proto)
 
         return fraction_interaction_proto
-    
+
     def to_fraction_customization_args_proto(self, customization_args):
         """Creates a CustomizationArgs proto object
             for FractionInputInstance.
@@ -2845,11 +2849,14 @@ class Exploration(python_utils.OBJECT):
             customization_arg_proto: proto object. The
                 CustomizationArgs proto object.
         """
-        customization_arg_proto = state_pb2.FractionInputInstance.CustomizationArgs(
-            requires_simplest_form=customization_args['requireSimplestForm'].value,
-            allow_improper_fractions=customization_args['allowImproperFraction'].value,
-            allow_nonzero_integer_part=customization_args['allowNonzeroIntegerPart'].value
-        )
+        customization_arg_proto = (
+            state_pb2.FractionInputInstance.CustomizationArgs(
+            requires_simplest_form=(
+                customization_args['requireSimplestForm'].value),
+            allow_improper_fractions=(
+                customization_args['allowImproperFraction'].value),
+            allow_nonzero_integer_part=(
+                customization_args['allowNonzeroIntegerPart'].value)))
 
         # custom_placeholder=self.to_subtitled_html_proto(
         #     self, customization_args['customPlaceholder'].value)
@@ -2862,18 +2869,22 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             solution: Solution. A possible solution
-                for the question asked in this interaction. 
+                for the question asked in this interaction.
 
         Returns:
             solution_proto: proto object. The
                 Solution proto object.
         """
-        solution_proto = None 
+        solution_proto = None
         if solution is not None:
-            solution_proto = state_pb.FractionInputInstance.Solution(
-                base_solution=self.to_base_solution_proto(self, solution.explanation),
-                correct_answer=self.to_fraction_proto(self, soltuion.correct_answer)
-            )
+            solution_proto = (
+                state_pb2.FractionInputInstance.Solution(
+                base_solution=(
+                    self.to_base_solution_proto(
+                        self, solution.explanation)),
+                correct_answer=(
+                    self.to_fraction_proto(
+                        self, solution.correct_answer))))
 
         return solution_proto
 
@@ -2883,7 +2894,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -2896,10 +2907,10 @@ class Exploration(python_utils.OBJECT):
                 self, answer_group)
             rules_spec_proto = self.to_fraction_rule_specs_proto(
                 self, answer_group.rule_specs)
-            answer_group_proto=state_pb2.FractionInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto,
-                rule_specs=rules_spec_proto
-            )
+            answer_group_proto = (
+                state_pb2.FractionInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto))
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
@@ -2908,7 +2919,7 @@ class Exploration(python_utils.OBJECT):
         """Creates a RuleSpec proto object.
 
         Args:
-            rule_specs_list: list(RuleSpec). List of rule specifications. 
+            rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
             rule_specs_list_proto: proto object list. The
@@ -2919,142 +2930,165 @@ class Exploration(python_utils.OBJECT):
 
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            if(rule_type == 'IsExactlyEqualTo'):
-                is_exactly_equal_to_proto = self.to_is_exactly_equal_to_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    is_exactly_equal_to=is_exactly_equal_to_proto
-                )
+            if rule_type == 'IsExactlyEqualTo':
+                is_exactly_equal_to_proto = (
+                    self.to_is_exactly_equal_to_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        is_exactly_equal_to=is_exactly_equal_to_proto))
 
-            if(rule_type == 'IsEquivalentTo'):
+            if rule_type == 'IsEquivalentTo':
                 is_equivalent_to_proto = self.to_is_equivalent_to_proto(
                     self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    is_equivalent_to=is_equivalent_to_proto
-                )
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        is_equivalent_to=is_equivalent_to_proto))
 
-            if(rule_type == 'IsEquivalentToAndInSimplestForm'):
-                is_equivalent_to_and_in_simplest_form_proto = self.to_is_equivalent_to_and_in_simplest_form_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    is_equivalent_to_and_in_simplest_form=is_equivalent_to_and_in_simplest_form_proto
-                )
+            if rule_type == 'IsEquivalentToAndInSimplestForm':
+                is_equivalent_to_and_in_simplest_form_proto = (
+                    self.to_is_equivalent_to_and_in_simplest_form_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        is_equivalent_to_and_in_simplest_form=(
+                            is_equivalent_to_and_in_simplest_form_proto)))
 
-            if(rule_type == 'IsLessThan'):
+            if rule_type == 'IsLessThan':
                 is_less_than_proto = self.to_is_less_than_proto_proto(
                     self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    is_less_than=is_less_than_proto
-                )
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        is_less_than=is_less_than_proto))
 
-            if(rule_type == 'IsGreaterThanSpec'):
+            if rule_type == 'IsGreaterThanSpec':
                 is_greater_than_proto = self.to_is_greater_than_proto(
                     self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    to_is_greater_than=is_greater_than_proto
-                )
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        to_is_greater_than=is_greater_than_proto))
 
-            if(rule_type == 'HasNumeratorEqualTo'):
-                has_numerator_equal_to_proto = self.to_has_numerator_equal_to_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    has_numerator_equal_to=has_numerator_equal_to_proto
-                )
+            if rule_type == 'HasNumeratorEqualTo':
+                has_numerator_equal_to_proto = (
+                    self.to_has_numerator_equal_to_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        has_numerator_equal_to=(
+                            has_numerator_equal_to_proto)))
 
-            if(rule_type == 'HasDenominatorEqualTo'):
-                has_denominator_equal_to_proto = self.to_has_denominator_equal_to_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    has_denominator_equal_to=has_denominator_equal_to_proto
-                )
+            if rule_type == 'HasDenominatorEqualTo':
+                has_denominator_equal_to_proto = (
+                    self.to_has_denominator_equal_to_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        has_denominator_equal_to=(
+                            has_denominator_equal_to_proto)))
 
-            if(rule_type == 'HasIntegerPartEqualTo'):
-                has_integer_part_equal_to_proto = self.to_has_integer_part_equal_to_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    has_integer_part_equal_to=has_integer_part_equal_to_proto
-                )
+            if rule_type == 'HasIntegerPartEqualTo':
+                has_integer_part_equal_to_proto = (
+                    self.to_has_integer_part_equal_to_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        has_integer_part_equal_to=(
+                            has_integer_part_equal_to_proto)))
 
-            if(rule_type == 'HasNoFractionalPart'):
-                has_no_fractional_part_proto = self.to_has_no_fractional_part_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    has_no_fractional_part=has_no_fractional_part_proto
-                )
+            if rule_type == 'HasNoFractionalPart':
+                has_no_fractional_part_proto = (
+                    self.to_has_no_fractional_part_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        has_no_fractional_part=(
+                            has_no_fractional_part_proto)))
 
-            if(rule_type == 'HasFractionalPartExactlyEqualTo'):
-                has_fractional_part_exactly_equal_to_proto = self.to_has_fractional_part_exactly_equal_to_proto(
-                    self, rule_spec.inputs['f'])
-                rules_specs_proto = state_pb2.FractionInputInstance.RuleSpec(
-                    has_fractional_part_exactly_equal_to=has_fractional_part_exactly_equal_to_proto
-                )
+            if rule_type == 'HasFractionalPartExactlyEqualTo':
+                has_fractional_part_exactly_equal_to_proto = (
+                    self.to_has_fractional_part_exactly_equal_to_proto(
+                        self, rule_spec.inputs['f']))
+                rules_specs_proto = (
+                    state_pb2.FractionInputInstance.RuleSpec(
+                        has_fractional_part_exactly_equal_to=(
+                            has_fractional_part_exactly_equal_to_proto)))
 
             rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
     def to_is_exactly_equal_to_proto(self, fraction):
-        is_exactly_equal_to_proto = state_pb2.FractionInputInstance.RuleSpec.IsExactlyEqualToSpec(
-            input=self.to_fraction_proto(self, fraction)
-        )
+        is_exactly_equal_to_proto = (
+            state_pb2.FractionInputInstance.RuleSpec.IsExactlyEqualToSpec(
+                input=self.to_fraction_proto(self, fraction)))
 
         return is_exactly_equal_to_proto
 
     def to_is_equivalent_to_proto(self, fraction):
-        equivalent_to_proto = state_pb2.FractionInputInstance.RuleSpec.IsEquivalentToSpec(
-            input=self.to_fraction_proto(self, fraction)
-        )
+        equivalent_to_proto = (
+            state_pb2.FractionInputInstance.RuleSpec.IsEquivalentToSpec(
+                input=self.to_fraction_proto(self, fraction)))
 
         return equivalent_to_proto
 
     def to_is_equivalent_to_and_in_simplest_form_proto(self, fraction):
-        is_equivalent_to_and_in_simplest_form_proto = state_pb2.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec(
-            input=self.to_fraction_proto(self, fraction)
-        )
+        is_equivalent_to_and_in_simplest_form_proto = (
+            state_pb2.FractionInputInstance
+            .RuleSpec.IsEquivalentToAndInSimplestFormSpec(
+                input=self.to_fraction_proto(self, fraction)))
 
         return is_equivalent_to_and_in_simplest_form_proto
 
     def to_is_less_than_proto(self, fraction):
-        is_less_than_proto = state_pb2.FractionInputInstance.RuleSpec.IsLessThanSpec(
-            input=self.to_fraction_proto(self, fraction)
-        )
+        is_less_than_proto = (
+            state_pb2.FractionInputInstance.RuleSpec.IsLessThanSpec(
+                input=self.to_fraction_proto(self, fraction)))
 
         return is_less_than_proto
 
     def to_is_greater_than_proto(self, fraction):
-        is_greater_than_proto = state_pb2.FractionInputInstance.RuleSpec.IsGreaterThanSpec(
-            input=self.to_fraction_proto(self, fraction)
-        )
+        is_greater_than_proto = (
+            state_pb2.FractionInputInstance.RuleSpec.IsGreaterThanSpec(
+                input=self.to_fraction_proto(self, fraction)))
 
         return is_greater_than_proto
 
     def to_has_numerator_equal_to_proto(self, input):
-        has_numerator_equal_to_proto = state_pb2.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec(
-            input=input)
+        has_numerator_equal_to_proto = (
+            state_pb2.FractionInputInstance
+            .RuleSpec.HasNumeratorEqualToSpec(
+                input=input))
 
         return has_numerator_equal_to_proto
 
     def to_has_denominator_equal_to_proto(self, input):
-        has_denominator_equal_to_proto = state_pb2.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec(
-            input=input)
+        has_denominator_equal_to_proto = (
+            state_pb2.FractionInputInstance
+            .RuleSpec.HasDenominatorEqualToSpec(
+                input=input))
 
         return has_denominator_equal_to_proto
 
     def to_has_integer_part_equal_to_proto(self, input):
-        has_integer_part_equal_to_proto = state_pb2.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec(
-            input=input)
+        has_integer_part_equal_to_proto = (
+            state_pb2.FractionInputInstance
+            .RuleSpec.HasIntegerPartEqualToSpec(
+                input=input))
 
         return has_integer_part_equal_to_proto
 
     def to_has_no_fractional_part_proto(self, input):
-        has_no_fractional_part_proto = state_pb2.FractionInputInstance.RuleSpec.HasNoFractionalPartSpec()
+        has_no_fractional_part_proto = (
+            state_pb2.FractionInputInstance
+            .RuleSpec.HasNoFractionalPartSpec())
 
         return has_no_fractional_part_proto
 
     def to_has_fractional_part_exactly_equal_to_proto(self, fraction):
-        has_fractional_part_exactly_equal_to_proto = state_pb2.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec(
-            input=self.to_fraction_proto(self, fraction)
-        )
+        has_fractional_part_exactly_equal_to_proto = (
+            state_pb2.FractionInputInstance
+            .RuleSpec.HasFractionalPartExactlyEqualToSpec(
+                input=self.to_fraction_proto(self, fraction)))
 
         return has_fractional_part_exactly_equal_to_proto
 
@@ -3086,25 +3120,28 @@ class Exploration(python_utils.OBJECT):
             item_selection_single_interaction_proto: proto object. The
                 ItemSelectionInputInstance proto object.
         """
-        customization_arg_proto = self.to_item_selection_single_customization_arg_proto(
-            self, interaction.customization_args)
+        customization_arg_proto = (
+            self.to_item_selection_single_customization_arg_proto(
+                self, interaction.customization_args))
 
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
 
-        answer_groups_proto = self.to_item_selection_single_answer_groups_proto(
-            self, interaction.answer_groups
-        )
+        answer_groups_proto = (
+            self.to_item_selection_single_answer_groups_proto(
+                self, interaction.answer_groups))
 
-        item_selection_single_interaction_proto = state_pb2.ItemSelectionInputInstance(
-            customization_args=customization_arg_proto,
-            default_outcome=outcome_proto,
-            hints=hints_proto,
-            answer_groups=answer_groups_proto
-        )
+        item_selection_single_interaction_proto = (
+            state_pb2.ItemSelectionInputInstance(
+                customization_args=customization_arg_proto,
+                default_outcome=outcome_proto,
+                hints=hints_proto,
+                answer_groups=answer_groups_proto))
 
         return item_selection_single_interaction_proto
 
@@ -3114,7 +3151,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -3125,24 +3162,27 @@ class Exploration(python_utils.OBJECT):
         for answer_group in answer_groups:
             base_answer_group_proto = self.to_base_answer_group_proto(
                 self, answer_group)
-            answer_group_proto=state_pb2.ItemSelectionInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto
-            )
+            answer_group_proto = (
+                state_pb2.ItemSelectionInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto))
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
 
-    def to_item_selection_single_customization_arg_proto(self, customization_args):
+    def to_item_selection_single_customization_arg_proto(
+        self, customization_args):
         choices_list_proto = []
         for value in customization_args['choices'].value:
-            value_proto=self.to_subtitled_html_proto(self, value)
+            value_proto = self.to_subtitled_html_proto(self, value)
             choices_list_proto.append(value_proto)
-            
-        customization_arg_proto = state_pb2.ItemSelectionInputInstance.CustomizationArgs(
-            min_allowable_selection_count=customization_args['minAllowableSelectionCount'].value,
-            max_allowable_selection_count=customization_args['maxAllowableSelectionCount'].value,
-            choices=choices_list_proto
-        )
+
+        customization_arg_proto = (
+            state_pb2.ItemSelectionInputInstance.CustomizationArgs(
+                min_allowable_selection_count=(
+                    customization_args['minAllowableSelectionCount'].value),
+                max_allowable_selection_count=(
+                    customization_args['maxAllowableSelectionCount'].value),
+                choices=choices_list_proto))
 
         return customization_arg_proto
 
@@ -3150,7 +3190,7 @@ class Exploration(python_utils.OBJECT):
         """Creates a Hint proto object.
 
         Args:
-            hints: Hint. The hint domain object. 
+            hints: Hint. The hint domain object.
 
         Returns:
             hints_list_proto: proto object list. The
@@ -3159,8 +3199,9 @@ class Exploration(python_utils.OBJECT):
         hints_list_proto = []
 
         for hint in hints:
-            hint_content_proto = self.to_subtitled_html_proto(self, hint.hint_content)
-            hint_proto=state_pb2.Hint(
+            hint_content_proto = (
+                self.to_subtitled_html_proto(self, hint.hint_content))
+            hint_proto = state_pb2.Hint(
                 hint_content=hint_content_proto
             )
             hints_list_proto.append(hint_proto)
@@ -3178,11 +3219,14 @@ class Exploration(python_utils.OBJECT):
             multiple_choice_interaction_proto: proto object. The
                 MultipleChoiceInputInstance proto object.
         """
-        customization_args_proto = self.to_multiple_choice_customization_args_proto(
-            self, interaction.customization_args)
+        customization_args_proto = (
+            self.to_multiple_choice_customization_args_proto(
+                self, interaction.customization_args))
 
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
@@ -3191,12 +3235,12 @@ class Exploration(python_utils.OBJECT):
             self, interaction.answer_groups
         )
 
-        multiple_choice_interaction_proto = state_pb2.MultipleChoiceInputInstance(
-            customization_args=customization_args_proto,
-            default_outcome=outcome_proto,
-            hints=hints_proto,
-            answer_groups=answer_groups_proto
-        )
+        multiple_choice_interaction_proto = (
+            state_pb2.MultipleChoiceInputInstance(
+                customization_args=customization_args_proto,
+                default_outcome=outcome_proto,
+                hints=hints_proto,
+                answer_groups=answer_groups_proto))
 
         return multiple_choice_interaction_proto
 
@@ -3206,7 +3250,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -3217,14 +3261,15 @@ class Exploration(python_utils.OBJECT):
         for answer_group in answer_groups:
             base_answer_group_proto = self.to_base_answer_group_proto(
                 self, answer_group)
-            answer_group_proto=state_pb2.MultipleChoiceInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto
-            )
+            answer_group_proto = (
+                state_pb2.MultipleChoiceInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto))
             answer_group_list_proto.append(answer_group_proto)
 
-        return answer_group_list_proto   
+        return answer_group_list_proto
 
-    def to_multiple_choice_customization_args_proto(self, customization_args):
+    def to_multiple_choice_customization_args_proto(
+            self, customization_args):
         """Creates a CustomizationArgs proto object
             for MultipleChoiceInputInstance.
 
@@ -3241,12 +3286,12 @@ class Exploration(python_utils.OBJECT):
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto=self.to_subtitled_html_proto(self, value)
+            value_proto = self.to_subtitled_html_proto(self, value)
             choices_list_proto.append(value_proto)
-        
-        customization_arg_proto = state_pb2.MultipleChoiceInputInstance.CustomizationArgs(
-            choices=choices_list_proto
-        )
+
+        customization_arg_proto = (
+            state_pb2.MultipleChoiceInputInstance.CustomizationArgs(
+                choices=choices_list_proto))
 
         return customization_arg_proto
 
@@ -3262,12 +3307,15 @@ class Exploration(python_utils.OBJECT):
                 NumericInputInstance proto object.
         """
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
 
-        solution_proto = self.to_numeric_solution(self, interaction.solution)
+        solution_proto = self.to_numeric_solution(
+            self, interaction.solution)
 
         answer_groups_proto = self.to_numeric_answer_groups_proto(
             self, interaction.answer_groups
@@ -3276,7 +3324,8 @@ class Exploration(python_utils.OBJECT):
         numeric_interaction_proto = state_pb2.NumericInputInstance(
             default_outcome=outcome_proto,
             hints=hints_proto,
-            solution=solution_proto
+            solution=solution_proto,
+            answer_groups=answer_groups_proto
         )
 
         return numeric_interaction_proto
@@ -3287,7 +3336,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -3300,7 +3349,7 @@ class Exploration(python_utils.OBJECT):
                 self, answer_group)
             rules_spec_proto = self.to_numeric_rule_specs_proto(
                 self, answer_group.rule_specs)
-            answer_group_proto=state_pb2.NumericInputInstance.AnswerGroup(
+            answer_group_proto = state_pb2.NumericInputInstance.AnswerGroup(
                 base_answer_group=base_answer_group_proto,
                 rule_specs=rules_spec_proto
             )
@@ -3323,54 +3372,59 @@ class Exploration(python_utils.OBJECT):
 
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            if(rule_type == 'Equals'):
+            if rule_type == 'Equals':
                 equals_to_proto = self.to_numeric_equals_to_proto(
                     self, rule_spec.inputs['x'])
                 rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
                     equals=equals_to_proto
                 )
 
-            if(rule_type == 'IsLessThan'):
+            if rule_type == 'IsLessThan':
                 is_less_than_proto = self.to_numeric_is_less_than_proto(
                     self, rule_spec.inputs['x'])
                 rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
                     is_less_than=is_less_than_proto
                 )
 
-            if(rule_type == 'IsGreaterThan'):
+            if rule_type == 'IsGreaterThan':
                 is_greater_than_proto = self.to_numeric_is_greater_than_proto(
                     self, rule_spec.inputs['x'])
                 rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
                     is_greater_than=is_greater_than_proto
                 )
 
-            if(rule_type == 'IsLessThanOrEqualTo'):
-                is_less_than_or_equal_to_proto = self.to_numeric_is_less_than_or_equal_to_proto(
-                    self, rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
-                    is_less_than_or_equal_to=is_less_than_or_equal_to_proto
-                )
+            if rule_type == 'IsLessThanOrEqualTo':
+                is_less_than_or_equal_to_proto = (
+                    self.to_numeric_is_less_than_or_equal_to_proto(
+                        self, rule_spec.inputs['x']))
+                rules_specs_proto = (
+                    state_pb2.NumericInputInstance.RuleSpec(
+                        is_less_than_or_equal_to=(
+                            is_less_than_or_equal_to_proto)))
 
-            if(rule_type == 'IsGreaterThanOrEqualTo'):
-                is_greater_than_or_equal_to_proto = self.to_numeric_is_greater_than_or_equal_to_proto(
-                    self, rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
-                    is_greater_than_or_equal_to=is_greater_than_or_equal_to_proto
-                )
+            if rule_type == 'IsGreaterThanOrEqualTo':
+                is_greater_than_or_equal_to_proto = (
+                    self.to_numeric_is_greater_than_or_equal_to_proto(
+                        self, rule_spec.inputs['x']))
+                rules_specs_proto = (
+                    state_pb2.NumericInputInstance.RuleSpec(
+                        is_greater_than_or_equal_to=(
+                            is_greater_than_or_equal_to_proto)))
 
-            if(rule_type == 'IsInclusivelyBetween'):
-                is_inclusively_between_proto = self.to_numeric_is_inclusively_between_proto(
-                    self, rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
-                    is_inclusively_between=is_inclusively_between_proto
-                )
+            if rule_type == 'IsInclusivelyBetween':
+                is_inclusively_between_proto = (
+                    self.to_numeric_is_inclusively_between_proto(
+                        self, rule_spec.inputs['x']))
+                rules_specs_proto = (
+                    state_pb2.NumericInputInstance.RuleSpec(
+                        is_inclusively_between=is_inclusively_between_proto))
 
-            if(rule_type == 'IsWithinToleranceSpec'):
-                is_within_tolerance_proto = self.to_numeric_is_within_tolerance_proto(
-                    self, rule_spec.inputs['x'])
+            if rule_type == 'IsWithinToleranceSpec':
+                is_within_tolerance_proto = (
+                    self.to_numeric_is_within_tolerance_proto(
+                        self, rule_spec.inputs['x']))
                 rules_specs_proto = state_pb2.NumericInputInstance.RuleSpec(
-                    is_within_tolerance=is_within_tolerance_proto
-                )
+                    is_within_tolerance=is_within_tolerance_proto)
 
             rule_specs_list_proto.append(rules_specs_proto)
 
@@ -3383,51 +3437,62 @@ class Exploration(python_utils.OBJECT):
         return equals_to_proto
 
     def to_numeric_is_less_than_proto(self, input):
-        is_less_than_proto = state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
-            input=input)
+        is_less_than_proto = (
+            state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
+                input=input))
 
         return is_less_than_proto
 
     def to_numeric_is_greater_than_proto(self, input):
-        is_greater_than_proto = state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
-            input=input)
+        is_greater_than_proto = (
+            state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
+                input=input))
 
         return is_greater_than_proto
 
     def to_numeric_is_less_than_or_equal_to_proto(self, input):
-        is_less_than_or_equal_to_proto = state_pb2.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec(
-            input=input)
+        is_less_than_or_equal_to_proto = (
+            state_pb2.NumericInputInstance
+            .RuleSpec.IsLessThanOrEqualToSpec(
+                input=input))
 
         return is_less_than_or_equal_to_proto
 
     def to_numeric_is_greater_than_or_equal_to_proto(self, input):
-        is_greater_than_or_equal_to_proto = state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec(
-            input=input)
+        is_greater_than_or_equal_to_proto = (
+            state_pb2.NumericInputInstance
+            .RuleSpec.IsGreaterThanOrEqualToSpec(
+                input=input))
 
         return is_greater_than_or_equal_to_proto
 
     def to_numeric_is_inclusively_between_proto(self, input):
-        is_inclusively_between_proto = state_pb2.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec(
-            inputLowerInclusive=input[0],
-            inputUpperInclusive=input[1])
+        is_inclusively_between_proto = (
+            state_pb2.NumericInputInstance
+            .RuleSpec.IsInclusivelyBetweenSpec(
+                inputLowerInclusive=input[0],
+                inputUpperInclusive=input[1]))
 
         return is_inclusively_between_proto
 
     def to_numeric_is_within_tolerance_proto(self, input):
-        is_within_tolerance_proto = state_pb2.NumericInputInstance.RuleSpec.IsWithinToleranceSpec(
-            inputTolerance=input[0],
-            inputComparedValue=input[1])
+        is_within_tolerance_proto = (
+            state_pb2.NumericInputInstance
+            .RuleSpec.IsWithinToleranceSpec(
+                inputTolerance=input[0],
+                inputComparedValue=input[1]))
 
         return is_within_tolerance_proto
 
     def to_numeric_solution(self, solution):
-        solution_proto = None 
+        solution_proto = None
         if solution is not None:
-            solution_proto = state_pb.NumericInputInstance.Solution(
-                base_solution=self.to_base_solution_proto(self, solution.explanation),
+            solution_proto = state_pb2.NumericInputInstance.Solution(
+                base_solution=self.to_base_solution_proto(
+                    self, solution.explanation),
                 correct_answer=solution.correct_answer
             )
-        
+
         return solution_proto
 
     def to_text_input_interaction_proto(self, interaction):
@@ -3445,7 +3510,9 @@ class Exploration(python_utils.OBJECT):
             self, interaction.customization_args)
 
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
@@ -3472,7 +3539,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -3483,7 +3550,7 @@ class Exploration(python_utils.OBJECT):
         for answer_group in answer_groups:
             base_answer_group_proto = self.to_base_answer_group_proto(
                 self, answer_group)
-            answer_group_proto=state_pb2.TextInputInstance.AnswerGroup(
+            answer_group_proto = state_pb2.TextInputInstance.AnswerGroup(
                 base_answer_group=base_answer_group_proto
             )
             answer_group_list_proto.append(answer_group_proto)
@@ -3491,12 +3558,13 @@ class Exploration(python_utils.OBJECT):
         return answer_group_list_proto
 
     def to_text_input_solution(self, solution):
-        solution_proto = None 
+        solution_proto = None
         if solution is not None:
-            solution_proto = state_pb.TextInputInstance.Solution(
-                base_solution=self.to_base_solution_proto(self, solution.explanation),
-                correct_answer=solution.correct_answer
-            )
+            solution_proto = state_pb2.TextInputInstance.Solution(
+                base_solution=(
+                    self.to_base_solution_proto(
+                        self, solution.explanation)),
+                correct_answer=solution.correct_answer)
 
         return solution_proto
 
@@ -3514,7 +3582,6 @@ class Exploration(python_utils.OBJECT):
             customization_arg_proto: proto object. The
                 CustomizationArgs proto object.
         """
-        # placeholder=self.to_subtitled_html_proto(self, customization_args['placeholder'].value),
 
         customization_arg_proto = state_pb2.TextInputInstance.CustomizationArgs(
             rows=customization_args['rows'].value
@@ -3533,39 +3600,41 @@ class Exploration(python_utils.OBJECT):
             ratio_expression_interaction_proto: proto object. The
                 RatioExpressionInputInstance proto object.
         """
-        customization_args_proto = self.to_ratio_expression_customization_args_proto(
-            self, interaction.customization_args)
-        
+        customization_args_proto = (
+            self.to_ratio_expression_customization_args_proto(
+                self, interaction.customization_args))
+
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct 
-        )
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
 
-        solution_proto = self.to_ratio_expression_solution_proto(self, interaction.solution)
+        solution_proto = self.to_ratio_expression_solution_proto(
+            self, interaction.solution)
 
         answer_groups_proto = self.to_ratio_expression_answer_groups_proto(
-            self, interaction.answer_groups
-        )
+            self, interaction.answer_groups)
 
-        ratio_expression_interaction_proto = state_pb2.RatioExpressionInputInstance(
-            customization_args=customization_args_proto,
-            default_outcome=outcome_proto,
-            solution=solution_proto,
-            hints=hints_proto,
-            answer_groups=answer_groups_proto
-        )
+        ratio_expression_interaction_proto = (
+            state_pb2.RatioExpressionInputInstance(
+                customization_args=customization_args_proto,
+                default_outcome=outcome_proto,
+                solution=solution_proto,
+                hints=hints_proto,
+                answer_groups=answer_groups_proto))
 
         return ratio_expression_interaction_proto
-    
+
     def to_ratio_expression_answer_groups_proto(self, answer_groups):
         """Creates a AnswerGroup proto object
             for RatioExpressionInputInstance.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -3578,10 +3647,10 @@ class Exploration(python_utils.OBJECT):
                 self, answer_group)
             rules_spec_proto = self.to_ratio_expression_rule_specs_proto(
                 self, answer_group.rule_specs)
-            answer_group_proto=state_pb2.RatioExpressionInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto,
-                rule_specs=rules_spec_proto
-            )
+            answer_group_proto = (
+                state_pb2.RatioExpressionInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto))
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
@@ -3601,26 +3670,28 @@ class Exploration(python_utils.OBJECT):
 
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            if(rule_type == 'Equals'):
+            if rule_type == 'Equals':
                 equals_to_proto = self.to_ratio_equals_to_proto(
                     self, rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.RatioExpressionInputInstance.RuleSpec(
-                    equals=equals_to_proto
-                )
+                rules_specs_proto = (
+                    state_pb2.RatioExpressionInputInstance.RuleSpec(
+                        equals=equals_to_proto))
 
-            if(rule_type == 'IsEquivalent'):
+            if rule_type == 'IsEquivalent':
                 is_equivalent_proto = self.to_ratio_is_equivalent_proto(
                     self, rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.RatioExpressionInputInstance.RuleSpec(
-                    is_equivalent=is_equivalent_proto
-                )
+                rules_specs_proto = (
+                    state_pb2.RatioExpressionInputInstance.RuleSpec(
+                        is_equivalent=is_equivalent_proto))
 
-            if(rule_type == 'HasNumberOfTermsEqualTo'):
-                ratio_has_numer_of_terms_equal_to_proto = self.to_ratio_has_numer_of_terms_equal_to_proto(
-                    self, rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.RatioExpressionInputInstance.RuleSpec(
-                    has_number_of_terms_equal_to=ratio_has_numer_of_terms_equal_to_proto
-                )
+            if rule_type == 'HasNumberOfTermsEqualTo':
+                ratio_has_numer_of_terms_equal_to_proto = (
+                    self.to_ratio_has_numer_of_terms_equal_to_proto(
+                        self, rule_spec.inputs['x']))
+                rules_specs_proto = (
+                    state_pb2.RatioExpressionInputInstance.RuleSpec(
+                        has_number_of_terms_equal_to=(
+                            ratio_has_numer_of_terms_equal_to_proto)))
 
             rule_specs_list_proto.append(rules_specs_proto)
 
@@ -3636,8 +3707,9 @@ class Exploration(python_utils.OBJECT):
             equals_to_proto: proto object. The
                 EqualsSpec proto object.
         """
-        equals_to_proto = state_pb2.RatioExpressionInputInstance.RuleSpec.EqualsSpec(
-            input=self.to_ratio_expression_proto(self, ratio))
+        equals_to_proto = (
+            state_pb2.RatioExpressionInputInstance.RuleSpec.EqualsSpec(
+                input=self.to_ratio_expression_proto(self, ratio)))
 
         return equals_to_proto
 
@@ -3651,8 +3723,9 @@ class Exploration(python_utils.OBJECT):
             is_equivalent_proto: proto object. The
                 IsEquivalentSpec proto object.
         """
-        is_equivalent_proto = state_pb2.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec(
-            input=self.to_ratio_expression_proto(self, ratio))
+        is_equivalent_proto = (
+            state_pb2.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec(
+                input=self.to_ratio_expression_proto(self, ratio)))
 
         return is_equivalent_proto
 
@@ -3666,9 +3739,10 @@ class Exploration(python_utils.OBJECT):
             has_numer_of_terms_equal_to_proto: proto object. The
                 HasNumberOfTermsEqualToSpec proto object.
         """
-        has_numer_of_terms_equal_to_proto = state_pb2.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec(
-            input_term_count=input_term_count
-        )
+        has_numer_of_terms_equal_to_proto = (
+            state_pb2.RatioExpressionInputInstance
+            .RuleSpec.HasNumberOfTermsEqualToSpec(
+                input_term_count=input_term_count))
 
         return has_numer_of_terms_equal_to_proto
 
@@ -3678,21 +3752,25 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             solution: Solution. A possible solution
-                for the question asked in this interaction. 
+                for the question asked in this interaction.
 
         Returns:
             solution_proto: proto object. The
                 Solution proto object.
         """
-        solution_proto = None 
+        solution_proto = None
         if solution is not None:
-            solution_proto = state_pb.RatioExpressionInputInstance.Solution(
-                base_solution=self.to_base_solution_proto(self, solution.explanation),
-                correct_answer=self.to_ratio_expression_proto(self, soltuion.correct_answer)
-            )
+            solution_proto = (
+                state_pb2.RatioExpressionInputInstance.Solution(
+                    base_solution=(
+                        self.to_base_solution_proto(
+                            self, solution.explanation)),
+                    correct_answer=(
+                        self.to_ratio_expression_proto(
+                            self, solution.correct_answer))))
 
-        return solution_proto        
-    
+        return solution_proto
+
     def to_ratio_expression_proto(self, ratio_list):
         """Creates a RatioExpression proto object.
 
@@ -3713,8 +3791,9 @@ class Exploration(python_utils.OBJECT):
         )
 
         return ratio_expression_proto
-    
-    def to_ratio_expression_customization_args_proto(self, customization_args):
+
+    def to_ratio_expression_customization_args_proto(
+            self, customization_args):
         """Creates a CustomizationArgs proto object
             for RatioExpressionInputInstance.
 
@@ -3728,11 +3807,10 @@ class Exploration(python_utils.OBJECT):
             customization_arg_proto: proto object. The
                 CustomizationArgs proto object.
         """
-        # placeholder=self.to_subtitled_html_proto(self, customization_args['placeholder'].value),        
 
-        customization_arg_proto = state_pb2.RatioExpressionInputInstance.CustomizationArgs(
-            number_of_terms=customization_args['numberOfTerms'].value
-        )
+        customization_arg_proto = (
+            state_pb2.RatioExpressionInputInstance.CustomizationArgs(
+                number_of_terms=customization_args['numberOfTerms'].value))
 
         return customization_arg_proto
 
@@ -3747,11 +3825,14 @@ class Exploration(python_utils.OBJECT):
             image_click_interaction_proto: proto object. The
                 ImageClickInputInstance proto object.
         """
-        customization_args_proto = self.to_image_click_customization_args_proto(
-            self, interaction.customization_args)
+        customization_args_proto = (
+            self.to_image_click_customization_args_proto(
+                self, interaction.customization_args))
 
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
             interaction.default_outcome.labelled_as_correct)
 
         hints_proto = self.to_hints_proto(self, interaction.hints)
@@ -3775,7 +3856,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -3788,7 +3869,7 @@ class Exploration(python_utils.OBJECT):
                 self, answer_group)
             rules_spec_proto = self.to_image_click_rule_specs_proto(
                 self, answer_group.rule_specs)
-            answer_group_proto=state_pb2.ImageClickInputInstance.AnswerGroup(
+            answer_group_proto = state_pb2.ImageClickInputInstance.AnswerGroup(
                 base_answer_group=base_answer_group_proto,
                 rule_specs=rules_spec_proto
             )
@@ -3811,7 +3892,7 @@ class Exploration(python_utils.OBJECT):
 
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            if(rule_type == 'IsInRegion'):
+            if rule_type == 'IsInRegion':
                 is_in_region_proto = self.to_is_in_image_region_proto(
                     self, rule_spec.inputs['x'])
                 rules_specs_proto = state_pb2.ImageClickInputInstance.RuleSpec(
@@ -3832,8 +3913,9 @@ class Exploration(python_utils.OBJECT):
             is_in_region_proto: proto object. The
                 IsInRegionSpec proto object.
         """
-        is_in_region_proto = state_pb2.ImageClickInputInstance.RuleSpec.IsInRegionSpec(
-            input_region=is_in_region)
+        is_in_region_proto = (
+            state_pb2.ImageClickInputInstance.RuleSpec.IsInRegionSpec(
+                input_region=is_in_region))
 
         return is_in_region_proto
 
@@ -3854,9 +3936,9 @@ class Exploration(python_utils.OBJECT):
         image_and_regions_proto = self.to_image_and_regions_proto(
             self, customization_args['imageAndRegions'])
 
-        customization_arg_proto = state_pb2.ImageClickInputInstance.CustomizationArgs(
-            image_and_regions=image_and_regions_proto
-        )
+        customization_arg_proto = (
+            state_pb2.ImageClickInputInstance.CustomizationArgs(
+                image_and_regions=image_and_regions_proto))
 
         return customization_arg_proto
 
@@ -3896,12 +3978,13 @@ class Exploration(python_utils.OBJECT):
         """
         labeled_regions_list_proto = []
 
-        for labeled_regions in labeledRegionsList:            
+        for labeled_regions in labeledRegionsList:
             labeled_region_proto = self.to_labeled_region_proto(
-                self, labeled_regions['label'], labeled_regions['region']['area'])
+                self, labeled_regions['label'],
+                labeled_regions['region']['area'])
 
             labeled_regions_list_proto.append(labeled_region_proto)
-        
+
         return labeled_regions_list_proto
 
     def to_labeled_region_proto(self, label, area):
@@ -3909,20 +3992,20 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             label: str. The lable of the clicked region.
-            area: The area is the list of coordinates consists
+            area: list. The area is the list of coordinates consists
                 of x,y points.
 
         Returns:
             labeled_region_proto: proto object. The
                 LabeledRegion proto object.
         """
-        normalized_rectangle_2d_proto = self.to_normalized_rectangle_2d_proto(
-            self, area)
+        normalized_rectangle_2d_proto = (
+            self.to_normalized_rectangle_2d_proto(self, area))
 
-        labeled_region_proto = objects_pb2.ImageWithRegions.LabeledRegion(
-            label=label,
-            normalized_rectangle_2d=normalized_rectangle_2d_proto
-        )
+        labeled_region_proto = (
+            objects_pb2.ImageWithRegions.LabeledRegion(
+                label=label,
+                normalized_rectangle_2d=normalized_rectangle_2d_proto))
 
         return labeled_region_proto
 
@@ -3930,18 +4013,18 @@ class Exploration(python_utils.OBJECT):
         """Creates a NormalizedRectangle2d proto object.
 
         Args:
-            area: The area is the list of coordinates consists
+            area: list. The area is the list of coordinates consists
                 of x,y points.
 
         Returns:
             normalized_rectangle_2d_proto: proto object. The
                 NormalizedRectangle2d proto object.
         """
-        normalized_rectangle_2d_proto = objects_pb2
-            .ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
+        normalized_rectangle_2d_proto = (
+            objects_pb2.ImageWithRegions.LabeledRegion.NormalizedRectangle2d(
                 upper_left=self.to_point2d_proto(self, area[0]),
                 lower_right=self.to_point2d_proto(self, area[1]),
-            )
+            ))
 
         return normalized_rectangle_2d_proto
 
@@ -3949,7 +4032,7 @@ class Exploration(python_utils.OBJECT):
         """Creates a Point2d proto object.
 
         Args:
-            area: The area is the coordinates consists
+            area: list. The area is the coordinates consists
                 of x,y points.
 
         Returns:
@@ -3963,18 +4046,14 @@ class Exploration(python_utils.OBJECT):
 
         return points_proto
 
-    def to_end_exploration_proto(self, interaction):
+    def to_end_exploration_proto(self):
         """Creates a EndExplorationInstance proto object.
-
-        Args:
-            interaction: InteractionInstance. The interaction instance
-                associated with this state.
 
         Returns:
             end_exploration_proto: proto object. The
                 EndExplorationInstance proto object.
         """
-        end_exploration_proto=state_pb2.EndExplorationInstance()
+        end_exploration_proto = state_pb2.EndExplorationInstance()
 
         return end_exploration_proto
 
@@ -3989,28 +4068,33 @@ class Exploration(python_utils.OBJECT):
             drag_and_drop_interaction_proto: proto object. The
                 DragAndDropSortInputInstance proto object.
         """
-        customization_args_proto = self.to_drag_and_drop_customization_args_proto(
-            self, interaction.customization_args)
+        customization_args_proto = (
+            self.to_drag_and_drop_customization_args_proto(
+                self, interaction.customization_args))
 
         outcome_proto = self.to_outcome_proto(
-            self, interaction.default_outcome.dest, interaction.default_outcome.feedback,
-            interaction.default_outcome.labelled_as_correct 
-        )
+            self,
+            interaction.default_outcome.dest,
+            interaction.default_outcome.feedback,
+            interaction.default_outcome.labelled_as_correct)
 
-        hints_proto = self.to_hints_proto(self, interaction.hints)
+        hints_proto = self.to_hints_proto(
+            self, interaction.hints)
 
-        solution_proto = self.to_drag_and_drop_solution_proto(self, interaction.solution)
+        solution_proto = self.to_drag_and_drop_solution_proto(
+            self, interaction.solution)
 
-        answer_groups_proto = self.to_drag_and_drop_answer_groups_proto(
-            self, interaction.answer_groups
-        )
+        answer_groups_proto = (
+            self.to_drag_and_drop_answer_groups_proto(
+                self, interaction.answer_groups))
 
-        drag_and_drop_interaction_proto = state_pb2.DragAndDropSortInputInstance(
-            customization_args=customization_args_proto,
-            default_outcome=outcome_proto,
-            solution=solution_proto,
-            answer_groups=answer_groups_proto
-        )
+        drag_and_drop_interaction_proto = (
+            state_pb2.DragAndDropSortInputInstance(
+                customization_args=customization_args_proto,
+                hints=hints_proto,
+                default_outcome=outcome_proto,
+                solution=solution_proto,
+                answer_groups=answer_groups_proto))
 
         return drag_and_drop_interaction_proto
 
@@ -4020,7 +4104,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance. 
+                interaction instance.
 
         Returns:
             answer_group_list_proto: proto object list. The
@@ -4029,11 +4113,11 @@ class Exploration(python_utils.OBJECT):
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
-            base_answer_group_proto = self.to_base_answer_group_proto(
-                self, answer_group)
-            answer_group_proto=state_pb2.DragAndDropSortInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto
-            )
+            base_answer_group_proto = (
+                self.to_base_answer_group_proto(self, answer_group))
+            answer_group_proto = (
+                state_pb2.DragAndDropSortInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto))
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
@@ -4044,45 +4128,47 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             solution: Solution. A possible solution
-                for the question asked in this interaction. 
+                for the question asked in this interaction.
 
         Returns:
             solution_proto: proto object. The
                 Solution proto object.
         """
-        solution_proto = None 
+        solution_proto = None
         if solution is not None:
-            solution_proto = state_pb.DragAndDropSortInputInstance.Solution(
-                base_solution=self.to_base_solution_proto(self, solution.explanation),
-                correct_answer=self.to_list_of_set_of_translatable_html_content_ids(
-                    self, soltuion.correct_answer)
-            )
+            solution_proto = (
+                state_pb2.DragAndDropSortInputInstance.Solution(
+                    base_solution=self.to_base_solution_proto(
+                        self, solution.explanation),
+                    correct_answer=(
+                        self.to_list_of_set_of_translatable_html_content_ids(
+                            self, solution.correct_answer))))
 
         return solution_proto
 
-    def to_list_of_set_of_translatable_html_content_ids(self, correct_answer):
+    def to_list_of_set_of_translatable_html_content_ids(
+        self, correct_answer):
         """Creates a ListOfSetsOfTranslatableHtmlContentIds proto object.
 
         Args:
-            set_of_content_id: list. A list of set of
+            correct_answer: list. A list of set of
                 TranslatableHtmlContentId.
 
         Returns:
-            list_of_set_of_translatable_html_content_ids_proto: proto object. The
-                ListOfSetsOfTranslatableHtmlContentIds proto object.
+            list_of_set_of_translatable_html_content_ids_proto: proto object.
+                The ListOfSetsOfTranslatableHtmlContentIds proto object.
         """
         content_id_lists_proto = []
 
         for set_of_content_id in correct_answer:
-            translatable_html_content_id_proto = self
-                .to_set_of_translatable_html_content_ids(
-                    self, set_of_content_id)
+            translatable_html_content_id_proto = (
+                self.to_set_of_translatable_html_content_ids(
+                    self, set_of_content_id))
             content_id_lists_proto.append(translatable_html_content_id_proto)
 
-        list_of_set_of_translatable_html_content_ids_proto = objects_pb2
-            .ListOfSetsOfTranslatableHtmlContentIds(
-                content_id_lists=content_id_lists_proto
-            )
+        list_of_set_of_translatable_html_content_ids_proto = (
+            objects_pb2.ListOfSetsOfTranslatableHtmlContentIds(
+                content_id_lists=content_id_lists_proto))
 
         return list_of_set_of_translatable_html_content_ids_proto
 
@@ -4090,27 +4176,29 @@ class Exploration(python_utils.OBJECT):
         """Creates a SetOfTranslatableHtmlContentIds proto object.
 
         Args:
-            set_of_content_id: list. A list of 
+            set_of_content_id: list. A list of
                 TranslatableHtmlContentId.
 
         Returns:
             set_of_translatable_html_content_ids_proto: proto object. The
                 SetOfTranslatableHtmlContentIds proto object.
         """
-        content_ids_list_proto = []
+        content_id_lists_proto = []
 
         for translatable_html_content_id in set_of_content_id:
-            translatable_html_content_id_proto = self.to_translatable_html_content_id_proto(
-                self, translatable_html_content_id)
+            translatable_html_content_id_proto = (
+                self.to_translatable_html_content_id_proto(
+                    self, translatable_html_content_id))
             content_id_lists_proto.append(translatable_html_content_id_proto)
 
-        set_of_translatable_html_content_ids_proto = objects_pb2.SetOfTranslatableHtmlContentIds(
-            content_ids=content_id_lists_proto
-        )
+        set_of_translatable_html_content_ids_proto = (
+            objects_pb2.SetOfTranslatableHtmlContentIds(
+                content_ids=content_id_lists_proto))
 
         return set_of_translatable_html_content_ids_proto
 
-    def to_translatable_html_content_id_proto(self, translatable_html_content_id):
+    def to_translatable_html_content_id_proto(
+        self, translatable_html_content_id):
         """Creates a TranslatableHtmlContentId proto object.
 
         Args:
@@ -4121,9 +4209,9 @@ class Exploration(python_utils.OBJECT):
             translatable_html_content_id_proto: proto object. The
                 TranslatableHtmlContentId proto object.
         """
-        translatable_html_content_id_proto = objects_pb2.TranslatableHtmlContentId(
-            content_id=translatable_html_content_id
-        )
+        translatable_html_content_id_proto = (
+            objects_pb2.TranslatableHtmlContentId(
+                content_id=translatable_html_content_id))
 
         return translatable_html_content_id_proto
 
@@ -4144,14 +4232,15 @@ class Exploration(python_utils.OBJECT):
         choices_list_proto = []
 
         for value in customization_args['choices'].value:
-            value_proto=self.to_subtitled_html_proto(self, value)
+            value_proto = self.to_subtitled_html_proto(self, value)
             choices_list_proto.append(value_proto)
-        
-        customization_arg_proto = state_pb2
-            .DragAndDropSortInputInstance.CustomizationArgs(
+
+        customization_arg_proto = (
+            state_pb2.DragAndDropSortInputInstance.CustomizationArgs(
                 choices=choices_list_proto,
-                allowMultipleItemsInSamePosition=customization_args['allowMultipleItemsInSamePosition'].value
-        )
+                allowMultipleItemsInSamePosition=(
+                    customization_args['allowMultipleItemsInSamePosition']
+                    .value)))
 
         return customization_arg_proto
 
@@ -4200,6 +4289,7 @@ class Exploration(python_utils.OBJECT):
         )
 
         return misconception_proto
+
 
 class ExplorationSummary(python_utils.OBJECT):
     """Domain object for an Oppia exploration summary."""
