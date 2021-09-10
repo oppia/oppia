@@ -97,6 +97,10 @@ DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
 # 'data_format', 'content_html' and 'translation_html' parameters.
 CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
+# This takes additional 'content_id', 'language_code' and 'state_name'
+# parameters.
+CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
+    'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
 CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
     'mark_written_translations_as_needing_update')
@@ -301,6 +305,15 @@ class ExplorationChange(change_domain.BaseChange):
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html', 'data_format'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+        'required_attribute_names': [
+            'content_id',
+            'language_code',
+            'state_name'
+        ],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
@@ -2396,7 +2409,7 @@ class ExplorationSummary(python_utils.OBJECT):
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
-            first_published_msec):
+            first_published_msec, deleted=False):
         """Initializes a ExplorationSummary domain object.
 
         Args:
@@ -2434,6 +2447,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 when the exploration model was last updated.
             first_published_msec: int. Time in milliseconds since the Epoch,
                 when the exploration was first published.
+            deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id
         self.title = title
@@ -2455,6 +2469,7 @@ class ExplorationSummary(python_utils.OBJECT):
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
+        self.deleted = deleted
 
     def validate(self):
         """Validates various properties of the ExplorationSummary.
@@ -3060,6 +3075,8 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                     change_is_mergeable = True
                 if not self.changed_properties[state_name]:
                     change_is_mergeable = True
+            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE:
+                change_is_mergeable = True
             elif change.cmd == CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE:
                 change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:

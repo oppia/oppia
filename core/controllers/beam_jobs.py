@@ -23,7 +23,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import beam_job_services
 import feconf
-from jobs import jobs_manager
 
 from typing import Any, Dict # isort: skip
 
@@ -57,14 +56,6 @@ class BeamJobRunHandler(base.BaseHandler):
                     'type': 'unicode'
                 }
             },
-            'job_arguments': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'unicode'
-                    },
-                }
-            },
         },
     }
 
@@ -84,11 +75,9 @@ class BeamJobRunHandler(base.BaseHandler):
         job_name = (
             self.normalized_payload.get('job_name')
             if self.normalized_payload else None)
-        job_arguments = (
-            self.normalized_payload.get('job_arguments')
-            if self.normalized_payload else None)
 
-        beam_job_run = jobs_manager.run_job_sync(job_name, job_arguments)
+        beam_job_run = beam_job_services.run_beam_job(job_name)
+
         self.render_json(beam_job_run.to_dict())
 
 

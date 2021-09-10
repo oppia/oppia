@@ -48,9 +48,7 @@ EXCLUDED_PATHS = (
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
-    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/expressions/parser.js')
+    'core/templates/expressions/parser.js',)
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
