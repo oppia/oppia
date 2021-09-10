@@ -66,6 +66,15 @@ class MultipleChoiceInput(base.BaseInteraction):
         'default_value': [{
             'content_id': None,
             'html': ''
+        },{
+            'content_id': None,
+            'html': ''
+        },{
+            'content_id': None,
+            'html': ''
+        },{
+            'content_id': None,
+            'html': ''
         }],
     }, {
         'name': 'showChoicesInShuffledOrder',

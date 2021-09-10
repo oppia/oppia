@@ -646,6 +646,15 @@
         "default_value": [{
           "content_id": null,
           "html": ""
+        }, {
+          "content_id": null,
+          "html": ""
+        }, {
+          "content_id": null,
+          "html": ""
+        }, {
+          "content_id": null,
+          "html": ""
         }]
       }, {
         "name": "showChoicesInShuffledOrder",
