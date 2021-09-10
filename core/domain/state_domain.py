@@ -315,7 +315,7 @@ class Hint(python_utils.OBJECT):
 
     @staticmethod
     def convert_html_in_hint(
-            hint_dict, conversion_fn, entity_type=None, entity_id=None):
+            hint_dict, conversion_fn):
         """Checks for HTML fields in the hints and converts it
         according to the conversion function.
 
@@ -323,15 +323,18 @@ class Hint(python_utils.OBJECT):
             hint_dict: dict. The hints dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            entity_type: str. The entity type to which the hint belongs to.
-            entity_id: str. The entity ID of the entity to which the hint
-                belongs to.
 
         Returns:
             dict. The converted hints dict.
         """
         hint_dict['hint_content']['html'] = (
             conversion_fn(hint_dict['hint_content']['html']))
+
+        return hint_dict
+
+    @staticmethod
+    def update_image_sizes_in_bytes_in_hint(
+            hint_dict, entity_type, entity_id):
         hint_dict['hint_content']['image_sizes_in_bytes'] = (
             html_cleaner.get_image_sizes_in_bytes_from_html(
                 hint_dict['hint_content']['html'],
@@ -429,8 +432,7 @@ class Solution(python_utils.OBJECT):
     @staticmethod
     def convert_html_in_solution(
             interaction_id, solution_dict, conversion_fn,
-            html_field_types_to_rule_specs, interaction_spec,
-            entity_type=None, entity_id=None):
+            html_field_types_to_rule_specs, interaction_spec):
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
 
@@ -445,9 +447,6 @@ class Solution(python_utils.OBJECT):
                 interaction id, format, and rule types. See
                 html_field_types_to_rule_specs_state_v41.json for an example.
             interaction_spec: dict. The specification for the interaction.
-            entity_type: str. The entity type to which the solution belongs to.
-            entity_id: str. The entity ID of the entity to which the solution
-                belongs to.
 
         Returns:
             dict. The converted Solution dict.
@@ -457,11 +456,6 @@ class Solution(python_utils.OBJECT):
 
         solution_dict['explanation']['html'] = (
             conversion_fn(solution_dict['explanation']['html']))
-        solution_dict['explanation']['image_sizes_in_bytes'] = (
-            html_cleaner.get_image_sizes_in_bytes_from_html(
-                solution_dict['explanation']['html'],
-                entity_type,
-                entity_id))
 
         if interaction_spec['can_have_solution']:
             if solution_dict['correct_answer']:
@@ -489,6 +483,21 @@ class Solution(python_utils.OBJECT):
                             raise Exception(
                                 'The solution does not have a valid '
                                 'correct_answer type.')
+
+        return solution_dict
+
+    @staticmethod
+    def update_image_sizes_in_bytes_in_solution(
+            interaction_id, solution_dict, entity_type, entity_id):
+
+        if interaction_id is None:
+            return solution_dict
+
+        solution_dict['explanation']['image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                solution_dict['explanation']['html'],
+                entity_type,
+                entity_id))
 
         return solution_dict
 
@@ -961,6 +970,53 @@ class InteractionInstance(python_utils.OBJECT):
 
         return customization_args
 
+    @staticmethod
+    def update_image_sizes_in_bytes_in_interaction(
+            interaction_dict, entity_type, entity_id):
+        """Checks for HTML fields in the interaction and updates the
+        image_sizes_in_bytes dict according to the rich text images present
+        in the html string."""
+        def conversion_fn(value, schema_obj_type):
+            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
+                value.image_sizes_in_bytes = (
+                    html_cleaner.get_image_sizes_in_bytes_from_html(
+                        value.html, entity_type, entity_id))
+
+            return value
+
+        interaction_id = interaction_dict['id']
+
+        # Convert the customization_args to a dictionary of customization arg
+        # name to InteractionCustomizationArg, so that we can utilize
+        # InteractionCustomizationArg helper functions.
+        # Then, convert back to original dict format afterwards, at the end.
+        customization_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                interaction_id,
+                interaction_dict['customization_args']))
+
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).customization_arg_specs
+
+        for ca_spec in ca_specs:
+            ca_spec_name = ca_spec.name
+            customization_args[ca_spec_name].value = (
+                InteractionCustomizationArg.traverse_by_schema_and_convert(
+                    ca_spec.schema,
+                    customization_args[ca_spec_name].value,
+                    conversion_fn
+                )
+            )
+
+        customization_args_dict = {}
+        for ca_name in customization_args:
+            customization_args_dict[ca_name] = (
+                customization_args[ca_name].to_customization_arg_dict())
+
+        interaction_dict['customization_args'] = customization_args_dict
+        return interaction_dict
+
 
 class InteractionCustomizationArg(python_utils.OBJECT):
     """Object representing an interaction's customization argument.
@@ -1362,9 +1418,7 @@ class Outcome(python_utils.OBJECT):
                     'received %s' % self.refresher_exploration_id)
 
     @staticmethod
-    def convert_html_in_outcome(
-            outcome_dict, conversion_fn,
-            entity_type=None, entity_id=None):
+    def convert_html_in_outcome(outcome_dict, conversion_fn):
         """Checks for HTML fields in the outcome and converts it
         according to the conversion function.
 
@@ -1372,10 +1426,6 @@ class Outcome(python_utils.OBJECT):
             outcome_dict: dict. The outcome dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            entity_type: str. The type of entity, of which the outcome is a
-                part of.
-            entity_id: str. The ID of the entity of which the outcome is a
-                part of.
 
         Returns:
             dict. The converted outcome dict.
@@ -1406,8 +1456,13 @@ class Outcome(python_utils.OBJECT):
         Returns:
             dict. The converted outcome dict.
         """
-        pass
+        outcome_dict['feedback']['image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                outcome_dict['feedback']['html'],
+                entity_type,
+                entity_id))
 
+        return outcome_dict
 
 class Voiceover(python_utils.OBJECT):
     """Value object representing an voiceover."""
@@ -1854,8 +1909,7 @@ class WrittenTranslations(python_utils.OBJECT):
 
     @staticmethod
     def convert_html_in_written_translations(
-            written_translations_dict,
-            conversion_fn, entity_type=None, entity_id=None):
+            written_translations_dict, conversion_fn):
         """Checks for HTML fields in the written translations and converts it
         according to the conversion function.
 
@@ -1863,10 +1917,6 @@ class WrittenTranslations(python_utils.OBJECT):
             written_translations_dict: dict. The written translations dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            entity_type: str. The type of entity, of which the written
-                translation is a part of.
-            entity_id: str. The ID of the entity of which the written
-                translation is a part of.
 
         Returns:
             dict. The converted written translations dict.
@@ -1886,14 +1936,6 @@ class WrittenTranslations(python_utils.OBJECT):
                                     'translations_mapping'][content_id][
                                         language_code]['translation'])
                             )
-                        written_translations_dict['translations_mapping'][
-                            content_id][language_code]['translation'] = (
-                            html_cleaner.get_image_sizes_in_bytes_from_html(
-                                written_translations_dict[
-                                    'translations_mapping'][content_id][
-                                    language_code]['translation'],
-                                entity_type,
-                                entity_id))
                 elif 'html' in translation_dict:
                     # TODO(#11950): Delete this once old schema migration
                     # functions are deleted.
@@ -1903,14 +1945,28 @@ class WrittenTranslations(python_utils.OBJECT):
                     written_translations_dict['translations_mapping'][
                         content_id][language_code]['html'] = (
                             conversion_fn(translation_dict['html']))
-                    written_translations_dict['translations_mapping'][
-                        content_id][language_code]['image_sizes_in_bytes'] = (
-                        html_cleaner.get_image_sizes_in_bytes_from_html(
-                            written_translations_dict[
-                                'translations_mapping'][content_id][
-                                language_code]['translation'],
-                            entity_type,
-                            entity_id))
+
+        return written_translations_dict
+
+    @staticmethod
+    def update_image_sizes_in_bytes_in_written_translations(
+            written_translations_dict, entity_type, entity_id):
+        for content_id, language_code_to_written_translation in (
+            written_translations_dict['translations_mapping'].items()):
+            for language_code in (
+                language_code_to_written_translation.keys()):
+                translation_dict = written_translations_dict[
+                    'translations_mapping'][content_id][language_code]
+                if 'data_format' in translation_dict:
+                    if (translation_dict['data_format'] ==
+                        WrittenTranslation.DATA_FORMAT_HTML):
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code][
+                            'image_sizes_in_bytes'] = (
+                            html_cleaner.get_image_sizes_in_bytes_from_html(
+                                translation_dict['translation'],
+                                entity_type,
+                                entity_id))
 
         return written_translations_dict
 
@@ -3420,7 +3476,6 @@ class State(python_utils.OBJECT):
     @classmethod
     def convert_html_fields_in_state(
             cls, state_dict, conversion_fn,
-            entity_type=None, entity_id=None,
             state_uses_old_interaction_cust_args_schema=False,
             state_uses_old_rule_template_schema=False):
         """Applies a conversion function on all the html strings in a state
@@ -3430,10 +3485,6 @@ class State(python_utils.OBJECT):
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
-            entity_type: str. The type of entity, of which the state is a
-                part of.
-            entity_id: str. The ID of the entity of which the state is a
-                part of.
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
@@ -3448,17 +3499,12 @@ class State(python_utils.OBJECT):
         """
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
-        state_dict['content']['image_sizes_in_bytes'] = (
-            html_cleaner.get_image_sizes_in_bytes_from_html(
-                state_dict['content']['html'],
-                entity_type,
-                entity_id))
 
         if state_dict['interaction']['default_outcome']:
             state_dict['interaction']['default_outcome'] = (
                 Outcome.convert_html_in_outcome(
                     state_dict['interaction']['default_outcome'],
-                    conversion_fn, entity_type, entity_id))
+                    conversion_fn))
 
         if state_uses_old_rule_template_schema:
             # We need to retrieve an older version of
@@ -3476,24 +3522,18 @@ class State(python_utils.OBJECT):
             state_dict['interaction']['answer_groups'][answer_group_index] = (
                 AnswerGroup.convert_html_in_answer_group(
                     answer_group, conversion_fn,
-                    html_field_types_to_rule_specs,
-                    entity_type,
-                    entity_id))
+                    html_field_types_to_rule_specs))
 
         if 'written_translations' in state_dict.keys():
             state_dict['written_translations'] = (
                 WrittenTranslations.
                 convert_html_in_written_translations(
-                    state_dict['written_translations'], conversion_fn,
-                    entity_type,
-                    entity_id))
+                    state_dict['written_translations'], conversion_fn))
 
         for hint_index, hint in enumerate(state_dict['interaction']['hints']):
             state_dict['interaction']['hints'][hint_index] = (
                 Hint.convert_html_in_hint(
-                    hint, conversion_fn,
-                    entity_type,
-                    entity_id))
+                    hint, conversion_fn))
 
         interaction_id = state_dict['interaction']['id']
         if interaction_id is None:
@@ -3509,12 +3549,7 @@ class State(python_utils.OBJECT):
                 state_dict['interaction']['solution']['explanation']['html'] = (
                     conversion_fn(state_dict['interaction']['solution'][
                         'explanation']['html']))
-                state_dict['interaction']['solution']['explanation'][
-                    'image_sizes_in_bytes'] = (
-                    html_cleaner.get_image_sizes_in_bytes_from_html(
-                        state_dict['interaction']['solution']['explanation'][
-                            'html'],
-                        entity_type, entity_id))
+
             return state_dict
 
         if state_dict['interaction']['solution']:
@@ -3535,9 +3570,7 @@ class State(python_utils.OBJECT):
                     state_dict['interaction']['solution'],
                     conversion_fn,
                     html_field_types_to_rule_specs,
-                    interaction_spec,
-                    entity_type,
-                    entity_id
+                    interaction_spec
                 ))
 
         if state_uses_old_interaction_cust_args_schema:
@@ -3604,22 +3637,60 @@ class State(python_utils.OBJECT):
                 entity_id))
 
         # For interactions - default outcome.
-        default_outcome = state_dict['interaction']['default_outcome']
-        feedback = default_outcome['feedback']
-        image_sizes_in_bytes = (
-            html_cleaner.get_image_sizes_in_bytes_from_html(
-                feedback['html'], entity_type, entity_id))
-        feedback['image_sizes_in_bytes'] = image_sizes_in_bytes
+        if state_dict['interaction']['default_outcome']:
+            state_dict['interaction']['default_outcome'] = (
+                Outcome.update_image_sizes_in_bytes_in_outcome(
+                    state_dict['interaction']['default_outcome'],
+                    entity_type, entity_id))
 
-        # For interactions - hints.
-        for hint in state_dict['interaction']['hints']:
-            image_sizes_in_bytes = (
-                html_cleaner.get_image_sizes_in_bytes_from_html(
-                    hint['hint_content']['html'],
+        # Answer groups, TBD.
+
+        # For written translations.
+        if 'written_translations' in state_dict.keys():
+            state_dict['written_translations'] = (
+                WrittenTranslations.update_image_sizes_in_bytes_in_written_translations(
+                    state_dict['written_translations'],
                     entity_type,
                     entity_id))
-            hint['hint_content']['image_sizes_in_bytes'] = (
-                image_sizes_in_bytes)
+
+        for hint_index, hint in enumerate(state_dict['interaction']['hints']):
+            state_dict['interaction']['hints'][hint_index] = (
+                Hint.update_image_sizes_in_bytes_in_hint(
+                    hint, entity_type, entity_id))
+
+        interaction_id = state_dict['interaction']['id']
+        if interaction_id is None:
+            return state_dict
+
+        if interaction_id == 'MathExpressionInput':
+            if state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'][
+                    'explanation']['image_sizes_in_bytes'] = (
+                    html_cleaner.get_image_sizes_in_bytes_from_html(
+                        state_dict['interaction']['solution']['explanation'][
+                            'html'],
+                        entity_type,
+                        entity_id))
+
+            return state_dict
+
+        # Interactions - customization args to be done.
+
+        # Interactions solution.
+        if state_dict['interaction']['solution']:
+            state_dict['interaction']['solution'] = (
+                Solution.update_image_sizes_in_bytes_in_solution(
+                    interaction_id,
+                    state_dict['interaction']['solution'],
+                    entity_type,
+                    entity_id))
+
+        # Interactions convert html in it
+        state_dict['interaction'] = (
+            InteractionInstance.update_image_sizes_in_bytes_in_interaction(
+                state_dict['interaction'],
+                entity_type,
+                entity_id))
 
         return state_dict
 
