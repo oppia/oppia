@@ -356,7 +356,7 @@ export class TranslationModalComponent {
     // optional decimal number followed by zero or more operator(including
     // equals sign) and number pairs. It also allows for whitespace between
     // numbers and operators.
-    // Eg: 1+1=2 1+1 1*1=1
+    // Examples 1+1=2 1+1 1*1=1
     const mathEquationRegex = new RegExp(
       /(?:(?:^|[-+_*/=])(?:\s*-?\d+(\.\d+)?(?:[eE][+-]?\d+)?\s*))+$/);
     if (originalElements.length === 0) {
