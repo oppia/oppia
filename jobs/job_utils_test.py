@@ -221,8 +221,8 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
                 ('CoreModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
         beam_entity.set_properties({
             'prop': 123,
-            'created_on': None,
-            'last_updated': None,
+            'created_on': datetime.datetime.utcnow(),
+            'last_updated': datetime.datetime.utcnow(),
             'deleted': False,
         })
 

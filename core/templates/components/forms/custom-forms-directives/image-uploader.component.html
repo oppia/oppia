@@ -20,7 +20,7 @@
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
-         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
+         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow, 'uploader-with-error-message': errorMessage}"
          for="image-file-input">
     <mat-icon class="mx-auto"
               [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
@@ -142,6 +142,10 @@
     width: 48px;
   }
 
+  .uploader-with-error-message {
+    height: 135px
+  }
+
   @media(max-width:768px) {
     .blog-post-thumbnail-uploader {
       height: 80px;
@@ -170,6 +174,19 @@
     .blog-post-thumbnail-uploader.image-uploader-is-narrow,
     .image-uploader-drop-area.image-uploader-is-narrow {
       height: 35px
+    }
+
+    .image-uploader-error-message {
+      font-size: 10px;
+    }
+
+    .image-uploader-error-message i {
+      font-size: 10px;
+    }
+
+    .image-uploader-is-narrow.uploader-with-error-message {
+      height: unset;
+      margin-top: -5px;
     }
   }
 </style>

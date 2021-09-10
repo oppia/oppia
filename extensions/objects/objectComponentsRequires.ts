@@ -33,8 +33,6 @@ require('objects/templates/int-editor.component.ts');
 require('objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts');
 require('objects/templates/list-of-tabs-editor.component.ts');
 require('objects/templates/list-of-unicode-string-editor.component.ts');
-require('objects/templates/logic-error-category-editor.component.ts');
-require('objects/templates/logic-question-editor.component.ts');
 require('objects/templates/math-equation-editor.component.ts');
 require('objects/templates/math-expression-content-editor.component.ts');
 require('objects/templates/music-phrase-editor.component.ts');

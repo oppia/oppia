@@ -19,6 +19,7 @@
 
 export default {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   // The term 'staging' is used instead of the classroom url fragment field
@@ -5458,7 +5459,6 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
-      "LogicProof",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",
@@ -5584,7 +5584,7 @@ export default {
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
-  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
@@ -5667,8 +5667,6 @@ export default {
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
-
-  "BEAM_JOBS_ARE_ENABLED": false,
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5942,18 +5940,6 @@ export default {
         }]
       },
       "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
     }
   ],
 
@@ -5979,6 +5965,11 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
+    },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About foundation | Oppia",
+      "META": []
     },
     "CLASSROOM": {
       "ROUTE": "learn/:classroom_url_fragment",

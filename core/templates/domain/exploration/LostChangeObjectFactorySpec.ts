@@ -17,8 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { LostChangeObjectFactory } from
-  'domain/exploration/LostChangeObjectFactory';
+import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { OutcomeObjectFactory } from './OutcomeObjectFactory';
 import { SubtitledHtml } from './subtitled-html.model';
 
@@ -139,10 +138,8 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
-      // This throws "Type 'null' is not assignable to type
-      // 'LostChangeValue | undefined'". We need to suppress this error
-      // because we are testing validations here.
-      // @ts-ignore
+      // 'old_value' will be null when the EndExploration
+      // is newly added.
       old_value: null,
       property_name: 'widget_id'
     });
@@ -158,10 +155,8 @@ describe('Lost Change Object Factory', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      // This throws "Type 'null' is not assignable to type
-      // 'LostChangeValue | undefined'". We need to suppress this error
-      // because we are testing validations here.
-      // @ts-ignore
+      // 'new_value' will be null when the EndExploration
+      // is deleted or removed.
       new_value: null,
       old_value: 'EndExploration',
       property_name: 'widget_id'
@@ -191,9 +186,9 @@ describe('Lost Change Object Factory', () => {
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null
         }),
-        dest: '',
-        feedback: new SubtitledHtml('', ''),
-        html: '',
+        dest: 'default',
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        html: '<p>Correct</p>',
         rules: [{
           type: 'Type1',
           inputs: {
@@ -214,9 +209,9 @@ describe('Lost Change Object Factory', () => {
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null
         }),
-        dest: '',
-        feedback: new SubtitledHtml('', ''),
-        html: '',
+        dest: 'default',
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+        html: '<p>Correct</p>',
         rules: [{
           type: 'Type1',
           inputs: {
@@ -240,7 +235,7 @@ describe('Lost Change Object Factory', () => {
       new_value: {
         outcome: undefined,
         dest: 'dest2',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type2',
@@ -253,7 +248,7 @@ describe('Lost Change Object Factory', () => {
       old_value: {
         outcome: undefined,
         dest: 'dest1',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type1',
@@ -285,7 +280,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest2',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type2',
@@ -308,7 +303,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest1',
-        feedback: new SubtitledHtml('', ''),
+        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
           type: 'Type1',

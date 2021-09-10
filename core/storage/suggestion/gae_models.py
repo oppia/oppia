@@ -22,8 +22,7 @@ import datetime
 from core.platform import models
 import feconf
 
-from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, List, Optional, Tuple, Union, cast)
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -172,7 +171,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple unshared instance since there
         are multiple suggestions per user.
         """
@@ -586,7 +585,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             dict. Dictionary of the data from GeneralSuggestionModel.
         """
 
-        user_data = dict()
+        user_data = {}
         suggestion_models = cast(
             List[GeneralSuggestionModel],
             cls.get_all()
@@ -743,7 +742,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple voiceover applications relevant to a user.
         """
@@ -777,7 +776,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from GeneralVoiceoverApplicationModel.
         """
-        user_data = dict()
+        user_data = {}
 
         voiceover_models = cast(
             List[GeneralVoiceoverApplicationModel],
@@ -866,7 +865,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """This model only contains general statistical information about the
         contributor dashboard and does not include any individual user
         information.
@@ -1055,7 +1054,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple languages and topics relevant to a user.
         """
@@ -1098,10 +1097,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         datastore_services.delete_multi(
-            cast(
-                List[datastore_services.Key],
-                cls.query(
-                    cls.contributor_user_id == user_id).fetch(keys_only=True)))
+            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def export_data(
@@ -1116,7 +1112,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from TranslationContributionStatsModel.
         """
-        user_data = dict()
+        user_data = {}
         stats_models = cast(
             List[TranslationContributionStatsModel],
             cls.get_all()

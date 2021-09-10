@@ -25,6 +25,7 @@ from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import beam_jobs
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
 from core.controllers import blog_homepage
@@ -76,10 +77,10 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -101,14 +102,19 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
-        self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
+        self.render_json({'is_internet_connected': True})
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -116,16 +122,20 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
-        self.render_json(self.values) # type: ignore[no-untyped-call]
+        self.render_json(self.values)
 
 
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET warmup requests."""
@@ -135,15 +145,19 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
         self.redirect('/')
 
 
+# Type for `defaults` is set to Dict[str, str] based on the usage in our
+# backend. Should be changed in future as per the requirements.
 def get_redirect_route(
-        regex_route: Text,
+        regex_route: str,
         handler: Type[base.BaseHandler],
-        defaults: Optional[Dict[Any, Any]] = None
+        defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
@@ -582,7 +596,7 @@ URLS = [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        r'/createhandler/state_interaction_stats/<exploration_id>/<state_name>',
         editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
@@ -816,6 +830,11 @@ URLS = [
     get_redirect_route(
         r'/blogadminhandler', blog_admin.BlogAdminHandler),
 
+    get_redirect_route('/beam_job', beam_jobs.BeamJobHandler),
+    get_redirect_route('/beam_job_run', beam_jobs.BeamJobRunHandler),
+    get_redirect_route(
+        '/beam_job_run_result', beam_jobs.BeamJobRunResultHandler),
+
     get_redirect_route(
         r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
         blog_dashboard.BlogPostHandler),
@@ -896,6 +915,11 @@ URLS.extend((
 URLS.extend((
     get_redirect_route(
         r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    get_redirect_route(
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
     get_redirect_route(
         r'/cron/mail/admins/contributor_dashboard_bottlenecks',
         cron.CronMailAdminContributorDashboardBottlenecksHandler),

@@ -89,12 +89,6 @@ export class OpportunitiesListComponent {
       // migration is complete.
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
-        // "more" returned from GAE storage is not always reliable if true.
-        // TODO(#11900): The following may not work if the last fetched
-        // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
-        // robust solution.
-        more = more &&
-        opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
         this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
@@ -113,13 +107,6 @@ export class OpportunitiesListComponent {
       this.loadMoreOpportunities().then(
         ({opportunitiesDicts, more}) => {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
-          // "more" returned from GAE storage is not always reliable if
-          // true.
-          // TODO(#11900): The following may not work if the last fetched
-          // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
-          // robust solution.
-          more = (
-            more && opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
           this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(

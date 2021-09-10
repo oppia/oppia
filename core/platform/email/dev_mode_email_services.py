@@ -24,7 +24,7 @@ import textwrap
 
 import python_utils
 
-from typing import Dict, List, Optional, Union # isort:skip
+from typing import Dict, List, Optional, Union
 
 
 def send_email_to_recipients(

@@ -41,6 +41,8 @@ contextlib2==0.6.0.post1
     # via -r requirements.in
 crcmod==1.7
     # via apache-beam
+defusedxml==0.7.1
+    # via -r requirements.in
 dill==0.3.1.1
     # via apache-beam
 docopt==0.6.2
@@ -174,6 +176,8 @@ grpcio==1.32.0
     #   googleapis-common-protos
     #   grpc-google-iam-v1
     #   grpcio-gcp
+gunicorn==20.1.0
+    # via -r requirements.in
 hdfs==2.6.0
     # via apache-beam
 html5lib==1.0.1
