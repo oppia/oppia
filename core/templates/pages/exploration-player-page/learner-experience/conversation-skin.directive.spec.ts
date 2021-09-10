@@ -2423,7 +2423,8 @@ describe('Conversation skin directive', function() {
       expect(() => {
         $scope.recommendedExplorationSummaries[0].parentExplorationIds;
       }).toThrowError(
-        'Cannot read property \'parentExplorationIds\' of undefined');
+        'Cannot read properties of undefined (reading \'parentExplorationIds\')'
+      );
     }));
 
     it('should fetch recommeded summary dicts ' +

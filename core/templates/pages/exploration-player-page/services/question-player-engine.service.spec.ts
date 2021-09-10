@@ -496,7 +496,8 @@ describe('Question player engine service ', () => {
 
     expect(() => {
       questionPlayerEngineService.getCurrentQuestionId();
-    }).toThrowError('Cannot read property \'getId\' of undefined');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getId\')');
 
     questionPlayerEngineService.init(
       multipleQuestionsBackendDict, initSuccessCb, initErrorCb);

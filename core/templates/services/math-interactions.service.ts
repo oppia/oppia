@@ -79,7 +79,10 @@ export class MathInteractionsService {
         '" and "' + symbol2 + '".');
     }
     if (
-      errorMessage === 'Cannot read property \'column\' of undefined.') {
+      errorMessage === 'Cannot read property \'column\' of undefined.' ||
+      errorMessage === 'Cannot read properties of undefined ' +
+        '(reading \'column\').'
+    ) {
       let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {
