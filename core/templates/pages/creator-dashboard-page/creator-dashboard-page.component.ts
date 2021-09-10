@@ -45,15 +45,18 @@ require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
 require('services/user.service.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$rootScope', '$window', 'AlertsService',
+    '$log', '$http', '$q', '$rootScope', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'ThreadStatusDisplayService',
+    'ThreadStatusDisplayService','ThreadDataBackendApiService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -62,11 +65,11 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $http, $q, $rootScope, $window, AlertsService,
+        $log, $http, $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
-        ThreadStatusDisplayService,
+        ThreadStatusDisplayService, ThreadDataBackendApiService,
         UrlInterpolationService, UserService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
         DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
@@ -96,11 +99,10 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       ctrl.setMyExplorationsView = function(newViewType) {
-        $http.post('/creatordashboardhandler/data', {
-          display_preference: newViewType,
-        }).then(function() {
-          ctrl.myExplorationsView = newViewType;
-        });
+        CreatorDashboardBackendApiService.postExplorationViewAsync(
+          newViewType).then(function() {
+            ctrl.myExplorationsView = newViewType;
+          });
         userDashboardDisplayPreference = newViewType;
       };
 
@@ -165,17 +167,18 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       var _fetchMessages = function(threadId) {
-        $http.get('/threadhandler/' + threadId).then(function(response) {
-          var allThreads = ctrl.mySuggestionsList.concat(
-            ctrl.suggestionsToReviewList);
-          for (var i = 0; i < allThreads.length; i++) {
-            if (allThreads[i].threadId === threadId) {
-              allThreads[i].setMessages(response.data.messages.map(
-                m => ThreadMessage.createFromBackendDict(m)));
-              break;
+        ThreadDataBackendApiService.fetchMessagesAsync(
+          threadId).then(function(response) {
+            var allThreads =  ctrl.mySuggestionsList.concat(
+              ctrl.suggestionsToReviewList);
+            for (var i = 0; i < allThreads.length; i++) {
+              if (allThreads[i].threadId === threadId) {
+                allThreads[i].setMessages(response.messages.map(
+                  m => ThreadMessage.createFromBackendDict(m)));
+                break;
+              }
             }
-          }
-        });
+          });
       };
 
       ctrl.clearActiveThread = function() {
@@ -183,6 +186,7 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       ctrl.setActiveThread = function(threadId) {
+        $log.info("here");
         _fetchMessages(threadId);
         for (var i = 0; i < ctrl.mySuggestionsList.length; i++) {
           if (ctrl.mySuggestionsList[i].threadId === threadId) {
@@ -287,6 +291,8 @@ angular.module('oppia').component('creatorDashboardPage', {
             ctrl.mySuggestionsList = responseData.createdSuggestionThreadsList;
             ctrl.suggestionsToReviewList = (
               responseData.suggestionThreadsToReviewList);
+
+            $log.info(JSON.stringify(ctrl.subscribersList.length));
 
             if (ctrl.dashboardStats && ctrl.lastWeekStats) {
               ctrl.relativeChangeInTotalPlays = (
