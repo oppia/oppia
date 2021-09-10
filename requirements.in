@@ -25,7 +25,7 @@ simplejson==3.17.0
 six==1.15.0
 soupsieve==1.9.5
 webencodings==0.5.1
-pillow==8.2.0
+pillow==8.3.2
 redis==3.5.3
 requests==2.26.0
 requests-mock==1.5.2
