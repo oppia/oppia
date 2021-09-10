@@ -48,3 +48,4 @@ urllib3==1.26.6
 # them earlier than we are able to install the libraries from this file.
 PyYAML==5.4.1
 certifi==2021.5.30
+google-cloud-dataflow-client==0.1.3

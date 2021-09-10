@@ -59,13 +59,14 @@ future==0.18.2
     # via
     #   -r requirements.in
     #   apache-beam
-google-api-core[grpc,grpcgcp]==1.22.4
+google-api-core[grpc,grpcgcp]==1.31.2
     # via
     #   firebase-admin
     #   google-api-python-client
     #   google-cloud-bigquery
     #   google-cloud-bigtable
     #   google-cloud-core
+    #   google-cloud-dataflow-client
     #   google-cloud-datastore
     #   google-cloud-dlp
     #   google-cloud-firestore
@@ -110,6 +111,8 @@ google-cloud-core==1.6.0
     #   google-cloud-spanner
     #   google-cloud-storage
     #   google-cloud-translate
+google-cloud-dataflow-client==0.1.3
+    # via -r requirements.in
 google-cloud-datastore==1.15.3
     # via
     #   apache-beam
@@ -218,6 +221,8 @@ packaging==20.4
     # via
     #   -r requirements.in
     #   bleach
+    #   google-api-core
+    #   google-cloud-dataflow-client
     #   pytest
 pillow==8.2.0
     # via -r requirements.in
@@ -226,7 +231,9 @@ pluggy==0.13.1
 proto-google-cloud-datastore-v1==0.90.4
     # via googledatastore
 proto-plus==1.18.1
-    # via google-cloud-firestore
+    # via
+    #   google-cloud-dataflow-client
+    #   google-cloud-firestore
 protobuf==3.13.0
     # via
     #   apache-beam
