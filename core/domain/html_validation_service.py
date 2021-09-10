@@ -135,7 +135,7 @@ INLINE_COMPONENT_TAG_NAMES = (
 BLOCK_COMPONENT_TAG_NAMES = (
     rte_component_registry.Registry.get_block_component_tag_names())
 
-# See https://perso.crans.org/besson/_static/python/lib/python2.7/encodings/cp1252.py
+# See https://perso.crans.org/besson/_static/python/lib/python2.7/encodings/cp1252.py # pylint: disable=line-too-long
 # Useful reading: https://www.regular-expressions.info/unicode8bit.html
 CHAR_MAPPINGS = [
     (u'\u00a0', u'\xa0'),
