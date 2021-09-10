@@ -42,7 +42,7 @@ interface LostChangeValues {
   'html'?: string;
 }
 
-type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
+export type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
   InteractionBackendDict | ParamChangeBackendDict[] |
   RecordedVoiceOverBackendDict | WrittenTranslationsBackendDict |
   ParamChangeBackendDict[] | ParamSpecBackendDict | boolean | number | string |
@@ -55,32 +55,46 @@ export interface LostChangeBackendDict {
   'new_state_name'?: string;
   'old_state_name'?: string;
   'state_name'?: string;
-  'new_value'?: LostChangeValue;
-  'old_value'?: LostChangeValue;
+  // 'new_value' here refers to the new value of an entity
+  // added into an Exploration. Entity here refers to the
+  // Interactions, Translations, Hints, Solutions etc. 'new_value'
+  // will be 'null' when any of these entities are deleted.
+  'new_value'?: LostChangeValue | null;
+  // 'old_value' here refers to the old value of an entity
+  // present in an Exploration. Entity here refers to the
+  // Interactions, Translations, Hints, Solutions etc. 'old_value'
+  // will be 'null' when any of these entities are newly added.
+  'old_value'?: LostChangeValue | null;
   'property_name'?: string;
   'translation_html'?: string;
   'content_id'?: string;
   'language_code'?: string;
 }
 
+// Properties are optional in 'LostChangeBackendDict' because all of them may
+// not be present in the dict and may change according to the cmd. Therefore,
+// they can be undefined.
+// TODO(#13677): Create separate interfaces for different unique commands(cmd)
+// received at LostChangeBackendDict.
 export class LostChange {
   cmd: string;
-  stateName: string;
-  newStateName: string;
-  oldStateName: string;
-  newValue: LostChangeValue;
-  oldValue: LostChangeValue;
-  propertyName: string;
-  contentId: string;
-  languageCode: string;
-  translationHTML: string;
+  stateName?: string;
+  newStateName?: string;
+  oldStateName?: string;
+  newValue?: LostChangeValue | null;
+  oldValue?: LostChangeValue | null;
+  propertyName?: string;
+  contentId?: string;
+  languageCode?: string;
+  translationHTML?: string;
   utilsService: UtilsService;
 
   constructor(
-      utilsService: UtilsService, cmd: string, newStateName: string,
-      oldStateName: string, stateName: string, newValue: LostChangeValue,
-      oldValue: LostChangeValue, propertyName: string, contentId: string,
-      languageCode: string, translationHTML: string) {
+      utilsService: UtilsService, cmd: string, newStateName?: string,
+      oldStateName?: string, stateName?: string,
+      newValue?: LostChangeValue | null, oldValue?: LostChangeValue | null,
+      propertyName?: string, contentId?: string,
+      languageCode?: string, translationHTML?: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -120,23 +134,22 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual(): boolean {
-    if ((<LostChangeValues> this.newValue).outcome &&
-      (<LostChangeValues> this.newValue).outcome.feedback &&
-      (<LostChangeValues> this.oldValue).outcome &&
-      (<LostChangeValues> this.oldValue).outcome.feedback) {
-      return (
-        (<LostChangeValues> this.newValue).outcome.feedback.html ===
-        (<LostChangeValues> this.oldValue).outcome.feedback.html);
+    let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
+    let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
+    if (
+      newValueOutcome && newValueOutcome?.feedback &&
+      oldValueOutcome && oldValueOutcome?.feedback
+    ) {
+      return newValueOutcome.feedback.html === oldValueOutcome.feedback.html;
     }
     return false;
   }
 
   isOutcomeDestEqual(): boolean {
-    if ((<LostChangeValues> this.newValue).outcome &&
-      (<LostChangeValues> this.oldValue).outcome) {
-      return (
-        (<LostChangeValues> this.oldValue).outcome.dest ===
-        (<LostChangeValues> this.newValue).outcome.dest);
+    let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
+    let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
+    if (newValueOutcome && oldValueOutcome) {
+      return newValueOutcome?.dest === oldValueOutcome?.dest;
     }
     return false;
   }
@@ -147,11 +160,10 @@ export class LostChange {
   }
 
   isFeedbackEqual(): boolean {
-    if ((<LostChangeValues> this.newValue).feedback &&
-    (<LostChangeValues> this.oldValue).feedback) {
-      return (
-        (<LostChangeValues> this.newValue).feedback.html ===
-        (<LostChangeValues> this.oldValue).feedback.html);
+    let newValueFeedback = (<LostChangeValues> this.newValue).feedback;
+    let oldValueFeedback = (<LostChangeValues> this.oldValue).feedback;
+    if (newValueFeedback && oldValueFeedback) {
+      return newValueFeedback?.html === oldValueFeedback?.html;
     }
     return false;
   }

@@ -36,8 +36,14 @@ import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -45,7 +51,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
-    FormsModule
+    DynamicContentModule,
+    FormsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     SkillsListComponent,
@@ -55,6 +63,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AssignSkillToTopicModalComponent,
     MergeSkillModalComponent,
     TopicsListComponent,
+    DeleteTopicModalComponent,
+    SelectTopicsComponent,
+    TopicsAndSkillsDashboardPageComponent,
+    CreateNewTopicModalComponent,
     DeleteTopicModalComponent
   ],
   entryComponents: [
@@ -66,6 +78,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MergeSkillModalComponent,
     TopicsListComponent,
     DeleteTopicModalComponent,
+    SelectTopicsComponent,
+    TopicsAndSkillsDashboardPageComponent,
+    CreateNewTopicModalComponent
   ],
   providers: [
     SkillCreationService,

@@ -22,6 +22,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { ProfileLinkImageBackendApiService } from
   'components/profile-link-directives/profile-link-image-backend-api.service';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'profile-link-image',
@@ -35,6 +36,11 @@ export class ProfileLinkImageComponent implements OnInit {
   @Input() username!: string;
   profileImageUrl!: string;
   profilePicture!: string;
+  profileUrl = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE +
+    '/' + this.username
+  );
+
   constructor(
     private profileLinkImageBackendApiService:
       ProfileLinkImageBackendApiService,

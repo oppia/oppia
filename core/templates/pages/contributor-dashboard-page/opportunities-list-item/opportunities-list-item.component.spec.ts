@@ -21,6 +21,7 @@ import { LazyLoadingComponent } from 'components/common-layout-directives/common
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 import { OpportunitiesListItemComponent } from './opportunities-list-item.component';
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 describe('Opportunities List Item Component', () => {
   let component: OpportunitiesListItemComponent;
@@ -40,7 +41,6 @@ describe('Opportunities List Item Component', () => {
       component = fixture.componentInstance;
     });
   }));
-
 
   describe('when opportunity is provided', () => {
     beforeEach(() => {
@@ -71,7 +71,24 @@ describe('Opportunities List Item Component', () => {
         expect(component.progressBarStyle).toEqual({
           width: '50%'
         });
+        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
       });
+
+    describe('when opportunity subheading corresponds to deleted ' +
+      'opportunity', () => {
+      beforeEach(() => {
+        component.opportunity.subheading = (
+          ContributorDashboardConstants
+            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should initialize isCorrespondingOpportunityDeleted to true',
+        () => {
+          expect(component.isCorrespondingOpportunityDeleted).toBe(true);
+        });
+    });
   });
 
   describe('when opportunity is not provided', () => {
@@ -92,6 +109,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.labelText).toBe(undefined);
         expect(component.labelStyle).toBe(undefined);
         expect(component.opportunityHeadingTruncationLength).toBe(40);
+        expect(component.isCorrespondingOpportunityDeleted).toBe(false);
       });
   });
 });

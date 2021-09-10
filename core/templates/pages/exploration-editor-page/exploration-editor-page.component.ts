@@ -143,12 +143,15 @@ require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/internet-connectivity.service.ts');
+require('services/alerts.service.ts');
 require('services/user.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
@@ -157,7 +160,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$uibModal',
+    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -170,9 +173,10 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'FocusManagerService', 'GraphDataService',
+    'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
+    'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -180,7 +184,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $uibModal,
+        $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -193,9 +197,10 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        FocusManagerService, GraphDataService,
+        FocusManagerService, GraphDataService, InternetConnectivityService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        ParamSpecsObjectFactory, PreventPageUnloadEventService,
+        RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -203,8 +208,11 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         UserService, WindowDimensionsService) {
       var ctrl = this;
+      var reconnectedMessageTimeoutMilliseconds = 4000;
+      var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
+      ctrl.connectedToInternet = true;
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -274,6 +282,7 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+
 
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
@@ -493,6 +502,7 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
+        InternetConnectivityService.startCheckingConnection();
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
@@ -500,6 +510,28 @@ angular.module('oppia').component('explorationEditorPage', {
               $rootScope.$applyAsync();
             }
           )
+        );
+        ctrl.directiveSubscriptions.add(
+          InternetConnectivityService.onInternetStateChange.subscribe(
+            internetAccessible => {
+              ctrl.connectedToInternet = internetAccessible;
+              if (internetAccessible) {
+                AlertsService.addSuccessMessage(
+                  'Reconnected. Checking whether your changes are mergeable.',
+                  reconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.removeListener();
+              } else {
+                AlertsService.addInfoMessage(
+                  'Looks like you are offline. ' +
+                  'You can continue working, and can save ' +
+                  'your changes once reconnected.',
+                  disconnectedMessageTimeoutMilliseconds);
+                PreventPageUnloadEventService.addListener();
+                if (RouterService.getActiveTabName() !== 'main') {
+                  ctrl.selectMainTab();
+                }
+              }
+            })
         );
         ctrl.directiveSubscriptions.add(
           ChangeListService.autosaveIsInProgress$.subscribe(
