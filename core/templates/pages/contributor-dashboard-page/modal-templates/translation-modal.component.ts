@@ -212,7 +212,7 @@ export class TranslationModalComponent {
       {
         text: this.textToTranslate,
         more: this.moreAvailable,
-        status: this.activeStatus as string,
+        status: this.activeStatus,
         translation: this.activeWrittenTranslation,
         dataFormat: this.activeDataFormat
       } = translatableItem
