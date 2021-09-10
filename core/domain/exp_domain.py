@@ -1926,7 +1926,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
-        """Converts from version 47 to 48. Version 53 fixes encoding issues in
+        """Converts from version 47 to 48. Version 48 fixes encoding issues in
         HTML fields.
 
         Args:
