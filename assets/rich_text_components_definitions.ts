@@ -71,7 +71,11 @@ export default {
       "name": "caption",
       "description": "Caption for image (optional)",
       "schema": {
-        "type": "unicode"
+        "type": "unicode",
+        "validators": [{
+          "id": "has_length_at_most",
+          "max_value": 160
+        }]
       },
       "default_value": ""
     }, {
@@ -158,7 +162,10 @@ export default {
       "name": "text",
       "description": "The text to be displayed",
       "schema": {
-        "type": "unicode"
+        "type": "unicode",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
       },
       "default_value": "concept card"
     }, {
