@@ -52,7 +52,7 @@ require(
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$log', '$http', '$q', '$rootScope', '$window', 'AlertsService',
+    '$q', '$rootScope', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
@@ -65,7 +65,7 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $log, $http, $q, $rootScope, $window, AlertsService,
+        $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
@@ -186,7 +186,6 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       ctrl.setActiveThread = function(threadId) {
-        $log.info("here");
         _fetchMessages(threadId);
         for (var i = 0; i < ctrl.mySuggestionsList.length; i++) {
           if (ctrl.mySuggestionsList[i].threadId === threadId) {
@@ -291,8 +290,6 @@ angular.module('oppia').component('creatorDashboardPage', {
             ctrl.mySuggestionsList = responseData.createdSuggestionThreadsList;
             ctrl.suggestionsToReviewList = (
               responseData.suggestionThreadsToReviewList);
-
-            $log.info(JSON.stringify(ctrl.subscribersList.length));
 
             if (ctrl.dashboardStats && ctrl.lastWeekStats) {
               ctrl.relativeChangeInTotalPlays = (
