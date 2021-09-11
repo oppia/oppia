@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -27,6 +27,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StewardsLandingPageComponent } from './stewards-landing-page.component';
 import { StewardsLandingPageRootComponent } from './stewards-landing-page-root.component';
+import { MyHammerConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -54,6 +55,10 @@ import { StewardsLandingPageRootComponent } from './stewards-landing-page-root.c
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ],
   bootstrap: [StewardsLandingPageRootComponent]

@@ -18,7 +18,7 @@
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -43,6 +43,7 @@ import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { MyHammerConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -91,6 +92,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })

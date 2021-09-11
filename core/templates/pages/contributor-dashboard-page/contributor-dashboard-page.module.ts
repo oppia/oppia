@@ -83,6 +83,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
