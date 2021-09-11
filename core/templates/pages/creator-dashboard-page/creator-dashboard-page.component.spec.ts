@@ -357,8 +357,8 @@ describe('Creator dashboard controller', () => {
         ' changes the format view', function() {
         var spyObj = spyOn(
           CreatorDashboardBackendApiService, 'postExplorationViewAsync')
-            .and.returnValue($q.resolve());
-        
+          .and.returnValue($q.resolve());
+
         ctrl.setMyExplorationsView('a');
         $rootScope.$apply();
 
@@ -456,7 +456,7 @@ describe('Creator dashboard controller', () => {
           var innerWidthSpy = spyOnProperty($window, 'innerWidth');
           var spyObj = spyOn(
             CreatorDashboardBackendApiService, 'postExplorationViewAsync')
-              .and.returnValue($q.resolve());
+            .and.returnValue($q.resolve());
 
           ctrl.setMyExplorationsView('list');
           $rootScope.$apply();
@@ -503,9 +503,9 @@ describe('Creator dashboard controller', () => {
 
         var spyObj = spyOn(
           ThreadDataBackendApiService, 'fetchMessagesAsync')
-            .and.returnValue($q.resolve({
-              messages: messages
-            }));
+          .and.returnValue($q.resolve({
+            messages: messages
+          }));
         ctrl.setActiveThread(threadId);
         $rootScope.$apply();
 
@@ -526,7 +526,7 @@ describe('Creator dashboard controller', () => {
 
         var spyObj = spyOn(
           ThreadDataBackendApiService, 'fetchMessagesAsync')
-            .and.returnValue($q.resolve());
+          .and.returnValue($q.resolve());
         ctrl.setActiveThread(threadId);
 
         expect(spyObj).toHaveBeenCalled();
@@ -540,7 +540,7 @@ describe('Creator dashboard controller', () => {
 
           var spyObj = spyOn(
             ThreadDataBackendApiService, 'fetchMessagesAsync')
-              .and.returnValue($q.resolve());
+            .and.returnValue($q.resolve());
           ctrl.setActiveThread(threadId);
 
           // Method showSuggestionModal is mocked otherwise using its original

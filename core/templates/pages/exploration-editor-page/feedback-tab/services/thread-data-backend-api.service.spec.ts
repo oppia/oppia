@@ -633,11 +633,12 @@ describe('retrieving threads service', () => {
 
   it('should fetch messages from a given threadId',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success')
-      var failHandler = jasmine.createSpy('fail')
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
       let mockThread = mockFeedbackThreads[0];
-      let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      let thread = feedbackThreadObjectFactory
+      .createFromBackendDict(mockThread);
 
       threadDataBackendApiService.fetchMessagesAsync(thread.threadId)
         .then(successHandler, failHandler);

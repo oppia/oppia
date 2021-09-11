@@ -56,7 +56,7 @@ angular.module('oppia').component('creatorDashboardPage', {
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'ThreadStatusDisplayService','ThreadDataBackendApiService',
+    'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -168,16 +168,16 @@ angular.module('oppia').component('creatorDashboardPage', {
       var _fetchMessages = function(threadId) {
         ThreadDataBackendApiService.fetchMessagesAsync(
           threadId).then(function(response) {
-            var allThreads =  ctrl.mySuggestionsList.concat(
-              ctrl.suggestionsToReviewList);
-            for (var i = 0; i < allThreads.length; i++) {
-              if (allThreads[i].threadId === threadId) {
-                allThreads[i].setMessages(response.messages.map(
-                  m => ThreadMessage.createFromBackendDict(m)));
-                break;
-              }
+          var allThreads = ctrl.mySuggestionsList.concat(
+            ctrl.suggestionsToReviewList);
+          for (var i = 0; i < allThreads.length; i++) {
+            if (allThreads[i].threadId === threadId) {
+              allThreads[i].setMessages(response.messages.map(
+                m => ThreadMessage.createFromBackendDict(m)));
+              break;
             }
-          });
+          }
+        });
       };
 
       ctrl.clearActiveThread = function() {
