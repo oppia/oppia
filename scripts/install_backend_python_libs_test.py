@@ -138,10 +138,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
             def communicate(self):
                 """Return required method."""
-                return b'', b'can\'t combine user with prefix'
+                return '', 'can\'t combine user with prefix'
 
-        def mock_check_call_error(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
+        def mock_check_call_error(cmd_tokens, **kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
+            if kwargs.get('encoding') != 'utf-8':
+                raise AssertionError(
+                    'Popen should have been called with encoding="utf-8"')
             return MockErrorProcess()
 
         self.swap_Popen_error = self.swap(
