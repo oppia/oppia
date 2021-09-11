@@ -151,6 +151,15 @@ describe('Collection editor navbar component', () => {
     expect(collectionEditorStateService.getCollectionRights).toHaveBeenCalled();
   }));
 
+  it('should test dropdown toggle functions', () => {
+    componentInstance.editButtonHovering = false;
+    componentInstance.onEditButtonHover();
+    expect(componentInstance.editButtonHovering).toBeTrue();
+    componentInstance.playerButtonHovering = false;
+    componentInstance.onPlayerButtonHover();
+    expect(componentInstance.playerButtonHovering).toBeTrue();
+  });
+
   it('should test getters', () => {
     componentInstance.validationIssues = [];
     componentInstance.collectionRights = {

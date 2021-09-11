@@ -80,6 +80,14 @@ export class CollectionEditorNavbarComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  onEditButtonHover(): void {
+    this.editButtonHovering = !this.editButtonHovering;
+  }
+
+  onPlayerButtonHover(): void {
+    this.playerButtonHovering = !this.playerButtonHovering;
+  }
+
   private _validateCollection() {
     if (this.collectionRights.isPrivate()) {
       this.validationIssues = (

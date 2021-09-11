@@ -2,9 +2,10 @@
   <!-- Editor -->
   <li [ngClass]="{'active': getActiveTabName() === 'edit', 'open': editButtonHovering && getWarningsCount()}"
       ngbDropdown
-      (mouseenter)="editButtonHovering = true;"
-      (mouseleave)="editButtonHovering = false;"
-      class="nav-item">
+      (mouseenter)="onEditButtonHover()"
+      (mouseleave)="$event.stopPropagation(); onEditButtonHover()"
+      class="nav-item"
+      #editDrop="ngbDropdown">
     <a href="#" ngbTooltip="Editor" (click)="selectMainTab()" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
@@ -35,8 +36,8 @@
   <!-- Player -->
   <li [ngClass]="{'open': (getWarningsCount() || getChangeListCount() > 0) && playerButtonHovering}"
       ngbDropdown
-      (mouseenter)="playerButtonHovering = true;"
-      (mouseleave)="playerButtonHovering = false;"
+      (mouseenter)="onPlayerButtonHover()"
+      (mouseleave)="$event.stopPropagation(); onPlayerButtonHover()"
       class="nav-item">
     <a [href]="'/collection/' + collectionId"
        target="_blank"
