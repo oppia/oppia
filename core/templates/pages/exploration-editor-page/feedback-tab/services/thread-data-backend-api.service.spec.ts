@@ -638,7 +638,7 @@ describe('retrieving threads service', () => {
 
       let mockThread = mockFeedbackThreads[0];
       let thread = feedbackThreadObjectFactory
-      .createFromBackendDict(mockThread);
+        .createFromBackendDict(mockThread);
 
       threadDataBackendApiService.fetchMessagesAsync(thread.threadId)
         .then(successHandler, failHandler);
