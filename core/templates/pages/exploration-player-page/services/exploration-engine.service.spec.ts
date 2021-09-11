@@ -812,7 +812,7 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.isCurrentStateInitial();
     }).toThrowError(
-      'Cannot read properties of undefined (reading \'initStateName\')');
+      'Cannot read property \'initStateName\' of undefined');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -828,7 +828,7 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.getState();
     }).toThrowError(
-      'Cannot read properties of undefined (reading \'getState\')');
+      'Cannot read property \'initStateName\' of undefined');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
