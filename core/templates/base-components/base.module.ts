@@ -45,26 +45,7 @@ import {
 } from './base-content.component';
 
 // Miscenellous.
-import * as hammer from 'hammerjs';
-import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-
-// Configurations.
-
-// Config for hammer gestures.
-export class MyHammerConfig extends HammerGestureConfig {
-  overrides = {
-    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
-    pinch: { enable: false },
-    rotate: { enable: false },
-  };
-
-  options = {
-    cssProps: {
-      userSelect: true
-    }
-  };
-}
 
 @NgModule({
   imports: [
@@ -76,13 +57,6 @@ export class MyHammerConfig extends HammerGestureConfig {
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     SharedPipesModule,
-  ],
-
-  providers: [
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    }
   ],
 
   declarations: [
