@@ -19,24 +19,9 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 
-// Config for ToastrModule (helps in flashing messages and alerts).
-export const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message protractor-test-toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
 
 // Modules.
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './routing/app.routing.module';
 
@@ -52,6 +37,7 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
 import firebase from 'firebase/app';
+import * as hammer from 'hammerjs';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -83,6 +69,36 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   }
 }
 
+// Config for ToastrModule (helps in flashing messages and alerts).
+export const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message protractor-test-toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
+
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = {
+    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
+    pinch: { enable: false },
+    rotate: { enable: false },
+  };
+
+  options = {
+    cssProps: {
+      userSelect: true
+    }
+  };
+}
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -101,6 +117,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     OppiaRootComponent,
   ],
   providers: [
+    AngularFireAuth,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
@@ -112,7 +129,6 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
       deps: [PlatformFeatureService],
       multi: true
     },
-    AngularFireAuth,
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig
@@ -120,6 +136,10 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     {
       provide: ErrorHandler,
       useClass: FirebaseErrorFilterHandler,
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ],
   bootstrap: [OppiaRootComponent]
