@@ -242,7 +242,8 @@ def run_cmd(cmd_tokens):
     Returns:
         str. The output of the command.
     """
-    return subprocess.check_output(cmd_tokens, stderr=subprocess.STDOUT).strip()
+    return subprocess.check_output(
+        cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
 
 def ensure_directory_exists(d):
