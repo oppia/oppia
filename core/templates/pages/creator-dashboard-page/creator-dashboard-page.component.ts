@@ -99,10 +99,9 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       ctrl.setMyExplorationsView = function(newViewType) {
+        ctrl.myExplorationsView = newViewType;
         CreatorDashboardBackendApiService.postExplorationViewAsync(
-          newViewType).then(function() {
-            ctrl.myExplorationsView = newViewType;
-          });
+          newViewType).then(function() {});
         userDashboardDisplayPreference = newViewType;
       };
 
