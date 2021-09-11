@@ -177,7 +177,6 @@
     "oppia/match-line-break": "error",
     "oppia/no-test-blockers": "error",
     "oppia/no-inject": "error",
-    "oppia/no-forEach": "error",
     "oppia/no-bypass-security-phrase": "error",
     "angular/di": [
       "error",
