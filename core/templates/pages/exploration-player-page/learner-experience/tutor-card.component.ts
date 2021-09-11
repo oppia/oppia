@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
@@ -30,6 +30,7 @@ import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { AudioPreloaderService } from '../services/audio-preloader.service';
@@ -38,6 +39,26 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
+
+// angular.module('oppia').animation(
+//   '.conversation-skin-responses-animate-slide', function() {
+//     return {
+//       removeClass: function(element, className, done) {
+//         if (className !== 'ng-hide') {
+//           done();
+//           return;
+//         }
+//         element.hide().slideDown(400, <(this: HTMLElement) => void>done);
+//       },
+//       addClass: function(element, className, done) {
+//         if (className !== 'ng-hide') {
+//           done();
+//           return;
+//         }
+//         element.slideUp(400, <(this: HTMLElement) => void>done);
+//       }
+//     };
+//   });
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -82,7 +103,8 @@ export class TutorCardComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -100,6 +122,7 @@ export class TutorCardComponent {
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
     this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
+
     this.profilePicture = this.urlInterpolationService
       .getStaticImageUrl('/avatar/user_blue_72px.png');
 
@@ -128,10 +151,11 @@ export class TutorCardComponent {
 
           // Auto scroll to the new feedback on mobile device.
           if (this.deviceInfoService.isMobileDevice()) {
-            // Let latestFeedbackIndex = (
-            //   this.displayedCard.getInputResponsePairs().length - 1);
+            let latestFeedbackIndex = (
+              this.displayedCard.getInputResponsePairs().length - 1);
 
-            // Some work left here.
+            this.windowRef.nativeWindow.location.hash = (
+              this.getInputResponsePairId(latestFeedbackIndex));
           }
         }
       )
@@ -158,9 +182,11 @@ export class TutorCardComponent {
     this.currentInteractionService.registerPresubmitHook(() => {
       this.waitingForOppiaFeedback = true;
     });
+
     if (!this.interactionIsActive) {
       this.lastAnswer = this.displayedCard.getLastAnswer();
     }
+
     if (!this.conceptCardIsBeingShown) {
       this.interactionInstructions = (
         this.displayedCard.getInteractionInstructions());
