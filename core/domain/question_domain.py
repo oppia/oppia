@@ -1134,6 +1134,25 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v47_dict_to_v48_dict(cls, question_state_dict):
+        """Converts draft change list from state version 47 to 48. Version 48
+        fixes encoding issues in HTML fields.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.fix_incorrectly_encoded_chars)
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
