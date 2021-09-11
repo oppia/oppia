@@ -79,7 +79,6 @@ export interface BeamJobRunBackendDict {
   'job_id': string;
   'job_name': string;
   'job_state': BeamJobRunState;
-  'job_arguments': string[];
   'job_started_on_msecs': number;
   'job_updated_on_msecs': number;
   'job_is_synchronous': boolean;
@@ -92,7 +91,6 @@ export class BeamJobRun {
       public readonly jobId: string,
       public readonly jobName: string,
       public readonly jobState: BeamJobRunState,
-      public readonly jobArguments: readonly string[],
       public readonly jobStartedOnMsecs: number,
       public readonly jobUpdatedOnMsecs: number,
       public readonly jobIsSynchronous: boolean) {
@@ -183,7 +181,7 @@ export class BeamJobRun {
   static createFromBackendDict(backendDict: BeamJobRunBackendDict): BeamJobRun {
     return new BeamJobRun(
       backendDict.job_id, backendDict.job_name, backendDict.job_state,
-      backendDict.job_arguments, backendDict.job_started_on_msecs,
-      backendDict.job_updated_on_msecs, backendDict.job_is_synchronous);
+      backendDict.job_started_on_msecs, backendDict.job_updated_on_msecs,
+      backendDict.job_is_synchronous);
   }
 }
