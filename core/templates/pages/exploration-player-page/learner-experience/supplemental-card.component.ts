@@ -16,7 +16,7 @@
  * @fileoverview Component for the supplemental card.
  */
 
-import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ViewRef, ElementRef, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { StateCard } from 'domain/state_card/state-card.model';
