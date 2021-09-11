@@ -44,7 +44,7 @@ import {
   BaseContentPageFooterDirective
 } from './base-content.component';
 
-// Miscenellous.
+// Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 @NgModule({
