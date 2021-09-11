@@ -67,6 +67,8 @@ ruleTester.run('protractor-practices', rule, {
     code: 'var modal = element.all(by.css(".modal-dialog")).last();'
   }, {
     code: 'var modal = element(by.css("option:checked"));'
+  }, {
+    code: '[].every(item);'
   }],
 
   invalid: [
@@ -153,6 +155,13 @@ ruleTester.run('protractor-practices', rule, {
       await invalid.get()`,
       errors: [{
         message: 'Please do not use await for "get()"',
+      }],
+    },
+    {
+      code:
+      '[].forEach(item)',
+      errors: [{
+        message: 'Please do not use .forEach(), consider .every() instead',
       }],
     },
   ]
