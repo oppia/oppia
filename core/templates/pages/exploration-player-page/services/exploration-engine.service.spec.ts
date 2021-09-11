@@ -403,7 +403,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.isInPreviewMode()).toBe(false);
     expect(() => {
       explorationEngineService.getExplorationTitle();
-    }).toThrowError('Cannot read properties of undefined (reading \'title\')');
+    }).toThrowError('Cannot read property \'title\' of undefined');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -432,7 +432,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.isInPreviewMode()).toBe(true);
     expect(() => {
       explorationEngineService.getExplorationTitle();
-    }).toThrowError('Cannot read properties of undefined (reading \'title\')');
+    }).toThrowError('Cannot read property \'title\' of undefined');
 
     explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     explorationEngineService.init(
@@ -690,7 +690,7 @@ describe('Exploration engine service ', () => {
 
     expect(() => {
       explorationEngineService.getExplorationTitle();
-    }).toThrowError('Cannot read properties of undefined (reading \'title\')');
+    }).toThrowError('Cannot read property \'title\' of undefined');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -724,8 +724,7 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.getAuthorRecommendedExpIds();
     }).toThrowError(
-      'Cannot read properties of undefined ' +
-      '(reading \'getAuthorRecommendedExpIds\')');
+      'Cannot read property \'getAuthorRecommendedExpIds\' of undefined');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
