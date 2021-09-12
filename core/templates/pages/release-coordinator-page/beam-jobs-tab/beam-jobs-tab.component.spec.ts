@@ -19,7 +19,7 @@
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
@@ -145,6 +145,23 @@ describe('Beam Jobs Tab Component', () => {
       .toBeObservable(expectedNames, {e: [], n: beamJobs.map(j => j.name)});
     m.expect(component.beamJobRuns)
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
+  }));
+
+  it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
+    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
+      .and.returnValue(of(beamJobRuns));
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
+
+    tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
+    flushMicrotasks();
+
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
+
+    component.ngOnDestroy();
   }));
 
   it('should return empty array when jobs fail to load', marbles(async(m) => {

@@ -21,8 +21,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { BehaviorSubject, combineLatest, Observable, of, zip } from 'rxjs';
-import { catchError, distinctUntilChanged, first, map, startWith } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, interval, Observable, of, Subscription, zip } from 'rxjs';
+import { catchError, distinctUntilChanged, first, map, startWith, switchMap } from 'rxjs/operators';
 
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { BeamJob } from 'domain/jobs/beam-job.model';
@@ -37,6 +37,8 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './beam-jobs-tab.component.html'
 })
 export class BeamJobsTabComponent implements OnInit, OnDestroy {
+  static readonly BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS = 15000;
+
   public dataFailedToLoad = false;
   readonly jobRunTableColumns: readonly string[] = [
     'run_status', 'job_name', 'started_on', 'updated_on', 'action'];
@@ -51,6 +53,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
   filteredJobNames: Observable<string[]>;
   filteredBeamJobRuns: Observable<BeamJobRun[]>;
+  beamJobRunsRefreshIntervalSubscription: Subscription;
 
   constructor(
       private backendApiService: ReleaseCoordinatorBackendApiService,
@@ -91,11 +94,18 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
         )
       )
     );
+
+    this.beamJobRunsRefreshIntervalSubscription = (
+      interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
+        .pipe(switchMap(() => this.backendApiService.getBeamJobRuns()))
+        .subscribe(beamJobRuns => this.beamJobRuns.next(beamJobRuns))
+    );
   }
 
   ngOnDestroy(): void {
     this.jobNames.complete();
     this.beamJobRuns.complete();
+    this.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }
 
   onError<T>(error: Error): Observable<T[]> {
