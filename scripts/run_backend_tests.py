@@ -402,8 +402,7 @@ def main(args=None):
 
         for task in tasks:
             if task.exception:
-                concurrent_task_utils.log(
-                    python_utils.convert_to_bytes(task.exception.args[0]))
+                concurrent_task_utils.log(task.exception.args[0])
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
@@ -501,13 +500,13 @@ def main(args=None):
             [sys.executable, COVERAGE_MODULE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing'],
-            stdout=subprocess.PIPE)
+            stdout=subprocess.PIPE, encoding='utf-8')
 
         report_stdout, _ = process.communicate()
         python_utils.PRINT(report_stdout)
 
         coverage_result = re.search(
-            rb'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
         if (coverage_result.group('total') != '100'
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')

@@ -31,7 +31,7 @@ from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-from typing import Any, Dict, Optional # isort:skip
+from typing import Any, Dict, Optional
 
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
@@ -76,7 +76,8 @@ def create_http_task(
     # We can see how the proto message for Task is defined. See the link:
     # https://github.com/googleapis/python-tasks/blob/2f6ae8318e9a6fc2963d4a7825ee96e41f330043/google/cloud/tasks_v2/types/task.py#L29
     task: Dict[str, Any] = {
-        'app_engine_http_request': {  # Specify the type of request.
+        # Specify the type of request.
+        'app_engine_http_request': {
             'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
             'relative_uri': url,
         }

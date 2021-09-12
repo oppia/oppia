@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import utils
 
-from typing import Dict, Optional # isort:skip # pylint: disable=unused-import
+from typing import Dict, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -174,7 +174,7 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not associated with users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

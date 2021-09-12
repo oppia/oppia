@@ -43,6 +43,10 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
       }
     };
 
+    $scope.existingMisconceptionNames = $scope.skill.getMisconceptions().map(
+      misconception => misconception.getName()
+    );
+
     $scope.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -55,8 +59,12 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.misconceptionNotes = '';
     $scope.misconceptionFeedback = '';
     $scope.misconceptionMustBeAddressed = true;
+    $scope.misconceptionNameIsDuplicate = false;
 
     $scope.saveMisconception = function() {
+      if ($scope.misconceptionNameIsDuplicate) {
+        return;
+      }
       var newMisconceptionId = $scope.skill.getNextMisconceptionId();
       $uibModalInstance.close({
         misconception: MisconceptionObjectFactory.create(
@@ -66,6 +74,12 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
           $scope.misconceptionFeedback,
           $scope.misconceptionMustBeAddressed)
       });
+    };
+
+    $scope.checkIfMisconceptionNameIsDuplicate = function() {
+      $scope.misconceptionNameIsDuplicate = (
+        $scope.existingMisconceptionNames.includes($scope.misconceptionName)
+      );
     };
   }
 ]);

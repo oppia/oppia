@@ -26,6 +26,10 @@ into this file.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from jobs import base_jobs
+
+from typing import List, Type
+
 # IMPORTANT: These modules MUST be imported! DO NOT DELETE!
 # We need each module to execute so that the class definitions trigger the
 # metaclass logic. That is, the following code:
@@ -40,14 +44,12 @@ from __future__ import unicode_literals
 # We need this to happen for every job in this registry file, because the
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
-from jobs import base_jobs
-from jobs import blog_validation_jobs  # pylint: disable=unused-import
-from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
-
-from typing import List
+from jobs.batch_jobs import blog_validation_jobs  # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import cron_jobs             # pylint: disable=unused-import  # isort: skip
+from jobs.batch_jobs import validation_jobs       # pylint: disable=unused-import  # isort: skip
 
 
-def get_all_jobs() -> List[base_jobs.JobMetaclass]:
+def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
     """Returns all jobs that have inherited from the JobBase class.
 
     Returns:
@@ -65,7 +67,7 @@ def get_all_job_names() -> List[str]:
     return base_jobs.JobMetaclass.get_all_job_names()
 
 
-def get_job_class_by_name(job_name: str) -> base_jobs.JobMetaclass:
+def get_job_class_by_name(job_name: str) -> Type[base_jobs.JobBase]:
     """Returns the class associated with the given job name.
 
     Args:

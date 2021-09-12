@@ -20,8 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import constants from 'assets/constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { initializeGoogleAnalytics } from 'google-analytics.initializer';
 
 // Service for sending events to Google Analytics.
 //
@@ -33,22 +33,25 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class SiteAnalyticsService {
-  constructor(private windowRef: WindowRef) {}
+  static googleAnalyticsIsInitialized: boolean = false;
 
-  get CAN_SEND_ANALYTICS_EVENTS(): boolean {
-    return constants.CAN_SEND_ANALYTICS_EVENTS;
+  constructor(private windowRef: WindowRef) {
+    if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
+      // This ensures that google analytics is initialized whenever this
+      // service is used.
+      initializeGoogleAnalytics();
+      SiteAnalyticsService.googleAnalyticsIsInitialized = true;
+    }
   }
 
   // For definitions of the various arguments, please see:
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.gtag('event', eventAction, {
-        event_category: eventCategory,
-        event_label: eventLabel
-      });
-    }
+    this.windowRef.nativeWindow.gtag('event', eventAction, {
+      event_category: eventCategory,
+      event_label: eventLabel
+    });
   }
 
   // The srcElement refers to the element on the page that is clicked.
