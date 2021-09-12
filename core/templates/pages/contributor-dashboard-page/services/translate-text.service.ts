@@ -250,4 +250,5 @@ export class TranslateTextService {
 }
 
 angular.module('oppia').factory(
-  'TranslateTextService', downgradeInjectable(TranslateTextService));
+  'TranslateTextService', downgradeInjectable(TranslateTextService)
+);
