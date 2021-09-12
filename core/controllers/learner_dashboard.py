@@ -84,7 +84,7 @@ class LearnerDashboardHandlerForTopicsAndStories(base.BaseHandler):
                 self.user_id,
                 learner_progress_in_topics_and_stories.learnt_topic_summaries))
         partially_learnt_topic_summaries = (
-            learner_progress_in_topics_and_stories.partially_learnt_topic_summaries #pylint:disable=line-too-long
+            learner_progress_in_topics_and_stories.partially_learnt_topic_summaries # pylint: disable=line-too-long
         )
         partially_learnt_topic_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
@@ -108,10 +108,10 @@ class LearnerDashboardHandlerForTopicsAndStories(base.BaseHandler):
                 self.user_id, untracked_topic_sumamries))
 
         completed_to_incomplete_stories = (
-            learner_progress_in_topics_and_stories.completed_to_incomplete_stories #pylint:disable=line-too-long
+            learner_progress_in_topics_and_stories.completed_to_incomplete_stories # pylint: disable=line-too-long
         )
         learnt_to_partially_learnt_topics = (
-            learner_progress_in_topics_and_stories.learnt_to_partially_learnt_topics #pylint:disable=line-too-long
+            learner_progress_in_topics_and_stories.learnt_to_partially_learnt_topics # pylint: disable=line-too-long
         )
         self.values.update({
             'completed_stories_list': completed_story_summary_dicts,
