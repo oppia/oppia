@@ -19,7 +19,7 @@
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
@@ -145,19 +145,20 @@ describe('Beam Jobs Tab Component', () => {
       .toBeObservable(expectedNames, {e: [], n: beamJobs.map(j => j.name)});
     m.expect(component.beamJobRuns)
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
+
+    component.ngOnDestroy();
   }));
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
     const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
       .and.returnValue(of(beamJobRuns));
 
-    component.ngOnInit();
-    flushMicrotasks();
+    fixture.detectChanges();
 
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
-    flushMicrotasks();
+    fixture.detectChanges();
 
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
 
@@ -171,6 +172,8 @@ describe('Beam Jobs Tab Component', () => {
 
     fixture.detectChanges();
     m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
+
+    component.ngOnDestroy();
   }));
 
   it('should return empty array when runs fail to load', marbles(async(m) => {
@@ -180,6 +183,8 @@ describe('Beam Jobs Tab Component', () => {
 
     fixture.detectChanges();
     m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
+
+    component.ngOnDestroy();
   }));
 
   it('should update the table when the job name input changes', async() => {
@@ -204,6 +209,8 @@ describe('Beam Jobs Tab Component', () => {
 
     expect(await autocomplete.getOptions()).toHaveSize(2);
     expect(await table.getRows()).toHaveSize(2);
+
+    component.ngOnDestroy();
   });
 
   it('should deselect a job after changing the input', async() => {
@@ -222,6 +229,8 @@ describe('Beam Jobs Tab Component', () => {
     fixture.detectChanges();
 
     expect(component.selectedJob).toBeNull();
+
+    component.ngOnDestroy();
   });
 
   it('should add a new job after starting a new job run', async() => {
@@ -255,6 +264,8 @@ describe('Beam Jobs Tab Component', () => {
     expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
+
+    component.ngOnDestroy();
   });
 
   it('should cancel the job and update its status', async() => {
@@ -290,6 +301,8 @@ describe('Beam Jobs Tab Component', () => {
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).not.toContain(runningFooJob);
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
+
+    component.ngOnDestroy();
   });
 
   it('should show the job output', async() => {
@@ -317,5 +330,7 @@ describe('Beam Jobs Tab Component', () => {
 
     expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(doneBarJob);
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+
+    component.ngOnDestroy();
   });
 });

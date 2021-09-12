@@ -17,7 +17,7 @@
  * release-coordinator panel.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -58,7 +58,8 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   constructor(
       private backendApiService: ReleaseCoordinatorBackendApiService,
       private alertsService: AlertsService,
-      private matDialog: MatDialog) {}
+      private matDialog: MatDialog,
+      private ngZone: NgZone) {}
 
   ngOnInit(): void {
     const initialBeamJobs = this.backendApiService.getBeamJobs()
@@ -95,11 +96,21 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.beamJobRunsRefreshIntervalSubscription = (
-      interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
-        .pipe(switchMap(() => this.backendApiService.getBeamJobRuns()))
-        .subscribe(beamJobRuns => this.beamJobRuns.next(beamJobRuns))
-    );
+    // Intervals need to be executed outside of Angular so that they don't
+    // interfere with testability (otherwise, the Angular component will never
+    // be "ready" since an interval executes indefinitely).
+    this.ngZone.runOutsideAngular(() => {
+      this.beamJobRunsRefreshIntervalSubscription = (
+        interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
+          .pipe(switchMap(() => this.backendApiService.getBeamJobRuns()))
+          .subscribe(beamJobRuns => {
+            // When we're ready to update the beam jobs, however, we want the
+            // update to occur within Angular so that change detection can
+            // notice it.
+            this.ngZone.run(() => this.beamJobRuns.next(beamJobRuns));
+          })
+      );
+    });
   }
 
   ngOnDestroy(): void {
