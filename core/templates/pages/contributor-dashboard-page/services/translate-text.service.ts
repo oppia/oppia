@@ -31,7 +31,7 @@ import {
 export interface TranslatableItem {
   translation: string | string[],
   status: Status | string,
-  text: string | string[] | undefined,
+  text: string | string[],
   more: boolean
   dataFormat: string,
   contentType: string,
@@ -68,8 +68,8 @@ export class TranslateTextService {
   SUBMITTED = 'submitted';
   stateWiseContents: StateNamesToContentIdMapping = {};
   stateWiseContentIds: Record<string, string[]> = {};
-  stateNamesList!: string[];
-  stateAndContent: StateAndContent[]=[];
+  stateNamesList: string[] = [];
+  stateAndContent: StateAndContent[] = [];
   activeIndex = this.STARTING_INDEX;
   activeExpId!: string;
   activeExpVersion!: string;
@@ -83,9 +83,9 @@ export class TranslateTextService {
       TranslateTextBackendApiService
   ) { }
 
-  private _getNextText(): string | string[] | undefined {
+  private _getNextText(): string | string[] | null {
     if (this.stateAndContent.length === 0) {
-      return undefined;
+      return null;
     }
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -95,9 +95,9 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] | undefined {
+  private _getPreviousText(): string | string[] | null {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
-      return undefined;
+      return null;
     }
     this.activeIndex -= 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -125,7 +125,7 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-      text: string | string[] | undefined,
+      text: string | string[] | null,
       more: boolean,
       status: Status | string,
       translation: string | string[]
