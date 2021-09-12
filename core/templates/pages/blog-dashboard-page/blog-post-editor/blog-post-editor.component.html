@@ -135,18 +135,20 @@
                 {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
               </span>
             </div>
-            <mat-button-toggle-group aria-label="Tags to classify blog post."
-                                     [value]="blogPostData.tags"
-                                     *ngFor="let tag of defaultTagsList"
-                                     multiple="true"
-                                     class="mx-2 my-2 tag">
-              <mat-button-toggle class="text-wrap"
-                                 (change)="onTagChange($event.value)"
-                                 [value]="tag"
-                                 [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
-              {{ tag }}
-              </mat-button-toggle>
-            </mat-button-toggle-group>
+            <div class="text-left">
+              <mat-button-toggle-group aria-label="Tags to classify blog post."
+                                       [value]="blogPostData.tags"
+                                       *ngFor="let tag of defaultTagsList"
+                                       multiple="true"
+                                       class="mx-2 my-2 tag">
+                <mat-button-toggle class="text-wrap"
+                                   (change)="onTagChange($event.value)"
+                                   [value]="tag"
+                                   [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
+                {{ tag }}
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
           </div>
         </div>
       </div>
@@ -199,7 +201,7 @@
             {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
           </span>
         </div>
-        <div *ngIf="!windowIsNarrow">
+        <div *ngIf="!windowIsNarrow" class="text-left">
           <mat-button-toggle-group aria-label="Tags to classify blog post."
                                    [value]="blogPostData.tags"
                                    *ngFor="let tag of defaultTagsList"
@@ -378,7 +380,7 @@
   }
 
   .tag /deep/ .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-    padding: 0 2px;
+    padding: 4px 5px;
   }
 
   .title-heading {

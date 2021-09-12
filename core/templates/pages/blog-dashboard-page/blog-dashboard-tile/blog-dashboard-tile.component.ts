@@ -49,7 +49,7 @@ export class BlogDashboardTileComponent implements OnInit {
 
   getDateStringInWords(naiveDate: string): string {
     return dayjs(
-      naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+      naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMM D, YYYY');
   }
 
   editBlogPost(): void {

@@ -3418,6 +3418,9 @@ def can_edit_entity(handler):
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_BLOG_POST:
+            return (
+                can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs))
         else:
             raise self.PageNotFoundException
 
