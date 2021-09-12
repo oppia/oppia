@@ -73,35 +73,46 @@ class LearnerDashboardHandlerForTopicsAndStories(base.BaseHandler):
                 learner_progress_services.get_topics_and_stories_progress(
                     self.user_id))
 
+        completed_story_sumamries = (
+            learner_progress_in_topics_and_stories.completed_story_summaries)
         completed_story_summary_dicts = (
             learner_progress_services.get_displayable_story_summary_dicts(
-                self.user_id,
-                learner_progress_in_topics_and_stories.completed_story_summaries))
+                self.user_id, completed_story_sumamries))
 
         learnt_topic_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id, 
+                self.user_id,
                 learner_progress_in_topics_and_stories.learnt_topic_summaries))
+        partially_learnt_topic_summaries = (
+            learner_progress_in_topics_and_stories.partially_learnt_topic_summaries #pylint:disable=line-too-long
+        )
         partially_learnt_topic_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id,
-                learner_progress_in_topics_and_stories.partially_learnt_topic_summaries))
+                self.user_id, partially_learnt_topic_summaries))
 
+        topics_to_learn_summaries = (
+            learner_progress_in_topics_and_stories.topics_to_learn_summaries)
         topics_to_learn_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
-                self.user_id, 
-                learner_progress_in_topics_and_stories.topics_to_learn_summaries))
+                self.user_id, topics_to_learn_summaries))
         all_topic_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
                 self.user_id,
                 learner_progress_in_topics_and_stories.all_topic_summaries))
+        untracked_topic_sumamries = (
+            learner_progress_in_topics_and_stories.untracked_topic_summaries
+        )
         untracked_topic_summary_dicts = (
             learner_progress_services
             .get_displayable_untracked_topic_summary_dicts(
-                self.user_id,
-                learner_progress_in_topics_and_stories.untracked_topic_summaries))
+                self.user_id, untracked_topic_sumamries))
 
-
+        completed_to_incomplete_stories = (
+            learner_progress_in_topics_and_stories.completed_to_incomplete_stories #pylint:disable=line-too-long
+        )
+        learnt_to_partially_learnt_topics = (
+            learner_progress_in_topics_and_stories.learnt_to_partially_learnt_topics #pylint:disable=line-too-long
+        )
         self.values.update({
             'completed_stories_list': completed_story_summary_dicts,
             'learnt_topics_list': learnt_topic_summary_dicts,
@@ -112,10 +123,9 @@ class LearnerDashboardHandlerForTopicsAndStories(base.BaseHandler):
             'untracked_topics': untracked_topic_summary_dicts,
             'number_of_nonexistent_topics_and_stories': (
                 number_of_nonexistent_topics_and_stories),
-            'completed_to_incomplete_stories': (
-                learner_progress_in_topics_and_stories.completed_to_incomplete_stories),
+            'completed_to_incomplete_stories': completed_to_incomplete_stories,
             'learnt_to_partially_learnt_topics': (
-                learner_progress_in_topics_and_stories.learnt_to_partially_learnt_topics),
+                learnt_to_partially_learnt_topics),
         })
         self.render_json(self.values)
 
@@ -170,7 +180,8 @@ class LearnerDashboardHandlerForExplorations(base.BaseHandler):
         """Handles GET requests."""
         (
             learner_progress, number_of_nonexistent_explorations) = (
-                learner_progress_services.get_exploration_progress(self.user_id))
+                learner_progress_services.get_exploration_progress(
+                    self.user_id))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(

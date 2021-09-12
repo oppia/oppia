@@ -1766,7 +1766,7 @@ def get_topics_and_stories_progress(user_id):
                 longer present.
             - learnt_topics: int. The number of learnt topics no
                 longer present.
-            - topics_to_learn: int. The number of topics marked to learn
+            - topics_to_learn: int. The number of topics marked to learn.
     """
     activity_ids_in_learner_dashboard = (
         get_learner_dashboard_activities(user_id))
@@ -1857,7 +1857,6 @@ def get_topics_and_stories_progress(user_id):
     filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn = (
         _get_filtered_topics_to_learn_summaries(
             user_id, topics_to_learn_summaries, topic_ids_to_learn))
-
 
     filtered_all_topic_summaries = (
         _get_filtered_all_topic_summaries(

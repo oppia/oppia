@@ -53,7 +53,8 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/learner-dashboard', response.headers['location'])
 
 
-class LearnerDashboardHandlerForTopicsAndStoriesTests(test_utils.GenericTestBase):
+class LearnerDashboardHandlerForTopicsAndStoriesTests(
+    test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
