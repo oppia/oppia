@@ -53,7 +53,7 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/learner-dashboard', response.headers['location'])
 
 
-class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
+class LearnerDashboardHandlerForTopicsAndStoriesTests(test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
@@ -97,7 +97,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardHandlerTests, self).setUp()
+        super(LearnerDashboardHandlerForTopicsAndStoriesTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -106,42 +106,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-
-    def test_can_see_completed_explorations(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['completed_explorations_list']), 0)
-
-        self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
-        self.publish_exploration(self.owner_id, self.EXP_ID_1)
-
-        learner_progress_services.mark_exploration_as_completed(
-            self.viewer_id, self.EXP_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['completed_explorations_list']), 1)
-        self.assertEqual(
-            response['completed_explorations_list'][0]['id'], self.EXP_ID_1)
-        self.logout()
-
-    def test_can_see_completed_collections(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['completed_collections_list']), 0)
-
-        self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
-        self.publish_collection(self.owner_id, self.COL_ID_1)
-
-        learner_progress_services.mark_collection_as_completed(
-            self.viewer_id, self.COL_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['completed_collections_list']), 1)
-        self.assertEqual(
-            response['completed_collections_list'][0]['id'], self.COL_ID_1)
-        self.logout()
 
     def test_can_see_completed_stories(self):
         self.login(self.VIEWER_EMAIL)
@@ -199,45 +163,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['learnt_topics_list']), 1)
         self.assertEqual(
             response['learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
-        self.logout()
-
-    def test_can_see_incomplete_explorations(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['incomplete_explorations_list']), 0)
-
-        self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
-        self.publish_exploration(self.owner_id, self.EXP_ID_1)
-
-        state_name = 'state_name'
-        version = 1
-
-        learner_progress_services.mark_exploration_as_incomplete(
-            self.viewer_id, self.EXP_ID_1, state_name, version)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['incomplete_explorations_list']), 1)
-        self.assertEqual(
-            response['incomplete_explorations_list'][0]['id'], self.EXP_ID_1)
-        self.logout()
-
-    def test_can_see_incomplete_collections(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['incomplete_collections_list']), 0)
-
-        self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
-        self.publish_collection(self.owner_id, self.COL_ID_1)
-
-        learner_progress_services.mark_collection_as_incomplete(
-            self.viewer_id, self.COL_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['incomplete_collections_list']), 1)
-        self.assertEqual(
-            response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
         self.logout()
 
     def test_can_see_partially_learnt_topics(self):
@@ -375,57 +300,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['untracked_topics']), 1)
         self.logout()
 
-    def test_can_see_exploration_playlist(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['exploration_playlist']), 0)
-
-        self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
-        self.publish_exploration(self.owner_id, self.EXP_ID_1)
-
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.viewer_id, self.EXP_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['exploration_playlist']), 1)
-        self.assertEqual(
-            response['exploration_playlist'][0]['id'], self.EXP_ID_1)
-        self.logout()
-
-    def test_can_see_collection_playlist(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['collection_playlist']), 0)
-
-        self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
-        self.publish_collection(self.owner_id, self.COL_ID_1)
-
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.viewer_id, self.COL_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['collection_playlist']), 1)
-        self.assertEqual(
-            response['collection_playlist'][0]['id'], self.COL_ID_1)
-        self.logout()
-
-    def test_can_see_subscription(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['subscription_list']), 0)
-
-        subscription_services.subscribe_to_creator(
-            self.viewer_id, self.owner_id)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['subscription_list']), 1)
-        self.assertEqual(
-            response['subscription_list'][0]['creator_username'],
-            self.OWNER_USERNAME)
-        self.logout()
-
     def test_get_learner_dashboard_ids(self):
         self.login(self.VIEWER_EMAIL)
 
@@ -556,6 +430,258 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             learner_dashboard_activity_ids['topic_ids_to_learn'],
             [self.TOPIC_ID_3])
 
+    def test_learner_dashboard_page(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
+        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
+
+        self.logout()
+
+
+class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+
+    EXP_ID_1 = 'EXP_ID_1'
+    EXP_TITLE_1 = 'Exploration title 1'
+    EXP_ID_2 = 'EXP_ID_2'
+    EXP_TITLE_2 = 'Exploration title 2'
+    EXP_ID_3 = 'EXP_ID_3'
+    EXP_TITLE_3 = 'Exploration title 3'
+
+    COL_ID_1 = 'COL_ID_1'
+    COL_TITLE_1 = 'Collection title 1'
+    COL_ID_2 = 'COL_ID_2'
+    COL_TITLE_2 = 'Collection title 2'
+    COL_ID_3 = 'COL_ID_3'
+    COL_TITLE_3 = 'Collection title 3'
+
+    STORY_ID_1 = 'STORY_1'
+    STORY_TITLE_1 = 'Story title 1'
+    STORY_ID_2 = 'STORY_2'
+    STORY_TITLE_2 = 'Story title 2'
+    STORY_ID_3 = 'STORY_3'
+    STORY_TITLE_3 = 'Story title 3'
+
+    TOPIC_ID_1 = 'TOPIC_1'
+    TOPIC_NAME_1 = 'Topic title 1'
+    TOPIC_ID_2 = 'TOPIC_2'
+    TOPIC_NAME_2 = 'Topic title 2'
+    TOPIC_ID_3 = 'TOPIC_3'
+    TOPIC_NAME_3 = 'Topic title 3'
+
+    subtopic_0 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+        'dummy-subtopic-zero')
+
+    subtopic_1 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+        'dummy-subtopic-zero')
+
+    def setUp(self):
+        super(LearnerDashboardHandlerForCollectionsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_can_see_completed_collections(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['completed_collections_list']), 0)
+
+        self.save_new_default_collection(
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
+
+        learner_progress_services.mark_collection_as_completed(
+            self.viewer_id, self.COL_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['completed_collections_list']), 1)
+        self.assertEqual(
+            response['completed_collections_list'][0]['id'], self.COL_ID_1)
+        self.logout()
+
+    def test_can_see_incomplete_collections(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['incomplete_collections_list']), 0)
+
+        self.save_new_default_collection(
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
+
+        learner_progress_services.mark_collection_as_incomplete(
+            self.viewer_id, self.COL_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['incomplete_collections_list']), 1)
+        self.assertEqual(
+            response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
+        self.logout()
+
+    def test_can_see_collection_playlist(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['collection_playlist']), 0)
+
+        self.save_new_default_collection(
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
+
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.viewer_id, self.COL_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['collection_playlist']), 1)
+        self.assertEqual(
+            response['collection_playlist'][0]['id'], self.COL_ID_1)
+        self.logout()
+
+    def test_learner_dashboard_page(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
+        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
+
+        self.logout()
+
+
+class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+
+    EXP_ID_1 = 'EXP_ID_1'
+    EXP_TITLE_1 = 'Exploration title 1'
+    EXP_ID_2 = 'EXP_ID_2'
+    EXP_TITLE_2 = 'Exploration title 2'
+    EXP_ID_3 = 'EXP_ID_3'
+    EXP_TITLE_3 = 'Exploration title 3'
+
+    COL_ID_1 = 'COL_ID_1'
+    COL_TITLE_1 = 'Collection title 1'
+    COL_ID_2 = 'COL_ID_2'
+    COL_TITLE_2 = 'Collection title 2'
+    COL_ID_3 = 'COL_ID_3'
+    COL_TITLE_3 = 'Collection title 3'
+
+    STORY_ID_1 = 'STORY_1'
+    STORY_TITLE_1 = 'Story title 1'
+    STORY_ID_2 = 'STORY_2'
+    STORY_TITLE_2 = 'Story title 2'
+    STORY_ID_3 = 'STORY_3'
+    STORY_TITLE_3 = 'Story title 3'
+
+    TOPIC_ID_1 = 'TOPIC_1'
+    TOPIC_NAME_1 = 'Topic title 1'
+    TOPIC_ID_2 = 'TOPIC_2'
+    TOPIC_NAME_2 = 'Topic title 2'
+    TOPIC_ID_3 = 'TOPIC_3'
+    TOPIC_NAME_3 = 'Topic title 3'
+
+    subtopic_0 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+        'dummy-subtopic-zero')
+
+    subtopic_1 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+        'dummy-subtopic-zero')
+
+    def setUp(self):
+        super(LearnerDashboardHandlerForExplorationsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_can_see_completed_explorations(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['completed_explorations_list']), 0)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['completed_explorations_list']), 1)
+        self.assertEqual(
+            response['completed_explorations_list'][0]['id'], self.EXP_ID_1)
+        self.logout()
+
+    def test_can_see_incomplete_explorations(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['incomplete_explorations_list']), 0)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        state_name = 'state_name'
+        version = 1
+
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, state_name, version)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['incomplete_explorations_list']), 1)
+        self.assertEqual(
+            response['incomplete_explorations_list'][0]['id'], self.EXP_ID_1)
+        self.logout()
+
+    def test_can_see_exploration_playlist(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['exploration_playlist']), 0)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.viewer_id, self.EXP_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['exploration_playlist']), 1)
+        self.assertEqual(
+            response['exploration_playlist'][0]['id'], self.EXP_ID_1)
+        self.logout()
+
+    def test_can_see_subscription(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['subscription_list']), 0)
+
+        subscription_services.subscribe_to_creator(
+            self.viewer_id, self.owner_id)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['subscription_list']), 1)
+        self.assertEqual(
+            response['subscription_list'][0]['creator_username'],
+            self.OWNER_USERNAME)
+        self.logout()
+
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
 
@@ -584,14 +710,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             thread_summaries[0]['original_author_id'], self.owner_id)
         self.assertEqual(thread.subject, 'a subject')
         self.assertEqual(thread.entity_type, 'exploration')
-        self.logout()
-
-    def test_learner_dashboard_page(self):
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
-
         self.logout()
 
 
