@@ -36,6 +36,9 @@ describe('Collections', function() {
   var thirdExplorationId = null;
   var fourthExplorationId = null;
   var libraryPage = null;
+  var expectedErrors = [
+    'Unable to preventDefault inside passive event listener invocation'
+  ];
 
   beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -171,7 +174,7 @@ describe('Collections', function() {
       await users.login('player@collections.com');
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+      await general.checkForConsoleErrors(expectedErrors);
 
       // Checking in a collection with two nodes.
       await browser.get('/collection_editor/create/' + collectionId);
@@ -182,7 +185,7 @@ describe('Collections', function() {
       await collectionEditorPage.closeSaveModal();
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+      await general.checkForConsoleErrors(expectedErrors);
 
       // Checking in a collection with three nodes.
       await browser.get('/collection_editor/create/' + collectionId);
@@ -193,7 +196,7 @@ describe('Collections', function() {
       await collectionEditorPage.closeSaveModal();
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+      await general.checkForConsoleErrors(expectedErrors);
 
       // Checking in a collection with four nodes.
       await browser.get('/collection_editor/create/' + collectionId);
@@ -204,11 +207,11 @@ describe('Collections', function() {
       await collectionEditorPage.closeSaveModal();
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+      await general.checkForConsoleErrors(expectedErrors);
       await users.logout();
     });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors(expectedErrors);
   });
 });
