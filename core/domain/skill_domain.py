@@ -997,6 +997,21 @@ class Skill(python_utils.OBJECT):
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
+    def _convert_skill_contents_v3_dict_to_v4_dict(cls, skill_contents_dict):
+        """Converts v3 skill contents to the v4 schema. The v4 schema
+        fixes HTML encoding issues.
+
+        Args:
+            skill_contents_dict: dict. The v3 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.fix_incorrectly_encoded_chars)
+
+    @classmethod
     def update_skill_contents_from_model(
             cls, versioned_skill_contents, current_version):
         """Converts the skill_contents blob contained in the given
@@ -1102,6 +1117,25 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict):
+        """Converts v4 misconception schema to the v5 schema. The v5 schema
+        fixes HTML encoding issues.
+
+        Args:
+            misconception_dict: dict. The v4 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['notes'] = (
+            html_validation_service.fix_incorrectly_encoded_chars(
+                misconception_dict['notes']))
+        misconception_dict['feedback'] = (
+            html_validation_service.fix_incorrectly_encoded_chars(
+                misconception_dict['feedback']))
+        return misconception_dict
+
+    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -1151,6 +1185,24 @@ class Skill(python_utils.OBJECT):
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
                 html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                    explanation))
+        return rubric_dict
+
+    @classmethod
+    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict):
+        """Converts v4 rubric schema to the v5 schema. The v4 schema
+        fixes HTML encoding issues.
+
+        Args:
+            rubric_dict: dict. The v4 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        for explanation_index, explanation in enumerate(
+                rubric_dict['explanations']):
+            rubric_dict['explanations'][explanation_index] = (
+                html_validation_service.fix_incorrectly_encoded_chars(
                     explanation))
         return rubric_dict
 
