@@ -477,17 +477,17 @@ def _run_pip_command(cmd_parts):
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
     process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        encoding='utf-8')
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-    elif b'can\'t combine user with prefix' in stderr:
+    elif 'can\'t combine user with prefix' in stderr:
         python_utils.PRINT('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
     else:
-        # Error output is in bytes, we need to decode the line to print it.
-        python_utils.PRINT(stderr.decode('utf-8'))
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')

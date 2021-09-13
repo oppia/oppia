@@ -36,7 +36,8 @@
 /core/controllers/ @aks681
 /core/domain/ @DubeySandeep
 /core/templates/components/ @srijanreddy98
-/core/templates/domain/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (1 line below).
+/core/templates/domain/ @EricZLou
 /core/templates/pages/ @srijanreddy98
 /core/templates/services/ @nithusha21
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
@@ -107,17 +108,19 @@
 /core/domain/blog*.py @iamprayush @aks681
 /core/controllers/blog_dashboard*.py @aks681
 /core/controllers/blog_homepage*.py @aks681
-/core/templates/domain/blog/ @kevintab95 @iamprayush
+# TODO(#13846): Add @kevintab95 after 2021-10-11 (1 line below).
+/core/templates/domain/blog/ @iamprayush
 /core/templates/pages/blog-dashboard-page/ @aks681 @iamprayush
 
 # Collection project.
 /core/controllers/collection*.py @aks681
 /core/domain/collection*.py @aks681
-/core/templates/components/entity-creation-services/collection-creation.service*.ts @kevintab95
-/core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @kevintab95
-/core/templates/domain/collection/ @kevintab95
-/core/templates/pages/collection-editor-page/ @kevintab95
-/core/templates/pages/collection-player-page/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (5 lines below).
+/core/templates/components/entity-creation-services/collection-creation.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @EricZLou
+/core/templates/domain/collection/ @EricZLou
+/core/templates/pages/collection-editor-page/ @EricZLou
+/core/templates/pages/collection-player-page/ @EricZLou
 
 
 # Contributor Dashboard project.
@@ -173,7 +176,7 @@
 
 # Dev workflow team.
 # TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
-/.circleci/ @kevintab95 @SAEb-ai @U8NWXD
+/.circleci/ @SAEb-ai @U8NWXD
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -187,7 +190,7 @@
 /core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
-/scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
+/scripts/check_e2e_tests_are_captured_in_ci*.py @DubeySandeep
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
@@ -213,41 +216,45 @@
 /core/domain/summary_services*.py @aks681
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
 /core/domain/value_generators_domain*.py @aks681
-/core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
-/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
-/core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
-/core/templates/components/button-directives/hint-and-solution-buttons.component.html @kevintab95
-/core/templates/components/state-directives/ @kevintab95
-/core/templates/components/graph-services/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (6 lines below).
+/core/templates/components/entity-creation-services/exploration-creation.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @EricZLou
+/core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @EricZLou
+/core/templates/components/button-directives/hint-and-solution-buttons.component.html @EricZLou
+/core/templates/components/state-directives/ @EricZLou
+/core/templates/components/graph-services/ @EricZLou
 /core/templates/components/on-screen-keyboard/ @aks681
 /core/templates/components/version-diff-visualization/ @aks681
-/core/templates/domain/editor/ @kevintab95
-/core/templates/domain/exploration/ @kevintab95
-/core/templates/domain/recommendations/ @kevintab95
-/core/templates/domain/state/ @kevintab95
-/core/templates/domain/summary/ @kevintab95
-/core/templates/domain/state_card/ @kevintab95
-/core/templates/pages/exploration-editor-page/ @kevintab95
-/core/templates/pages/exploration-editor-page/history-tab/ @kevintab95
-/core/templates/pages/exploration-editor-page/settings-tab/ @kevintab95
-/core/templates/pages/exploration-player-page/ @kevintab95
-/core/templates/components/state-editor/ @kevintab95
-/core/templates/services/compute-graph.service.ts @kevintab95
-/core/templates/services/context.service*.ts @kevintab95
-/core/templates/services/editability.service*.ts @kevintab95
-/core/templates/services/exploration-features*.ts @kevintab95
-/core/templates/services/exploration-html-formatter.service*.ts @kevintab95
-/core/templates/services/image-upload-helper.service*.ts @kevintab95
-/core/templates/services/validators.service*.ts @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (18 lines below).
+/core/templates/domain/editor/ @EricZLou
+/core/templates/domain/exploration/ @EricZLou
+/core/templates/domain/recommendations/ @EricZLou
+/core/templates/domain/state/ @EricZLou
+/core/templates/domain/summary/ @EricZLou
+/core/templates/domain/state_card/ @EricZLou
+/core/templates/pages/exploration-editor-page/ @EricZLou
+/core/templates/pages/exploration-editor-page/history-tab/ @EricZLou
+/core/templates/pages/exploration-editor-page/settings-tab/ @EricZLou
+/core/templates/pages/exploration-player-page/ @EricZLou
+/core/templates/components/state-editor/ @EricZLou
+/core/templates/services/compute-graph.service.ts @EricZLou
+/core/templates/services/context.service*.ts @EricZLou
+/core/templates/services/editability.service*.ts @EricZLou
+/core/templates/services/exploration-features*.ts @EricZLou
+/core/templates/services/exploration-html-formatter.service*.ts @EricZLou
+/core/templates/services/image-upload-helper.service*.ts @EricZLou
+/core/templates/services/validators.service*.ts @EricZLou
 
 
 # Forms pages.
-/core/templates/components/forms/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (1 line below).
+/core/templates/components/forms/ @EricZLou
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @srijanreddy98
 /core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
-/core/templates/services/schema-default-value.service*.ts @kevintab95
-/core/templates/services/schema-form-submitted.service*.ts @kevintab95
-/core/templates/services/schema-undefined-last-element.service*.ts @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (3 lines below).
+/core/templates/services/schema-default-value.service*.ts @EricZLou
+/core/templates/services/schema-form-submitted.service*.ts @EricZLou
+/core/templates/services/schema-undefined-last-element.service*.ts @EricZLou
 
 
 # Google-app-engine configurations
@@ -340,8 +347,9 @@
 /extensions/interactions/ @iamprayush
 # TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
 /extensions/objects/ @iamprayush
-/extensions/objects/templates/filepath-editor.component*.ts @kevintab95
-/extensions/objects/templates/filepath-editor.component.html @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (2 lines below).
+/extensions/objects/templates/filepath-editor.component*.ts @EricZLou
+/extensions/objects/templates/filepath-editor.component.html @EricZLou
 # TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
 /extensions/value_generators/ @iamprayush
 # TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
@@ -387,10 +395,11 @@
 /core/controllers/library*.py @aks681
 /core/domain/recommendations*.py @aks681
 /core/domain/search_services*.py @aks681
-/core/templates/pages/library-page/ @kevintab95
-/core/templates/services/construct-translation-ids.service*.ts @kevintab95
-/core/templates/services/search-backend-api.service*.ts @kevintab95
-/core/templates/services/search.service*.ts @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (4 lines below).
+/core/templates/pages/library-page/ @seanlip
+/core/templates/services/construct-translation-ids.service*.ts @seanlip
+/core/templates/services/search-backend-api.service*.ts @seanlip
+/core/templates/services/search.service*.ts @seanlip
 
 
 # Navigation bar project.
@@ -411,16 +420,17 @@
 /core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
 /core/domain/rights_domain*.py @aks681
-/core/templates/components/concept-card/ @kevintab95
-/core/templates/components/score-ring/ @kevintab95
-/core/templates/components/skill-mastery/ @kevintab95
-/core/templates/components/skills-mastery-list/ @kevintab95
-/core/templates/domain/question/ @kevintab95
-/core/templates/domain/review_test/ @kevintab95
-/core/templates/pages/practice-session-page/ @kevintab95
-/core/templates/pages/review-test-page/ @kevintab95
-/core/templates/services/questions-list.service*.ts @kevintab95
-/core/templates/components/question-directives/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (10 lines below).
+/core/templates/components/concept-card/ @EricZLou
+/core/templates/components/score-ring/ @EricZLou
+/core/templates/components/skill-mastery/ @EricZLou
+/core/templates/components/skills-mastery-list/ @EricZLou
+/core/templates/domain/question/ @EricZLou
+/core/templates/domain/review_test/ @EricZLou
+/core/templates/pages/practice-session-page/ @EricZLou
+/core/templates/pages/review-test-page/ @EricZLou
+/core/templates/services/questions-list.service*.ts @EricZLou
+/core/templates/components/question-directives/ @EricZLou
 
 
 # Readme
@@ -433,22 +443,25 @@
 /core/controllers/concept_card_viewer*.py @aks681
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
-/core/templates/components/entity-creation-services/skill-creation.service*.ts @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (1 line below).
+/core/templates/components/entity-creation-services/skill-creation.service*.ts @EricZLou
 /core/templates/components/question-difficulty-selector/ @aks681
-/core/templates/components/review-material-editor/ @kevintab95
-/core/templates/components/rubrics-editor/ @kevintab95
-/core/templates/components/skill-selector/ @kevintab95
-/core/templates/domain/skill/ @kevintab95
-/core/templates/pages/skill-editor-page/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (5 lines below).
+/core/templates/components/review-material-editor/ @EricZLou
+/core/templates/components/rubrics-editor/ @EricZLou
+/core/templates/components/skill-selector/ @EricZLou
+/core/templates/domain/skill/ @EricZLou
+/core/templates/pages/skill-editor-page/ @EricZLou
 
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/templates/components/entity-creation-services/story-creation.service*.ts @kevintab95
-/core/templates/domain/story/ @kevintab95
-/core/templates/domain/story_viewer/ @kevintab95
-/core/templates/pages/story-editor-page/ @kevintab95
-/core/templates/pages/story-viewer-page/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (5 lines below).
+/core/templates/components/entity-creation-services/story-creation.service*.ts @EricZLou
+/core/templates/domain/story/ @EricZLou
+/core/templates/domain/story_viewer/ @EricZLou
+/core/templates/pages/story-editor-page/ @EricZLou
+/core/templates/pages/story-viewer-page/ @EricZLou
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
@@ -457,21 +470,23 @@
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
-/core/templates/components/entity-creation-services/topic-creation.service*.ts @kevintab95
-/core/templates/domain/classroom/ @kevintab95
-/core/templates/domain/subtopic_viewer/ @kevintab95
-/core/templates/domain/topic/ @kevintab95
-/core/templates/domain/topic_viewer @kevintab95
-/core/templates/pages/classroom-page/ @kevintab95
-/core/templates/pages/subtopic-viewer-page/ @kevintab95
-/core/templates/pages/topic-editor-page/ @kevintab95
-/core/templates/pages/topic-viewer-page/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (9 lines below).
+/core/templates/components/entity-creation-services/topic-creation.service*.ts @EricZLou
+/core/templates/domain/classroom/ @aks681 @seanlip
+/core/templates/domain/subtopic_viewer/ @aks681 @seanlip
+/core/templates/domain/topic/ @aks681 @seanlip
+/core/templates/domain/topic_viewer @aks681 @seanlip
+/core/templates/pages/classroom-page/ @aks681 @seanlip
+/core/templates/pages/subtopic-viewer-page/ @aks681 @seanlip
+/core/templates/pages/topic-editor-page/ @aks681 @seanlip
+/core/templates/pages/topic-viewer-page/ @aks681 @seanlip
 
 # Topics and skills dashboard project.
 /core/controllers/subtopic_viewer*.py @aks681
 /core/controllers/topics_and_skills_dashboard*.py @aks681
-/core/templates/domain/topics_and_skills_dashboard/ @kevintab95
-/core/templates/pages/topics-and-skills-dashboard-page/ @kevintab95
+# TODO(#13846): Revert ownership to @kevintab95 after 2021-10-11 (2 lines below).
+/core/templates/domain/topics_and_skills_dashboard/ @aks681 @seanlip
+/core/templates/pages/topics-and-skills-dashboard-page/ @aks681 @seanlip
 
 
 # Infrastructure.
@@ -606,26 +621,26 @@
 
 
 # Simple pages.
-# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
-/core/controllers/pages*.py @kevintab95
-/core/controllers/custom_landing_pages*.py @kevintab95
-/core/templates/pages/contact-page/ @kevintab95
-/core/templates/pages/delete-account-page/ @kevintab95
-/core/templates/pages/donate-page/ @kevintab95
-/core/templates/pages/error-pages/ @kevintab95
-/core/templates/pages/get-started-page/ @kevintab95
-/core/templates/pages/landing-pages/ @kevintab95
-/core/templates/pages/maintenance-page/ @kevintab95
-/core/templates/pages/partnerships-page/ @kevintab95
-/core/templates/pages/pending-account-deletion-page/ @kevintab95
-/core/templates/pages/preferences-page/ @kevintab95
-/core/templates/pages/signup-page/ @kevintab95
-/core/templates/pages/splash-page/ @kevintab95
-/core/templates/pages/teach-page/ @kevintab95
-/core/templates/pages/thanks-page/ @kevintab95
-/core/templates/pages/participation-playbook/ @kevintab95
-/core/templates/pages/about-foundation-page/ @kevintab95
-/core/templates/pages/volunteer-page/ @kevintab95
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14 (19 lines below).
+/core/controllers/pages*.py @seanlip
+/core/controllers/custom_landing_pages*.py @seanlip
+/core/templates/pages/contact-page/ @seanlip
+/core/templates/pages/delete-account-page/ @seanlip
+/core/templates/pages/donate-page/ @seanlip
+/core/templates/pages/error-pages/ @seanlip
+/core/templates/pages/get-started-page/ @seanlip
+/core/templates/pages/landing-pages/ @seanlip
+/core/templates/pages/maintenance-page/ @seanlip
+/core/templates/pages/partnerships-page/ @seanlip
+/core/templates/pages/pending-account-deletion-page/ @seanlip
+/core/templates/pages/preferences-page/ @seanlip
+/core/templates/pages/signup-page/ @seanlip
+/core/templates/pages/splash-page/ @seanlip
+/core/templates/pages/teach-page/ @seanlip
+/core/templates/pages/thanks-page/ @seanlip
+/core/templates/pages/participation-playbook/ @seanlip
+/core/templates/pages/about-foundation-page/ @seanlip
+/core/templates/pages/volunteer-page/ @seanlip
 
 
 # Speed Improvement team.
@@ -655,12 +670,12 @@
 
 
 # User’s profile page.
-# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
-/core/controllers/profile*.py @kevintab95
-/core/templates/domain/user/ @kevintab95
-/core/templates/pages/profile-page/ @kevintab95
-/core/templates/services/user.service*.ts @kevintab95
-/core/templates/services/user-backend-api.service*.ts @kevintab95
+# TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14 (5 lines below).
+/core/controllers/profile*.py @seanlip
+/core/templates/domain/user/ @seanlip
+/core/templates/pages/profile-page/ @seanlip
+/core/templates/services/user.service*.ts @seanlip
+/core/templates/services/user-backend-api.service*.ts @seanlip
 
 
 # Service constants
@@ -703,15 +718,15 @@
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
 /core/templates/karma.module.ts @DubeySandeep
 # TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
-/core/tests/protractor_utils/ @kevintab95 @SAEb-ai @U8NWXD
-/core/tests/protractor_desktop/ @kevintab95 @SAEb-ai @U8NWXD
-/core/tests/protractor/ @kevintab95 @SAEb-ai @U8NWXD
-/core/tests/protractor.conf.js @kevintab95 @SAEb-ai @U8NWXD
-/extensions/interactions/*/protractor.js @kevintab95 @U8NWXD
-/extensions/interactions/protractor.js @kevintab95 @U8NWXD
-/extensions/rich_text_components/*/protractor.js @kevintab95 @U8NWXD
-/extensions/rich_text_components/protractor.js @kevintab95 @U8NWXD
-/extensions/objects/protractor.js @kevintab95 @U8NWXD
+/core/tests/protractor_utils/ @SAEb-ai @U8NWXD
+/core/tests/protractor_desktop/ @SAEb-ai @U8NWXD
+/core/tests/protractor/ @SAEb-ai @U8NWXD
+/core/tests/protractor.conf.js @SAEb-ai @U8NWXD
+/extensions/interactions/*/protractor.js @U8NWXD
+/extensions/interactions/protractor.js @U8NWXD
+/extensions/rich_text_components/*/protractor.js @U8NWXD
+/extensions/rich_text_components/protractor.js @U8NWXD
+/extensions/objects/protractor.js @U8NWXD
 /scripts/backend_test_shards.json @U8NWXD
 /.github/actions @SAEb-ai @U8NWXD
 
