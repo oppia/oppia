@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import enum
 import uuid
 
 from core.platform import models
@@ -30,54 +31,6 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 
 _MAX_ID_GENERATION_ATTEMPTS = 5
-
-# NOTE: The following values are constants from an enum defined by Google Cloud
-# Dataflow, and are thus outside of our control:
-# https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#jobstate
-
-BeamJobState = python_utils.create_enum( # pylint: disable=invalid-name
-    # The job is currently running.
-    'RUNNING',
-    # The job has been created but is not yet running. Jobs that are pending may
-    # only transition to RUNNING, or FAILED.
-    'PENDING',
-    # The job has not yet started to run.
-    'STOPPED',
-    # The job has has been explicitly cancelled and is in the process of
-    # stopping. Jobs that are cancelling may only transition to CANCELLED or
-    # FAILED.
-    'CANCELLING',
-    # The job has has been explicitly cancelled. This is a terminal job state.
-    # This state may only be set via a Cloud Dataflow jobs.update call, and only
-    # if the job has not yet reached another terminal state.
-    'CANCELLED',
-    # The job is in the process of draining. A draining job has stopped pulling
-    # from its input sources and is processing any data that remains in-flight.
-    # This state may be set via a Cloud Dataflow jobs.update call, but only as a
-    # transition from RUNNING. Jobs that are draining may only transition to
-    # DRAINED, CANCELLED, or FAILED.
-    'DRAINING',
-    # The job has been drained. A drained job terminated by stopping pulling
-    # from its input sources and processing any data that remained in-flight
-    # when draining was requested. This state is a terminal state, may only be
-    # set by the Cloud Dataflow service, and only as a transition from DRAINING.
-    'DRAINED',
-    # The job was successfully updated, meaning that this job was stopped and
-    # another job was started, inheriting state from this one. This is a
-    # terminal job state. This state may only be set by the Cloud Dataflow
-    # service, and only as a transition from RUNNING.
-    'UPDATED',
-    # The job has successfully completed. This is a terminal job state. This
-    # state may be set by the Cloud Dataflow service, as a transition from
-    # RUNNING. It may also be set via a Cloud Dataflow jobs.update call, if the
-    # job has not yet reached a terminal state.
-    'DONE',
-    # The job has has failed. This is a terminal job state. This state may only
-    # be set by the Cloud Dataflow service, and only as a transition from
-    # RUNNING.
-    'FAILED',
-    # The job's run state isn't specified.
-    'UNKNOWN')
 
 
 def _get_new_model_id(model_class: base_models.BaseModel) -> str:
@@ -92,6 +45,56 @@ def _get_new_model_id(model_class: base_models.BaseModel) -> str:
             return new_id
     raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
         _MAX_ID_GENERATION_ATTEMPTS))
+
+
+class BeamJobState(enum.Enum):
+    """Constants from an enum defined by Google Cloud Dataflow, which are thus
+    outside of our control:
+    https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#jobstate
+    """
+
+    # The job is currently running.
+    RUNNING = 'RUNNING'
+    # The job has been created but is not yet running. Jobs that are pending may
+    # only transition to RUNNING, or FAILED.
+    PENDING = 'PENDING'
+    # The job has not yet started to run.
+    STOPPED = 'STOPPED'
+    # The job has has been explicitly cancelled and is in the process of
+    # stopping. Jobs that are cancelling may only transition to CANCELLED or
+    # FAILED.
+    CANCELLING = 'CANCELLING'
+    # The job has has been explicitly cancelled. This is a terminal job state.
+    # This state may only be set via a Cloud Dataflow jobs.update call, and only
+    # if the job has not yet reached another terminal state.
+    CANCELLED = 'CANCELLED'
+    # The job is in the process of draining. A draining job has stopped pulling
+    # from its input sources and is processing any data that remains in-flight.
+    # This state may be set via a Cloud Dataflow jobs.update call, but only as a
+    # transition from RUNNING. Jobs that are draining may only transition to
+    # DRAINED, CANCELLED, or FAILED.
+    DRAINING = 'DRAINING'
+    # The job has been drained. A drained job terminated by stopping pulling
+    # from its input sources and processing any data that remained in-flight
+    # when draining was requested. This state is a terminal state, may only be
+    # set by the Cloud Dataflow service, and only as a transition from DRAINING.
+    DRAINED = 'DRAINED'
+    # The job was successfully updated, meaning that this job was stopped and
+    # another job was started, inheriting state from this one. This is a
+    # terminal job state. This state may only be set by the Cloud Dataflow
+    # service, and only as a transition from RUNNING.
+    UPDATED = 'UPDATED'
+    # The job has successfully completed. This is a terminal job state. This
+    # state may be set by the Cloud Dataflow service, as a transition from
+    # RUNNING. It may also be set via a Cloud Dataflow jobs.update call, if the
+    # job has not yet reached a terminal state.
+    DONE = 'DONE'
+    # The job has has failed. This is a terminal job state. This state may only
+    # be set by the Cloud Dataflow service, and only as a transition from
+    # RUNNING.
+    FAILED = 'FAILED'
+    # The job's run state isn't specified.
+    UNKNOWN = 'UNKNOWN'
 
 
 class BeamJobRunModel(base_models.BaseModel):
@@ -109,9 +112,6 @@ class BeamJobRunModel(base_models.BaseModel):
         datastore_services.StringProperty(required=False, indexed=True))
     # The name of the job class that implements the job's logic.
     job_name = datastore_services.StringProperty(required=True, indexed=True)
-    # The arguments provided to the job run.
-    job_arguments = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
     # The state of the job at the time the model was last updated.
     latest_job_state = datastore_services.StringProperty(
         required=True, indexed=True, choices=[
@@ -153,7 +153,6 @@ class BeamJobRunModel(base_models.BaseModel):
         return dict(super(BeamJobRunModel, cls).get_export_policy(), **{
             'dataflow_job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'job_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'job_arguments': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
