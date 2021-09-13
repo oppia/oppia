@@ -104,13 +104,14 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         # Only execute this job if it's possible to send the emails and there
         # are reviewers to notify.
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
         if not (config_domain
                 .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
-            return
+            return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
-            return
+            return self.render_json({})
+
         reviewers_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
@@ -138,7 +139,8 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to get reviewed.
         """
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
+
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN)
         question_admin_ids = user_services.get_user_ids_by_role(
