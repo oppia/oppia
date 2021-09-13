@@ -304,10 +304,9 @@ var ExplorationEditorTranslationTab = function() {
     await action.click(
       'Audio upload container element',
       audioUploadContainerElement);
-    await waitFor.visibilityOf(
-      audioUploadErrorMessageElement,
-      'Audio upload error message element is not visible');
-    expect(await audioUploadErrorMessageElement.getText())
+    expect(await action.getText(
+      'Audio upload error message element',
+      audioUploadErrorMessageElement))
       .toContain('This file is not recognized as an audio file.');
   };
 
@@ -318,9 +317,9 @@ var ExplorationEditorTranslationTab = function() {
     await action.sendKeys(
       'Audio upload input', audioUploadInput, audioAbsolutePath, false);
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
-    await waitFor.visibilityOf(
-      audioOverFiveMinutesErrorMessageElement, 'Error element is not visible');
-    await expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
+    await expect(await action.getText(
+      'Audio over five minutes error message element',
+      audioOverFiveMinutesErrorMessageElement)).toContain(
       'Audio files must be under 300 seconds in length.');
   };
 
@@ -375,16 +374,12 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectToBeInTranslationMode = async function() {
-    await waitFor.visibilityOf(
-      languageSelectorLabelElement,
-      'Language selector label element taking too long to appear');
-    expect(await languageSelectorLabelElement.getText()).toBe(
-      'Translations for language:');
-    await waitFor.visibilityOf(
-      progressBarLabelElement,
-      'Progress selector lable element taking too long to appear');
-    expect(await progressBarLabelElement.getText()).toBe(
-      'Exploration translation progress:');
+    expect(await action.getText(
+      'Language selector label element',
+      languageSelectorLabelElement)).toBe('Translations for language:');
+    expect(await action.getText(
+      'Progress selector lable element',
+      progressBarLabelElement)).toBe('Exploration translation progress:');
     await waitFor.visibilityOf(
       translationModeButton,
       'Translation mode button taking to long to appear');
@@ -398,16 +393,12 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectToBeInVoiceoverMode = async function() {
-    await waitFor.visibilityOf(
-      languageSelectorLabelElement,
-      'Language selector label element taking too long to appear');
-    expect(await languageSelectorLabelElement.getText()).toBe(
-      'Voiceovers for language:');
-    await waitFor.visibilityOf(
-      progressBarLabelElement,
-      'Progress bar element taking to long to appear');
-    expect(await progressBarLabelElement.getText()).toBe(
-      'Exploration voiceover progress:');
+    expect(await action.getText(
+      'Language selector label element',
+      languageSelectorLabelElement)).toBe('Voiceovers for language:');
+    expect(await action.getText(
+      'Progress bar element',
+      progressBarLabelElement)).toBe('Exploration voiceover progress:');
     await waitFor.visibilityOf(
       translationModeButton,
       'Translation mode button taking to long to appear');
@@ -422,7 +413,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectContentTabContentToMatch = async function(content) {
     await action.click('Content tab button', contentTabButton);
-    expect(await contentTabText.getText()).toMatch(content);
+    expect(await action.getText(
+      'Content tab button',
+      contentTabText)).toMatch(content);
   };
 
   this.expectFeedbackTabContentsToMatch = async function(contents) {
@@ -432,8 +425,9 @@ var ExplorationEditorTranslationTab = function() {
       await action.click(
         'Translation feeback button',
         translationFeedback(index));
-      expect(await translationFeedbackText(index).getText()).toMatch(
-        contents[index]);
+      expect(await action.getText(
+        'Translation feeback button',
+        translationFeedbackText(index))).toMatch(contents[index]);
     }
   };
 
@@ -441,21 +435,23 @@ var ExplorationEditorTranslationTab = function() {
     await action.click('Hints tab button', hintsTabButton);
     for (var index in contents) {
       await action.click('Translation hint', translationHint(index));
-      expect(await translationHintText(index).getText()).toMatch(
-        contents[index]);
+      expect(await action.getText(
+        'Translation hint',
+        translationHintText(index))).toMatch(contents[index]);
     }
   };
 
   this.expectSolutionTabContentToMatch = async function(content) {
     await action.click('Solution tab button', solutionTabButton);
-    expect(await solutionTabText.getText()).toMatch(content);
+    expect(await action.getText(
+      'Solution tab button',
+      solutionTabText)).toMatch(content);
   };
 
   this.expectNumericalStatusToMatch = async function(content) {
-    await waitFor.visibilityOf(
-      numericalStatus,
-      'Numerical status taking too long to appear');
-    expect(await numericalStatus.getText()).toMatch(content);
+    expect(await action.getText(
+      'Numerical status',
+      numericalStatus)).toMatch(content);
   };
 
   this.expectNumericalStatusAccessibilityToMatch = async function(content) {
@@ -524,10 +520,9 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
-    await waitFor.visibilityOf(
-      selectedLanguageElement,
-      'Selected language element taking too long to appear');
-    expect(await selectedLanguageElement.getText()).toMatch(language);
+    expect(await action.getText(
+      'Selected language element',
+      selectedLanguageElement)).toMatch(language);
   };
 
   this.navigateToFeedbackTab = async function() {
@@ -545,7 +540,9 @@ var ExplorationEditorTranslationTab = function() {
   this.moveToState = async function(targetName) {
     await general.scrollToTop();
     var listOfNames = await stateNodes.map(async function(stateElement) {
-      return await stateNodeLabel(stateElement).getText();
+      return await action.getText(
+        'State element',
+        stateNodeLabel(stateElement));
     });
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
@@ -563,10 +560,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectCorrectStatusColor = async function(stateName, expectedColor) {
     var listOfNames = await stateNodes.map(async function(stateElement) {
-      await waitFor.visibilityOf(
-        stateElement,
-        'State Element taking too long to appear');
-      return await stateNodeLabel(stateElement).getText();
+      return await action.getText(
+        'State Element',
+        stateNodeLabel(stateElement));
     });
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
