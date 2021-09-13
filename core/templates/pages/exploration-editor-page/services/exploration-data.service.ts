@@ -73,7 +73,11 @@ export class ExplorationDataService {
     if (!explorationId) {
       this.loggerService.error(
         'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-      return;
+      this.autosaveChangeListAsync = undefined;
+      this.discardDraftAsync = undefined;
+      this.getDataAsync = undefined;
+      this.getLastSavedDataAsync = undefined;
+      this.save = undefined;
     } else {
       this.explorationId = explorationId;
       this.resolvedAnswersUrlPrefix = (
