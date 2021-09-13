@@ -283,6 +283,22 @@ class SubtopicPage(python_utils.OBJECT):
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
+    def _convert_page_contents_v3_dict_to_v4_dict(cls, page_contents_dict):
+        """Converts v3 SubtopicPage Contents schema to the v4 schema.
+        v4 schema fixes HTML encoding issues.
+
+        Args:
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+                domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+        return cls.convert_html_fields_in_subtopic_page_contents(
+            page_contents_dict,
+            html_validation_service.fix_incorrectly_encoded_chars)
+
+    @classmethod
     def update_page_contents_from_model(
             cls, versioned_page_contents, current_version):
         """Converts the page_contents blob contained in the given

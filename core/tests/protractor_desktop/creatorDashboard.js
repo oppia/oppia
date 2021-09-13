@@ -19,6 +19,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../protractor_utils/forms.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
@@ -133,7 +134,7 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user7@creatorDashboard.com', 'learner7');
 
     await users.login('user5@creatorDashboard.com');
-    await workflow.createAndPublishExploration(
+    await workflow.createAndPublishTwoCardExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
@@ -141,7 +142,7 @@ describe('Creator dashboard functionality', function() {
       true
     );
     await creatorDashboardPage.get();
-    await workflow.createAndPublishExploration(
+    await workflow.createAndPublishTwoCardExploration(
       EXPLORATION_TITLE_4,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
@@ -153,6 +154,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_3);
     await libraryPage.playExploration(EXPLORATION_TITLE_3);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_3);
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 1'));
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 2'));
     await explorationPlayerPage.rateExploration(3);
     await users.logout();
 
@@ -160,6 +168,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_4);
     await libraryPage.playExploration(EXPLORATION_TITLE_4);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_4);
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 1'));
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 2'));
     await explorationPlayerPage.rateExploration(5);
     await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();
@@ -198,7 +213,7 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user10@creatorDashboard.com', 'learner10');
 
     await users.login('user8@creatorDashboard.com');
-    await workflow.createAndPublishExploration(
+    await workflow.createAndPublishTwoCardExploration(
       EXPLORATION_TITLE_5,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
@@ -206,7 +221,7 @@ describe('Creator dashboard functionality', function() {
       true
     );
     await creatorDashboardPage.get();
-    await workflow.createAndPublishExploration(
+    await workflow.createAndPublishTwoCardExploration(
       EXPLORATION_TITLE_6,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
@@ -218,6 +233,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_5);
     await libraryPage.playExploration(EXPLORATION_TITLE_5);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_5);
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 1'));
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 2'));
     await explorationPlayerPage.rateExploration(3);
     await users.logout();
 
@@ -225,6 +247,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_6);
     await libraryPage.playExploration(EXPLORATION_TITLE_6);
+    await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_6);
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 1'));
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 2'));
     await explorationPlayerPage.rateExploration(5);
     await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();

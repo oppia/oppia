@@ -19,6 +19,7 @@
 
 export default {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   // The term 'staging' is used instead of the classroom url fragment field
@@ -5458,7 +5459,6 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
-      "LogicProof",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",
@@ -5584,7 +5584,7 @@ export default {
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
-  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
@@ -5678,6 +5678,9 @@ export default {
 
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
+  // A regular expression for allowed characters for thumbnail filename.
+  "VALID_THUMBNAIL_FILENAME_REGEX": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
 
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
@@ -5933,18 +5936,6 @@ export default {
       "backend_id": "created_collection",
       "backend_attr": "created_collection",
       "description": "Has created collection",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
       "schema": {
         "type": "bool",
         "validators": [{
