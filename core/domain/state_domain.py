@@ -233,9 +233,7 @@ class AnswerGroup(python_utils.OBJECT):
 
     @staticmethod
     def convert_html_in_answer_group(
-            answer_group_dict, conversion_fn, html_field_types_to_rule_specs,
-            entity_type=None, entity_id=None
-    ):
+            answer_group_dict, conversion_fn, html_field_types_to_rule_specs):
         """Checks for HTML fields in an answer group dict and converts it
         according to the conversion function.
 
@@ -248,21 +246,12 @@ class AnswerGroup(python_utils.OBJECT):
                 mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
                 html_field_types_to_rule_specs_state_v41.json for an example.
-            entity_type: str. The entity type to which the answer group belongs
-                to.
-            entity_id: str. The entity ID of the entity to which the answer
-                group belongs to.
 
         Returns:
             dict. The converted answer group dict.
         """
         answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
             answer_group_dict['outcome']['feedback']['html'])
-        answer_group_dict['outcome']['feedback']['image_sizes_in_bytes'] = (
-            html_cleaner.get_image_sizes_in_bytes_from_html(
-                answer_group_dict['outcome']['feedback']['html'],
-                entity_type,
-                entity_id))
 
         for rule_spec_index, rule_spec in enumerate(
                 answer_group_dict['rule_specs']):
@@ -314,8 +303,7 @@ class Hint(python_utils.OBJECT):
         self.hint_content.validate()
 
     @staticmethod
-    def convert_html_in_hint(
-            hint_dict, conversion_fn):
+    def convert_html_in_hint(hint_dict, conversion_fn):
         """Checks for HTML fields in the hints and converts it
         according to the conversion function.
 
@@ -329,7 +317,6 @@ class Hint(python_utils.OBJECT):
         """
         hint_dict['hint_content']['html'] = (
             conversion_fn(hint_dict['hint_content']['html']))
-
         return hint_dict
 
     @staticmethod
@@ -979,7 +966,6 @@ class InteractionInstance(python_utils.OBJECT):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-
         if interaction_id is None:
             return {}
 
@@ -1612,8 +1598,8 @@ class WrittenTranslation(python_utils.OBJECT):
     }
 
     def __init__(
-            self, data_format, translation, needs_update,
-            image_sizes_in_bytes):
+            self, data_format, translation,
+            needs_update, image_sizes_in_bytes):
         """Initializes a WrittenTranslation domain object.
 
         Args:
