@@ -1938,6 +1938,26 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
+        """Converts from version 47 to 48. Version 48 fixes encoding issues in
+        HTML fields.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.fix_incorrectly_encoded_chars)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -1974,7 +1994,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 52
+    CURRENT_EXP_SCHEMA_VERSION = 53
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2114,6 +2134,28 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
+        """Converts a v52 exploration dict into a v53 exploration dict.
+        Version 53 fixes encoding issues in HTML fields.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v51.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v52.
+        """
+
+        exploration_dict['schema_version'] = 53
+
+        exploration_dict['states'] = cls._convert_states_v47_dict_to_v48_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 48
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2178,6 +2220,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v51_dict_to_v52_dict(
                 exploration_dict)
             exploration_schema_version = 52
+
+        if exploration_schema_version == 52:
+            exploration_dict = cls._convert_v52_dict_to_v53_dict(
+                exploration_dict)
+            exploration_schema_version = 53
 
         return exploration_dict
 
