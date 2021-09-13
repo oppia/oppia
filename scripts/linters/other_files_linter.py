@@ -48,6 +48,8 @@ _DEPENDENCY_SOURCE_PACKAGE = 'package.json'
 WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
+WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
+    'backend_tests.yml',)
 
 THIRD_PARTY_LIBS = [
     {
@@ -290,6 +292,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
             os.path.join(WORKFLOWS_DIR, filename)
             for filename in os.listdir(WORKFLOWS_DIR)
             if re.search(WORKFLOW_FILENAME_REGEX, filename)
+            if filename not in WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT
         }
         errors = []
         for workflow_path in workflow_paths:
