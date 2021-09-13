@@ -2345,6 +2345,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
+    def test_subtitled_html_proto_is_correct(self):
+        content = state_domain.SubtitledHtml('id_1', '<p>content</p>')
+        expected_subtitled_html_proto = (
+            exp_domain.Exploration.to_subtitled_html_proto(content))
+
+        self.assertEqual(expected_subtitled_html_proto.content_id, 'id_1')
+        self.assertEqual(expected_subtitled_html_proto.html, '<p>content</p>')
+
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
