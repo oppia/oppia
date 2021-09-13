@@ -130,6 +130,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "Del din udforskning",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Forbedr din udforskning",
 	"I18N_GET_STARTED_PAGE_TITLE": "Kom i gang",
+	"I18N_GOT_IT": "Forstået",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Tilføj kant",
 	"I18N_INTERACTIONS_GRAPH_DELETE": "Slet",
 	"I18N_INTERACTIONS_GRAPH_ERROR_INVALID": "Ugyldig graf!",
@@ -317,5 +318,6 @@
 	"I18N_TOPNAV_MODERATOR_PAGE": "Moderator side",
 	"I18N_TOPNAV_SIGN_IN": "Log ind",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Log ind med Google",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervis med Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervis med Oppia",
+	"I18N_WARNING_MODAL_TITLE": "Advarsel!"
 }

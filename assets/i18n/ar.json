@@ -532,6 +532,7 @@
 	"I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "جلسة التسجيل منتهية الصلاحية",
 	"I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "عذرا، انتهت صلاحية جلسة التسجيل الخاصة بك، الرجاء النقر فوق \"متابعة التسجيل\" لإعادة تشغيل العملية.",
 	"I18N_REVIEW_TEST_PAGE_BREADCRUMB": "فحص المراجعة.",
+	"I18N_SHOW_SOLUTION_BUTTON": "أظهر الحل",
 	"I18N_SIDEBAR_ABOUT_LINK": "حول",
 	"I18N_SIDEBAR_BLOG": "مدونة",
 	"I18N_SIDEBAR_CLASSROOM": "غرفة الدراسة",
