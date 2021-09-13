@@ -4638,6 +4638,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -4732,6 +4735,19 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_SKILL, skill_id))
             self.assertEqual(response['entity_id'], skill_id)
             self.assertEqual(response['entity_type'], 'skill')
+        self.logout()
+
+    def test_can_edit_blog_post(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        blog_post = blog_services.create_new_blog_post(blog_admin_id)
+        blog_post_id = blog_post.id
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_BLOG_POST, blog_post_id))
+            self.assertEqual(response['entity_id'], blog_post_id)
+            self.assertEqual(response['entity_type'], 'blog_post')
         self.logout()
 
     def test_can_edit_story(self):
