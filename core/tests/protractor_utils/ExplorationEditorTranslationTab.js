@@ -378,14 +378,14 @@ var ExplorationEditorTranslationTab = function() {
       'Language selector label element',
       languageSelectorLabelElement)).toBe('Translations for language:');
     expect(await action.getText(
-      'Progress selector lable element',
+      'Progress selector label element',
       progressBarLabelElement)).toBe('Exploration translation progress:');
     expect(await action.getAttribute(
       'Translation mode button',
       translationModeButton,
       'class')).toMatch('oppia-active-mode');
     expect(await action.getAttribute(
-      'Voice over mode',
+      'Voiceover mode button',
       voiceoverModeButton,
       'class')).not.toMatch('oppia-active-mode');
   };
@@ -419,10 +419,10 @@ var ExplorationEditorTranslationTab = function() {
     expect(await feedbackList.count()).toEqual(contents.length);
     for (var index in contents) {
       await action.click(
-        'Translation feeback button',
+        'Translation feedback button',
         translationFeedback(index));
       expect(await action.getText(
-        'Translation feeback button',
+        'Translation feedback button',
         translationFeedbackText(index))).toMatch(contents[index]);
     }
   };
