@@ -75,6 +75,7 @@ describe('Exploration editor page component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
+  var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
   let as: AlertsService = null;
@@ -258,6 +259,7 @@ describe('Exploration editor page component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
+    $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     ics = $injector.get('InternetConnectivityService');
@@ -285,6 +287,7 @@ describe('Exploration editor page component', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage', {
       NgbModal: ngbModal,
+      $scope: $scope,
     });
   }));
 
@@ -492,27 +495,21 @@ describe('Exploration editor page component', function() {
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve('editor')
-        }
-      );
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('editor')
+      });
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect(ngbModal.open).toHaveBeenCalled();
+      expect($uibModal.open).toHaveBeenCalled();
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        <NgbModalRef>{
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve('translation')
-        }
-      );
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('translation')
+      });
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect(ngbModal.open).toHaveBeenCalled();
+      expect($uibModal.open).toHaveBeenCalled();
     });
   });
 
