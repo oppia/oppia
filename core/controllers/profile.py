@@ -378,6 +378,11 @@ class SignupHandler(base.BaseHandler):
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
+
     @acl_decorators.can_manage_own_account
     def delete(self):
         """Handles DELETE requests."""
