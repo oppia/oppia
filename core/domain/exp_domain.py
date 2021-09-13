@@ -2164,11 +2164,11 @@ class Exploration(python_utils.OBJECT):
     def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
         """Converts a v52 exploration dict into a v53 exploration dict.
         Version 53 fixes encoding issues in HTML fields.
-        
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v51.
-        
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v52.
@@ -2186,11 +2186,11 @@ class Exploration(python_utils.OBJECT):
     def _convert_v53_dict_to_v54_dict(cls, exploration_dict):
         """Converts a v53 exploration dict into a v54 exploration dict.
         Version 54 contains exploration size.
-        
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v54.
-        
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v54.
