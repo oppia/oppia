@@ -1962,11 +1962,13 @@ class Exploration(python_utils.OBJECT):
     def _convert_states_v48_dict_to_v49_dict(cls, exp_id, states_dict):
         """Converts from version 47 to 48. Version 48 contains the attribute
         image_sizes_in_bytes for subtitled_html.
+
         Args:
             exp_id: str. The ID of the exploration.
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a State
                 domain object.
+
         Returns:
             dict. The converted states_dict.
         """
