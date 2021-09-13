@@ -264,7 +264,9 @@ class BaseHandler(webapp2.RequestHandler):
         request_split = python_utils.url_split(self.request.uri)
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
-        if request_split.netloc == 'oppiaserver.appspot.com':
+        # Note: this must use the https check (rather than e.g.
+        # request_split.netloc) since cron job requests in App Engine use http.
+        if self.request.uri.startswith('https://oppiaserver.appspot.com'):
             self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
