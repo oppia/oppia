@@ -54,9 +54,6 @@ var ExplorationEditorTranslationTab = function() {
   this.finishTutorial = async function() {
     // Finish the tutorial.
     var finishTutorialButton = element.all(by.buttonText('Finish'));
-    await waitFor.elementToBeClickable(
-      finishTutorialButton.first(),
-      'Finish Tutorial Stage button is not clickable');
     var buttons = finishTutorialButton;
     if (await buttons.count() === 1) {
       await action.click('Finish tutorial stage button', buttons.get(0));
@@ -80,9 +77,6 @@ var ExplorationEditorTranslationTab = function() {
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
-      await waitFor.elementToBeClickable(
-        nextTutorialStageButton.first(),
-        'Next Tutorial Stage button is not clickable');
       var buttons = nextTutorialStageButton;
       if (await buttons.count() === 1) {
         await action.click('Next tutorial stage button', buttons.get(0));
@@ -218,13 +212,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.deleteAudioRecord = async function() {
-    await waitFor.elementToBeClickable(
-      deleteRecordButton,
-      'Delete Record button is not clickable');
     await action.click('Delete record button', deleteRecordButton);
-    await waitFor.elementToBeClickable(
-      confirmDeleteRecordButton,
-      'The confirm record deletion button is not clickable');
     await action.click(
       'Confirm delete record button',
       confirmDeleteRecordButton);
@@ -244,33 +232,21 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.addAudioRecord = async function() {
-    await waitFor.elementToBeClickable(
-      startRecordButton,
-      'Add Record button is not clickable');
     await action.click('Start record button', startRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.stopAudioRecord = async function() {
-    await waitFor.elementToBeClickable(
-      stopRecordButton,
-      'Stop Record button is not clickable');
     await action.click('Stop record button', stopRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.confirmAudioRecord = async function() {
-    await waitFor.elementToBeClickable(
-      confirmRecordButton,
-      'Confirm record addition is not clickable');
     await action.click('Confirm record button', confirmRecordButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.playAudioRecord = async function() {
-    await waitFor.elementToBeClickable(
-      playRecordButton,
-      'Play Record button is not clickable');
     await action.click('Play record button', playRecordButton);
     await waitFor.pageToFullyLoad();
   };
