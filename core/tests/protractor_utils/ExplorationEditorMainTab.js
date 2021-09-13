@@ -218,7 +218,7 @@ var ExplorationEditorMainTab = function() {
       'Save',
     ];
     for (const HEADING of tutorialTabHeadings) {
-    // Use: await tutorialTabHeadings.every(async function(heading) {
+    // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', HEADING));
       await waitFor.visibilityOf(
@@ -748,9 +748,9 @@ var ExplorationEditorMainTab = function() {
     var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
     if (angularSelectors) {
-      angularSelectors.every(function(elem) {
-        parameterTypes.push(elem.toString().slice(1, -1));
-      });
+      for (var index = 0; index < angularSelectors.length; index++) {
+        parameterTypes.push(angularSelectors[index].toString().slice(1, -1));
+      }
     }
     // Expected sample output = Array[NonnegativeInt, NonnegativeInt].
     return parameterTypes;
@@ -815,7 +815,8 @@ var ExplorationEditorMainTab = function() {
     // Return as-is if string does not contain placeholders.
     if (placeholders) {
       // Replacing placeholders in ruleDescription with given text.
-      placeholders.every(function(placeholderElement, index) {
+      for (var index = 0; index < placeholders.length; index++) {
+        var placeholderElement = placeholders[index];
         if (providedText[0] === '...') {
           ruleDescription = ruleDescription.replace(placeholderElement, '...');
         } else {
@@ -828,7 +829,7 @@ var ExplorationEditorMainTab = function() {
           ruleDescription = ruleDescription.replace(
             placeholderElement, providedText[index].toString());
         }
-      });
+      }
     }
     return ruleDescription;
   };

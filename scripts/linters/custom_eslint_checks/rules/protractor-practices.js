@@ -36,8 +36,8 @@ module.exports = {
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
-      disallowforEach: (
-        'Please do not use .forEach(), consider .every()' +
+      disallowForEach: (
+        'Please do not use .forEach(), consider "for loop"' +
         ' instead'),
       disallowAwait: 'Please do not use await for "{{propertyName}}()"',
       useProtractorTest: (
@@ -162,11 +162,11 @@ module.exports = {
           messageId: 'disallowThen'
         });
       },
-      'CallExpression[callee.property.name=\'forEach\']': function(node) {
+      'CallExpression[callee.property.name=forEach]': function(node) {
         context.report({
           node: node.callee.property,
           loc: node.callee.property.loc,
-          messageId: 'disallowforEach'
+          messageId: 'disallowForEach'
         });
       },
       [byCssSelector]: function(node) {

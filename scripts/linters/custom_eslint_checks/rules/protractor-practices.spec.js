@@ -68,7 +68,10 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: 'var modal = element(by.css("option:checked"));'
   }, {
-    code: '[].every(item);'
+    code: ` let items = [];
+            for(let i=0;i< items.length; i++){
+            console.log(items[i])};
+            //[].forEach(item);`,
   }],
 
   invalid: [
@@ -161,7 +164,7 @@ ruleTester.run('protractor-practices', rule, {
       code:
       '[].forEach(item)',
       errors: [{
-        message: 'Please do not use .forEach(), consider .every() instead',
+        message: 'Please do not use .forEach(), consider "for loop" instead',
       }],
     },
   ]
