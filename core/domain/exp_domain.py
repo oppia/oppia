@@ -1960,7 +1960,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v48_dict_to_v49_dict(cls, exp_id, states_dict):
-        """Converts from version 47 to 48. Version 48 contains the attribute
+        """Converts from version 48 to 49. Version 49 contains the attribute
         image_sizes_in_bytes for subtitled_html.
 
         Args:
@@ -2016,7 +2016,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 53
+    CURRENT_EXP_SCHEMA_VERSION = 54
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2178,12 +2178,37 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content):
+    def _convert_v53_dict_to_v54_dict(cls, exp_id, exploration_dict):
+        """Converts a v53 exploration dict into a v54 exploration dict.
+        Version 54 includes a new attribute image_size_in_bytes for the
+        SubtitledHtml and WrittenTranslation fields.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v53.
+            exp_id: str. The ID of the exploration.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v54.
+        """
+
+        exploration_dict['schema_version'] = 54
+
+        exploration_dict['states'] = cls._convert_states_v48_dict_to_v49_dict(
+            exp_id, exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 49
+
+        return exploration_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(cls, yaml_content, exp_id):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
+            exp_id: str. The ID of the exploration.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -2248,6 +2273,11 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 53
 
+        if exploration_schema_version == 53:
+            exploration_dict = cls._convert_v53_dict_to_v54_dict(
+                exp_id, exploration_dict)
+            exploration_schema_version = 54
+
         return exploration_dict
 
     @classmethod
@@ -2267,7 +2297,8 @@ class Exploration(python_utils.OBJECT):
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
+        exploration_dict = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 
