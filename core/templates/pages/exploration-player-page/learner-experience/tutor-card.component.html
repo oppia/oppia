@@ -43,7 +43,8 @@
     </div>
 
     <div *ngIf="arePreviousResponsesShown && !conceptCardIsBeingShown"
-         class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
+         class="conversation-skin-tutor-card-middle-section"
+         [@simpleFadeAnimation]="'in'">
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
         <div *ngIf="(!(index === (displayedCard.getInputResponsePairs().length - 1)) || !isInteractionInline())">
           <oppia-input-response-pair [data]="responsePair"

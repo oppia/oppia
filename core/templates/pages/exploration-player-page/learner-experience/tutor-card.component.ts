@@ -16,9 +16,10 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
@@ -40,49 +41,25 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
 
-// angular.module('oppia').animation(
-//   '.conversation-skin-responses-animate-slide', function() {
-//     return {
-//       removeClass: function(element, className, done) {
-//         if (className !== 'ng-hide') {
-//           done();
-//           return;
-//         }
-//         element.hide().slideDown(400, <(this: HTMLElement) => void>done);
-//       },
-//       addClass: function(element, className, done) {
-//         if (className !== 'ng-hide') {
-//           done();
-//           return;
-//         }
-//         element.slideUp(400, <(this: HTMLElement) => void>done);
-//       }
-//     };
-//   });
-
 @Component({
   selector: 'oppia-tutor-card',
-  templateUrl: './tutor-card.component.html'
+  templateUrl: './tutor-card.component.html',
 })
 export class TutorCardComponent {
   @Input() isLearnAgainButton: boolean;
-  @Input() onDismiss;
   @Input() displayedCard: StateCard;
-  @Input() startCardChangeAnimation;
-  @Output() startCardChangeAnimationChange: EventEmitter<void> = (
-    new EventEmitter());
+  @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
   directiveSubscriptions = new Subscription();
-  private _editorPreviewMode;
+  private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;
-  lastAnswer;
+  lastAnswer: string;
   conceptCardIsBeingShown: boolean;
   interactionIsActive: boolean;
   waitingForOppiaFeedback: boolean = false;
-  interactionInstructions;
-  contentAudioTranslations;
+  interactionInstructions: string;
+  contentAudioTranslations: BindableVoiceovers;
   isIframed: boolean;
-  isAudioBarExpandedOnMobileDevice: () => boolean;
   getCanAskLearnerForAnswerInfo: () => boolean;
   OPPIA_AVATAR_IMAGE_URL: string;
   OPPIA_AVATAR_LINK_URL: string;
@@ -110,12 +87,6 @@ export class TutorCardComponent {
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
     this.isIframed = this.urlService.isIframed();
-    this.isAudioBarExpandedOnMobileDevice = () => {
-      return (
-        this.deviceInfoService.isMobileDevice() &&
-        this.audioBarStatusService.isAudioBarExpanded()
-      );
-    };
     this.getCanAskLearnerForAnswerInfo = (
       this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
     this.OPPIA_AVATAR_IMAGE_URL = (
@@ -167,16 +138,22 @@ export class TutorCardComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  isAudioBarExpandedOnMobileDevice(): boolean {
+    return (
+      this.deviceInfoService.isMobileDevice() &&
+      this.audioBarStatusService.isAudioBarExpanded()
+    );
+  }
+
   updateDisplayedCard(): void {
     this.arePreviousResponsesShown = false;
     this.lastAnswer = null;
     this.conceptCardIsBeingShown = Boolean(
       !this.displayedCard.getInteraction());
-    this.interactionIsActive =
-      !this.displayedCard.isCompleted();
+    this.interactionIsActive = !this.displayedCard.isCompleted();
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
-        (data) => this.interactionIsActive = false
+        () => this.interactionIsActive = false
       )
     );
     this.currentInteractionService.registerPresubmitHook(() => {
