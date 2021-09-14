@@ -51,8 +51,7 @@ export class StateAndContent {
     public dataFormat: string,
     public contentType: string,
     // Null type is added to them to remove the type conflicts with
-    // "translatableItem.interactionId, translatableItem.ruleType " ,
-    // for more information see https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+    // "translatableItem.interactionId, translatableItem.ruleType "
     public interactionId: string | null,
     public ruleType: string | null
   ) {}
