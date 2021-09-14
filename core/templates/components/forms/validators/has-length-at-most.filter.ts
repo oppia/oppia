@@ -13,17 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for Apache Beam jobs.
+ * @fileoverview Validator to check if input has length at
+ * most some value.
  */
 
-export interface BeamJobBackendDict {
-  'name': string;
-}
-
-export class BeamJob {
-  constructor(public readonly name: string) {}
-
-  static createFromBackendDict(backendDict: BeamJobBackendDict): BeamJob {
-    return new BeamJob(backendDict.name);
-  }
-}
+angular.module('oppia').filter('hasLengthAtMost', [function() {
+  return function(input, args) {
+    return (input.length <= args.maxValue);
+  };
+}]);
