@@ -44,6 +44,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'App.ts',
     'audio-preloader.service.ts',
     'Base.ts',
+    'change-list.service.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
