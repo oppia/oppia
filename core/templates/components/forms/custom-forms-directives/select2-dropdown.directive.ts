@@ -42,6 +42,8 @@ angular.module('oppia').directive('select2Dropdown', [
         // already exist. If it is undefined then all new choices are rejected.
         newChoiceRegex: '@',
         onSelectionChange: '&',
+        maximumInputLength: '@',
+        maximumSelectionLength: '@',
         placeholder: '@',
         width: '@'
       },
@@ -58,6 +60,8 @@ angular.module('oppia').directive('select2Dropdown', [
             data: $scope.choices,
             multiple: $scope.allowMultipleChoices === 'true',
             tags: $scope.newChoiceRegex !== undefined,
+            maximumInputLength: $scope.maximumInputLength || 0,
+            maximumSelectionLength: $scope.maximumSelectionLength || 0,
             placeholder: $scope.placeholder,
             width: $scope.width || '250px',
             dropdownCssClass: null,
