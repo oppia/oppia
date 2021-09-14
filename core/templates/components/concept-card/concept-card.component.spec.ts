@@ -13,61 +13,60 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for Concept Card Directive.
+ * @fileoverview Unit test for Concept Card Component.
  */
 
-import { destroyPlatform } from '@angular/core';
-import { async } from '@angular/core/testing';
-import { setupAndGetUpgradedComponentAsync } from '../../tests/unit-test-utils.ajs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ConceptCardComponent } from './concept-card.component';
-require('./concept-card.component.ts');
 
-describe('ConceptCardDirective', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
-  let $q = null;
-
+describe('ConceptCardComponent', () => {
   let loadConceptCardsAsync: jasmine.Spy;
+  let fixture: ComponentFixture<ConceptCardComponent>;
+  let component: ConceptCardComponent;
+  let conceptCardObjectFactory: ConceptCardObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    loadConceptCardsAsync = jasmine.createSpy('loadConceptCardsAsyncSpy');
-    const mockConceptBackendApiService = {
-      loadConceptCardsAsync
-    };
-    $provide.value(
-      'ConceptCardBackendApiService', mockConceptBackendApiService);
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        ConceptCardComponent,
+        MockTranslatePipe
+      ],
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
-    $scope = $rootScope.$new();
-
-    ctrl = $componentController('conceptCard', {
-      $scope: $scope
-    });
-  }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ConceptCardComponent);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
+    component = fixture.componentInstance;
+  });
 
   it('should load concept cards', () => {
-    ctrl.index = 0;
+    component.index = 0;
     loadConceptCardsAsync.and.resolveTo([{
       getWorkedExamples: () => {
         return ['1'];
       }
     }]);
 
-    ctrl.$onInit();
-    ctrl.conceptCards = [{
+    spyOn(conceptCardObjectFactory, 'getWorkedExamples').and.returnValue(['1']);
+    component.ngOnInit();
+    component.conceptCards = [{
       getWorkedExamples: () => {
         return ['1'];
       }
     }];
-    $scope.$apply();
 
-    expect(ctrl.currentConceptCard.getWorkedExamples()).toEqual(['1']);
-    expect(ctrl.numberOfWorkedExamplesShown).toBe(1);
+    expect(component.currentConceptCard.getWorkedExamples()).toEqual(['1']);
+    expect(component.numberOfWorkedExamplesShown).toBe(1);
   });
 
   it('should show error message when adding concept card to' +
@@ -75,50 +74,35 @@ describe('ConceptCardDirective', () => {
     loadConceptCardsAsync.and.returnValue($q.reject(''));
     spyOn($scope, '$watch').and.stub();
 
-    ctrl.$onInit();
-    $scope.$apply();
+    component.ngOnInit();
 
-    expect(ctrl.skillDeletedMessage).toBe(
+    expect(component.skillDeletedMessage).toBe(
       'Oops, it looks like this skill has been deleted.');
   });
 
   it('should show more worked examples when user clicks on \'+ Worked ' +
     'Examples\'', () => {
-    ctrl.explanationIsShown = true;
-    ctrl.numberOfWorkedExamplesShown = 2;
+    component.explanationIsShown = true;
+    component.numberOfWorkedExamplesShown = 2;
 
-    ctrl.showMoreWorkedExamples();
+    component.showMoreWorkedExamples();
 
-    expect(ctrl.explanationIsShown).toBe(false);
-    expect(ctrl.numberOfWorkedExamplesShown).toBe(3);
+    expect(component.explanationIsShown).toBe(false);
+    expect(component.numberOfWorkedExamplesShown).toBe(3);
   });
 
   it('should check if worked example is the last one', () => {
-    ctrl.currentConceptCard = {
+    component.currentConceptCard = {
       getWorkedExamples: () => {
         return ['1'];
       }
     };
-    ctrl.numberOfWorkedExamplesShown = 1;
+    component.numberOfWorkedExamplesShown = 1;
 
-    expect(ctrl.isLastWorkedExample()).toBe(true);
+    expect(component.isLastWorkedExample()).toBe(true);
 
-    ctrl.numberOfWorkedExamplesShown = 2;
+    component.numberOfWorkedExamplesShown = 2;
 
-    expect(ctrl.isLastWorkedExample()).toBe(false);
+    expect(component.isLastWorkedExample()).toBe(false);
   });
-});
-
-describe('Upgraded component', () => {
-  beforeEach(() => destroyPlatform());
-  afterEach(() => destroyPlatform());
-
-  it('should create the upgraded component', async(() => {
-    setupAndGetUpgradedComponentAsync(
-      'concept-card',
-      'conceptCard',
-      [ConceptCardComponent]
-    ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!'));
-  }));
 });
