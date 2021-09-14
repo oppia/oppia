@@ -49,6 +49,7 @@ class CronModelsCleanupHandler(base.BaseHandler):
         """
         cron_services.delete_models_marked_as_deleted()
         cron_services.mark_outdated_models_as_deleted()
+        return self.render_json({})
 
 
 class CronUserDeletionHandler(base.BaseHandler):
@@ -64,6 +65,7 @@ class CronUserDeletionHandler(base.BaseHandler):
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        return self.render_json({})
 
 
 class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
@@ -79,6 +81,7 @@ class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        return self.render_json({})
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(
@@ -101,19 +104,21 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         # Only execute this job if it's possible to send the emails and there
         # are reviewers to notify.
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
         if not (config_domain
                 .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
-            return
+            return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
-            return
+            return self.render_json({})
+
         reviewers_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 reviewer_ids))
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
             reviewer_ids, reviewers_suggestion_email_infos)
+        return self.render_json({})
 
 
 class CronMailAdminContributorDashboardBottlenecksHandler(
@@ -134,7 +139,8 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to get reviewed.
         """
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
+
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN)
         question_admin_ids = user_services.get_user_ids_by_role(
@@ -170,3 +176,4 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     question_admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+        return self.render_json({})
