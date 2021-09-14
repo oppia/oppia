@@ -10,12 +10,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: 'Send notification'
+    - name: Set build url in env
+      run: echo "BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >>> $GITHUB_ENV"
+      shell: bash
+    - name: Send notification
       run: |
         curl -X POST \
         -H 'Content-Type: application/json' \
         ${{ inputs.webhook-url }} \
         -d '{
-          "text": ${{ inputs.message }}
+          "text": ${{ format('Message: {0}\n Build url: {1}', inputs.message, env.BUILD_URL)  }}
         }'
       shell: bash

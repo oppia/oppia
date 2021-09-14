@@ -21,22 +21,16 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
-      - name: Install third party
-        run: python -m scripts.install_third_party_libs
-      - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
-        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - name: Run frontend tests
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-      - name: Report success
-        if: ${{ success() }}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "Frontend test success: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          webhook-url: https://webhooktest.com/864ab4699a2e48a9a9e68a85d02264b3
+      # - uses: ./.github/actions/merge
+      # - name: Install third party
+      #   run: python -m scripts.install_third_party_libs
+      # - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
+      #   run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      # - name: Run frontend tests
+      #   run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
       - name: Report failure
-        if: ${{ failure() }}
+        # if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "Frontend test success: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          message: "Frontend test failed on develop branch!"
           webhook-url: https://webhooktest.com/864ab4699a2e48a9a9e68a85d02264b3
