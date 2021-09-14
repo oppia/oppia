@@ -1,9 +1,9 @@
-name: 'Send notifications to webhooks'
-description: 'This action sends notifications to the given webhooks.'
+name: 'Send notification through webhook'
+description: 'This action sends notifications to the given webhook url.'
 inputs:
   webhook-url:
-      description: 'The URL of the webhook'
-      required: true
+    description: 'The webhook URL.'
+    required: true
   message:
     description: 'A message to send through webhook.'
     required: true
@@ -19,6 +19,6 @@ runs:
         -H 'Content-Type: application/json' \
         ${{ inputs.webhook-url }} \
         -d '{
-          "text": ${{ format('*Message*: {0}\n *Build url*: {1}', inputs.message, env.BUILD_URL) }}
+          "text": ${{ format('*Message*: {0}\n*Build url*: {1}', inputs.message, env.BUILD_URL) }}
         }'
       shell: bash
