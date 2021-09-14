@@ -249,7 +249,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated,
-        exp_summary_model.first_published_msec
+        exp_summary_model.first_published_msec,
+        exp_summary_model.deleted
     )
 
 

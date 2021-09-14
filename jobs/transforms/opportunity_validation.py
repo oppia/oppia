@@ -26,16 +26,18 @@ from typing import Any, Union, Type, Iterator, Tuple, List # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import base_models
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import story_models
     from mypy_imports import topic_models
 
 (
-    opportunity_models, exp_models, topic_models, story_models
+    opportunity_models, exp_models,
+    topic_models, story_models, base_models
 ) = models.Registry.import_models([
     models.NAMES.opportunity, models.NAMES.exploration,
-    models.NAMES.topic, models.NAMES.story
+    models.NAMES.topic, models.NAMES.story, models.NAMES.base_models
 ])
 
 
@@ -43,9 +45,7 @@ if MYPY: # pragma: no cover
     opportunity_models.ExplorationOpportunitySummaryModel)
 def exploration_opportunity_summary_model_relationships(
         model: Type[opportunity_models.ExplorationOpportunitySummaryModel]
-) -> Iterator[Tuple[Any, List[Union[
-    Type[exp_models.ExplorationModel], Type[topic_models.TopicModel],
-    Type[story_models.StoryModel]]]]]:
+) -> base_models.BaseModel:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [exp_models.ExplorationModel]
     yield model.topic_id, [topic_models.TopicModel]

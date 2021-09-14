@@ -37,10 +37,9 @@ import utils
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
+from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
 import webapp2
 
-from typing import ( # isort:skip
-    ContextManager, Dict, List, Optional, Tuple, Union, cast)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -905,7 +904,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     EMAIL = 'foo@bar.com'
 
     def setUp(self) -> None:
-        super(FirebaseAuthServicesTestBase, self).setUp() # type: ignore[no-untyped-call]
+        super(FirebaseAuthServicesTestBase, self).setUp()
         self.firebase_sdk_stub = FirebaseAdminSdkStub()
         self.firebase_sdk_stub.install(self)
 

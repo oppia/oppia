@@ -129,7 +129,8 @@ class ExplorationPage(base.BaseHandler):
                     'type': 'int',
                     'validators': [{
                         'id': 'is_at_least',
-                        'min_value': 1 # Version must be greater than zero.
+                        # Version must be greater than zero.
+                        'min_value': 1
                     }]
                 },
                 'default_value': None
@@ -211,7 +212,8 @@ class ExplorationHandler(base.BaseHandler):
                     'type': 'int',
                     'validators': [{
                         'id': 'is_at_least',
-                        'min_value': 1 # Version must be greater than zero.
+                        # Version must be greater than zero.
+                        'min_value': 1
                     }]
                 },
                 'default_value': None

@@ -266,7 +266,6 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-
     _update_suggestions([suggestion])
 
 
@@ -1362,6 +1361,10 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+
+    Returns:
+        Suggestion|None. The corresponding suggestion, or None if no suggestion
+        is found.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
     new_change_obj = question_domain.QuestionSuggestionChange(
@@ -1388,3 +1391,5 @@ def update_question_suggestion(
     suggestion.change = new_change_obj
 
     _update_suggestion(suggestion)
+
+    return suggestion

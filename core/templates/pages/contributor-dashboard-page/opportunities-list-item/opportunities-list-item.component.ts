@@ -19,11 +19,14 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+
 export interface ExplorationOpportunity {
   id: string;
   labelText: string;
   labelColor: string;
   progressPercentage: number;
+  subheading?: string;
 }
 
 @Component({
@@ -44,6 +47,7 @@ export class OpportunitiesListItemComponent {
   labelStyle: { 'background-color': string; };
   progressPercentage: string;
   progressBarStyle: { width: string; };
+  isCorrespondingOpportunityDeleted: boolean = false;
 
   ngOnInit(): void {
     if (this.opportunity && this.labelRequired) {
@@ -60,9 +64,14 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage = (
           this.opportunity.progressPercentage + '%');
-        this.progressBarStyle = {width: this.progressPercentage};
+        this.progressBarStyle = { width: this.progressPercentage };
       }
       this.opportunityDataIsLoading = false;
+      if (this.opportunity.subheading ===
+          ContributorDashboardConstants
+            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT) {
+        this.isCorrespondingOpportunityDeleted = true;
+      }
     } else {
       this.opportunityDataIsLoading = true;
     }
@@ -71,4 +80,4 @@ export class OpportunitiesListItemComponent {
 
 angular.module('oppia').directive(
   'oppiaOpportunitiesListItem', downgradeComponent(
-    {component: OpportunitiesListItemComponent}));
+    { component: OpportunitiesListItemComponent }));

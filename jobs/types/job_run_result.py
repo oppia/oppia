@@ -17,6 +17,7 @@
 """Objects for holding onto the results produced by Apache Beam jobs."""
 
 from __future__ import absolute_import
+from __future__ import annotations
 from __future__ import unicode_literals
 
 import heapq
@@ -24,7 +25,9 @@ import heapq
 import python_utils
 import utils
 
-MAX_OUTPUT_BYTES = 1000000
+from typing import Any, List, Tuple # isort: skip
+
+MAX_OUTPUT_BYTES = 1500
 
 
 class JobRunResult(python_utils.OBJECT):
@@ -36,7 +39,7 @@ class JobRunResult(python_utils.OBJECT):
 
     __slots__ = ('stdout', 'stderr')
 
-    def __init__(self, stdout='', stderr=''):
+    def __init__(self, stdout: str = '', stderr: str = ''):
         """Initializes a new JobRunResult instance.
 
         Args:
@@ -53,7 +56,7 @@ class JobRunResult(python_utils.OBJECT):
                 'JobRunResult must not exceed %d bytes' % MAX_OUTPUT_BYTES)
 
     @classmethod
-    def as_stdout(cls, value, use_repr=False):
+    def as_stdout(cls, value: Any, use_repr: bool = False) -> JobRunResult:
         """Returns a new JobRunResult with a stdout value.
 
         Args:
@@ -68,7 +71,7 @@ class JobRunResult(python_utils.OBJECT):
         return JobRunResult(stdout=str_value)
 
     @classmethod
-    def as_stderr(cls, value, use_repr=False):
+    def as_stderr(cls, value: Any, use_repr: bool = False) -> JobRunResult:
         """Returns a new JobRunResult with a stderr value.
 
         Args:
@@ -83,7 +86,7 @@ class JobRunResult(python_utils.OBJECT):
         return JobRunResult(stderr=str_value)
 
     @classmethod
-    def accumulate(cls, results):
+    def accumulate(cls, results: List[JobRunResult]) -> List[JobRunResult]:
         """Accumulates results into bigger ones that maintain the size limit.
 
         The len_in_bytes() of each result is always less than MAX_OUTPUT_BYTES.
@@ -99,7 +102,7 @@ class JobRunResult(python_utils.OBJECT):
         if not results:
             return []
 
-        results_heap = []
+        results_heap: List[Tuple[int, int, JobRunResult]] = []
         for i, result in enumerate(results):
             # Use i as a tie-breaker so that results, which don't implement the
             # comparison operators, don't get compared with one another.
@@ -131,7 +134,7 @@ class JobRunResult(python_utils.OBJECT):
             batched_results.append(JobRunResult(stdout=stdout, stderr=stderr))
         return batched_results
 
-    def len_in_bytes(self):
+    def len_in_bytes(self) -> int:
         """Returns the number of bytes encoded by the JobRunResult instance.
 
         Returns:
@@ -142,28 +145,32 @@ class JobRunResult(python_utils.OBJECT):
         )
         return sum(len(output) for output in output_bytes)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '%s(stdout=%s, stderr=%s)' % (
             self.__class__.__name__,
             utils.quoted(self.stdout), utils.quoted(self.stderr))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.stdout, self.stderr))
 
-    def __eq__(self, other):
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __eq__(self, other: Any) -> Any:
         return (
             (self.stdout, self.stderr) == (other.stdout, other.stderr) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
-    def __ne__(self, other):
+    # NOTE: Needs to return Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __ne__(self, other: Any) -> Any:
         return (
             not (self == other)
             if self.__class__ is other.__class__ else NotImplemented)
 
-    def __getstate__(self):
+    def __getstate__(self) -> Tuple[str, str]:
         """Called by pickle to get the value that uniquely defines self."""
         return self.stdout, self.stderr
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Tuple[str, str]) -> None:
         """Called by pickle to build an instance from __getstate__'s value."""
         self.stdout, self.stderr = state

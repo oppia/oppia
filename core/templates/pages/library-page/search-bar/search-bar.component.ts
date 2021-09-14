@@ -191,8 +191,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
           url.search = '?q=' + searchUrlQueryString;
           this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
         } else {
-          this.windowRef.nativeWindow.location.href = '/search/find?q=' +
-            searchUrlQueryString;
+          let url = new URL(this.windowRef.nativeWindow.location.toString());
+          url.pathname = '/search/find';
+          url.search = '?q=' + searchUrlQueryString;
+          this.windowRef.nativeWindow.location.href = url.toString();
         }
       });
   }
@@ -296,6 +298,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
               selections[languageCode] = !selections[languageCode];
             }
           });
+
+          let selections = this.selectionDetails.languageCodes.selections;
+          selections[
+            this.i18nLanguageCodeService.getCurrentI18nLanguageCode()] = true;
 
           this.updateSelectionDetails('languageCodes');
 

@@ -1618,9 +1618,10 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         correctly_translated_content_ids = []
         for content_id, translations in self.translations_mapping.items():
-            if language_code in translations and (
-                    not translations[language_code].needs_update and
-                    translations[language_code].translation != ''):
+            if (
+                language_code in translations and
+                not translations[language_code].needs_update
+            ):
                 correctly_translated_content_ids.append(content_id)
 
         return correctly_translated_content_ids
@@ -1637,6 +1638,19 @@ class WrittenTranslations(python_utils.OBJECT):
             WrittenTranslation.DATA_FORMAT_HTML, html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
+
+    def mark_written_translation_as_needing_update(
+            self, content_id, language_code):
+        """Marks translation as needing update for the given content id and
+        language code.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+        """
+        self.translations_mapping[content_id][language_code].needs_update = (
+            True
+        )
 
     def mark_written_translations_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
@@ -2789,6 +2803,18 @@ class State(python_utils.OBJECT):
             data_format, translation, False)
         self.written_translations.translations_mapping[content_id][
             language_code] = written_translation
+
+    def mark_written_translation_as_needing_update(
+            self, content_id, language_code):
+        """Marks translation as needing update for the given content id and
+        language code.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+        """
+        self.written_translations.mark_written_translation_as_needing_update(
+            content_id, language_code)
 
     def mark_written_translations_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
