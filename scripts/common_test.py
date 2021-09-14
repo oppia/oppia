@@ -77,7 +77,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
-            b'Test for common.py')
+            'Test for common.py')
 
     def test_ensure_directory_exists_with_existing_dir(self):
         check_function_calls = {

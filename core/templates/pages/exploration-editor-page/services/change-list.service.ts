@@ -18,7 +18,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, OnInit, Output } from '@angular/core';
+import { EventEmitter, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -34,7 +34,7 @@ import { InternetConnectivityService } from 'services/internet-connectivity.serv
 @Injectable({
   providedIn: 'root'
 })
-export class ChangeListService implements OnInit {
+export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
   undoneChangeStack: ExplorationChange[] = [];
@@ -92,13 +92,13 @@ export class ChangeListService implements OnInit {
     private loaderService: LoaderService,
     private loggerService: LoggerService,
     private internetConnectivityService: InternetConnectivityService,
-  ) {}
-
-  ngOnInit(): void {
+  ) {
+    // We have added subscriptions in the constructor.
+    // Since, ngOnInit does not work in angular services.
+    // Ref: https://github.com/angular/angular/issues/23235.
     this.loaderService.onLoadingMessageChange.subscribe(
       (message: string) => this.loadingMessage = message
     );
-
     this.internetConnectivityService.onInternetStateChange.subscribe(
       internetAccessible => {
         if (internetAccessible && this.temporaryListOfChanges.length > 0) {
@@ -313,10 +313,27 @@ export class ChangeListService implements OnInit {
 
   /**
    * Saves a change dict that represents marking a translation as needing
-   * update.
+   * update in a particular language.
    *
    * @param {string} contentId - The content id of the translated content.
    * @param {string} languageCode - The language code.
+   * @param {string} stateName - The current state name.
+   */
+  markTranslationAsNeedingUpdate(
+      contentId: string, languageCode: string, stateName: string): void {
+    this.addChange({
+      cmd: 'mark_written_translation_as_needing_update',
+      content_id: contentId,
+      language_code: languageCode,
+      state_name: stateName
+    });
+  }
+
+  /**
+   * Saves a change dict that represents marking a translation as needing
+   * update in all languages.
+   *
+   * @param {string} contentId - The content id of the translated content.
    * @param {string} stateName - The current state name.
    */
   markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {

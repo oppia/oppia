@@ -25,7 +25,7 @@ import os
 
 from constants import constants
 
-from typing import Dict, List, NewType, Union # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Union
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -260,7 +260,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 47
+CURRENT_STATE_SCHEMA_VERSION = 48
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -272,13 +272,13 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 4
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 5
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 4
+CURRENT_RUBRIC_SCHEMA_VERSION = 5
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
@@ -287,7 +287,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -493,6 +493,11 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
+
+# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
+# buckets. It's OK for them to be the same.
+DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
+DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -767,9 +772,6 @@ DISABLED_EXPLORATION_IDS = ['5']
 GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
-# External URL for the Foundation site.
-FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
-
 # NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
 # Change to the correct url for internal testing in the testing production
 # environment.
@@ -792,6 +794,7 @@ TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
+ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'

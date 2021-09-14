@@ -2,23 +2,23 @@
 <div class="oppia-subtopic-viewer-container">
   <div class="oppia-subtopic-viewer-container-card">
     <div class="oppia-subtopic-title">
-      <[$ctrl.subtopicTitle]>
+      {{ subtopicTitle }}
     </div>
     <div class="oppia-page-contents-viewer">
       <div>
-        <angular-html-bind html-data="$ctrl.pageContents.getHtml()">
-        </angular-html-bind>
+        <angular-html-bind-wrapper *ngIf="pageContents" [htmlData]="pageContents.getHtml()">
+        </angular-html-bind-wrapper>
       </div>
     </div>
   </div>
 
-  <div ng-if="$ctrl.nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
+  <div *ngIf="nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
     <div class="next-subtopic-section">
-      <p class="oppia-subtopic-next-subtopic-label" translate="I18N_SUBTOPIC_VIEWER_NEXT_SKILL">Next Skill:</p>
-      <oppia-subtopic-summary-tile [topic-url-fragment]="$ctrl.topicUrlFragment"
-                                   [classroom-url-fragment]="$ctrl.classroomUrlFragment"
-                                   [subtopic]="$ctrl.nextSubtopic"
-                                   [topic-id]="$ctrl.parentTopicId">
+      <p class="oppia-subtopic-next-subtopic-label" [innerHTML]="'I18N_SUBTOPIC_VIEWER_NEXT_SKILL' | translate">Next Skill:</p>
+      <oppia-subtopic-summary-tile [topicUrlFragment]="topicUrlFragment"
+                                   [classroomUrlFragment]="classroomUrlFragment"
+                                   [subtopic]="nextSubtopic"
+                                   [topicId]="parentTopicId">
       </oppia-subtopic-summary-tile>
     </div>
   </div>
