@@ -410,7 +410,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectContentTabContentToMatch = async function(content) {
     await action.click('Content tab button', contentTabButton);
     expect(await action.getText(
-      'Content tab button',
+      'Content tab text',
       contentTabText)).toMatch(content);
   };
 
