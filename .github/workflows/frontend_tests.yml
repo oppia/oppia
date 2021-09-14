@@ -28,8 +28,10 @@ jobs:
       #   run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       # - name: Run frontend tests
       #   run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-      - name: Report failure
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Vaiables to check
+        run: echo "$GITHUB_REF"
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "Frontend test failed on develop branch!"
