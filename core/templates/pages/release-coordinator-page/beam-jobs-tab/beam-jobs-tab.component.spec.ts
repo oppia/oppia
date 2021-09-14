@@ -146,22 +146,7 @@ describe('Beam Jobs Tab Component', () => {
     m.expect(component.beamJobRuns)
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
 
-    component.ngOnDestroy();
-  }));
-
-  it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
-    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
-      .and.returnValue(of(beamJobRuns));
-
-    fixture.detectChanges();
-
-    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
-
-    tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
-    fixture.detectChanges();
-
-    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
-
+    m.flush();
     component.ngOnDestroy();
   }));
 
@@ -173,6 +158,7 @@ describe('Beam Jobs Tab Component', () => {
     fixture.detectChanges();
     m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
 
+    m.flush();
     component.ngOnDestroy();
   }));
 
@@ -184,6 +170,7 @@ describe('Beam Jobs Tab Component', () => {
     fixture.detectChanges();
     m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
 
+    m.flush();
     component.ngOnDestroy();
   }));
 
@@ -333,4 +320,20 @@ describe('Beam Jobs Tab Component', () => {
 
     component.ngOnDestroy();
   });
+
+  it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
+    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
+      .and.returnValue(of(beamJobRuns));
+
+    fixture.detectChanges();
+
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
+
+    tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
+    fixture.detectChanges();
+
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
+
+    component.ngOnDestroy();
+  }));
 });
