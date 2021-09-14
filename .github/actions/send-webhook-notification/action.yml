@@ -11,7 +11,7 @@ runs:
   using: "composite"
   steps:
     - name: Set build url in env
-      run: echo "BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >>> $GITHUB_ENV"
+      run: echo "BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_ENV"
       shell: bash
     - name: Send notification
       run: |
