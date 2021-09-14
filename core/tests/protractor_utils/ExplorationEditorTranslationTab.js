@@ -419,10 +419,10 @@ var ExplorationEditorTranslationTab = function() {
     expect(await feedbackList.count()).toEqual(contents.length);
     for (var index in contents) {
       await action.click(
-        `Translation feedback button at index ${index}`,
+        'Translation feedback button',
         translationFeedback(index));
       expect(await action.getText(
-        `Translation feedback button at index ${index}`,
+        'Translation feedback button',
         translationFeedbackText(index))).toMatch(contents[index]);
     }
   };
@@ -430,11 +430,9 @@ var ExplorationEditorTranslationTab = function() {
   this.expectHintsTabContentsToMatch = async function(contents) {
     await action.click('Hints tab button', hintsTabButton);
     for (var index in contents) {
-      await action.click(
-        `Translation hint at index ${index}`,
-        translationHint(index));
+      await action.click('Translation hint', translationHint(index));
       expect(await action.getText(
-        `Translation hint at index ${index}`,
+        'Translation hint',
         translationHintText(index))).toMatch(contents[index]);
     }
   };
@@ -538,7 +536,7 @@ var ExplorationEditorTranslationTab = function() {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
-        await action.click(`State node at index ${i}`, stateNodes.get(i));
+        await action.click('State node', stateNodes.get(i));
         matched = true;
       }
     }
