@@ -124,16 +124,16 @@
 
 
 # Contributor Dashboard project.
-/core/controllers/contributor_dashboard*.py @sagangwee
-/core/domain/opportunity*.py @sagangwee
+/core/controllers/contributor_dashboard*.py @oppia/contributor-experience-team
+/core/domain/opportunity*.py @oppia/contributor-experience-team
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
-/core/domain/translation*.py @sagangwee
-/core/domain/voiceover_services*.py @sagangwee
+/core/domain/translation*.py @oppia/contributor-experience-team
+/core/domain/voiceover_services*.py @oppia/contributor-experience-team
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
-/core/storage/translation/ @sagangwee
-/core/templates/domain/opportunity/ @sagangwee
-/core/templates/pages/contributor-dashboard-page/ @sagangwee
-/core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
+/core/storage/translation/ @oppia/contributor-experience-team
+/core/templates/domain/opportunity/ @oppia/contributor-experience-team
+/core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
+/core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
 
 
 # Core documentation
@@ -544,7 +544,7 @@
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
 /extensions/extensions.module.ts @seanlip
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
-/mypy.ini @hardikkat24 
+/mypy.ini @hardikkat24
 /mypy_imports.py @hardikkat24
 /mypy_requirements.txt @hardikkat24
 /python_utils*.py @DubeySandeep
