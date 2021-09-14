@@ -39,8 +39,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val) => {}
+      replace: (val: string) => {}
     },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -70,8 +71,9 @@ describe('CreateActivityButtonComponent', () => {
   let ngbModal: NgbModal;
 
   let userInfoForCollectionCreator = {
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -80,9 +82,13 @@ describe('CreateActivityButtonComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -91,8 +97,9 @@ describe('CreateActivityButtonComponent', () => {
   };
 
   let userInfoForNonCollectionCreator = {
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -101,9 +108,13 @@ describe('CreateActivityButtonComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isQuestionAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     canCreateCollections: () => false,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',

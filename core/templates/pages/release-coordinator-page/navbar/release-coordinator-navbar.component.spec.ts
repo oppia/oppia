@@ -17,12 +17,12 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
-
-import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
 import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
+import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
 
 
 describe('Release coordinator navbar component', () => {
@@ -36,16 +36,18 @@ describe('Release coordinator navbar component', () => {
   };
   let profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ReleaseCoordinatorNavbarComponent>;
-
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockRouterModule
+      ],
       declarations: [ReleaseCoordinatorNavbarComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReleaseCoordinatorNavbarComponent);
     component = fixture.componentInstance;
-    userService = TestBed.get(UserService);
+    userService = TestBed.inject(UserService);
     fixture.detectChanges();
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
@@ -63,12 +65,12 @@ describe('Release coordinator navbar component', () => {
     expect(component.logoutUrl).toEqual('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
     expect(component.activeTab).toBe(
-      ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
+      ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
   });
 
   it('should allow switching tabs correctly', () => {
     expect(component.activeTab).toBe(
-      ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
+      ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
 
     component.switchTab(ReleaseCoordinatorPageConstants.TAB_ID_MISC);
     component.activeTabChange.subscribe(

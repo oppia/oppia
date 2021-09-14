@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -34,15 +34,19 @@ import { CollectionPermissionsCard } from 'pages/collection-editor-page/settings
 import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
 import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CollectionDetailsEditor,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
@@ -51,7 +55,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
     CollectionStatisticsTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,
@@ -68,6 +71,10 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -78,6 +85,7 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

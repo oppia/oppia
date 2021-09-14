@@ -28,10 +28,10 @@ import {
 } from 'domain/skill/skill-creation-backend-api.service';
 
 describe('Skill creation backend api service', () => {
-  let httpTestingController: HttpTestingController = null;
-  let skillCreationBackendApiService: SkillCreationBackendApiService = null;
-  let rubricDict: RubricBackendDict = null;
-  let postData: SkillCreationBackendDict = null;
+  let httpTestingController: HttpTestingController;
+  let skillCreationBackendApiService: SkillCreationBackendApiService;
+  let rubricDict: RubricBackendDict;
+  let postData: SkillCreationBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

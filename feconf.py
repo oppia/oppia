@@ -16,14 +16,19 @@
 
 """Stores various configuration options and constants for Oppia."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import datetime
 import os
 
 from constants import constants
+
+from typing import Dict, List, Union
+
+CommandType = (
+    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -40,9 +45,13 @@ DEBUG = False
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
-if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
-        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
-    raise Exception('DEV_MODE can\'t be true on production.')
+if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+    server_software = os.getenv('SERVER_SOFTWARE')
+    if (
+            server_software and
+            not server_software.startswith(('Development', 'gunicorn'))
+    ):
+        raise Exception('DEV_MODE can\'t be true on production.')
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -165,6 +174,7 @@ ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
 ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
 ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 
+ENTITY_TYPE_BLOG_POST = 'blog_post'
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
@@ -184,6 +194,9 @@ PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
+
+# The maximum number of goals allowed in the learner goals of the learner.
+MAX_CURRENT_GOALS_COUNT = 5
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
@@ -247,7 +260,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 45
+CURRENT_STATE_SCHEMA_VERSION = 48
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -256,25 +269,25 @@ CURRENT_STATE_SCHEMA_VERSION = 45
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 5
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 3
+CURRENT_RUBRIC_SCHEMA_VERSION = 5
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -327,14 +340,14 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS = {
+DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
 }
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS = {
+DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
@@ -407,7 +420,7 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 }
 
 # Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
+XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
@@ -417,7 +430,7 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
-def get_empty_ratings():
+def get_empty_ratings() -> Dict[str, int]:
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -426,6 +439,11 @@ def get_empty_ratings():
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
+
+# To use mailchimp email service.
+BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP = 'mailchimp_email_service'
+# Use GAE email service by default.
+BULK_EMAIL_SERVICE_PROVIDER = BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
 
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
@@ -441,6 +459,15 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# Audience ID of the mailing list for Oppia in Mailchimp.
+MAILCHIMP_AUDIENCE_ID = None
+# Mailchimp API Key.
+MAILCHIMP_API_KEY = None
+# Mailchimp username.
+MAILCHIMP_USERNAME = None
+# Mailchimp secret, used to authenticate webhook requests.
+MAILCHIMP_WEBHOOK_SECRET = None
+
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
@@ -455,10 +482,22 @@ ES_PASSWORD = None
 REDISHOST = 'localhost'
 REDISPORT = 6379
 
+# The DB numbers for various Redis instances that Oppia uses. Do not reuse these
+# if you're creating a new Redis client.
+OPPIA_REDIS_DB_INDEX = 0
+CLOUD_NDB_REDIS_DB_INDEX = 1
+STORAGE_EMULATOR_REDIS_DB_INDEX = 2
+
+
 # NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
+
+# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
+# buckets. It's OK for them to be the same.
+DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
+DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -617,6 +656,18 @@ MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
 
+# The maximum number of blog post cards to be visible on each page in blog
+# homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in author
+# specific blog post page.
+MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+
+# The maximum number of blog post cards to be visible as suggestions on the
+# blog post page.
+MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = 2
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -654,9 +705,6 @@ ALLOWED_RTE_EXTENSIONS = {
     },
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
-    },
-    'Svgdiagram': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
     },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
@@ -708,6 +756,7 @@ DEMO_EXPLORATIONS = {
     u'23': 'rating_test.yaml',
     u'24': 'learner_flow_test.yaml',
     u'25': 'exploration_player_test.yaml',
+    u'26': 'android_interactions',
 }
 
 DEMO_COLLECTIONS = {
@@ -722,9 +771,6 @@ DISABLED_EXPLORATION_IDS = ['5']
 # Oppia Google Group URL.
 GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
-
-# External URL for the Foundation site.
-FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
 # NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
 # Change to the correct url for internal testing in the testing production
@@ -748,8 +794,18 @@ TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
+ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+BLOG_ADMIN_PAGE_URL = '/blog-admin'
+BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
+BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+BLOG_DASHBOARD_URL = '/blog-dashboard'
+BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
+BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
+BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
+BLOG_HOMEPAGE_URL = '/blog'
+AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -761,6 +817,7 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
@@ -803,6 +860,7 @@ LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -821,7 +879,6 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -859,6 +916,9 @@ STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+# This should be synchronized with SUBTOPIC_MASTERY_DATA_URL_TEMPLATE
+# in app.constants.ts.
+SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
@@ -1001,25 +1061,46 @@ HANDLER_TYPE_JSON = 'json'
 HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
-ROLE_ID_GUEST = 'GUEST'
-ROLE_ID_BANNED_USER = 'BANNED_USER'
-ROLE_ID_LEARNER = 'LEARNER'
-ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+# TODO(#13388): The role id variable name doesn't match the string value,
+# write a one-off job to update the string value in the datastore.
+ROLE_ID_CURRICULUM_ADMIN = 'ADMIN'
+ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
+ROLE_ID_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
-ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
+ROLE_ID_FULL_USER = 'EXPLORATION_EDITOR'
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_MOBILE_LEARNER = 'LEARNER'
 ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_QUESTION_ADMIN = 'QUESTION_ADMIN'
 ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
-ROLE_ID_ADMIN = 'ADMIN'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
+ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
+ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
+
+ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
+    ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
 
 ALLOWED_USER_ROLES = [
-    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
-    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
-    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
-    ROLE_ID_ADMIN]
+    ROLE_ID_CURRICULUM_ADMIN,
+    ROLE_ID_BLOG_ADMIN,
+    ROLE_ID_BLOG_POST_EDITOR,
+    ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_FULL_USER,
+    ROLE_ID_GUEST,
+    ROLE_ID_MOBILE_LEARNER,
+    ROLE_ID_MODERATOR,
+    ROLE_ID_QUESTION_ADMIN,
+    ROLE_ID_RELEASE_COORDINATOR,
+    ROLE_ID_TOPIC_MANAGER,
+    ROLE_ID_TRANSLATION_ADMIN,
+    ROLE_ID_VOICEOVER_ADMIN
+]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
-ROLE_ACTION_UPDATE = 'update'
+ROLE_ACTION_ADD = 'add'
+ROLE_ACTION_REMOVE = 'remove'
+DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
@@ -1053,8 +1134,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1072,8 +1152,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgdiagram'
+            'oppia-noninteractive-tabs'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -1091,9 +1170,6 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-svgdiagram': [
-                'blockquote', 'li', '[document]'
-            ],
             'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
@@ -1116,20 +1192,10 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgdiagram'
+            'oppia-noninteractive-tabs'
         ]
 
     }
-}
-
-# A dict representing available landing pages, having subject as a key and list
-# of topics as the value.
-# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
-# oppia constant defined in
-# core/templates/pages/landing-pages/TopicLandingPage.js file.
-AVAILABLE_LANDING_PAGES = {
-    'math': ['fractions', 'negative-numbers', 'ratios']
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
@@ -1214,7 +1280,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1256,8 +1322,9 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'user_id_attribute_names': []
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS)
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
+    COMMON_RIGHTS_ALLOWED_COMMANDS
+)
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
@@ -1279,6 +1346,11 @@ EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated values from the server data.
+    'deprecated_values': {
+        'new_status': ['publicized']
     }
 })
 
@@ -1293,7 +1365,7 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1387,3 +1459,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
+
+# Prefix for all access validation handlers.
+# The naming scheme for access validation handlers is
+# '/access_validation_handler/<handler_name>'
+# example '/access_validation_handler/validate_access_to_splash_page'.
+ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'

@@ -16,8 +16,8 @@
 
 """Tests for the base interaction specification."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import json
@@ -49,18 +49,22 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'AlgebraicExpressionInput',
     'Continue',
     'CodeRepl',
+    'DragAndDropSortInput',
     'EndExploration',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
     'InteractiveMap',
-    'LogicProof',
+    'ItemSelectionInput',
     'MathEquationInput',
     'MultipleChoiceInput',
     'NumericExpressionInput',
     'RatioExpressionInput',
+    'NumericInput',
+    'NumberWithUnits',
     'SetInput',
-    'TextInput'
+    'TextInput',
+    'MathEquationInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [
@@ -176,7 +180,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """
         names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
-            names = [name for name in names if not name.endswith(suffix)]
+            names = [
+                name for name in names
+                if name != '__pycache__' and not name.endswith(suffix)
+            ]
         return names
 
     def _get_linear_interaction_ids(self):
@@ -253,7 +260,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         _check_num_interaction_rules('MultipleChoiceInput', 1)
         _check_num_interaction_rules('NumericInput', 7)
         _check_num_interaction_rules('Continue', 0)
-        with self.assertRaisesRegexp(KeyError, 'u\'FakeObjType\''):
+        with self.assertRaisesRegexp(KeyError, '\'FakeObjType\''):
             _check_num_interaction_rules('FakeObjType', 0)
 
     def test_interaction_rule_descriptions_in_dict(self):

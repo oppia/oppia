@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -33,6 +32,7 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
 import { FractionEditorComponent } from './templates/fraction-editor.component';
 import { FormsModule } from '@angular/forms';
 import { FilepathEditorComponent } from './templates/filepath-editor.component';
+import { ImageEditorComponent } from './templates/image-editor.component';
 import { GraphInputInteractionModule } from 'interactions/GraphInput/graph-input-interactions.module';
 import { GraphEditorComponent } from './templates/graph-editor.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
@@ -48,8 +48,6 @@ import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.compo
 import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
 import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
 import { MathEquationEditorComponent } from './templates/math-equation-editor.component';
-import { LogicErrorCategoryEditorComponent } from './templates/logic-error-category-editor.component';
-import { LogicQuestionEditorComponent } from './templates/logic-question-editor.component';
 import { MathExpressionContentEditorComponent } from './templates/math-expression-content-editor.component';
 import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
 import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
@@ -64,13 +62,14 @@ import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-alge
 import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
-import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.component';
+import { SvgEditorComponent } from './templates/svg-editor.component';
 import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
 import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
 import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
 import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
 import { MatCardModule } from '@angular/material/card';
 import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-editor.component';
+import { TranslatableHtmlContentIdEditorComponent } from './templates/translatable-html-content-id.component';
 import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
 import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
 
@@ -78,7 +77,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     CommonElementsModule,
     FormsModule,
     LeafletModule,
@@ -101,6 +99,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -110,8 +109,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
-    LogicErrorCategoryEditorComponent,
-    LogicQuestionEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
@@ -130,7 +127,8 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
-    SvgFilenameEditorComponent,
+    SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -143,6 +141,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -152,8 +151,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
-    LogicErrorCategoryEditorComponent,
-    LogicQuestionEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
@@ -172,7 +169,8 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
-    SvgFilenameEditorComponent,
+    SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -185,6 +183,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -194,8 +193,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
-    LogicErrorCategoryEditorComponent,
-    LogicQuestionEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
@@ -214,7 +211,8 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
-    SvgFilenameEditorComponent,
+    SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent

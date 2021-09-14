@@ -55,7 +55,9 @@
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-admin" role="navigation">
     <div class="navbar-container oppia-navbar-container">
       <div class="navbar-header protractor-test-navbar-header float-left">
-        <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/community-library">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
+           href="/community-library"
+           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
@@ -76,7 +78,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : dropdownMenuIsActive}">
-                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateDropdownMenu()"
                    (mouseleave)="deactivateDropdownMenu()">
@@ -153,7 +155,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-admin">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
-                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
@@ -194,14 +196,8 @@
                   </li>
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/notifications"
-                       class="dropdown-item oppia-dropdown-item-text">
-                      Notifications
-                    </a>
-                  </li>
-                  <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        href="/preferences"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -228,6 +224,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        [href]="logoutUrl"
+                       [routerLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

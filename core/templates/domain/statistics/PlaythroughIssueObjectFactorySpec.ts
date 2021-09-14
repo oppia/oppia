@@ -122,9 +122,9 @@ describe('Playthrough Issue Object Factory', () => {
 
     expect(() => {
       // This throws "Type 'string' is not assignable to type
-      // '"CyclicStateTransitions"'." This is because 'playthroughDict' has an
-      // invalid value of 'issue_type' property. We need to do that in order
-      // to test validations.
+      // '"CyclicStateTransitions"'.". We need to suppress this error because
+      // 'playthroughDict' has an invalid value of 'issue_type' property. We
+      // need to do that in order to test validations.
       // @ts-expect-error
       piof.createFromBackendDict(playthroughDict);
     }).toThrowError(

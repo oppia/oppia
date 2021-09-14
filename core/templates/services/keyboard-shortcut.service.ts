@@ -125,10 +125,6 @@ export class KeyboardShortcutService {
     });
 
     Mousetrap.bind('ctrl+5', () => {
-      this.windowRef.nativeWindow.location.href = '/notifications';
-    });
-
-    Mousetrap.bind('ctrl+6', () => {
       this.windowRef.nativeWindow.location.href = '/preferences';
     });
   }

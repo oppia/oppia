@@ -14,8 +14,8 @@
 
 """Controllers for the Oppia exploration learner view."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 import logging
@@ -111,6 +111,55 @@ class ExplorationEmbedPage(base.BaseHandler):
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                },
+                'default_value': None
+            },
+            'parent': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'iframed': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': None
+            },
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
@@ -118,23 +167,22 @@ class ExplorationPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.request.get('v')
-        version = int(version_str) if version_str else None
+        version = self.normalized_request.get('v')
 
-        if self.request.get('iframed'):
+        if self.normalized_request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
-            if version_str:
-                redirect_url += '?v=%s' % version_str
+            if version:
+                redirect_url += '?v=%s' % version
             self.redirect(redirect_url)
             return
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection or if
         # the 'parent' parameter is present.
-        if self.request.get('parent'):
+        if self.normalized_request.get('parent'):
             collection_id = None
         else:
-            collection_id = self.request.get('collection_id')
+            collection_id = self.normalized_request.get('collection_id')
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
@@ -146,6 +194,32 @@ class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
@@ -154,8 +228,7 @@ class ExplorationHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version = self.request.get('v')
-        version = int(version) if version else None
+        version = self.normalized_request.get('v')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
@@ -588,6 +661,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         state_name = self.payload.get('state_name')
         user_id = self.user_id
         collection_id = self.payload.get('collection_id')
+        story_id = exp_services.get_story_id_linked_to_exploration(
+            exploration_id)
 
         if user_id:
             learner_progress_services.mark_exploration_as_incomplete(
@@ -596,6 +671,21 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         if user_id and collection_id:
             learner_progress_services.mark_collection_as_incomplete(
                 user_id, collection_id)
+
+        if user_id and story_id:
+            story = story_fetchers.get_story_by_id(story_id)
+            if story is not None:
+                learner_progress_services.record_story_started(
+                    user_id, story.id)
+                if story.corresponding_topic_id is not None:
+                    learner_progress_services.record_topic_started(
+                        user_id, story.corresponding_topic_id)
+            else:
+                logging.error(
+                    'Could not find a story corresponding to %s '
+                    'id.' % story_id)
+                self.render_json({})
+                return
 
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
@@ -615,11 +705,12 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
-        """Removes exploration or collection from incomplete list.
+        """Removes exploration, collection, story or topic from incomplete
+            list.
 
         Args:
             activity_type: str. The activity type. Currently, it can take values
-                "exploration" or "collection".
+                "exploration", "collection", "story" or "topic".
             activity_id: str. The ID of the activity to be deleted.
         """
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
@@ -627,6 +718,12 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
                 self.user_id, activity_id)
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
             learner_progress_services.remove_collection_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_STORY:
+            learner_progress_services.remove_story_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
+            learner_progress_services.remove_topic_from_partially_learnt_list(
                 self.user_id, activity_id)
 
         self.render_json(self.values)
@@ -765,8 +862,7 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        if not (fetch_by_difficulty_value == 'true' or
-                fetch_by_difficulty_value == 'false'):
+        if fetch_by_difficulty_value not in ('true', 'false'):
             raise self.InvalidInputException(
                 'fetch_by_difficulty must be true or false')
         fetch_by_difficulty = (fetch_by_difficulty_value == 'true')

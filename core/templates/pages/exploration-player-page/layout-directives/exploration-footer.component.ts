@@ -51,35 +51,45 @@ export class ExplorationFooterComponent {
   }
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
-    this.iframed = this.urlService.isIframed();
-    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
-      .subscribe(evt => {
-        this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-      });
-
-    if (!this.contextService.isInQuestionPlayerMode() ||
-        this.contextService.getQuestionPlayerIsManuallySet()) {
-      this.explorationSummaryBackendApiService
-        .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
-        .then((responseObject) => {
-          let summaries = responseObject.summaries;
-          if (summaries.length > 0) {
-            let contributorSummary = (
-              summaries[0].human_readable_contributors_summary);
-            this.contributorNames = Object.keys(contributorSummary).sort(
-              (contributorUsername1, contributorUsername2) => {
-                let commitsOfContributor1 = contributorSummary[
-                  contributorUsername1].num_commits;
-                let commitsOfContributor2 = contributorSummary[
-                  contributorUsername2].num_commits;
-                return commitsOfContributor2 - commitsOfContributor1;
-              }
-            );
-          }
+    // TODO(#13494): Implement a different footer for practice-session-page.
+    // This component is used at 'exploration-player-page' and
+    // 'practice-session-page' with different usage at both places.
+    // 'contextService.getExplorationId()' throws an error when this component
+    // is used at 'practice-session-page' because the author profiles section
+    // does not exist and the URL does not contain a valid explorationId.
+    // Try-catch is for catching the error thrown from context-service so
+    // that the component behaves properly at both the places.
+    try {
+      this.explorationId = this.contextService.getExplorationId();
+      this.iframed = this.urlService.isIframed();
+      this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+      this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+        .subscribe(evt => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
         });
-    }
+
+      if (!this.contextService.isInQuestionPlayerMode() ||
+          this.contextService.getQuestionPlayerIsManuallySet()) {
+        this.explorationSummaryBackendApiService
+          .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
+          .then((responseObject) => {
+            let summaries = responseObject.summaries;
+            if (summaries.length > 0) {
+              let contributorSummary = (
+                summaries[0].human_readable_contributors_summary);
+              this.contributorNames = Object.keys(contributorSummary).sort(
+                (contributorUsername1, contributorUsername2) => {
+                  let commitsOfContributor1 = contributorSummary[
+                    contributorUsername1].num_commits;
+                  let commitsOfContributor2 = contributorSummary[
+                    contributorUsername2].num_commits;
+                  return commitsOfContributor2 - commitsOfContributor1;
+                }
+              );
+            }
+          });
+      }
+    } catch (err) { }
   }
 
   ngOnDestroy(): void {

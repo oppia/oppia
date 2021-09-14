@@ -16,8 +16,8 @@
 
 """Tests for state domain objects and methods defined on them."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import logging
@@ -344,7 +344,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with rules_registry_swap, interaction_registry_swap:
             html_list = state.get_all_html_content_strings()
 
-        self.assertEqual(
+        self.assertItemsEqual(
             html_list,
             [
                 '<p>state written_translation solution-hi</p>',
@@ -1219,7 +1219,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
         _verify_interaction_does_not_support_android(self, 'GraphInput')
         _verify_interaction_does_not_support_android(self, 'InteractiveMap')
-        _verify_interaction_does_not_support_android(self, 'LogicProof')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
         _verify_interaction_does_not_support_android(self, 'SetInput')
@@ -1321,13 +1320,32 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_written_translations(written_translations)
 
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'hint_1': '<p>hint one</p>',
-                'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>'
-            })
+            content_id_mapping_needing_translations[
+                'hint_1'
+            ].content,
+            '<p>hint one</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'solution'
+            ].content,
+            '<p>hello_world is a string</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'feedback_1'
+            ].content,
+            '<p>Feedback</p>',
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content,
+            '<p>The default outcome.</p>'
+        )
 
     def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1368,7 +1386,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Input1', 'Input2']
                             }
                     })
             ],
@@ -1414,15 +1432,178 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_written_translations(written_translations)
 
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'hint_1': '<p>hint one</p>',
-                'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>',
-                'content': '<p>This is content</p>',
-                'ca_placeholder_0': 'Placeholder'
-            })
+            content_id_mapping_needing_translations[
+                'hint_1'
+            ].content,
+            '<p>hint one</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'solution'
+            ].content,
+            '<p>hello_world is a string</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'feedback_1'
+            ].content,
+            '<p>Feedback</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content,
+            '<p>The default outcome.</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'content'
+            ].content,
+            '<p>This is content</p>',
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_placeholder_0'
+            ].content,
+            'Placeholder'
+        )
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Contains')
+
+    def test_get_content_id_mapping_needing_translations_for_set_input_rule(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('SetInput')
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'unicodeStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        init_state.update_interaction_answer_groups(
+            [state_answer_group])
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'feedback_1': {},
+                'rule_input_4': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'SetInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Equals')
+
+    def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        # Set the content.
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        # Set the multiple choice interaction.
+        init_state.update_interaction_id('MultipleChoiceInput')
+        state_interaction_cust_args = {
+            'showChoicesInShuffledOrder': {
+                'value': True
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '\u003cp\u003eoption 1\u003c/p\u003e'
+                    },
+                    {
+                        'content_id': 'ca_choices_1',
+                        'html': '1,000'
+                    },
+                    {
+                        'content_id': 'ca_choices_2',
+                        'html': '100'
+                    }
+                ]
+            }
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+        # Set the default outcome.
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+        # Set the translations.
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'default_outcome': {},
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        # Choice 2 should not be returned as its value is numeric.
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'content'
+            ].content, '<p>This is content</p>')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content, '<p>The default outcome.</p>')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_0'
+            ].content, '\u003cp\u003eoption 1\u003c/p\u003e')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_1'
+            ].content, '1,000')
+        self.assertFalse(
+            'ca_choices_2' in content_id_mapping_needing_translations)
 
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -4130,9 +4311,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
-                'Equals\'} has the wrong type. It should be a TranslatableSetOf'
-                'NormalizedString.'
+                'Value has the wrong type. It should be a TranslatableSetOf'
+                'NormalizedString. The value is'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -4169,7 +4349,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_answer_groups(
             [state_answer_group])
 
-        with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
+        with logging_swap, self.assertRaisesRegexp(KeyError, '\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
                 .rule_specs[0].validate([], {})
@@ -4179,7 +4359,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([u\'x\'])'
+                'parameter names: {\'x\'}'
             ]
         )
 
@@ -4342,7 +4522,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations.add_content_id_for_translation('feedback_1')
         written_translations.add_content_id_for_translation('feedback_2')
-        self.assertEqual(
+        self.assertItemsEqual(
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
@@ -4568,7 +4748,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
-            written_translations.validate([b'invalid_content'])
+            written_translations.validate(['invalid_content'])
 
     def test_get_content_ids_that_are_correctly_translated(self):
         written_translations_dict = {
@@ -4677,8 +4857,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
         recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
         recorded_voiceovers.add_content_id_for_voiceover('feedback_2')
-        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [
-            'feedback_2', 'feedback_1'])
+        self.assertItemsEqual(
+            recorded_voiceovers.get_content_ids_for_voiceovers(),
+            ['feedback_2', 'feedback_1'])
 
     def test_add_content_id_for_voiceovers_adds_content_id(self):
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
@@ -4866,7 +5047,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state recorded_voiceovers to match the listed '
                 'content ids [\'invalid_content\']')):
-            recorded_voiceovers.validate([b'invalid_content'])
+            recorded_voiceovers.validate(['invalid_content'])
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):

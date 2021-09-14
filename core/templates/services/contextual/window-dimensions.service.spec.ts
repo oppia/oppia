@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for WindowDimensionsService.
  */
 import { TestBed } from '@angular/core/testing';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Window Dimensions Service', () => {
-  let wds, wr;
+  let wds: WindowDimensionsService;
+  let wr: WindowRef;
 
   beforeEach(() => {
-    wds = TestBed.get(WindowDimensionsService);
-    wr = TestBed.get(WindowRef);
+    wds = TestBed.inject(WindowDimensionsService);
+    wr = TestBed.inject(WindowRef);
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.

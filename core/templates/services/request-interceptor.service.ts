@@ -27,7 +27,8 @@ import { CsrfTokenService } from './csrf-token.service';
   providedIn: 'root'
 })
 export class MockCsrfTokenService {
-  tokenPromise: PromiseLike<string> = null;
+  // 'tokenPromise' will be null when token is not initialized .
+  tokenPromise: PromiseLike<string> | null = null;
 
   initializeToken(): void {
     if (this.tokenPromise !== null) {
@@ -86,20 +87,20 @@ export class RequestInterceptor implements HttpInterceptor {
               if (!(request.body instanceof FormData)) {
                 var body = new FormData();
                 body.append('payload', JSON.stringify(request.body));
-                // This throws "Cannot assign to 'body' because it is
-                // a read-only property". We need to manually suprress this
-                // error because this is a request interceptor and we need to
-                // to modify the contents of the request.
+                // This throws "Cannot assign to 'body' because it is a
+                // read-only property". We need to suppress this error because
+                // this is a request interceptor and we need to modify the
+                // contents of the request.
                 // @ts-ignore
                 request.body = body;
               }
               request.body.append('csrf_token', token);
               request.body.append('source', document.URL);
             } else {
-              // This throws "Cannot assign to 'body' because it is
-              // a read-only property". We need to manually suprress this
-              // error because this is a request interceptor and we need to
-              // to modify the contents of the request.
+              // This throws "Cannot assign to 'body' because it is a
+              // read-only property". We need to suppress this error because
+              // this is a request interceptor and we need to modify the
+              // contents of the request.
               // @ts-ignore
               request.body = {
                 csrf_token: token,

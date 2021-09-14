@@ -54,6 +54,9 @@ export class CkEditorInitializerService {
       rteHelperService: RteHelperService,
       htmlEscaperService: HtmlEscaperService,
       contextService: ContextService, ngZone: NgZone): void {
+    if (rteHelperService === undefined) {
+      return;
+    }
     ngZone.runOutsideAngular(() => {
       var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
       _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -144,16 +147,15 @@ export class CkEditorInitializerService {
                       editor.fire('saveSnapshot');
                     }
                   },
-                  function() {
-                    var newWidgetSelector = (
-                      '[data-cke-widget-id="' + that.id + '"]');
-                    // The below check is required, since without this, even a
-                    // valid RTE component was getting removed from the editor
-                    // when 'Cancel' was clicked in the customization modal.
-                    var widgetElement = editor.editable().findOne(
-                      newWidgetSelector);
-                    if (widgetElement && widgetElement.getText() === '') {
-                      widgetElement.remove();
+                  function(widgetShouldBeRemoved) {
+                    if (widgetShouldBeRemoved) {
+                      var newWidgetSelector = (
+                        '[data-cke-widget-id="' + that.id + '"]');
+                      var widgetElement = editor.editable().findOne(
+                        newWidgetSelector);
+                      if (widgetElement) {
+                        widgetElement.remove();
+                      }
                     }
                   });
               },

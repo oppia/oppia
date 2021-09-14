@@ -14,8 +14,8 @@
 
 """Tests for subtopic viewer page"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
@@ -31,9 +31,9 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(BaseSubtopicViewerControllerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.topic_id = 'topic_id'
         self.subtopic_id_1 = 1
@@ -161,7 +161,7 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
             '/learn/staging/%s/revision/%s'
             % ('pvttopic', 'sub-url-frag-one'),
             expected_status_int=302)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '/learn/staging/%s/revision/%s'
             % ('pvttopic', 'sub-url-frag-one'))
@@ -186,6 +186,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'skill_ids': ['skill_id_2'],
             'id': 2,
             'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title 2',
             'url_fragment': 'sub-url-frag-two'
         }
@@ -215,6 +216,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'skill_ids': ['skill_id_1'],
             'id': 1,
             'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title',
             'url_fragment': 'sub-url-frag-one'
         }

@@ -19,10 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import {
-  HttpClient,
-  HttpXhrBackend,
-  // eslint-disable-next-line camelcase
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpXhrBackend,
+  // eslint-disable-next-line camelcase, oppia/disallow-flags
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
@@ -73,7 +72,7 @@ import { BrowserCheckerService } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
+  'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { ClassifierDataBackendApiService } from
   'services/classifier-data-backend-api.service';
 import { ClassroomBackendApiService } from
@@ -173,7 +172,6 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
@@ -229,10 +227,6 @@ import { LearnerParamsService } from
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { LogicProofRulesService } from
-  'interactions/LogicProof/directives/logic-proof-rules.service';
-import { LogicProofValidationService } from
-  'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { MathEquationInputRulesService } from
@@ -382,8 +376,6 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateContentService } from
@@ -564,7 +556,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
-    upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
@@ -584,7 +575,6 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
-    upgradedServices['LogicProofRulesService'] = new LogicProofRulesService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
@@ -686,11 +676,9 @@ export class UpgradedServices {
       new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
       new FractionInputValidationService(
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['GraphInputRulesService'] =
       new GraphInputRulesService(
@@ -717,9 +705,6 @@ export class UpgradedServices {
       new ItemSelectionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['LocalStorageService'] = new LocalStorageService();
-    upgradedServices['LogicProofValidationService'] =
-      new LogicProofValidationService(
-        upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -744,8 +729,7 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
       new NumberWithUnitsObjectFactory(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['FractionObjectFactory']);
+        upgradedServices['UnitsObjectFactory']);
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -947,7 +931,6 @@ export class UpgradedServices {
         upgradedServices['ImageClickInputRulesService'],
         upgradedServices['InteractiveMapRulesService'],
         upgradedServices['ItemSelectionInputRulesService'],
-        upgradedServices['LogicProofRulesService'],
         upgradedServices['MathEquationInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
@@ -1097,9 +1080,6 @@ export class UpgradedServices {
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['StateCardObjectFactory'] =
-      new StateCardObjectFactory(
-        upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['AppService'],
@@ -1146,9 +1126,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['UserBackendApiService'] =
       new UserBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['WindowRef'],
-        upgradedServices['Title']);
+        upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
@@ -1196,8 +1174,6 @@ export class UpgradedServices {
     upgradedServices['ProfileLinkImageBackendApiService'] =
       new ProfileLinkImageBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
-      upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['UserExplorationPermissionsService'] = (
       new UserExplorationPermissionsService(
         upgradedServices['ExplorationPermissionsBackendApiService']));
@@ -1235,7 +1211,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
         upgradedServices['AnswerClassificationService'],
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);
     upgradedServices['StateTopAnswersStatsService'] =

@@ -19,7 +19,7 @@
 var waitFor = require('./waitFor.js');
 
 var autoSaveIndicatorElement = element(
-  by.css('.protractor-autosave-indicator'));
+  by.css('.protractor-test-autosave-indicator'));
 
 // Waits for the invisibility of the autosave message.
 var waitForAutosave = async function() {
@@ -64,6 +64,13 @@ var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
+var matSelect = async function(selectorName, selectorElement, optionToSelect) {
+  await click(selectorName, selectorElement);
+  var optionElement = element(
+    by.cssContainingText('.mat-option-text', optionToSelect));
+  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+};
+
 var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var select2Results = element(by.css('.select2-results'));
@@ -87,5 +94,6 @@ exports.click = click;
 exports.getText = getText;
 exports.select = select;
 exports.select2 = select2;
+exports.matSelect = matSelect;
 exports.sendKeys = sendKeys;
 exports.waitForAutosave = waitForAutosave;

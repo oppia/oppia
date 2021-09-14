@@ -17,12 +17,11 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { ToastrService } from 'ngx-toastr';
 import { AlertsService } from 'services/alerts.service';
 import { AlertMessageComponent } from './alert-message.component';
 
-describe('Warnings and Alert Component', () => {
+describe('Alert Message Component', () => {
   let fixture: ComponentFixture<AlertMessageComponent>;
   let componentInstance: AlertMessageComponent;
   let numOfCalls: number = 0;
@@ -65,8 +64,8 @@ describe('Warnings and Alert Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        SharedComponentsModule
+      declarations: [
+        AlertMessageComponent,
       ],
       providers: [
         {

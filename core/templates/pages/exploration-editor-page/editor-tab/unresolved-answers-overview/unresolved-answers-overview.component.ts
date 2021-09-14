@@ -51,14 +51,14 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
     'ExplorationStatesService', 'ExternalSaveService',
     'ImprovementsService', 'StateEditorService',
     'StateInteractionIdService', 'StateTopAnswersStatsService',
-    'UrlInterpolationService', 'INTERACTION_SPECS',
+    'INTERACTION_SPECS',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
         $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         ImprovementsService, StateEditorService,
         StateInteractionIdService, StateTopAnswersStatsService,
-        UrlInterpolationService, INTERACTION_SPECS,
+        INTERACTION_SPECS,
         SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
       var ctrl = this;
 
@@ -98,8 +98,8 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
         ExternalSaveService.onExternalSave.emit();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/teach-oppia-modal.template.html'),
           backdrop: 'static',
           controller: 'TeachOppiaModalController'

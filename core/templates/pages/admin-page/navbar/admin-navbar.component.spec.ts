@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
@@ -39,7 +40,10 @@ describe('Admin Navbar component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockRouterModule
+      ],
       declarations: [AdminNavbarComponent]
     }).compileComponents();
 
@@ -85,7 +89,7 @@ describe('Admin Navbar component', () => {
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
-    adminRouterService.showTab('#config');
+    adminRouterService.showTab('#/config');
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(true);
@@ -101,7 +105,7 @@ describe('Admin Navbar component', () => {
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
-    adminRouterService.showTab('#features');
+    adminRouterService.showTab('#/features');
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(false);
@@ -117,7 +121,7 @@ describe('Admin Navbar component', () => {
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
-    adminRouterService.showTab('#roles');
+    adminRouterService.showTab('#/roles');
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(false);
@@ -133,7 +137,7 @@ describe('Admin Navbar component', () => {
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
-    adminRouterService.showTab('#misc');
+    adminRouterService.showTab('#/misc');
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(false);

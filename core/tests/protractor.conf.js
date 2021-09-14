@@ -28,12 +28,21 @@ var suites = {
       'protractor_desktop/additionalEditorFeatures.js'
     ],
 
+    additionalEditorFeaturesModals: [
+      'protractor_desktop/additionalEditorFeaturesModals.js'
+    ],
+
+
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
     ],
 
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
+    ],
+  
+    blogDashboard: [
+      'protractor_desktop/blogDashboard.js'
     ],
 
     classroomPage: [
@@ -58,10 +67,6 @@ var suites = {
 
     creatorDashboard: [
       'protractor_desktop/creatorDashboard.js'
-    ],
-
-    emailDashboard: [
-      'protractor_desktop/emailDashboard.js'
     ],
 
     embedding: [
@@ -138,10 +143,6 @@ var suites = {
 
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    releaseCoordinatorPageFeatures: [
-      'protractor_desktop/releaseCoordinatorPageFeatures.js'
     ],
 
     subscriptions: [
@@ -312,10 +313,6 @@ exports.config = {
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
   baseUrl: 'http://localhost:9001',
-
-  // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>.
-  rootElement: 'body',
 
   // A callback function called once protractor is ready and available, and
   // before the specs are executed

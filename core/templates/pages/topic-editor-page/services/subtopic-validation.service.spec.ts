@@ -16,63 +16,78 @@
  * @fileoverview Unit tests for SubtopicValidationService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// topic-editor-state.service.ts is upgraded to Angular 8.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { SubtopicValidationService } from './subtopic-validation.service';
+import { TopicEditorStateService } from './topic-editor-state.service';
 
+describe('Subtopic validation service', () => {
+  let subtopicValidationService: SubtopicValidationService;
+  let topicObjectFactory: TopicObjectFactory;
+  let topicEditorStateService: TopicEditorStateService;
 
-describe('Subtopic validation service', function() {
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia'));
-
-  var TopicObjectFactory = null;
-  var TopicEditorStateService = null;
-  var SubtopicValidationService = null;
-
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SubtopicValidationService = $injector.get('SubtopicValidationService');
-
-    var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
-    subtopic1.setUrlFragment('subtopic-one');
-    var subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
-    subtopic2.setUrlFragment('subtopic-two');
-    var subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
-    subtopic3.setUrlFragment('subtopic-three');
-    topic.getSubtopics = function() {
-      return [subtopic1, subtopic2, subtopic3];
-    };
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      providers: [
+        TopicEditorStateService,
+        TopicObjectFactory
+      ]
+    }).compileComponents();
   }));
 
-  it('should validate subtopic name correctly', function() {
-    expect(SubtopicValidationService.checkValidSubtopicName(
+  beforeEach(() => {
+    subtopicValidationService = TestBed.inject(SubtopicValidationService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    topicEditorStateService = TestBed.inject(TopicEditorStateService);
+
+    let topic = topicObjectFactory.createInterstitialTopic();
+    let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
+    subtopic1.setUrlFragment('subtopic-one');
+    let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
+    subtopic2.setUrlFragment('subtopic-two');
+    let subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
+    subtopic3.setUrlFragment('subtopic-three');
+    topic.getSubtopics = () => {
+      return [subtopic1, subtopic2, subtopic3];
+    };
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+  });
+
+  it('should validate subtopic name correctly', () => {
+    expect(subtopicValidationService.checkValidSubtopicName(
       'Random name')).toEqual(true);
-    expect(SubtopicValidationService.checkValidSubtopicName(
+    expect(subtopicValidationService.checkValidSubtopicName(
       'Subtopic1')).toEqual(false);
-    expect(SubtopicValidationService.checkValidSubtopicName(
+    expect(subtopicValidationService.checkValidSubtopicName(
       'Subtopic2')).toEqual(false);
-    expect(SubtopicValidationService.checkValidSubtopicName(
+    expect(subtopicValidationService.checkValidSubtopicName(
       'Subtopic3')).toEqual(false);
-    expect(SubtopicValidationService.checkValidSubtopicName(
+    expect(subtopicValidationService.checkValidSubtopicName(
       'Subtopic4')).toEqual(true);
   });
 
-  it('should validate if subtopic with url fragment exists', function() {
-    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+  it('should validate if subtopic with url fragment exists', () => {
+    expect(subtopicValidationService.doesSubtopicWithUrlFragmentExist(
       'random-name')).toEqual(false);
-    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+    expect(subtopicValidationService.doesSubtopicWithUrlFragmentExist(
       'subtopic-one')).toEqual(true);
-    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+    expect(subtopicValidationService.doesSubtopicWithUrlFragmentExist(
       'subtopic-two')).toEqual(true);
-    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+    expect(subtopicValidationService.doesSubtopicWithUrlFragmentExist(
       'subtopic-three')).toEqual(true);
-    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+    expect(subtopicValidationService.doesSubtopicWithUrlFragmentExist(
       'subtopic-four')).toEqual(false);
+  });
+
+  it('should validate url fragement', () => {
+    expect(subtopicValidationService.isUrlFragmentValid('CAPITAL_INVALID'))
+      .toBeFalse();
+    expect(subtopicValidationService.isUrlFragmentValid('valid-fragement'))
+      .toBeTrue();
   });
 });

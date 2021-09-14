@@ -16,26 +16,33 @@
  * @fileoverview Unit tests for SuggestionModalService.
  */
 import { TestBed } from '@angular/core/testing';
+import { ui } from 'angular';
 import { AppConstants } from 'app.constants';
-import { SuggestionModalService } from './suggestion-modal.service';
+import { ParamDict, SuggestionModalService } from './suggestion-modal.service';
 
 describe('Suggestion Modal Service', () => {
-  let sms;
-  const uibModalInstanceMock = {
+  let sms: SuggestionModalService;
+  const IPromise = new Promise((resolve, reject) => {});
+  const uibModalInstanceMock: ui.bootstrap.IModalInstanceService = {
     close: paramDict => {},
-    dismiss: message => {}
+    dismiss: message => {},
+    result: IPromise,
+    opened: IPromise,
+    rendered: IPromise,
+    closed: IPromise,
   };
 
   beforeEach(() => {
-    sms = TestBed.get(SuggestionModalService);
+    sms = TestBed.inject(SuggestionModalService);
   });
 
   it('should accept suggestion', () => {
     const closeSpy = spyOn(uibModalInstanceMock, 'close').and.callThrough();
-    const paramDict = {
+    const paramDict: ParamDict = {
       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
       commitMessage: '',
-      reviewMessage: ''
+      reviewMessage: '',
+      audioUpdateRequired: false
     };
     sms.acceptSuggestion(uibModalInstanceMock, paramDict);
 
@@ -44,10 +51,11 @@ describe('Suggestion Modal Service', () => {
 
   it('should reject suggestion', () => {
     const closeSpy = spyOn(uibModalInstanceMock, 'close').and.callThrough();
-    const paramDict = {
+    const paramDict: ParamDict = {
       action: AppConstants.ACTION_REJECT_SUGGESTION,
       commitMessage: '',
-      reviewMessage: ''
+      reviewMessage: '',
+      audioUpdateRequired: false
     };
     sms.rejectSuggestion(uibModalInstanceMock, paramDict);
 
@@ -57,7 +65,7 @@ describe('Suggestion Modal Service', () => {
   it('should cancel suggestion', () => {
     const closeSpy = spyOn(uibModalInstanceMock, 'dismiss').and.callThrough();
     const dismissMessage = 'cancel';
-    sms.cancelSuggestion(uibModalInstanceMock, dismissMessage);
+    sms.cancelSuggestion(uibModalInstanceMock);
 
     expect(closeSpy).toHaveBeenCalledWith(dismissMessage);
   });

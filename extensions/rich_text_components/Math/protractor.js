@@ -43,9 +43,9 @@ var escapedJsonToObj = function(json) {
 };
 const SVGTAGS = {
   'x^2 + y^2': (
-    '<svg width="7.485ex" height="2.85ex" viewBox="0 -919.2 3222.8 1226.9" f' +
-    'ocusable="false" style="vertical-align: -0.715ex;" xmlns="http://www.w3' +
-    '.org/2000/svg"><g stroke="currentColor" fill="currentColor" stroke-widt' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="7.485ex" height="2.85ex" ' +
+    'viewBox="0 -919.2 3222.8 1226.9" focusable="false" style="vertical-align' +
+    ': -0.715ex;"><g stroke="currentColor" fill="currentColor" stroke-widt' +
     'h="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="10" d="M52 2' +
     '89Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 4' +
     '42 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415' +

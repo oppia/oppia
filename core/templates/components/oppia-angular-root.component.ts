@@ -86,11 +86,15 @@ import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia
 import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
 import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import { NoninteractiveSvgdiagram } from 'rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 
 const componentMap = {
   Collapsible: {
@@ -108,9 +112,6 @@ const componentMap = {
   Skillreview: {
     component_class: NoninteractiveSkillreview,
   },
-  Svgdiagram: {
-    component_class: NoninteractiveSvgdiagram,
-  },
   Tabs: {
     component_class: NoninteractiveTabs,
   },
@@ -118,20 +119,23 @@ const componentMap = {
     component_class: NoninteractiveVideo,
   }
 };
+
 @Component({
   selector: 'oppia-angular-root',
-  template: ''
+  templateUrl: './oppia-angular-root.component.html'
 })
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-  static ajsTranslate;
+  direction: string = 'ltr';
+
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
+  static rteElementsAreInitialized: boolean = false;
   static rteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
@@ -143,8 +147,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
+    private documentAttributeCustomizationService:
+      DocumentAttributeCustomizationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private htmlEscaperService: HtmlEscaperService,
+    private metaTagCustomizationService: MetaTagCustomizationService,
     private ngZone: NgZone,
     private pageTitleService: PageTitleService,
     private profilePageBackendApiService: ProfilePageBackendApiService,
@@ -153,8 +160,14 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private translateService: TranslateService,
     private translateCacheService: TranslateCacheService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
     private injector: Injector
   ) {
+    if (OppiaAngularRootComponent.rteElementsAreInitialized) {
+      return;
+    }
+
     for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
       const rteElement = createCustomElement(
         componentMap[rteKey].component_class,
@@ -165,6 +178,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         rteElement
       );
     }
+    OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
   public ngAfterViewInit(): void {
@@ -195,7 +209,75 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       this.translateCacheService);
     OppiaAngularRootComponent.injector = this.injector;
 
+    // Initialize dynamic meta tags.
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'application-name',
+        content: AppConstants.SITE_NAME
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-square310x310logo',
+        content: this.getAssetUrl(
+          '/assets/images/logo/msapplication-large.png')
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-wide310x150logo',
+        content: this.getAssetUrl(
+          '/assets/images/logo/msapplication-wide.png')
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-square150x150logo',
+        content: this.getAssetUrl(
+          '/assets/images/logo/msapplication-square.png')
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-square70x70logo',
+        content: this.getAssetUrl(
+          '/assets/images/logo/msapplication-tiny.png')
+      },
+      {
+        propertyType: 'property',
+        propertyValue: 'og:url',
+        content: this.urlService.getCurrentLocation().href
+      },
+      {
+        propertyType: 'property',
+        propertyValue: 'og:image',
+        content: this.urlInterpolationService.getStaticImageUrl(
+          '/logo/288x288_logo_mint.webp')
+      }
+    ]);
+
+    // Initialize translations.
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+      (code) => {
+        this.translateService.use(code);
+        for (var i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
+          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
+            this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
+            break;
+          }
+        }
+        this.documentAttributeCustomizationService.addAttribute('lang', code);
+      }
+    );
+    this.translateCacheService.init();
+
+    const cachedLanguage = this.translateCacheService.getCachedLanguage();
+    if (cachedLanguage) {
+      this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+    }
+
     // This emit triggers ajs to start its app.
     this.initialized.emit();
+  }
+
+  getAssetUrl(path: string): string {
+    return this.urlInterpolationService.getFullStaticAssetUrl(path);
   }
 }

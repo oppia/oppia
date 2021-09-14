@@ -19,7 +19,7 @@
 
 require(
   'components/question-directives/questions-list/' +
-  'questions-list.directive.ts');
+  'questions-list.component.ts');
 
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
@@ -45,8 +45,8 @@ angular.module('oppia').directive('questionsTab', [
           ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.getGroupedSkillSummaries =
-              SkillEditorStateService.getGroupedSkillSummaries;
+            $scope.groupedSkillSummaries = (
+              SkillEditorStateService.getGroupedSkillSummaries());
             $scope.skillIdToRubricsObject = {};
             $scope.skillIdToRubricsObject[$scope.skill.getId()] =
               $scope.skill.getRubrics();

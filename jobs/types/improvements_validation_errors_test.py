@@ -16,8 +16,8 @@
 
 """Unit tests for improvements model validator errors."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 
 from core.platform import models
@@ -49,6 +49,6 @@ class InvalidCompositeEntityErrorTests(
             model)
 
         self.assertEqual(
-            error.message,
-            'InvalidCompositeEntityError in TaskEntryModel(id=\'23\'): model '
+            error.stderr,
+            'InvalidCompositeEntityError in TaskEntryModel(id="23"): model '
             'has invalid composite entity %s' % model.composite_entity_id)

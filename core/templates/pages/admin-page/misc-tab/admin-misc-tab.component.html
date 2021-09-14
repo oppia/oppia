@@ -1,0 +1,277 @@
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Topic Similarities</h3>
+  <div class="oppia-topic-similarities-container">
+    Upload a csv file:<br>
+    The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
+    <input type="file" id="topicSimilaritiesFile">
+    <button (click)="uploadTopicSimilaritiesFile()">Upload</button>
+    <button (click)="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Search Index</h3>
+  <button (click)="clearSearchIndex()">Clear Search Index</button>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Extract Data</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="submitQuery()">
+      <div class="form-group row">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expId"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Exploration version:</label>
+        <input type="number"
+               min="0"
+               [(ngModel)]="expVersion"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>State name:</label>
+        <input type="text"
+               [(ngModel)]="stateName"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Number of answers:</label>
+        <input type="number"
+               min="0"
+               [(ngModel)]="numAnswers"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="submit query">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+    <p> (To get all answers set number of answers to 0) </p>
+    <p *ngIf="showDataExtractionQueryStatus">Status: {{ dataExtractionQueryStatusMessage }}</p>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Regenerate contribution opportunities for a topic:</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="regenerateOpportunitiesRelatedToTopic()">
+      <div class="form-group row">
+        <label>Topic ID:</label>
+        <input type="text"
+               [(ngModel)]="topicIdForRegeneratingOpportunities"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Regenerate">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+    <p *ngIf="regenerationMessage">{{ regenerationMessage }}</p>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Send a Test Mail to Admin</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="sendDummyMailToAdmin()">
+      <div class="form-group row">
+        <input type="submit" value="Send">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update username</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateUsername()">
+      <div class="form-group row">
+        <label>Old username:</label>
+        <input type="text"
+               [(ngModel)]="oldUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>New username:</label>
+        <input type="text"
+               [(ngModel)]="newUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true"
+               [maxlength]="MAX_USERNAME_LENGTH">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Update">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Number of pending deletion requests</h3>
+  <div class="oppia-query-form">
+    <form class="form"
+          (submit)="getNumberOfPendingDeletionRequestModels()">
+      <div class="form-group row">
+        <input type="submit"
+               value="Get number of users whose deletion is currently in-progress">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Get models related to a user</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="getModelsRelatedToUser()">
+      <div class="form-group row">
+        <label>User ID:</label>
+        <input type="text"
+               [(ngModel)]="userIdToGet"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Get">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Delete user</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="deleteUser()">
+      <div class="form-group row">
+        <label>User ID:</label>
+        <input type="text"
+               [(ngModel)]="userIdToDelete"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Username:</label>
+        <input type="text"
+               [(ngModel)]="usernameToDelete"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Delete">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Grant super admin privileges to Firebase account</h3>
+  <p>The chosen user will be forcibly logged out.</p>
+  <p>This operation is idempotent.</p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="grantSuperAdminPrivileges()">
+      <div class="form-group row">
+        <label>Username:</label>
+        <input type="text"
+               [(ngModel)]="usernameToGrant"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Grant">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update Blog Post Data</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateBlogPostData()">
+      <div class="form-group row">
+        <label>Blog Post Id:</label>
+        <input type="text"
+               [(ngModel)]="blogPostId"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Author Username:</label>
+        <input type="text"
+               [(ngModel)]="authorUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <label>Published On:</label>
+        <input type="text"
+               [(ngModel)]="publishedOn"
+               [ngModelOptions]="{standalone: true}"
+               required="true"
+               placeholder="Enter in mm/dd/yyyy">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Update">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Revoke super admin privileges from Firebase account</h3>
+  <p>The chosen user will be forcibly logged out.</p>
+  <p>This operation is idempotent.</p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="revokeSuperAdminPrivileges()">
+      <div class="form-group row">
+        <label>Username:</label>
+        <input type="text"
+               [(ngModel)]="usernameToRevoke"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Revoke">
+      </div>
+    </form>
+  </div>
+</mat-card>
+<style>
+  .oppia-admin-page-card {
+    max-width: 700px
+  }
+  .oppia-admin-page-card > button {
+    max-width: 30%;
+  }
+  .oppia-admin-page-card.oppia-long-text p {
+    margin: 0 0 1em 0;
+  }
+  .oppia-admin-page-card .oppia-query-form .form-group {
+    margin-left: 0;
+  }
+  .oppia-admin-page-card .oppia-query-form label {
+    font-weight: normal;
+    width: 30%;
+  }
+  .oppia-topic-similarities-container > input,
+  .oppia-topic-similarities-container > button {
+    display: block;
+    margin: 5px 0 5px 0;
+  }
+  .oppia-long-text-card {
+    max-width: 700px;
+  }
+
+  .oppia-page-card.mat-card {
+    margin-top: 40px;
+    padding: 30px 55px 30px 45px;
+  }
+</style>

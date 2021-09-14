@@ -57,14 +57,15 @@
       <div class="story-input-header">
         <span>Thumbnail Image*</span>
       </div>
-      <thumbnail-uploader preview-title="story.title"
-                          aspect-ratio="'4:3'"
-                          disabled="false"
-                          use-local-storage="true"
-                          allowed-bg-colors="allowedBgColors"
-                          thumbnail-bg-color="story.getThumbnailBgColor()"
-                          preview-description-bg-color="'#2F6687'">
-      </thumbnail-uploader>
+      <oppia-thumbnail-uploader [preview-title]="story.title"
+                                [aspect-ratio]="'4:3'"
+                                [disabled]="false"
+                                [use-local-storage]="true"
+                                [allowed-bg-colors]="allowedBgColors"
+                                [thumbnail-bg-color]="story.getThumbnailBgColor()"
+                                preview-description-bg-color="#2F6687"
+                                (image-save)="updateView()">
+      </oppia-thumbnail-uploader>
     </div>
   </div>
   <div class="modal-footer">

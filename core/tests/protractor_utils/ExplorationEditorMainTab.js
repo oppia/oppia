@@ -65,8 +65,9 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-interaction-editor'));
   var explorationGraph = element(by.css('.protractor-test-exploration-graph'));
   var stateNodes = explorationGraph.all(by.css('.protractor-test-node'));
+  var nodeLabelLocator = by.css('.protractor-test-node-label');
   var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
+    return nodeElement.element(nodeLabelLocator);
   };
   var interactionTab = function(tabId) {
     return element(by.css('.protractor-test-interaction-tab-' + tabId));
@@ -79,7 +80,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-open-outcome-dest-editor'));
   var openOutcomeFeedBackEditor = element(
     by.css('.protractor-test-open-outcome-feedback-editor'));
-  var postTutorialPopover = element(by.css('.popover-content'));
+  var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
   var responseBody = function(responseNum) {
     return element(by.css('.protractor-test-response-body-' + responseNum));
   };
@@ -92,6 +93,24 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-container'));
   var stateNameInput = element(
     by.css('.protractor-test-state-name-input'));
+  var ruleDetails = element(by.css('.protractor-test-rule-details'));
+  var stateContentEditorLocator = by.css(
+    '.protractor-test-state-content-editor');
+  var addOrUpdateSolutionModal = element(
+    by.css('.protractor-test-add-or-update-solution-modal'));
+  var answerDescriptionFragment = element.all(
+    by.css('.protractor-test-answer-description-fragment'));
+  var answerDescription = element(
+    by.css('.protractor-test-answer-description'));
+  var deleteNodeLocator = by.css('.protractor-test-delete-node');
+  var titleElement = element(by.css('.ng-joyride-title'));
+  var ckEditorElement = element(by.css('.protractor-test-ck-editor'));
+  var interactionHtmlElement = element(
+    by.css('.protractor-test-interaction-html'));
+  var answerTab = element(by.css('.protractor-test-answer-tab'));
+  var hintTextElement = element(by.css('.protractor-test-hint-text'));
+  var explanationTextAreaElement = element(
+    by.css('.protractor-test-explanation-textarea'));
 
   /*
    * Buttons
@@ -139,6 +158,13 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-submit'));
   var answerCorrectnessToggle = element(
     by.css('.protractor-test-editor-correctness-toggle'));
+  var skipButtons = element.all(by.css('.ng-joyride .skipBtn'));
+  var nextTutorialStageButtons = element.all(
+    by.css('.ng-joyride .nextBtn'));
+  var startTutorialButton = element(
+    by.css('.protractor-test-start-tutorial'));
+  var submitSolutionButton = element(
+    by.css('.protractor-test-submit-solution-button'));
 
   /*
    * Symbols
@@ -160,10 +186,9 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    var buttons = element.all(by.css('.skipBtn'));
-    if (await buttons.count() === 1) {
-      await action.click('Skip button', buttons.get(0));
-    } else if (await buttons.count() !== 0) {
+    if (await skipButtons.count() === 1) {
+      await action.click('Skip button', skipButtons.get(0));
+    } else if (await skipButtons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
     }
@@ -192,14 +217,13 @@ var ExplorationEditorMainTab = function() {
       'Preview',
       'Save',
     ];
-    for (const heading of tutorialTabHeadings) {
+    for (const HEADING of tutorialTabHeadings) {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
-        '.popover-title', heading));
+        '.popover-title', HEADING));
       await waitFor.visibilityOf(
-        tutorialTabHeadingElement, 'Tutorial: ' + heading + 'is not visible');
+        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButtons = element.all(by.css('.nextBtn'));
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons.first(),
         'Next Tutorial Stage button is not clickable');
@@ -218,12 +242,9 @@ var ExplorationEditorMainTab = function() {
   this.startTutorial = async function() {
     await waitFor.visibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
-    var startTutorialButton = element(
-      by.css('.protractor-test-start-tutorial'));
     await action.click('Start Tutorial button', startTutorialButton);
     await waitFor.visibilityOf(
-      element(by.css('.ng-joyride-title')),
-      'Tutorial modal takes too long to appear');
+      titleElement, 'Tutorial modal takes too long to appear');
   };
 
   // ---- RESPONSE EDITOR ----
@@ -296,8 +317,8 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        await waitFor.visibilityOf(await responseTab.first());
-        headerElem = await responseTab.get(
+        await waitFor.visibilityOf(responseTab.first());
+        headerElem = responseTab.get(
           responseNum);
       }
 
@@ -324,7 +345,6 @@ var ExplorationEditorMainTab = function() {
           ruleDescription, feedbackTextArray);
         ruleDescription += '...';
         // Adding "..." to end of string.
-        var answerTab = element(by.css('.protractor-test-answer-tab'));
         expect(await action.getText('Answer Tab', answerTab)).toEqual(
           ruleDescription);
       },
@@ -406,7 +426,6 @@ var ExplorationEditorMainTab = function() {
         await action.click('Add Answer Button', addAnswerButton);
 
         // Set the rule description.
-        var ruleDetails = element(by.css('.protractor-test-rule-details'));
         var args = [ruleDetails, interactionId, ruleName];
         for (var i = 2; i < arguments.length; i++) {
           args.push(arguments[i]);
@@ -494,8 +513,7 @@ var ExplorationEditorMainTab = function() {
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.element(
-      by.css('.protractor-test-state-content-editor'));
+    var stateContentEditor = stateEditorTag.element(stateContentEditorLocator);
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
@@ -533,11 +551,9 @@ var ExplorationEditorMainTab = function() {
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
-    var hintTextButton = element(
-      by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
+    var hintTextButton = hintTextElement.all(by.tagName('p')).last();
     await action.click('Hint Text Button', hintTextButton);
-    var CKEditor = element(
-      by.css('.protractor-test-ck-editor')).all(by.className(
+    var CKEditor = ckEditorElement.all(by.className(
       'oppia-rte-resizer')).first();
     await action.sendKeys('Text CKEditor', CKEditor, hint);
     await action.click('Save Hint Button', saveHintButton);
@@ -548,26 +564,19 @@ var ExplorationEditorMainTab = function() {
   this.addSolution = async function(interactionId, solution) {
     await action.waitForAutosave();
     await action.click('Add Solution', addSolutionButton);
-    var addOrUpdateSolutionModal = element(
-      by.css('.protractor-test-add-or-update-solution-modal'));
     await waitFor.visibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes to long to appear');
     var interaction = await interactions.getInteraction(interactionId);
     await interaction.submitAnswer(
-      element(by.css('.protractor-test-interaction-html')),
-      solution.correctAnswer);
-    var explanationTextArea = element(
-      by.css('.protractor-test-explanation-textarea')).all(
+      interactionHtmlElement, solution.correctAnswer);
+    var explanationTextArea = explanationTextAreaElement.all(
       by.tagName('p')).first();
     await action.click('Explanation Text Area', explanationTextArea);
-    var CKEditor = element(
-      by.css('.protractor-test-ck-editor')).all(by.className(
+    var CKEditor = ckEditorElement.all(by.className(
       'oppia-rte-resizer')).first();
     await action.sendKeys(
       'Text CKEditor', CKEditor, solution.explanation);
-    var submitSolutionButton = element(
-      by.css('.protractor-test-submit-solution-button'));
     await action.click('Submit Solution Button', submitSolutionButton);
     await waitFor.invisibilityOf(
       addOrUpdateSolutionModal,
@@ -627,7 +636,6 @@ var ExplorationEditorMainTab = function() {
       TextInput: 'commonly-used',
       FractionInput: 'math',
       GraphInput: 'math',
-      LogicProof: 'math',
       SetInput: 'math',
       AlgebraicExpressionInput: 'math',
       MathEquationInput: 'math',
@@ -761,10 +769,8 @@ var ExplorationEditorMainTab = function() {
     }
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
-    var answerDescriptionFragment = element.all(
-      by.css('.protractor-test-answer-description-fragment'));
     for (var i = 0; i < parameterValues.length; i++) {
-      var parameterElement = await answerDescriptionFragment.get(i * 2 + 1);
+      var parameterElement = answerDescriptionFragment.get(i * 2 + 1);
       var parameterEditor = await forms.getEditor(
         parameterTypes[i])(parameterElement);
 
@@ -834,10 +840,8 @@ var ExplorationEditorMainTab = function() {
     // Replace selectors with "...".
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
-    var answerDescription = element(
-      by.css('.protractor-test-answer-description'));
     await action.click('Answer Description', answerDescription);
-    var ruleDropdownElement = await element.all(by.cssContainingText(
+    var ruleDropdownElement = element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
@@ -852,8 +856,7 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var deleteNode = nodeElement.element(
-      by.css('.protractor-test-delete-node'));
+    var deleteNode = nodeElement.element(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
 
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);

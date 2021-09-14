@@ -21,7 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require('domain/topic/topic-update.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/subtopic-validation-service.ts');
+require('pages/topic-editor-page/services/subtopic-validation.service');
 
 import createSubtopicConstants from 'assets/constants';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
@@ -88,6 +88,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       ctrl.editableThumbnailBgColor = newThumbnailBgColor;
       TopicUpdateService.setSubtopicThumbnailBgColor(
         ctrl.topic, ctrl.subtopicId, newThumbnailBgColor);
+      $scope.$applyAsync();
     };
 
     ctrl.resetErrorMsg = function() {

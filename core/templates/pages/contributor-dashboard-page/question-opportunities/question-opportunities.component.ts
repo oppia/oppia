@@ -25,10 +25,10 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'components/question-difficulty-selector/' +
-  'question-difficulty-selector.directive.ts');
+  'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 require(
   'pages/contributor-dashboard-page/login-required-message/' +
   'login-required-message.component.ts');
@@ -113,6 +113,7 @@ angular.module('oppia').component('questionOpportunities', {
           backdrop: 'static',
           keyboard: false,
           resolve: {
+            suggestionId: () => '',
             question: () => question,
             questionId: () => questionId,
             questionStateData: () => questionStateData,
@@ -125,6 +126,7 @@ angular.module('oppia').component('questionOpportunities', {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
+          $rootScope.$applyAsync();
         });
       };
 

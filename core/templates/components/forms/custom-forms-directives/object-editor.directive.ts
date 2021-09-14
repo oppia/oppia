@@ -68,8 +68,6 @@ angular.module('oppia').directive('objectEditor', [
           'list-of-sets-of-translatable-html-content-ids',
           'list-of-tabs',
           'list-of-unicode-string',
-          'logic-error-category',
-          'logic-question',
           'math-equation',
           'math-expression-content',
           'set-of-unicode-string',
@@ -118,6 +116,7 @@ angular.module('oppia').directive('objectEditor', [
           for (const key of Object.keys(e)) {
             scope.ngModelController.$setValidity(key, e[key]);
           }
+          scope.$applyAsync();
         };
         if (directiveName) {
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {

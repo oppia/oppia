@@ -31,11 +31,16 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
   'belongs_to_subscribed_activities': boolean
-  'is_admin': boolean
-  'is_moderator': boolean
   'is_super_admin': boolean
-  'is_topic_manager': boolean
   'playlist_limit_exceeded': boolean
+  'user_email': string
+  'username': string
+  }
+
+interface LearnerGoalsResponseObject {
+  'belongs_to_learnt_list': boolean
+  'is_super_admin': boolean
+  'goals_limit_exceeded': boolean
   'user_email': string
   'username': string
   }
@@ -44,9 +49,13 @@ interface LearnerPlaylistResponseObject {
   providedIn: 'root'
 })
 export class LearnerDashboardActivityBackendApiService {
-  successfullyAdded: boolean;
-  addToLearnerPlaylistUrl: string;
-  removeActivityModalStatus: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  addToLearnerPlaylistUrl!: string;
+  addToLearnerGoalsUrl!: string;
+  removeActivityModalStatus!: string;
+  successfullyAdded: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -118,13 +127,42 @@ export class LearnerDashboardActivityBackendApiService {
     });
   }
 
+  async addToLearnerGoals(
+      activityId: string, activityType: string): Promise<boolean> {
+    this.successfullyAdded = true;
+    this.addToLearnerGoalsUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        '/learnergoalshandler/<activityType>/<activityId>', {
+          activityType: activityType,
+          activityId: activityId
+        }));
+    var response = await this.http.post<LearnerGoalsResponseObject>(
+      this.addToLearnerGoalsUrl, {}).toPromise();
+    if (response.belongs_to_learnt_list) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'You have already learnt this activity.');
+    }
+    if (response.goals_limit_exceeded) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'Your \'Current Goals\' list is full! Please finish existing ' +
+        'goals or remove some to add new goals to your list.');
+    }
+    if (this.successfullyAdded) {
+      this.alertsService.addSuccessMessage(
+        'Successfully added to your \'Current Goals\' list.');
+    }
+    return this.successfullyAdded;
+  }
+
   // This function will open a modal to remove an exploration
   // from the given list either 'Play Later' or 'In Progress'
+  // or remove a topic from the 'Current Goals' or 'In Progress'
   // in Learner Dashboard Page.
   async removeActivityModalAsync(
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
-    this.removeActivityModalStatus = null;
     const modelRef = this.ngbModal.open(
       RemoveActivityModalComponent, {backdrop: true});
     modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;

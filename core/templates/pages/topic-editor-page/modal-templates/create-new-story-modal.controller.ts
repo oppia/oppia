@@ -68,6 +68,10 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
         });
     };
 
+    $scope.updateView = function() {
+      $scope.$applyAsync();
+    };
+
     $scope.isValid = function() {
       return Boolean(
         $scope.story.isValid() &&

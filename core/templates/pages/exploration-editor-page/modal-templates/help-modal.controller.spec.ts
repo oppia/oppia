@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 /**
  * @fileoverview Unit tests for HelpModalController.

@@ -6,22 +6,18 @@
         <ul>
           <li>
             <a href="/about"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
                [innerHTML]="'I18N_FOOTER_ABOUT' | translate">
             </a>
           </li>
           <li>
-            <a href="http://oppiafoundation.org/"
+            <a href="/about-foundation"
                [innerHTML]="'I18N_FOOTER_OPPIA_FOUNDATION' | translate">
             </a>
           </li>
           <li>
             <a href="https://medium.com/oppia-org"
                [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
-            </a>
-          </li>
-          <li>
-            <a href="/about#credits"
-               [innerHTML]="'I18N_FOOTER_CREDITS' | translate">
             </a>
           </li>
           <li>
@@ -37,27 +33,32 @@
         <ul>
           <li>
             <a href="/get-started"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.ROUTE"
                class="protractor-test-get-started-link"
                [innerHTML]="'I18N_FOOTER_GET_STARTED' | translate">
             </a>
           </li>
           <li>
             <a href="/creator-guidelines"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE"
                [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate">
             </a>
           </li>
           <li>
             <a href="/teach"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE"
                [innerHTML]="'I18N_FOOTER_TEACH_PAGE' | translate">
             </a>
           </li>
           <li>
             <a href="/community-library"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
                [innerHTML]="'I18N_FOOTER_BROWSE_LIBRARY' | translate">
             </a>
           </li>
           <li>
             <a href="/contact"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                [innerHTML]="'I18N_FOOTER_CONTACT_US' | translate">
             </a>
           </li>
@@ -67,7 +68,8 @@
         <h3 [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
-            <a href="https://oppiafoundation.org/volunteer"
+            <a href="/volunteer"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                [innerHTML]="'I18N_HEADING_VOLUNTEER' | translate">
             </a>
           </li>
@@ -80,18 +82,21 @@
           </li>
           <li>
             <a href="/donate"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                class="protractor-test-donate-link"
                [innerHTML]="'I18N_FOOTER_DONATE' | translate">
             </a>
           </li>
           <li>
             <a href="/terms"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
                class="protractor-test-terms-link"
                [innerHTML]="'I18N_FOOTER_TERMS_OF_SERVICE' | translate">
             </a>
           </li>
           <li>
             <a href="/privacy-policy"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
                class="protractor-test-privacy-policy-link"
                [innerHTML]="'I18N_FOOTER_PRIVACY_POLICY' | translate">
             </a>
@@ -99,8 +104,6 @@
         </ul>
       </div>
       <div class="col">
-        <h3><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h3>
-        <oppia-i18n-language-selector></oppia-i18n-language-selector>
         <oppia-social-buttons></oppia-social-buttons>
       </div>
     </div>

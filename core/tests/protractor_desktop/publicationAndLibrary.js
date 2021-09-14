@@ -46,7 +46,7 @@ describe('Library index page', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'superUser@publicationAndLibrary.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
     await adminPage.editConfigProperty(
@@ -108,7 +108,7 @@ describe('Library index page', function() {
     await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
-    await explorationEditorPage.saveChanges('change language');
+    await explorationEditorPage.publishChanges('change language');
     await users.logout();
 
     await users.login('celebrimor@publicationAndLibrary.com');
@@ -244,11 +244,15 @@ describe('Permissions for private explorations', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var expectedConsoleErrors = null;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    expectedConsoleErrors = [
+      'Failed to load resource: the server responded with a status of 404'
+    ];
   });
 
   it('should not be changeable if title is not given to exploration',
@@ -299,46 +303,11 @@ describe('Permissions for private explorations', function() {
     await general.openEditor(explorationId, false);
     await general.expectErrorPage(404);
     await users.logout();
-  });
-
-  it('should be correct for voice artists', async function() {
-    await users.createUser('expOwner@oppia.tests', 'expOwner');
-    await users.createUser('voiceArtist@oppia.tests', 'voiceArtist');
-    await users.createUser('guestUser@oppia.tests', 'guestUser');
-
-    await users.login('expOwner@oppia.tests');
-    await workflow.createExploration(true);
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 1'));
-    await explorationEditorPage.saveChanges('Added content to first card.');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('voice artists');
-    await workflow.addExplorationVoiceArtist('voiceArtist');
-    expect(await workflow.getExplorationManagers()).toEqual(['expOwner']);
-    expect(await workflow.getExplorationCollaborators()).toEqual([]);
-    expect(await workflow.getExplorationVoiceArtists()).toEqual(
-      ['voiceArtist']);
-    expect(await workflow.getExplorationPlaytesters()).toEqual([]);
-    var explorationId = await general.getExplorationIdFromEditor();
-    await users.logout();
-
-    await users.login('voiceArtist@oppia.tests');
-    await general.openEditor(explorationId, true);
-    await explorationEditorMainTab.expectContentToMatch(
-      await forms.toRichText('this is card 1'));
-    expect(await element(by.css(
-      '.protractor-test-save-changes')).isPresent()).toBeTruthy();
-    await users.logout();
-
-    await users.login('guestUser@oppia.tests');
-    await general.openEditor(explorationId, false);
-    await general.expectErrorPage(404);
-    await users.logout();
+    expectedConsoleErrors.push(
+      `The requested path /create/${explorationId} is not found.`);
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([
-      'Failed to load resource: the server responded with a status of 404'
-    ]);
+    await general.checkForConsoleErrors(expectedConsoleErrors);
   });
 });

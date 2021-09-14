@@ -26,11 +26,11 @@ import { AdminPageData, AdminPageDataBackendDict } from
   'domain/admin/admin-backend-api.service';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('Admin Data Service', () => {
-  let adminDataService: AdminDataService = null;
+  let adminDataService: AdminDataService;
   let httpTestingController: HttpTestingController;
   var sampleAdminData: AdminPageDataBackendDict = {
     role_to_actions: {
@@ -53,12 +53,12 @@ describe('Admin Data Service', () => {
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#C6DCDA',
         total_published_node_count: 10,
-        url_fragment: 'topicurlfrag'
+        url_fragment: 'topicurlfrag',
+        can_edit_topic: false,
+        is_published: false
       }
     ],
-    updatable_roles: {
-      TOPIC_MANAGER: 'topic manager'
-    },
+    updatable_roles: ['TOPIC_MANAGER'],
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
     config_properties: {
@@ -77,7 +77,9 @@ describe('Admin Data Service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: {
+    viewable_roles: ['TOPIC_MANAGER'],
+    human_readable_roles: {
+      FULL_USER: 'full user',
       TOPIC_MANAGER: 'topic manager'
     },
     feature_flags: [{
@@ -114,8 +116,9 @@ describe('Admin Data Service', () => {
       roleToActions: sampleAdminData.role_to_actions,
       configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
+      humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
-        TopicSummary.createFromBackendDict),
+        CreatorTopicSummary.createFromBackendDict),
       featureFlags: sampleAdminData.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict))
     };

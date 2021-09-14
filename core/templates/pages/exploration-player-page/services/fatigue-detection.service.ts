@@ -29,8 +29,10 @@ export class FatigueDetectionService {
   private submissionTimesMsec: number[] = [];
   private SPAM_COUNT_THRESHOLD: number = 4;
   private SPAM_WINDOW_MSEC: number = 10000;
-  private windowStartTime: number;
-  private windowEndTime: number;
+  // Function shift return result type T | undefined
+  // so WindowStartTime can be undefined.
+  private windowStartTime!: number | undefined;
+  private windowEndTime!: number;
 
   constructor(
     private ngbModal: NgbModal) { }
@@ -43,8 +45,9 @@ export class FatigueDetectionService {
       this.windowStartTime = this.submissionTimesMsec.shift();
       this.windowEndTime =
         this.submissionTimesMsec[this.submissionTimesMsec.length - 1];
-      if (this.windowEndTime.valueOf() - this.windowStartTime.valueOf() <
-         this.SPAM_WINDOW_MSEC) {
+      if (this.windowStartTime !== undefined && (this.windowEndTime.valueOf() -
+        this.windowStartTime.valueOf() < this.SPAM_WINDOW_MSEC)
+      ) {
         return true;
       }
     }

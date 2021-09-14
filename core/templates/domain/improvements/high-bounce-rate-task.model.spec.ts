@@ -163,8 +163,8 @@ describe('High bounce rate task', function() {
             entity_id: 'eid',
             entity_version: 1,
             // This throws "Type '"???"' is not assignable to type
-            // '"high_bounce_rate"'." This is because 'task_type'
-            // should be equal to 'high_bounce_rate' but we set it
+            // '"high_bounce_rate"'.". We need to suppress this error because
+            // 'task_type' should be equal to 'high_bounce_rate' but we set it
             // to an invalid value in order to test validations.
             // @ts-expect-error
             task_type: '???',

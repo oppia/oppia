@@ -61,9 +61,9 @@
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
       </div>
-      <div ng-if="recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
+      <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
-          <span class="conversation-skin-next-lesson-text">Next Lesson</span>
+          <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
           <span><[recommendedExplorationSummaries[0].title]></span>
         </div>
         <div>
@@ -110,7 +110,7 @@
     </div>
   </div>
 
-  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries !== null && recommendedExplorationSummaries.length > 0"
+  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
@@ -119,18 +119,18 @@
 
       <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
         <oppia-exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
-                                        [get-collection-id]="collectionId"
-                                        [get-exploration-id]="exp.id"
-                                        [get-exploration-title]="exp.title"
-                                        [get-story-node-id]="nextNodeId"
-                                        [get-parent-exploration-ids]="parentExplorationIds"
-                                        [get-last-updated-msec]="exp.lastUpdatedMsec"
-                                        [get-objective]="exp.objective"
-                                        [get-category]="exp.category"
-                                        [get-ratings]="exp.ratings"
-                                        [get-thumbnail-icon-url]="exp.thumbnailIconUrl"
-                                        [get-thumbnail-bg-color]="exp.thumbnailBgColor"
-                                        [get-num-views]="exp.numViews"
+                                        [collection-id]="collectionId"
+                                        [exploration-id]="exp.id"
+                                        [exploration-title]="exp.title"
+                                        [story-node-id]="nextNodeId"
+                                        [parent-exploration-ids]="parentExplorationIds"
+                                        [last-updated-msec]="exp.lastUpdatedMsec"
+                                        [objective]="exp.objective"
+                                        [category]="exp.category"
+                                        [ratings]="exp.ratings"
+                                        [thumbnail-icon-url]="exp.thumbnailIconUrl"
+                                        [thumbnail-bg-color]="exp.thumbnailBgColor"
+                                        [num-views]="exp.numViews"
                                         [is-community-owned]="exp.communityOwned"
                                         class="oppia-exploration-summary-tile">
         </oppia-exploration-summary-tile>
@@ -149,8 +149,8 @@
     <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
   <div ng-if="inStoryMode && !isLoggedIn" class="conversation-skin-login-container">
-    <div class="conversation-skin-congratulations-text">Congratulations on completing the chapter!</div>
-    <span class="conversation-skin-login-text text-secondary">Log in or sign up to save your progress and play through the next lesson.</span>
+    <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
+    <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
       <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="signIn()">
         LOGIN

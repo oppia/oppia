@@ -20,28 +20,32 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
-import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
 import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
+import { UserService } from 'services/user.service';
+
 
 @Component({
   selector: 'oppia-release-coordinator-navbar',
   templateUrl: './release-coordinator-navbar.component.html',
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
-  @Input() activeTab;
+  @Input() activeTab: string;
   @Output() activeTabChange = new EventEmitter();
 
-  TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
+  TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
   profilePictureDataUrl: string;
   username: string;
   profileUrl: string;
-  logoutUrl: string = AppConstants.LOGOUT_URL;
+  logoutUrl: string = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
   profileDropdownIsActive: boolean = false;
   logoWebpImageSrc: string;
   logoPngImageSrc: string;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -88,7 +92,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     this.logoWebpImageSrc = this.urlInterpolationService.getStaticImageUrl(
       '/logo/288x128_logo_white.webp');
 
-    this.activeTab = this.TAB_ID_JOBS;
+    this.activeTab = this.TAB_ID_BEAM_JOBS;
   }
 }
 

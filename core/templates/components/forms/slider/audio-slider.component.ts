@@ -40,8 +40,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
   }`]
 })
 export class AudioSliderComponent {
-  @Input() value: number;
-  @Input() max: number;
+  // These properties are initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() value!: number;
+  @Input() max!: number;
   @Input() thumbLabel = false;
   @Output() valueChange = new EventEmitter<{ value: number }>();
   constructor() { }

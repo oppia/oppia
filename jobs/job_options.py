@@ -16,48 +16,34 @@
 
 """Option class for configuring the behavior of Oppia jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import argparse
 import feconf
-from jobs.io import stub_io
 
 from apache_beam.options import pipeline_options
 
-
-def validate_datastoreio_stub(obj):
-    """Asserts that the given object is an instance of DatastoreioStub.
-
-    Args:
-        obj: *. The object to validate.
-
-    Returns:
-        DatastoreioStub. The validated object, unchanged.
-
-    Raises:
-        TypeError. The object is not an instance of DatastoreioStub.
-    """
-    if not isinstance(obj, stub_io.DatastoreioStub):
-        raise TypeError('obj=%r is not an instance of DatastoreioStub' % obj)
-    return obj
+from typing import List, Optional # isort: skip
 
 
-class JobOptions(pipeline_options.GoogleCloudOptions):
+class JobOptions(pipeline_options.PipelineOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
-        # TODO(#11475): Delete this option once we're able to use the real
-        # datastoreio module once we've finished migrating to Python 3.
-        'datastoreio_stub': (
-            validate_datastoreio_stub,
-            'Source of datastore operations for the pipeline to depend upon'),
+        'namespace': (
+            str, 'Namespace for isolating the NDB operations during tests.'),
     }
 
-    def __init__(self, flags=None, **job_options):
+    def __init__(
+        self,
+        flags: Optional[List[str]] = None,
+        **job_options: Optional[str]
+    ) -> None:
         """Initializes a new JobOptions instance.
 
         Args:
-            flags: dict(str:str)|None. Command-line flags for customizing a
+            flags: list(str)|None. Command-line flags for customizing a
                 pipeline. Although Oppia doesn't use command-line flags to
                 control jobs or pipelines, we still need to pass the value
                 (unmodified) because PipelineOptions, a parent class, needs it.
@@ -66,21 +52,22 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
         """
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:
-            unsupported_options = ', '.join(sorted(unsupported_options))
-            raise ValueError('Unsupported option(s): %s' % unsupported_options)
+            joined_unsupported_options = ', '.join(sorted(unsupported_options))
+            raise ValueError(
+                'Unsupported option(s): %s' % joined_unsupported_options)
         super(JobOptions, self).__init__(
-            # Needed by PipelineOptions superclass.
+            # Needed by PipelineOptions.
             flags=flags,
-            # Needed by GoogleCloudOptions superclass.
+            # Needed by GoogleCloudOptions.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
-            # TODO(#11475): Figure out what these values should be. We can't run
-            # unit tests on DataflowRunner unless they have a valid GCS path.
-            temp_location='gs://todo/todo', staging_location='gs://todo/todo',
+            temp_location=feconf.DATAFLOW_TEMP_LOCATION,
+            staging_location=feconf.DATAFLOW_STAGING_LOCATION,
+            save_main_session=True,
             **job_options)
 
     @classmethod
-    def _add_argparse_args(cls, parser):
+    def _add_argparse_args(cls, parser: argparse.ArgumentParser) -> None:
         """Adds Oppia's job-specific arguments to the parser.
 
         Args:
