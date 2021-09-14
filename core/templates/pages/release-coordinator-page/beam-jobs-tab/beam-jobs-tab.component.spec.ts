@@ -146,11 +146,10 @@ describe('Beam Jobs Tab Component', () => {
     m.expect(component.beamJobRuns)
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
 
-    m.flush();
-    component.ngOnDestroy();
+    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
-  it('should return empty array when jobs fail to load', marbles(async(m) => {
+  it('should return empty array when jobs fail to load', marbles(m => {
     const beamJobs = m.hot('^-#', null, new Error('err'));
     const expectedNames = ' e-e';
     spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
@@ -158,11 +157,10 @@ describe('Beam Jobs Tab Component', () => {
     fixture.detectChanges();
     m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
 
-    m.flush();
-    component.ngOnDestroy();
+    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
-  it('should return empty array when runs fail to load', marbles(async(m) => {
+  it('should return empty array when runs fail to load', marbles(m => {
     const beamJobRuns = m.hot('^-#', null, new Error('err'));
     const expectedRuns = '     e-e';
     spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
@@ -170,8 +168,7 @@ describe('Beam Jobs Tab Component', () => {
     fixture.detectChanges();
     m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
 
-    m.flush();
-    component.ngOnDestroy();
+    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }));
 
   it('should update the table when the job name input changes', async() => {
