@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 from jobs.decorators import validation_decorators
 
-from typing import Any, Union, Type, Iterator, Tuple, List # isort:skip
+from typing import Any, Type, Iterator, Tuple, List # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     opportunity_models.ExplorationOpportunitySummaryModel)
 def exploration_opportunity_summary_model_relationships(
         model: Type[opportunity_models.ExplorationOpportunitySummaryModel]
-) -> base_models.BaseModel:
+) -> Iterator[Tuple[Any, List[Type[base_models.BaseModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [exp_models.ExplorationModel]
     yield model.topic_id, [topic_models.TopicModel]

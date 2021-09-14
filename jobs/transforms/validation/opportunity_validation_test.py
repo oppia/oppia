@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 from jobs.decorators import validation_decorators
-from jobs.transforms import opportunity_validation  # isort:skip # pylint: disable=unused-import
 
 
 class RelationshipsOfTests(test_utils.TestBase):
