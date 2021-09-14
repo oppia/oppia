@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 import base64
 import datetime
+import functools
 import hmac
 import json
 import logging
@@ -36,7 +37,6 @@ import feconf
 import python_utils
 import utils
 
-import functools
 import webapp2
 
 from typing import Any, Dict, Optional # isort: skip
