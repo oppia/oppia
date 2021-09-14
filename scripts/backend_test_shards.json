@@ -158,7 +158,7 @@
         "jobs.transforms.validation.blog_validation_test",
         "jobs.transforms.validation.skill_validation_test",
         "jobs.transforms.validation.story_validation_test",
-        "jobs.transforms.opportunity_validation_test",
+        "jobs.transforms.validation.opportunity_validation_test",
         "core.tests.load_tests.feedback_thread_summaries_test",
         "core.tests.test_utils_test",
         "core.tests.gae_suite_test"
