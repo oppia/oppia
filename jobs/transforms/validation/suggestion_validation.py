@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 from jobs.decorators import validation_decorators
 
-from typing import Any, Iterator, Tuple, List, Type # isort:skip
+from typing import Iterator, Tuple, List, Type # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover

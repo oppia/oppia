@@ -25,7 +25,7 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms.validation import base_validation
 
-from typing import Any, Optional, Type, Iterator, Tuple, List # isort:skip
+from typing import Type, Iterator, Tuple, List # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
