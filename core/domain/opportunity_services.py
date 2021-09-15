@@ -97,11 +97,12 @@ def get_exploration_opportunity_summary_from_model(model):
             ))
         filtered_suggestions = []
         for suggestion in suggestions_in_review:
-            if suggestion != None:
+            if suggestion is not None:
                 filtered_suggestions.append(suggestion)
         in_review_count = len(filtered_suggestions)
         if in_review_count > 0:
-            translation_in_review_counts[language_code['code']] = in_review_count
+            translation_in_review_counts[
+                language_code['code']] = in_review_count
 
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,

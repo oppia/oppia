@@ -74,7 +74,7 @@ export class OpportunitiesListItemComponent {
         this.progressPercentage = (
           this.opportunity.progressPercentage + '%');
         const translationSuggestionTypeIndex = 0;
-        if (this.opportunityType == constants.CONTRIBUTION_RIGHT_CATEGORIES[
+        if (this.opportunityType === constants.CONTRIBUTION_RIGHT_CATEGORIES[
           translationSuggestionTypeIndex]) {
           this.isTranslationProgressBar = true;
           const translatedPercentage = (
