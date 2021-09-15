@@ -261,6 +261,29 @@ class AnswerGroup(python_utils.OBJECT):
 
         return answer_group_dict
 
+    @staticmethod
+    def update_image_sizes_in_bytes_in_answer_group(
+            answer_group_dict, entity_type, entity_id):
+        """Checks for HTML fields in an answer group dict and introduces a new
+        attribute image_sizes_in_bytes which holds the mapping of all the rich
+        text images to its sizes in bytes.
+
+        Args:
+            answer_group_dict: dict. The answer group dict.
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+
+        Returns:
+            dict. The converted answer group dict.
+        """
+        answer_group_dict['outcome']['feedback']['image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                answer_group_dict['outcome']['feedback']['html'],
+                entity_type,
+                entity_id))
+
+
+
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -2308,6 +2331,7 @@ class RuleSpec(python_utils.OBJECT):
         # is used to figure out the assembly of the html in the rulespecs.
         for interaction_and_rule_details in (
                 html_field_types_to_rule_specs.values()):
+            # Checking if rule type has html.
             rule_type_has_html = (
                 rule_spec_dict['rule_type'] in
                 interaction_and_rule_details['ruleTypes'].keys())
@@ -2323,6 +2347,7 @@ class RuleSpec(python_utils.OBJECT):
                         input_variable_match_found = True
                         rule_input_variable = (
                             rule_spec_dict['inputs'][input_variable])
+                        # TODO -- Continue investigating from this line.
                         if (html_type_format ==
                                 feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
                             rule_spec_dict['inputs'][input_variable] = (
