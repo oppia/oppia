@@ -19,6 +19,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import constants from 'assets/constants';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 export interface ExplorationOpportunity {
@@ -44,6 +45,7 @@ export class OpportunitiesListItemComponent {
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() opportunityHeadingTruncationLength: number;
+  @Input() opportunityType: string;
 
   opportunityDataIsLoading: boolean = true;
   labelText: string;
@@ -71,7 +73,9 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage = (
           this.opportunity.progressPercentage + '%');
-        if (this.opportunity.translationsCount) {
+        const translationSuggestionTypeIndex = 0;
+        if (this.opportunityType == constants.CONTRIBUTION_RIGHT_CATEGORIES[
+          translationSuggestionTypeIndex]) {
           this.isTranslationProgressBar = true;
           const translatedPercentage = (
             this.opportunity.translationsCount / this.opportunity.totalCount

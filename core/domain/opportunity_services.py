@@ -26,6 +26,7 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import question_fetchers
 from core.domain import story_fetchers
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import utils
@@ -87,14 +88,20 @@ def get_exploration_opportunity_summary_from_model(model):
         model.incomplete_translation_language_codes + missing_language_codes)
 
     translation_in_review_counts = {}
-    for lc in constants.SUPPORTED_CONTENT_LANGUAGES:
-        in_review_count = len(
-            suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_in_review_with_exp_id(
+    for language_code in constants.SUPPORTED_CONTENT_LANGUAGES:
+        suggestions_in_review = (
+            suggestion_services
+            .get_translation_suggestions_in_review_by_exploration(
                 model.id,
-                lc['code']))
+                language_code['code']
+            ))
+        filtered_suggestions = []
+        for suggestion in suggestions_in_review:
+            if suggestion != None:
+                filtered_suggestions.append(suggestion)
+        in_review_count = len(filtered_suggestions)
         if in_review_count > 0:
-            translation_in_review_counts[lc['code']] = in_review_count
+            translation_in_review_counts[language_code['code']] = in_review_count
 
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,

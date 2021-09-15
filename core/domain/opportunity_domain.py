@@ -195,8 +195,11 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'received %s' % list(sorted(expected_set_of_all_languages)))
 
     def _validate_translation_counts(self, translation_counts):
-        """Validates various translation_counts and translation_in_review_counts
-        of the object.
+        """Validates per-language counts of translations.
+
+        Args:
+            translation_counts: dict. A dict with language code as a key and
+                number of translations in that language as the value.
 
         Raises:
             ValidationError. One or more attributes of the object are invalid.

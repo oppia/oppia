@@ -35,6 +35,7 @@ import { TranslateTextService } from '../services/translate-text.service';
 export class TranslationOpportunitiesComponent {
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
+  opportunityType = 'translation';
   constructor(
     private readonly contextService: ContextService,
     private readonly contributionOpportunitiesService:

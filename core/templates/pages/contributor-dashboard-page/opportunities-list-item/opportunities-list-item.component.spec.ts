@@ -108,6 +108,7 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25
       };
+      component.opportunityType = 'translation';
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
       component.labelRequired = true;
@@ -150,11 +151,13 @@ describe('Opportunities List Item Component', () => {
   describe('when opportunity is not provided', () => {
     beforeEach(() => {
       component.opportunity = null;
+      component.opportunityType = null;
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = null;
+      component.opportunityType = '';
       fixture.detectChanges();
       component.ngOnInit();
     });

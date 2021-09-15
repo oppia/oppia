@@ -24,6 +24,7 @@ import {
 describe('Exploration opportunity summary model', () => {
   describe('ExplorationOpportunitySummaryObjectFactory', () => {
     let backendDict: ExplorationOpportunitySummaryBackendDict;
+    let explorationOpportunitySummary: ExplorationOpportunitySummary;
 
     beforeEach(() => {
       backendDict = {
@@ -39,78 +40,49 @@ describe('Exploration opportunity summary model', () => {
           hi: 20
         }
       };
+      explorationOpportunitySummary = (
+        ExplorationOpportunitySummary.createFromBackendDict(
+          backendDict));
     });
 
     it('should return a correct exploration id', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(explorationOpportunitySummary.getExplorationId()).toEqual(
         'exp_id');
     });
 
     it('should return a correct opportunity heading', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(explorationOpportunitySummary.getOpportunityHeading()).toEqual(
         'Introduction');
     });
 
     it('should return a correct opportunity subheading', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(explorationOpportunitySummary.getOpportunitySubheading()).toEqual(
         'Topic - A new story');
     });
 
     it('should return a correct content count', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(explorationOpportunitySummary.getContentCount()).toEqual(100);
     });
 
     it('should return a correct translation progress percentage', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(
         explorationOpportunitySummary.getTranslationProgressPercentage('hi'))
         .toEqual(15);
     });
 
-    it('should return a correct translations in review counts', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
+    it('should return correct translations in review counts', () => {
       expect(
         explorationOpportunitySummary.getTranslationsInReviewCount('hi'))
         .toEqual(20);
     });
 
     it('should return a correct translations counts if available', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(
         explorationOpportunitySummary.getTranslationsCount('hi'))
         .toEqual(15);
     });
 
     it('should return a correct translations counts if not available', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(
         explorationOpportunitySummary.getTranslationsCount('en'))
         .toEqual(0);
@@ -127,21 +99,17 @@ describe('Exploration opportunity summary model', () => {
         translation_counts: {},
         translation_in_review_counts: {}
       };
-      let explorationOpportunitySummary = (
+      const explorationOpportunitySummaryForNoContents = (
         ExplorationOpportunitySummary.createFromBackendDict(
           backendDictWithNoContents));
 
       expect(
-        explorationOpportunitySummary.getTranslationsCount('en'))
+        explorationOpportunitySummaryForNoContents.getTranslationsCount('en'))
         .toEqual(0);
     });
 
     it('should return a correct translation progress percentage for non ' +
       'existing language code', () => {
-      let explorationOpportunitySummary = (
-        ExplorationOpportunitySummary.createFromBackendDict(
-          backendDict));
-
       expect(
         explorationOpportunitySummary.getTranslationProgressPercentage('en'))
         .toEqual(0);
