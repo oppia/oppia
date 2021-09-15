@@ -68,9 +68,10 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: 'var modal = element(by.css("option:checked"));'
   }, {
-    code: ` let items = [];
-            for(let i=0;i< items.length; i++){
-            console.log(items[i])};
+    code: ` var items = ["item1", "item2", "item3"];
+            for (let i=0; i < items.length; i++) {
+              console.log(items[i])
+            };
             //[].forEach(item);`,
   }],
 
@@ -162,9 +163,12 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
-      '[].forEach(item)',
+      `var books = [ "book1", "book2", "book3"];
+      books.forEach( function(book) {
+        console.log(book)
+      });`,
       errors: [{
-        message: 'Please do not use .forEach(), consider "for loop" instead',
+        message: 'Please do not use .forEach(), consider using "for loop"',
       }],
     },
   ]
