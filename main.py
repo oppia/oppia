@@ -911,7 +911,8 @@ URLS.extend((
         r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
 ))
 
-# Add cron urls.
+# Add cron urls. Note that cron URLs MUST start with /cron for them to work
+# in production (see dispatch() in base.py).
 URLS.extend((
     get_redirect_route(
         r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
