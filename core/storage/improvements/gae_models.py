@@ -143,9 +143,9 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        task_entry_models = (
+        task_entry_keys = (
             cls.query(cls.resolver_id == user_id).fetch(keys_only=True))
-        datastore_services.delete_multi(task_entry_models)
+        datastore_services.delete_multi(task_entry_keys)
 
     @staticmethod
     def get_model_association_to_user(

@@ -399,7 +399,7 @@ class BaseModel(datastore_services.Model):
     @classmethod
     def get_all(
             cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
-    ) -> datastore_services.Query[SELF_BASE_MODEL]:
+    ) -> 'datastore_services.Query[SELF_BASE_MODEL]':
         """Gets iterable of all entities of this class.
 
         Args:
@@ -444,7 +444,7 @@ class BaseModel(datastore_services.Model):
     @classmethod
     def _fetch_page_sorted_by_last_updated(
             cls: Type[SELF_BASE_MODEL],
-            query: datastore_services.Query[SELF_BASE_MODEL],
+            query: 'datastore_services.Query[SELF_BASE_MODEL]',
             page_size: int,
             urlsafe_start_cursor: Optional[str]
     ) -> Tuple[Sequence[SELF_BASE_MODEL], Optional[str], bool]:

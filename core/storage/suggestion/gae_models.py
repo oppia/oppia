@@ -479,8 +479,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             been waiting for review.
         """
         return cls.get_all().filter(datastore_services.all_of(
-                cls.status == STATUS_IN_REVIEW,
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION
         )).order(
             cls.last_updated
         ).fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)

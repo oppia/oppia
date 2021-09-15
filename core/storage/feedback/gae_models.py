@@ -564,7 +564,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return message
 
     @classmethod
-    def get_message_count(cls, thread_id: str) -> Optional[int]:
+    def get_message_count(cls, thread_id: str) -> int:
         """Returns the number of messages in the thread. Includes the
         deleted entries.
 
@@ -579,7 +579,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_message_counts(
             cls, thread_ids: List[str]
-    ) -> List[Union[None, int]]:
+    ) -> List[int]:
         """Returns a list containing the number of messages in the threads.
         Includes the deleted entries.
 
@@ -590,6 +590,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             list(int). List of the message counts for the threads.
         """
         thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
+        assert None not in thread_models
         return [
             thread_model.message_count if thread_model else None
             for thread_model in thread_models
