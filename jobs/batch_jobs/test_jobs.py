@@ -20,23 +20,25 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+from core.platform import models
 from jobs import base_jobs
 from jobs import job_utils
 from jobs.io import ndb_io
 from jobs.types import job_run_result
 
 import apache_beam as beam
-from google.cloud import ndb
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class CountAllModelsJob(base_jobs.JobBase):
     """Counts all models in storage."""
 
-    def run(self) -> beam.PTransform[job_run_result.JobRunResult]:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         return (
             self.pipeline
-            | ndb_io.GetModels(ndb.Model.query()) # type: ignore[no-untyped-call]
-            | beam.GroupBy(job_utils.get_model_kind)
+            | ndb_io.GetModels(datastore_services.query_everything()) # type: ignore[attr-defined, no-untyped-call]
+            | beam.Map(job_utils.get_model_kind)
             | beam.combiners.Count.PerElement()
             | beam.Map(lambda key_val: '%s: %d' % key_val)
             | beam.Map(job_run_result.JobRunResult.as_stdout)
