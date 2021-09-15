@@ -37,7 +37,7 @@ module.exports = {
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
       disallowForEach: (
-        'Please do not use .forEach(), consider using' + 
+        'Please do not use .forEach(), consider using' +
         ' "for loop"'),
       disallowAwait: 'Please do not use await for "{{propertyName}}()"',
       useProtractorTest: (

@@ -68,7 +68,7 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: 'var modal = element(by.css("option:checked"));'
   }, {
-    code: ` var items = ["item1", "item2", "item3"];
+    code: ` var items = ['item1', 'item2', 'item3'];
             for (let i=0; i < items.length; i++) {
               console.log(items[i])
             };
@@ -163,7 +163,7 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
-      `var books = [ "book1", "book2", "book3"];
+      `var books = [ 'book1', 'book2', 'book3'];
       books.forEach( function(book) {
         console.log(book)
       });`,
