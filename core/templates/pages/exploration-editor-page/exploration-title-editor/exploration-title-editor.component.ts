@@ -34,14 +34,15 @@ angular.module('oppia').component('explorationTitleEditor', {
   template: require('./exploration-title-editor.component.html'),
   controller: [
     '$scope', 'ExplorationTitleService', 'FocusManagerService',
-    'RouterService',
+    'RouterService', 'MAX_CHARS_IN_EXPLORATION_TITLE',
     function(
         $scope, ExplorationTitleService, FocusManagerService,
-        RouterService) {
+        RouterService, MAX_CHARS_IN_EXPLORATION_TITLE) {
       $scope.explorationTitleService = ExplorationTitleService;
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.$onInit = function() {
+        ctrl.MAX_CHARS_IN_EXPLORATION_TITLE = MAX_CHARS_IN_EXPLORATION_TITLE;
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshSettingsTab.subscribe(
             () => {

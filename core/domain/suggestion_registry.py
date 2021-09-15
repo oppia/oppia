@@ -1430,6 +1430,29 @@ class TranslationContributionStats(python_utils.OBJECT):
         self.rejected_translation_word_count = rejected_translation_word_count
         self.contribution_dates = contribution_dates
 
+    @classmethod
+    def create_default(
+        cls, language_code=None, contributor_user_id=None, topic_id=None
+    ) -> 'TranslationContributionStats':
+        """Create default translation contribution stats.
+
+        Args:
+            language_code: str. The language code for which are these stats
+                generated.
+            contributor_user_id: str. User ID of the contributor to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the translations created.
+
+        Returns:
+            TranslationContributionStats. Default translation contribution
+            stats.
+        """
+        return cls(
+            language_code, contributor_user_id, topic_id,
+            0, 0, 0, 0, 0, 0, 0, set()
+        )
+
     def to_dict(self):
         """Returns a dict representation of a TranslationContributionStats
         domain object.
