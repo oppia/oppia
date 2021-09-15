@@ -16,8 +16,8 @@
 
 """Domain object for states and their constituents."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import copy
@@ -1417,7 +1417,7 @@ class Voiceover(python_utils.OBJECT):
                 'Expected audio filename to be a string, received %s' %
                 self.filename)
         dot_index = self.filename.rfind('.')
-        if dot_index == -1 or dot_index == 0:
+        if dot_index in (-1, 0):
             raise utils.ValidationError(
                 'Invalid audio filename: %s' % self.filename)
         extension = self.filename[dot_index + 1:]
@@ -1618,8 +1618,10 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         correctly_translated_content_ids = []
         for content_id, translations in self.translations_mapping.items():
-            if language_code in translations and not (
-                    translations[language_code].needs_update):
+            if (
+                language_code in translations and
+                not translations[language_code].needs_update
+            ):
                 correctly_translated_content_ids.append(content_id)
 
         return correctly_translated_content_ids
@@ -1636,6 +1638,19 @@ class WrittenTranslations(python_utils.OBJECT):
             WrittenTranslation.DATA_FORMAT_HTML, html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
+
+    def mark_written_translation_as_needing_update(
+            self, content_id, language_code):
+        """Marks translation as needing update for the given content id and
+        language code.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+        """
+        self.translations_mapping[content_id][language_code].needs_update = (
+            True
+        )
 
     def mark_written_translations_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
@@ -1704,7 +1719,7 @@ class WrittenTranslations(python_utils.OBJECT):
         Returns:
             list(str). A list of content id available for text translation.
         """
-        return list(self.translations_mapping.keys())
+        return list(sorted(self.translations_mapping.keys()))
 
     def get_translated_content(self, content_id, language_code):
         """Returns the translated content for the given content_id in the given
@@ -2056,7 +2071,7 @@ class RuleSpec(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected inputs to be a dict, received %s' % self.inputs)
         input_key_set = set(self.inputs.keys())
-        param_names_set = set([rp[0] for rp in rule_params_list])
+        param_names_set = set(rp[0] for rp in rule_params_list)
         leftover_input_keys = input_key_set - param_names_set
         leftover_param_names = param_names_set - input_key_set
 
@@ -2336,6 +2351,56 @@ class SubtitledUnicode(python_utils.OBJECT):
         return cls(content_id, '')
 
 
+class TranslatableItem(python_utils.OBJECT):
+    """Value object representing item that can be translated."""
+
+    DATA_FORMAT_HTML = 'html'
+    DATA_FORMAT_UNICODE_STRING = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+    CONTENT_TYPE_CONTENT = 'content'
+    CONTENT_TYPE_INTERACTION = 'interaction'
+    CONTENT_TYPE_RULE = 'rule'
+    CONTENT_TYPE_FEEDBACK = 'feedback'
+    CONTENT_TYPE_HINT = 'hint'
+    CONTENT_TYPE_SOLUTION = 'solution'
+
+    def __init__(
+            self, content, data_format, content_type, interaction_id=None,
+            rule_type=None):
+        """Initializes a TranslatableItem domain object.
+
+        Args:
+            content: str|list(str). The translatable content text.
+            data_format: str. The data format of the translatable content.
+            content_type: str. One of `Content`, `Interaction`, ‘Rule`,
+                `Feedback`, `Hint`, `Solution`.
+            interaction_id: str|None. Interaction ID, e.g. `TextInput`, if the
+                content corresponds to an InteractionInstance, else None.
+            rule_type: str|None. Rule type if content_type == `Rule`, e.g.
+                “Equals”, “IsSubsetOf”, “Contains” else None.
+        """
+        self.content = content
+        self.data_format = data_format
+        self.content_type = content_type
+        self.interaction_id = interaction_id
+        self.rule_type = rule_type
+
+    def to_dict(self):
+        """Returns a dict representing this TranslatableItem domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of TranslatableItem instance.
+        """
+        return {
+            'content': self.content,
+            'data_format': self.data_format,
+            'content_type': self.content_type,
+            'interaction_id': self.interaction_id,
+            'rule_type': self.rule_type
+        }
+
+
 class State(python_utils.OBJECT):
     """Domain object for a state."""
 
@@ -2531,11 +2596,11 @@ class State(python_utils.OBJECT):
         Raises:
             ValueError. The given content_id does not exist.
         """
-        content_id_to_html = self._get_all_translatable_content()
-        if content_id not in content_id_to_html:
+        content_id_to_translatable_item = self._get_all_translatable_content()
+        if content_id not in content_id_to_translatable_item:
             raise ValueError('Content ID %s does not exist' % content_id)
 
-        return content_id_to_html[content_id]
+        return content_id_to_translatable_item[content_id].content
 
     def is_rte_content_supported_on_android(self):
         """Checks whether the RTE components used in the state are supported by
@@ -2555,9 +2620,9 @@ class State(python_utils.OBJECT):
                 bool. Whether all RTE tags in the html are whitelisted.
             """
             component_name_prefix = 'oppia-noninteractive-'
-            component_names = set([
+            component_names = set(
                 component['id'].replace(component_name_prefix, '')
-                for component in html_cleaner.get_rte_components(html)])
+                for component in html_cleaner.get_rte_components(html))
             return any(component_names.difference(
                 android_validation_constants.VALID_RTE_COMPONENTS))
 
@@ -2731,13 +2796,25 @@ class State(python_utils.OBJECT):
         Args:
             content_id: str. The id of the content.
             language_code: str. The language code of the translated html.
-            translation: str. The translated content.
+            translation: str|list(str). The translated content.
             data_format: str. The data format of the translated content.
         """
         written_translation = WrittenTranslation(
             data_format, translation, False)
         self.written_translations.translations_mapping[content_id][
             language_code] = written_translation
+
+    def mark_written_translation_as_needing_update(
+            self, content_id, language_code):
+        """Marks translation as needing update for the given content id and
+        language code.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+        """
+        self.written_translations.mark_written_translation_as_needing_update(
+            content_id, language_code)
 
     def mark_written_translations_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
@@ -2917,8 +2994,9 @@ class State(python_utils.OBJECT):
                             normalized_param = param_type.normalize(value)
                         except Exception:
                             raise Exception(
-                                '%s has the wrong type. It should be a %s.' %
-                                (value, param_type.__name__))
+                                'Value has the wrong type. It should be a %s. '
+                                'The value is %s' %
+                                (param_type.__name__, value))
 
                     rule_inputs[param_name] = normalized_param
 
@@ -3071,40 +3149,82 @@ class State(python_utils.OBJECT):
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
-        Note: Currently, we don't support interaction translation through
-        contributor dashboard, this method only returns content which are
-        translatable through the contributor dashboard.
-
         Returns:
-            dict(str, str). Returns a dict with key as content id and content
-            html/unicode as the value.
+            dict(str, TranslatableItem). Returns a dict with key as content
+            id and TranslatableItem as value with the appropriate data
+            format.
         """
-        content_id_to_string = {}
+        content_id_to_translatable_item = {}
 
-        content_id_to_string[self.content.content_id] = self.content.html
+        content_id_to_translatable_item[self.content.content_id] = (
+            TranslatableItem(
+                self.content.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_CONTENT))
 
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
         if default_outcome is not None and default_outcome.feedback.html != '':
-            content_id_to_string[default_outcome.feedback.content_id] = (
-                default_outcome.feedback.html)
+            content_id_to_translatable_item[
+                default_outcome.feedback.content_id
+            ] = TranslatableItem(
+                default_outcome.feedback.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_FEEDBACK)
 
         for answer_group in self.interaction.answer_groups:
             if answer_group.outcome.feedback.html != '':
-                content_id_to_string[
+                content_id_to_translatable_item[
                     answer_group.outcome.feedback.content_id
-                ] = (answer_group.outcome.feedback.html)
+                ] = TranslatableItem(
+                    answer_group.outcome.feedback.html,
+                    TranslatableItem.DATA_FORMAT_HTML,
+                    TranslatableItem.CONTENT_TYPE_FEEDBACK)
+            # As of Aug 2021, only TextInput and SetInput have translatable rule
+            # inputs.
+            if self.interaction.id not in ['TextInput', 'SetInput']:
+                continue
+            for rule_spec in answer_group.rule_specs:
+                for input_value in rule_spec.inputs.values():
+                    if 'normalizedStrSet' in input_value:
+                        content_id_to_translatable_item[
+                            input_value['contentId']
+                        ] = TranslatableItem(
+                            input_value['normalizedStrSet'],
+                            TranslatableItem
+                            .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+                            TranslatableItem.CONTENT_TYPE_RULE,
+                            self.interaction.id,
+                            rule_spec.rule_type)
+                    if 'unicodeStrSet' in input_value:
+                        content_id_to_translatable_item[
+                            input_value['contentId']
+                        ] = TranslatableItem(
+                            input_value['unicodeStrSet'],
+                            TranslatableItem
+                            .DATA_FORMAT_SET_OF_UNICODE_STRING,
+                            TranslatableItem.CONTENT_TYPE_RULE,
+                            self.interaction.id,
+                            rule_spec.rule_type)
 
         for hint in self.interaction.hints:
             if hint.hint_content.html != '':
-                content_id_to_string[hint.hint_content.content_id] = (
-                    hint.hint_content.html)
+                content_id_to_translatable_item[
+                    hint.hint_content.content_id
+                ] = TranslatableItem(
+                    hint.hint_content.html,
+                    TranslatableItem.DATA_FORMAT_HTML,
+                    TranslatableItem.CONTENT_TYPE_HINT)
 
         solution = self.interaction.solution
         if solution is not None and solution.explanation.html != '':
-            content_id_to_string[solution.explanation.content_id] = (
-                solution.explanation.html)
+            content_id_to_translatable_item[
+                solution.explanation.content_id
+            ] = TranslatableItem(
+                solution.explanation.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_SOLUTION)
 
         for ca_dict in self.interaction.customization_args.values():
             subtitled_htmls = ca_dict.get_subtitled_html()
@@ -3113,16 +3233,26 @@ class State(python_utils.OBJECT):
                 # Make sure we don't include content that only consists of
                 # numbers. See issue #13055.
                 if html_string != '' and not html_string.isnumeric():
-                    content_id_to_string[subtitled_html.content_id] = (
-                        html_string)
+                    content_id_to_translatable_item[
+                        subtitled_html.content_id
+                    ] = TranslatableItem(
+                        html_string,
+                        TranslatableItem.DATA_FORMAT_HTML,
+                        TranslatableItem.CONTENT_TYPE_INTERACTION,
+                        self.interaction.id)
 
             subtitled_unicodes = ca_dict.get_subtitled_unicode()
             for subtitled_unicode in subtitled_unicodes:
                 if subtitled_unicode.unicode_str != '':
-                    content_id_to_string[subtitled_unicode.content_id] = (
-                        subtitled_unicode.unicode_str)
+                    content_id_to_translatable_item[
+                        subtitled_unicode.content_id
+                    ] = TranslatableItem(
+                        subtitled_unicode.unicode_str,
+                        TranslatableItem.DATA_FORMAT_UNICODE_STRING,
+                        TranslatableItem.CONTENT_TYPE_INTERACTION,
+                        self.interaction.id)
 
-        return content_id_to_string
+        return content_id_to_translatable_item
 
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
@@ -3131,20 +3261,21 @@ class State(python_utils.OBJECT):
             language_code: str. The abbreviated code of the language.
 
         Returns:
-            dict(str, str). A dict with key as content id and value as the
-            content html.
+            dict(str, TranslatableItem). A dict with key as content id and
+            value as TranslatableItem containing the content and the data
+            format.
         """
-        content_id_to_html = self._get_all_translatable_content()
+        content_id_to_translatable_item = self._get_all_translatable_content()
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
         for content_id in available_translation_content_ids:
-            content_id_to_html.pop(content_id, None)
+            content_id_to_translatable_item.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.
 
-        return content_id_to_html
+        return content_id_to_translatable_item
 
     def to_dict(self):
         """Returns a dict representing this State domain object.
@@ -3234,7 +3365,7 @@ class State(python_utils.OBJECT):
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
                 schema v36).
-            state_uses_old_rule_template_schema: bool. Wheter the rule inputs
+            state_uses_old_rule_template_schema: bool. Whether the rule inputs
                 contain html in the form of DragAndDropHtmlString,
                 SetOfHtmlString, or ListOfSetsOfHtmlString (shoud be True if
                 prior to state schema v42).

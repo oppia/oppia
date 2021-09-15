@@ -74,7 +74,8 @@ interface CreatorDashboardDataBackendDict {
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  lastWeekStats: CreatorDashboardStats;
+  // 'lastWeekStats' is null for a new creator.
+  lastWeekStats: CreatorDashboardStats | null;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
@@ -173,7 +174,7 @@ export class CreatorDashboardBackendApiService {
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
               topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
-                topicSummaryDict))) : null)
+                topicSummaryDict))) : [])
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);

@@ -35,6 +35,7 @@ export class AttributionGuideComponent implements OnInit {
   iframed: boolean = false;
   generateAttibutionIsAllowed: boolean = false;
   maskIsShown: boolean = false;
+  printAttributionLink: string = '';
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
@@ -45,6 +46,12 @@ export class AttributionGuideComponent implements OnInit {
   ngOnInit(): void {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
+    this.printAttributionLink = (
+      '<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" ' +
+      'rel=\"noopener\" target=\"_blank\"><span ' +
+      'class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>' +
+      '<span class=\"material-icons oppia-open-new-tab-icon\">' +
+      'open_in_new</span></a>');
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
     if (this.generateAttibutionIsAllowed) {
@@ -85,13 +92,15 @@ export class AttributionGuideComponent implements OnInit {
   copyAttribution(className: string): void {
     const codeDiv = document.getElementsByClassName(className)[0];
     const range = document.createRange();
-    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild);
-    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild);
+    range.setStartBefore(<Node>(<HTMLDivElement>codeDiv).firstChild);
+    range.setEndAfter(<Node>(<HTMLDivElement>codeDiv).lastChild);
+    // 'getSelection()' will not return 'null' since it is not called on an
+    // undisplayed <iframe>. That is why we can use '?'.
     const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
     document.execCommand('copy');
-    selection.removeAllRanges();
+    selection?.removeAllRanges();
     $(codeDiv).tooltip('show');
     setTimeout(() => $(codeDiv).tooltip('hide'), 1000);
   }

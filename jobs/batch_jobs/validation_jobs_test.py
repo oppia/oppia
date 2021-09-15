@@ -16,14 +16,14 @@
 
 """Unit tests for jobs.batch_jobs.validation_jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 import feconf
 from jobs import job_test_utils
 from jobs.batch_jobs import validation_jobs
-from jobs.transforms import base_validation
+from jobs.transforms.validation import base_validation
 from jobs.types import base_validation_errors
 from jobs.types import model_property
 

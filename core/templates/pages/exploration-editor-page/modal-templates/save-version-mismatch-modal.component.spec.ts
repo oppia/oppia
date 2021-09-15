@@ -23,7 +23,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
 import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
 
 @Component({
@@ -89,17 +88,9 @@ describe('Save Version Mismatch Modal Component', () => {
     state_name: 'State name',
   } as unknown as LostChange];
 
-  const lostChangesResponse = [{
-    utilsService: {},
-    cmd: 'add_state',
-    stateName: 'State name',
-  }];
-
   let component: SaveVersionMismatchModalComponent;
   let fixture: ComponentFixture<SaveVersionMismatchModalComponent>;
   let windowRef: MockWindowRef;
-  let loggerService: LoggerService;
-  let logSpy = null;
   let explorationDataService: MockExplorationDataService;
 
   beforeEach(waitForAsync(() => {
@@ -112,7 +103,6 @@ describe('Save Version Mismatch Modal Component', () => {
         ChangesInHumanReadableFormComponentStub
       ],
       providers: [
-        LoggerService,
         LostChangeObjectFactory,
         {
           provide: ExplorationDataService,
@@ -135,17 +125,7 @@ describe('Save Version Mismatch Modal Component', () => {
     component = fixture.componentInstance;
     component.lostChanges = lostChanges;
 
-    loggerService = TestBed.inject(LoggerService);
-    logSpy = spyOn(loggerService, 'error').and.callThrough();
-
     fixture.detectChanges();
-  });
-
-  it('should evaluates lostChanges when controller is initialized', () => {
-    expect(component.lostChanges[0].cmd).toBe('add_state');
-    expect(component.lostChanges[0].stateName).toBe('State name');
-    expect(logSpy).toHaveBeenCalledWith(
-      'Lost changes: ' + JSON.stringify(lostChangesResponse));
   });
 
   it('should remove exploration draft from local storage when modal is closed',
@@ -194,7 +174,36 @@ describe('Save Version Mismatch Modal Component', () => {
     fixture.detectChanges();
 
     expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to copy and ' +
-      'paste these changes before discarding them.');
+      'The lost changes are displayed below. You may want to export or ' +
+      'copy and paste these changes before discarding them.');
+  });
+
+  it('should export the lost changes and close the modal', () => {
+    spyOn(
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
+    ).withArgs('oppia-lost-changes').and.returnValue([
+      {
+        innerText: 'Dummy Inner Text'
+      }
+    ]);
+    const spyObj = jasmine.createSpyObj('a', ['click']);
+    const reloadSpy = jasmine.createSpy('reload');
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        reload: reloadSpy
+      }
+    });
+    spyOn(document, 'createElement').and.returnValue(spyObj);
+    component.hasLostChanges = true;
+    component.exportAndDiscardChanges();
+    expect(document.createElement).toHaveBeenCalledTimes(1);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(spyObj.download).toBe('lostChanges.txt');
+    expect(spyObj.click).toHaveBeenCalledTimes(1);
+    expect(spyObj.click).toHaveBeenCalledWith();
+    waitForAsync(() => {
+      expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
+      expect(reloadSpy).toHaveBeenCalled();
+    });
   });
 });

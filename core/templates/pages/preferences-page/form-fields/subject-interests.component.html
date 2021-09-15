@@ -1,0 +1,32 @@
+<mat-form-field class="subject-interests-chip-list" appearance="fill">
+  <mat-label>Subject Interests</mat-label>
+  <mat-chip-list #chipList aria-label="Subject Interests">
+    <mat-chip *ngFor="let subjectInterest of subjectInterests"
+              [selectable]="selectable"
+              [removable]="removable"
+              (removed)="remove(subjectInterest)">
+      {{ subjectInterest }}
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+    </mat-chip>
+    <input placeholder="New Subject Interest"
+           class="protractor-test-subject-interests-input"
+           #subjectInterestInput
+           [formControl]="formCtrl"
+           [matAutocomplete]="auto"
+           [matChipInputFor]="chipList"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           (matChipInputTokenEnd)="add($event)">
+  </mat-chip-list>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let subjectInterest of filteredSubjectInterests | async" [value]="subjectInterest">
+      {{ subjectInterest }}
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error>Subject interests must be unique and in lowercase.</mat-error>
+</mat-form-field>
+
+<style>
+  .subject-interests-chip-list {
+    width: 100%;
+  }
+</style>

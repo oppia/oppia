@@ -30,7 +30,8 @@ class MockWindowRef {
       protocol: 'https:',
       host: 'www.oppia.org'
     },
-    open: (url: string) => {}
+    open: (url: string) => {},
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -50,7 +51,7 @@ describe('SharingLinksComponent', () => {
   let windowRef: MockWindowRef;
   let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
   let ngbModal: NgbModal;
-  let siteAnalyticsService: SiteAnalyticsService = null;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
@@ -74,12 +75,6 @@ describe('SharingLinksComponent', () => {
     component.shareType = 'exploration';
     component.explorationId = 'exp1';
 
-    expect(component.activityId).toBe(undefined);
-    expect(component.activityUrlFragment).toBe(undefined);
-    expect(component.serverName).toBe(undefined);
-    expect(component.escapedTwitterText).toBe(undefined);
-    expect(component.classroomUrl).toBe(undefined);
-
     component.ngOnInit();
 
     expect(component.activityId).toBe('exp1');
@@ -95,12 +90,6 @@ describe('SharingLinksComponent', () => {
     ' collection is shared', () => {
     component.shareType = 'collection';
     component.collectionId = 'col1';
-
-    expect(component.activityId).toBe(undefined);
-    expect(component.activityUrlFragment).toBe(undefined);
-    expect(component.serverName).toBe(undefined);
-    expect(component.escapedTwitterText).toBe(undefined);
-    expect(component.classroomUrl).toBe(undefined);
 
     component.ngOnInit();
 

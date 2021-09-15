@@ -16,8 +16,8 @@
 
 """Commands for operations on blogs, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -26,7 +26,7 @@ from core.domain import blog_domain
 from core.domain import html_cleaner
 from core.domain import role_services
 from core.platform import models
-
+import feconf
 import python_utils
 import utils
 
@@ -74,25 +74,6 @@ def get_blog_post_by_id(blog_post_id, strict=True):
         return get_blog_post_from_model(blog_post_model)
     else:
         return None
-
-
-def get_blog_posts_by_ids(blog_post_ids):
-    """Returns a list of blog posts matching the IDs provided.
-
-    Args:
-        blog_post_ids: list(str). List of IDs to get blog posts for.
-
-    Returns:
-        list(BlogPost|None). The list of blog posts corresponding to given IDs
-        (with None in place of blog post IDs corresponding to deleted blog
-        posts).
-    """
-    all_blog_post_models = (
-        blog_models.BlogPostModel.get_multi(blog_post_ids))
-    blog_posts = [
-        get_blog_post_from_model(model) if model is not None else None
-        for model in all_blog_post_models]
-    return blog_posts
 
 
 def get_blog_post_by_url_fragment(url_fragment):
@@ -180,7 +161,9 @@ def get_blog_post_summary_models_list_by_user_id(
     blog_post_summaries = [
         get_blog_post_summary_from_model(model) if model is not None else None
         for model in blog_post_summary_models]
-    return blog_post_summaries if len(blog_post_summaries) != 0 else None
+    return (
+        sorted(blog_post_summaries, key=lambda k: k.last_updated, reverse=True)
+            if len(blog_post_summaries) != 0 else [])
 
 
 def filter_blog_post_ids(user_id, blog_post_is_published):
@@ -195,10 +178,14 @@ def filter_blog_post_ids(user_id, blog_post_is_published):
         list(str). The blog post IDs of the blog posts for which the user is an
         editor corresponding to the status(draft/published).
     """
-    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
-        blog_models.BlogPostRightsModel.editor_ids == user_id,
-        blog_models.BlogPostRightsModel.blog_post_is_published == (
-            blog_post_is_published)).fetch()
+    if blog_post_is_published:
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                user_id))
+    else:
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
+                user_id))
     model_ids = []
     if blog_post_rights_models:
         for model in blog_post_rights_models:
@@ -277,23 +264,30 @@ def get_blog_post_rights(blog_post_id, strict=True):
     return get_blog_post_rights_from_model(model)
 
 
-def get_blog_post_rights_by_user_id(user_id):
-    """Retrieves the rights object for all blog posts for which the given
-    user is an editor.
+def get_published_blog_post_summaries_by_user_id(user_id, max_limit):
+    """Retrieves the summary objects for given number of published blog posts
+    for which the given user is an editor.
 
     Args:
         user_id: str. ID of the user.
+        max_limit: int. The number of models to be fetched.
 
     Returns:
-        list(BlogPostRights). The rights objects associated with the
+        list(BlogPostSummary). The summary objects associated with the
         blog posts assigned to given user.
     """
-    blog_post_rights_models = (
-        blog_models.BlogPostRightsModel.get_by_user(user_id))
-    return [
-        get_blog_post_rights_from_model(model)
-        for model in blog_post_rights_models
-        if model is not None]
+    blog_rights_models = (
+        blog_models.BlogPostRightsModel.get_published_models_by_user(
+            user_id, max_limit))
+    if not blog_rights_models:
+        return None
+    blog_post_ids = [model.id for model in blog_rights_models]
+    blog_summary_models = (
+        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model)
+        for model in blog_summary_models]
+    return blog_post_summaries
 
 
 def does_blog_post_with_url_fragment_exist(url_fragment):
@@ -500,8 +494,10 @@ def generate_summary_of_blog_post(content):
     """
     raw_text = html_cleaner.strip_html_tags(content)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
-    summary = raw_text[:max_chars_in_summary] + '...'
-    return summary
+    if len(raw_text) > max_chars_in_summary:
+        summary = raw_text[:max_chars_in_summary] + '...'
+        return summary
+    return raw_text
 
 
 def compute_summary_of_blog_post(blog_post):
@@ -570,10 +566,12 @@ def update_blog_post(blog_post_id, change_dict):
         blog_post_models = blog_models.BlogPostModel.query().filter(
             blog_models.BlogPostModel.title == updated_blog_post.title
             ).filter(blog_models.BlogPostModel.deleted == False).fetch()  # pylint: disable=singleton-comparison
-        if blog_post_models != []:
-            raise utils.ValidationError(
-                'Blog Post with given title already exists: %s'
-                % updated_blog_post.title)
+        if len(blog_post_models) > 0:
+            if (len(blog_post_models) > 1 or (
+                    blog_post_models[0].id != blog_post_id)):
+                raise utils.ValidationError(
+                    'Blog Post with given title already exists: %s'
+                    % updated_blog_post.title)
 
     _save_blog_post(updated_blog_post)
     updated_blog_post_summary = compute_summary_of_blog_post(updated_blog_post)
@@ -600,3 +598,64 @@ def create_new_blog_post(author_id):
     _save_blog_post_summary(new_blog_post_summary_model)
 
     return new_blog_post
+
+
+def get_published_blog_post_summaries(offset=0):
+    """Returns published BlogPostSummaries list.
+
+    Args:
+        offset: int. Number of query results to skip from top.
+
+    Returns:
+        list(BlogPostSummaries) | None . These are sorted in order of the date
+        published. None if no blog post is published.
+    """
+    max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.blog_post_is_published == True).order( # pylint: disable=singleton-comparison
+            -blog_models.BlogPostRightsModel.last_updated).fetch(
+                max_limit, offset=offset)
+    if len(blog_post_rights_models) == 0:
+        return None
+    blog_post_ids = [model.id for model in blog_post_rights_models]
+    blog_post_summary_models = (
+        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
+    blog_post_summaries = []
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model) if model is not None else None
+        for model in blog_post_summary_models]
+    return blog_post_summaries
+
+
+def update_blog_models_author_and_published_on_date(
+        blog_post_id, author_id, date):
+    """Updates blog post model with the author id and published on
+    date provided.
+
+    Args:
+        blog_post_id: str. The ID of the blog post which has to be updated.
+        author_id: str. User ID of the author.
+        date: str. The date of publishing the blog post.
+    """
+    blog_post = get_blog_post_by_id(blog_post_id, True)
+    blog_post_rights = get_blog_post_rights(
+        blog_post_id, strict=True)
+
+    blog_post.author_id = author_id
+    supported_date_string = date + ', 00:00:00:00'
+    blog_post.published_on = utils.convert_string_to_naive_datetime_object(
+        supported_date_string)
+    blog_post.validate(strict=True)
+
+    blog_post_summary = compute_summary_of_blog_post(blog_post)
+    _save_blog_post_summary(blog_post_summary)
+
+    blog_post_model = blog_models.BlogPostModel.get(
+        blog_post.id, strict=True)
+    blog_post_model.author_id = blog_post.author_id
+    blog_post_model.published_on = blog_post.published_on
+    blog_post_model.update_timestamps()
+    blog_post_model.put()
+
+    blog_post_rights.editor_ids.append(blog_post.author_id)
+    save_blog_post_rights(blog_post_rights)

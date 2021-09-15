@@ -16,8 +16,8 @@
 
 """Utility methods for managing concurrent tasks."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import threading
@@ -123,8 +123,7 @@ class TaskThread(threading.Thread):
         except Exception as e:
             self.exception = e
             self.stacktrace = traceback.format_exc()
-            if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
-                    self.exception.args[0]):
+            if 'KeyboardInterrupt' not in self.exception.args[0]:
                 log(e)
                 log(
                     'ERROR %s: %.1f secs' %

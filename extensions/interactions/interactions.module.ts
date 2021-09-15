@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
@@ -32,7 +31,6 @@ import { NumericExpressionInputModule } from './NumericExpressionInput/numeric-e
 import { NumericInputModule } from './NumericInput/numeric-input-interactions.module';
 import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interactions.module';
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
-import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
@@ -41,7 +39,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
     ContinueExtensionsModule,
@@ -52,7 +49,6 @@ import { TranslateModule } from '@ngx-translate/core';
     NumericInputModule,
     MathEquationInputModule,
     InteractiveMapInteractionModule,
-    LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
     SetInputInteractionModule,
     TextInputInteractionModule,
@@ -71,7 +67,6 @@ import { TranslateModule } from '@ngx-translate/core';
     NumericInputModule,
     MathEquationInputModule,
     InteractiveMapInteractionModule,
-    LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
     SetInputInteractionModule,
     TextInputInteractionModule

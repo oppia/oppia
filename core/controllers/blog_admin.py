@@ -14,8 +14,8 @@
 
 """Controllers for the blog admin page"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -31,6 +31,21 @@ import feconf
 
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
+
+
+class BlogAdminPage(base.BaseHandler):
+    """Blog Admin Page  Handler to render the frontend template."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_admin_page
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_template('blog-admin-page.mainpage.html')
 
 
 class BlogAdminHandler(base.BaseHandler):
@@ -66,8 +81,7 @@ class BlogAdminHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_admin_page
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         config_properties = config_domain.Registry.get_config_property_schemas()
         config_prop_for_blog_admin = {
@@ -91,19 +105,18 @@ class BlogAdminHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_access_blog_admin_page
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Handles POST requests."""
         result = {}
         if self.normalized_payload.get(
                 'action') == 'save_config_properties':
             new_config_property_values = self.normalized_payload.get(
                 'new_config_property_values')
+            for (name, value) in new_config_property_values.items():
+                config_services.set_property(self.user_id, name, value)
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
                 (self.user_id, new_config_property_values))
-            for (name, value) in new_config_property_values.items():
-                config_services.set_property(self.user_id, name, value)
         elif self.normalized_payload.get(
                 'action') == 'revert_config_property':
             config_property_id = (
@@ -145,8 +158,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_manage_blog_post_editors
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Handles POST requests."""
         username = self.normalized_payload.get('username')
         role = self.normalized_payload.get('role')
@@ -154,15 +166,14 @@ class BlogAdminRolesHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
-        user_services.update_user_role(user_id, role)
+        user_services.add_user_role(user_id, role)
         role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
+            self.user_id, feconf.ROLE_ACTION_ADD, role=role,
             username=username)
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors
-    def put(self):
-        # type: () -> None
+    def put(self) -> None:
         """Handles PUT requests."""
         username = self.normalized_payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
@@ -170,6 +181,6 @@ class BlogAdminRolesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        user_services.remove_blog_editor(user_id)
+        user_services.remove_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
         blog_services.deassign_user_from_all_blog_posts(user_id)
         self.render_json({})

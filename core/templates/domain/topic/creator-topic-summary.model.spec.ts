@@ -19,7 +19,7 @@
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 describe('Creator topic summary model', () => {
-  let _sampleCreatorTopicSummary: CreatorTopicSummary = null;
+  let _sampleCreatorTopicSummary: CreatorTopicSummary;
 
   beforeEach(() => {
     let sampleCreatorTopicSummaryBackendDict = {
@@ -41,6 +41,7 @@ describe('Creator topic summary model', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       is_published: false,
+      can_edit_topic: false
     };
     _sampleCreatorTopicSummary = CreatorTopicSummary.createFromBackendDict(
       sampleCreatorTopicSummaryBackendDict);

@@ -26,7 +26,7 @@ describe('NumericExpressionEditor', () => {
   let fixture: ComponentFixture<NumericExpressionEditorComponent>;
   let component: NumericExpressionEditorComponent;
   const originalGuppy = window.Guppy;
-  const mockGuppyObject: GuppyObject = {
+  const mockGuppyObject = {
     divId: '2',
     guppyInstance: {
       asciimath: () => {
@@ -35,7 +35,7 @@ describe('NumericExpressionEditor', () => {
     }
   };
   let guppyInitializationService: GuppyInitializationService;
-  let deviceInfoService = null;
+  let deviceInfoService: DeviceInfoService;
 
   class MockGuppy {
     static focused = true;
@@ -64,7 +64,6 @@ describe('NumericExpressionEditor', () => {
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     window.Guppy = MockGuppy;
-    component.currentValue = '';
   })));
 
   afterEach(() => {
@@ -73,15 +72,20 @@ describe('NumericExpressionEditor', () => {
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not show warnings if the editor is active', () => {
-    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+    // This throws "Type 'undefined' is not assignable to type 'string'".
+    // We need to suppress this error because we are testing validations here.
+    // Validation here refers to the 'if' checks defined in ngOnInit() which
+    // replaces 'value' with empty strings if null or undefined.
+    // @ts-ignore
     component.currentValue = undefined;
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
@@ -89,7 +93,10 @@ describe('NumericExpressionEditor', () => {
 
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
+    // This throws "Type 'null' is not assignable to type 'string'".
+    // We need to suppress this error because we are testing validations here.
+    // @ts-ignore
     component.value = null;
     MockGuppy.focused = false;
     component.ngOnInit();
@@ -98,13 +105,11 @@ describe('NumericExpressionEditor', () => {
 
   it('should correctly validate current answer', () => {
     // This should not show warnings if the editor hasn't been touched.
-    component.currentValue = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
 
     component.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    component.currentValue = '';
     expect(component.isCurrentAnswerValid()).toBeFalse();
     expect(
       component.warningText).toBe('Please enter an answer before submitting.');
@@ -122,7 +127,7 @@ describe('NumericExpressionEditor', () => {
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });

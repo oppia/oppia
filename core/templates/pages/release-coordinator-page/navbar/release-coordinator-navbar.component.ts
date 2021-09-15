@@ -34,17 +34,18 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   @Input() activeTab: string;
   @Output() activeTabChange = new EventEmitter();
 
-  BEAM_JOBS_TAB_IS_ENABLED = AppConstants.BEAM_JOBS_ARE_ENABLED;
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
-  TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
   profilePictureDataUrl: string;
   username: string;
   profileUrl: string;
-  logoutUrl: string = AppConstants.LOGOUT_URL;
+  logoutUrl: string = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
   profileDropdownIsActive: boolean = false;
   logoWebpImageSrc: string;
   logoPngImageSrc: string;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -91,7 +92,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     this.logoWebpImageSrc = this.urlInterpolationService.getStaticImageUrl(
       '/logo/288x128_logo_white.webp');
 
-    this.activeTab = this.TAB_ID_JOBS;
+    this.activeTab = this.TAB_ID_BEAM_JOBS;
   }
 }
 

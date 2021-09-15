@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for parameter name editor.
+ * @fileoverview Component for parameter name editor.
  */
 
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be

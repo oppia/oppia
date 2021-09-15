@@ -14,8 +14,8 @@
 
 """Python execution for checking whether the tests output is flaky."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import os
@@ -33,15 +33,6 @@ PASS_REPORT_URL = (
 REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
 
 CI_INFO = {
-    'circleCI': {
-        'env': {
-            'identifier': 'CIRCLECI',
-            'user_info': 'CIRCLE_USERNAME',
-            'branch': 'CIRCLE_BRANCH',
-            'build_url_template_vars': ['CIRCLE_BUILD_URL']
-        },
-        'build_url_template': '%s',
-    },
     'githubActions': {
         'env': {
             'identifier': 'GITHUB_ACTIONS',
@@ -50,6 +41,15 @@ CI_INFO = {
             'build_url_template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID'],
         },
         'build_url_template': 'https://github.com/%s/actions/runs/%s',
+    },
+    'circleCI': {
+        'env': {
+            'identifier': 'CIRCLECI',
+            'user_info': 'CIRCLE_USERNAME',
+            'branch': 'CIRCLE_BRANCH',
+            'build_url_template_vars': ['CIRCLE_BUILD_URL']
+        },
+        'build_url_template': '%s',
     }
 }
 

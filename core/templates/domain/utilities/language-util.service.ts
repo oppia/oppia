@@ -50,7 +50,7 @@ interface SupportedContentLanguageBackendDict {
   'direction': string;
 }
 
-interface LanguageIdAndText {
+export interface LanguageIdAndText {
   id: string;
   text: string;
 }
@@ -158,9 +158,9 @@ export class LanguageUtilService {
     return this.getAllAudioLanguageCodes();
   }
 
-  getAudioLanguageDescription(audioLanguageCode: string): string | null {
+  getAudioLanguageDescription(audioLanguageCode: string): string {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
-    return language ? language.description : null;
+    return language.description;
   }
 
   getLanguageDirection(languageCode: string): string {

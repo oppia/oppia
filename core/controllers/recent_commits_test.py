@@ -16,8 +16,8 @@
 
 """Tests for recent commit controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 from core.tests import test_utils
@@ -115,8 +115,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             params={'query_type': 'all_non_private_commits'})
 
         self.assertEqual(
-            len(response_dict['results']),
-            feconf.COMMIT_LIST_PAGE_SIZE)
+            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE)
         self.assertTrue(response_dict['more'])
 
         cursor = response_dict['cursor']

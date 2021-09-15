@@ -14,8 +14,8 @@
 
 """Tests for feedback-related services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import event_services
 from core.domain import exp_domain
@@ -350,18 +350,14 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             self.EXPECTED_THREAD_DICT_VIEWER, threads[0].to_dict())
 
-    def test_get_total_open_threads_for_single_exploration(self):
+    def test_get_total_open_thread_for_single_exploration(self):
         feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-
-        threads = feedback_services.get_all_threads(
-            'exploration', self.EXP_ID_1, False)
-        self.assertEqual(1, len(threads))
-
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi(
-                [self.EXP_ID_1])), 1)
+        thread = feedback_services.get_thread_analytics(self.EXP_ID_1)
+        self.assertEqual(thread.id, self.EXP_ID_1)
+        self.assertEqual(thread.num_open_threads, 1)
+        self.assertEqual(thread.num_total_threads, 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
         feedback_services.create_thread(
@@ -859,9 +855,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # the email.
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
 
@@ -885,9 +878,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # There are two jobs in the taskqueue: one for the realtime
             # event associated with creating a thread, and one for sending
             # the email.
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
@@ -928,12 +918,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
 
-            # Note: the job in the taskqueue represents the realtime
-            # event emitted by create_thread().
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -948,12 +932,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
 
-            # Note: the job in the taskqueue represents the realtime
-            # event emitted by create_thread().
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -964,12 +942,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 'exploration', self.exploration.id, None,
                 'a subject', 'some text')
 
-            # Note: the job in the taskqueue represents the realtime
-            # event emitted by create_thread().
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -983,9 +955,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # There are two jobs in the taskqueue: one for the realtime
             # event associated with creating a thread, and one for sending
             # the email.
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
@@ -1010,12 +979,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
 
-            # Note: the job in the taskqueue represents the realtime
-            # event emitted by create_thread().
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1026,12 +989,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', '')
 
-            # Note: the job in the taskqueue represents the realtime
-            # event emitted by create_thread().
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1042,12 +999,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 'exploration', self.exploration.id,
                 self.editor_id, 'a subject', 'A message')
 
-            # Note: the job in the taskqueue represents the realtime
-            # event emitted by create_thread().
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1063,9 +1014,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
@@ -1077,9 +1025,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_changing_status_of_thread(self):
@@ -1093,9 +1038,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
@@ -1111,9 +1053,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_each_feedback_message(self):
@@ -1130,9 +1069,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
             feedback_services.create_message(
@@ -1140,9 +1076,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
 
             feedback_services.create_message(
@@ -1150,9 +1083,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
 
 
@@ -1223,13 +1153,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_correct_emails_are_sent_for_multiple_feedback(self):
         expected_email_html_body = (
@@ -1287,13 +1214,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_emails_are_not_sent_if_already_seen(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1310,7 +1234,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
-                {'thread_id': thread_id}, csrf_token=csrf_token)
+                {}, csrf_token=csrf_token)
 
             self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
@@ -1376,13 +1300,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 thread_id, self.editor_id, None, None, 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_emails_are_sent_for_status_change(self):
         expected_email_html_body = (
@@ -1425,13 +1346,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 feedback_models.STATUS_CHOICES_FIXED, None, '')
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_emails_are_sent_for_both_status_change_and_message(self):
         expected_email_html_body_message = (
@@ -1501,17 +1419,12 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 2)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body_status)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body_status)
-            self.assertEqual(
-                messages[1].html.decode(), expected_email_html_body_message)
-            self.assertEqual(
-                messages[1].body.decode(), expected_email_text_body_message)
+            self.assertEqual(messages[0].html, expected_email_html_body_status)
+            self.assertEqual(messages[0].body, expected_email_text_body_status)
+            self.assertEqual(messages[1].html, expected_email_html_body_message)
+            self.assertEqual(messages[1].body, expected_email_text_body_message)
 
     def test_that_emails_are_not_sent_to_anonymous_user(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:

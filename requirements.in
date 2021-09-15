@@ -3,23 +3,21 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.24.0
+apache-beam[gcp]==2.31.0
 backports.functools-lru-cache==1.6.1
-beautifulSoup4==4.9.1
+beautifulsoup4==4.9.3
 bleach==3.3.0
 callbacks==0.3.0
 contextlib2==0.6.0.post1
-# TODO(#11474): Use a regular dependency after upgrading to Python 3. Until
-# then, we must depend on a patched version of firebase-admin==3.2.1 (hosted on
-# the following repository) because that is the last version which supports
-# Python 2, but is missing a feature which we were forced to patch in.
-git+git://github.com/oppia/firebase-admin-python@8d6deee889733d09ef5327d78c09e4d7b17785ac#egg=firebase-admin
+defusedxml==0.7.1
+firebase-admin==5.0.0
 future==0.18.2
-GoogleAppEngineCloudStorageClient==1.9.22.1
-GoogleAppEngineMapReduce==1.9.22.0
+gunicorn==20.1.0
+google-cloud-storage==1.37.1
 GoogleAppEnginePipeline==1.9.22.1
 Graphy==1.0.0
 html5lib==1.0.1
+mailchimp3==3.0.14
 mutagen==1.43.0
 packaging==20.4
 pylatexenc==2.6
@@ -27,13 +25,27 @@ simplejson==3.17.0
 six==1.15.0
 soupsieve==1.9.5
 webencodings==0.5.1
+pillow==8.2.0
 redis==3.5.3
-requests==2.24.0
+requests==2.26.0
 requests-mock==1.5.2
 requests-toolbelt==0.9.1
+rsa==4.7
+googledatastore==7.0.2
+google-auth==1.34.0
+google-cloud-ndb==1.8.0
 google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
-googleapis_common_protos==1.52.0
+pytest==6.2.3
 webapp2==3.0.0b1
-elasticsearch==7.10.0
-mailchimp3==3.0.14
+elasticsearch==7.14.0
+urllib3==1.26.6
+# TODO(#13506): Remove these after we refactor the Python library
+# handling process.
+# These libraries are already in oppia_tools folder, but are also needed here
+# since the oppia_tools folder is used for tooling and is not deployed to the
+# server. These libraries need to be in the oppia_tools folder because we need
+# them earlier than we are able to install the libraries from this file.
+PyYAML==5.4.1
+certifi==2021.5.30
+google-cloud-dataflow-client==0.1.3

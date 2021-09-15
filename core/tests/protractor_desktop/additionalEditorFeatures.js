@@ -32,6 +32,8 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
+var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
+
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
@@ -52,7 +54,7 @@ describe('Full exploration editor', function() {
       await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
-      await workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial(false);
       await explorationEditorMainTab.startTutorial();
       await explorationEditorMainTab.playTutorial();
       await explorationEditorMainTab.finishTutorial();
@@ -382,6 +384,69 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.expectInteractionToMatch('EndExploration');
     await users.logout();
   });
+
+  it(
+    'should merge changes when the changes are not conflicting ' +
+      'and the frontend version of an exploration is not equal to ' +
+      'the backend version',
+    async function() {
+      await users.createUser('user9@editor.com', 'user9Editor');
+      await users.createUser('user10@editor.com', 'user10Editor');
+
+      // Create an exploration as user user9Editor with title, category, and
+      // objective set and add user user10Editor as a collaborator.
+      await users.login('user9@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user10Editor');
+      await explorationEditorPage.navigateToMainTab();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      // Login as collaborator and make changes in title and objective which
+      // do not conflict with the user user9editor's unsaved content changes.
+      await users.login('user10@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Title Changed');
+      await explorationEditorSettingsTab.setObjective('Objective Changed.');
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      // Open the exploration again from the first user's account and try saving
+      // the unsaved changes. They should be saved.
+      await users.login('user9@editor.com');
+      await general.openEditor(explorationId, false);
+      await waitFor.pageToFullyLoad();
+      expect(await lostChangesModal.isPresent()).toBe(false);
+      await explorationEditorPage.saveChanges();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorPage.verifyExplorationSettingFields(
+        'Title Changed',
+        'Algebra',
+        'Objective Changed.',
+        'English',
+        []
+      );
+      await users.logout();
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);

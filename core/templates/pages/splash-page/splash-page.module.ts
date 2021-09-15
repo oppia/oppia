@@ -16,47 +16,28 @@
  * @fileoverview Module for the splash page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { SplashPageComponent } from './splash-page.component';
 import { SplashPageRootComponent } from './splash-page-root.component';
+import { CommonModule } from '@angular/common';
+import { SplashPageRoutingModule } from './splash-page-routing.module';
+
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    SplashPageRoutingModule
   ],
   declarations: [
     SplashPageComponent,
     SplashPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     SplashPageComponent,
     SplashPageRootComponent,
-    OppiaAngularRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [SplashPageRootComponent]
+  ]
 })
 export class SplashPageModule {}

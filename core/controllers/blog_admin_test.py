@@ -14,8 +14,8 @@
 
 """Tests for the blog admin page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -23,6 +23,28 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.tests import test_utils
 import feconf
+
+
+class BlogAdminPageTests(test_utils.GenericTestBase):
+    """Checks the access to the blog admin page and its rendering."""
+
+    def test_blog_admin_page_access_without_logging_in(self):
+        """Tests access to the Blog Admin page."""
+        self.get_html_response('/blog-admin', expected_status_int=302)
+
+    def test_blog_admin_page_acess_without_being_blog_admin(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response('/blog-admin', expected_status_int=401)
+        self.logout()
+
+    def test_blog_admin_page_acess_as_blog_admin(self):
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.login(self.BLOG_ADMIN_EMAIL)
+        self.get_html_response('/blog-admin')
+        self.logout()
 
 
 class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
@@ -34,7 +56,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
 
@@ -50,7 +72,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
             {
-                'role': feconf.ROLE_ID_BLOG_ADMIN,
+                'role': feconf.ROLE_ID_BLOG_POST_EDITOR,
                 'username': username
             },
             csrf_token=csrf_token,
@@ -110,7 +132,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
 
@@ -207,3 +229,59 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
             'property_values\' failed: Could not convert list to int: [20]')
+
+    def test_raise_error_for_updating_value_to_zero_for_max_tags(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = 0
+
+        response_dict = self.get_json('/blogadminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': 10,
+        }, response_config_properties[
+            config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name])
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
+                    new_config_value),
+            }
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response_dict['error'], 'Schema validation for \'new_config_'
+            'property_values\' failed: Validation failed: is_at_least'
+            ' ({\'min_value\': 1}) for object 0'
+        )
+
+    def test_raise_error_for_updating_to_negative_value_for_max_tags(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = -2
+
+        response_dict = self.get_json('/blogadminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': 10,
+        }, response_config_properties[
+            config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name])
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
+                    new_config_value),
+            }
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response_dict['error'], 'Schema validation for \'new_config_'
+            'property_values\' failed: Validation failed: is_at_least'
+            ' ({\'min_value\': 1}) for object -2'
+        )

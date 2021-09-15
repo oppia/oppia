@@ -16,8 +16,8 @@
 
 """Unit tests for base model validator errors."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import pickle
@@ -372,5 +372,5 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             error.stderr,
             'CommitCmdsValidateError in BaseCommitLogEntryModel'
             '(id="invalid"): Commit command domain validation for '
-            'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed '
+            'command: {\'cmd-invalid\': \'invalid_test_command\'} failed '
             'with error: Missing cmd key in change dict')

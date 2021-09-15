@@ -60,7 +60,7 @@ describe('Upload Activity Modal Component', () => {
       component = fixture.componentInstance;
     });
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    alertsService = TestBed.get(AlertsService);
+    alertsService = TestBed.inject(AlertsService);
   }));
 
   it('should close modal when saving activity', fakeAsync(() => {
@@ -118,5 +118,34 @@ describe('Upload Activity Modal Component', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should throw error if no label is found for uploading files', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    spyOn(document, 'getElementById').and.returnValue(null);
+    expect(() => {
+      component.save();
+    }).toThrowError('No label found for uploading files.');
+    expect(dismissSpy).not.toHaveBeenCalled();
+  });
+
+  it('should throw error if no files are uploaded', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    // This throws "Argument of type '() => { files: { size: number;
+    // name: string; }[]; }' is not assignable to parameter of type
+    // '(elementId: string) => HTMLElement'.". This is because the
+    // actual 'getElementById' returns more properties than just "files".
+    // We need to suppress this error because we need only "files"
+    // property for testing.
+    // @ts-expect-error
+    spyOn(document, 'getElementById').and.callFake(() => {
+      return {
+        files: null
+      };
+    });
+    expect(() => {
+      component.save();
+    }).toThrowError('No files found.');
+    expect(dismissSpy).not.toHaveBeenCalled();
   });
 });

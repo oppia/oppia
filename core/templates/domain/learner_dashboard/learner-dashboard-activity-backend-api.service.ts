@@ -31,10 +31,7 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
   'belongs_to_subscribed_activities': boolean
-  'is_admin': boolean
-  'is_moderator': boolean
   'is_super_admin': boolean
-  'is_topic_manager': boolean
   'playlist_limit_exceeded': boolean
   'user_email': string
   'username': string
@@ -42,10 +39,7 @@ interface LearnerPlaylistResponseObject {
 
 interface LearnerGoalsResponseObject {
   'belongs_to_learnt_list': boolean
-  'is_admin': boolean
-  'is_moderator': boolean
   'is_super_admin': boolean
-  'is_topic_manager': boolean
   'goals_limit_exceeded': boolean
   'user_email': string
   'username': string
@@ -55,10 +49,13 @@ interface LearnerGoalsResponseObject {
   providedIn: 'root'
 })
 export class LearnerDashboardActivityBackendApiService {
-  successfullyAdded: boolean;
-  addToLearnerPlaylistUrl: string;
-  addToLearnerGoalsUrl: string;
-  removeActivityModalStatus: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  addToLearnerPlaylistUrl!: string;
+  addToLearnerGoalsUrl!: string;
+  removeActivityModalStatus!: string;
+  successfullyAdded: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -166,7 +163,6 @@ export class LearnerDashboardActivityBackendApiService {
   async removeActivityModalAsync(
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
-    this.removeActivityModalStatus = null;
     const modelRef = this.ngbModal.open(
       RemoveActivityModalComponent, {backdrop: true});
     modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;

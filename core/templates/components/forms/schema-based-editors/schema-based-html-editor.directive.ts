@@ -29,6 +29,7 @@ export class SchemaBasedHtmlEditorComponent implements OnInit {
   @Input() disabled;
   @Input() labelForFocusTarget;
   @Input() uiConfig;
+  @Input() headersEnabled;
   constructor() { }
 
   ngOnInit(): void { }

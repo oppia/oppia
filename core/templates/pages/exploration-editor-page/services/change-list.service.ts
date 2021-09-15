@@ -18,7 +18,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, OnInit, Output } from '@angular/core';
+import { EventEmitter, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -28,16 +28,13 @@ import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange, ExplorationChangeEditExplorationProperty } from 'domain/exploration/exploration-draft.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChangeListService implements OnInit {
-  // TODO(sll): Implement undo, redo functionality. Show a message on each
-  // step saying what the step is doing.
-  // TODO(sll): Allow the user to view the list of changes made so far, as
-  // well as the list of changes in the undo stack.
-
+export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
 
@@ -45,6 +42,8 @@ export class ChangeListService implements OnInit {
   // undone change.
   undoneChangeStack: ExplorationChange[] = [];
   loadingMessage: string = '';
+  // Temporary list of the changes made to the exploration when offline.
+  temporaryListOfChanges: ExplorationChange[] = [];
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -86,17 +85,29 @@ export class ChangeListService implements OnInit {
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(
+    private windowRef: WindowRef,
     private alertsService: AlertsService,
     private autosaveInfoModalsService: AutosaveInfoModalsService,
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-  ) {}
-
-  ngOnInit(): void {
+    private internetConnectivityService: InternetConnectivityService,
+  ) {
+    // We have added subscriptions in the constructor.
+    // Since, ngOnInit does not work in angular services.
+    // Ref: https://github.com/angular/angular/issues/23235.
     this.loaderService.onLoadingMessageChange.subscribe(
       (message: string) => this.loadingMessage = message
     );
+    this.internetConnectivityService.onInternetStateChange.subscribe(
+      internetAccessible => {
+        if (internetAccessible && this.temporaryListOfChanges.length > 0) {
+          for (let change of this.temporaryListOfChanges) {
+            this.addChange(change);
+          }
+          this.temporaryListOfChanges = [];
+        }
+      });
   }
 
   private autosaveChangeListOnChange(explorationChangeList) {
@@ -105,18 +116,22 @@ export class ChangeListService implements OnInit {
     // If error is present -> Check for the type of error occurred
     // (Display the corresponding modals in both cases, if not already
     // opened):
-    // - Version Mismatch.
+    // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList,
       response => {
-        if (!response.is_version_of_draft_valid) {
+        if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
               explorationChangeList);
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
+        if (!response.is_version_of_draft_valid &&
+          response.changes_are_mergeable) {
+          this.windowRef.nativeWindow.location.reload();
+        }
       },
       () => {
         this.alertsService.clearWarnings();
@@ -133,6 +148,10 @@ export class ChangeListService implements OnInit {
 
   private addChange(changeDict: ExplorationChange) {
     if (this.loadingMessage) {
+      return;
+    }
+    if (!this.internetConnectivityService.isOnline()) {
+      this.temporaryListOfChanges.push(changeDict);
       return;
     }
     this.explorationChangeList.push(changeDict);
@@ -268,6 +287,60 @@ export class ChangeListService implements OnInit {
       cmd: 'rename_state',
       new_state_name: newStateName,
       old_state_name: oldStateName
+    });
+  }
+
+  addWrittenTranslation(
+      contentId: string, dataFormat: string, languageCode: string,
+      stateName: string, translationHtml: string): void {
+  // Written translations submitted via the translation tab in the
+  // exploration editor need not pass content_html because
+  // translations submitted via this method do not undergo a review. The
+  // content_html is only required when submitting translations via
+  // the contributor dashboard because such translation suggestions
+  // undergo a manual review process where the reviewer will need to look
+  // at the corresponding original content at the time of submission.
+    this.addChange({
+      cmd: 'add_written_translation',
+      content_id: contentId,
+      data_format: dataFormat,
+      language_code: languageCode,
+      state_name: stateName,
+      content_html: 'N/A',
+      translation_html: translationHtml
+    });
+  }
+
+  /**
+   * Saves a change dict that represents marking a translation as needing
+   * update in a particular language.
+   *
+   * @param {string} contentId - The content id of the translated content.
+   * @param {string} languageCode - The language code.
+   * @param {string} stateName - The current state name.
+   */
+  markTranslationAsNeedingUpdate(
+      contentId: string, languageCode: string, stateName: string): void {
+    this.addChange({
+      cmd: 'mark_written_translation_as_needing_update',
+      content_id: contentId,
+      language_code: languageCode,
+      state_name: stateName
+    });
+  }
+
+  /**
+   * Saves a change dict that represents marking a translation as needing
+   * update in all languages.
+   *
+   * @param {string} contentId - The content id of the translated content.
+   * @param {string} stateName - The current state name.
+   */
+  markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {
+    this.addChange({
+      cmd: 'mark_written_translations_as_needing_update',
+      content_id: contentId,
+      state_name: stateName
     });
   }
 

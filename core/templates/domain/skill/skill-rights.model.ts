@@ -25,8 +25,7 @@ export class SkillRights {
   _skillId: string;
   _canEditSkillDescription: boolean;
 
-  constructor(
-      skillId: string, canEditSkillDescription: boolean) {
+  constructor(skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }
@@ -36,10 +35,6 @@ export class SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
       skillRightsBackendDict.can_edit_skill_description);
-  }
-
-  static createInterstitialSkillRights(): SkillRights {
-    return new SkillRights(null, false);
   }
 
   getSkillId(): string {

@@ -18,6 +18,8 @@
 
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ContextService } from 'services/context.service';
 import { OutcomeFeedbackEditorComponent } from './outcome-feedback-editor.component';
 
@@ -76,12 +78,14 @@ describe('Outcome Feedback Editor Component', () => {
       ChangeDetectorRef);
     const detectChangesSpy = spyOn(
       changeDetectorRef.constructor.prototype, 'detectChanges');
-    component.outcome = {
-      feedback: {
-        html: '<p> Previous HTML string </p>'
-      },
-      hasNonemptyFeedback: () => true
-    };
+    component.outcome = new Outcome(
+      'default',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
 
     expect(component.outcome.feedback.html).toBe(
       '<p> Previous HTML string </p>');
@@ -98,12 +102,14 @@ describe('Outcome Feedback Editor Component', () => {
       ChangeDetectorRef);
     const detectChangesSpy = spyOn(
       changeDetectorRef.constructor.prototype, 'detectChanges');
-    component.outcome = {
-      feedback: {
-        html: '<p> Previous HTML string </p>'
-      },
-      hasNonemptyFeedback: () => true
-    };
+    component.outcome = new Outcome(
+      'default',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
 
     expect(component.outcome.feedback.html).toBe(
       '<p> Previous HTML string </p>');

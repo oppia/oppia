@@ -16,8 +16,8 @@
 
 """Tests for jobs.types.job_run_result."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import pickle
 
@@ -44,12 +44,12 @@ class JobRunResultTests(test_utils.TestBase):
 
     def test_as_stdout_using_repr(self):
         run_result = job_run_result.JobRunResult.as_stdout('abc', use_repr=True)
-        self.assertEqual(run_result.stdout, 'u\'abc\'')
+        self.assertEqual(run_result.stdout, '\'abc\'')
         self.assertEqual(run_result.stderr, '')
 
     def test_as_stderr_using_repr(self):
         run_result = job_run_result.JobRunResult.as_stderr('abc', use_repr=True)
-        self.assertEqual(run_result.stderr, 'u\'abc\'')
+        self.assertEqual(run_result.stderr, '\'abc\'')
         self.assertEqual(run_result.stdout, '')
 
     def test_empty_result_raises_value_error(self):
@@ -58,14 +58,14 @@ class JobRunResultTests(test_utils.TestBase):
 
     def test_enormous_result_raises_value_error(self):
         with self.assertRaisesRegexp(ValueError, r'must not exceed \d+ bytes'):
-            job_run_result.JobRunResult(stdout='a' * 1000001)
+            job_run_result.JobRunResult(stdout='a' * 1501)
 
     def test_accumulate(self):
-        (single_job_run_result,) = job_run_result.JobRunResult.accumulate([
+        single_job_run_result = job_run_result.JobRunResult.accumulate([
             job_run_result.JobRunResult(stdout='abc', stderr=''),
             job_run_result.JobRunResult(stdout='', stderr='123'),
             job_run_result.JobRunResult(stdout='def', stderr='456'),
-        ])
+        ])[0]
 
         self.assertItemsEqual(
             single_job_run_result.stdout.split('\n'), ['abc', 'def'])
@@ -75,20 +75,20 @@ class JobRunResultTests(test_utils.TestBase):
     def test_accumulate_with_enormous_outputs(self):
         accumulated_results = job_run_result.JobRunResult.accumulate([
             job_run_result.JobRunResult(
-                stdout='a' * 500000, stderr='b' * 500000),
+                stdout='a' * 750, stderr='b' * 750),
             job_run_result.JobRunResult(
-                stdout='a' * 400000, stderr='b' * 400000),
+                stdout='a' * 500, stderr='b' * 500),
             job_run_result.JobRunResult(
-                stdout='a' * 300000, stderr='b' * 300000),
+                stdout='a' * 250, stderr='b' * 250),
             job_run_result.JobRunResult(
-                stdout='a' * 200000, stderr='b' * 200000),
+                stdout='a' * 100, stderr='b' * 100),
             job_run_result.JobRunResult(
-                stdout='a' * 100000, stderr='b' * 100000),
+                stdout='a' * 50, stderr='b' * 50),
         ])
 
         # 100000 and 200000 are small enough ot fit as one, but the others will
         # each need their own result.
-        self.assertEqual(len(accumulated_results), 4)
+        self.assertEqual(len(accumulated_results), 3)
 
     def test_accumulate_with_empty_list(self):
         self.assertEqual(job_run_result.JobRunResult.accumulate([]), [])

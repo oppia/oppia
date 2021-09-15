@@ -29,6 +29,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
+import constants from 'assets/constants';
+
 interface SaveAudioResponse {
   'filename': string;
   'duration_secs': number;
@@ -80,7 +82,7 @@ export class AssetsBackendApiService {
     }
     return this.fetchFile(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
-      AppConstants.ASSET_TYPE_AUDIO);
+      constants.ASSET_TYPE_AUDIO);
   }
 
   async loadImage(
@@ -91,7 +93,7 @@ export class AssetsBackendApiService {
       return new ImageFile(filename, data);
     }
     return this.fetchFile(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+      entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }
 
   async saveAudio(
@@ -141,9 +143,6 @@ export class AssetsBackendApiService {
         entity_type: entityType,
         entity_id: entityId
       });
-    if (thumbnailFileUrl === null) {
-      throw new Error('Thumbnail File Url is null');
-    }
     return this.http.post<{filename: string}>(thumbnailFileUrl, form);
   }
 
@@ -152,37 +151,37 @@ export class AssetsBackendApiService {
   }
 
   abortAllCurrentAudioDownloads(): void {
-    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_AUDIO);
+    this.abortAllCurrentDownloads(constants.ASSET_TYPE_AUDIO);
   }
 
   abortAllCurrentImageDownloads(): void {
-    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_IMAGE);
+    this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
   }
 
   getAssetsFilesCurrentlyBeingRequested(): (
     {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {
-      [AppConstants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
-      [AppConstants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
+      [constants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
+      [constants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
     };
   }
 
   getAudioDownloadUrl(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_AUDIO);
+      entityType, entityId, filename, constants.ASSET_TYPE_AUDIO);
   }
 
   getImageUrlForPreview(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+      entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }
 
   getThumbnailUrlForPreview(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
+      entityType, entityId, filename, constants.ASSET_TYPE_THUMBNAIL);
   }
 
   private getDownloadUrl(
@@ -195,15 +194,12 @@ export class AssetsBackendApiService {
         asset_type: assetType,
         filename: filename,
       });
-    if (downloadUrl === null) {
-      throw new Error('Download Url is null');
-    }
     return downloadUrl;
   }
 
   private getFileDownloadRequestsByAssetType(
       assetType: string): FileDownloadRequest[] {
-    if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+    if (assetType === constants.ASSET_TYPE_AUDIO) {
       return this.audioFileDownloadRequests;
     } else {
       return this.imageFileDownloadRequests;
@@ -232,7 +228,7 @@ export class AssetsBackendApiService {
     try {
       const blob = await blobPromise;
       this.assetsCache.set(filename, blob);
-      if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+      if (assetType === constants.ASSET_TYPE_AUDIO) {
         return new AudioFile(filename, blob);
       } else {
         return new ImageFile(filename, blob);
@@ -259,9 +255,6 @@ export class AssetsBackendApiService {
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
-    if (audioUploadUrl === null) {
-      throw new Error('Audio Upload Url is null');
-    }
     return audioUploadUrl;
   }
 
@@ -270,9 +263,6 @@ export class AssetsBackendApiService {
     let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
-    if (imageUploadUrl === null) {
-      throw new Error('Image Upload Url is null');
-    }
     return imageUploadUrl;
   }
 }

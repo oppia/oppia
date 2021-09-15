@@ -29,7 +29,7 @@ interface BoolSchema {
   type: 'bool';
 }
 
-interface UnicodeSchema {
+export interface UnicodeSchema {
   type: 'unicode';
   // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
@@ -53,7 +53,7 @@ interface FloatSchema {
   choices?: number[];
 }
 
-interface ListSchema {
+export interface ListSchema {
   type: 'list';
   items: Schema | Schema[] | string;
 }

@@ -16,8 +16,8 @@
 
 """Lint checks for Js and Ts files."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import os
@@ -50,8 +50,12 @@ COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 # NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
 # questions, please talk to @srijanreddy98.
 INJECTABLES_TO_IGNORE = [
-    'MockIgnoredService', # This file is required for the js-ts-linter-test.
-    'UpgradedServices' # We don't want this service to be present in the index.
+    # This file is required for the js-ts-linter-test.
+    'MockIgnoredService',
+    # We don't want this service to be present in the index.
+    'UpgradedServices',
+    # Route guards cannot be made injectables until migration is complete.
+    'CanAccessSplashPageGuard',
 ]
 
 
@@ -137,7 +141,7 @@ def compile_all_ts_files():
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
         './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
-    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    subprocess.call(cmd, stdout=subprocess.PIPE, shell=True)
 
 
 class JsTsLintChecksManager(python_utils.OBJECT):
@@ -186,7 +190,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
-        parsed_js_and_ts_files = dict()
+        parsed_js_and_ts_files = {}
         concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
             file_content = self.file_cache.read(filepath)
@@ -281,8 +285,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if is_corresponding_angularjs_filepath:
                     compiled_js_filepath = self._get_compiled_ts_filepath(
                         corresponding_angularjs_filepath)
-                    file_content = self.file_cache.read(
-                        compiled_js_filepath).decode('utf-8')
+                    file_content = self.file_cache.read(compiled_js_filepath)
 
                     parsed_script = (
                         _parse_js_or_ts_file(filepath, file_content))
@@ -525,8 +528,10 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
+        # Standard and error output is in bytes, we need to decode the line to
+        # print it.
+        linter_stdout = encoded_linter_stdout.decode('utf-8')
+        linter_stderr = encoded_linter_stderr.decode('utf-8')
         if linter_stderr:
             raise Exception(linter_stderr)
 

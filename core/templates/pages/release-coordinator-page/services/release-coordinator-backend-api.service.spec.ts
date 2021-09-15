@@ -21,7 +21,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { JobsData, JobsDataBackendDict, ReleaseCoordinatorBackendApiService } from './release-coordinator-backend-api.service';
-import { ComputationData } from 'domain/admin/computation-data.model';
 import { Job } from 'domain/admin/job.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -41,18 +40,6 @@ describe('Release coordinator backend api service', () => {
     human_readable_current_time: 'June 03 15:31:20',
     audit_job_status_summaries: [],
     recent_job_data: [],
-    continuous_computations_data: [
-      {
-        is_startable: true,
-        status_code: 'never_started',
-        computation_type: 'FeedbackAnalyticsAggregator',
-        last_started_msec: null,
-        active_realtime_layer_index: null,
-        last_stopped_msec: null,
-        is_stoppable: false,
-        last_finished_msec: null
-      }
-    ]
   };
   let jobsData: JobsData;
 
@@ -79,9 +66,6 @@ describe('Release coordinator backend api service', () => {
         Job.createFromBackendDict),
       recentJobData: jobsDataBackendResponse.recent_job_data.map(
         Job.createFromBackendDict),
-      continuousComputationsData:
-       jobsDataBackendResponse.continuous_computations_data.map(
-         ComputationData.createFromBackendDict)
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -163,70 +147,6 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should request to start computation given the job' +
-   'name when calling startComputationAsync', fakeAsync(() => {
-    let computationType = 'FeedbackAnalyticsAggregator';
-    let payload = {
-      action: 'start_computation',
-      computation_type: computationType
-    };
-    rcbas.startComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should request to stop computation given the job' +
-   'name when calling stopComputationAsync', fakeAsync(() => {
-    let computationType = 'FeedbackAnalyticsAggregator';
-    let payload = {
-      action: 'stop_computation',
-      computation_type: computationType
-    };
-    rcbas.stopComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fail to stop computation given the job' +
-   'name when calling stopComputationAsync', fakeAsync(() => {
-    let computationType = 'InvalidComputaionType';
-    let payload = {
-      action: 'stop_computation',
-      computation_type: computationType
-    };
-    rcbas.stopComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
   }));
 
   it('should request to show the output of valid' +
@@ -355,13 +275,13 @@ describe('Release coordinator backend api service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush({
       jobs: [
-        { name: 'FooJob', parameter_names: ['abc'] },
+        { name: 'FooJob' },
       ],
     });
     flushMicrotasks();
 
     expect(await beamJobsPromise).toEqual([
-      new BeamJob('FooJob', ['abc']),
+      new BeamJob('FooJob'),
     ]);
   }));
 
@@ -375,7 +295,6 @@ describe('Release coordinator backend api service', () => {
           job_id: 'abc',
           job_name: 'FooJob',
           job_state: 'RUNNING',
-          job_arguments: ['abc'],
           job_started_on_msecs: 0,
           job_updated_on_msecs: 0,
           job_is_synchronous: false,
@@ -385,21 +304,20 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunsPromise).toEqual([
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', ['abc'], 0, 0, false),
+      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false),
     ]);
   }));
 
   it('should start a new job', fakeAsync(async() => {
-    const beamJob = new BeamJob('FooJob', ['abc']);
-    const beamJobRunPromise = rcbas.startNewBeamJob(beamJob, []).toPromise();
+    const beamJob = new BeamJob('FooJob');
+    const beamJobRunPromise = rcbas.startNewBeamJob(beamJob).toPromise();
     const req = httpTestingController.expectOne('/beam_job_run');
     expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual({job_name: 'FooJob', job_arguments: []});
+    expect(req.request.body).toEqual({job_name: 'FooJob'});
     req.flush({
       job_id: 'abc',
       job_name: 'FooJob',
       job_state: 'RUNNING',
-      job_arguments: ['abc'],
       job_started_on_msecs: 0,
       job_updated_on_msecs: 0,
       job_is_synchronous: false,
@@ -407,12 +325,12 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunPromise).toEqual(
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', ['abc'], 0, 0, false));
+      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false));
   }));
 
   it('should cancel a running beam job', fakeAsync(async() => {
     const beamJobRun = (
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', ['abc'], 0, 0, false));
+      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false));
     const beamJobRunPromise = rcbas.cancelBeamJobRun(beamJobRun).toPromise();
     const req = httpTestingController.expectOne('/beam_job_run?job_id=abc');
     expect(req.request.method).toEqual('DELETE');
@@ -420,7 +338,6 @@ describe('Release coordinator backend api service', () => {
       job_id: 'abc',
       job_name: 'FooJob',
       job_state: 'CANCELLING',
-      job_arguments: ['abc'],
       job_started_on_msecs: 0,
       job_updated_on_msecs: 0,
       job_is_synchronous: false,
@@ -428,12 +345,12 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunPromise).toEqual(
-      new BeamJobRun('abc', 'FooJob', 'CANCELLING', ['abc'], 0, 0, false));
+      new BeamJobRun('abc', 'FooJob', 'CANCELLING', 0, 0, false));
   }));
 
   it('should get the output of a beam job run', fakeAsync(async() => {
     const beamJobRun = (
-      new BeamJobRun('abc', 'FooJob', 'DONE', ['abc'], 0, 0, false));
+      new BeamJobRun('abc', 'FooJob', 'DONE', 0, 0, false));
     const resultPromise = rcbas.getBeamJobRunOutput(beamJobRun).toPromise();
     const req = (
       httpTestingController.expectOne('/beam_job_run_result?job_id=abc'));

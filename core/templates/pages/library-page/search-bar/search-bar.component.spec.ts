@@ -33,6 +33,7 @@ import { SearchService, SelectionDetails } from 'services/search.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
+import { Subject } from 'rxjs/internal/Subject';
 
 
 @Pipe({name: 'truncate'})
@@ -223,7 +224,7 @@ describe('Search bar component', () => {
         value: 'search'
       }
     };
-    expect(component.searchToBeExec(search)).toBeNull();
+    component.searchToBeExec(search);
 
     spyOn(component.searchQueryChanged, 'next');
     component.classroomPageIsActive = false;
@@ -281,7 +282,7 @@ describe('Search bar component', () => {
     windowRef.nativeWindow.location = new URL('http://localhost/not/search/find');
     component.onSearchQueryChangeExec();
     expect(windowRef.nativeWindow.location.href).toEqual(
-      '/search/find?q=search_query');
+      'http://localhost/search/find?q=search_query');
   });
 
   it('should update search fields based on url query', () => {
@@ -332,7 +333,15 @@ describe('Search bar component', () => {
         return null;
       });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
-    component.searchQueryChanged.next();
+    component.searchQueryChanged = {
+      pipe: (param1, parm2) => {
+        return {
+          subscribe(callb) {
+            callb();
+          }
+        };
+      }
+    } as Subject<string>;
     component.ngOnInit();
     expect(component.searchDropdownCategories).toHaveBeenCalled();
     expect(languageUtilService.getLanguageIdsAndTexts).toHaveBeenCalled();

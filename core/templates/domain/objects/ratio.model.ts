@@ -21,6 +21,8 @@ import { ObjectsDomainConstants } from
 import { RatioInputAnswer } from
   'interactions/answer-defs';
 
+type GreatestCommonDivisor = (x: number, y: number) => number;
+
 export class Ratio {
   components: number[];
   constructor(numbersList: number[]) {
@@ -92,7 +94,7 @@ export class Ratio {
    * Returns this Ratio in its most simplified form.
    */
   convertToSimplestForm(): number[] {
-    var gcd = (x: number, y: number) => {
+    var gcd: GreatestCommonDivisor = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
     var gcdResult = this.components.reduce(gcd);

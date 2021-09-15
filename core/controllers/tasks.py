@@ -14,12 +14,12 @@
 
 """Controllers for task queue handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 
-from core import jobs_registry
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -31,12 +31,12 @@ from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import wipeout_service
-import python_utils
 
 
 class UnsentFeedbackEmailHandler(base.BaseHandler):
     """Handler task of sending emails of feedback messages."""
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -76,6 +76,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 class SuggestionEmailHandler(base.BaseHandler):
     """Handler task of sending email of suggestion."""
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
@@ -95,6 +96,7 @@ class SuggestionEmailHandler(base.BaseHandler):
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
     """Handles task of sending feedback message emails instantly."""
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -118,6 +120,7 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
     changed.
     """
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -144,6 +147,7 @@ class FlagExplorationEmailHandler(base.BaseHandler):
     to moderators.
     """
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
@@ -169,8 +173,6 @@ class DeferredTasksHandler(base.BaseHandler):
     """
 
     DEFERRED_TASK_FUNCTIONS = {
-        taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
-            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
             exp_services.delete_explorations_from_user_models),
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (
@@ -190,8 +192,10 @@ class DeferredTasksHandler(base.BaseHandler):
             .remove_user_from_activities_with_associated_rights_models)
     }
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        payload = json.loads(self.request.body.decode())
+        # The request body has bytes type, thus we need to decode it first.
+        payload = json.loads(self.request.body.decode('utf-8'))
         if 'fn_identifier' not in payload:
             raise Exception(
                 'This request cannot defer tasks because it does not contain a '
@@ -199,8 +203,7 @@ class DeferredTasksHandler(base.BaseHandler):
                 'must contain a function_identifier in the payload.')
         if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
             raise Exception(
-                'The function id, %s, is not valid.' %
-                python_utils.convert_to_bytes(payload['fn_identifier']))
+                'The function id, %s, is not valid.' % payload['fn_identifier'])
 
         deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
             payload['fn_identifier']]

@@ -33,8 +33,6 @@ import { ImageWithRegionsEditorComponent } from 'objects/templates/image-with-re
 import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from 'objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component';
 import { ListOfTabsEditorComponent } from 'objects/templates/list-of-tabs-editor.component';
 import { ListOfUnicodeStringEditorComponent } from 'objects/templates/list-of-unicode-string-editor.component';
-import { LogicErrorCategoryEditorComponent } from 'objects/templates/logic-error-category-editor.component';
-import { LogicQuestionEditorComponent } from 'objects/templates/logic-question-editor.component';
 import { MathEquationEditorComponent } from 'objects/templates/math-equation-editor.component';
 import { MathExpressionContentEditorComponent } from 'objects/templates/math-expression-content-editor.component';
 import { MusicPhraseEditorComponent } from 'objects/templates/music-phrase-editor.component';
@@ -54,7 +52,7 @@ import { SetOfUnicodeStringEditorComponent } from 'objects/templates/set-of-unic
 import { SkillSelectorEditorComponent } from 'objects/templates/skill-selector-editor.component';
 import { SubtitledHtmlEditorComponent } from 'objects/templates/subtitled-html-editor.component';
 import { SubtitledUnicodeEditorComponent } from 'objects/templates/subtitled-unicode-editor.component';
-import { SvgFilenameEditorComponent } from 'objects/templates/svg-filename-editor.component';
+import { SvgEditorComponent } from 'objects/templates/svg-editor.component';
 import { TranslatableHtmlContentIdEditorComponent } from 'objects/templates/translatable-html-content-id.component';
 import { TranslatableSetOfNormalizedStringEditorComponent } from 'objects/templates/translatable-set-of-normalized-string-editor.component';
 import { TranslatableSetOfUnicodeStringEditorComponent } from 'objects/templates/translatable-set-of-unicode-string-editor.component';
@@ -81,8 +79,6 @@ const EDITORS = {
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
   'list-of-tabs': ListOfTabsEditorComponent,
   'list-of-unicode-string': ListOfUnicodeStringEditorComponent,
-  'logic-error-category': LogicErrorCategoryEditorComponent,
-  'logic-question': LogicQuestionEditorComponent,
   'math-equation': MathEquationEditorComponent,
   'math-expression-content': MathExpressionContentEditorComponent,
   'set-of-unicode-string': SetOfUnicodeStringEditorComponent,
@@ -103,7 +99,7 @@ const EDITORS = {
   'skill-selector': SkillSelectorEditorComponent,
   'subtitled-html': SubtitledHtmlEditorComponent,
   'subtitled-unicode': SubtitledUnicodeEditorComponent,
-  'svg-filename': SvgFilenameEditorComponent,
+  svg: SvgEditorComponent,
   'translatable-html-content-id': TranslatableHtmlContentIdEditorComponent,
   'translatable-set-of-normalized-string':
     TranslatableSetOfNormalizedStringEditorComponent,

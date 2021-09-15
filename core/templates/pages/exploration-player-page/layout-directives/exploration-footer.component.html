@@ -31,7 +31,12 @@
             <ul ngbDropdownMenu class="author-profile-dropdown-menu"
                 aria-labelledby="dropdownMenu2">
               <li *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>
-                <a href="/profile/{{ name }}" target="_blank" rel="noopener">{{ name }}</a>
+                <a href="/profile/{{ name }}"
+                   [routerLink]="'/profile/' + name"
+                   target="_blank"
+                   rel="noopener">
+                   {{ name }}
+                </a>
               </li>
             </ul>
           </div>

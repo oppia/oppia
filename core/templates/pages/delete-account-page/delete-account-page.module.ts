@@ -16,49 +16,31 @@
  * @fileoverview Module for the delete account page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { DeleteAccountPageComponent } from './delete-account-page.component';
 import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
 import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
+import { CommonModule } from '@angular/common';
+import { DeleteAccountPageRoutingModule } from './delete-account-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    DeleteAccountPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
     DeleteAccountPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
     DeleteAccountPageRootComponent,
-    OppiaAngularRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [DeleteAccountPageRootComponent]
+  ]
 })
 export class DeleteAccountPageModule {}

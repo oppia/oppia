@@ -14,8 +14,8 @@
 
 """Common utility functions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import collections
@@ -37,15 +37,15 @@ from constants import constants
 import feconf
 import python_utils
 
-from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
-    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
-    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import (
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
+    Union)
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
-sys.path.insert(0, _YAML_PATH) # type: ignore[arg-type]
+sys.path.insert(0, _YAML_PATH)
 
-import yaml  # isort:skip  #pylint: disable=wrong-import-position
+import yaml  # isort:skip  # pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -54,11 +54,6 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
-
-# TODO(#13059): Every use of constants is followed by
-# 'type: ignore[attr-defined]' because mypy is not able to identify the
-# attributes of constants but this will be fixed after introduction of protobuf
-# for constants.
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
 # because python_utils is untyped and will be removed in python3.
@@ -94,8 +89,9 @@ class ExplorationConversionError(Exception):
     pass
 
 
-def get_file_contents(filepath, raw_bytes=False, mode='r'):
-    # type: (Text, bool, Text) -> Text
+def get_file_contents(
+        filepath: str, raw_bytes: bool = False, mode: str = 'r'
+) -> str:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -119,8 +115,9 @@ def get_file_contents(filepath, raw_bytes=False, mode='r'):
         return f.read() # type: ignore[no-any-return]
 
 
-def get_exploration_components_from_dir(dir_path):
-    # type: (Text) -> Tuple[Text, List[Tuple[Text, Text]]]
+def get_exploration_components_from_dir(
+        dir_path: str
+) -> Tuple[str, List[Tuple[str, str]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -146,7 +143,7 @@ def get_exploration_components_from_dir(dir_path):
 
     for root, directories, files in os.walk(dir_path):
         for directory in directories:
-            if root == dir_path and directory != 'assets':
+            if root == dir_path and directory not in ('assets', '__pycache__'):
                 raise Exception(
                     'The only directory in %s should be assets/' % dir_path)
 
@@ -180,8 +177,7 @@ def get_exploration_components_from_dir(dir_path):
     return yaml_content, assets_list
 
 
-def get_comma_sep_string_from_list(items):
-    # type: (List[Text]) -> Text
+def get_comma_sep_string_from_list(items: List[str]) -> str:
     """Turns a list of items into a comma-separated string.
 
     Args:
@@ -200,8 +196,7 @@ def get_comma_sep_string_from_list(items):
     return '%s and %s' % (', '.join(items[:-1]), items[-1])
 
 
-def to_ascii(input_string):
-    # type: (Text) -> Text
+def to_ascii(input_string: str) -> str:
     """Change unicode characters in a string to ascii if possible.
 
     Args:
@@ -210,12 +205,14 @@ def to_ascii(input_string):
     Returns:
         str. String containing the ascii representation of the input string.
     """
-    return unicodedata.normalize(
-        'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
+    normalized_string = unicodedata.normalize(
+        'NFKD', python_utils.UNICODE(input_string))
+    return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
-def dict_from_yaml(yaml_str):
-    # type: (Text) -> Dict[str, Any]
+# This function accepts general structured yaml string, hence Any type has to be
+# used here for the type of returned dictionary.
+def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
     """Gets the dict representation of a YAML string.
 
     Args:
@@ -237,8 +234,11 @@ def dict_from_yaml(yaml_str):
         raise InvalidInputException(e)
 
 
-def recursively_remove_key(obj, key_to_remove):
-    # type: (Union[Dict[Any, Any], List[Any]], Text) -> None
+# Here obj has a recursive structure. The list element or dictionary value
+# could recursively be the same structure, hence we use Any as their types.
+def recursively_remove_key(
+        obj: Union[Dict[str, Any], List[Any]], key_to_remove: str
+) -> None:
     """Recursively removes keys from a list or dict.
 
     Args:
@@ -259,8 +259,7 @@ def recursively_remove_key(obj, key_to_remove):
             recursively_remove_key(obj[key], key_to_remove)
 
 
-def get_random_int(upper_bound):
-    # type: (int) -> int
+def get_random_int(upper_bound: int) -> int:
     """Returns a random integer in [0, upper_bound).
 
     Args:
@@ -276,8 +275,7 @@ def get_random_int(upper_bound):
     return generator.randrange(0, stop=upper_bound)
 
 
-def get_random_choice(alist):
-    # type: (List[T]) -> T
+def get_random_choice(alist: List[T]) -> T:
     """Gets a random element from a list.
 
     Args:
@@ -292,8 +290,7 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def convert_png_data_url_to_binary(image_data_url):
-    # type: (Text) -> Text
+def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """Converts a PNG base64 data URL to a PNG binary data.
 
     Args:
@@ -301,21 +298,20 @@ def convert_png_data_url_to_binary(image_data_url):
             data URL.
 
     Returns:
-        str. Binary content of the PNG created from the data URL.
+        bytes. Binary content of the PNG created from the data URL.
 
     Raises:
         Exception. The given string does not represent a PNG data URL.
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote( # type: ignore[no-untyped-call]
+            python_utils.urllib_unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
 
 
-def convert_png_binary_to_data_url(content):
-    # type: (Text) -> Text
+def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
@@ -327,21 +323,19 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    # We accept unicode but imghdr.what(file, h) accept 'h' of type str.
-    # So we have casted content to be str.
-    content = cast(str, content)
+    # We accept unicode but imghdr.what(file, h) accepts 'h' of type bytes.
+    # So we have casted content to be bytes.
+    content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote( # type: ignore[no-untyped-call]
-                base64.b64encode(content))
+            python_utils.url_quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
 
 
-def convert_png_to_data_url(filepath):
-    # type: (Text) -> Text
+def convert_png_to_data_url(filepath: str) -> str:
     """Converts the png file at filepath to a data URL.
 
     Args:
@@ -354,8 +348,7 @@ def convert_png_to_data_url(filepath):
     return convert_png_binary_to_data_url(file_contents)
 
 
-def camelcase_to_hyphenated(camelcase_str):
-    # type: (Text) -> Text
+def camelcase_to_hyphenated(camelcase_str: str) -> str:
     """Camelcase to hyhpenated conversion of the passed string.
 
     Args:
@@ -368,8 +361,7 @@ def camelcase_to_hyphenated(camelcase_str):
     return re.sub('([a-z0-9])([A-Z])', r'\1-\2', intermediate_str).lower()
 
 
-def camelcase_to_snakecase(camelcase_str):
-    # type: (Text) -> Text
+def camelcase_to_snakecase(camelcase_str: str) -> str:
     """Camelcase to snake case conversion of the passed string.
 
     Args:
@@ -382,8 +374,9 @@ def camelcase_to_snakecase(camelcase_str):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', intermediate_str).lower()
 
 
-def set_url_query_parameter(url, param_name, param_value):
-    # type: (Text, Text, Text) -> Text
+def set_url_query_parameter(
+        url: str, param_name: str, param_value: str
+) -> str:
     """Set or replace a query parameter, and return the modified URL.
 
     Args:
@@ -403,19 +396,14 @@ def set_url_query_parameter(url, param_name, param_value):
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = (
-        python_utils.url_split(url)) # type: ignore[no-untyped-call]
-    query_params = (
-        python_utils.parse_query_string( # type: ignore[no-untyped-call]
-            query_string))
+    scheme, netloc, path, query_string, fragment = python_utils.url_split(url) # type: ignore[no-untyped-call]
+    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode( # type: ignore[no-untyped-call]
-        query_params, doseq=True)
+    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
 
-    return ( # type: ignore[no-any-return]
-        python_utils.url_unsplit( # type: ignore[no-untyped-call]
-            (scheme, netloc, path, new_query_string, fragment)))
+    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
+        (scheme, netloc, path, new_query_string, fragment))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -423,13 +411,11 @@ class JSONEncoderForHTML(json.JSONEncoder):
 
     # Ignoring error code [override] because JSONEncoder has return type str
     # but we are returning Union[str, unicode].
-    def encode(self, o): # type: ignore[override]
-        # type: (Text) -> Text
+    def encode(self, o: str) -> str:
         chunks = self.iterencode(o, True)
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
-    def iterencode(self, o, _one_shot=False): # type: ignore[override]
-        # type: (Text, bool) -> Iterator[Text]
+    def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
         chunks = super(
             JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
@@ -437,8 +423,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
                 '<', '\\u003c').replace('>', '\\u003e')
 
 
-def convert_to_hash(input_string, max_length):
-    # type: (Text, int) -> Text
+def convert_to_hash(input_string: str, max_length: int) -> str:
     """Convert a string to a SHA1 hash.
 
     Args:
@@ -463,32 +448,28 @@ def convert_to_hash(input_string, max_length):
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(
-            python_utils.convert_to_bytes(  # type: ignore[no-untyped-call]
-                input_string)).digest(),
+            python_utils.convert_to_bytes(input_string)).digest(),
         altchars=b'ab'
-    ).replace('=', 'c')
+    ).replace(b'=', b'c')
 
-    return encoded_string[:max_length]
+    return encoded_string[:max_length].decode('utf-8')
 
 
-def base64_from_int(value):
-    # type: (int) -> Text
+def base64_from_int(value: int) -> str:
     """Converts the number into base64 representation.
 
     Args:
         value: int. Integer value for conversion into base64.
 
     Returns:
-        *. Returns the base64 representation of the number passed.
+        str. Returns the base64 representation of the number passed.
     """
     byte_value = (
-        b'[' + python_utils.convert_to_bytes( # type: ignore[no-untyped-call]
-            value) + b']')
-    return base64.b64encode(byte_value)
+        b'[' + python_utils.UNICODE(value).encode('utf-8') + b']')
+    return base64.b64encode(byte_value).decode('utf-8')
 
 
-def get_time_in_millisecs(datetime_obj):
-    # type: (datetime.datetime) -> float
+def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     """Returns time in milliseconds since the Epoch.
 
     Args:
@@ -498,13 +479,10 @@ def get_time_in_millisecs(datetime_obj):
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return ( # type: ignore[no-any-return]
-        msecs + python_utils.divide( # type: ignore[no-untyped-call]
-            datetime_obj.microsecond, 1000.0))
+    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
 
 
-def convert_naive_datetime_to_string(datetime_obj):
-    # type: (datetime.datetime) -> Text
+def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
     """Returns a human-readable string representing the naive datetime object.
 
     Args:
@@ -517,8 +495,9 @@ def convert_naive_datetime_to_string(datetime_obj):
     return datetime_obj.strftime(DATETIME_FORMAT)
 
 
-def convert_string_to_naive_datetime_object(date_time_string):
-    # type: (Text) -> datetime.datetime
+def convert_string_to_naive_datetime_object(
+        date_time_string: str
+) -> datetime.datetime:
     """Returns the naive datetime object equivalent of the date string.
 
     Args:
@@ -533,8 +512,7 @@ def convert_string_to_naive_datetime_object(date_time_string):
     return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
 
 
-def get_current_time_in_millisecs():
-    # type: () -> float
+def get_current_time_in_millisecs() -> float:
     """Returns time in milliseconds since the Epoch.
 
     Returns:
@@ -543,8 +521,7 @@ def get_current_time_in_millisecs():
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
-def get_human_readable_time_string(time_msec):
-    # type: (float) -> Text
+def get_human_readable_time_string(time_msec: float) -> str:
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
 
@@ -557,13 +534,12 @@ def get_human_readable_time_string(time_msec):
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', # type: ignore[arg-type]
-        time.gmtime(python_utils.divide( # type: ignore[no-untyped-call]
-            time_msec, 1000.0)))
+        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
 
 
-def create_string_from_largest_unit_in_timedelta(timedelta_obj):
-    # type: (datetime.timedelta) -> Text
+def create_string_from_largest_unit_in_timedelta(
+        timedelta_obj: datetime.timedelta
+) -> str:
     """Given the timedelta object, find the largest nonzero time unit and
     return that value, along with the time unit, as a human readable string.
     The returned string is not localized.
@@ -602,8 +578,10 @@ def create_string_from_largest_unit_in_timedelta(timedelta_obj):
             return '1 minute'
 
 
-def are_datetimes_close(later_datetime, earlier_datetime):
-    # type: (datetime.datetime, datetime.datetime) -> bool
+def are_datetimes_close(
+        later_datetime: datetime.datetime,
+        earlier_datetime: datetime.datetime
+) -> bool:
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
 
@@ -619,8 +597,7 @@ def are_datetimes_close(later_datetime, earlier_datetime):
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
 
 
-def generate_random_string(length):
-    # type: (int) -> Text
+def generate_random_string(length: int) -> str:
     """Generates a random string of the specified length.
 
     Args:
@@ -629,11 +606,10 @@ def generate_random_string(length):
     Returns:
         str. Random string of specified length.
     """
-    return base64.urlsafe_b64encode(os.urandom(length))[:length]
+    return base64.urlsafe_b64encode(os.urandom(length))[:length].decode('utf-8')
 
 
-def generate_new_session_id():
-    # type: () -> Text
+def generate_new_session_id() -> str:
     """Generates a new session id.
 
     Returns:
@@ -642,8 +618,7 @@ def generate_new_session_id():
     return generate_random_string(24)
 
 
-def vfs_construct_path(base_path, *path_components):
-    # type: (Text, *Text) -> Text
+def vfs_construct_path(base_path: str, *path_components: str) -> str:
     """Mimics behavior of os.path.join on Posix machines.
 
     Args:
@@ -656,8 +631,7 @@ def vfs_construct_path(base_path, *path_components):
     return os.path.join(base_path, *path_components)
 
 
-def vfs_normpath(path):
-    # type: (Text) -> Text
+def vfs_normpath(path: str) -> str:
     """Normalize path from posixpath.py, eliminating double slashes, etc.
 
     Args:
@@ -669,8 +643,9 @@ def vfs_normpath(path):
     return os.path.normpath(path)
 
 
-def require_valid_name(name, name_type, allow_empty=False):
-    # type: (Text, Text, bool) -> None
+def require_valid_name(
+        name: str, name_type: str, allow_empty: bool = False
+) -> None:
     """Generic name validation.
 
     Args:
@@ -708,15 +683,16 @@ def require_valid_name(name, name_type, allow_empty=False):
         raise ValidationError(
             'Adjacent whitespace in %s should be collapsed.' % name_type)
 
-    for character in constants.INVALID_NAME_CHARS: # type: ignore[attr-defined]
+    for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
                 (character, name_type, name))
 
 
-def require_valid_url_fragment(name, name_type, allowed_length):
-    # type: (Text, Text, int) -> None
+def require_valid_url_fragment(
+        name: str, name_type: str, allowed_length: int
+) -> None:
     """Generic URL fragment validation.
 
     Args:
@@ -744,16 +720,14 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             '%s field should not exceed %d characters, '
             'received %s.' % (name_type, allowed_length, name))
 
-    if not re.match(
-            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined] # pylint: disable=line-too-long
+    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
                 name_type, name))
 
 
-def require_valid_thumbnail_filename(thumbnail_filename):
-    # type: (Text) -> None
+def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
     """Generic thumbnail filename validation.
 
         Args:
@@ -791,8 +765,37 @@ def require_valid_thumbnail_filename(thumbnail_filename):
                 thumbnail_filename)
 
 
-def require_valid_meta_tag_content(meta_tag_content):
-    # type: (Text) -> None
+def require_valid_image_filename(image_filename: str) -> None:
+    """Generic image filename validation.
+
+        Args:
+            image_filename: str. The image filename to validate.
+
+        Raises:
+            ValidationError. Image filename is not a string.
+            ValidationError. Image filename does start with a dot.
+            ValidationError. Image filename includes slashes
+                or consecutive dots.
+            ValidationError. Image filename does not include an extension.
+        """
+    if image_filename is not None:
+        if not isinstance(image_filename, python_utils.BASESTRING):
+            raise ValidationError(
+                'Expected image filename to be a string, received %s'
+                % image_filename)
+        if image_filename.rfind('.') == 0:
+            raise ValidationError(
+                'Image filename should not start with a dot.')
+        if '/' in image_filename or '..' in image_filename:
+            raise ValidationError(
+                'Image filename should not include slashes or '
+                'consecutive dot characters.')
+        if '.' not in image_filename:
+            raise ValidationError(
+                'Image filename should include an extension.')
+
+
+def require_valid_meta_tag_content(meta_tag_content: str) -> None:
     """Generic meta tag content validation.
 
         Args:
@@ -806,15 +809,15 @@ def require_valid_meta_tag_content(meta_tag_content):
         raise ValidationError(
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
-    if len(meta_tag_content) > (
-            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined] # pylint: disable=line-too-long
+    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
 
 
-def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
-    # type: (Text) -> None
+def require_valid_page_title_fragment_for_web(
+        page_title_fragment_for_web: str
+) -> None:
     """Generic page title fragment validation.
 
     Args:
@@ -825,7 +828,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
-        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
     if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -833,11 +836,10 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
 
-def capitalize_string(input_string):
-    # type: (Text) -> Text
+def capitalize_string(input_string: str) -> str:
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
 
@@ -854,8 +856,7 @@ def capitalize_string(input_string):
         return input_string
 
 
-def get_hex_color_for_category(category):
-    # type: (Text) -> Text
+def get_hex_color_for_category(category: str) -> str:
     """Returns the category, it returns the color associated with the category,
     if the category is present in the app constants else given a default color.
 
@@ -866,14 +867,12 @@ def get_hex_color_for_category(category):
         str. Color assigned to that category.
     """
     return ( # type: ignore[no-any-return]
-        constants.CATEGORIES_TO_COLORS[category] # type: ignore[attr-defined]
-        if category in (
-            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
-        else constants.DEFAULT_COLOR) # type: ignore[attr-defined]
+        constants.CATEGORIES_TO_COLORS[category]
+        if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_COLOR)
 
 
-def get_thumbnail_icon_url_for_category(category):
-    # type: (Text) -> Text
+def get_thumbnail_icon_url_for_category(category: str) -> str:
     """Returns the category, it returns the associated thumbnail icon, if the
     category is present in the app constants else given a default thumbnail.
 
@@ -884,15 +883,13 @@ def get_thumbnail_icon_url_for_category(category):
         str. Path to the Thumbnail Icon assigned to that category.
     """
     icon_name = (
-        category if category in (
-            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
-        else constants.DEFAULT_THUMBNAIL_ICON) # type: ignore[attr-defined]
+        category if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
 
-def is_supported_audio_language_code(language_code):
-    # type: (Text) -> bool
+def is_supported_audio_language_code(language_code: str) -> bool:
     """Checks if the given language code is a supported audio language code.
 
     Args:
@@ -901,13 +898,11 @@ def is_supported_audio_language_code(language_code):
     Returns:
         bool. Whether the language code is supported audio language code or not.
     """
-    language_codes = [lc['id'] for lc in (
-        constants.SUPPORTED_AUDIO_LANGUAGES)] # type: ignore[attr-defined]
+    language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES]
     return language_code in language_codes
 
 
-def is_valid_language_code(language_code):
-    # type: (Text) -> bool
+def is_valid_language_code(language_code: str) -> bool:
     """Checks if the given language code is a valid language code.
 
     Args:
@@ -917,13 +912,11 @@ def is_valid_language_code(language_code):
         bool. Whether the language code is valid or not.
     """
     language_codes = [
-        lc['code'] for lc in (
-            constants.SUPPORTED_CONTENT_LANGUAGES)] # type: ignore[attr-defined]
+        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
     return language_code in language_codes
 
 
-def get_supported_audio_language_description(language_code):
-    # type: (Text) -> Text
+def get_supported_audio_language_description(language_code: str) -> str:
     """Returns the language description for the given language code.
 
     Args:
@@ -936,16 +929,17 @@ def get_supported_audio_language_description(language_code):
     Raises:
         Exception. If the given language code is unsupported.
     """
-    for language in (
-            constants.SUPPORTED_AUDIO_LANGUAGES): # type: ignore[attr-defined]
+    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
         if language['id'] == language_code:
             return language['description'] # type: ignore[no-any-return]
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
 def is_user_id_valid(
-        user_id, allow_system_user_id=False, allow_pseudonymous_id=False):
-    # type: (Text, bool, bool) -> bool
+        user_id: str,
+        allow_system_user_id: bool = False,
+        allow_pseudonymous_id: bool = False
+) -> bool:
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.
 
@@ -967,8 +961,7 @@ def is_user_id_valid(
     return bool(re.match(feconf.USER_ID_REGEX, user_id))
 
 
-def is_pseudonymous_id(user_id):
-    # type: (Text) -> bool
+def is_pseudonymous_id(user_id: str) -> bool:
     """Check that the ID is a pseudonymous one.
 
     Args:
@@ -980,8 +973,7 @@ def is_pseudonymous_id(user_id):
     return bool(re.match(feconf.PSEUDONYMOUS_ID_REGEX, user_id))
 
 
-def unescape_encoded_uri_component(escaped_string):
-    # type: (Text) -> Text
+def unescape_encoded_uri_component(escaped_string: str) -> str:
     """Unescape a string that is encoded with encodeURIComponent.
 
     Args:
@@ -990,13 +982,10 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return ( # type: ignore[no-any-return]
-        python_utils.urllib_unquote( # type: ignore[no-untyped-call]
-            escaped_string).decode('utf-8'))
+    return python_utils.urllib_unquote(escaped_string)
 
 
-def snake_case_to_camel_case(snake_str):
-    # type: (Text) -> Text
+def snake_case_to_camel_case(snake_str: str) -> str:
     """Converts a string in snake_case to camelCase.
 
     Args:
@@ -1011,8 +1000,7 @@ def snake_case_to_camel_case(snake_str):
     return components[0] + ''.join(x.title() for x in components[1:])
 
 
-def get_asset_dir_prefix():
-    # type: () -> Text
+def get_asset_dir_prefix() -> str:
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
 
@@ -1021,14 +1009,17 @@ def get_asset_dir_prefix():
         null string.
     """
     asset_dir_prefix = ''
-    if not constants.DEV_MODE: # type: ignore[attr-defined]
+    if not constants.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
 
 
-def get_hashable_value(value):
-    # type: (Any) -> Any
+# As mentioned in the documentation, `value` can have any general type which
+# a JSON object can represent, hence its type is chosen as Any. Since we
+# recursively convert this general json object into tuple or sorted tuple,
+# the return type will also be of type Any.
+def get_hashable_value(value: Any) -> Any:
     """This function returns a hashable version of the input JSON-like value.
 
     It converts the built-in sequences into their hashable counterparts
@@ -1055,8 +1046,7 @@ def get_hashable_value(value):
         return value
 
 
-def compress_to_zlib(data):
-    # type: (Text) -> Text
+def compress_to_zlib(data: bytes) -> bytes:
     """Compress the data to zlib format for efficient storage and communication.
 
     Args:
@@ -1065,14 +1055,10 @@ def compress_to_zlib(data):
     Returns:
         str. Compressed data string.
     """
-    # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty. For details, refer to:
-    # https://github.com/oppia/oppia/wiki/Backend-Type-Annotations#1-use-typingtext-instead-of-str-and-unicode
-    return zlib.compress(data) # type: ignore[arg-type]
+    return zlib.compress(data)
 
 
-def decompress_from_zlib(data):
-    # type: (Text) -> Text
+def decompress_from_zlib(data: bytes) -> bytes:
     """Decompress the zlib compressed data.
 
     Args:
@@ -1081,13 +1067,12 @@ def decompress_from_zlib(data):
     Returns:
         str. Decompressed data string.
     """
-    # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty.
-    return zlib.decompress(data) # type: ignore[arg-type]
+    return zlib.decompress(data)
 
 
-def compute_list_difference(list_a, list_b):
-    # type: (List[Any], List[Any]) -> List[Any]
+# The mentioned types can be changed in future if they are inadequate to
+# represent the types handled by this function.
+def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
     """Returns the set difference of two lists.
 
     Args:
@@ -1097,20 +1082,22 @@ def compute_list_difference(list_a, list_b):
     Returns:
         list. List of the set difference of list_a - list_b.
     """
-    return list(set(list_a) - set(list_b))
+    return list(sorted(set(list_a) - set(list_b)))
 
 
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic
 # type "OrderedDict"' but here we don't need to specify this.
-class OrderedCounter(
-        collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass
 
 
-def grouper(iterable, chunk_len, fillvalue=None):
-    # type: (Iterable[T], int, Optional[T]) -> Iterable[Iterable[T]]
+def grouper(
+        iterable: Iterable[T],
+        chunk_len: int,
+        fillvalue: Optional[T] = None
+) -> Iterable[Iterable[T]]:
     """Collect data into fixed-length chunks.
 
     Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
@@ -1130,13 +1117,16 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return ( # type: ignore[no-any-return]
-        python_utils.zip_longest( # type: ignore[no-untyped-call]
-            *args, fillvalue=fillvalue))
+    return python_utils.zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-any-return, no-untyped-call]
 
 
-def partition(iterable, predicate=bool, enumerated=False):
-    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]] # pylint: disable=line-too-long
+def partition(
+        iterable: Iterable[T],
+        predicate: Callable[..., bool] = bool,
+        enumerated: bool = False
+) -> Tuple[
+        Iterable[Union[T, Tuple[int, T]]],
+        Iterable[Union[T, Tuple[int, T]]]]:
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.
@@ -1172,8 +1162,8 @@ def partition(iterable, predicate=bool, enumerated=False):
         themselves.
     """
     if enumerated:
-        new_iterable = enumerate(
-            iterable) # type: Iterable[Union[T, Tuple[int, T]]]
+        new_iterable: Iterable[Union[T, Tuple[int, T]]] = enumerate(
+            iterable)
         old_predicate = predicate
         predicate = lambda pair: old_predicate(pair[1])
     else:
@@ -1187,8 +1177,7 @@ def partition(iterable, predicate=bool, enumerated=False):
         (i for i, predicate_is_true in false_part if not predicate_is_true))
 
 
-def quoted(s):
-    # type: (Text) -> Text
+def quoted(s: str) -> str:
     """Returns a string enclosed in quotes, escaping any quotes within it.
 
     Args:

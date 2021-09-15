@@ -3,12 +3,10 @@
     <div class="oppia-donation-card-content-wide">
       <div class="oppia-donate-options">
         <div *ngIf="windowIsNarrow">
-          <h1 class="oppia-donate-h1">Donate to the <br>
-          Oppia Foundation</h1>
+          <h1 class="oppia-donate-h1"><span [innerHTML]="'I18N_DONATE_PAGE_TITLE' | translate"></span></h1>
         </div>
         <div *ngIf="!windowIsNarrow">
-          <h1 class="oppia-donate-h1">Donate to <br>
-          The Oppia Foundation</h1>
+          <h1 class="oppia-donate-h1"><span [innerHTML]="'I18N_DONATE_PAGE_TITLE' | translate"></span></h1>
         </div>
         <div class="text-center">
           <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -32,7 +30,7 @@
           <a (click)="onDonateThroughAmazon()" class="btn oppia-donate-options-button" tabindex="0">Amazon Smile</a>
         </div>
         <h2 class="oppia-gift-funds-text">
-          Your generous gift funds:
+          <span [innerHTML]="'I18N_DONATE_PAGE_IMAGE_TITLE' | translate"></span>
         </h2>
         <div class="oppia-donate-img-container text-center">
           <img [src]="donateImgUrl" alt="Server costs, student outreach, marketing">
@@ -49,19 +47,17 @@
                   class="position-absolute w-100 h-100 oppia-meet-contributors-iframe">
           </iframe>
         </div>
-        <h3 class="oppia-donate-h3"><em>Hear from our Oppia community</em></h3>
+        <h3 class="oppia-donate-h3">
+          <em>
+            <span [innerHTML]="'I18N_DONATE_PAGE_VIDEO_SUBTITLE' | translate"></span>
+          </em>
+        </h3>
         <div class="oppia-vision-text-container">
           <p class="oppia-vision-text">
-            In 2012, Oppia started with a simple idea: to improve the education of
-            students around the world while improving the quality of teaching.
-            This vision has since turned into an educational platform with over
-            11,000 explorations that have been used by more than 430,000 users
-            worldwide.
+            <span [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT_ONE' | translate"></span>
           </p>
           <p class="oppia-vision-text">
-            Please donate to The Oppia Foundation, a registered 501(c)(3) nonprofit,
-            and join us in bringing the joys of teaching and learning to people
-            everywhere.
+            <span [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT_TWO' | translate"></span>
           </p>
         </div>
       </div>

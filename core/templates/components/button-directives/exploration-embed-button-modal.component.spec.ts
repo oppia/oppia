@@ -108,4 +108,32 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     expect(addRange).toHaveBeenCalled();
     expect(removeAllRanges).toHaveBeenCalled();
   }));
+
+  it('should throw Error if codeDiv is null', () => {
+    let event = {
+      type: 'click',
+      currentTarget: null
+    };
+    expect(() => {
+      // This throws "Argument of type '{ type: string; currentTarget:
+      // () => any; }' is not assignable to parameter of type 'MouseEvent'."
+      // We need to suppress this error because we need to test selectText
+      // function.
+      // @ts-expect-error
+      component.selectText(event);
+    }).toThrowError('No CodeDiv was found!');
+  });
+
+  it('should throw Error if selection is null', fakeAsync(() => {
+    const removeAllRanges = jasmine.createSpy('removeAllRanges');
+    const addRange = jasmine.createSpy('addRange');
+    spyOn(window, 'getSelection').and.returnValue(null);
+
+    let embedUrlDiv = fixture.debugElement.query(
+      By.css('.oppia-embed-modal-code'));
+    embedUrlDiv.nativeElement.click();
+    fixture.detectChanges();
+    expect(addRange).not.toHaveBeenCalled();
+    expect(removeAllRanges).not.toHaveBeenCalled();
+  }));
 });

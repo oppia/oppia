@@ -16,8 +16,8 @@
 are created.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -215,8 +215,8 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 
         if (keywords is not None and (not isinstance(keywords, list) or (
                 not all(
-                    [isinstance(keyword, python_utils.BASESTRING)
-                     for keyword in keywords])))):
+                    isinstance(keyword, python_utils.BASESTRING)
+                    for keyword in keywords)))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 

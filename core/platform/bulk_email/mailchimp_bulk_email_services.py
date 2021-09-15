@@ -16,20 +16,21 @@
 
 """Services for handling mailchimp API calls."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import ast
 import hashlib
+import logging
 
 import feconf
+import python_utils
+
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
-import python_utils
 
-
-def _get_subscriber_hash(email):
+def _get_subscriber_hash(email: str) -> str:
     """Returns Mailchimp subscriber hash from email.
 
     Args:
@@ -45,11 +46,12 @@ def _get_subscriber_hash(email):
         raise Exception(
             'Invalid type for email. Expected string, received %s' % email)
     md5_hash = hashlib.md5()
-    md5_hash.update(email)
+    # The md5 accepts only bytes, so we first need to encode the email to bytes.
+    md5_hash.update(email.encode('utf-8'))
     return md5_hash.hexdigest()
 
 
-def _get_mailchimp_class():
+def _get_mailchimp_class() -> mailchimp3.MailChimp:
     """Returns the mailchimp api class. This is separated into a separate
     function to facilitate testing.
 
@@ -58,16 +60,18 @@ def _get_mailchimp_class():
     Returns:
         Mailchimp. A mailchimp class instance with the API key and username
         initialized.
-
-    Raises:
-        Exception. Mailchimp API key is not available.
-        Exception. Mailchimp username is not set.
     """
+    # The return value ignore pragma is required for this. This is
+    # because adding a Union[] type annotation to handle both None and
+    # mailchimp3.MailChimp causes errors where the return value is called
+    # (for eg: client.lists), since NoneType does not have an attribute lists.
     if not feconf.MAILCHIMP_API_KEY:
-        raise Exception('Mailchimp API key is not available.')
+        logging.exception('Mailchimp API key is not available.')
+        return None # type: ignore[return-value]
 
     if not feconf.MAILCHIMP_USERNAME:
-        raise Exception('Mailchimp username is not set.')
+        logging.exception('Mailchimp username is not set.')
+        return None
 
     # The following is a class initialized in the library with the API key and
     # username and hence cannot be tested directly. The mailchimp functions are
@@ -76,7 +80,7 @@ def _get_mailchimp_class():
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
-def _create_user_in_mailchimp_db(user_email):
+def _create_user_in_mailchimp_db(user_email: str) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
 
@@ -116,7 +120,7 @@ def _create_user_in_mailchimp_db(user_email):
     return True
 
 
-def permanently_delete_user_from_list(user_email):
+def permanently_delete_user_from_list(user_email: str) -> None:
     """Permanently deletes the user with the given email from the Mailchimp
     list.
 
@@ -133,6 +137,8 @@ def permanently_delete_user_from_list(user_email):
         Exception. Any error raised by the mailchimp API.
     """
     client = _get_mailchimp_class()
+    if not client:
+        return None
     subscriber_hash = _get_subscriber_hash(user_email)
 
     try:
@@ -154,7 +160,9 @@ def permanently_delete_user_from_list(user_email):
             raise Exception(error_message['detail'])
 
 
-def add_or_update_user_status(user_email, can_receive_email_updates):
+def add_or_update_user_status(
+        user_email: str, can_receive_email_updates: bool
+) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
 
@@ -177,6 +185,8 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
             deleted earlier) raised by the mailchimp API.
     """
     client = _get_mailchimp_class()
+    if not client:
+        return False
     subscriber_hash = _get_subscriber_hash(user_email)
 
     subscribed_mailchimp_data = {

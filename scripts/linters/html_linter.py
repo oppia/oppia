@@ -16,8 +16,8 @@
 
 """Lint checks for HTML files."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import html.parser
 import os
@@ -398,7 +398,9 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, _ = proc.communicate()
-        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
+        linter_stdout = encoded_linter_stdout.decode('utf-8')
         # This line splits the output of the linter and extracts digits
         # from it. The digits are stored in a list. The second last
         # digit in the list represents the number of errors in the file.
