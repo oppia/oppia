@@ -22,8 +22,18 @@ jobs:
           python-version: '3.7'
           architecture: 'x64'
       - uses: ./.github/actions/merge
-      - name: Install third party
-        run: python -m scripts.install_third_party_libs
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
