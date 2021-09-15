@@ -86,6 +86,7 @@ import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 import { ConceptCardComponent } from './concept-card/concept-card.component';
 import { ScoreRingComponent } from './score-ring/score-ring.component';
+import { CompletionGraphComponent } from './statistics-directives/completion-graph.component';
 
 
 // Pipes.
@@ -139,6 +140,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CompletionGraphComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -195,6 +197,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     AudioBarComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CompletionGraphComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
@@ -261,6 +264,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     AudioBarComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CompletionGraphComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
