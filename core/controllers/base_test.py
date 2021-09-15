@@ -345,6 +345,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
 
+    def test_no_redirection_for_cron_jobs(self):
+        # Valid URL, where user now has permissions.
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email('admin@example.com')
+        self.get_json('/cron/models/cleanup', expected_status_int=200)
+        self.logout()
+
+        # Valid URL, but user does not have permissions.
+        self.get_json(
+            'https://oppiaserver.appspot.com/cron/models/cleanup',
+            expected_status_int=401)
+
+        # Invalid URL.
+        self.get_html_response(
+            'https://oppiaserver.appspot.com/cron/unknown',
+            expected_status_int=404)
+
     def test_splash_redirect(self):
         # Tests that the old '/splash' URL is redirected to '/'.
         response = self.get_html_response('/splash', expected_status_int=302)
