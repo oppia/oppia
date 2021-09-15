@@ -1,6 +1,3 @@
-from typing import Any
-
-
 class Task:
     name: str = ...
 

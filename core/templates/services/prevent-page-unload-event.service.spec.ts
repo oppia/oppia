@@ -129,7 +129,7 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.addListener(validationCallback);
     spyOn(reloadEvt, 'preventDefault');
 
-    windowRef.nativeWindow.location.reload(validationCallback());
+    windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
