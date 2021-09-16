@@ -63,7 +63,6 @@ class JobOptions(pipeline_options.PipelineOptions):
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             temp_location=feconf.DATAFLOW_TEMP_LOCATION,
             staging_location=feconf.DATAFLOW_STAGING_LOCATION,
-            save_main_session=True,
             **job_options)
 
     @classmethod
