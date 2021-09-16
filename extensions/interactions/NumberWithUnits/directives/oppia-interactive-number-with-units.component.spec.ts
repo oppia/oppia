@@ -112,7 +112,7 @@ describe('oppiaInteractiveNumberWithUnits', function() {
     ctrl.answer = '24 k';
     $scope.$apply();
 
-    expect(ctrl.getWarningText()).toBe('SyntaxError: Unit "k" not found.');
+    expect(ctrl.getWarningText()).toBe('Unit "k" not found.');
   });
 
   it('should close help modal when user clicks the \'close\' button', () =>{
@@ -181,6 +181,6 @@ describe('oppiaInteractiveNumberWithUnits', function() {
 
     ctrl.submitAnswer('24 k');
 
-    expect(ctrl.getWarningText()).toBe('SyntaxError: Unit "k" not found.');
+    expect(ctrl.getWarningText()).toBe('Unit "k" not found.');
   });
 });
