@@ -58,8 +58,8 @@ var getText = async function(elementName, element) {
 };
 
 var getAttribute = async function(elementName, element, attribute) {
-  await waitFor.visibilityOf(
-    element, `${elementName} is not visible for getAttribute(${attribute})`);
+  await waitFor.presenceOf(
+    element, `${elementName} is not present for getAttribute(${attribute})`);
   return await element.getAttribute(attribute);
 };
 

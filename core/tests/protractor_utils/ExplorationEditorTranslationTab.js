@@ -501,14 +501,9 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectPlayRecordingAccessibilityToMatch = async function(content) {
-    // Not using action.getAttribute here because it also checks for
-    // visibility of element before calling getAttribute, this element is not
-    // visible because of which some tests fail, but it is present in DOM.
-    await waitFor.presenceOf(
+    expect(await action.getAttribute(
+      'Translation tab play recording',
       translationTabPlayRecordingAccessibility,
-      'Translation tab play recording not present'
-    );
-    expect(await translationTabPlayRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
