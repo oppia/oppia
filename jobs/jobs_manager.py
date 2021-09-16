@@ -147,7 +147,7 @@ def refresh_state_of_beam_job_run_model(
     if job_id is None:
         beam_job_run_model.latest_job_state = (
             beam_job_models.BeamJobState.UNKNOWN.value)
-        beam_job_run_model.update_timestamps()
+        beam_job_run_model.update_timestamps(update_last_updated_time=False)
         return
 
     try:
