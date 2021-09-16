@@ -16,28 +16,35 @@
  * @fileoverview Unit tests for Score Ring Component.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { ScoreRingComponent } from './score-ring.component';
 
-describe('Score Ring Component', () => {
-  let ctrl = null;
-  let $scope = null;
-  let $rootScope = null;
-  let COLORS_FOR_PASS_FAIL_MODE = null;
+describe('ConceptCardComponent', () => {
+  let fixture: ComponentFixture<ScoreRingComponent>;
+  let component: ScoreRingComponent;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        ScoreRingComponent,
+        MockTranslatePipe
+      ],
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    COLORS_FOR_PASS_FAIL_MODE = $injector.get('COLORS_FOR_PASS_FAIL_MODE');
-
-    ctrl = $componentController('scoreRing', {
-      $scope: $scope
-    }, {
-      getScore: () => 1
-    });
-  }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ScoreRingComponent);
+    component = fixture.componentInstance;
+    component.score = 1;
+  });
 
   it('should set component properties on initialization', () => {
     spyOn(document, 'querySelector').and.returnValue({
@@ -57,33 +64,49 @@ describe('Score Ring Component', () => {
       }
     });
 
-    ctrl.$onInit();
-    $scope.$apply();
+    component.ngOnInit();
 
     expect(document.querySelector).toHaveBeenCalledWith('.score-ring-circle');
   });
 
   it('should get score ring color', () => {
-    ctrl.testIsPassed = () => true;
+    component.isTestPassed = true;
 
-    expect(ctrl.getScoreRingColor())
-      .toBe(COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR);
+    expect(component.getScoreRingColor())
+      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR);
 
-    ctrl.testIsPassed = () => false;
+    component.isTestPassed = false;
 
-    expect(ctrl.getScoreRingColor())
-      .toBe(COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR);
+    expect(component.getScoreRingColor())
+      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR);
   });
 
   it('should get score outer ring color', () => {
-    ctrl.testIsPassed = () => true;
+    component.isTestPassed = true;
 
-    expect(ctrl.getScoreOuterRingColor())
-      .toBe(COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER);
+    expect(component.getScoreOuterRingColor())
+      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER);
 
-    ctrl.testIsPassed = () => false;
+    component.isTestPassed = false;
 
-    expect(ctrl.getScoreOuterRingColor())
-      .toBe(COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER);
+    expect(component.getScoreOuterRingColor())
+      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER);
+  });
+
+  it('should set the new score if it changes', () => {
+    let changes: SimpleChanges = {
+      score: {
+        currentValue: 35,
+        previousValue: 75,
+        firstChange: true,
+        isFirstChange: () => true
+      }
+    };
+    expect(component.score).toEqual(35);
+
+    component.ngOnChanges(changes);
+
+    expect(component.score).toEqual(75);
+    expect(component.circle.style.strokeDashoffset).toEqual('abc');
   });
 });

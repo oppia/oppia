@@ -19,7 +19,9 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ConceptCardComponent } from './concept-card.component';
 
@@ -27,7 +29,27 @@ describe('ConceptCardComponent', () => {
   let loadConceptCardsAsync: jasmine.Spy;
   let fixture: ComponentFixture<ConceptCardComponent>;
   let component: ConceptCardComponent;
-  let conceptCardObjectFactory: ConceptCardObjectFactory;
+  let conceptCard: ConceptCard;
+  let example1: WorkedExample;
+  let example2: WorkedExample;
+  let workedExamples: WorkedExample[];
+
+  example1 = new WorkedExample(new SubtitledHtml(
+    'worked example question 1',
+    'worked_example_q_1'
+  ), new SubtitledHtml(
+    'worked example explanation 1',
+    'worked_example_e_1'
+  ));
+
+  example2 = new WorkedExample(new SubtitledHtml(
+    'worked example question 2',
+    'worked_example_q_2'
+  ), new SubtitledHtml(
+    'worked example explanation 2',
+    'worked_example_e_2'
+  ));
+  workedExamples = [example1, example2],
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +67,7 @@ describe('ConceptCardComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConceptCardComponent);
-    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
+    conceptCard = TestBed.inject(ConceptCard);
     component = fixture.componentInstance;
   });
 
@@ -57,22 +79,17 @@ describe('ConceptCardComponent', () => {
       }
     }]);
 
-    spyOn(conceptCardObjectFactory, 'getWorkedExamples').and.returnValue(['1']);
+    spyOn(conceptCard, 'getWorkedExamples').and.returnValue(workedExamples);
     component.ngOnInit();
-    component.conceptCards = [{
-      getWorkedExamples: () => {
-        return ['1'];
-      }
-    }];
 
-    expect(component.currentConceptCard.getWorkedExamples()).toEqual(['1']);
+    expect(
+      component.currentConceptCard.getWorkedExamples()).toEqual(workedExamples);
     expect(component.numberOfWorkedExamplesShown).toBe(1);
   });
 
   it('should show error message when adding concept card to' +
     ' a deleted skill', () => {
-    loadConceptCardsAsync.and.returnValue($q.reject(''));
-    spyOn($scope, '$watch').and.stub();
+    loadConceptCardsAsync.and.returnValue(Promise.reject(''));
 
     component.ngOnInit();
 
@@ -92,11 +109,8 @@ describe('ConceptCardComponent', () => {
   });
 
   it('should check if worked example is the last one', () => {
-    component.currentConceptCard = {
-      getWorkedExamples: () => {
-        return ['1'];
-      }
-    };
+    spyOn(conceptCard, 'getWorkedExamples').and.returnValue(workedExamples);
+
     component.numberOfWorkedExamplesShown = 1;
 
     expect(component.isLastWorkedExample()).toBe(true);

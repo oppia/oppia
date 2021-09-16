@@ -16,7 +16,7 @@
  * @fileoverview Component for the completion graph of the improvements tab.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 
@@ -24,7 +24,7 @@ import { ImprovementsConstants } from 'domain/improvements/improvements.constant
   selector: 'oppia-completion-graph',
   templateUrl: './completion-graph.component.html',
 })
-export class CompletionGraphComponent {
+export class CompletionGraphComponent implements OnInit {
   @Input() completionRate: number;
   completionBarStyle: {
     'stroke-dasharray': number;
