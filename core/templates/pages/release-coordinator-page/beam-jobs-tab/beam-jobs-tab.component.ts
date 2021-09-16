@@ -21,7 +21,7 @@ import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { BehaviorSubject, combineLatest, interval, Observable, of, Subscription, zip } from 'rxjs';
+import { BehaviorSubject, combineLatest, interval, NEVER, Observable, of, Subscription, zip } from 'rxjs';
 import { catchError, distinctUntilChanged, first, map, startWith, switchMap } from 'rxjs/operators';
 
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
@@ -102,7 +102,10 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
     this.ngZone.runOutsideAngular(() => {
       this.beamJobRunsRefreshIntervalSubscription = (
         interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
-          .pipe(switchMap(() => this.backendApiService.getBeamJobRuns()))
+          .pipe(switchMap(
+            () => this.beamJobRuns.value.every(j => j.inTerminalState()) ?
+              // Only callout to the backend when a job needs to be updated.
+              NEVER : this.backendApiService.getBeamJobRuns()))
           .subscribe(beamJobRuns => {
             // When we're ready to update the beam jobs, however, we want the
             // update to occur within Angular so that change detection can
