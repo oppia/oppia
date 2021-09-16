@@ -69,7 +69,6 @@ export interface CollectionHandler {
   templateUrl: './collection-player-page.component.html'
 })
 export class CollectionPlayerPageComponent implements OnInit {
-  activeHighlightedIconIndex!: number;
   collection!: Collection;
   collectionPlaythrough;
   currentExplorationId!: string;
@@ -92,6 +91,7 @@ export class CollectionPlayerPageComponent implements OnInit {
   collectionSummary;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
+  elementToScrollTo: string;
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -109,14 +109,6 @@ export class CollectionPlayerPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  setIconHighlight(index: number): void {
-    this.activeHighlightedIconIndex = index;
-  }
-
-  unsetIconHighlight(): void {
-    this.activeHighlightedIconIndex = -1;
   }
 
   togglePreviewCard(): void {
@@ -266,12 +258,15 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
-  scrollToLocation(id: string): void {
-    this.windowRef.nativeWindow.location.hash = '#' + (id);
+  scrollToLocation(el: string): void {
+    this.elementToScrollTo = el;
+    const element = document.getElementById(el);
+    element.scrollIntoView({behavior: 'smooth'});
   }
 
   closeOnClickingOutside(): void {
     this.explorationCardIsShown = false;
+    this.scrollToLocation(this.elementToScrollTo);
   }
 
   onClickStopPropagation($evt: Event): void {
@@ -317,7 +312,6 @@ export class CollectionPlayerPageComponent implements OnInit {
     // background color and icon url for the icons generated on the
     // path.
     this.pathIconParameters = [];
-    this.activeHighlightedIconIndex = -1;
     this.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
     this.ODD_SVG_HEIGHT_OFFSET_PX = 150;
     this.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
@@ -335,6 +329,7 @@ export class CollectionPlayerPageComponent implements OnInit {
     document.addEventListener('touchstart', () => {
       if (this.explorationCardIsShown === true) {
         this.explorationCardIsShown = false;
+        this.scrollToLocation(this.elementToScrollTo);
       }
     });
 

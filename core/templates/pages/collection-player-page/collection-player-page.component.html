@@ -103,24 +103,11 @@
               </image>
             </pattern>
           </defs>
-          <a (mouseenter)="updateExplorationPreview(node.getExplorationId());
-                           setIconHighlight(index);"
-             (mouseleave)="togglePreviewCard();
-                           unsetIconHighlight(index);">
-            <circle [hidden]="!((node.getExplorationId() === nextExplorationId) && (index !== activeHighlightedIconIndex))"
-                    cx="50"
-                    cy="70"
-                    r="50"
-                    attr.id="{{'highlight' + index}}"
-                    fill="#FF8C00"
-                    fill-opacity="0.5"/>
-            <circle [hidden]="!(index === activeHighlightedIconIndex)"
-                    cx="50"
-                    cy="70"
-                    r="50"
-                    attr.id="{{'highlight' + index}}"
-                    fill="#A6DACF"
-                    fill-opacity="0.5"/>
+          <a class="button glow-button"
+             target="_blank"
+             [attr.xlink:href]="getExplorationUrl(node.getExplorationId())" 
+             (mouseenter)="updateExplorationPreview(node.getExplorationId())"
+             (mouseleave)="togglePreviewCard();">
             <circle cx="50"
                     cy="70"
                     r="42"
@@ -138,7 +125,7 @@
            class="mobile-lesson-icon">
       <div class="mobile-path-segment"
            *ngFor="let node of collection.getCollectionNodes();let index = index"
-           id="mobile-path-anchor-index">
+           id="mobile-path-anchor-{{index}}">
         <a href="#"
            [attr.title-data]="index + 1 + '. ' + node?.getExplorationTitle()"
            class="oppia-collection-node-small-screen">
@@ -272,6 +259,11 @@
 <attribution-guide></attribution-guide>
 
 <style>
+  .glow-button:hover {
+      -webkit-filter: drop-shadow(0px 0px 6px #045a47);      
+      filter: drop-shadow(0px 0px 6px #045a47);  
+  }
+
   @media screen and (max-width: 942px) {
     .oppia-collection-path-section, .oppia-card-preview-panel {
         display: none;
