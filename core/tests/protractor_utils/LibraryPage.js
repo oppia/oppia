@@ -61,7 +61,6 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    // Using for loop instead of .filter() function.
     var filteredExplorationSummaryTile = [];
 
     for (i = 0; i < allExplorationSummaryTile.length; i++) {

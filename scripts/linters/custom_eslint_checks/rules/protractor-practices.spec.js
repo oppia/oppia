@@ -67,6 +67,12 @@ ruleTester.run('protractor-practices', rule, {
     code: 'var modal = element.all(by.css(".modal-dialog")).last();'
   }, {
     code: 'var modal = element(by.css("option:checked"));'
+  }, {
+    code: '// Filter results from the array'
+  }, {
+    code: '/* Filter results from array*/'
+  }, {
+    code: 'var filtered_fruti = apple.filter'
   }],
 
   invalid: [
@@ -134,7 +140,18 @@ ruleTester.run('protractor-practices', rule, {
       code:
       `genderList.filter(function() {
         gender = 'female';
-      })`,
+      });`,
+      errors: [{
+        message: 'Please do not use .filter(), consider using a for loop',
+      }]
+    },
+    {
+      code:
+      `
+      function gradeList(name, gradebook){
+        return gradebook[name]
+      }
+      gradeList.filter(gradeList(name, gradebook));`,
       errors: [{
         message: 'Please do not use .filter(), consider using a for loop',
       }]

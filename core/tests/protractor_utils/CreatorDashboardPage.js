@@ -69,7 +69,6 @@ var CreatorDashboardPage = function() {
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    // Using for loop instead of .filter() function.
     var filteredExplorationCards = [];
     for (i = 0; i < allExplorationCards.length; i++) {
       var text = await allExplorationCards[i].getText();

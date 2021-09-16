@@ -71,7 +71,6 @@ var checkForConsoleErrors = async function(
 
   var browserLogs = await browser.manage().logs().get('browser');
 
-  // Using for loop instead of .filter() function.
   var browserErrors = [];
   for (i = 0; i < browserLogs.length; i++) {
     var logEntry = browserLogs[i];

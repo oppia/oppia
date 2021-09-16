@@ -97,7 +97,6 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    // Using for loop for filter purposes.
     var explorationsCardByName = [];
     for (i = 0; i < allExplorationCardElements.length; i++) {
       var cardTitle = allExplorationCardElements[i].element(cardTitleCss);
