@@ -133,9 +133,10 @@ env_variables:
 # These environment variables allows Cloud NDB services to communicate with the
 # Cloud Datastore Emulator. THESE MUST NOT BE DEPLOYED TO PRODUCTION! We strip
 # them from the deployed app.yaml in scripts.build.
-  DATASTORE_DATASET: "dev-project-id"
+  DATASTORE_DATASET: "oppiaserver-backup-migration"
   DATASTORE_EMULATOR_HOST: "localhost:8089"
   DATASTORE_EMULATOR_HOST_PATH: "localhost:8089/datastore"
   DATASTORE_HOST: "http://localhost:8089"
-  DATASTORE_PROJECT_ID: "dev-project-id"
+  DATASTORE_PROJECT_ID: "oppiaserver-backup-migration"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
+  GOOGLE_APPLICATION_CREDENTIALS: "/Users/brianrodri/GoogleDrive/oppia/oppiaserver-backup-migration-55c9440275b1.json"
