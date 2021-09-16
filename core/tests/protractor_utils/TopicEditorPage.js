@@ -215,12 +215,15 @@ var TopicEditorPage = function() {
   };
 
   this.expectSubtopicPageContentsToMatch = async function(contents) {
-    var text = await subtopicContentText.getText();
+    var text = await action.getText(
+      'Subtopic Content Text', subtopicContentText);
     expect(text).toMatch(contents);
   };
 
   this.expectTitleOfSubtopicWithIndexToMatch = async function(title, index) {
-    expect(await subtopics.get(index).getText()).toEqual(title);
+    var subtopic = subtopics.get(index);
+    var text = await action.getText('Subtopic Text', subtopic);
+    expect(text).toEqual(title);
   };
 
   this.changeSubtopicTitle = async function(title) {
@@ -307,7 +310,10 @@ var TopicEditorPage = function() {
     var target = subtopicColumns.get(subtopicIndex);
     var uncategorizedSkillIndex = -1;
     for (var i = 0; i < await uncategorizedSkills.count(); i++) {
-      if (skillDescription === await uncategorizedSkills.get(i).getText()) {
+      var uncategorizedSkill = uncategorizedSkills.get(i);
+      var text = await action.getText(
+        'Ungategorized Skill Text', uncategorizedSkill);
+      if (skillDescription === text) {
         uncategorizedSkillIndex = i;
         break;
       }
@@ -336,8 +342,10 @@ var TopicEditorPage = function() {
     expect(skillNames.length).toEqual(assignedSkillsLength);
 
     for (var i = 0; i < assignedSkillsLength; i++) {
-      var skillDescription = await assignedSkillDescriptions.get(i).getText();
-      expect(skillDescription).toEqual(skillNames[i]);
+      var skillDescription = assignedSkillDescriptions.get(i);
+      var text = await action.getText(
+        'Skill Description Text', skillDescription);
+      expect(text).toEqual(skillNames[i]);
     }
   };
 
@@ -355,8 +363,10 @@ var TopicEditorPage = function() {
       'Uncategorized skills taking too long to appear.');
 
     for (var i = 0; i < await uncategorizedSkills.count(); i++) {
-      expect(skillDescriptions[i]).toEqual(
-        await uncategorizedSkills.get(i).getText());
+      var uncategorizedSkill = uncategorizedSkills.get(i);
+      var text = await action.getText(
+        'Uncategorized Skill Text', uncategorizedSkill);
+      expect(skillDescriptions[i]).toEqual(text);
     }
   };
 
@@ -368,7 +378,9 @@ var TopicEditorPage = function() {
     var assignedSkillsLength = await assignedSkills.count();
     var toMoveSkillIndex = -1;
     for (var i = 0; i < assignedSkillsLength; i++) {
-      if (skillDescription === await assignedSkills.get(i).getText()) {
+      var assignedSkill = assignedSkills.get(i);
+      var text = await action.getText('Assigned Skill Text', assignedSkill);
+      if (skillDescription === text) {
         toMoveSkillIndex = i;
         break;
       }
@@ -406,18 +418,19 @@ var TopicEditorPage = function() {
   this.expectStoryTitleToBe = async function(title, index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    expect(
-      await storyListItems.get(index).all(storyTitleLocator).first().getText()
-    ).toEqual(title);
+    var text = await action.getText(
+      'Story List Text',
+      storyListItems.get(index).all(storyTitleLocator).first());
+    expect(text).toEqual(title);
   };
 
   this.expectStoryPublicationStatusToBe = async function(status, index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    expect(
-      await storyListItems.get(index).all(
-        storyPublicationStatusLocator).first().getText()
-    ).toEqual(status);
+    var text = await action.getText(
+      'Story List Text',
+      storyListItems.get(index).all(storyPublicationStatusLocator).first());
+    expect(text).toEqual(status);
   };
 
   this.navigateToStoryWithIndex = async function(index) {
