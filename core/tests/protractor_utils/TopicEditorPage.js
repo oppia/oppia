@@ -186,7 +186,7 @@ var TopicEditorPage = function() {
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
     await action.click('Select Skill Dropdown', selectSkillDropdown);
-    var skillDescriptionButton = await element(
+    var skillDescriptionButton = element(
       by.css('option[label="' + skillDescription + '"]'));
     await action.click('Skill Description Button', skillDescriptionButton);
     await waitFor.visibilityOf(
@@ -203,7 +203,7 @@ var TopicEditorPage = function() {
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
     await action.click('Select skill dropdown', selectSkillDropdown);
-    var skillDescriptionButton = await element(
+    var skillDescriptionButton = element(
       by.css('option[label="' + skillDescription + '"]'));
     await action.click('Skill Description Button', skillDescriptionButton);
     await action.click('Create question button', createQuestionButton);
