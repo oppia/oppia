@@ -175,8 +175,7 @@
 
 
 # Dev workflow team.
-# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
-/.circleci/ @SAEb-ai @U8NWXD
+/.circleci/ @oppia/automated-qa-reviewers
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -717,18 +716,17 @@
 /core/controllers/android_e2e_config*.py @seanlip @BenHenning
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
 /core/templates/karma.module.ts @DubeySandeep
-# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
-/core/tests/protractor_utils/ @SAEb-ai @U8NWXD
-/core/tests/protractor_desktop/ @SAEb-ai @U8NWXD
-/core/tests/protractor/ @SAEb-ai @U8NWXD
-/core/tests/protractor.conf.js @SAEb-ai @U8NWXD
-/extensions/interactions/*/protractor.js @U8NWXD
-/extensions/interactions/protractor.js @U8NWXD
-/extensions/rich_text_components/*/protractor.js @U8NWXD
-/extensions/rich_text_components/protractor.js @U8NWXD
-/extensions/objects/protractor.js @U8NWXD
-/scripts/backend_test_shards.json @U8NWXD
-/.github/actions @SAEb-ai @U8NWXD
+/core/tests/protractor_utils/ @oppia/automated-qa-reviewers
+/core/tests/protractor_desktop/ @oppia/automated-qa-reviewers
+/core/tests/protractor/ @oppia/automated-qa-reviewers
+/core/tests/protractor.conf.js @oppia/automated-qa-reviewers
+/extensions/interactions/*/protractor.js @oppia/automated-qa-reviewers
+/extensions/interactions/protractor.js @oppia/automated-qa-reviewers
+/extensions/rich_text_components/*/protractor.js @oppia/automated-qa-reviewers
+/extensions/rich_text_components/protractor.js @oppia/automated-qa-reviewers
+/extensions/objects/protractor.js @oppia/automated-qa-reviewers
+/scripts/backend_test_shards.json @oppia/automated-qa-reviewers
+/.github/actions @oppia/automated-qa-reviewers
 
 
 # Python 3 Migration project.
@@ -771,5 +769,4 @@
 /.github/CODEOWNERS @DubeySandeep
 # TODO(#13808): Revert ownership to @vojtechjelinek after 2021-09-14.
 /.github/stale.yml @DubeySandeep
-# TODO(#13596): Add @krishnarao22 back to codeowners after 2021-09-01
-/.github/workflows/ @DubeySandeep @SAEb-ai @U8NWXD
+/.github/workflows/ @DubeySandeep @oppia/automated-qa-reviewers
