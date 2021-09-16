@@ -23,12 +23,9 @@ import re
 
 from constants import constants
 
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class UserSettings(python_utils.OBJECT):
@@ -383,7 +380,7 @@ class UserSettings(python_utils.OBJECT):
         return username.lower() if username else None
 
     @classmethod
-    def require_valid_username(cls, username):
+    def require_valid_username(cls, username: str):
         """Checks if the given username is valid or not.
 
         Args:

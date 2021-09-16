@@ -861,6 +861,28 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_search_query_string('(missing-inner-quotes)'))
         self.assertFalse(is_search_query_string('missing-outer-parens'))
 
+    def test_is_valid_username_string(self) -> None:
+        """Checks whether given username string is valid.
+
+        Returns:
+            bool. A boolean value representing whether given username is
+            valid or not.
+        """
+        is_valid_username_string = (
+            schema_utils.get_validator('is_valid_username_string'))
+
+        self.assertTrue(is_valid_username_string('alphabetic'))
+        self.assertTrue(is_valid_username_string('alpha1234'))
+        self.assertTrue(is_valid_username_string('un'))
+        self.assertTrue(is_valid_username_string('username'))
+
+        self.assertFalse(is_valid_username_string('invalidch@r'))
+        self.assertFalse(is_valid_username_string('invalidch@434##@r'))
+        self.assertFalse(is_valid_username_string('long' * 10))
+        self.assertFalse(is_valid_username_string('admin'))
+        self.assertFalse(is_valid_username_string('oppia'))
+        self.assertFalse(is_valid_username_string(''))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
