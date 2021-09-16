@@ -163,12 +163,12 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
-      `var books = [ 'book1', 'book2', 'book3'];
-      books.forEach( function(book) {
+      `var books = ['book1', 'book2', 'book3'];
+      books.forEach(function(book) {
         console.log(book)
       });`,
       errors: [{
-        message: 'Please do not use .forEach(), consider using "for loop"',
+        message: 'Please do not use .forEach(), consider using a "for loop" instead',
       }],
     },
   ]
