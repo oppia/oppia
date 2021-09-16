@@ -95,12 +95,14 @@ export class NumberWithUnitsValidationService {
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
-      } catch (e) {
-        var additionalInfo = (
-          '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
-          '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
-        );
-        e.message += additionalInfo;
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          var additionalInfo = (
+            '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
+            '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
+          );
+          e.message += additionalInfo;
+        }
         throw e;
       }
     };
