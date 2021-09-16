@@ -169,7 +169,7 @@ ruleTester.run('protractor-practices', rule, {
       });`,
       errors: [{
         message: (
-        'Please do not use .forEach(), consider using a "for loop" instead'),
+          'Please do not use .forEach(), consider using a "for loop" instead'),
       }],
     },
   ]
