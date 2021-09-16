@@ -227,7 +227,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicTitle = async function(title) {
-    await subtopicTitleField.clear();
+    await action.clear('Subtopic Title Field', subtopicTitleField);
     await subtopicTitleField.sendKeys(title);
   };
 
@@ -238,7 +238,7 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
     await action.click('Page Editor Input', pageEditorInput);
-    await pageEditorInput.clear();
+    await action.clear('Page Editor Input', pageEditorInput);
     await pageEditorInput.sendKeys(content);
     await action.click(
       'Save Subtopic Page Content Button', saveSubtopicPageContentButton);
@@ -491,7 +491,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeTopicName = async function(newName) {
-    await topicNameField.clear();
+    await action.clear('Topic Name Field', topicNameField);
     await topicNameField.sendKeys(newName);
     await action.click('Topic Name Heading', topicNameHeading);
   };
@@ -510,7 +510,7 @@ var TopicEditorPage = function() {
 
   this.changeTopicDescription = async function(newDescription) {
     await general.scrollToTop();
-    await topicDescriptionField.clear();
+    await action.clear('Topic Description Field', topicDescriptionField);
     await topicDescriptionField.sendKeys(newDescription);
     await action.click('Topic Description Heading', topicDescriptionHeading);
   };
