@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AlertsService } from 'services/alerts.service';
 import { CollectionHandler, CollectionSummary } from '../collection-player-page.component';
 
 @Injectable({
@@ -28,7 +27,6 @@ import { CollectionHandler, CollectionSummary } from '../collection-player-page.
 export class CollectionPlayerBackendApiService {
   constructor(
     private http: HttpClient,
-    private alertsService: AlertsService,
   ) {}
 
   async fetchCollectionSummariesAsync(
@@ -40,9 +38,6 @@ export class CollectionPlayerBackendApiService {
       }
     }).toPromise().then((response: CollectionSummary) => {
       return response;
-    }, () => {
-      this.alertsService.addWarning(
-        'There was an error while fetching the collection summary.');
     });
   }
 

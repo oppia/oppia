@@ -105,7 +105,7 @@
           </defs>
           <a class="button glow-button"
              target="_blank"
-             [attr.xlink:href]="getExplorationUrl(node.getExplorationId())" 
+             [attr.xlink:href]="getExplorationUrl(node.getExplorationId())"
              (mouseenter)="updateExplorationPreview(node.getExplorationId())"
              (mouseleave)="togglePreviewCard();">
             <circle cx="50"
@@ -260,8 +260,8 @@
 
 <style>
   .glow-button:hover {
-      -webkit-filter: drop-shadow(0px 0px 6px #045a47);      
-      filter: drop-shadow(0px 0px 6px #045a47);  
+    -webkit-filter: drop-shadow(0px 0px 6px #045a47);
+    filter: drop-shadow(0px 0px 6px #045a47);
   }
 
   @media screen and (max-width: 942px) {

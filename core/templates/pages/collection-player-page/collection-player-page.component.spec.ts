@@ -198,14 +198,6 @@ describe('Collection player page component', () => {
     expect(eventSpy.stopPropagation).toHaveBeenCalled();
   });
 
-  it('should close exploration card on clicking outside', () => {
-    component.explorationCardIsShown = true;
-
-    component.closeOnClickingOutside();
-
-    expect(component.explorationCardIsShown).toBe(false);
-  });
-
   it('should return exploration title position given index ' +
     'when calling \'getExplorationTitlePosition\'', () => {
     // Case 1.
@@ -350,17 +342,6 @@ describe('Collection player page component', () => {
 
     expect(urlInterpolationSpy).toHaveBeenCalledWith('/imagepath');
     expect(url).toBe('imageUrl');
-  });
-
-  it('should set icon hight when calling \'setIconHighlight\'', () => {
-    // Default value.
-    component.activeHighlightedIconIndex = -1;
-
-    component.setIconHighlight(10);
-    expect(component.activeHighlightedIconIndex).toBe(10);
-
-    component.unsetIconHighlight();
-    expect(component.activeHighlightedIconIndex).toBe(-1);
   });
 
   it('should toggle preview card when calling ' +
