@@ -20,158 +20,105 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
-from core.domain import opportunity_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_services
-from core.domain import subtopic_page_domain
-from core.domain import topic_services
-from core.domain import topic_domain
+
 from core.platform import models
+import feconf
 from jobs import job_test_utils
 from jobs.batch_jobs import opportunity_jobs
 from jobs.types import job_run_result
-import python_utils
 
 from typing import Dict, List, Union # isort:skip
 
 MYPY = False
 if MYPY:
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
+    from mypy_imports import story_models
+    from mypy_imports import topic_models
 
-(exp_models, opportunity_models, 
-topic_models, story_models,) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.opportunity,
-        models.NAMES.topic, models.NAMES.story]))
+(
+    exp_models, opportunity_models,
+    topic_models, story_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.topic, models.NAMES.story
+])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ExplorationOpportunitySummaryModelRegenerationJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = opportunity_jobs.ExplorationOpportunitySummaryModelRegenerationJob
 
+    VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+    TOPIC_1_ID = 'topic_1_id'
+    STORY_1_ID = 'story_1_id'
+    LANG_1 = 'lang_1'
+
     def setUp(self):
         super(
-            ExplorationOpportunitySummaryModelRegenerationJobTests, self).setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
-        self.topic_id_1 = 'topic1'
-        self.topic_id_2 = 'topic2'
-
-        story_id_1 = 'story1'
-        story_id_2 = 'story2'
-
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)
-
-        topic_1 = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'topic', 'abbrev-one', 'description')
-        topic_1.thumbnail_filename = 'thumbnail.svg'
-        topic_1.thumbnail_bg_color = '#C6DCDA'
-        topic_1.subtopics = [
-            topic_domain.Subtopic(
-                1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-three')]
-        topic_1.next_subtopic_id = 2
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, self.topic_id_1))
-        subtopic_page_services.save_subtopic_page(
-            self.owner_id, subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample'
-            })]
+            ExplorationOpportunitySummaryModelRegenerationJobTests, self
+        ).setUp()
+        topic_model = self.create_model(  # type: ignore[no-untyped-call]
+            topic_models.TopicModel,
+            id=self.TOPIC_1_ID,
+            name='title',
+            canonical_name='title',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic',
+            canonical_story_references=[{
+                'story_id': self.STORY_1_ID,
+                'story_is_published': False
+            }]
         )
-        topic_services.save_new_topic(self.owner_id, topic_1)
-        topic_services.publish_topic(self.topic_id_1, self.admin_id)
+        topic_model.update_timestamps()
 
-        topic_2 = topic_domain.Topic.create_default_topic(
-            self.topic_id_2, 'topic2', 'abbrev-two', 'description')
-        topic_2.thumbnail_filename = 'thumbnail.svg'
-        topic_2.thumbnail_bg_color = '#C6DCDA'
-        topic_2.subtopics = [
-            topic_domain.Subtopic(
-                1, 'Title', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-three')]
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, self.topic_id_2))
-        subtopic_page_services.save_subtopic_page(
-            self.owner_id, subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample'
-            })]
+        story_model = self.create_model(  # type: ignore[no-untyped-call]
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            title='title',
+            language_code='cs',
+            story_contents_schema_version=1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.EXP_1_ID,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note'
         )
-        topic_2.next_subtopic_id = 2
-        topic_services.save_new_topic(self.owner_id, topic_2)
-        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        story_model.update_timestamps()
 
-        story_1 = story_domain.Story.create_default_story(
-            story_id_1, 'A story', 'description', self.topic_id_1,
-            'story-one')
-        story_2 = story_domain.Story.create_default_story(
-            story_id_2, 'A story', 'description', self.topic_id_2,
-            'story-two')
-
-        story_services.save_new_story(self.owner_id, story_1)
-        story_services.save_new_story(self.owner_id, story_2)
-        topic_services.add_canonical_story(
-            self.owner_id, self.topic_id_1, story_id_1)
-        topic_services.publish_story(self.topic_id_1, story_id_1, self.admin_id)
-        topic_services.add_canonical_story(
-            self.owner_id, self.topic_id_2, story_id_2)
-        topic_services.publish_story(self.topic_id_2, story_id_2, self.admin_id)
-        story_services.update_story(
-            self.owner_id, story_id_1, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
-        story_services.update_story(
-            self.owner_id, story_id_2, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '1'
-            })], 'Changes.')
-
-        all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
-
-        opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
-            all_opportunity_models)
-            
+        exp_model = self.create_model(  # type: ignore[no-untyped-call]
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='lang',
+            init_state_name='state',
+            states_schema_version=48
+        )
+        exp_model.update_timestamps()
+        datastore_services.put_multi([exp_model, story_model, topic_model])
 
     def test_regeneration_job_returns_the_initial_opportunity(self):
         all_opportunity_models = list(
@@ -180,9 +127,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTests(job_test_utils.JobT
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS'),
-            job_run_result.JobRunResult(stdout='SUCCESS')])
+            job_run_result.JobRunResult(stdout='SUCCESS')
+        ])
 
-        all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
-        self.assertEqual(len(all_opportunity_models), 2)
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(self.EXP_1_ID))
+        self.assertIsNotNone(opportunity_model)

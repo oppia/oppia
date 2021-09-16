@@ -35,15 +35,19 @@ from typing import List, cast # isort:skip
 
 MYPY = False
 if MYPY:
-    from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
+    from mypy_imports import story_models
+    from mypy_imports import topic_models
 
 
-(exp_models, opportunity_models, 
-topic_models, story_models,) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.opportunity,
-        models.NAMES.topic, models.NAMES.story]))
+(
+    exp_models, opportunity_models,
+    topic_models, story_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.topic, models.NAMES.story
+])
 
 
 class ExplorationOpportunitySummaryModelDeletionJob(base_jobs.JobBase):
@@ -59,7 +63,7 @@ class ExplorationOpportunitySummaryModelDeletionJob(base_jobs.JobBase):
         """
         exp_oppurtunity_models = (
             opportunity_models.ExplorationOpportunitySummaryModel.get_all(
-                        include_deleted=False))
+                include_deleted=False))
         (
             self.pipeline 
             | beam.Create([model.key for model in exp_oppurtunity_models])
@@ -130,16 +134,16 @@ class ExplorationOpportunitySummaryModelRegenerationJob(base_jobs.JobBase):
                 exploration_opportunity_summary_model_list.append(model)
 
             return {
-                    'status': 'SUCCESS',
-                    'job_result': job_run_result.JobRunResult(stdout='SUCCESS'),
-                    'models': exploration_opportunity_summary_model_list
-                }
+                'status': 'SUCCESS',
+                'job_result': job_run_result.JobRunResult(stdout='SUCCESS'),
+                'models': exploration_opportunity_summary_model_list
+            }
         except Exception as e:
             return {
-                    'status': 'FAILURE',
-                    'job_result': job_run_result.JobRunResult(stderr='FAILURE: %s' % e),
-                    'models': []
-                }
+                'status': 'FAILURE',
+                'job_result': job_run_result.JobRunResult(stderr='FAILURE: %s' % e),
+                'models': []
+            }
         
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -180,7 +184,6 @@ class ExplorationOpportunitySummaryModelRegenerationJob(base_jobs.JobBase):
             | 'Combine exploration and ids' >> beam.Map(lambda exp: (exp.id, exp))
         )
 
-
         stories_dict = beam.pvalue.AsDict(story_ids_to_story)
         exploration_dict = beam.pvalue.AsDict(exp_ids_to_exp)
 
@@ -190,12 +193,20 @@ class ExplorationOpportunitySummaryModelRegenerationJob(base_jobs.JobBase):
                 self._regenerate_opportunities_related_to_topic, stories_dict=stories_dict, exploration_dict=exploration_dict)
         )
 
-        (
+        unused_print_result = (
+            output
+            | 'Filter the models with SUCCESS status' >> beam.Filter(
+                lambda result: result['status'] == 'SUCCESS')
+            | 'Fetch the models to be printed' >> beam.FlatMap(lambda result: result['models'])
+            | 'Print models' >> beam.Map(print)
+        )
+
+        unused_put_result = (
             output 
             | 'Filter the results with SUCCESS status' >> beam.Filter(
                 lambda result: result['status'] == 'SUCCESS')
             | 'Fetch the models to be put' >> beam.FlatMap(lambda result: result['models'])
-            | ndb_io.PutModels()
+            | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
         return (

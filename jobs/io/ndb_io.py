@@ -73,6 +73,11 @@ class GetModels(beam.PTransform):
 class PutModels(beam.PTransform):
     """Writes NDB models to the datastore."""
 
+    @staticmethod
+    def test(input):
+        print(input)
+        return input
+
     def expand(self, entities):
         """Writes the given models to the datastore.
 

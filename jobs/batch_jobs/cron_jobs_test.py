@@ -407,11 +407,8 @@ class GenerateTranslationContributionStatsTests(job_test_utils.JobTestBase):
     VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
-    TOPIC_2_ID = 'topic_2_id'
     TOPIC_1_ID = 'topic_1_id'
-    TOPIC_2_ID = 'topic_2_id'
     LANG_1 = 'lang_1'
-    LANG_2 = 'lang_2'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty() # type: ignore[no-untyped-call]
