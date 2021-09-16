@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -215,11 +215,7 @@ class StoryModel(base_models.VersionedModel):
             StoryModel|None. The story model of the story or None if not
             found.
         """
-        return cast(
-            Optional[StoryModel],
-            StoryModel.query().filter(
-                cls.url_fragment == url_fragment).filter(
-                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return cls.get_all().filter(cls.url_fragment == url_fragment).get()
 
 
 class StorySummaryModel(base_models.BaseModel):

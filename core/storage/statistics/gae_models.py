@@ -1880,11 +1880,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return [
             annotations.version for annotations in
-            cast(
-                List[ExplorationAnnotationsModel],
-                cls.get_all().filter(
-                    cls.exploration_id == exploration_id
-                ).fetch(feconf.DEFAULT_QUERY_LIMIT))
+            cls.get_all().filter(
+                cls.exploration_id == exploration_id
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
         ]
 
     @staticmethod
@@ -2060,8 +2058,7 @@ class StateAnswersModel(base_models.BaseModel):
                     for shard_id in python_utils.RANGE(
                         1, main_shard.shard_count + 1)]
                 all_models += cast(
-                    List[StateAnswersModel],
-                    cls.get_multi(shard_ids))
+                    List[StateAnswersModel], cls.get_multi(shard_ids))
             return all_models
         else:
             return None

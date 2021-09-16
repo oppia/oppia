@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -319,10 +319,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
         user_data = {}
-        report_models = cast(
-            List[AppFeedbackReportModel],
-            cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
-        )
+        report_models = cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
@@ -608,7 +605,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     @classmethod
     def get_stats_for_ticket(
             cls, ticket_id: str
-    ) -> List['AppFeedbackReportStatsModel']:
+    ) -> Sequence['AppFeedbackReportStatsModel']:
         """Fetches the stats for a single ticket.
 
         Args:
@@ -619,8 +616,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             AppFeedbackReportStatsModel entities that record stats on the
             ticket.
         """
-        ticket_models = cls.query(cls.ticket_id == ticket_id).fetch()
-        return cast(List[AppFeedbackReportStatsModel], ticket_models)
+        return cls.query(cls.ticket_id == ticket_id).fetch()
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

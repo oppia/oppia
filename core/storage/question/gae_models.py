@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -379,7 +379,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_count: int,
             skill_ids: List[str],
             offset: int
-    ) -> List['QuestionSkillLinkModel']:
+    ) -> Sequence['QuestionSkillLinkModel']:
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
 
@@ -397,12 +397,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
         ) * question_count
 
-        return cast(
-            List[QuestionSkillLinkModel],
-            cls.query(
-                cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated).fetch(
-                question_skill_count, offset=offset))
+        return cls.query(
+            cls.skill_id.IN(skill_ids)
+        ).order(-cls.last_updated).fetch(question_skill_count, offset=offset)
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
@@ -453,7 +450,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809
         # for more details.
 
-        def get_offset(query: datastore_services.Query) -> int:
+        def get_offset(
+                query: 'datastore_services.Query[QuestionSkillLinkModel]'
+        ) -> int:
             """Helper function to get the offset."""
             question_count = query.count()
             if question_count > 2 * question_count_per_skill:
@@ -470,11 +469,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = cast(
-                List[QuestionSkillLinkModel],
+            new_question_skill_link_models = list(
                 equal_questions_query.fetch(
                     limit=question_count_per_skill * 2,
-                    offset=get_offset(equal_questions_query)))
+                    offset=get_offset(equal_questions_query)
+                )
+            )
             for model in new_question_skill_link_models:
                 if model.question_id in question_skill_link_mapping:
                     new_question_skill_link_models.remove(model)
@@ -487,11 +487,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # requested difficulty.
                 easier_questions_query = query.filter(
                     cls.skill_difficulty < difficulty_requested)
-                easier_question_skill_link_models = cast(
-                    List[QuestionSkillLinkModel],
+                easier_question_skill_link_models = list(
                     easier_questions_query.fetch(
                         limit=question_count_per_skill * 2,
-                        offset=get_offset(easier_questions_query)))
+                        offset=get_offset(easier_questions_query)
+                    )
+                )
                 for model in easier_question_skill_link_models:
                     if model.question_id in question_skill_link_mapping:
                         easier_question_skill_link_models.remove(model)
@@ -514,13 +515,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         easier_question_skill_link_models)
                     harder_questions_query = query.filter(
                         cls.skill_difficulty > difficulty_requested)
-                    harder_question_skill_link_models = (
+                    harder_question_skill_link_models = list(
                         harder_questions_query.fetch(
                             limit=question_count_per_skill * 2,
-                            offset=get_offset(harder_questions_query)))
-                    harder_question_skill_link_models = cast(
-                        List[QuestionSkillLinkModel],
-                        harder_questions_query.fetch())
+                            offset=get_offset(harder_questions_query)
+                        )
+                    )
                     for model in harder_question_skill_link_models:
                         if model.question_id in question_skill_link_mapping:
                             harder_question_skill_link_models.remove(model)
@@ -536,9 +536,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                                 len(new_question_skill_link_models)
                             ))
                     new_question_skill_link_models.extend(
-                        cast(
-                            List[QuestionSkillLinkModel],
-                            harder_question_skill_link_models))
+                        harder_question_skill_link_models)
 
             new_question_skill_link_models = (
                 new_question_skill_link_models[:question_count_per_skill])
@@ -584,7 +582,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_models = []
         existing_question_ids = []
 
-        def get_offset(query: datastore_services.Query) -> int:
+        def get_offset(
+                query: 'datastore_services.Query[QuestionSkillLinkModel]'
+        ) -> int:
             """Helper function to get the offset."""
             question_count = query.count()
             if question_count > 2 * question_count_per_skill:
@@ -598,11 +598,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = cast(
-                List[QuestionSkillLinkModel],
+            new_question_skill_link_models = list(
                 query.fetch(
                     limit=question_count_per_skill * 2,
-                    offset=get_offset(query)))
+                    offset=get_offset(query)
+                )
+            )
             # Deduplicate if the same question is linked to multiple skills.
             for model in new_question_skill_link_models:
                 if model.question_id in existing_question_ids:
@@ -650,7 +651,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     @classmethod
     def get_models_by_skill_id(
             cls, skill_id: str
-    ) -> List['QuestionSkillLinkModel']:
+    ) -> Sequence['QuestionSkillLinkModel']:
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
@@ -661,15 +662,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             domains that are linked to the skill ID. None if the skill
             ID doesn't exist.
         """
-        return cast(
-            List[QuestionSkillLinkModel],
-            QuestionSkillLinkModel.query().filter(
-                cls.skill_id == skill_id).fetch())
+        return cls.get_all().filter(cls.skill_id == skill_id).fetch()
 
     @classmethod
     def get_models_by_question_id(
             cls, question_id: str
-    ) -> List['QuestionSkillLinkModel']:
+    ) -> Sequence['QuestionSkillLinkModel']:
         """Returns a list of QuestionSkillLinkModels of a particular
         question ID.
 
@@ -681,11 +679,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             models that are linked to the question ID, or None if there are no
             question skill link models associated with the question ID.
         """
-        return cast(
-            List[QuestionSkillLinkModel],
-            QuestionSkillLinkModel.query().filter(
-                cls.question_id == question_id,
-                cls.deleted == False).fetch()) # pylint: disable=singleton-comparison
+        return cls.get_all().filter(cls.question_id == question_id).fetch()
 
     @classmethod
     def put_multi_question_skill_links(

@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict, List, cast
+from typing import Dict, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -118,7 +118,7 @@ class JobModel(base_models.BaseModel):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
-    def get_all_unfinished_jobs(cls, limit: int) -> List['JobModel']:
+    def get_all_unfinished_jobs(cls, limit: int) -> Sequence['JobModel']:
         """Gets at most `limit` unfinished jobs.
 
         Args:
@@ -128,16 +128,14 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
-        return cast(
-            List[JobModel],
-            cls.query().filter(
-                JobModel.status_code.IN(
-                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
-            ).order(-cls.time_queued_msec).fetch(limit)
-        )
+        return cls.query().filter(
+            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
+        ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
-    def get_unfinished_jobs(cls, job_type: str) -> datastore_services.Query:
+    def get_unfinished_jobs(
+            cls, job_type: str
+    ) -> 'datastore_services.Query[JobModel]':
         """Gets jobs that are unfinished.
 
         Args:

@@ -2,11 +2,12 @@ from .context import Context
 from redis import StrictRedis
 
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence,
+    Any, Callable, Dict, Generic, Iterable, Iterator, List, Optional, Sequence,
     Type, TypeVar, Tuple, Union, overload)
 from typing_extensions import Literal
 
-TYPE_MODEL = TypeVar('TYPE_MODEL', bound = 'Model')
+TYPE_MODEL = TypeVar('TYPE_MODEL', bound='Model')
+T_co = TypeVar('T_co', covariant=True)
 
 class Client:
     def context(
@@ -27,7 +28,7 @@ class Model(type):
         self, exclude: Optional[List[str]] = None
     ) -> Dict[str, Any]: ...
     @classmethod
-    def query(cls, *args: Any, **kwds: Any) -> Query: ...
+    def query(cls: Type[TYPE_MODEL], *args: Any, **kwds: Any) -> Query[TYPE_MODEL]: ...
     def put(self, **ctx_options: Any) -> None: ...
     @classmethod
     def get_by_id(
@@ -109,7 +110,7 @@ class DisjunctionNode(Node): ...
 AND = ConjunctionNode
 OR = DisjunctionNode
 
-class Query:
+class Query(Generic[T_co]):
     def __init__(
         self, kind: Optional[Any] = ..., ancestor: Optional[Any] = ...,
         filters: Optional[Any] = ..., orders: Optional[Any] = ...,
@@ -119,8 +120,8 @@ class Query:
     ) -> None: ...
     @property
     def projection(self) -> Union[Tuple[str], List[str]]: ...
-    def filter(self, *args: Any) -> Query: ...
-    def order(self, *args: Any) -> Query: ...
+    def filter(self, *args: Any) -> Query[T_co]: ...
+    def order(self, *args: Any) -> Query[T_co]: ...
     def __iter__(self) -> Iterator[Any]: ...
     @overload
     def fetch(
@@ -129,18 +130,36 @@ class Query:
         offset: Optional[int] = ...,
         projection: Optional[List[Property]] = ...,
         keys_only: Literal[False] = ...
-    ) -> Sequence[Model]: ...
+    ) -> Sequence[T_co]: ...
     @overload
     def fetch(
         self,
         keys_only: Literal[True],
         limit: Optional[int] = ...
     ) -> Sequence[Key]: ...
-    def get(self, **q_options: Any) -> Optional[Union[Model, Key]]: ...
+    @overload
+    def get(
+        self, keys_only: Literal[False] = ..., **q_options: Any
+    ) -> Optional[T_co]: ...
+    @overload
+    def get(
+        self, keys_only: Literal[True], **q_options: Any
+    ) -> Optional[Key]: ...
     def count(self, limit: Optional[int] = ..., **q_options: Any) -> int: ...
+    @overload
     def fetch_page(
-        self, page_size: int, **q_options: Any
-    ) -> Tuple[Sequence[Union[Model, Key]], Cursor, bool]: ...
+        self,
+        page_size: int,
+        start_cursor: Optional[Cursor],
+        keys_only: Literal[False] = ...,
+    ) -> Tuple[Sequence[T_co], Cursor, bool]: ...
+    @overload
+    def fetch_page(
+        self,
+        page_size: int,
+        start_cursor: Cursor,
+        keys_only: Literal[True],
+    ) -> Tuple[Sequence[Key], Cursor, bool]: ...
 
 class Cursor:
     def __init__(
