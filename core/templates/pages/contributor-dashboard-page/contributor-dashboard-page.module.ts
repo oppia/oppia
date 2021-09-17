@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -41,6 +41,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { TranslationModalComponent } from './modal-templates/translation-modal.component';
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import { MyHammerConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -97,7 +99,6 @@ class ContributorDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
