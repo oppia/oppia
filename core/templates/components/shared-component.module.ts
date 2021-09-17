@@ -138,7 +138,6 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
     AudioBarComponent,
     AudioFileUploaderComponent,
     AttributionGuideComponent,
-    AudioBarComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,

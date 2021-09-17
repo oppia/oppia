@@ -196,19 +196,6 @@ export class AudioPlayerService {
     }
   }
 
-  getProgress(): number {
-    if (this.getAudioDuration() > 0) {
-      return this.getCurrentTime() / this.getAudioDuration();
-    }
-    return 0;
-  }
-
-  setProgress(progress: number): void {
-    if (progress > 0 && progress < 1) {
-      this.setCurrentTime(this.getAudioDuration() * progress);
-    }
-  }
-
   isPlaying(): boolean {
     return this._currentTrack !== null && this._currentTrack.playing();
   }

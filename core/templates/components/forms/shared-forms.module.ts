@@ -53,7 +53,6 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
   exports: [
     AudioSliderComponent,
     CustomFormsComponentsModule,
-    AudioSliderComponent,
     SchemaBasedEditorDirective
   ],
 })
