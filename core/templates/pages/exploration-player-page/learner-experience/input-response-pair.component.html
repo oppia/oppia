@@ -10,14 +10,14 @@
 <div class="conversation-skin-learner-answer-container">
   <img class="conversation-skin-user-avatar rounded-circle" [src]="decodedProfilePicture ? decodedProfilePicture : ''" alt="">
   <div *ngIf="!data.isHint">
-    <div *ngIf="getShortAnswerHtml()"
+    <div dir="auto" *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
          class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
       <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getShortAnswerHtml()">
       </angular-html-bind-wrapper>
     </div>
-    <div *ngIf="!getShortAnswerHtml()">
+    <div dir="auto" *ngIf="!getShortAnswerHtml()">
       <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getAnswerHtml()">
       </angular-html-bind-wrapper>
@@ -45,7 +45,7 @@
     <div class="conversation-skin-feedback-dot-three"></div>
   </div>
   <span id="getInputResponsePairId()"></span>
-  <div>
+  <div dir="auto">
     <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
                                [htmlData]="data.oppiaResponse"
                                classStr="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"

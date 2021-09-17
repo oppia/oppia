@@ -7,9 +7,6 @@
   border: none;
   color: #0D48A1;
   text-align: left;
-  /* This is needed so that images stay bounded by the container in Firefox. */
-  /* This also limits the selection area of the option to the text and radio button. */
-  width: auto;
 }
 
 .multiple-choice-radio-button-container {
@@ -18,6 +15,8 @@
 
 .multiple-choice-content-container {
   display: table-cell;
+  padding-left: 12px;
+  padding-right: 12px;
   vertical-align: top;
 }
 
@@ -27,7 +26,6 @@
   display: inline-block;
   height: 16px;
   margin-bottom: -1px;
-  margin-right: 12px;
   width: 16px;
 }
 
