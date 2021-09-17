@@ -5662,7 +5662,7 @@ export default {
   // and change useEmulator to be false, before deploying to production.
   "FIREBASE_CONFIG_API_KEY": "fake-api-key",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
-  "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
+  "FIREBASE_CONFIG_PROJECT_ID": "oppiaserver-backup-migration",
   "FIREBASE_CONFIG_STORAGE_BUCKET": "",
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_APP_ID": "",
