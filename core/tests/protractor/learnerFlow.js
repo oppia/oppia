@@ -444,7 +444,9 @@ describe('Learner dashboard functionality', function() {
   // });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([
+      'Unable to preventDefault inside passive event listener invocation.'
+    ]);
     await users.logout();
   });
 });
