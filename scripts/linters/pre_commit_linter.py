@@ -89,7 +89,7 @@ SHARDS = {
         'core/storage/',
         'core/controllers/',
         'core/platform',
-        'jobs/',
+        'core/jobs/',
     ],
     'other': None,
 }
