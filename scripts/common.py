@@ -188,6 +188,7 @@ PROTRACTOR_CONFIG_FILE_PATH = (
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
     PYLINT_PATH,
+    THIRD_PARTY_PYTHON_LIBS_DIR,
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
@@ -201,7 +202,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         'typing_extensions-%s' % TYPING_EXTENSIONS_VERSION
     ),
     CURR_DIR,
-    THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
 
 
