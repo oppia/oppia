@@ -139,4 +139,4 @@ env_variables:
   DATASTORE_HOST: "http://localhost:8089"
   DATASTORE_PROJECT_ID: "oppiaserver-backup-migration"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
-  GOOGLE_APPLICATION_CREDENTIALS: "/Users/brianrodri/GoogleDrive/oppia/oppiaserver-backup-migration-55c9440275b1.json"
+  GOOGLE_APPLICATION_CREDENTIALS: "/home/vojtech/Programming/oppia-python3/oppiaserver-backup-migration-55c9440275b1.json"

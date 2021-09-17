@@ -26,31 +26,11 @@
 # Note that the root folder MUST be named 'oppia'.
 
 sudo apt-get update
-sudo apt-get install curl
-sudo apt-get install git
-sudo apt-get install openjdk-8-jre
-sudo apt-get install python3-setuptools
-sudo apt-get install python3-dev
-sudo apt-get install python3-pip
-sudo apt-get install unzip
-sudo apt-get install python3-yaml
-sudo apt-get install python-matplotlib
-sudo apt-get install python3-matplotlib
+# Prerequirements for python.
+sudo apt-get install -y curl git openjdk-8-jre python3-setuptools python3-dev \
+    python3-pip unzip python3-yaml python-matplotlib python3-matplotlib
 pip install --upgrade pip==21.2.3
 # Prerequirements for pyenv.
-sudo apt-get install make
-sudo apt-get install build-essential
-sudo apt-get install libssl-dev
-sudo apt-get install lib1g-dev
-sudo apt-get install libbz2-dev
-sudo apt-get install libreadline-dev
-sudo apt-get install libsqlite3-dev
-sudo apt-get install wget
-sudo apt-get install llvm
-sudo apt-get install libncursesw5-dev
-sudo apt-get install xz-utils
-sudo apt-get install tk-dev
-sudo apt-get install libxml2-dev
-sudo apt-get install libxmlsec1-dev
-sudo apt-get install libffi-dev
-sudo apt-get install liblzma-dev
+sudo apt-get install -y make build-essential libssl-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev wget llvm libncursesw5-dev xz-utils tk-dev \
+    libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev

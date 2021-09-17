@@ -1,4 +1,12 @@
-FROM ubuntu-bionic
+FROM ubuntu:18.04
+
+# Install sudo
+RUN apt-get update && apt-get -y install sudo
+
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
+
+# Install prereqs
+RUN sh /scripts/install_prerequisites.sh
 
 # Install SDK
 RUN pip install --no-cache-dir apache-beam[gcp]==2.32.0
