@@ -18,14 +18,11 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import { Collection } from 'domain/collection/collection.model';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { Observable, OperatorFunction } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { AlertsService } from 'services/alerts.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -59,59 +56,6 @@ export class CollectionNodeCreatorComponent {
 
   ngOnInit(): void {
     this.collection = this.collectionEditorStateService.getCollection();
-  }
-
-  /**
-   * Fetches a list of exploration metadata dicts from backend, given
-   * a search query. It then extracts the title and id of the
-   * exploration to prepare typeahead options.
-   */
-  fetchTypeaheadResults(searchQuery: string): Promise<string[]> {
-    const that = this;
-    if (this.isValidSearchQuery(searchQuery)) {
-      this.searchQueryHasError = false;
-      return this.searchExplorationsBackendApiService.fetchExplorationsAsync(
-        searchQuery
-      ).then((explorationMetadataList) => {
-        let options: string[] = [];
-        explorationMetadataList.map((item) => {
-          if (!that.collection.containsCollectionNode(item.id)) {
-            options.push(item.title + ' (' + item.id + ')');
-          }
-        });
-        return options;
-      }, () => {
-        this.alertsService.addWarning(
-          'There was an error when searching for matching ' +
-          'explorations.');
-        return [];
-      });
-    } else {
-      this.searchQueryHasError = true;
-    }
-  }
-
-  searchTypeheadResults: OperatorFunction<string, readonly string[]>= (
-      searchText$: Observable<string>) => {
-    return searchText$.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((text) => this.fetchTypeaheadResults(text))
-    );
-  };
-
-  isValidSearchQuery(searchQuery: string): boolean {
-    // Allow underscores because they are allowed in exploration IDs.
-    let INVALID_SEARCH_CHARS = (
-      AppConstants.INVALID_NAME_CHARS.filter((item) => {
-        return item !== '_';
-      }));
-    for (let i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
-      if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
-        return false;
-      }
-    }
-    return true;
   }
 
   addExplorationToCollection(newExplorationId: string): void {
@@ -151,14 +95,6 @@ export class CollectionNodeCreatorComponent {
       });
   }
 
-  convertTypeaheadToExplorationId(typeaheadOption: string): string {
-    let matchResults = typeaheadOption.match(/\((.*?)\)$/);
-    if (matchResults === null) {
-      return typeaheadOption;
-    }
-    return matchResults[1];
-  }
-
   // Creates a new exploration, then adds it to the collection.
   createNewExploration(): void {
     let title = (
@@ -194,8 +130,7 @@ export class CollectionNodeCreatorComponent {
 
 
   addExploration(): void {
-    this.addExplorationToCollection(this.convertTypeaheadToExplorationId(
-      this.newExplorationId));
+    this.addExplorationToCollection(this.newExplorationId);
     this.newExplorationId = '';
   }
 }

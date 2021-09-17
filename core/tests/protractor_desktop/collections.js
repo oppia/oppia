@@ -36,9 +36,7 @@ describe('Collections', function() {
   var thirdExplorationId = null;
   var fourthExplorationId = null;
   var libraryPage = null;
-  var expectedErrors = [
-    'Unable to preventDefault inside passive event listener invocation.'
-  ];
+  var expectedErrors = [];
 
   beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();

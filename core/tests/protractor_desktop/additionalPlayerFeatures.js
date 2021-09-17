@@ -526,8 +526,6 @@ describe('Full exploration editor', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([
-      'Unable to preventDefault inside passive event listener invocation.'
-    ]);
+    await general.checkForConsoleErrors([]);
   });
 });
