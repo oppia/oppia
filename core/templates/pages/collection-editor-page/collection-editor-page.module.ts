@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -42,7 +42,8 @@ import { CollectionEditorTabComponent } from './editor-tab/collection-editor-tab
 import { CollectionEditorSaveModalComponent } from './modals/collection-editor-save-modal.component';
 import { CollectionEditorPrePublishModalComponent } from './modals/collection-editor-pre-publish-modal.component';
 import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { CollectionEditorPageComponent } from './collection-editor-page.component';
 
 @NgModule({
   imports: [
@@ -92,6 +93,10 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ]
 })
@@ -102,7 +107,6 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { CollectionEditorPageComponent } from './collection-editor-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
