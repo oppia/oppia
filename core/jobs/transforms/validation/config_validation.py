@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 from core.domain import config_domain
 from core.domain import platform_parameter_domain as parameter_domain
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation
 from core.platform import models
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 

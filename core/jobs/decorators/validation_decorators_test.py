@@ -24,8 +24,8 @@ import re
 
 from core.platform import models
 from core.tests import test_utils
-from jobs.decorators import validation_decorators
-from jobs.types import model_property
+from core.jobs.decorators import validation_decorators
+from core.jobs.types import model_property
 import python_utils
 
 import apache_beam as beam

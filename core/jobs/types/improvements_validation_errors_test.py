@@ -19,10 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-
+from core.jobs.types import base_validation_errors_test
+from core.jobs.types import improvements_validation_errors
 from core.platform import models
-from jobs.types import base_validation_errors_test
-from jobs.types import improvements_validation_errors
 
 (improvements_models,) = models.Registry.import_models(
     [models.NAMES.improvements])

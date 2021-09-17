@@ -20,12 +20,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core.domain import beam_job_services
+from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
-from jobs.io import ndb_io
-from jobs.types import job_run_result
 
 import apache_beam as beam
-
 from typing import Optional
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])

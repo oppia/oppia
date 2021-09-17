@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation_registry
 from core.tests import test_utils
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation_registry
 
 
 class GetAuditsByKindTests(test_utils.TestBase):

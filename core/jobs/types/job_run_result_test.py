@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import pickle
 
+from core.jobs.types import job_run_result
 from core.tests import test_utils
-from jobs.types import job_run_result
 
 
 class JobRunResultTests(test_utils.TestBase):

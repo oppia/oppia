@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation
 from core.platform import models
 import feconf
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation
 
 (auth_models, user_models) = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))

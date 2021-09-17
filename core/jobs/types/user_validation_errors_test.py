@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core.jobs.types import base_validation_errors
+from core.jobs.types import base_validation_errors_test
+from core.jobs.types import user_validation_errors
 from core.platform import models
 import feconf
-from jobs.types import base_validation_errors
-from jobs.types import base_validation_errors_test
-from jobs.types import user_validation_errors
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])

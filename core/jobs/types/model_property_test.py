@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import pickle
 
+from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils
-from jobs.types import model_property
 import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
