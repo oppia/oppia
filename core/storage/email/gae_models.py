@@ -26,16 +26,14 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
-    from mypy_imports import user_models # pylint: disable=unused-import
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -221,7 +219,7 @@ class SentEmailModel(base_models.BaseModel):
             cls,
             email_hash: str,
             sent_datetime_lower_bound: Optional[datetime.datetime] = None
-    ) -> List['SentEmailModel']:
+    ) -> Sequence['SentEmailModel']:
         """Returns all messages with a given email_hash.
 
         This also takes an optional sent_datetime_lower_bound argument,
@@ -256,9 +254,7 @@ class SentEmailModel(base_models.BaseModel):
         if sent_datetime_lower_bound is not None:
             query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
 
-        messages = cast(List[SentEmailModel], query.fetch())
-
-        return messages
+        return query.fetch()
 
     @classmethod
     def _generate_hash(
