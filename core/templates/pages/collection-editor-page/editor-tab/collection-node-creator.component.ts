@@ -61,11 +61,6 @@ export class CollectionNodeCreatorComponent {
     this.collection = this.collectionEditorStateService.getCollection();
   }
 
-  onSelect(selectEvent): void {
-    selectEvent.preventDefault();
-    // console.log(exp);
-  }
-
   /**
    * Fetches a list of exploration metadata dicts from backend, given
    * a search query. It then extracts the title and id of the
