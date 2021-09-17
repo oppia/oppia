@@ -108,7 +108,7 @@ describe('Blog Dashboard Tile Component', () => {
 
     component.ngOnInit();
 
-    expect(component.lastUpdatedDateString).toEqual('November 21, 2014');
+    expect(component.lastUpdatedDateString).toEqual('Nov 21, 2014');
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
@@ -116,15 +116,15 @@ describe('Blog Dashboard Tile Component', () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       let DATE = '11/21/2014';
       expect(component.getDateStringInWords(DATE))
-        .toBe('November 21, 2014');
+        .toBe('Nov 21, 2014');
 
       DATE = '01/16/2027';
       expect(component.getDateStringInWords(DATE))
-        .toBe('January 16, 2027');
+        .toBe('Jan 16, 2027');
 
       DATE = '02/02/2018';
       expect(component.getDateStringInWords(DATE))
-        .toBe('February 2, 2018');
+        .toBe('Feb 2, 2018');
     });
 
   it('should navigate to blog post editor interface on clicking edit', () => {
