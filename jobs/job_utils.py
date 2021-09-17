@@ -25,6 +25,7 @@ import feconf
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
+from typing import Any, List, Optional, Tuple, Type, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,7 +36,9 @@ datastore_services = models.Registry.import_datastore_services()
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-def clone_model(model, **new_values):
+def clone_model(
+    model: datastore_services.Model, **new_values: Any
+) -> datastore_services.Model:
     """Clones the entity, adding or overriding constructor attributes.
 
     The cloned entity will have exactly the same property values as the
@@ -65,7 +68,7 @@ def clone_model(model, **new_values):
         return cls(id=model_id, **props)
 
 
-def get_model_class(kind):
+def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     """Returns the model class corresponding to the given kind.
 
     NOTE: A model's kind is usually, but not always, the same as a model's class
@@ -83,7 +86,9 @@ def get_model_class(kind):
     Raises:
         KindError. Internally raised by _lookup_model when the kind is invalid.
     """
-    return datastore_services.Model._lookup_model(kind)  # pylint: disable=protected-access
+    return cast(
+        Type[datastore_services.Model],
+        datastore_services.Model._lookup_model(kind))  # type: ignore[attr-defined]  # pylint: disable=protected-access
 
 
 def get_model_kind(model: datastore_services.Model) -> str:
@@ -105,14 +110,13 @@ def get_model_kind(model: datastore_services.Model) -> str:
         TypeError. When the argument is not a model.
     """
     if isinstance(model, datastore_services.Model) or (
-            isinstance(model, type) and
             issubclass(model, datastore_services.Model)):
-        return model._get_kind()  # pylint: disable=protected-access
+        return cast(str, model._get_kind())  # type: ignore[attr-defined]  # pylint: disable=protected-access
     else:
         raise TypeError('%r is not a model type or instance' % model)
 
 
-def get_model_id(model):
+def get_model_id(model: datastore_services.Model) -> Optional[str]:
     """Returns the given model's ID.
 
     Args:
@@ -130,7 +134,9 @@ def get_model_id(model):
         raise TypeError('%r is not a model instance' % model)
 
 
-def get_model_property(model, property_name):
+def get_model_property(
+    model: datastore_services.Model, property_name: str
+) -> Any:
     """Returns the given property from a model.
 
     Args:
@@ -151,7 +157,9 @@ def get_model_property(model, property_name):
         raise TypeError('%r is not a model instance' % model)
 
 
-def get_beam_entity_from_ndb_model(model):
+def get_beam_entity_from_ndb_model(
+    model: datastore_services.Model
+) -> beam_datastore_types.Entity:
     """Returns an Apache Beam entity equivalent to the given NDB model.
 
     Args:
@@ -168,7 +176,9 @@ def get_beam_entity_from_ndb_model(model):
     )
 
 
-def get_ndb_model_from_beam_entity(beam_entity):
+def get_ndb_model_from_beam_entity(
+    beam_entity: beam_datastore_types.Entity
+) -> datastore_services.Model:
     """Returns an NDB model equivalent to the given Apache Beam entity.
 
     Args:
@@ -181,12 +191,16 @@ def get_ndb_model_from_beam_entity(beam_entity):
     # We use private _lookup_model and _entity_from_ds_entity here because it
     # provides a functionality that we need and writing it ourselves would be
     # too complicated.
-    ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind())  # pylint: disable=protected-access
-    return ndb_model._entity_from_ds_entity( # pylint: disable=protected-access
-        beam_entity.to_client_entity(), model_class=ndb_model_class)
+    ndb_model_class = get_model_class(ndb_key.kind())  # pylint: disable=protected-access
+    return cast(
+        datastore_services.Model,
+        ndb_model._entity_from_ds_entity( # pylint: disable=protected-access
+            beam_entity.to_client_entity(), model_class=ndb_model_class))
 
 
-def get_ndb_key_from_beam_key(beam_key):
+def get_ndb_key_from_beam_key(
+    beam_key: beam_datastore_types.Key
+) -> datastore_services.Key:
     """Returns an NDB key equivalent to the given Apache Beam key.
 
     Args:
@@ -195,10 +209,14 @@ def get_ndb_key_from_beam_key(beam_key):
     Returns:
         datastore_services.Key. The NDB key.
     """
-    return datastore_services.Key._from_ds_key(beam_key.to_client_key())  # pylint: disable=protected-access
+    return cast(
+        datastore_services.Key,
+        datastore_services.Key._from_ds_key(beam_key.to_client_key()))  # type: ignore[attr-defined]  # pylint: disable=protected-access
 
 
-def get_beam_key_from_ndb_key(ndb_key):
+def get_beam_key_from_ndb_key(
+    ndb_key: datastore_services.Key
+) -> beam_datastore_types.Key:
     """Returns an Apache Beam key equivalent to the given NDB key.
 
     Args:
@@ -212,7 +230,9 @@ def get_beam_key_from_ndb_key(ndb_key):
         namespace=ndb_key.namespace())
 
 
-def get_beam_query_from_ndb_query(query, namespace=None):
+def get_beam_query_from_ndb_query(
+    query: datastore_services.Query, namespace: Optional[str] = None
+) -> beam_datastore_types.Query:
     """Returns an equivalent Apache Beam query from the given NDB query.
 
     This function helps developers avoid learning two types of query syntaxes.
@@ -237,7 +257,7 @@ def get_beam_query_from_ndb_query(query, namespace=None):
     if query.filters:
         filters = _get_beam_filters_from_ndb_filter_node(query.filters)
     else:
-        filters = None
+        filters = []
 
     if query.order_by:
         order = _get_beam_order_from_ndb_order(query.order_by)
@@ -251,24 +271,26 @@ def get_beam_query_from_ndb_query(query, namespace=None):
         kind=kind,
         namespace=namespace,
         project=feconf.OPPIA_PROJECT_ID,
-        filters=filters,
+        filters=filters or None,
         order=order
     )
 
 
-def _get_beam_filters_from_ndb_filter_node(filter_node):
+def _get_beam_filters_from_ndb_filter_node(
+    filter_node: datastore_services.FilterNode
+) -> List[Tuple[str, str, str]]:
     """Returns an equivalent Apache Beam filter from the given NDB filter node.
 
     Args:
-        filter_node: ndb_query.FilterNode. The filter node to convert.
+        filter_node: datastore_services.FilterNode. The filter node to convert.
 
     Returns:
         tuple(tuple(str, str, str)). The equivalent Apache Beam filters. Items
         are: (property name, comparison operator, property value).
     """
-    if isinstance(filter_node, ndb_query.ConjunctionNode):
+    if isinstance(filter_node, datastore_services.ConjunctionNode):
         nodes = list(filter_node)  # pylint: disable=protected-access
-    elif isinstance(filter_node, ndb_query.FilterNode):
+    elif isinstance(filter_node, datastore_services.FilterNode):
         nodes = [filter_node]  # pylint: disable=protected-access
     else:
         raise TypeError(
@@ -279,7 +301,9 @@ def _get_beam_filters_from_ndb_filter_node(filter_node):
     return [(n._name, n._opsymbol, n._value) for n in nodes] # pylint: disable=protected-access
 
 
-def _get_beam_order_from_ndb_order(orders):
+def _get_beam_order_from_ndb_order(
+    orders: ndb_query.PropertyOrder
+) -> Tuple[str, ...]:
     """Returns an equivalent Apache Beam order from the given datastore Order.
 
     Args:
