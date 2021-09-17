@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import collections
 
 from core.jobs import base_jobs
+from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms.validation import base_validation
 from core.jobs.transforms.validation import base_validation_registry
@@ -62,8 +63,6 @@ class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
         Returns:
             ModelKey. The corresponding model key.
         """
-        from jobs import job_utils
-
         return cls(
             model_kind=job_utils.get_model_kind(model),
             model_id=job_utils.get_model_id(model))
@@ -79,8 +78,6 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             PCollection. A PCollection of audit errors discovered during the
             audit.
         """
-        from jobs import job_utils
-
         existing_models, deleted_models = (
             self.pipeline
             | 'Get all models' >> (
@@ -288,8 +285,6 @@ class GetMissingModelKeyErrors(beam.PTransform):
             tuple(ModelKey, ModelRelationshipError). The key for a referenced
             model and the error to report when the key doesn't exist.
         """
-        from jobs import job_utils
-
         # NOTE: This loop yields 1 or many values, depending on whether the
         # property is a repeated property (i.e. a list).
         for property_value in property_of_model.yield_value_from_model(model):

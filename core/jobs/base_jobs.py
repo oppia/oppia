@@ -58,7 +58,7 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
-from jobs.types import job_run_result
+from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
