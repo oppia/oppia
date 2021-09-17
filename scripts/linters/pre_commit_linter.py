@@ -482,7 +482,7 @@ def _get_all_filepaths(
     all_matching_filepaths = [
         filename for filename in all_filepaths if not
         any(
-            fnmatch.fnmatch(filename, pattern) for pattern  # pylint: disable=comprehension-escape
+            fnmatch.fnmatch(filename, pattern) for pattern
             in general_purpose_linter.EXCLUDED_PATHS
         )
     ]
