@@ -19,8 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import itertools
-
 from constants import constants
 from core.domain import beam_job_domain
 from core.platform import models
@@ -72,7 +70,7 @@ def get_beam_job_runs(
     Returns:
         list(BeamJobRun). A list of every job run recorded in the datastore.
     """
-    beam_job_run_models = _get_all_beam_job_run_models()
+    beam_job_run_models = list(beam_job_models.BeamJobRunModel.query())
     beam_job_runs = [
         get_beam_job_run_from_model(m) for m in beam_job_run_models
     ]
@@ -84,6 +82,7 @@ def get_beam_job_runs(
             if beam_job_runs[i].in_terminal_state:
                 continue
             jobs_manager.refresh_state_of_beam_job_run_model(beam_job_run_model)
+            beam_job_run_model.update_timestamps(update_last_updated_time=False)
             updated_beam_job_run_models.append(beam_job_run_model)
             beam_job_runs[i] = get_beam_job_run_from_model(beam_job_run_model)
 
@@ -163,16 +162,6 @@ def create_beam_job_run_result_model(
     return model
 
 
-def refresh_state_of_all_beam_job_run_models() -> None:
-    """Refreshes the state of all BeamJobRunModels that haven't terminated."""
-    beam_job_run_models = _get_all_beam_job_run_models(include_terminated=False)
-
-    for beam_job_run_model in beam_job_run_models:
-        jobs_manager.refresh_state_of_beam_job_run_model(beam_job_run_model)
-
-    datastore_services.put_multi(beam_job_run_models)
-
-
 def get_beam_job_run_from_model(
     beam_job_run_model: beam_job_models.BeamJobRunModel
 ) -> beam_job_domain.BeamJobRun:
@@ -189,31 +178,3 @@ def get_beam_job_run_from_model(
         beam_job_run_model.latest_job_state, beam_job_run_model.created_on,
         beam_job_run_model.last_updated,
         beam_job_run_model.dataflow_job_id is None)
-
-
-def _get_all_beam_job_run_models(
-    include_terminated: bool = True
-) -> List[beam_job_models.BeamJobRunModel]:
-    """Returns all of the BeamJobRunModels in the datastore.
-
-    Args:
-        include_terminated: bool. Whether the returned list should include jobs
-            that have terminated.
-
-    Returns:
-        list(BeamJobRunModel). The BeamJobRunModels in the datastore.
-    """
-    if include_terminated:
-        return list(beam_job_models.BeamJobRunModel.query().iter())
-
-    return list(itertools.chain.from_iterable(
-        beam_job_models.BeamJobRunModel.query(
-            beam_job_models.BeamJobRunModel.latest_job_state == state).iter()
-        for state in (
-            beam_job_models.BeamJobState.CANCELLING.value,
-            beam_job_models.BeamJobState.DRAINING.value,
-            beam_job_models.BeamJobState.PENDING.value,
-            beam_job_models.BeamJobState.RUNNING.value,
-            beam_job_models.BeamJobState.STOPPED.value,
-            beam_job_models.BeamJobState.UNKNOWN.value,
-        )))
