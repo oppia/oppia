@@ -93,7 +93,7 @@ describe('Learner view info component', () => {
     componentInstance.ngOnDestory();
   });
 
-  it('should initialize', fakeAsync(() => {
+  it('should initialize the component properties correctly', fakeAsync(() => {
     let explorationId = 'expId';
     let explorationTitle = 'Exploration Title';
     let topicUrl = 'topic_url';
@@ -106,7 +106,6 @@ describe('Learner view info component', () => {
           title: explorationTitle
         }
       } as FetchExplorationBackendResponse));
-
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(componentInstance, 'getTopicUrl').and.returnValue(topicUrl);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
@@ -121,6 +120,7 @@ describe('Learner view info component', () => {
     componentInstance.ngOnInit();
     tick();
     tick();
+
     expect(urlService.getPathname).toHaveBeenCalled();
     expect(contextService.getExplorationId).toHaveBeenCalled();
     expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
@@ -135,18 +135,21 @@ describe('Learner view info component', () => {
       .toHaveBeenCalled();
   }));
 
-  it('should get topic url', () => {
+  it('should get topic url from fragment correctly', () => {
     let topicUrl = 'topic_url';
+
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic_url_fragment');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom_url_fragment');
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(topicUrl);
+
     expect(componentInstance.getTopicUrl()).toEqual(topicUrl);
   });
 
-  it('should open information card modal', () => {
+  it('should invoke information card modal', () => {
     let ngbModal = TestBed.inject(NgbModal);
+
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
         expInfo: null
@@ -158,37 +161,46 @@ describe('Learner view info component', () => {
         }
       }
     } as NgbModalRef);
+
     componentInstance.openInformationCardModal();
+
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should show information card', fakeAsync(() => {
+  it('should display information card', fakeAsync(() => {
     let explorationId = 'expId';
     componentInstance.explorationId = explorationId;
     componentInstance.expInfo = {} as LearnerExplorationSummaryBackendDict;
+
     spyOn(componentInstance, 'openInformationCardModal');
     componentInstance.showInformationCard();
-    expect(componentInstance.openInformationCardModal).toHaveBeenCalled();
-    componentInstance.expInfo = null;
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.resolve({
         summaries: []
       }));
+
+    expect(componentInstance.openInformationCardModal).toHaveBeenCalled();
+    componentInstance.expInfo = null;
+
     componentInstance.showInformationCard();
     tick();
+
     expect(learnerViewInfoBackendApiService.fetchLearnerInfoAsync)
       .toHaveBeenCalled();
   }));
 
-  it('should show error if backend call fails', fakeAsync(() => {
+  it('should handle error if backend call fails', fakeAsync(() => {
     let explorationId = 'expId';
     componentInstance.explorationId = explorationId;
     componentInstance.expInfo = null;
+
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());
     spyOn(loggerService, 'error');
+
     componentInstance.showInformationCard();
     tick();
+
     expect(loggerService.error).toHaveBeenCalled();
   }));
 });

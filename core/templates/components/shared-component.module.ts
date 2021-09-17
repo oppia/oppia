@@ -195,7 +195,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
-    CreateActivityModalComponent,
+    CreateActivityModalCompopnent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
