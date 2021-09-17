@@ -417,7 +417,7 @@ class ExportAccountHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-        'DELETE' : {}
+        'DELETE': {}
     }
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -511,7 +511,7 @@ class UserInfoHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET' : {}
+        'GET': {}
     }
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
