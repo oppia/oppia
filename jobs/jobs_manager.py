@@ -164,8 +164,10 @@ def refresh_state_of_beam_job_run_model(
             job.current_state, beam_job_models.BeamJobState.UNKNOWN).value
         job_state_updated = job.current_state_time.replace(tzinfo=None)
 
-        if (beam_job_run_model.latest_job_state != job_state and
-                job_state == beam_job_models.BeamJobState.FAILED.value):
+        if (
+                beam_job_run_model.latest_job_state != job_state and
+                job_state == beam_job_models.BeamJobState.FAILED.value
+        ):
             _put_job_stderr(beam_job_run_model.id, pprint.pformat(job))
 
     beam_job_run_model.latest_job_state = job_state
