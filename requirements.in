@@ -3,7 +3,7 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.31.0
+apache-beam[gcp]==2.33.0rc1
 backports.functools-lru-cache==1.6.1
 beautifulsoup4==4.9.3
 bleach==3.3.0
@@ -37,6 +37,7 @@ google-cloud-ndb==1.8.0
 google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
 pytest==6.2.3
+typing_extensions==3.10.0.2
 webapp2==3.0.0b1
 elasticsearch==7.14.0
 urllib3==1.26.6
