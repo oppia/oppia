@@ -34,16 +34,14 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, List, Optional, Tuple, Union, cast
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
-    from mypy_imports import user_models  # pylint: disable=unused-import
 
-(base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -185,10 +183,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = {}
-        feedback_models = cast(
-            List[GeneralFeedbackThreadModel],
-            cls.get_all().filter(cls.original_author_id == user_id).fetch()
-        )
+        feedback_models = (
+            cls.get_all().filter(cls.original_author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
@@ -260,7 +256,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             entity_type: str,
             entity_id: str,
             limit: int = feconf.DEFAULT_QUERY_LIMIT
-    ) -> List['GeneralFeedbackThreadModel']:
+    ) -> Sequence['GeneralFeedbackThreadModel']:
         """Returns a list of threads associated with the entity, ordered
         by their "last updated" field. The number of entities fetched is
         limited by the `limit` argument to this method, whose default
@@ -276,11 +272,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             list(GeneralFeedbackThreadModel). List of threads associated with
             the entity. Doesn't include deleted entries.
         """
-        return cast(
-            List[GeneralFeedbackThreadModel],
-            cls.get_all().filter(cls.entity_type == entity_type).filter(
-                cls.entity_id == entity_id
-            ).order(-cls.last_updated).fetch(limit))
+        return cls.get_all().filter(cls.entity_type == entity_type).filter(
+            cls.entity_id == entity_id
+        ).order(-cls.last_updated).fetch(limit)
 
 
 class GeneralFeedbackMessageModel(base_models.BaseModel):
@@ -374,10 +368,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
 
         user_data = {}
-        feedback_models = cast(
-            List[GeneralFeedbackMessageModel],
-            cls.get_all().filter(cls.author_id == user_id).fetch()
-        )
+        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
@@ -537,7 +528,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_messages(
             cls,
             thread_id: str
-    ) -> List['GeneralFeedbackMessageModel']:
+    ) -> Sequence['GeneralFeedbackMessageModel']:
         """Returns a list of messages in the given thread. The number of
         messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
@@ -549,11 +540,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
             messages.
         """
-        return cast(
-            List[GeneralFeedbackMessageModel],
-            cls.get_all().filter(
-                cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
-        )
+        return cls.get_all().filter(
+            cls.thread_id == thread_id
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_most_recent_message(
@@ -588,7 +577,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return cls.get_message_counts([thread_id])[0]
 
     @classmethod
-    def get_message_counts(cls, thread_ids: List[str]) -> List[int]:
+    def get_message_counts(
+            cls, thread_ids: List[str]
+    ) -> List[int]:
         """Returns a list containing the number of messages in the threads.
         Includes the deleted entries.
 
@@ -598,11 +589,12 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             list(int). List of the message counts for the threads.
         """
-        thread_models = cast(
-            List[GeneralFeedbackThreadModel],
-            GeneralFeedbackThreadModel.get_multi(thread_ids)
-        )
-        return [thread_model.message_count for thread_model in thread_models]
+        thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
+        assert None not in thread_models
+        return [
+            thread_model.message_count if thread_model else None
+            for thread_model in thread_models
+        ]
 
     # TODO(#13523): Change the return value of the function below from
     # tuple(list, str|None, bool) to a domain object.
@@ -611,7 +603,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             cls,
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List['GeneralFeedbackMessageModel'], Optional[str], bool]:
+    ) -> Tuple[Sequence['GeneralFeedbackMessageModel'], Optional[str], bool]:
         """Fetches a list of all the messages sorted by their last updated
         attribute.
 
