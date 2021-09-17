@@ -40,7 +40,6 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { SupplementalCardComponent } from './learner-experience/supplemental-card.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
@@ -67,7 +66,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    SupplementalCardComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
@@ -78,7 +76,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
-    SupplementalCardComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
