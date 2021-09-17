@@ -116,7 +116,12 @@ def run_job(
     if pipeline is None:
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
-            options=job_options.JobOptions(namespace=namespace))
+            options=job_options.JobOptions(
+                namespace=namespace,
+                experiment='use_runner_v2',
+                sdk_container_image=''
+            )
+        )
 
     with _job_bookkeeping_context(job_class.__name__) as run_model:
         job = job_class(pipeline)
