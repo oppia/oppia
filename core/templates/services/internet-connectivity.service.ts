@@ -61,6 +61,8 @@ export class InternetConnectivityService {
               return (
                 this._serverConnectionBackendApiService
                   .fetchConnectionCheckResultAsync());
+            } else {
+              throw Error();
             }
           }),
           retryWhen(errors => errors.pipe(
