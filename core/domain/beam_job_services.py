@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import beam_job_domain
+from core.jobs import jobs_manager
+from core.jobs import registry as jobs_registry
 from core.platform import models
-from jobs import jobs_manager
-from jobs import registry as jobs_registry
 
 from typing import List, Optional # isort: skip
 

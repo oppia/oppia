@@ -490,9 +490,9 @@
 
 # Infrastructure.
 # TODO(#13808): Add ownership to @vojtechjelinek after 2021-09-14.
-/jobs/ @rohitkatlaa
-/jobs/transforms @rohitkatlaa
-/jobs/types @rohitkatlaa
+/core/jobs/ @rohitkatlaa
+/core/jobs/transforms @rohitkatlaa
+/core/jobs/types @rohitkatlaa
 /core/templates/domain/jobs/ @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21

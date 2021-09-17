@@ -24,10 +24,10 @@ import contextlib
 import datetime
 import re
 
+from core.jobs import base_jobs
+from core.jobs import job_options
 from core.platform import models
 from core.tests import test_utils
-from jobs import base_jobs
-from jobs import job_options
 import python_utils
 
 from apache_beam import runners

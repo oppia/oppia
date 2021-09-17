@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core.jobs import base_jobs
 from core.platform import models
-from jobs import base_jobs
 import python_utils
 import utils
 

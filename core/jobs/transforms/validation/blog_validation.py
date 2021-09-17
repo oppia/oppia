@@ -22,11 +22,11 @@ from __future__ import unicode_literals
 import datetime
 
 from core.domain import blog_domain
+from core.jobs import job_utils
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation
+from core.jobs.types import blog_validation_errors
 from core.platform import models
-from jobs import job_utils
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation
-from jobs.types import blog_validation_errors
 
 import apache_beam as beam
 

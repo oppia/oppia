@@ -25,14 +25,15 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import recommendations_services
 from core.domain import search_services
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import cron_jobs
+from core.jobs.types import job_run_result
 from core.platform import models
 import feconf
-from jobs import job_test_utils
-from jobs.batch_jobs import cron_jobs
-from jobs.types import job_run_result
 import python_utils
 
 import apache_beam as beam
+
 from typing import Dict, List, Set, Tuple, Union # isort:skip
 
 MYPY = False

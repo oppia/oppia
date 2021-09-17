@@ -20,10 +20,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core.domain import platform_parameter_domain as parameter_domain
+from core.jobs import job_test_utils
+from core.jobs.transforms.validation import config_validation
+from core.jobs.types import base_validation_errors
 from core.platform import models
-from jobs import job_test_utils
-from jobs.transforms.validation import config_validation
-from jobs.types import base_validation_errors
 
 import apache_beam as beam
 

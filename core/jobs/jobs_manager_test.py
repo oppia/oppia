@@ -24,13 +24,13 @@ import datetime
 from unittest import mock
 
 from core.domain import beam_job_services
+from core.jobs import base_jobs
+from core.jobs import job_options
+from core.jobs import jobs_manager
+from core.jobs.types import job_run_result
 from core.storage.beam_job import gae_models as beam_job_models
 from core.tests import test_utils
 import feconf
-from jobs import base_jobs
-from jobs import job_options
-from jobs import jobs_manager
-from jobs.types import job_run_result
 
 import apache_beam as beam
 from apache_beam import runners

@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs import base_jobs
+from core.jobs import registry
 from core.tests import test_utils
-from jobs import base_jobs
-from jobs import registry
 
 
 class RegistryTests(test_utils.TestBase):

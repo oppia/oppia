@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core.jobs import job_utils
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation
+from core.jobs.types import user_validation_errors
 from core.platform import models
 import feconf
-from jobs import job_utils
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation
-from jobs.types import user_validation_errors
 
 import apache_beam as beam
 

@@ -24,10 +24,10 @@ import inspect
 import itertools
 import re
 
+from core.jobs import job_utils
+from core.jobs.types import base_validation_errors
+from core.jobs.types import model_property
 from core.platform import models
-from jobs import job_utils
-from jobs.types import base_validation_errors
-from jobs.types import model_property
 import python_utils
 
 import apache_beam as beam

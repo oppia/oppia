@@ -30,16 +30,15 @@ from core.domain import search_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import user_services
+from core.jobs import base_jobs
+from core.jobs import job_utils
+from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
 import feconf
-from jobs import base_jobs
-from jobs import job_utils
-from jobs.io import ndb_io
-from jobs.types import job_run_result
 import python_utils
 
 import apache_beam as beam
-
 from typing import Dict, Iterable, List, Optional, Tuple, Union, cast
 
 MYPY = False

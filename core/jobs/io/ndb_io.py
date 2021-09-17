@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs import job_utils
 from core.platform import models
 import feconf
 
@@ -55,8 +56,6 @@ class GetModels(beam.PTransform):
         Returns:
             PCollection. The PCollection of models.
         """
-        from jobs import job_utils
-
         query = job_utils.get_beam_query_from_ndb_query(
             self.query, namespace=initial_pipeline.pipeline.options.namespace)
         return (
@@ -86,8 +85,6 @@ class PutModels(beam.PTransform):
             PCollection. An empty PCollection. This is needed because all
             expand() methods need to return some PCollection.
         """
-        from jobs import job_utils
-
         return (
             entities
             | 'Transforming the NDB models into Apache Beam entities' >> (
@@ -115,8 +112,6 @@ class DeleteModels(beam.PTransform):
             PCollection. An empty PCollection. This is needed because all
             expand() methods need to return some PCollection.
         """
-        from jobs import job_utils
-
         return (
             entities
             | 'Transforming the NDB keys into Apache Beam keys' >> (

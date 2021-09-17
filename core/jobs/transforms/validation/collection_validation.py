@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 from core.domain import collection_domain
 from core.domain import rights_domain
+from core.jobs import job_utils
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation
 from core.platform import models
-from jobs import job_utils
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation
 
 (collection_models,) = models.Registry.import_models([models.NAMES.collection])
 

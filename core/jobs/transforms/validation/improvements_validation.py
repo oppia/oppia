@@ -19,11 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs import job_utils
+from core.jobs.decorators import validation_decorators
+from core.jobs.types import improvements_validation_errors
 from core.platform import models
-from jobs import job_utils
-from jobs.decorators import validation_decorators
-from jobs.types import improvements_validation_errors
-
 
 import apache_beam as beam
 

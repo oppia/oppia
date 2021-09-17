@@ -20,10 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import skill_domain
+from core.jobs import job_utils
+from core.jobs.decorators import validation_decorators
+from core.jobs.transforms.validation import base_validation
 from core.platform import models
-from jobs import job_utils
-from jobs.decorators import validation_decorators
-from jobs.transforms.validation import base_validation
 
 MYPY = False
 if MYPY: # pragma: no cover

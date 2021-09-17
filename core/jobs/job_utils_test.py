@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core.jobs import job_utils
 from core.platform import models
 from core.tests import test_utils
 import feconf
-from jobs import job_utils
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 

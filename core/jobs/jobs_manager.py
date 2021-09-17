@@ -24,17 +24,16 @@ import logging
 import pprint
 
 from core.domain import beam_job_services
+from core.jobs import base_jobs
+from core.jobs import job_options
+from core.jobs.io import job_io
 from core.storage.beam_job import gae_models as beam_job_models
 import feconf
-from jobs import base_jobs
-from jobs import job_options
-from jobs.io import job_io
 import python_utils
 
 import apache_beam as beam
 from apache_beam import runners
 from google.cloud import dataflow
-
 from typing import Iterator, Optional, Type
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.

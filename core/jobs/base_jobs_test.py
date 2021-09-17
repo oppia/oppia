@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import re
 
+from core.jobs import base_jobs
+from core.jobs import job_test_utils
 from core.tests import test_utils
-from jobs import base_jobs
-from jobs import job_test_utils
 
 from typing import Dict, Type
 

@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs import job_utils
 from core.platform import models
-from jobs import job_utils
 import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])

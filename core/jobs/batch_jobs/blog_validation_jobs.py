@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.types import blog_validation_errors
 from core.platform import models
-from jobs import base_jobs
-from jobs.io import ndb_io
-from jobs.types import blog_validation_errors
 
 import apache_beam as beam
 

@@ -24,11 +24,11 @@ import re
 from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
+from core.jobs import job_test_utils
+from core.jobs.transforms.validation import base_validation
+from core.jobs.types import base_validation_errors
 from core.platform import models
 import feconf
-from jobs import job_test_utils
-from jobs.transforms.validation import base_validation
-from jobs.types import base_validation_errors
 
 import apache_beam as beam
 

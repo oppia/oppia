@@ -19,10 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.jobs import job_test_utils
+from core.jobs.transforms.validation import skill_validation
+from core.jobs.types import base_validation_errors
 from core.platform import models
-from jobs import job_test_utils
-from jobs.transforms.validation import skill_validation
-from jobs.types import base_validation_errors
 
 import apache_beam as beam
 

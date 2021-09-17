@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.jobs import job_test_utils
+from core.jobs.io import ndb_io
 from core.platform import models
-from jobs import job_test_utils
-from jobs.io import ndb_io
 
 import apache_beam as beam
 

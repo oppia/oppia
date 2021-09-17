@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import collections
 
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.transforms.validation import base_validation
+from core.jobs.transforms.validation import base_validation_registry
+from core.jobs.types import base_validation_errors
 from core.platform import models
-from jobs import base_jobs
-from jobs.io import ndb_io
-from jobs.transforms.validation import base_validation
-from jobs.transforms.validation import base_validation_registry
-from jobs.types import base_validation_errors
 import python_utils
 
 import apache_beam as beam
