@@ -34,21 +34,21 @@ describe('ConceptCardComponent', () => {
   let example2: WorkedExample;
   let workedExamples: WorkedExample[];
 
-  example1 = new WorkedExample(new SubtitledHtml(
+  example1 = (new SubtitledHtml(
     'worked example question 1',
     'worked_example_q_1'
   ), new SubtitledHtml(
     'worked example explanation 1',
     'worked_example_e_1'
-  ));
+  )) as unknown as WorkedExample;
 
-  example2 = new WorkedExample(new SubtitledHtml(
+  example2 = (new SubtitledHtml(
     'worked example question 2',
     'worked_example_q_2'
   ), new SubtitledHtml(
     'worked example explanation 2',
     'worked_example_e_2'
-  ));
+  )) as unknown as WorkedExample;
   workedExamples = [example1, example2],
 
   beforeEach(() => {
@@ -60,7 +60,7 @@ describe('ConceptCardComponent', () => {
         ConceptCardComponent,
         MockTranslatePipe
       ],
-      providers: [],
+      providers: [ConceptCard],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
@@ -69,6 +69,7 @@ describe('ConceptCardComponent', () => {
     fixture = TestBed.createComponent(ConceptCardComponent);
     conceptCard = TestBed.inject(ConceptCard);
     component = fixture.componentInstance;
+    conceptCard._workedExamples = workedExamples;
   });
 
   it('should load concept cards', () => {

@@ -22,7 +22,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ScoreRingComponent } from './score-ring.component';
 
-describe('ConceptCardComponent', () => {
+describe('Score Ring Component', () => {
   let fixture: ComponentFixture<ScoreRingComponent>;
   let component: ScoreRingComponent;
 
@@ -43,10 +43,11 @@ describe('ConceptCardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ScoreRingComponent);
     component = fixture.componentInstance;
-    component.score = 1;
+    component.score = 35;
   });
 
   it('should set component properties on initialization', () => {
+    component.score = 35;
     spyOn(document, 'querySelector').and.returnValue({
       // This throws "Argument of type '{ r: { baseVal: { value: number; };
       // }; style: { strokeDasharray: string; strokeDashoffset: string; }; }'
@@ -70,6 +71,7 @@ describe('ConceptCardComponent', () => {
   });
 
   it('should get score ring color', () => {
+    component.score = 35;
     component.isTestPassed = true;
 
     expect(component.getScoreRingColor())
@@ -82,6 +84,7 @@ describe('ConceptCardComponent', () => {
   });
 
   it('should get score outer ring color', () => {
+    component.score = 35;
     component.isTestPassed = true;
 
     expect(component.getScoreOuterRingColor())
@@ -96,17 +99,17 @@ describe('ConceptCardComponent', () => {
   it('should set the new score if it changes', () => {
     let changes: SimpleChanges = {
       score: {
-        currentValue: 35,
-        previousValue: 75,
+        currentValue: 75,
+        previousValue: 35,
         firstChange: true,
         isFirstChange: () => true
       }
     };
     expect(component.score).toEqual(35);
 
+    component.ngOnInit();
     component.ngOnChanges(changes);
 
-    expect(component.score).toEqual(75);
-    expect(component.circle.style.strokeDashoffset).toEqual('abc');
+    expect(component.circle.style.strokeDashoffset).toEqual('196.35');
   });
 });
