@@ -145,11 +145,6 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    os.path.join(
-        _PARENT_DIR,
-        'oppia_tools',
-        'typing_extensions-%s' % common.TYPING_EXTENSIONS_VERSION
-    ),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 

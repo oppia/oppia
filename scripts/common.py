@@ -52,7 +52,6 @@ GRPCIO_VERSION = '1.38.0'
 ENUM_VERSION = '1.1.10'
 PROTOBUF_VERSION = '3.13.0'
 SETUPTOOLS_VERSION = '36.6.0'
-TYPING_EXTENSIONS_VERSION = '3.10.0.2'
 
 # Node version.
 NODE_VERSION = '14.15.0'
@@ -196,12 +195,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
-    os.path.join(
-        OPPIA_TOOLS_DIR,
-        'typing_extensions-%s' % TYPING_EXTENSIONS_VERSION
-    ),
-    THIRD_PARTY_PYTHON_LIBS_DIR,
     CURR_DIR,
+    THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
 
 

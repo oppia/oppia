@@ -238,11 +238,6 @@ def main() -> None:
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
         ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'typing_extensions',
-            common.TYPING_EXTENSIONS_VERSION,
-            common.OPPIA_TOOLS_DIR
-        ),
     ]
 
     for package, version, path in local_pip_dependencies:
