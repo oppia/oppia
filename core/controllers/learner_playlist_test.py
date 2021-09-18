@@ -164,8 +164,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
                 'exp_id_%s' %
-                python_utils.UNICODE(
-                    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
+                str(feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['playlist_limit_exceeded'], True)
 
@@ -263,8 +262,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
                 'exp_id_%s' %
-                python_utils.UNICODE(
-                    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
+                str(feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3)),
             {}, csrf_token=csrf_token)
         self.assertEqual(response['playlist_limit_exceeded'], True)
 

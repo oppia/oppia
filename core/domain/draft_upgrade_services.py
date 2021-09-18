@@ -186,8 +186,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             if isinstance(html_list, list):
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
-                                    if isinstance(
-                                            answer_html, python_utils.UNICODE):
+                                    if isinstance(answer_html, str):
                                         new_value['correct_answer'][list_index][
                                             answer_html_index] = (
                                                 conversion_fn(answer_html))

@@ -29,7 +29,6 @@ import feconf
 from jobs import base_jobs
 from jobs import job_options
 from jobs.io import job_io
-import python_utils
 
 import apache_beam as beam
 from apache_beam import runners
@@ -195,7 +194,7 @@ def _job_bookkeeping_context(
 
     except Exception as exception:
         run_model.latest_job_state = beam_job_models.BeamJobState.FAILED.value
-        _put_job_stderr(run_model.id, python_utils.UNICODE(exception))
+        _put_job_stderr(run_model.id, str(exception))
 
     finally:
         run_model.put()

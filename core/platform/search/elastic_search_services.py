@@ -268,7 +268,7 @@ def search(
         # There is at least one more page of results to fetch. Trim the results
         # in this call to the desired size.
         matched_search_docs = matched_search_docs[:size]
-        resulting_offset = python_utils.UNICODE(int(offset) + size)
+        resulting_offset = str(int(offset) + size)
 
     if ids_only:
         result_docs = [doc['_id'] for doc in matched_search_docs]

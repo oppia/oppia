@@ -36,7 +36,6 @@ from jobs import base_jobs
 from jobs import job_utils
 from jobs.io import ndb_io
 from jobs.types import job_run_result
-import python_utils
 
 import apache_beam as beam
 
@@ -450,7 +449,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
         )
         word_count = translation['content_word_count']
         suggestion_date = datetime.datetime.strptime(
-            python_utils.UNICODE(translation['last_updated_date']), '%Y-%m-%d'
+            str(translation['last_updated_date']), '%Y-%m-%d'
         ).date()
         return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
             accumulator.language_code,
@@ -569,7 +568,7 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
         sorted_similarities = sorted(
             similarities, reverse=True, key=lambda x: x['similarity_score'])
         return [
-            python_utils.UNICODE(item['exp_id']) for item in sorted_similarities
+            str(item['exp_id']) for item in sorted_similarities
         ][:MAX_RECOMMENDATIONS]
 
     @staticmethod

@@ -1887,7 +1887,7 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
         expected_scores_dict = {}
         for index in python_utils.RANGE(1, 4):
-            key = 'category%s' % python_utils.UNICODE(index)
+            key = 'category%s' % str(index)
             expected_scores_dict[key] = index
 
         scores_dict = suggestion_services.get_all_scores_of_user(

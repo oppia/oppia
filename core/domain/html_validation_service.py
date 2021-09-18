@@ -641,7 +641,7 @@ def validate_customization_args_in_tag(tag):
                                 component_tag):
                             yield err_msg
     except Exception as e:
-        yield python_utils.UNICODE(e)
+        yield str(e)
 
 
 def validate_svg_filenames_in_math_rich_text(
@@ -666,14 +666,14 @@ def validate_svg_filenames_in_math_rich_text(
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            error_list.append(python_utils.UNICODE(math_tag))
+            error_list.append(str(math_tag))
         else:
             file_system_class = fs_services.get_entity_file_system_class()
             fs = fs_domain.AbstractFileSystem(
                 file_system_class(entity_type, entity_id))
             filepath = 'image/%s' % svg_filename
             if not fs.isfile(filepath):
-                error_list.append(python_utils.UNICODE(math_tag))
+                error_list.append(str(math_tag))
     return error_list
 
 
@@ -700,8 +700,8 @@ def validate_math_content_attribute_in_html(html_string):
             })
         except utils.ValidationError as e:
             error_list.append({
-                'invalid_tag': python_utils.UNICODE(math_tag),
-                'error': python_utils.UNICODE(e)
+                'invalid_tag': str(math_tag),
+                'error': str(e)
             })
     return error_list
 
@@ -841,7 +841,7 @@ def add_math_content_to_math_rte_components(html_string):
             except Exception as e:
                 logging.exception(
                     'Invalid raw_latex string found in the math tag : %s' % (
-                        python_utils.UNICODE(e)
+                        str(e)
                     )
                 )
                 python_utils.reraise_exception()
@@ -867,7 +867,7 @@ def add_math_content_to_math_rte_components(html_string):
 
     # We need to replace the <br/> tags (if any) with  <br> because for passing
     # the textangular migration tests we need to have only <br> tags.
-    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+    return str(soup).replace('<br/>', '<br>')
 
 
 def validate_math_tags_in_html(html_string):
@@ -966,7 +966,7 @@ def convert_svg_diagram_to_image_for_soup(soup_context):
         svg_image['filepath-with-value'] = svg_filepath
         svg_image['caption-with-value'] = escape_html('""')
         svg_image.name = 'oppia-noninteractive-image'
-    return python_utils.UNICODE(soup_context)
+    return str(soup_context)
 
 
 def convert_svg_diagram_tags_to_image_tags(html_string):
@@ -979,7 +979,7 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     Returns:
         str. The updated html string.
     """
-    return python_utils.UNICODE(
+    return str(
         _process_string_with_components(
             html_string,
             convert_svg_diagram_to_image_for_soup
@@ -997,7 +997,7 @@ def _replace_incorrectly_encoded_chars(soup_context):
     Returns:
         str. The updated html string.
     """
-    html_string = python_utils.UNICODE(soup_context)
+    html_string = str(soup_context)
     char_mapping_tuples = CHAR_MAPPINGS + [
         # Replace 'spaces' with space characters, otherwise we can't do a
         # canonical comparison.
@@ -1018,7 +1018,7 @@ def fix_incorrectly_encoded_chars(html_string):
     Returns:
         str. The updated html string.
     """
-    return python_utils.UNICODE(
+    return str(
         _process_string_with_components(
             html_string,
             _replace_incorrectly_encoded_chars

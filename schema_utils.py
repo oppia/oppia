@@ -160,8 +160,8 @@ def normalize_against_schema(
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.UNICODE(obj)
-        assert isinstance(obj, python_utils.UNICODE), (
+            obj = str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -186,8 +186,8 @@ def normalize_against_schema(
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
-            obj = python_utils.UNICODE(obj)
-        assert isinstance(obj, python_utils.UNICODE), (
+            obj = str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
@@ -197,8 +197,8 @@ def normalize_against_schema(
             if isinstance(obj, bytes):
                 obj = obj.decode('utf-8')
             else:
-                obj = python_utils.UNICODE(obj)
-            assert isinstance(obj, python_utils.UNICODE), (
+                obj = str(obj)
+            assert isinstance(obj, str), (
                 'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
@@ -490,8 +490,7 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
-        string_types = (python_utils.BASESTRING, python_utils.UNICODE)
-        if isinstance(obj, string_types):
+        if isinstance(obj, str):
             return not bool(re.search(EMAIL_REGEX, obj))
         return True
 

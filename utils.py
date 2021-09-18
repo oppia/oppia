@@ -206,7 +206,7 @@ def to_ascii(input_string: str) -> str:
         str. String containing the ascii representation of the input string.
     """
     normalized_string = unicodedata.normalize(
-        'NFKD', python_utils.UNICODE(input_string))
+        'NFKD', str(input_string))
     return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
@@ -465,7 +465,7 @@ def base64_from_int(value: int) -> str:
         str. Returns the base64 representation of the number passed.
     """
     byte_value = (
-        b'[' + python_utils.UNICODE(value).encode('utf-8') + b']')
+        b'[' + str(value).encode('utf-8') + b']')
     return base64.b64encode(byte_value).decode('utf-8')
 
 

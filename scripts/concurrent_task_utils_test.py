@@ -49,7 +49,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                     in the same line of output.
             """
             self.task_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
+                ' '.join(str(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
 

@@ -230,7 +230,7 @@ def decorate_beam_errors():
     try:
         yield
     except beam_testing_util.BeamAssertException as exception:
-        exception_message = python_utils.UNICODE(exception)
+        exception_message = str(exception)
         match = (
             re.match(
                 r'.*'

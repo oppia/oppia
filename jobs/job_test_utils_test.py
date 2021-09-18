@@ -24,7 +24,6 @@ from unittest import mock
 from core.platform import models
 from core.tests import test_utils
 from jobs import job_test_utils
-import python_utils
 
 import apache_beam as beam
 from apache_beam.testing import util as beam_testing_util
@@ -116,7 +115,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
             with job_test_utils.decorate_beam_errors():
                 raise beam_testing_util.BeamAssertException(actual_msg)
         except AssertionError as e:
-            self.assertMultiLineEqual(python_utils.UNICODE(e), decorated_msg)
+            self.assertMultiLineEqual(str(e), decorated_msg)
 
     def test_decorates_message_with_both_unexpected_and_missing(self):
         actual_msg = (

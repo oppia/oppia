@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from core.domain import role_services
 from core.tests import test_utils
 import feconf
-import python_utils
 
 
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
@@ -33,12 +32,12 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(role_actions, dict))
         for role_name, allotted_actions in role_actions.items():
-            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
+            self.assertTrue(isinstance(role_name, str))
             self.assertTrue(isinstance(allotted_actions, list))
             self.assertEqual(len(set(allotted_actions)), len(allotted_actions))
             for action_name in allotted_actions:
                 self.assertTrue(
-                    isinstance(action_name, python_utils.UNICODE))
+                    isinstance(action_name, str))
 
     def test_get_all_actions(self):
         with self.assertRaisesRegexp(

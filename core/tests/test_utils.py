@@ -2111,7 +2111,7 @@ title: Title
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
-        return python_utils.UNICODE(abs(hash(email)))
+        return str(abs(hash(email)))
 
     def get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
@@ -3368,7 +3368,7 @@ class LinterTestBase(GenericTestBase):
                     in the same line of output.
             """
             self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
+                ' '.join(str(arg) for arg in args))
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 

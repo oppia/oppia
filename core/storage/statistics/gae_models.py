@@ -1547,7 +1547,7 @@ class PlaythroughModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(
+                    str(
                         utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
@@ -2223,8 +2223,8 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, python_utils.UNICODE(exploration_version),
-            state_name, python_utils.UNICODE(shard_id)])
+            exploration_id, str(exploration_version),
+            state_name, str(shard_id)])
 
     # TODO(#13523): Change answer lists to TypedDict/Domain Object
     # to remove Any used below.

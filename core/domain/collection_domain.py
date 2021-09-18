@@ -622,7 +622,7 @@ class Collection(python_utils.OBJECT):
             skill_names.update(node['acquired_skills'])
             skill_names.update(node['prerequisite_skills'])
         skill_names_to_ids = {
-            name: _SKILL_ID_PREFIX + python_utils.UNICODE(index)
+            name: _SKILL_ID_PREFIX + str(index)
             for index, name in enumerate(sorted(skill_names))
         }
 
