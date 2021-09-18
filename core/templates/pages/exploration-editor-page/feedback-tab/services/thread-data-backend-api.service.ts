@@ -212,6 +212,14 @@ export class ThreadDataBackendApiService {
     });
   }
 
+  async fetchMessagesAsync(
+      threadId: string
+  ): Promise<ThreadMessages> {
+    return this.http.get<ThreadMessages>(
+      this.getThreadHandlerUrl(threadId)
+    ).toPromise();
+  }
+
   async getOpenThreadsCountAsync(): Promise<number> {
     let threadsCount = this.http.get<NumberOfOpenThreads>(
       this.getFeedbackStatsHandlerUrl()
