@@ -475,6 +475,7 @@
 
 
 # Infrastructure.
+/setup.py @brianrodri
 /core/jobs/ @vojtechjelinek
 /core/jobs/transforms @vojtechjelinek
 /core/jobs/types @vojtechjelinek

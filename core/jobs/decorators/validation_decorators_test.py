@@ -22,10 +22,10 @@ from __future__ import unicode_literals
 import collections
 import re
 
-from core.platform import models
-from core.tests import test_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import model_property
+from core.platform import models
+from core.tests import test_utils
 import python_utils
 
 import apache_beam as beam
