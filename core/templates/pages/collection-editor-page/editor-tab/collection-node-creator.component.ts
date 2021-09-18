@@ -20,7 +20,6 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import { Collection } from 'domain/collection/collection.model';
-import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { AlertsService } from 'services/alerts.service';
@@ -47,8 +46,6 @@ export class CollectionNodeCreatorComponent {
     ExplorationCreationBackendApiService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
-    private searchExplorationsBackendApiService:
-    SearchExplorationsBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
     private validatorsService: ValidatorsService,
     private normalizeWhitespacePipe: NormalizeWhitespacePipe

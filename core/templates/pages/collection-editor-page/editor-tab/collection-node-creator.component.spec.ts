@@ -22,10 +22,8 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import { Collection } from 'domain/collection/collection.model';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
-import { ExplorationMetadata } from 'domain/exploration/exploration-metadata.model';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { from } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -37,7 +35,6 @@ describe('Collection node creator component', () => {
   let fixture: ComponentFixture<CollectionNodeCreatorComponent>;
   let componentInstance: CollectionNodeCreatorComponent;
   let collectionEditorStateService: CollectionEditorStateService;
-  let searchExplorationsBackendApiService: SearchExplorationsBackendApiService;
   let alertsService: AlertsService;
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let collectionLinearizerService: CollectionLinearizerService;
@@ -78,8 +75,6 @@ describe('Collection node creator component', () => {
     fixture = TestBed.createComponent(CollectionNodeCreatorComponent);
     componentInstance = fixture.componentInstance;
     collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
-    searchExplorationsBackendApiService = TestBed.inject(
-      SearchExplorationsBackendApiService);
     alertsService = TestBed.inject(AlertsService);
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
@@ -96,51 +91,6 @@ describe('Collection node creator component', () => {
       mockCollection);
     componentInstance.ngOnInit();
     expect(componentInstance.collection).toEqual(mockCollection);
-  });
-
-  it('should fetch typeahead results', fakeAsync(() => {
-    let explorationTitle = 'Exploration Title';
-    let explorationId = 'id';
-    let isValidSearchQuerySpy = spyOn(
-      componentInstance, 'isValidSearchQuery').and.returnValue(true);
-    let sebasSpy = spyOn(
-      searchExplorationsBackendApiService, 'fetchExplorationsAsync')
-      .and.returnValue(Promise.resolve(
-        [ExplorationMetadata.createFromBackendDict({
-          id: explorationId,
-          objective: '',
-          title: explorationTitle
-        })]));
-
-    componentInstance.collection = mockCollection;
-    spyOn(componentInstance.collection, 'containsCollectionNode')
-      .and.returnValue(false);
-
-    componentInstance.fetchTypeaheadResults('Explo').then((options) => {
-      expect(options.length).toEqual(1);
-    });
-    tick();
-    expect(componentInstance.searchQueryHasError).toBeFalse();
-
-    isValidSearchQuerySpy.and.returnValue(false);
-    componentInstance.fetchTypeaheadResults('Explo');
-    tick();
-    expect(componentInstance.searchQueryHasError).toBeTrue();
-
-    isValidSearchQuerySpy.and.returnValue(true);
-    sebasSpy.and.returnValue(Promise.reject());
-    spyOn(alertsService, 'addWarning');
-    componentInstance.fetchTypeaheadResults('Explo').then((options) => {
-      expect(options).toEqual([]);
-    });
-    tick();
-    expect(alertsService.addWarning).toHaveBeenCalled();
-  }));
-
-  it('should validate search query', () => {
-    expect(componentInstance.isValidSearchQuery(
-      'invalid<search>query:')).toBeFalse();
-    expect(componentInstance.isValidSearchQuery('valid search')).toBeTrue();
   });
 
   it('should add exploration to collection', fakeAsync(() => {
@@ -230,14 +180,6 @@ describe('Collection node creator component', () => {
       );
     }));
 
-  it('should convert typeahead to exploration id', () => {
-    let expId = 'eMMRB6JFLSGM';
-    expect(componentInstance.convertTypeaheadToExplorationId(
-      `Test Exploration (${expId})`)).toEqual(expId);
-    expect(componentInstance.convertTypeaheadToExplorationId(expId))
-      .toEqual(expId);
-  });
-
   it('should create new exploration', fakeAsync(() => {
     let expTitle = 'Exp Title';
     let expId = 'newExpId';
@@ -286,16 +228,4 @@ describe('Collection node creator component', () => {
     componentInstance.addExploration();
     expect(componentInstance.newExplorationId).toEqual('');
   });
-
-  it('should search typeahead results', fakeAsync(() => {
-    let explorations = ['New Exploration'];
-    let resultsSpy = jasmine.createSpy('Results');
-    spyOn(componentInstance, 'fetchTypeaheadResults').and.returnValue(
-      Promise.resolve(explorations));
-    tick();
-    componentInstance.searchTypeheadResults(from('New'))
-      .subscribe(resultsSpy);
-    tick();
-    expect(resultsSpy).toHaveBeenCalledWith(explorations);
-  }));
 });
