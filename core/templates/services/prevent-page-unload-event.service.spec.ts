@@ -40,17 +40,15 @@ describe ('Prevent page unload event service', function() {
   });
 
 
-  // Mocking window object here because beforeunload requres the
+  // Mocking window object here because beforeunload requires the
   // full page to reload. Page reloads raise an error in karma.
   var mockWindow = {
     addEventListener: function(eventname: string, callback: () => {}) {
       document.addEventListener('mock' + eventname, callback);
     },
     location: {
-      reload: (val = true) => {
-        if (val) {
-          document.dispatchEvent(reloadEvt);
-        }
+      reload: () => {
+        document.dispatchEvent(reloadEvt);
       }
     }
   };
@@ -123,13 +121,12 @@ describe ('Prevent page unload event service', function() {
 
   it('should test if Alert is not displayed when a condition is passed', () => {
     spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
-    var validationCallback = () => {
+    preventPageUnloadEventService.addListener(() => {
       return false;
-    };
-    preventPageUnloadEventService.addListener(validationCallback);
+    });
     spyOn(reloadEvt, 'preventDefault');
 
-    windowRef.nativeWindow.location.reload(false);
+    windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
