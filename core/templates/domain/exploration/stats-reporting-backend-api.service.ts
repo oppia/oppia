@@ -81,9 +81,7 @@ export class StatsReportingBackendApiService {
           additionalInfo += (
             '\nRefresher exp id: ' + nextExpId);
         }
-        if (
-          previousStateName &&
-          nextStateName) {
+        if (previousStateName && nextStateName) {
           additionalInfo += (
             '\nOld State name: ' + previousStateName +
             '\nNew State name: ' + nextStateName);
