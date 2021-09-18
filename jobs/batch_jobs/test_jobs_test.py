@@ -25,7 +25,7 @@ from jobs.batch_jobs import test_jobs
 from jobs.types import job_run_result
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])

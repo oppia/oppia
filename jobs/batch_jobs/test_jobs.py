@@ -29,7 +29,7 @@ from jobs.types import job_run_result
 import apache_beam as beam
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()

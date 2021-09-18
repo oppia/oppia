@@ -39,7 +39,7 @@ from apache_beam.testing import util as beam_testing_util
 from typing import Any, Iterator, Optional, Sequence, Type
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
