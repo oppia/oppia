@@ -148,7 +148,7 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
 
 # Here Any is used in the type annotation because it mimics the types defined in
 # the stubs for this library.
-def query_everything(**kwargs: Dict[str, Any]) -> ndb.Query:
+def query_everything(**kwargs: Dict[str, Any]) -> 'ndb.Query[Model]':
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 

@@ -22,7 +22,7 @@ import datetime
 from core.platform import models
 import feconf
 
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -269,7 +269,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def query_suggestions(
             cls, query_fields_and_values: List[Tuple[str, str]]
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Queries for suggestions.
 
         Args:
@@ -287,15 +287,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
             if field not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
                 raise Exception('Not allowed to query on field %s' % field)
             query = query.filter(getattr(cls, field) == value)
-
-        return cast(
-            List[GeneralSuggestionModel],
-            query.fetch(feconf.DEFAULT_QUERY_LIMIT))
+        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
             cls, exp_id: str, language_code: str
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
@@ -309,16 +306,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
             with target_id of exp_id. The number of returned results is capped
             by feconf.DEFAULT_QUERY_LIMIT.
         """
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.language_code == language_code)
-            .filter(
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-            .filter(cls.target_id == exp_id)
-            .fetch(feconf.DEFAULT_QUERY_LIMIT)
-        )
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.language_code == language_code,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.target_id == exp_id
+        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_translation_suggestion_ids_with_exp_ids(
@@ -336,18 +329,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
             guaranteed that the suggestion ids returned are ordered by the
             exploration ids in exp_ids.
         """
-        query = (
-            cls.get_all()
-            .filter(
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-            .filter(cls.target_id.IN(exp_ids))
-        )
-        suggestion_models = []
+        query = cls.get_all().filter(datastore_services.all_of(
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.target_id.IN(exp_ids)
+        ))
+        suggestion_models: List[GeneralSuggestionModel] = []
         offset, more = (0, True)
         while more:
-            results = cast(
-                List[GeneralSuggestionModel],
-                query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset))
+            results = query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset)
             if len(results):
                 offset = offset + len(results)
                 suggestion_models.extend(results)
@@ -366,17 +355,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
-        suggestion_models = cast(
-            List[GeneralSuggestionModel],
-            cls.get_all().filter(
-                cls.status == STATUS_IN_REVIEW).filter(
-                    cls.last_updated < threshold_time).fetch())
+        suggestion_models = cls.get_all().filter(
+            cls.status == STATUS_IN_REVIEW
+        ).filter(cls.last_updated < threshold_time).fetch()
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
     def get_suggestions_waiting_too_long_for_review(
             cls
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Returns a list of suggestions that have been waiting for a review
         longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
         Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
@@ -398,20 +385,19 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.last_updated < threshold_time)
-            .filter(cls.suggestion_type.IN(
-                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
-            .order(cls.last_updated)
-            .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.last_updated < threshold_time,
+            cls.suggestion_type.IN(
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
+        )).order(
+            cls.last_updated
+        ).fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(
             cls, score_categories: List[str], user_id: str
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Gets all suggestions which are in review in the given
         score_categories.
 
@@ -429,17 +415,16 @@ class GeneralSuggestionModel(base_models.BaseModel):
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
 
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
-                cls.score_category.IN(score_categories)).filter(
-                    cls.author_id != user_id).fetch(
-                        feconf.DEFAULT_QUERY_LIMIT))
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.score_category.IN(score_categories),
+            cls.author_id != user_id
+        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_in_review_translation_suggestions(
             cls, user_id: str, language_codes: List[str]
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Gets all translation suggestions which are in review.
 
         Args:
@@ -452,20 +437,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which are in review, but not created by the given user.
         """
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-            .filter(cls.author_id != user_id)
-            .filter(cls.language_code.IN(language_codes))
-            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes)
+        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_in_review_question_suggestions(
             cls, user_id: str
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Gets all question suggestions which are in review.
 
         Args:
@@ -477,18 +459,16 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which are in review, but not created by the given user.
         """
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
-            .filter(cls.author_id != user_id)
-            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            cls.author_id != user_id
+        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(
             cls
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
         of question suggestions, sorted in descending order by review wait
         time.
@@ -498,19 +478,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sorted in descending order based on how long the suggestions have
             been waiting for review.
         """
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
-            .order(cls.last_updated)
-            .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
-        )
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION
+        )).order(
+            cls.last_updated
+        ).fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
 
     @classmethod
     def get_translation_suggestions_waiting_longest_for_review(
             cls, language_code: str
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
         sorted in descending order by review wait time.
@@ -524,21 +502,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sorted in descending order based on how long the suggestions have
             been waiting for review.
         """
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-            .filter(cls.language_code == language_code)
-            .order(cls.last_updated)
-            .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
-        )
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.language_code == language_code
+        )).order(
+            cls.last_updated
+        ).fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
             cls, suggestion_type: str, user_id: str
-    ) -> List['GeneralSuggestionModel']:
+    ) -> Sequence['GeneralSuggestionModel']:
         """Gets all suggestions of suggestion_type which the user has created.
 
         Args:
@@ -549,12 +524,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which the given user has created.
         """
-        return cast(
-            List[GeneralSuggestionModel],
-            cls.get_all().filter(
-                cls.suggestion_type == suggestion_type).filter(
-                    cls.author_id == user_id).order(-cls.created_on).fetch(
-                        feconf.DEFAULT_QUERY_LIMIT))
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.suggestion_type == suggestion_type,
+            cls.author_id == user_id
+        )).order(-cls.created_on).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_score_categories(cls) -> List[str]:
@@ -564,9 +537,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             list(str). A list of all the score categories.
         """
-        query_set = cast(
-            List[GeneralSuggestionModel],
-            cls.query(projection=['score_category'], distinct=True))
+        query_set = cls.query(projection=['score_category'], distinct=True)
         return [data.score_category for data in query_set]
 
     # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
@@ -586,10 +557,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
 
         user_data = {}
-        suggestion_models = cast(
-            List[GeneralSuggestionModel],
-            cls.get_all()
-            .filter(cls.author_id == user_id).fetch())
+        suggestion_models = (
+            cls.get_all().filter(cls.author_id == user_id).fetch())
 
         for suggestion_model in suggestion_models:
             user_data[suggestion_model.id] = {
@@ -667,7 +636,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     @classmethod
     def get_user_voiceover_applications(
             cls, author_id: str, status: Optional[str] = None
-    ) -> List['GeneralVoiceoverApplicationModel']:
+    ) -> Sequence['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application submitted by the given user.
 
         Args:
@@ -688,14 +657,12 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         else:
             voiceover_application_query = cls.query(cls.author_id == author_id)
 
-        return cast(
-            List[GeneralVoiceoverApplicationModel],
-            voiceover_application_query.fetch())
+        return voiceover_application_query.fetch()
 
     @classmethod
     def get_reviewable_voiceover_applications(
             cls, user_id: str
-    ) -> List['GeneralVoiceoverApplicationModel']:
+    ) -> Sequence['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover application which a given user can
         review.
 
@@ -708,11 +675,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             applications which the given user can review.
         """
-        return cast(
-            List[GeneralVoiceoverApplicationModel],
-            cls.query(datastore_services.all_of(
-                cls.author_id != user_id,
-                cls.status == STATUS_IN_REVIEW)).fetch())
+        return cls.query(datastore_services.all_of(
+            cls.author_id != user_id,
+            cls.status == STATUS_IN_REVIEW
+        )).fetch()
 
     @classmethod
     def get_voiceover_applications(
@@ -720,7 +686,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             target_type: str,
             target_id: str,
             language_code: str
-    ) -> List['GeneralVoiceoverApplicationModel']:
+    ) -> Sequence['GeneralVoiceoverApplicationModel']:
         """Returns a list of voiceover applications submitted for a give entity
         in a given language.
 
@@ -734,11 +700,11 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             application which is submitted to a give entity in a given language.
         """
-        return cast(
-            List[GeneralVoiceoverApplicationModel],
-            cls.query(datastore_services.all_of(
-                cls.target_type == target_type, cls.target_id == target_id,
-                cls.language_code == language_code)).fetch())
+        return cls.query(datastore_services.all_of(
+            cls.target_type == target_type,
+            cls.target_id == target_id,
+            cls.language_code == language_code
+        )).fetch()
 
     @staticmethod
     def get_model_association_to_user(
@@ -778,9 +744,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         user_data = {}
 
-        voiceover_models = cast(
-            List[GeneralVoiceoverApplicationModel],
-            cls.query(cls.author_id == user_id).fetch())
+        voiceover_models = cls.query(cls.author_id == user_id).fetch()
 
         for voiceover_model in voiceover_models:
             user_data[voiceover_model.id] = {
@@ -1017,7 +981,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     @classmethod
     def get_all_by_user_id(
             cls, user_id: str
-    ) -> List['TranslationContributionStatsModel']:
+    ) -> Sequence['TranslationContributionStatsModel']:
         """Gets all TranslationContributionStatsModels matching the supplied
         user_id.
 
@@ -1025,12 +989,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             list(TranslationContributionStatsModel). The matching
             TranslationContributionStatsModels.
         """
-        return cast(
-            List[TranslationContributionStatsModel],
-            cls.get_all()
-            .filter(cls.contributor_user_id == user_id)
-            .fetch(feconf.DEFAULT_QUERY_LIMIT)
-        )
+        return cls.get_all().filter(
+            cls.contributor_user_id == user_id
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -1113,10 +1074,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             dict. Dictionary of the data from TranslationContributionStatsModel.
         """
         user_data = {}
-        stats_models = cast(
-            List[TranslationContributionStatsModel],
-            cls.get_all()
-            .filter(cls.contributor_user_id == user_id).fetch())
+        stats_models = cls.get_all().filter(
+            cls.contributor_user_id == user_id
+        ).fetch()
         for model in stats_models:
             user_data[model.id] = {
                 'language_code': model.language_code,
