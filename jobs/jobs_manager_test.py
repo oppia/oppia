@@ -150,13 +150,12 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
         self.assertIn(self.dataflow_job.id, result.stderr)
 
     def test_failed_api_call_logs_the_exception(self) -> None:
+        self.run_model.latest_job_state = 'PENDING'
         self.dataflow_client_mock.get_job.side_effect = Exception('uh-oh')
 
         with self.capture_logging() as logs:
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                Exception, 'uh-oh',
-                lambda: jobs_manager.refresh_state_of_beam_job_run_model(
-                    self.run_model))
+            jobs_manager.refresh_state_of_beam_job_run_model(self.run_model)
 
         self.assertGreater(len(logs), 0)
         self.assertIn('uh-oh', logs[0])
+        self.assertEqual(self.run_model.latest_job_state, 'UNKNOWN')

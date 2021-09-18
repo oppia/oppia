@@ -119,9 +119,7 @@ def run_job(
             options=job_options.JobOptions(namespace=namespace))
 
     with _job_bookkeeping_context(job_class.__name__) as run_model:
-        job = job_class(pipeline)
-
-        unused_pdone = job.run() | job_io.PutResults(run_model.id)
+        _ = job_class(pipeline).run() | job_io.PutResults(run_model.id)
 
         run_result = pipeline.run()
 
@@ -151,28 +149,30 @@ def refresh_state_of_beam_job_run_model(
         return
 
     try:
-        get_job_request = dataflow.GetJobRequest(
+        job = dataflow.JobsV1Beta3Client().get_job(dataflow.GetJobRequest(
             job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
-            location=feconf.GOOGLE_APP_ENGINE_REGION)
-        job = dataflow.JobsV1Beta3Client().get_job(request=get_job_request)
-
-        updated_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
-            job.current_state, beam_job_models.BeamJobState.UNKNOWN).value
-        last_updated = job.current_state_time.replace(tzinfo=None)
-
-        if (beam_job_run_model.latest_job_state != updated_state and
-                updated_state == beam_job_models.BeamJobState.FAILED.value):
-            _put_job_stderr(
-                beam_job_run_model.id, pprint.pformat(job, indent=2))
+            location=feconf.GOOGLE_APP_ENGINE_REGION))
 
     except Exception:
-        logging.exception('Failed to update the state of job_id="%s"!' % job_id)
-        raise
+        job_state = beam_job_models.BeamJobState.UNKNOWN.value
+        job_state_updated = beam_job_run_model.last_updated
+
+        logging.exception('Failed to update job_id="%s"!' % job_id)
 
     else:
-        beam_job_run_model.latest_job_state = updated_state
-        beam_job_run_model.last_updated = last_updated
-        beam_job_run_model.update_timestamps(update_last_updated_time=False)
+        job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
+            job.current_state, beam_job_models.BeamJobState.UNKNOWN).value
+        job_state_updated = job.current_state_time.replace(tzinfo=None)
+
+        if (
+                beam_job_run_model.latest_job_state != job_state and
+                job_state == beam_job_models.BeamJobState.FAILED.value
+        ):
+            _put_job_stderr(beam_job_run_model.id, pprint.pformat(job))
+
+    beam_job_run_model.latest_job_state = job_state
+    beam_job_run_model.last_updated = job_state_updated
+    beam_job_run_model.update_timestamps(update_last_updated_time=False)
 
 
 @contextlib.contextmanager
