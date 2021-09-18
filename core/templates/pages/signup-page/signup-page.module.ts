@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -29,6 +29,7 @@ import { RegistrationSessionExpiredModalComponent } from './modals/registration-
 import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
 import { SignupPageRootComponent } from './signup-page-root.component';
 import { SignupPageComponent } from './signup-page.component';
+import { MyHammerConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -60,6 +61,10 @@ import { SignupPageComponent } from './signup-page.component';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ],
   bootstrap: [SignupPageRootComponent]
