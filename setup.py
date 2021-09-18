@@ -25,7 +25,7 @@ when running the workflow for remote execution.
 import setuptools
 
 # Configure the required packages and scripts to install.
-with open('./requirements.txt') as requirements_file: # pylint: disable=replace-disallowed-function-calls
+with open('./requirements.txt', 'r') as requirements_file: # pylint: disable=replace-disallowed-function-calls
     REQUIRED_PACKAGES = [
         line for line in requirements_file
         if line.strip() and not line.strip().startswith('#')
