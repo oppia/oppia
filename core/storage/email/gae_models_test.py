@@ -40,7 +40,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
     def setUp(self) -> None:
-        super(SentEmailModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
+        super(SentEmailModelUnitTests, self).setUp()
 
         def mock_generate_hash(
                 unused_cls: email_models.SentEmailModel,
