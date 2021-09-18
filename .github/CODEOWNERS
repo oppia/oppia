@@ -197,7 +197,7 @@
 
 
 # Exploration project.
-/core/controllers/editor*.py @aks681 @rohitkatlaa
+/core/controllers/editor*.py @aks681
 /core/controllers/reader*.py @aks681
 /core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @aks681
@@ -399,7 +399,7 @@
 # New structures team.
 # Question project.
 /core/controllers/practice_sessions*.py @aks681
-/core/controllers/question*.py @aks681 @rohitkatlaa
+/core/controllers/question*.py @aks681
 /core/controllers/review_tests*.py @aks681
 /core/domain/classroom_domain.py @aks681
 /core/domain/classroom_services*.py @aks681
@@ -475,10 +475,10 @@
 
 
 # Infrastructure.
-/jobs/ @rohitkatlaa @vojtechjelinek
-/jobs/transforms @rohitkatlaa @vojtechjelinek
-/jobs/types @rohitkatlaa @vojtechjelinek
-/core/templates/domain/jobs/ @rohitkatlaa @vojtechjelinek
+/jobs/ @vojtechjelinek
+/jobs/transforms @vojtechjelinek
+/jobs/types @vojtechjelinek
+/core/templates/domain/jobs/ @vojtechjelinek
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main*.py @DubeySandeep @nithusha21
@@ -487,7 +487,7 @@
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
 /core/controllers/beam_jobs*.py @brianrodri
-/core/domain/beam_job*.py @rohitkatlaa @vojtechjelinek
+/core/domain/beam_job*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
 /core/platform/ @vojtechjelinek
@@ -674,8 +674,8 @@
 
 
 # Data stability.
-/core/controllers/domain_objects_validator*.py @rohitkatlaa @vojtechjelinek
-/core/controllers/payload_validator*.py @rohitkatlaa @vojtechjelinek
+/core/controllers/domain_objects_validator*.py @vojtechjelinek
+/core/controllers/payload_validator*.py @vojtechjelinek
 
 
 # QA team.
