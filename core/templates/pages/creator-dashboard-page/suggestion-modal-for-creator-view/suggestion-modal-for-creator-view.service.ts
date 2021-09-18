@@ -22,7 +22,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/suggestion-modal.service.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
-  'suggestion-modal-for-creator-view.controller');
+  'suggestion-modal-for-creator-view.component');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log', '$uibModal', 'UrlInterpolationService',
