@@ -46,7 +46,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         for entity in base_models.BaseModel.get_all():
             entity.delete()
 
-        super(BaseModelUnitTests, self).tearDown() # type: ignore[no-untyped-call]
+        super(BaseModelUnitTests, self).tearDown()
 
     def test_get_deletion_policy(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -309,7 +309,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
     MODEL_ID = 'model1'
 
     def setUp(self) -> None:
-        super(BaseHumanMaintainedModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(BaseHumanMaintainedModelTests, self).setUp()
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self: base_models.BaseHumanMaintainedModel) -> None:
             """Function to modify and save the entities used for testing

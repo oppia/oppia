@@ -84,7 +84,7 @@ class IndexExplorationsInSearch(base_jobs.JobBase):
         return (
             self.pipeline
             | 'Get all non-deleted models' >> (
-                ndb_io.GetModels( # type: ignore[no-untyped-call]
+                ndb_io.GetModels(
                     exp_models.ExpSummaryModel.get_all(include_deleted=False)))
             | 'Split models into batches' >> beam.transforms.util.BatchElements(
                 max_batch_size=self.MAX_BATCH_SIZE)
@@ -129,13 +129,13 @@ class CollectWeeklyDashboardStats(base_jobs.JobBase):
         user_settings_models = (
             self.pipeline
             | 'Get all UserSettingsModels' >> (
-                ndb_io.GetModels(user_models.UserSettingsModel.get_all())) # type: ignore[no-untyped-call]
+                ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
         )
 
         old_user_stats_models = (
             self.pipeline
             | 'Get all UserStatsModels' >> (
-                ndb_io.GetModels(user_models.UserStatsModel.get_all())) # type: ignore[no-untyped-call]
+                ndb_io.GetModels(user_models.UserStatsModel.get_all()))
         )
 
         # Creates UserStatsModels if it does not exists.
@@ -237,7 +237,7 @@ class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
         """
         model = cast(
             user_models.UserStatsModel,
-            job_utils.clone_model(user_stats_model) # type: ignore[no-untyped-call]
+            job_utils.clone_model(user_stats_model)
         )
         schema_version = model.schema_version
 
@@ -268,7 +268,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
         """
         suggestions_grouped_by_target = (
             self.pipeline
-            | 'Get all non-deleted suggestion models' >> ndb_io.GetModels( # type: ignore[no-untyped-call]
+            | 'Get all non-deleted suggestion models' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
                     include_deleted=False))
             # We need to window the models so that CoGroupByKey below
@@ -286,7 +286,7 @@ class GenerateTranslationContributionStats(base_jobs.JobBase):
         )
         exp_opportunities = (
             self.pipeline
-            | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(  # type: ignore[no-untyped-call]
+            | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(
                 opportunity_models.ExplorationOpportunitySummaryModel.get_all(
                     include_deleted=False))
             # We need to window the models so that CoGroupByKey below
@@ -517,7 +517,7 @@ class ComputeExplorationRecommendations(base_jobs.JobBase):
         exp_summary_models = (
             self.pipeline
             | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))  # type: ignore[no-untyped-call]
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
         )
 
         exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)

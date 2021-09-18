@@ -558,7 +558,7 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/types/feedback_validation_errors.py',
     'jobs/types/feedback_validation_errors_test.py',
     'jobs/types/improvements_validation_errors.py',
-    'obs/types/improvements_validation_errors_test.py',
+    'jobs/types/improvements_validation_errors_test.py',
     'jobs/types/job_run_result.py',
     'jobs/types/job_run_result_test.py',
     'jobs/types/model_property.py',

@@ -18,15 +18,15 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from typing import Optional
-
-from apache_beam import pvalue
 
 from core.platform import models
 import feconf
 
 import apache_beam as beam
+from apache_beam import pvalue
 from apache_beam.io.gcp.datastore.v1new import datastoreio
+
+from typing import Optional
 
 MYPY = False
 if MYPY:

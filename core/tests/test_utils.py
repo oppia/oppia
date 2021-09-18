@@ -1858,7 +1858,7 @@ title: Title
 
             super(GenericTestBase, self).run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()

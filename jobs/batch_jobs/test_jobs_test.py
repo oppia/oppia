@@ -20,10 +20,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core.platform import models
-from jobs.types import job_run_result
-from jobs.batch_jobs import test_jobs
-
 from jobs import job_test_utils
+from jobs.batch_jobs import test_jobs
+from jobs.types import job_run_result
 
 MYPY = False
 if MYPY:

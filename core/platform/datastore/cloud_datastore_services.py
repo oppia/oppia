@@ -110,7 +110,7 @@ def update_timestamps_multi(
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
+def put_multi(entities: Sequence[Model]) -> List[str]:
     """Stores a sequence of Model instances.
 
     Args:
@@ -119,7 +119,7 @@ def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(entities)
+    return ndb.put_multi(list(entities))
 
 
 @transaction_services.run_in_transaction_wrapper

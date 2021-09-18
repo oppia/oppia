@@ -40,7 +40,8 @@ from typing import Any, Iterator, Optional, Sequence, Type
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -122,9 +123,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
 
     def create_model(
         self,
-        model_class: Type[base_models.BaseModel],
+        model_class: Type[base_models.SELF_BASE_MODEL],
         **properties: Any
-    ) -> datastore_services.Model:
+    ) -> base_models.SELF_BASE_MODEL:
         """Helper method for creating valid models with common default values.
 
         Args:
@@ -207,7 +208,7 @@ class JobTestBase(PipelinedTestBase):
         """
         datastore_services.update_timestamps_multi(
             model_list, update_last_updated_time=False)
-        datastore_services.put_multi(model_list) # type: ignore[arg-type]
+        datastore_services.put_multi(model_list)
 
     def assert_job_output_is(self, expected: beam.PCollection) -> None:
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
