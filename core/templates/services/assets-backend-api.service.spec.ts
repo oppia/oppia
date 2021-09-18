@@ -216,6 +216,27 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).toHaveBeenCalled();
     }));
 
+    it('should handle rejection when saving a math SVG fails', fakeAsync(() => {
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
+      spyOn(
+        // This throws "Argument of type 'getImageUploadUrl' is not assignable
+        // to parameter of type 'keyof AssetsBackendApiService'. We need to
+        // suppress this error because of strict type checking.
+        // @ts-ignore
+        assetsBackendApiService, 'getImageUploadUrl'
+      ).and.throwError(Error('token'));
+
+      assetsBackendApiService.saveMathExpresionImage(
+        imageBlob, 'new.svg', 'exploration', 'expid12345')
+        .then(onSuccess, onFailure);
+      flushMicrotasks();
+
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalled();
+    }));
+
     it('should handle rejection when saving a file fails', fakeAsync(() => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');

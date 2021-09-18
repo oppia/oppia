@@ -121,6 +121,7 @@ describe ('Prevent page unload event service', function() {
 
   it('should test if Alert is not displayed when a condition is passed', () => {
     spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    preventPageUnloadEventService.removeListener();
     preventPageUnloadEventService.addListener(() => {
       return false;
     });
