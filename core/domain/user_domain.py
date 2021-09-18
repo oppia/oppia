@@ -23,7 +23,7 @@ import re
 
 from constants import constants
 
-import feconf
+from core import feconf
 import python_utils
 import utils
 

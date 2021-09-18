@@ -21,7 +21,7 @@ API.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import feconf
+from core import feconf
 import python_utils
 
 import elasticsearch

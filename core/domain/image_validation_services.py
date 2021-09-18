@@ -19,9 +19,8 @@ from __future__ import unicode_literals
 
 import imghdr
 
+from core import feconf
 from core.domain import html_validation_service
-
-import feconf
 import utils
 
 

@@ -21,8 +21,8 @@ import math
 import random
 
 from constants import constants
+from core import feconf
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

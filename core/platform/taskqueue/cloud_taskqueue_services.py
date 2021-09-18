@@ -24,7 +24,7 @@ import json
 import logging
 
 from constants import constants
-import feconf
+from core import feconf
 
 from google import auth
 from google.api_core import retry

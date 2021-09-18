@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import os
 
+from core import feconf
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
-import feconf
 import python_utils
 from scripts import common
 

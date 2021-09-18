@@ -21,12 +21,12 @@ import json
 import os
 
 from constants import constants
+from core import feconf
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 from proto_files import text_classifier_pb2
 import python_utils
 import utils

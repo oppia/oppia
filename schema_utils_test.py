@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import inspect
 import re
 
+from core import feconf
 from core.domain import email_manager
 from core.tests import test_utils
-import feconf
 import python_utils
 import schema_utils
 

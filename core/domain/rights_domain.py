@@ -18,9 +18,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
+from core import feconf
 from core.domain import change_domain
 from core.domain import user_services
-import feconf
 import python_utils
 import utils
 

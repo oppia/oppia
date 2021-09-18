@@ -19,13 +19,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import validation_jobs
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
-import feconf
 
 (auth_models, base_models, user_models) = models.Registry.import_models(
     [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])

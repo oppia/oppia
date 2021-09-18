@@ -23,12 +23,12 @@ import copy
 import datetime
 
 from constants import constants
+from core import feconf
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 from typing import Any, Dict, List
 

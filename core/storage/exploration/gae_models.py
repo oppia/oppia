@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core import feconf
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
-import feconf
 import python_utils
 import utils
 
@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services # pylint: disable=unused-import
+    from mypy_imports import datastore_services  # pylint: disable=unused-import
 
 datastore_services = models.Registry.import_datastore_services()
 

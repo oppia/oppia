@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import logging
 
 from constants import constants
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import learner_progress_services
@@ -29,7 +30,6 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_fetchers
-import feconf
 import utils
 
 

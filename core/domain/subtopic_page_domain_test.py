@@ -20,10 +20,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
+from core import feconf
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
-import feconf
 import utils
 
 

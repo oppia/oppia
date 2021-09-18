@@ -21,10 +21,9 @@ import datetime
 import enum
 
 from constants import constants
+from core import feconf
 from core.platform import models
-import feconf
 import python_utils
-
 import utils
 
 from typing import ( # isort:skip

@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import os
 
 from constants import constants
+from core import feconf
 from core.domain import config_services
 from core.domain import question_services
 from core.domain import skill_fetchers
@@ -28,7 +29,6 @@ from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.tests import test_utils
-import feconf
 import python_utils
 
 

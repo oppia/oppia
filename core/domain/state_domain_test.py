@@ -24,6 +24,7 @@ import logging
 import os
 import re
 
+from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -33,7 +34,6 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
-import feconf
 import python_utils
 import schema_utils
 import utils

@@ -20,9 +20,9 @@ from __future__ import unicode_literals
 import datetime
 import types
 
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import utils
 
 MYPY = False

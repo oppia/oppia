@@ -19,10 +19,9 @@ from __future__ import unicode_literals
 
 import os
 
+from core import feconf
 from core.domain import image_validation_services
 from core.tests import test_utils
-
-import feconf
 import python_utils
 import utils
 

@@ -23,6 +23,7 @@ import datetime
 import logging
 
 from constants import constants
+from core import feconf
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
@@ -30,7 +31,6 @@ from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import python_utils
 import schema_utils
 import utils

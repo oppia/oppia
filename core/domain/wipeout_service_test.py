@@ -21,6 +21,7 @@ import datetime
 import logging
 
 from constants import constants
+from core import feconf
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -44,7 +45,6 @@ from core.domain import wipeout_domain
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
 (

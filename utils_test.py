@@ -25,8 +25,8 @@ import datetime
 import os
 
 from constants import constants
+from core import feconf
 from core.tests import test_utils
-import feconf
 import python_utils
 import utils
 

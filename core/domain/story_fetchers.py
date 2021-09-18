@@ -25,10 +25,10 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
 from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
-import feconf
 import python_utils
 
 (story_models, user_models) = models.Registry.import_models(

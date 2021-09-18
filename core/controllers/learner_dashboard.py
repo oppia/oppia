@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_fetchers
@@ -27,7 +28,6 @@ from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
-import feconf
 import python_utils
 import utils
 

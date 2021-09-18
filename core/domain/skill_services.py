@@ -21,6 +21,7 @@ import collections
 import logging
 
 from constants import constants
+from core import feconf
 from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
@@ -36,7 +37,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import python_utils
 
 (skill_models, user_models, question_models, topic_models) = (

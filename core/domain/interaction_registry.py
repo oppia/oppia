@@ -25,7 +25,7 @@ import os
 import pkgutil
 
 from constants import constants
-import feconf
+from core import feconf
 import python_utils
 
 

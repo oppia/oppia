@@ -25,12 +25,12 @@ import json
 import logging
 from unittest import mock
 
+from core import feconf
 from core.domain import auth_domain
 from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-import feconf
 import python_utils
 import utils
 
@@ -40,10 +40,10 @@ from firebase_admin import exceptions as firebase_exceptions
 from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
 import webapp2
 
-
 MYPY = False
 if MYPY: # pragma: no cover
     import contextlib  # pylint: disable=unused-import
+
     from mypy_imports import auth_models
 
 auth_models, user_models = (

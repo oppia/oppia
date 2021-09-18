@@ -23,7 +23,7 @@ import inspect
 import pkgutil
 
 import constants
-import feconf
+from core import feconf
 import python_utils
 import utils
 

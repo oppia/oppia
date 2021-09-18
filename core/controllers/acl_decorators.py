@@ -24,6 +24,7 @@ import logging
 import re
 
 from constants import constants
+from core import feconf
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classifier_services
@@ -42,7 +43,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-import feconf
 import utils
 
 from typing import Any, Callable # isort: skip

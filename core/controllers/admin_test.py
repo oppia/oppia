@@ -21,6 +21,7 @@ import datetime
 import logging
 
 from constants import constants
+from core import feconf
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -49,7 +50,6 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-import feconf
 import python_utils
 import utils
 

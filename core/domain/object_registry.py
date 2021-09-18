@@ -21,8 +21,8 @@ import copy
 import inspect
 import json
 
+from core import feconf
 from extensions.objects.models import objects
-import feconf
 import python_utils
 import utils
 

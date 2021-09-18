@@ -21,12 +21,12 @@ from __future__ import unicode_literals
 
 import copy
 
+from core import feconf
 from core.domain import caching_services
 from core.domain import classroom_services
 from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

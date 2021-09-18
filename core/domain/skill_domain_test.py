@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core import feconf
 from core.domain import skill_domain
 from core.domain import state_domain
 from core.tests import test_utils
-import feconf
 import utils
 
 

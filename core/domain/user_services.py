@@ -26,12 +26,12 @@ import logging
 import re
 
 from constants import constants
+from core import feconf
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

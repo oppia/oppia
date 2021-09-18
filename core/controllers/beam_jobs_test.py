@@ -19,12 +19,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.jobs import base_jobs
 from core.jobs import jobs_manager
 from core.tests import test_utils
-import feconf
 
 import apache_beam as beam
 

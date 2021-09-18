@@ -31,11 +31,11 @@ from __future__ import unicode_literals
 import datetime
 import re
 
+from core import feconf
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import base_validation_errors
 from core.platform import models
-import feconf
 import python_utils
 
 import apache_beam as beam

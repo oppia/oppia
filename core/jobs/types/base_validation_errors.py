@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.jobs import job_utils
 from core.jobs.types import job_run_result
-import feconf
 import python_utils
 import utils
 

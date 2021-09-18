@@ -20,7 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
-import feconf
+from core import feconf
 
 from apache_beam.options import pipeline_options
 

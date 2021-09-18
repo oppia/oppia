@@ -23,8 +23,8 @@ import datetime
 import json
 import sys
 
+from core import feconf
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

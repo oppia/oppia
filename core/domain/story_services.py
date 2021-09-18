@@ -27,6 +27,7 @@ import copy
 import logging
 
 from constants import constants
+from core import feconf
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -37,7 +38,6 @@ from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

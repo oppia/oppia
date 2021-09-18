@@ -20,12 +20,12 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core import feconf
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 

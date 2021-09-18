@@ -29,8 +29,8 @@ import re
 import string
 
 from constants import constants
+from core import feconf
 from core.domain import change_domain
-import feconf
 import python_utils
 import utils
 

@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.jobs import job_utils
 from core.platform import models
-import feconf
 
 import apache_beam as beam
 from apache_beam.io.gcp.datastore.v1new import datastoreio

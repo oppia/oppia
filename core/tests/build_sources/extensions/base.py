@@ -42,11 +42,11 @@ import json
 import os
 import sys
 
+from core import feconf
 from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
-import feconf
 import python_utils
 import utils
 

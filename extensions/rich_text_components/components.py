@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import re
 
 import constants
+from core import feconf
 from extensions.objects.models import objects
-import feconf
 import python_utils
 import utils
 

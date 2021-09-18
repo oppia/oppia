@@ -27,10 +27,10 @@ import string
 import struct
 
 from constants import constants
+from core import feconf
 from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
-import feconf
 import python_utils
 import schema_utils
 import schema_utils_test

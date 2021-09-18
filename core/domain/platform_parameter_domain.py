@@ -23,11 +23,10 @@ import json
 import re
 
 from constants import constants
+from core import feconf
 from core.domain import change_domain
-import feconf
 import python_utils
 import utils
-
 
 SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name

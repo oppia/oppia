@@ -24,6 +24,7 @@ import json
 import os
 
 from constants import constants
+from core import feconf
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
@@ -33,7 +34,6 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
 import python_utils

@@ -22,12 +22,12 @@ from __future__ import unicode_literals
 import datetime
 import pickle
 
+from core import feconf
 from core.jobs import job_utils
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils as core_test_utils
-import feconf
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

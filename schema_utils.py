@@ -31,12 +31,11 @@ import numbers
 import re
 
 from constants import constants
+from core import feconf
 from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
-import feconf
 import python_utils
-
 import utils
 
 from typing import Any, Callable, Dict, List, Optional, cast

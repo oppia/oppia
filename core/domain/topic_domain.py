@@ -26,12 +26,12 @@ import re
 
 import android_validation_constants
 from constants import constants
+from core import feconf
 from core.domain import change_domain
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
-import feconf
 import python_utils
 import utils
 

@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import collections
 
 from constants import constants
-import feconf
+from core import feconf
 import python_utils
 import utils
 

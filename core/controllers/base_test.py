@@ -29,6 +29,7 @@ import sys
 import types
 
 from constants import constants
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import payload_validator
@@ -42,7 +43,6 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import main
 import python_utils
 import utils

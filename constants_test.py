@@ -20,8 +20,8 @@ from __future__ import unicode_literals
 import os
 
 import constants
+from core import feconf
 from core.tests import test_utils
-import feconf
 import python_utils
 
 

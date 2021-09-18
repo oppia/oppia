@@ -22,6 +22,7 @@ import itertools
 import logging
 import re
 
+from core import feconf
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -34,7 +35,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

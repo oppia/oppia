@@ -19,13 +19,13 @@ from __future__ import unicode_literals
 
 import logging
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
-import feconf
 import utils
 
 

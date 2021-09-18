@@ -31,13 +31,13 @@ import re
 import string
 
 from constants import constants
+from core import feconf
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-import feconf
 import python_utils
 import schema_utils
 import utils

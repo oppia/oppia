@@ -23,9 +23,9 @@ import csv
 import datetime
 import json
 
+from core import feconf
 from core.domain import rights_domain
 from core.platform import models
-import feconf
 import python_utils
 
 (exp_models, recommendations_models,) = models.Registry.import_models([

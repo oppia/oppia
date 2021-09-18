@@ -24,7 +24,7 @@ import inspect
 import os
 import pkgutil
 
-import feconf
+from core import feconf
 import python_utils
 import utils
 

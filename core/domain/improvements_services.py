@@ -23,9 +23,9 @@ import collections
 import itertools
 import operator
 
+from core import feconf
 from core.domain import improvements_domain
 from core.platform import models
-import feconf
 import python_utils
 
 (improvements_models,) = (

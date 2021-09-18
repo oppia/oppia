@@ -20,8 +20,8 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
+from core import feconf
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

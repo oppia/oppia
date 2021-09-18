@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core import feconf
 from core.domain import exp_domain
 from core.domain import recommendations_services
 from core.domain import search_services
@@ -29,7 +30,6 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import cron_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-import feconf
 import python_utils
 
 import apache_beam as beam

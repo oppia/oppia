@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import ast
 
+from core import feconf
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
-import feconf
 import python_utils
 
 from typing import Dict, List, Tuple, Union

@@ -21,13 +21,13 @@ import copy
 import logging
 
 from constants import constants
+from core import feconf
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

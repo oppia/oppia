@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
 (improvements_models,) = (

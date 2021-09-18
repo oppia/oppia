@@ -22,6 +22,7 @@ import logging
 import random
 
 from constants import constants
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -56,7 +57,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
 import python_utils
 import utils
 

@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import json
 
 from constants import constants
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
@@ -46,7 +47,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 import python_utils
 
 import webapp2

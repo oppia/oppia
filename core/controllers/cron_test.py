@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import datetime
 
 from constants import constants
+from core import feconf
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
@@ -30,7 +31,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import main
 
 import webtest

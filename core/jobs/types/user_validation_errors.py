@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.jobs.types import base_validation_errors
-import feconf
 
 
 class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):

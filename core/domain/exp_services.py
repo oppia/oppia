@@ -36,6 +36,7 @@ import zipfile
 
 import android_validation_constants
 from constants import constants
+from core import feconf
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
@@ -59,7 +60,6 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import python_utils
 import utils
 

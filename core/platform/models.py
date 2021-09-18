@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import inspect
 from types import ModuleType # pylint: disable=import-only-modules
 from constants import constants
-import feconf
+from core import feconf
 import python_utils
 
 from typing import List, Tuple, Type

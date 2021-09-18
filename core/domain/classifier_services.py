@@ -23,12 +23,12 @@ import hashlib
 import hmac
 import logging
 
+from core import feconf
 from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.platform import models
-import feconf
 import python_utils
 
 (classifier_models, exp_models) = models.Registry.import_models(

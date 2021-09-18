@@ -19,13 +19,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import auth_validation
 from core.jobs.types import base_validation_errors
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 import apache_beam as beam
 

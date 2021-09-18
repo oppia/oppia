@@ -27,7 +27,7 @@ import subprocess
 import sys
 import threading
 
-import feconf
+from core import feconf
 import python_utils
 from scripts import common
 

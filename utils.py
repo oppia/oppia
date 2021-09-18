@@ -34,7 +34,7 @@ import unicodedata
 import zlib
 
 from constants import constants
-import feconf
+from core import feconf
 import python_utils
 
 from typing import (

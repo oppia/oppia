@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import feconf
 from core.platform import models
-import feconf
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 

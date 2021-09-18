@@ -44,9 +44,9 @@ import collections
 import itertools
 import operator
 
+from core import feconf
 from core.domain import exp_domain
 from core.domain import stats_domain
-import feconf
 import python_utils
 import utils
 

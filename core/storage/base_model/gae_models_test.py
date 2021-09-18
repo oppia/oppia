@@ -24,9 +24,9 @@ import re
 import types
 
 from constants import constants
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
 from typing import Dict, List, Set, Union, cast
