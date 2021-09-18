@@ -3,7 +3,7 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.32.0
+apache-beam[gcp]==2.33.0rc1
 beautifulsoup4==4.10.0
 bleach==4.1.0
 defusedxml==0.7.1
@@ -32,6 +32,7 @@ rsa==4.7.2
 simplejson==3.17.5
 six==1.16.0
 soupsieve==2.2.1
+typing_extensions==3.10.0.2
 urllib3==1.26.6
 webapp2==3.0.0b1
 webencodings==0.5.1
