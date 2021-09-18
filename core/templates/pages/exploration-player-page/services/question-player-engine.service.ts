@@ -145,7 +145,8 @@ export class QuestionPlayerEngineService {
       errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
-    let currentIndex = questionDicts.length, randomIndex;
+    let currentIndex = questionDicts.length;
+    let randomIndex;
 
     while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex);
