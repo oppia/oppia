@@ -29,7 +29,7 @@ sudo apt-get update
 # Prerequirements for python.
 sudo apt-get install -y curl git openjdk-8-jre python3-setuptools python3-dev \
     python3-pip unzip python3-yaml python-matplotlib python3-matplotlib
-pip install --upgrade pip==21.2.3
+pip3 install --upgrade pip==21.2.3
 # Prerequirements for pyenv.
 sudo apt-get install -y make build-essential libssl-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget llvm libncursesw5-dev xz-utils tk-dev \
