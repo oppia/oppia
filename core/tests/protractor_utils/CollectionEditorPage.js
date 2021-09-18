@@ -62,34 +62,6 @@ var CollectionEditorPage = function() {
     await action.click('Add Exploration Button', addExplorationButton);
   };
 
-  // Search and add an existing exploration (by title) to the node graph.
-  this.searchForAndAddExistingExploration = async function(query) {
-    await waitFor.visibilityOf(
-      addExplorationInput, 'Add Exploration Input is not visible');
-    await action.sendKeys(
-      'Add Exploration Input', addExplorationInput, query);
-    // Need to wait for result to appear.
-    await waitFor.elementToBeClickable(
-      addExplorationButton, 'Unable to find exploration: ' + query);
-
-    var dropdownResultElement = element(
-      by.cssContainingText('.dropdown-menu', new RegExp(query)));
-    await waitFor.presenceOf(
-      dropdownResultElement, 'Unable to find exploration: ' + query);
-    var matchingSearchResult = (
-      element(by.cssContainingText('.ngb-highlight', query)));
-    await waitFor.presenceOf(
-      matchingSearchResult, 'Unable to find search result: ' + query);
-    await action.click('Matching search result', matchingSearchResult);
-
-    var isEnabled = await addExplorationButton.isEnabled();
-    if (isEnabled) {
-      await action.click('Add Exploration Button', addExplorationButton);
-    } else {
-      throw new Error ('Add Exploration Button is not clickable');
-    }
-  };
-
   // Shift a node left in the node graph.
   this.shiftNodeLeft = async function(number) {
     await action.click('Editor Shift Left', editorShiftLeft.get(number));
