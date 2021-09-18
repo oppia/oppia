@@ -25,7 +25,10 @@ import os
 
 from constants import constants
 
-from typing import Dict, List, Text, Union # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Union
+
+CommandType = (
+    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -257,7 +260,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 47
+CURRENT_STATE_SCHEMA_VERSION = 48
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -269,13 +272,13 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 4
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 5
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 4
+CURRENT_RUBRIC_SCHEMA_VERSION = 5
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
@@ -284,7 +287,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -337,19 +340,19 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS = {
+DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
-} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
+}
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS = {
+DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
     }
-} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -427,8 +430,7 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
-def get_empty_ratings():
-    # type: () -> Dict[Text, int]
+def get_empty_ratings() -> Dict[str, int]:
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -491,6 +493,11 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
+
+# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
+# buckets. It's OK for them to be the same.
+DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
+DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -765,9 +772,6 @@ DISABLED_EXPLORATION_IDS = ['5']
 GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
-# External URL for the Foundation site.
-FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
-
 # NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
 # Change to the correct url for internal testing in the testing production
 # environment.
@@ -790,6 +794,7 @@ TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
+ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'
@@ -911,6 +916,8 @@ STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+# This should be synchronized with SUBTOPIC_MASTERY_DATA_URL_TEMPLATE
+# in app.constants.ts.
 SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
@@ -1273,7 +1280,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1313,11 +1320,11 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
-}] # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
+}]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
-) # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
+)
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
@@ -1358,7 +1365,7 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1452,3 +1459,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
+
+# Prefix for all access validation handlers.
+# The naming scheme for access validation handlers is
+# '/access_validation_handler/<handler_name>'
+# example '/access_validation_handler/validate_access_to_splash_page'.
+ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'

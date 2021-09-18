@@ -16,6 +16,7 @@
   </a>
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block"
      href="/"
+     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
      [oppiaFocusOn]="labelForClearingFocus"
      [ngClass]="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
     <picture>
@@ -93,6 +94,7 @@
             class="nav-item oppia-clickable-navbar-element">
           <a class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
              href="/community-library"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
              [innerHTML]="'I18N_TOPNAV_LIBRARY' | translate">
           </a>
         </li>
@@ -128,7 +130,7 @@
             </li>
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="http://oppiafoundation.org"
+                 href="/about-foundation"
                  target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_OPPIA_FOUNDATION' | translate">
@@ -167,7 +169,10 @@
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
-                 href="https://oppiafoundation.org/volunteer"
+                 href="/volunteer"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                 target="_blank"
+                 rel="noopener"
                  [innerHTML]="'I18N_HEADING_VOLUNTEER'| translate">
               </a>
             </li>
@@ -276,6 +281,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
+             [routerLink]="profilePageUrl"
              class="dropdown-item nav-link protractor-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
             <strong>
@@ -314,8 +320,17 @@
           </a>
         </li>
         <li class="nav-item">
+          <a *ngIf="(isBlogAdmin || isBlogPostEditor)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/blog-dashboard"
+             class="dropdown-item nav-link protractor-test-blog-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_BLOG_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
              class="dropdown-item nav-link protractor-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
           </a>

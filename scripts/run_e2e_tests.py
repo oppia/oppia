@@ -117,6 +117,7 @@ RERUN_POLICIES = {
     'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
     'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
     'adminpage': RERUN_POLICY_NEVER,
+    'blogdashboard': RERUN_POLICY_NEVER,
     'classroompage': RERUN_POLICY_KNOWN_FLAKES,
     'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
     'collections': RERUN_POLICY_NEVER,
@@ -268,6 +269,9 @@ def run_tests(args):
             app_yaml_path,
             port=GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
+            # Automatic restart can be disabled since we don't expect code
+            # changes to happen while the e2e tests are running.
+            automatic_restart=False,
             skip_sdk_update_check=True,
             env={
                 **os.environ,
@@ -335,8 +339,16 @@ def main(args=None):
             test_is_flaky = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
             if policy == RERUN_POLICY_NEVER:
+                python_utils.PRINT(
+                    'Not rerunning because the policy is to never '
+                    'rerun the {} suite'.format(parsed_args.suite))
                 break
             if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                python_utils.PRINT((
+                    'Not rerunning because the policy is to only '
+                    'rerun the %s suite on known flakes, and this '
+                    'failure did not match any known flakes')
+                    % parsed_args.suite)
                 break
 
     sys.exit(return_code)

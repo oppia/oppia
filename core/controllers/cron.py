@@ -23,6 +23,7 @@ from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 import feconf
 
@@ -48,6 +49,39 @@ class CronModelsCleanupHandler(base.BaseHandler):
         """
         cron_services.delete_models_marked_as_deleted()
         cron_services.mark_outdated_models_as_deleted()
+        return self.render_json({})
+
+
+class CronUserDeletionHandler(base.BaseHandler):
+    """Handler for running the user deletion one off job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        return self.render_json({})
+
+
+class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+    """Handler for running the fully complete user deletion one off job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        return self.render_json({})
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(
@@ -70,19 +104,21 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         # Only execute this job if it's possible to send the emails and there
         # are reviewers to notify.
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
         if not (config_domain
                 .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
-            return
+            return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
-            return
+            return self.render_json({})
+
         reviewers_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 reviewer_ids))
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
             reviewer_ids, reviewers_suggestion_email_infos)
+        return self.render_json({})
 
 
 class CronMailAdminContributorDashboardBottlenecksHandler(
@@ -103,25 +139,31 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to get reviewed.
         """
         if not feconf.CAN_SEND_EMAILS:
-            return
+            return self.render_json({})
+
+        admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+        question_admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_QUESTION_ADMIN)
+        translation_admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_TRANSLATION_ADMIN)
 
         if (
                 config_domain
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
-            admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_CURRICULUM_ADMIN)
             suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
             )
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                admin_ids, suggestion_types_needing_reviewers)
+                admin_ids,
+                translation_admin_ids,
+                question_admin_ids,
+                suggestion_types_needing_reviewers)
         if (
                 config_domain
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
                 .value):
-            admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_CURRICULUM_ADMIN)
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
                 .get_info_about_suggestions_waiting_too_long_for_review()
@@ -130,5 +172,8 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 email_manager
                 .send_mail_to_notify_admins_suggestions_waiting_long(
                     admin_ids,
+                    translation_admin_ids,
+                    question_admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+        return self.render_json({})

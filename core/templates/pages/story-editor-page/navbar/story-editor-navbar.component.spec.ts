@@ -22,11 +22,13 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorNavbarComponent } from './story-editor-navbar.component';
+import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -48,8 +50,11 @@ describe('Story editor navbar component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [StoryEditorNavbarComponent],
+      imports: [HttpClientTestingModule, NgbModule],
+      declarations: [
+        StoryEditorNavbarComponent,
+        StoryEditorUnpublishModalComponent
+      ],
       providers: [
         StoryObjectFactory,
         StoryEditorStateService,
@@ -59,6 +64,10 @@ describe('Story editor navbar component', () => {
         AlertsService
       ],
       schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [StoryEditorUnpublishModalComponent]
+      }
     }).compileComponents();
   });
 
@@ -308,6 +317,12 @@ describe('Story editor navbar component', () => {
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockStoryInitializedEventEmitter);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>({
+        result: Promise.resolve('success')
+      });
+    });
 
     component.ngOnInit();
     mockStoryInitializedEventEmitter.emit();
@@ -330,6 +345,7 @@ describe('Story editor navbar component', () => {
     component.unpublishStory();
     tick(1000);
     fixture.detectChanges();
+    expect(modalSpy).toHaveBeenCalled();
     expect(component.storyIsPublished).toBe(false);
   }));
 

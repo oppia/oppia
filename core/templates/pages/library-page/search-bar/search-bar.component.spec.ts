@@ -224,7 +224,7 @@ describe('Search bar component', () => {
         value: 'search'
       }
     };
-    expect(component.searchToBeExec(search)).toBeNull();
+    component.searchToBeExec(search);
 
     spyOn(component.searchQueryChanged, 'next');
     component.classroomPageIsActive = false;
@@ -282,7 +282,7 @@ describe('Search bar component', () => {
     windowRef.nativeWindow.location = new URL('http://localhost/not/search/find');
     component.onSearchQueryChangeExec();
     expect(windowRef.nativeWindow.location.href).toEqual(
-      '/search/find?q=search_query');
+      'http://localhost/search/find?q=search_query');
   });
 
   it('should update search fields based on url query', () => {

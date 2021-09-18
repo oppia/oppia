@@ -46,7 +46,9 @@ export interface ExplorationSummaryDict {
 }
 
 interface HumanReadableContributorSummaryBackendDict {
-  'num_commits': number
+  [username: string]: {
+    'num_commits': number
+  }
 }
 
 @Injectable({
@@ -61,8 +63,7 @@ export class ExplorationSummaryBackendApiService {
   private _fetchExpSummaries(
       explorationIds: string[],
       includePrivateExplorations: boolean,
-      successCallback: (
-        value: ExplorationSummaryBackendDict) => void,
+      successCallback: (value: ExplorationSummaryBackendDict) => void,
       errorCallback: (reason: string | null[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
@@ -83,7 +84,8 @@ export class ExplorationSummaryBackendApiService {
           include_private_explorations: JSON.stringify(
             includePrivateExplorations)
         }
-      }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
+      }
+    ).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
       if (summaries === null) {
         const summariesError = (
           'Summaries fetched are null for explorationIds: ' + explorationIds

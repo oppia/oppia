@@ -50,6 +50,9 @@
     <button class="btn btn-danger protractor-test-question-suggestion-review-reject-button" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
   </span>
   <span tooltip-placement="bottom">
+    <button class="btn btn-secondary protractor-test-question-suggestion-review-edit-button" ng-if="reviewable" ng-click="edit()">Edit</button>
+  </span>
+  <span tooltip-placement="bottom">
     <button class="btn btn-success protractor-test-question-suggestion-review-accept-button" ng-if="reviewable" ng-click="accept()">Accept</button>
   </span>
 </div>

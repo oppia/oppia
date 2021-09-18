@@ -57,6 +57,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isCurriculumAdmin: boolean;
   isTopicManager: boolean;
   isSuperAdmin: boolean;
+  isBlogAdmin: boolean;
+  isBlogPostEditor: boolean;
   userIsLoggedIn: boolean;
   username: string;
   currentUrl: string;
@@ -92,7 +94,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
-    'story_editor'];
+    'story_editor', 'blog-dashboard'];
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
@@ -184,6 +186,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
+      this.isBlogAdmin = userInfo.isBlogAdmin();
+      this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.username = userInfo.getUsername();
       if (this.username) {

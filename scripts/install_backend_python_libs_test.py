@@ -138,10 +138,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
             def communicate(self):
                 """Return required method."""
-                return b'', b'can\'t combine user with prefix'
+                return '', 'can\'t combine user with prefix'
 
-        def mock_check_call_error(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
+        def mock_check_call_error(cmd_tokens, **kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
+            if kwargs.get('encoding') != 'utf-8':
+                raise AssertionError(
+                    'Popen should have been called with encoding="utf-8"')
             return MockErrorProcess()
 
         self.swap_Popen_error = self.swap(
@@ -167,14 +170,19 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         with self.swap_Popen, self.swap(pip, '__version__', '21.1.0'):
             install_backend_python_libs.verify_pip_is_installed()
 
+        pip_string_with_version = (
+            'pip==%s' % install_backend_python_libs.OPPIA_REQUIRED_PIP_VERSION)
+
         self.assertEqual(self.cmd_token_list, [
-            ['pip', 'install', 'pip==21.2.3'],
+            ['pip', 'install', pip_string_with_version],
         ])
 
     def test_correct_pip_version_does_nothing(self):
         import pip
 
-        with self.swap_check_call, self.swap(pip, '__version__', '21.0.1'):
+        with self.swap_check_call, self.swap(
+                pip, '__version__',
+                install_backend_python_libs.OPPIA_REQUIRED_PIP_VERSION):
             install_backend_python_libs.verify_pip_is_installed()
 
         self.assertEqual(self.cmd_token_list, [])

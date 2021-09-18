@@ -142,7 +142,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
 
-    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('Math');
+    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('math');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);

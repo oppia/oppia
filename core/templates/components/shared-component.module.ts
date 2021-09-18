@@ -25,7 +25,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
@@ -53,6 +53,7 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
+import { PracticeTabComponent } from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
@@ -62,7 +63,7 @@ import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/lea
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
-import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thumbnail-uploader.component';
@@ -81,6 +82,8 @@ import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-so
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
+import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
+import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
 
 
 // Pipes.
@@ -112,6 +115,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     NgBootstrapModule,
     DynamicContentModule,
     FormsModule,
+    ReactiveFormsModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -142,6 +146,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FilteredChoicesFieldComponent,
+    PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
@@ -149,6 +155,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
     OutcomeFeedbackEditorComponent,
@@ -191,6 +198,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    FilteredChoicesFieldComponent,
+    MultiSelectionFieldComponent,
+    PracticeTabComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -255,6 +265,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    MultiSelectionFieldComponent,
+    FilteredChoicesFieldComponent,
+    PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,

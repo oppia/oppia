@@ -135,8 +135,13 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 if 'choices' in new_value.keys():
                     for value_index, value in enumerate(
                             new_value['choices']['value']):
-                        new_value['choices']['value'][value_index] = (
-                            conversion_fn(value))
+                        if isinstance(value, dict) and 'html' in value:
+                            new_value['choices']['value'][value_index][
+                                'html'
+                            ] = conversion_fn(value['html'])
+                        elif isinstance(value, python_utils.BASESTRING):
+                            new_value['choices']['value'][value_index] = (
+                                conversion_fn(value))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 for content_id, language_code_to_written_translation in (
@@ -205,6 +210,23 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'new_value': new_value
                 })
         return draft_change_list
+
+    @classmethod
+    def _convert_states_v47_dict_to_v48_dict(cls, draft_change_list):
+        """Converts draft change list from state version 47 to 48. State
+        version 48 fixes encoding issues in HTML fields.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        conversion_fn = (
+            html_validation_service.fix_incorrectly_encoded_chars)
+        return cls._convert_html_in_draft_change_list(
+            draft_change_list, conversion_fn)
 
     @classmethod
     def _convert_states_v46_dict_to_v47_dict(cls, draft_change_list):
