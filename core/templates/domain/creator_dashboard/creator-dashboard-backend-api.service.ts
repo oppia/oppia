@@ -184,6 +184,12 @@ export class CreatorDashboardBackendApiService {
   async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardDataAsync();
   }
+
+  async postExplorationViewAsync(newViewType: string): Promise<void> {
+    return this.http.post<void>('/creatordashboardhandler/data', {
+      display_preference: newViewType
+    }).toPromise();
+  }
 }
 
 angular.module('oppia').factory(

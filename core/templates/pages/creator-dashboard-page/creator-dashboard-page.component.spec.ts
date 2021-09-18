@@ -53,7 +53,6 @@ var _getSuggestionThreads = (
 
 describe('Creator dashboard controller', () => {
   var ctrl = null;
-  var $httpBackend = null;
   var $q = null;
   var $rootScope = null;
   var $window = null;
@@ -64,6 +63,7 @@ describe('Creator dashboard controller', () => {
   var SuggestionModalForCreatorDashboardService = null;
   var suggestionsService = null;
   var SuggestionThreadObjectFactory = null;
+  var ThreadDataBackendApiService = null;
   var UserService = null;
   var explorationCreationService = null;
   var userInfo = {
@@ -73,7 +73,6 @@ describe('Creator dashboard controller', () => {
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(($injector, $componentController) => {
-    $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $window = $injector.get('$window');
@@ -91,6 +90,7 @@ describe('Creator dashboard controller', () => {
     explorationCreationService = $injector.get('ExplorationCreationService');
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
+    ThreadDataBackendApiService = $injector.get('ThreadDataBackendApiService');
     UserService = $injector.get('UserService');
 
     spyOn(CsrfService, 'getTokenAsync').and.returnValue(
@@ -355,11 +355,14 @@ describe('Creator dashboard controller', () => {
 
       it('should save the exploration format view in the backend when creator' +
         ' changes the format view', function() {
-        $httpBackend.expect('POST', '/creatordashboardhandler/data')
-          .respond(200);
-        ctrl.setMyExplorationsView('a');
-        $httpBackend.flush();
+        var spyObj = spyOn(
+          CreatorDashboardBackendApiService, 'postExplorationViewAsync')
+          .and.returnValue($q.resolve());
 
+        ctrl.setMyExplorationsView('a');
+        $rootScope.$apply();
+
+        expect(spyObj).toHaveBeenCalled();
         expect(ctrl.myExplorationsView).toBe('a');
       });
 
@@ -451,11 +454,14 @@ describe('Creator dashboard controller', () => {
       it('should update exploration view and publish text on resizing page',
         function() {
           var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-          $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
-            200);
-          ctrl.setMyExplorationsView('list');
-          $httpBackend.flush();
+          var spyObj = spyOn(
+            CreatorDashboardBackendApiService, 'postExplorationViewAsync')
+            .and.returnValue($q.resolve());
 
+          ctrl.setMyExplorationsView('list');
+          $rootScope.$apply();
+
+          expect(spyObj).toHaveBeenCalled();
           expect(ctrl.myExplorationsView).toBe('list');
 
           innerWidthSpy.and.callFake(() => 480);
@@ -495,12 +501,15 @@ describe('Creator dashboard controller', () => {
         suggestionThreadObject.setMessages(messages.map(m => (
           ThreadMessage.createFromBackendDict(m))));
 
-        $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({
-          messages: messages
-        });
+        var spyObj = spyOn(
+          ThreadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue($q.resolve({
+            messages: messages
+          }));
         ctrl.setActiveThread(threadId);
-        $httpBackend.flush();
+        $rootScope.$apply();
 
+        expect(spyObj).toHaveBeenCalled();
         expect(ctrl.activeThread).toEqual(suggestionThreadObject);
         expect(ctrl.canReviewActiveThread).toBe(false);
       });
@@ -515,10 +524,12 @@ describe('Creator dashboard controller', () => {
 
         ctrl.clearActiveThread();
 
-        $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
+        var spyObj = spyOn(
+          ThreadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue($q.resolve());
         ctrl.setActiveThread(threadId);
-        $httpBackend.flush();
 
+        expect(spyObj).toHaveBeenCalled();
         expect(ctrl.activeThread).toEqual(suggestionToReviewObject);
         expect(ctrl.canReviewActiveThread).toBe(true);
       });
@@ -527,9 +538,10 @@ describe('Creator dashboard controller', () => {
         function() {
           var threadId = 'exp1';
 
-          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
+          var spyObj = spyOn(
+            ThreadDataBackendApiService, 'fetchMessagesAsync')
+            .and.returnValue($q.resolve());
           ctrl.setActiveThread(threadId);
-          $httpBackend.flush();
 
           // Method showSuggestionModal is mocked otherwise using its original
           // implementation will throw an error: 'appendTo element not found.
@@ -541,6 +553,7 @@ describe('Creator dashboard controller', () => {
             .and.callFake(() => {});
           ctrl.showSuggestionModal();
 
+          expect(spyObj).toHaveBeenCalled();
           expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)
             .toHaveBeenCalled();
         });

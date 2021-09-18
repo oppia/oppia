@@ -45,15 +45,18 @@ require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
 require('services/user.service.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$rootScope', '$window', 'AlertsService',
+    '$q', '$rootScope', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'ThreadStatusDisplayService',
+    'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -62,11 +65,11 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $http, $q, $rootScope, $window, AlertsService,
+        $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
-        ThreadStatusDisplayService,
+        ThreadDataBackendApiService, ThreadStatusDisplayService,
         UrlInterpolationService, UserService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
         DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
@@ -96,11 +99,9 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       ctrl.setMyExplorationsView = function(newViewType) {
-        $http.post('/creatordashboardhandler/data', {
-          display_preference: newViewType,
-        }).then(function() {
-          ctrl.myExplorationsView = newViewType;
-        });
+        ctrl.myExplorationsView = newViewType;
+        CreatorDashboardBackendApiService.postExplorationViewAsync(
+          newViewType).then(function() {});
         userDashboardDisplayPreference = newViewType;
       };
 
@@ -165,12 +166,13 @@ angular.module('oppia').component('creatorDashboardPage', {
       };
 
       var _fetchMessages = function(threadId) {
-        $http.get('/threadhandler/' + threadId).then(function(response) {
+        ThreadDataBackendApiService.fetchMessagesAsync(
+          threadId).then(function(response) {
           var allThreads = ctrl.mySuggestionsList.concat(
             ctrl.suggestionsToReviewList);
           for (var i = 0; i < allThreads.length; i++) {
             if (allThreads[i].threadId === threadId) {
-              allThreads[i].setMessages(response.data.messages.map(
+              allThreads[i].setMessages(response.messages.map(
                 m => ThreadMessage.createFromBackendDict(m)));
               break;
             }

@@ -630,4 +630,28 @@ describe('retrieving threads service', () => {
       threadDataBackendApiService.resolveSuggestionAsync(null, '', '', ''))
       .toBeRejectedWithError('Trying to update a non-existent thread');
   });
+
+  it('should fetch messages from a given threadId',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      let mockThread = mockFeedbackThreads[0];
+      let thread = feedbackThreadObjectFactory
+        .createFromBackendDict(mockThread);
+
+      threadDataBackendApiService.fetchMessagesAsync(thread.threadId)
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/threadhandler/exploration.exp1.abc1');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Success');
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });
