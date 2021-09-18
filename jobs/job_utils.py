@@ -110,6 +110,7 @@ def get_model_kind(model: datastore_services.Model) -> str:
         TypeError. When the argument is not a model.
     """
     if isinstance(model, datastore_services.Model) or (
+            isinstance(model, type) and
             issubclass(model, datastore_services.Model)):
         return cast(str, model._get_kind())  # type: ignore[attr-defined]  # pylint: disable=protected-access
     else:
