@@ -40,15 +40,17 @@ describe ('Prevent page unload event service', function() {
   });
 
 
-  // Mocking window object here because beforeunload requires the
+  // Mocking window object here because beforeunload requres the
   // full page to reload. Page reloads raise an error in karma.
   var mockWindow = {
     addEventListener: function(eventname: string, callback: () => {}) {
       document.addEventListener('mock' + eventname, callback);
     },
     location: {
-      reload: () => {
-        document.dispatchEvent(reloadEvt);
+      reload: (val = true) => {
+        if (val) {
+          document.dispatchEvent(reloadEvt);
+        }
       }
     }
   };
@@ -121,13 +123,16 @@ describe ('Prevent page unload event service', function() {
 
   it('should test if Alert is not displayed when a condition is passed', () => {
     spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
-    preventPageUnloadEventService.removeListener();
-    preventPageUnloadEventService.addListener(() => {
+    var validationCallback = () => {
       return false;
-    });
+    };
+    preventPageUnloadEventService.addListener(validationCallback);
     spyOn(reloadEvt, 'preventDefault');
 
-    windowRef.nativeWindow.location.reload();
+    // This throws "Expected 0 arguments, but got 1.". We need to suppress this
+    // error because the nativeWindow is mocked and allows 1 argument.
+    // @ts-ignore
+    windowRef.nativeWindow.location.reload(validationCallback());
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
