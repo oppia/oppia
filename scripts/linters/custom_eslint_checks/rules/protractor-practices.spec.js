@@ -67,6 +67,12 @@ ruleTester.run('protractor-practices', rule, {
     code: 'var modal = element.all(by.css(".modal-dialog")).last();'
   }, {
     code: 'var modal = element(by.css("option:checked"));'
+  }, {
+    code: ` var items = ['item1', 'item2', 'item3'];
+            for (let i=0; i < items.length; i++) {
+              console.log(items[i])
+            };
+            //[].forEach(item);`,
   }],
 
   invalid: [
@@ -153,6 +159,17 @@ ruleTester.run('protractor-practices', rule, {
       await invalid.get()`,
       errors: [{
         message: 'Please do not use await for "get()"',
+      }],
+    },
+    {
+      code:
+      `var books = ['book1', 'book2', 'book3'];
+      books.forEach(function(book) {
+        console.log(book)
+      });`,
+      errors: [{
+        message: (
+          'Please do not use .forEach(), consider using a "for loop" instead'),
       }],
     },
   ]
