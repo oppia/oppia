@@ -31,12 +31,14 @@ import {
 export interface TranslatableItem {
   translation: string | string[],
   status: Status,
-  text: string | string[],
   more: boolean
   dataFormat: string,
   contentType: string,
-  interactionId: string,
-  ruleType: string,
+  // These properties will be null when the 
+  // content is not provided for translation.
+  text: string | string[] | null,
+  interactionId: string | null,
+  ruleType: string | null
 }
 
 export type Status = 'pending' | 'submitted';
@@ -50,8 +52,8 @@ export class StateAndContent {
     public translation: string | string[],
     public dataFormat: string,
     public contentType: string,
-    // Null type is added to them to remove the type conflicts with
-    // "translatableItem.interactionId, translatableItem.ruleType "
+    // The following two properties are set to null when the
+    // interactionId and ruleType is not provided.
     public interactionId: string | null,
     public ruleType: string | null
   ) {}
@@ -129,7 +131,7 @@ export class TranslateTextService {
   private _getUpdatedTextToTranslate(
       text: string | string[] | null,
       more: boolean,
-      status: Status | string,
+      status: Status,
       translation: string | string[]
   ): TranslatableItem {
     const {
@@ -152,7 +154,7 @@ export class TranslateTextService {
       contentType: contentType,
       interactionId: interactionId,
       ruleType: ruleType
-    }as TranslatableItem;
+    };
   }
 
   init(expId: string, languageCode: string, successCallback: () => void): void {
