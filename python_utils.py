@@ -493,28 +493,6 @@ def with_metaclass(meta, *bases):
     return future.utils.with_metaclass(meta, *bases)
 
 
-def convert_to_bytes(string_to_convert) -> bytes:
-    """Converts the string to bytes.
-
-    Args:
-        string_to_convert: unicode|str. Required string to be converted into
-            bytes.
-
-    Returns:
-        bytes. The encoded string.
-    """
-    if isinstance(string_to_convert, UNICODE):
-        return string_to_convert.encode('utf-8')
-    elif isinstance(string_to_convert, int):
-        raise Exception(
-            'Passing int is not allowed, since it is insecure, because when a '
-            'big number is passed to the bytes function it can spend some time '
-            'generating an array with empty bytes. '
-            'See: https://beginnersbook.com/2019/05/python-bytes/'
-        )
-    return bytes(string_to_convert)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the

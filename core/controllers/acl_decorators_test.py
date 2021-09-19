@@ -47,7 +47,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
-import python_utils
 
 import webapp2
 import webtest
@@ -4963,8 +4962,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = 'fake_secret'
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4978,8 +4977,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             with self.swap(constants, 'DEV_MODE', False):
@@ -4992,8 +4991,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes('message'), payload['vm_id'])
+            secret.encode('utf-8'),
+            'message'.encode('utf-8'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -5005,8 +5004,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):

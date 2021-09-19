@@ -340,7 +340,7 @@ class AbstractFileSystem(python_utils.OBJECT):
         # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
         file_content = (
-            python_utils.convert_to_bytes(raw_bytes)
+            raw_bytes.encode('utf-8')
             if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(filepath, file_content, mimetype)

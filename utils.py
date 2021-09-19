@@ -325,7 +325,8 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     """
     # We accept unicode but imghdr.what(file, h) accepts 'h' of type bytes.
     # So we have casted content to be bytes.
-    content = python_utils.convert_to_bytes(content)
+    if isinstance(content, str):
+        content = content.encode('utf-8')
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
@@ -438,7 +439,7 @@ def convert_to_hash(input_string: str, max_length: int) -> str:
         Exception. If the input string is not the instance of the str,
             them this exception is raised.
     """
-    if not isinstance(input_string, python_utils.BASESTRING):
+    if not isinstance(input_string, str):
         raise Exception(
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
@@ -447,8 +448,7 @@ def convert_to_hash(input_string: str, max_length: int) -> str:
     # Prefixing altchars with b' to ensure that all characters in encoded_string
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
-        hashlib.sha1(
-            python_utils.convert_to_bytes(input_string)).digest(),
+        hashlib.sha1(input_string.encode('utf-8')).digest(),
         altchars=b'ab'
     ).replace(b'=', b'c')
 
