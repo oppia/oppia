@@ -211,7 +211,7 @@ describe('Topic and Story viewer functionality', function() {
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');
       await explorationPlayerPage.clickThroughToNextCard();
       await topicViewerPage.expectMessageAfterCompletion(
-        'Test complete. Well done!'
+        'Session complete. Well done!'
       );
       await users.logout();
     });
