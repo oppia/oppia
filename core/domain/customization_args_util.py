@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 import python_utils
 import schema_utils
-import utils
 
 
 def get_full_customization_args(customization_args, ca_specs):

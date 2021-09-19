@@ -23,8 +23,8 @@ import collections
 
 from constants import constants
 from core import feconf
+from core import utils
 import python_utils
-import utils
 
 attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (

@@ -24,13 +24,13 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from extensions.objects.models import objects
 from extensions.rich_text_components import components
 import python_utils
-import utils
 
 import bs4
 import defusedxml.ElementTree

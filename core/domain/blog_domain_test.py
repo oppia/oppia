@@ -20,10 +20,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from constants import constants
+from core import utils
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.tests import test_utils
-import utils
 
 
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):

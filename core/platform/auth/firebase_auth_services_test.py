@@ -26,13 +26,13 @@ import logging
 from unittest import mock
 
 from core import feconf
+from core import utils
 from core.domain import auth_domain
 from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import python_utils
-import utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth

@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import collections
 
+from core import utils
 import python_utils
-import utils
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles

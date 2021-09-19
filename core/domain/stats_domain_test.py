@@ -23,13 +23,13 @@ import datetime
 import re
 
 from core import feconf
+from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 import python_utils
-import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 from constants import constants
 from core import feconf
 from core import platform_feature_list
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import platform_feature_services
-import utils
 
 
 class PlatformFeaturesEvaluationHandler(base.BaseHandler):

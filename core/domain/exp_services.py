@@ -37,6 +37,7 @@ import zipfile
 import android_validation_constants
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
@@ -61,7 +62,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import python_utils
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([

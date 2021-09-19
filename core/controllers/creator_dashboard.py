@@ -23,6 +23,7 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
@@ -38,7 +39,6 @@ from core.domain import summary_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 import python_utils
-import utils
 
 EXPLORATION_ID_KEY = 'exploration_id'
 COLLECTION_ID_KEY = 'collection_id'

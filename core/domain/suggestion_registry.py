@@ -23,6 +23,7 @@ import copy
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -37,7 +38,6 @@ from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 

@@ -32,6 +32,7 @@ import string
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
@@ -40,7 +41,6 @@ from core.domain import state_domain
 from core.platform import models
 import python_utils
 import schema_utils
-import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 

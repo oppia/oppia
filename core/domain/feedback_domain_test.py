@@ -20,9 +20,9 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
+from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
-import utils
 
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):

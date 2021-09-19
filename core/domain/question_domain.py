@@ -26,6 +26,7 @@ import re
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -38,7 +39,6 @@ from core.platform import models
 from extensions import domain
 import python_utils
 import schema_utils
-import utils
 
 from pylatexenc import latex2text
 

@@ -21,9 +21,9 @@ import datetime
 import types
 
 from core import feconf
+from core import utils
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 MYPY = False
 if MYPY: # pragma: no cover

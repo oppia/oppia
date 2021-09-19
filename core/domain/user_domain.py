@@ -22,10 +22,9 @@ from __future__ import unicode_literals
 import re
 
 from constants import constants
-
 from core import feconf
+from core import utils
 import python_utils
-import utils
 
 
 class UserSettings(python_utils.OBJECT):

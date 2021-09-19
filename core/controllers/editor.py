@@ -24,6 +24,7 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as objects_validator
@@ -41,7 +42,6 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
-import utils
 
 
 def _require_valid_version(version_from_payload, exploration_version):

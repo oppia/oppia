@@ -22,9 +22,9 @@ import random
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.platform import models
 import python_utils
-import utils
 
 from typing import Any, Dict, List, Sequence
 

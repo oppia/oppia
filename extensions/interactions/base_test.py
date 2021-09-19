@@ -27,6 +27,7 @@ import string
 import struct
 
 from core import feconf
+from core import utils
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
@@ -36,7 +37,6 @@ from extensions.interactions import base
 import python_utils
 import schema_utils
 import schema_utils_test
-import utils
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.

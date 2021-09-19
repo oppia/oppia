@@ -123,7 +123,7 @@
         "core.storage.storage_models_test",
         "scripts.flake_checker_test",
         "core.platform.cache.redis_cache_services_test",
-        "utils_test",
+        "core.utils_test",
         "scripts.linters.linter_utils_test",
         "scripts.linters.python_linter_test",
         "core.platform.auth.firebase_auth_services_test",

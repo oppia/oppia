@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_fetchers
@@ -29,7 +30,6 @@ from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 import python_utils
-import utils
 
 
 class OldLearnerDashboardRedirectPage(base.BaseHandler):

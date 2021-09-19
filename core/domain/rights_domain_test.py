@@ -22,11 +22,11 @@ from __future__ import unicode_literals
 import logging
 
 from constants import constants
+from core import utils
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import utils
 
 
 class ActivityRightsTests(test_utils.GenericTestBase):

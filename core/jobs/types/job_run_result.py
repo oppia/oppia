@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 
 import heapq
 
+from core import utils
 import python_utils
-import utils
 
 from typing import Any, List, Tuple # isort: skip
 

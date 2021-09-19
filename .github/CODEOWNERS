@@ -524,7 +524,7 @@
 /extensions/extensions.module.ts @vojtechjelinek
 /python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
-/utils*.py @aks681
+/core/utils*.py @aks681
 
 
 # Python typing

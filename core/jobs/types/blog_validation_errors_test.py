@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import utils
 from core.jobs.types import base_validation_errors_test
 from core.jobs.types import blog_validation_errors
 from core.platform import models
-import utils
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -22,9 +22,9 @@ import inspect
 import json
 
 from core import feconf
+from core import utils
 from extensions.objects.models import objects
 import python_utils
-import utils
 
 
 class Registry(python_utils.OBJECT):

@@ -31,6 +31,7 @@ import types
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import payload_validator
@@ -44,7 +45,6 @@ from core.platform import models
 from core.tests import test_utils
 import main
 import python_utils
-import utils
 
 import webapp2
 import webtest

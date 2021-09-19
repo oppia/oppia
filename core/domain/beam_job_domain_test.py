@@ -21,11 +21,11 @@ from __future__ import unicode_literals
 
 import datetime
 
+from core import utils
 from core.domain import beam_job_domain
 from core.jobs.batch_jobs import validation_jobs
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 

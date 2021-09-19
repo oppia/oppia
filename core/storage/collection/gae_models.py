@@ -24,10 +24,10 @@ import datetime
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import python_utils
-import utils
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 

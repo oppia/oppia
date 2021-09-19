@@ -25,6 +25,7 @@ import zipfile
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -35,7 +36,6 @@ from core.domain import takeout_service
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
-import utils
 
 
 class ProfileHandler(base.BaseHandler):

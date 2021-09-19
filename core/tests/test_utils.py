@@ -34,6 +34,7 @@ import unittest
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.controllers import base
 from core.domain import auth_domain
 from core.domain import caching_domain
@@ -65,7 +66,6 @@ import main
 from proto_files import text_classifier_pb2
 import python_utils
 import schema_utils
-import utils
 
 import elasticsearch
 import requests_mock

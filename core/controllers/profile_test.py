@@ -25,6 +25,7 @@ import zipfile
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -32,7 +33,6 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

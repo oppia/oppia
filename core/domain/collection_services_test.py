@@ -25,6 +25,7 @@ import os
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_domain
@@ -33,7 +34,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import python_utils
-import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])

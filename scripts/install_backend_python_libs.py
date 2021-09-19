@@ -25,13 +25,12 @@ import shutil
 import subprocess
 import sys
 
+from core import utils
 import python_utils
-import utils
 
 import pkg_resources
 
 from . import common
-
 
 # This is the version that is set in install_prerequisites.sh.
 OPPIA_REQUIRED_PIP_VERSION = '21.2.3'

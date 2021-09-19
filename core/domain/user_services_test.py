@@ -26,6 +26,7 @@ import re
 
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import event_services
@@ -38,7 +39,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import python_utils
-import utils
 
 import requests_mock
 

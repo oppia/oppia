@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 import collections
 
 from core import feconf
+from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
-import utils
 
 SERVER_MODES = parameter_domain.SERVER_MODES
 

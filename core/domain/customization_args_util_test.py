@@ -23,11 +23,11 @@ import os
 import re
 
 from core import feconf
+from core import utils
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
 import python_utils
-import utils
 
 
 class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):

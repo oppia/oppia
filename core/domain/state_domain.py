@@ -28,6 +28,7 @@ import re
 import android_validation_constants
 from constants import constants
 from core import feconf
+from core import utils
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
@@ -37,7 +38,6 @@ from core.domain import translatable_object_registry
 from extensions.objects.models import objects
 import python_utils
 import schema_utils
-import utils
 
 
 class AnswerGroup(python_utils.OBJECT):

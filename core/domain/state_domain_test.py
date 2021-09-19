@@ -25,6 +25,7 @@ import os
 import re
 
 from core import feconf
+from core import utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -36,7 +37,6 @@ from core.domain import translatable_object_registry
 from core.tests import test_utils
 import python_utils
 import schema_utils
-import utils
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
