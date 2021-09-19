@@ -32,11 +32,11 @@ import re
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
-import python_utils
 
 from typing import Any, Callable, Dict, List, Optional, cast
 

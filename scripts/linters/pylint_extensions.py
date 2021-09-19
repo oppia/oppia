@@ -27,8 +27,9 @@ import re
 import sys
 import tokenize
 
+from core import python_utils
 from core.controllers import payload_validator
-import python_utils
+
 from .. import docstrings_checker
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

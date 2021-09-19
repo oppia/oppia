@@ -26,7 +26,7 @@ import pkgutil
 
 from constants import constants
 from core import feconf
-import python_utils
+from core import python_utils
 
 
 class Registry(python_utils.OBJECT):

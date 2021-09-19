@@ -25,8 +25,8 @@ import shutil
 import subprocess
 import sys
 
+from core import python_utils
 from core import utils
-import python_utils
 
 import pkg_resources
 

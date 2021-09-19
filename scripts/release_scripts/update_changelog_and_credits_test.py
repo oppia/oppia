@@ -27,8 +27,8 @@ import sys
 import tempfile
 
 import constants
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
 

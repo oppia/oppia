@@ -35,7 +35,7 @@ import zlib
 
 from constants import constants
 from core import feconf
-import python_utils
+from core import python_utils
 
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,

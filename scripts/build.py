@@ -28,7 +28,7 @@ import shutil
 import subprocess
 import threading
 
-import python_utils
+from core import python_utils
 from scripts import common
 from scripts import servers
 

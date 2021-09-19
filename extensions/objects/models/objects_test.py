@@ -23,9 +23,9 @@ import inspect
 import json
 import re
 
+from core import python_utils
 from core.tests import test_utils
 from extensions.objects.models import objects
-import python_utils
 import schema_utils_test
 
 

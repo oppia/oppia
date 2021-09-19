@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import base64
 
 from core import feconf
-import python_utils
+from core import python_utils
 
 from typing import Dict, List, Optional, Union
 

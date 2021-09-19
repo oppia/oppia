@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import os
 import re
 
-import python_utils
+from core import python_utils
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses

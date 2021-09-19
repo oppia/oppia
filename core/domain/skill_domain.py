@@ -23,12 +23,12 @@ import json
 import android_validation_constants
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
-import python_utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.

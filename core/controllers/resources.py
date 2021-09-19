@@ -22,13 +22,13 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import fs_domain
 from core.domain import value_generators_domain
-import python_utils
 
 
 class ValueGeneratorHandler(base.BaseHandler):

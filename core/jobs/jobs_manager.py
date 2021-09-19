@@ -24,12 +24,12 @@ import logging
 import pprint
 
 from core import feconf
+from core import python_utils
 from core.domain import beam_job_services
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.io import job_io
 from core.storage.beam_job import gae_models as beam_job_models
-import python_utils
 
 import apache_beam as beam
 from apache_beam import runners

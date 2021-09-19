@@ -27,6 +27,7 @@ import re
 import time
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
@@ -34,7 +35,6 @@ from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
-import python_utils
 
 import backports.functools_lru_cache
 import webapp2

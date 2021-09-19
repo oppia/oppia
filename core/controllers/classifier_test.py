@@ -25,6 +25,7 @@ import os
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
@@ -36,7 +37,6 @@ from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
-import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 

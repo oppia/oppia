@@ -23,6 +23,7 @@ import os
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import question_domain
@@ -38,7 +39,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (
     topic_models, suggestion_models

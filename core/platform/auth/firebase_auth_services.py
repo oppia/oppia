@@ -58,9 +58,9 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.domain import auth_domain
 from core.platform import models
-import python_utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth

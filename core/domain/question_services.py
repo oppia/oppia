@@ -22,6 +22,7 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -29,7 +30,6 @@ from core.domain import question_fetchers
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
-import python_utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])

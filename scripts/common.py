@@ -31,7 +31,7 @@ import sys
 import time
 
 import constants
-import python_utils
+from core import python_utils
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 

@@ -25,11 +25,11 @@ import argparse  # pylint: disable=unused-import
 import fnmatch  # pylint: disable=unused-import
 import multiprocessing  # pylint: disable=unused-import
 import os  # pylint: disable=unused-import
-import threading  # pylint: disable=unused-import
 import subprocess  # pylint: disable=unused-import
 import sys  # pylint: disable=unused-import
+import threading  # pylint: disable=unused-import
 
-import python_utils  # pylint: disable=unused-import
+from core import python_utils  # pylint: disable=unused-import
 
 
 def fun():

@@ -24,11 +24,11 @@ import inspect
 import itertools
 import re
 
+from core import python_utils
 from core.jobs import job_utils
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
-import python_utils
 
 import apache_beam as beam
 from apache_beam import typehints

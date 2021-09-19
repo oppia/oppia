@@ -23,7 +23,7 @@ import inspect
 from types import ModuleType # pylint: disable=import-only-modules
 from constants import constants
 from core import feconf
-import python_utils
+from core import python_utils
 
 from typing import List, Tuple, Type
 

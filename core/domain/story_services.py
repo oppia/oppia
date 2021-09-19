@@ -28,6 +28,7 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import caching_services
 from core.domain import exp_fetchers
@@ -39,7 +40,6 @@ from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
-import python_utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])

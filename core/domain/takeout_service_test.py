@@ -22,6 +22,7 @@ import json
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -32,7 +33,6 @@ from core.domain import takeout_service
 from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (
     app_feedback_report_models, auth_models, base_models, blog_models,

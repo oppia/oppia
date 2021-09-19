@@ -21,6 +21,7 @@ import datetime
 import os
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
@@ -35,7 +36,6 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 

@@ -28,7 +28,7 @@ import subprocess
 import sys
 
 import constants
-import python_utils
+from core import python_utils
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

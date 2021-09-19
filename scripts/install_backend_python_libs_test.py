@@ -27,8 +27,8 @@ import shutil
 import subprocess
 import sys
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
 from scripts import scripts_test_utils

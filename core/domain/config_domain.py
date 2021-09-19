@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
-import python_utils
 import schema_utils
 
 (config_models, suggestion_models,) = models.Registry.import_models(

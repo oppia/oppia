@@ -23,8 +23,8 @@ import html
 import json
 import logging
 
+from core import python_utils
 from core.domain import rte_component_registry
-import python_utils
 
 import bleach
 import bs4

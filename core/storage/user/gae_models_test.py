@@ -23,12 +23,12 @@ import datetime
 import types
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 from typing import Dict, List, Set, Union
 

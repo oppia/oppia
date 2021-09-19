@@ -23,6 +23,7 @@ import datetime
 import itertools
 
 from core import feconf
+from core import python_utils
 from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import rights_manager
@@ -30,7 +31,6 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import python_utils
 
 (
     email_models, expl_models, feedback_models,

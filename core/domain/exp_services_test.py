@@ -26,6 +26,7 @@ import re
 import zipfile
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
@@ -44,7 +45,6 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (
     feedback_models, exp_models, opportunity_models,

@@ -35,7 +35,7 @@ from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 _PARSER = argparse.ArgumentParser(

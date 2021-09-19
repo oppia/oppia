@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -27,7 +28,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import python_utils
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):

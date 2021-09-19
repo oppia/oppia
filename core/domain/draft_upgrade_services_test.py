@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
@@ -27,7 +28,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import state_domain
 from core.tests import test_utils
-import python_utils
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):

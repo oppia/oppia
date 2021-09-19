@@ -30,9 +30,9 @@ import string
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import change_domain
-import python_utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.

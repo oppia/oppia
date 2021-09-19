@@ -26,9 +26,9 @@ import sys
 import tempfile
 import unittest
 
+from core import python_utils
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
-import python_utils
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):

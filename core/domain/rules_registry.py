@@ -23,8 +23,8 @@ import json
 import os
 
 from core import feconf
+from core import python_utils
 from core import utils
-import python_utils
 
 
 class Registry(python_utils.OBJECT):

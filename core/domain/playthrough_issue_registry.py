@@ -23,8 +23,8 @@ import os
 import pkgutil
 
 from core import feconf
+from core import python_utils
 from core.platform import models
-import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

@@ -20,9 +20,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import feconf
+from core import python_utils
 from core.domain import role_services
 from core.tests import test_utils
-import python_utils
 
 
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):

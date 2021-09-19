@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core import python_utils
 from core import utils
-import python_utils
 import schema_utils
 
 

@@ -21,8 +21,8 @@ import os
 
 import constants
 from core import feconf
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 
 class ConstantsTests(test_utils.GenericTestBase):

@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import pickle
 
+from core import python_utils
 from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

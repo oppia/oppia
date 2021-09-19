@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import os
 import re
 
+from core import python_utils
 from core import utils
-import python_utils
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.

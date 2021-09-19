@@ -24,7 +24,7 @@ import hashlib
 import logging
 
 from core import feconf
-import python_utils
+from core import python_utils
 
 import mailchimp3
 from mailchimp3 import mailchimpclient

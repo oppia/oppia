@@ -23,7 +23,7 @@ import copy
 import json
 
 from constants import constants
-import python_utils
+from core import python_utils
 import schema_utils
 
 

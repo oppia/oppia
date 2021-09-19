@@ -23,8 +23,8 @@ import re
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
-import python_utils
 
 
 class UserSettings(python_utils.OBJECT):

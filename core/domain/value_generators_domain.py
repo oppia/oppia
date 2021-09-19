@@ -25,8 +25,8 @@ import os
 import pkgutil
 
 from core import feconf
+from core import python_utils
 from core import utils
-import python_utils
 
 
 class BaseValueGenerator(python_utils.OBJECT):

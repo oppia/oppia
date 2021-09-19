@@ -22,6 +22,7 @@ import logging
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
@@ -45,7 +46,6 @@ from core.domain import wipeout_domain
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (
     app_feedback_report_models, auth_models, blog_models,

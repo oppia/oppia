@@ -32,11 +32,11 @@ import datetime
 import re
 
 from core import feconf
+from core import python_utils
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import base_validation_errors
 from core.platform import models
-import python_utils
 
 import apache_beam as beam
 

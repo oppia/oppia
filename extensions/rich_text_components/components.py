@@ -23,9 +23,9 @@ import re
 
 import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from extensions.objects.models import objects
-import python_utils
 
 import bs4
 

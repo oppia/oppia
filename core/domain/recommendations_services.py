@@ -24,9 +24,9 @@ import datetime
 import json
 
 from core import feconf
+from core import python_utils
 from core.domain import rights_domain
 from core.platform import models
-import python_utils
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])

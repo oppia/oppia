@@ -23,7 +23,7 @@ import subprocess
 import sys
 
 from constants import constants
-import python_utils
+from core import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker

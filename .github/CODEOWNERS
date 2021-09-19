@@ -522,7 +522,7 @@
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
-/python_utils*.py @DubeySandeep
+/core/python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
 /core/utils*.py @aks681
 

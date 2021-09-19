@@ -28,11 +28,11 @@ import struct
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
-import python_utils
 import schema_utils
 import schema_utils_test
 

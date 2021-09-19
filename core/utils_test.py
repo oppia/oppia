@@ -26,9 +26,9 @@ import os
 
 from constants import constants
 from core import feconf
+from core import python_utils
 from core import utils
 from core.tests import test_utils
-import python_utils
 
 from typing import Any, Dict, List
 

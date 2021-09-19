@@ -23,7 +23,7 @@ import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']

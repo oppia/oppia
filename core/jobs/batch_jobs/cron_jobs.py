@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 import datetime
 
 from core import feconf
+from core import python_utils
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -36,7 +37,6 @@ from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-import python_utils
 
 import apache_beam as beam
 from typing import Dict, Iterable, List, Optional, Tuple, Union, cast
