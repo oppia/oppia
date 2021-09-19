@@ -34,7 +34,7 @@ export interface TranslatableItem {
   more: boolean
   dataFormat: string,
   contentType: string,
-  // These properties will be null when the 
+  // These properties will be null when the
   // content is not provided for translation.
   text: string | string[] | null,
   interactionId: string | null,
