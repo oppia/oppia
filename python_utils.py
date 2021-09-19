@@ -58,7 +58,6 @@ OBJECT = builtins.object
 PRINT = print
 RANGE = builtins.range
 ROUND = builtins.round
-UNICODE = builtins.str
 ZIP = builtins.zip
 
 
@@ -515,7 +514,7 @@ def _recursively_convert_to_str(value):
         }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == UNICODE:  # pylint: disable=unidiomatic-typecheck
+    elif type(value) == str:  # pylint: disable=unidiomatic-typecheck
         return value
     elif type(value) == builtins.bytes:  # pylint: disable=unidiomatic-typecheck
         return value.decode('utf-8')

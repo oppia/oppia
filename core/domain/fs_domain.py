@@ -339,8 +339,11 @@ class AbstractFileSystem(python_utils.OBJECT):
         # be stored in a file opened in binary mode. However, it is not
         # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
+
+        if isinstance(raw_bytes, str):
+            raw_bytes = raw_bytes.encode('utf-8')
         file_content = (
-            raw_bytes.encode('utf-8')
+            raw_bytes
             if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(filepath, file_content, mimetype)
