@@ -17,12 +17,12 @@
  * release-coordinator panel.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { BehaviorSubject, combineLatest, Observable, of, zip } from 'rxjs';
-import { catchError, distinctUntilChanged, first, map, startWith } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, interval, NEVER, Observable, of, Subscription, zip } from 'rxjs';
+import { catchError, distinctUntilChanged, first, map, startWith, switchMap } from 'rxjs/operators';
 
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { BeamJob } from 'domain/jobs/beam-job.model';
@@ -37,6 +37,8 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './beam-jobs-tab.component.html'
 })
 export class BeamJobsTabComponent implements OnInit, OnDestroy {
+  static readonly BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS = 15000;
+
   public dataFailedToLoad = false;
   readonly jobRunTableColumns: readonly string[] = [
     'run_status', 'job_name', 'started_on', 'updated_on', 'action'];
@@ -51,11 +53,13 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
   filteredJobNames: Observable<string[]>;
   filteredBeamJobRuns: Observable<BeamJobRun[]>;
+  beamJobRunsRefreshIntervalSubscription: Subscription;
 
   constructor(
       private backendApiService: ReleaseCoordinatorBackendApiService,
       private alertsService: AlertsService,
-      private matDialog: MatDialog) {}
+      private matDialog: MatDialog,
+      private ngZone: NgZone) {}
 
   ngOnInit(): void {
     const initialBeamJobs = this.backendApiService.getBeamJobs()
@@ -91,11 +95,41 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
         )
       )
     );
+
+    // Intervals need to be executed *outside* of Angular so that they don't
+    // interfere with testability (otherwise, the Angular component will never
+    // be "ready" since an interval executes indefinitely).
+    this.ngZone.runOutsideAngular(() => {
+      this.beamJobRunsRefreshIntervalSubscription = (
+        interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
+          .pipe(switchMap(() => {
+            // If every job in the current list is in a terminal state (won't
+            // ever change), then we return NEVER (an Observable which neither
+            // completes nor emits values) to avoid calling out to the backend.
+            //
+            // We do this because there's no point in trying to update the state
+            // of jobs that have already reached their terminal (final) state.
+            if (this.beamJobRuns.value.every(j => j.inTerminalState())) {
+              return NEVER;
+            } else {
+              // Otherwise, try to reach out to the backend and retrieve an
+              // update on the state of our jobs.
+              return this.backendApiService.getBeamJobRuns();
+            }
+          }))
+          .subscribe(beamJobRuns => {
+            // When we're ready to update the beam jobs, we want the update to
+            // execute *inside* of Angular so that change detection can notice.
+            this.ngZone.run(() => this.beamJobRuns.next(beamJobRuns));
+          })
+      );
+    });
   }
 
   ngOnDestroy(): void {
     this.jobNames.complete();
     this.beamJobRuns.complete();
+    this.beamJobRunsRefreshIntervalSubscription.unsubscribe();
   }
 
   onError<T>(error: Error): Observable<T[]> {
