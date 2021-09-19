@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import importlib
 import inspect
 import io
 import json
@@ -36,9 +37,7 @@ from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -312,19 +311,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_dev_mode_cannot_be_true_on_production(self):
-        # We need to delete the existing module else the re-importing
-        # would just call the existing module.
-        del sys.modules['feconf']
         server_software_swap = self.swap(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
-            # This pragma is needed since we are re-importing under
-            # invalid conditions. The pylint error messages
-            # 'reimported', 'unused-variable', 'redefined-outer-name' and
-            # 'unused-import' would appear if this line was not disabled.
-            import feconf  # pylint: disable-all
+            importlib.reload(feconf)  # pylint: disable-all
 
     def test_frontend_error_handler(self):
         observed_log_messages = []
