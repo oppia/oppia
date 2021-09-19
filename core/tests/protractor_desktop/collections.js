@@ -36,7 +36,6 @@ describe('Collections', function() {
   var thirdExplorationId = null;
   var fourthExplorationId = null;
   var libraryPage = null;
-  var expectedErrors = [];
   var lazyExplorationId = null;
   var linearExplorationId = null;
   var testExplorationId = null;
@@ -181,7 +180,7 @@ describe('Collections', function() {
       await users.login('player@collections.com');
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors(expectedErrors);
+      await general.checkForConsoleErrors([]);
 
       // Checking in a collection with two nodes.
       await browser.get('/collection_editor/create/' + collectionId);
@@ -192,7 +191,7 @@ describe('Collections', function() {
       await collectionEditorPage.closeSaveModal();
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors(expectedErrors);
+      await general.checkForConsoleErrors([]);
 
       // Checking in a collection with three nodes.
       await browser.get('/collection_editor/create/' + collectionId);
@@ -203,7 +202,7 @@ describe('Collections', function() {
       await collectionEditorPage.closeSaveModal();
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors(expectedErrors);
+      await general.checkForConsoleErrors([]);
 
       // Checking in a collection with four nodes.
       await browser.get('/collection_editor/create/' + collectionId);
@@ -214,11 +213,11 @@ describe('Collections', function() {
       await collectionEditorPage.closeSaveModal();
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors(expectedErrors);
+      await general.checkForConsoleErrors([]);
       await users.logout();
     });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors(expectedErrors);
+    await general.checkForConsoleErrors([]);
   });
 });
