@@ -29,7 +29,7 @@ from apache_beam.io.gcp.datastore.v1new import datastoreio
 from typing import Optional
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
