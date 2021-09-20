@@ -151,7 +151,7 @@ ruleTester.run('protractor-practices', rule, {
       function gradeList(name, gradebook){
         return gradebook[name]
       }
-      gradeList.filter(gradeList(name, gradebook));`,
+      gradeList.filter((name) => gradeList(name, gradebook));`,
       errors: [{
         message: 'Please do not use .filter(), consider using a for loop',
       }]
