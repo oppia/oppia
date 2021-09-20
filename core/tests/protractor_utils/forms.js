@@ -305,27 +305,37 @@ var UnicodeEditor = function(elem) {
 
 var AutocompleteDropdownEditor = function(elem) {
   var containerLocator = by.css('.select2-container');
+  var containerElement = elem.element(containerLocator);
   var dropdownElement = element(by.css('.select2-dropdown'));
   var searchInputLocator = by.css('.select2-search input');
+  var searchInputElement = dropdownElement.element(searchInputLocator);
   return {
     setValue: async function(text) {
-      await elem.element(containerLocator).click();
+      await action.click(
+        'Container Element',
+        containerElement);
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await dropdownElement.element(searchInputLocator).sendKeys(text + '\n');
+      await action.sendKeys(
+        'Search Input Element',
+        searchInputElement,
+        text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await elem.element(containerLocator).click();
+      await action.click('Container Element', containerElement);
       var actualOptions = await dropdownElement.all(by.tagName('li')).map(
         async function(optionElem) {
-          return await optionElem.getText();
+          return await action.getText('Option Elem', optionElem);
         }
       );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      await dropdownElement.element(searchInputLocator).sendKeys('\n');
+      await action.sendKeys(
+        'Search Input Element',
+        searchInputElement,
+        '\n');
     }
   };
 };
@@ -334,7 +344,9 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   var selectionChoiceRemoveLocator = by.css(
     '.select2-selection__choice__remove');
   var selectionRenderedLocator = by.css('.select2-selection__rendered');
-  var saerchFieldElement = elem.element(by.css('.select2-search__field'));
+  var searchFieldElement = elem.element(by.css('.select2-search__field'));
+  var containerLocator = by.css('.select2-container');
+  var containerElement = elem.element(containerLocator);
   return {
     setValues: async function(texts) {
       // Clear all existing choices.
@@ -346,12 +358,14 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       // removes the element from the DOM. We also omit the last element
       // because it is the field for new input.
       for (var i = deleteButtons.length - 2; i >= 0; i--) {
-        await deleteButtons[i].click();
+        await action.click(`Delete Buttons ${i}`, deleteButtons[i]);
       }
 
       for (var i = 0; i < texts.length; i++) {
-        await elem.element(containerLocator).click();
-        await saerchFieldElement.sendKeys(
+        await action.click('Container Element', containerElement);
+        await action.sendKeys(
+          `Search Field Element ${i}`,
+          searchFieldElement,
           texts[i] + '\n');
       }
     },
@@ -379,7 +393,9 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    await searchBarDropdownToggleElement.click();
+    await action.click(
+      'Search Dropdown Toggle Element',
+      searchBarDropdownToggleElement);
 
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
@@ -390,7 +406,7 @@ var MultiSelectEditor = function(elem) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
-        await filteredElement.click();
+        await action.click('Filtered Elements', filteredElement);
       }
     }
 
@@ -401,7 +417,9 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    await searchBarDropdownToggleElement.click();
+    await action.click(
+      'Search Dropdown Toggle Element',
+      searchBarDropdownToggleElement);
   };
 
   return {
@@ -415,7 +433,9 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      await searchBarDropdownToggleElement.click();
+      await action.click(
+        'Search Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
 
       // Find the selected elements.
       var actualSelection = await elem.element(searchBarDropdownMenuLocator)
@@ -425,7 +445,9 @@ var MultiSelectEditor = function(elem) {
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      await searchBarDropdownToggleElement.click();
+      await action.click(
+        'Search Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
     }
   };
 };
@@ -460,11 +482,11 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await entry.getText();
+        return await action.getText('Entry', entry);
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
-    var fullText = await elem.getText();
+    var fullText = await action.getText('Entry', entry);
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
@@ -600,7 +622,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    * This recursive function is used by expectTextWithHighlightingToBe().
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
-   * codemirror should scroll to,
+   * codeMirror should scroll to,
    * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
    * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
@@ -608,9 +630,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'text': the exact string of text expected on that line
    *  - 'highlighted': true or false, whether the line is highlighted
    *  - 'checked': true or false, whether the line has been checked
-   * compareHightlighting: Whether highlighting should be compared.
+   * compareHighlighting: Whether highlighting should be compared.
    */
-  var _compareText = async function(compareDict, compareHightlighting) {
+  var _compareText = async function(compareDict, compareHighlighting) {
     var scrollTo = 0;
     var prevScrollTop = -1;
     var actualDiffDict = {};
@@ -621,7 +643,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       scrollBarWebElement = await scrollBarElements.last().getWebElement();
     }
     while (true) {
-      // This is used to match and scroll the text in codemirror to a point
+      // This is used to match and scroll the text in codeMirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
       await browser.executeScript(
@@ -660,7 +682,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     for (var lineNumber in compareDict) {
       expect(actualDiffDict[lineNumber].text).toEqual(
         compareDict[lineNumber].text);
-      if (compareHightlighting) {
+      if (compareHighlighting) {
         expect(actualDiffDict[lineNumber].highlighted).toEqual(
           compareDict[lineNumber].highlighted);
       }
@@ -669,7 +691,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 
   return {
     /**
-     * Compares text and highlighting with codemirror-mergeview. The input
+     * Compares text and highlighting with codeMirror-mergeView. The input
      * should be an object whose keys are line numbers and whose values should
      * be an object with the following key-value pairs:
      *  - text: the exact string of text expected on that line
@@ -684,8 +706,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await _compareText(expectedTextDict, true);
     },
     /**
-     * Compares text with codemirror. The input should be a string (with
-     * line breaks) of the expected display on codemirror.
+     * Compares text with codeMirror. The input should be a string (with
+     * line breaks) of the expected display on codeMirror.
      */
     expectTextToBe: async function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
@@ -703,10 +725,14 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 };
 
 var CodeStringEditor = function(elem) {
+  var codeStringElement = elem.element(by.tagName('textarea'));
   return {
     setValue: async function(code) {
-      await elem.element(by.tagName('textarea')).clear();
-      await elem.element(by.tagName('textarea')).sendKeys(code);
+      await action.click('Code String Element', codeStringElement);
+      await action.sendKeys(
+        'Code String Element',
+        codeStringElement,
+        code);
     }
   };
 };
