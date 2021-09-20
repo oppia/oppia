@@ -45,7 +45,7 @@
 
 
 # Android team
-/android_validation_constants*.py @seanlip @BenHenning
+/core/android_validation_constants*.py @seanlip @BenHenning
 
 
 # Angular Migration team

@@ -19,7 +19,7 @@ constants are the same.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import android_validation_constants
+from core import android_validation_constants
 from core.constants import constants
 from core.tests import test_utils
 

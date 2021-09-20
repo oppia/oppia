@@ -34,7 +34,7 @@ import os
 import pprint
 import zipfile
 
-import android_validation_constants
+from core import android_validation_constants
 from core import feconf
 from core import python_utils
 from core import utils
