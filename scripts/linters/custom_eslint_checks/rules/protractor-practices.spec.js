@@ -70,7 +70,7 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: '// Filter results from the array using arr.filter()'
   }, {
-    code: '/* Filter results from array*/'
+    code: '/* Filter results from array using arr.filter() */'
   }, {
     code: 'var filtered_fruit = apple.filter'
   }],
