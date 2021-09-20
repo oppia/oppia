@@ -27,12 +27,12 @@ from apache_beam.options import pipeline_options
 from typing import List, Optional # isort: skip
 
 
-class JobOptions(pipeline_options.PipelineOptions):
+class JobOptions(pipeline_options.DebugOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
         'namespace': (
-            str, 'Namespace for isolating the NDB operations during tests.'),
+            str, 'Namespace for isolating the NDB operations during tests.')
     }
 
     def __init__(
@@ -63,6 +63,8 @@ class JobOptions(pipeline_options.PipelineOptions):
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             temp_location=feconf.DATAFLOW_TEMP_LOCATION,
             staging_location=feconf.DATAFLOW_STAGING_LOCATION,
+            experiments=['use_runner_v2'],
+            sdk_container_image='gcr.io/oppiaserver-backup-migration/oppia:latest',
             **job_options)
 
     @classmethod

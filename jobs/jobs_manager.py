@@ -118,8 +118,6 @@ def run_job(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
             options=job_options.JobOptions(
                 namespace=namespace,
-                experiment='use_runner_v2',
-                sdk_container_image=''
             )
         )
 

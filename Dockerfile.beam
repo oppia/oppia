@@ -5,14 +5,19 @@ RUN apt-get update && apt-get -y install sudo
 
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
 
-RUN ls
-
 # Install prereqs
 COPY scripts/install_prerequisites.sh /scripts/install_prerequisites.sh
 RUN sh /scripts/install_prerequisites.sh
 
+# Install and enable pyenv
+RUN git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
+ENV PYENV_ROOT="$HOME/.pyenv"
+ENV PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
+RUN pyenv install 3.7.10
+RUN pyenv global 3.7.10
+
 # Install SDK
-RUN pip3 install --no-cache-dir apache-beam[gcp]==2.32.0
+RUN pip install --no-cache-dir apache-beam[gcp]==2.32.0
 
 # Copy files from official SDK image, including script/dependencies
 COPY --from=apache/beam_python3.7_sdk:2.32.0 /opt/apache/beam /opt/apache/beam
