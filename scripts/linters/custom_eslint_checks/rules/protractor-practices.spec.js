@@ -68,7 +68,7 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: 'var modal = element(by.css("option:checked"));'
   }, {
-    code: '// Filter results from the array'
+    code: '// Filter results from the array using arr.filter()'
   }, {
     code: '/* Filter results from array*/'
   }, {
