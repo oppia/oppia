@@ -25,7 +25,7 @@ import feconf
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
-from typing import Any, List, Optional, Tuple, Type, cast
+from typing import Any, List, Optional, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -86,9 +86,7 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     Raises:
         KindError. Internally raised by _lookup_model when the kind is invalid.
     """
-    return cast(
-        Type[datastore_services.Model],
-        datastore_services.Model._lookup_model(kind))  # type: ignore[attr-defined]  # pylint: disable=protected-access
+    return datastore_services.Model._lookup_model(kind)  # type: ignore[attr-defined]  # pylint: disable=protected-access
 
 
 def get_model_kind(model: datastore_services.Model) -> str:
@@ -112,7 +110,7 @@ def get_model_kind(model: datastore_services.Model) -> str:
     if isinstance(model, datastore_services.Model) or (
             isinstance(model, type) and
             issubclass(model, datastore_services.Model)):
-        return cast(str, model._get_kind())  # type: ignore[attr-defined]  # pylint: disable=protected-access
+        return model._get_kind()  # type: ignore[attr-defined]  # pylint: disable=protected-access
     else:
         raise TypeError('%r is not a model type or instance' % model)
 
@@ -193,10 +191,8 @@ def get_ndb_model_from_beam_entity(
     # provides a functionality that we need and writing it ourselves would be
     # too complicated.
     ndb_model_class = get_model_class(ndb_key.kind())  # pylint: disable=protected-access
-    return cast(
-        datastore_services.Model,
-        ndb_model._entity_from_ds_entity( # pylint: disable=protected-access
-            beam_entity.to_client_entity(), model_class=ndb_model_class))
+    return ndb_model._entity_from_ds_entity( # pylint: disable=protected-access
+        beam_entity.to_client_entity(), model_class=ndb_model_class)
 
 
 def get_ndb_key_from_beam_key(
@@ -210,9 +206,7 @@ def get_ndb_key_from_beam_key(
     Returns:
         datastore_services.Key. The NDB key.
     """
-    return cast(
-        datastore_services.Key,
-        datastore_services.Key._from_ds_key(beam_key.to_client_key()))  # type: ignore[attr-defined]  # pylint: disable=protected-access
+    return datastore_services.Key._from_ds_key(beam_key.to_client_key())  # type: ignore[attr-defined]  # pylint: disable=protected-access
 
 
 def get_beam_key_from_ndb_key(

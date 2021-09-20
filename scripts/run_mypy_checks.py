@@ -519,8 +519,6 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/job_options_test.py',
     'jobs/job_test_utils.py',
     'jobs/job_test_utils_test.py',
-    'jobs/job_utils.py',
-    'jobs/job_utils_test.py',
     'jobs/registry.py',
     'jobs/registry_test.py',
     'jobs/transforms/validation/auth_validation.py',
