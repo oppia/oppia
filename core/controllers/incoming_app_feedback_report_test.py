@@ -105,8 +105,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         all_reports = (
             app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
         self.assertEqual(len(all_reports), 1)
-        report_model = cast(
-            app_feedback_report_models.AppFeedbackReportModel, all_reports[0])
+        report_model = all_reports[0]
 
         self.assertEqual(report_model.platform, 'android')
         self.assertEqual(

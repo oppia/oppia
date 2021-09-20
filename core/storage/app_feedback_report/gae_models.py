@@ -306,7 +306,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         report_models = cls.query(
             cls.created_on < datetime_before_which_to_scrub,
             cls.scrubbed_by == None).fetch()  # pylint: disable=singleton-comparison
-        return cast(Sequence[AppFeedbackReportModel], report_models)
+        return report_models
 
     @classmethod
     def get_filter_options_for_field(cls, filter_field: str) -> List[str]:
