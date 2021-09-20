@@ -68,6 +68,7 @@ describe('Beam Jobs Tab Component', () => {
     new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false));
   const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
+  const terminalBeamJobRuns = [doneBarJob];
 
   beforeEach(waitForAsync(async() => {
     TestBed.configureTestingModule({
@@ -324,12 +325,32 @@ describe('Beam Jobs Tab Component', () => {
 
     fixture.detectChanges();
 
+    // The first time is called by ngOnInit().
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
     fixture.detectChanges();
 
+    // The second time is called out by our interval refresh timer.
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
+
+    component.ngOnDestroy();
+  }));
+
+  it('should not refresh beam jobs if all jobs are terminal', fakeAsync(() => {
+    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
+      .and.returnValue(of(terminalBeamJobRuns));
+
+    fixture.detectChanges();
+
+    // The first time is called by ngOnInit().
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
+
+    tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
+    fixture.detectChanges();
+
+    // The second time should not be called out, because all jobs are terminal.
+    expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     component.ngOnDestroy();
   }));
