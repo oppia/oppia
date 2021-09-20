@@ -48,8 +48,11 @@ def generate_signature(secret, message, vm_id):
     Returns:
         str. The signature of the payload data.
     """
-    encoded_vm_id = vm_id.encode('utf-8')
-    message = b'%s|%s' % (base64.b64encode(message), encoded_vm_id)
+    if isinstance(vm_id, str):
+        vm_id = vm_id.encode('utf-8')
+    if isinstance(message, str):
+        message = message.encode('utf-8')
+    message = b'%s|%s' % (base64.b64encode(message), vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256
     ).hexdigest()
@@ -74,8 +77,7 @@ def verify_signature(oppia_ml_auth_info):
         return False
 
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message.encode('utf-8'),
-        oppia_ml_auth_info.vm_id)
+        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
