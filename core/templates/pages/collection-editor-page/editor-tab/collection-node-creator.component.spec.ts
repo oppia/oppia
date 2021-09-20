@@ -219,7 +219,7 @@ describe('Collection node creator component', () => {
   }));
 
   it('should check if id is malformed', () => {
-    expect(componentInstance.isMalformedId('adkslajdf#')).toBeTrue();
+    expect(componentInstance.isIdMalformed('adkslajdf#')).toBeTrue();
   });
 
   it('should add exploration', () => {

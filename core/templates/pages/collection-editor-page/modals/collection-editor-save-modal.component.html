@@ -1,12 +1,12 @@
 <div class="modal-header protractor-test-save-modal">
   <h3>
-    <span *ngIf="isCollectionPrivate">Save Draft</span>
-    <span *ngIf="!isCollectionPrivate">Publish Changes</span>
+    <span *ngIf="collectionIsPrivate">Save Draft</span>
+    <span *ngIf="!collectionIsPrivate">Publish Changes</span>
   </h3>
 </div>
 <div class="modal-body oppia-long-text">
   <p>
-    <span *ngIf="isCollectionPrivate">(Optional)</span>
+    <span *ngIf="collectionIsPrivate">(Optional)</span>
     Please enter a brief description of what you have changed:
     <textarea rows="3"
               cols="50"
@@ -21,9 +21,9 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-close-save-modal-button"
-          (disabled)="!isCollectionPrivate && !commitMessage"
+          (disabled)="!collectionIsPrivate && !commitMessage"
           (click)="confirm(commitMessage)">
-    <span *ngIf="isCollectionPrivate">Save Draft</span>
-    <span *ngIf="!isCollectionPrivate">Publish Changes</span>
+    <span *ngIf="collectionIsPrivate">Save Draft</span>
+    <span *ngIf="!collectionIsPrivate">Publish Changes</span>
   </button>
 </div>

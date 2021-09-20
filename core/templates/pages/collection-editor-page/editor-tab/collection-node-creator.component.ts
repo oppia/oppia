@@ -118,7 +118,7 @@ export class CollectionNodeCreatorComponent {
   // Checks whether the user has left a '#' at the end of their ID
   // by accident (which can happen if it's being copy/pasted from the
   // editor page.
-  isMalformedId(typedExplorationId: string): boolean {
+  isIdMalformed(typedExplorationId: string): boolean {
     return (
       typedExplorationId &&
       typedExplorationId.lastIndexOf('#') ===
