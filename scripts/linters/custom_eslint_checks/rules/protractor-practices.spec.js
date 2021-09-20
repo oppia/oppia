@@ -72,7 +72,13 @@ ruleTester.run('protractor-practices', rule, {
             for (let i=0; i < items.length; i++) {
               console.log(items[i])
             };
-            //[].forEach(item);`,
+            //[].forEach(item);`
+  }, {
+    code: '// Filter results from the array using arr.filter()'
+  }, {
+    code: '/* Filter results from array using arr.filter() */'
+  }, {
+    code: 'var filtered_fruit = apple.filter'
   }],
 
   invalid: [
@@ -142,7 +148,7 @@ ruleTester.run('protractor-practices', rule, {
         gender = 'female';
       });`,
       errors: [{
-        message: 'Please do not use .filter(), consider using a for loop',
+        message: 'Please do not use .filter(); consider using a for loop',
       }]
     },
     {
@@ -151,7 +157,7 @@ ruleTester.run('protractor-practices', rule, {
       function gradeList(name, gradebook){
         return gradebook[name]
       }
-      gradeList.filter(gradeList(name, gradebook));`,
+      gradeList.filter((name) => gradeList(name, gradebook));`,
       errors: [{
         message: 'Please do not use .filter(), consider using a for loop',
       }]
