@@ -57,7 +57,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createVertex = async function(xOffset, yOffset) {
-    await addNodeButton.click();
+    await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -65,7 +65,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
-    await addEdgeButton.click();
+    await action.click('Add Edge Button',addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -91,10 +91,10 @@ var GraphEditor = function(graphInputContainer) {
       }
     },
     clearDefaultGraph: async function() {
-      await deleteButton.click();
+      await action.click('Delete Button', deleteButton)
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await vertexElement(i).click();
+        await action.click('Vertex Element', vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -185,23 +185,19 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = by.css(
     '.protractor-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(rteElements.first());
-  await (await rteElements.first()).click();
+  await action.click('Rte Elements first', rteElements.first())
 
   var _appendContentText = async function(text) {
-    await (await rteElements.first()).sendKeys(text);
+    await action.sendKeys('Rte Elements First', rteElements.first(), text)
   };
   var _clickToolbarButton = async function(buttonName) {
-    await waitFor.elementToBeClickable(
-      elem.element(by.css('.' + buttonName)),
-      'Toolbar button takes too long to be clickable.');
-    await elem.element(by.css('.' + buttonName)).click();
+    await action.click('Button Name Element', elem.element(by.css('.' + buttonName)));
   };
   var _clearContent = async function() {
     expect(
       await (await rteElements.first()).isPresent()
     ).toBe(true);
-    await (await rteElements.first()).clear();
+    await action.clear('Rte Elements First Clear', rteElements.first());
   };
 
   return {
@@ -260,10 +256,7 @@ var RichTextEditor = async function(elem) {
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
       var doneButton = modal.element(closeRteComponentButtonLocator);
-      await waitFor.elementToBeClickable(
-        doneButton,
-        'save button taking too long to be clickable');
-      await doneButton.click();
+      await action.click('Done Button', doneButton);
       await waitFor.invisibilityOf(
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
@@ -298,8 +291,8 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(text);
+      await action.click('Element From Input tag', elem.element(by.tagName('input')));
+      await action.sendKeys('Element from Input', elem.element(by.tagName('input')))
     }
   };
 };
