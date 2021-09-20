@@ -52,9 +52,6 @@ JsonProperty = ndb.JsonProperty
 StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
-FilterNode = ndb.FilterNode
-ConjunctionNode = ndb.ConjunctionNode
-
 TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model) # pylint: disable=invalid-name
 
 CLIENT = ndb.Client()
@@ -151,7 +148,7 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
 
 # Here Any is used in the type annotation because it mimics the types defined in
 # the stubs for this library.
-def query_everything(**kwargs: Dict[str, Any]) -> 'ndb.Query[Model]':
+def query_everything(**kwargs: Dict[str, Any]) -> Query:
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 

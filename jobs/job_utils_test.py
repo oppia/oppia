@@ -28,6 +28,11 @@ from jobs import job_utils
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -110,7 +115,7 @@ class GetModelClassTests(test_utils.TestBase):
             job_utils.get_model_class('BaseModel'), base_models.BaseModel)
 
     def test_get_from_non_existing_model(self) -> None:
-        with self.assertRaisesRegexp(Exception, 'No model class found'):
+        with self.assertRaisesRegexp(Exception, 'No model class found'): # type: ignore[no-untyped-call]
             job_utils.get_model_class('InvalidModel')
 
 
@@ -126,9 +131,9 @@ class GetModelKindTests(test_utils.TestBase):
             job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
     def test_get_from_bad_value(self) -> None:
-        self.assertRaisesRegexp(
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             TypeError, 'not a model type or instance',
-            lambda: job_utils.get_model_kind(123))
+            lambda: job_utils.get_model_kind(123)) # type: ignore[arg-type]
 
 
 class GetModelPropertyTests(test_utils.TestBase):
@@ -149,8 +154,8 @@ class GetModelPropertyTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_property(model, 'prop'), None)
 
     def test_get_property_from_bad_value(self) -> None:
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
-            job_utils.get_model_property(123, 'prop')
+        with self.assertRaisesRegexp(TypeError, 'not a model instance'): # type: ignore[no-untyped-call]
+            job_utils.get_model_property(123, 'prop') # type: ignore[arg-type]
 
 
 class GetModelIdTests(test_utils.TestBase):
@@ -161,8 +166,8 @@ class GetModelIdTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_id(model), '123')
 
     def test_get_id_from_bad_value(self) -> None:
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
-            job_utils.get_model_id(123)
+        with self.assertRaisesRegexp(TypeError, 'not a model instance'): # type: ignore[no-untyped-call]
+            job_utils.get_model_id(123) # type: ignore[arg-type]
 
 
 class BeamEntityToAndFromModelTests(test_utils.TestBase):
@@ -276,19 +281,19 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         query = datastore_services.Query(filters=datastore_services.any_of(
             BarModel.prop == 1, BarModel.prop == 2))
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'):
+        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_in_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop.IN([1, 2, 3]))
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'):
+        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_not_equal_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop != 1)
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'):
+        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_order(self) -> None:

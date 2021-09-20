@@ -26,6 +26,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+from typing import Sequence
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -86,7 +88,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             query = query.filter(
                 email_models.SentEmailModel.email_hash == 'Email Hash')
 
-            results = query.fetch(2)
+            results: Sequence[email_models.SentEmailModel] = query.fetch(2)
 
             self.assertEqual(len(results), 1)
 

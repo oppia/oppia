@@ -235,10 +235,8 @@ class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
         Yields:
             UserStatsModel. The updated user stats model.
         """
-        model = cast(
-            user_models.UserStatsModel,
-            job_utils.clone_model(user_stats_model)
-        )
+        model = job_utils.clone_model(user_stats_model)
+
         schema_version = model.schema_version
 
         if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
