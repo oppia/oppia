@@ -65,7 +65,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
-    await action.click('Add Edge Button',addEdgeButton);
+    await action.click('Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -91,7 +91,7 @@ var GraphEditor = function(graphInputContainer) {
       }
     },
     clearDefaultGraph: async function() {
-      await action.click('Delete Button', deleteButton)
+      await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await action.click('Vertex Element', vertexElement(i));
@@ -185,13 +185,15 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = by.css(
     '.protractor-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await action.click('Rte Elements first', rteElements.first())
+  await action.click('Rte Elements first', rteElements.first());
 
   var _appendContentText = async function(text) {
-    await action.sendKeys('Rte Elements First', rteElements.first(), text)
+    await action.sendKeys('Rte Elements First', rteElements.first(), text);
   };
   var _clickToolbarButton = async function(buttonName) {
-    await action.click('Button Name Element', elem.element(by.css('.' + buttonName)));
+    await action.click(
+      'Button Name Element',
+      elem.element(by.css('.' + buttonName)));
   };
   var _clearContent = async function() {
     expect(
@@ -291,8 +293,12 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await action.click('Element From Input tag', elem.element(by.tagName('input')));
-      await action.sendKeys('Element from Input', elem.element(by.tagName('input')))
+      await action.click(
+        'Element From Input tag',
+        elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Element from Input',
+        elem.element(by.tagName('input')));
     }
   };
 };
