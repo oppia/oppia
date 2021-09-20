@@ -119,7 +119,6 @@ def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
-    'AllTopicNamesHandler',
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
