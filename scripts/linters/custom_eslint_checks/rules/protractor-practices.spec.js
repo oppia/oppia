@@ -142,7 +142,7 @@ ruleTester.run('protractor-practices', rule, {
         gender = 'female';
       });`,
       errors: [{
-        message: 'Please do not use .filter(), consider using a for loop',
+        message: 'Please do not use .filter(); consider using a for loop',
       }]
     },
     {
