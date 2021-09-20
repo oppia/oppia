@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain

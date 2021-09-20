@@ -24,10 +24,10 @@ import copy
 import datetime
 import os
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.tests import test_utils
 
 from typing import Any, Dict, List

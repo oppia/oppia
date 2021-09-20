@@ -27,7 +27,7 @@ import os
 import subprocess
 import sys
 
-import constants
+from core import constants
 from core import python_utils
 from scripts import common
 

@@ -21,9 +21,9 @@ import datetime
 import logging
 import types
 
-from constants import constants
 from core import feconf
 from core import python_utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager

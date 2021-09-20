@@ -26,12 +26,12 @@ import re
 import string
 import struct
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import schema_utils
 from core import schema_utils_test
 from core import utils
+from core.constants import constants
 from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils

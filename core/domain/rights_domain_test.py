@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
 from core import utils
+from core.constants import constants
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services

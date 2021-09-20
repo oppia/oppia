@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import re
 
-import constants
+from core import constants
 from core import feconf
 from core import python_utils
 from core import utils

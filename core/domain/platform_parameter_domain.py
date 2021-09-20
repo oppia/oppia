@@ -22,10 +22,10 @@ from __future__ import unicode_literals
 import json
 import re
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import change_domain
 
 SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name

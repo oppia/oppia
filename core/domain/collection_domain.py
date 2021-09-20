@@ -28,10 +28,10 @@ import json
 import re
 import string
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import change_domain
 
 # Do not modify the values of these constants. This is to preserve backwards

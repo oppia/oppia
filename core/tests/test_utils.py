@@ -32,11 +32,11 @@ import os
 import re
 import unittest
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import schema_utils
 from core import utils
+from core.constants import constants
 from core.controllers import base
 from core.domain import auth_domain
 from core.domain import caching_domain

@@ -25,9 +25,9 @@ import logging
 import os
 import zipfile
 
-from constants import constants
 from core import feconf
 from core import python_utils
+from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
 from core.domain import exp_domain

@@ -17,10 +17,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_fetchers

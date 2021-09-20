@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import rights_domain
 from core.domain import role_services

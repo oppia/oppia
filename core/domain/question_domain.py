@@ -24,11 +24,11 @@ import copy
 import datetime
 import re
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import schema_utils
 from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain

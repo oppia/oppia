@@ -22,8 +22,8 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_domain

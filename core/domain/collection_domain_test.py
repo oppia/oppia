@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils

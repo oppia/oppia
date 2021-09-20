@@ -17,9 +17,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
 from core import feconf
 from core import python_utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services

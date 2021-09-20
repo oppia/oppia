@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
 from core import feconf
 from core import python_utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import recommendations_services
 from core.domain import search_services

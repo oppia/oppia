@@ -31,7 +31,7 @@ import sys
 import tempfile
 import time
 
-import constants
+from core import constants
 from core import python_utils
 from core.tests import test_utils
 

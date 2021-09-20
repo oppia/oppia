@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import os
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.domain import exp_fetchers
 from core.domain import skill_fetchers
 from core.domain import story_fetchers

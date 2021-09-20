@@ -34,7 +34,7 @@ from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-i
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-from constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from core import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 

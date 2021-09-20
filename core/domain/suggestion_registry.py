@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 
 import copy
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers

@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.domain import activity_domain
 from core.platform import models
 

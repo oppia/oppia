@@ -24,10 +24,10 @@ import json
 import numbers
 import sys
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain

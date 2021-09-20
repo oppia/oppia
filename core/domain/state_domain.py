@@ -26,11 +26,11 @@ import logging
 import re
 
 import android_validation_constants
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import schema_utils
 from core import utils
+from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry

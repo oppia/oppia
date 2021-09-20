@@ -26,10 +26,10 @@ from __future__ import unicode_literals
 import copy
 import logging
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services

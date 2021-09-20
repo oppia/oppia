@@ -30,7 +30,7 @@ import subprocess
 import sys
 import time
 
-import constants
+from core import constants
 from core import python_utils
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']

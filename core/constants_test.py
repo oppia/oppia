@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 
 import os
 
-import constants
+from core import constants
 from core import feconf
 from core import python_utils
 from core.tests import test_utils

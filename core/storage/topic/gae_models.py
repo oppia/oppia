@@ -19,9 +19,9 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from constants import constants
 from core import feconf
 from core import python_utils
+from core.constants import constants
 from core.platform import models
 
 from typing import Any, Dict, List, Optional, Sequence

@@ -22,10 +22,10 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 

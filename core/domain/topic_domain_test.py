@@ -22,10 +22,10 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-from constants import constants
 from core import feconf
 from core import python_utils
 from core import utils
+from core.constants import constants
 from core.domain import fs_domain
 from core.domain import topic_domain
 from core.domain import user_services

@@ -33,14 +33,13 @@ import time
 import unicodedata
 import zlib
 
-from constants import constants
 from core import feconf
 from core import python_utils
+from core.constants import constants
 
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
     Union)
-
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)

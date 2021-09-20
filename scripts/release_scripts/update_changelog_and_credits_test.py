@@ -26,7 +26,7 @@ import subprocess
 import sys
 import tempfile
 
-import constants
+from core import constants
 from core import python_utils
 from core.tests import test_utils
 from scripts import common

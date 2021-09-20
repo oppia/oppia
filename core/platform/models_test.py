@@ -23,8 +23,8 @@ import re
 import sys
 from types import ModuleType  # pylint: disable=import-only-modules
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 

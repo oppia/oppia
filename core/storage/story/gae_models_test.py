@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 
 import datetime
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 

@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import json
 
-from constants import constants
 from core import feconf
+from core.constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import collection_domain
