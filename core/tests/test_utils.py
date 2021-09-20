@@ -35,6 +35,7 @@ import unittest
 from constants import constants
 from core import feconf
 from core import python_utils
+from core import schema_utils
 from core import utils
 from core.controllers import base
 from core.domain import auth_domain
@@ -65,7 +66,6 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
-import schema_utils
 
 import elasticsearch
 import requests_mock

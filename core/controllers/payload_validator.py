@@ -22,7 +22,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core import python_utils
-import schema_utils
+from core import schema_utils
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 

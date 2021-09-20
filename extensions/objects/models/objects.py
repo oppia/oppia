@@ -24,7 +24,7 @@ import json
 
 from constants import constants
 from core import python_utils
-import schema_utils
+from core import schema_utils
 
 
 class BaseObject(python_utils.OBJECT):
