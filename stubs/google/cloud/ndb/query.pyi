@@ -100,4 +100,3 @@ class Query:
         start_cursor: Cursor,
         keys_only: Literal[True],
     ) -> Tuple[Sequence[Key], Cursor, bool]: ...
-

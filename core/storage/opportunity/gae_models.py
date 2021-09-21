@@ -142,7 +142,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         # Do a forward lookup so that we can know if there are more values.
         fetch_result = (
             language_query.fetch_page(page_size + 1, start_cursor=start_cursor))
-        plus_one_query_models, _, _  = fetch_result
+        plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
