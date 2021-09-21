@@ -132,6 +132,14 @@ export class UtilsService {
   // Determines whether the URL is pointing to a page on the Oppia site.
   getSafeReturnUrl(urlString: string): string {
     try {
+      // Make sure the URL can be decoded properly.
+      urlString = decodeURIComponent(urlString);
+    } catch (_) {
+      // The URL could not be decoded, so reject it and return '/' instead.
+      return '/';
+    }
+
+    try {
       // Throws an exception when the URL does not have a scheme.
       const url = new URL(urlString);
 
