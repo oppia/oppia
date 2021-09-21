@@ -44,8 +44,6 @@ require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
 require(
-  'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
-require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.component.ts');
 require(
