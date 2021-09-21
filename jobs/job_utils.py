@@ -153,7 +153,7 @@ def get_model_property(
     Raises:
         TypeError. When the argument is not a model.
     """
-    if property_name == 'id' and isinstance(model, base_models.BaseModel):
+    if property_name == 'id':
         return get_model_id(model)
     elif isinstance(model, datastore_services.Model):
         return getattr(model, property_name)
