@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that are run by CRON scheduler."""
+"""Simple jobs designed to be easy to read and test."""
 
 from __future__ import absolute_import
 from __future__ import annotations
