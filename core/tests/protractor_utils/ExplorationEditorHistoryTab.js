@@ -171,9 +171,10 @@ var ExplorationEditorHistoryTab = function() {
         expect(states.length).toEqual(expectedStates.length);
         // Note: we need to compare this way because the state graph is
         // sometimes generated with states in different configurations.
-        states.forEach(function(element) {
-          expect(expectedStates).toContain(element);
-        });
+        for (var index = 0; index < states.length; index++) {
+          var state = states[index];
+          expect(expectedStates).toContain(state);
+        }
       },
       /*
        * This method checks for the number of deleted links(red), added links
