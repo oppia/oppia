@@ -4774,6 +4774,10 @@ div.oppia-issues-learner-action {
   text-transform: uppercase;
   width: 260px;
 }
+
+.oppia-welcome-modal .oppia-welcome-modal-left-button {
+  margin-right: 10px;
+}
 .oppia-welcome-modal .oppia-welcome-modal-button:hover,
 .oppia-welcome-modal .oppia-welcome-modal-button:focus,
 .oppia-welcome-modal .oppia-welcome-modal-button:active {
