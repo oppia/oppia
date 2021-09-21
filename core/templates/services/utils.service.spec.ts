@@ -179,4 +179,29 @@ describe('Utils Service', () => {
 
     expect(uts.isOverflowing(null)).toBeFalse();
   });
+
+  it('should reject executable javascript code', () => {
+    expect(uts.getSafeReturnUrl('javascript:alert(1)')).toEqual('/');
+  });
+
+  it('should reject external URLs', () => {
+    expect(uts.getSafeReturnUrl('https://google.com')).toEqual('/');
+  });
+
+  it('should reject scheme-less external URLs', () => {
+    expect(uts.getSafeReturnUrl('google.com')).toEqual('/');
+  });
+
+  it('should reject malformed URLs', () => {
+    expect(uts.getSafeReturnUrl('///')).toEqual('/');
+  });
+
+  it('should accept root URL', () => {
+    expect(uts.getSafeReturnUrl('/')).toEqual('/');
+  });
+
+  it('should accept relative paths', () => {
+    expect(uts.getSafeReturnUrl('/learner-dashboard'))
+      .toEqual('/learner-dashboard');
+  });
 });
