@@ -722,6 +722,45 @@ describe('Exploration save service ' +
     expect(modalSpy).toHaveBeenCalledTimes(1);
   }));
 
+  it('should remove focus after exploration save modal ' +
+    'is closed', fakeAsync(function() {
+    let startLoadingCb = jasmine.createSpy('startLoadingCb');
+    let endLoadingCb = jasmine.createSpy('endLoadingCb');
+    let sampleStates = statesObjectFactory.createFromBackendDict(
+      statesBackendDict);
+    let mockEventEmitter = new EventEmitter();
+    spyOn(RouterService, 'savePendingChanges')
+      .and.returnValue(null);
+    spyOn(ExplorationStatesService, 'getStates')
+      .and.returnValue(sampleStates);
+    spyOn(explorationDiffService, 'getDiffGraphData')
+      .and.returnValue({
+        nodes: 'nodes',
+        links: ['links'],
+        finalStateIds: ['finalStaeIds'],
+        originalStateIds: ['Hola'],
+        stateIds: [],
+      });
+    spyOn($uibModal, 'open').and.callThrough();
+    let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
+      .and.returnValue(mockEventEmitter);
+
+    explorationSaveService.saveChanges(
+      startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
+    flush();
+    $rootScope.$apply();
+    $timeout.flush();
+    flush();
+    $rootScope.$apply();
+
+    mockEventEmitter.emit('labelForClearingFocus');
+    tick();
+
+    expect(focusSpy).toHaveBeenCalled();
+  }));
+
   it('should focus on the exploration save modal ' +
     'when modal is opened', fakeAsync(function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
