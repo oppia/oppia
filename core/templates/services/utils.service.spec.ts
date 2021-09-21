@@ -196,12 +196,21 @@ describe('Utils Service', () => {
     expect(uts.getSafeReturnUrl('///')).toEqual('/');
   });
 
+  it('should reject invalid URLs', () => {
+    expect(uts.getSafeReturnUrl('%')).toEqual('/');
+  });
+
   it('should accept root URL', () => {
     expect(uts.getSafeReturnUrl('/')).toEqual('/');
   });
 
   it('should accept relative paths', () => {
     expect(uts.getSafeReturnUrl('/learner-dashboard'))
+      .toEqual('/learner-dashboard');
+  });
+
+  it('should accept encoded URL components', () => {
+    expect(uts.getSafeReturnUrl('%2Flearner-dashboard'))
       .toEqual('/learner-dashboard');
   });
 });
