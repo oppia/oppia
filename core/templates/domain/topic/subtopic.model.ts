@@ -185,14 +185,16 @@ export class Subtopic {
       subtopicBackendDict.url_fragment);
   }
 
-  static createFromTitle(subtopicId: number, title: string): Subtopic {
+  static createFromTitle(subtopicId: number, title: string,
+    thumbnail_filename: string, thumbnail_bg_color: string,
+    url_fragment: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: 'null',
-      thumbnail_bg_color: 'null',
-      url_fragment: 'null'
+      thumbnail_filename: thumbnail_filename,
+      thumbnail_bg_color: thumbnail_bg_color,
+      url_fragment: url_fragment
     }, {});
   }
 }
