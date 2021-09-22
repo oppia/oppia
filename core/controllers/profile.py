@@ -41,6 +41,22 @@ import utils
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema':{
+                'type': 'basestring',
+                'validators': [{
+                    'id': "is_valid_username_string"
+                }]
+
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET':{}
+    }
+
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
@@ -139,6 +155,26 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'update_type': {
+                'schema': {
+                    'type': 'list(str)'
+                }
+            },
+            'data': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
@@ -191,8 +227,8 @@ class PreferencesHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        update_type = self.payload.get('update_type')
-        data = self.payload.get('data')
+        update_type = self.normalized_payload.get('update_type')
+        data = self.normalized_payload.get('data')
         bulk_email_signup_message_should_be_shown = False
         if update_type == 'user_bio':
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
@@ -311,6 +347,36 @@ class SignupPage(base.BaseHandler):
 class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
 
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'agreed_to_terms': {
+                'schema': {
+                    'type': 'bool'
+                },
+            },
+            'default_dashboard': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'can_receive_email_updates': {
+                'schema': {
+                    'type': 'bool'                    
+                },
+            }
+        }
+    }
+
+
+
     REDIRECT_UNFINISHED_SIGNUPS = False
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -333,10 +399,10 @@ class SignupHandler(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
-        username = self.payload.get('username')
-        agreed_to_terms = self.payload.get('agreed_to_terms')
-        default_dashboard = self.payload.get('default_dashboard')
-        can_receive_email_updates = self.payload.get(
+        username = self.normalized_payload.get('username')
+        agreed_to_terms = self.normalized_payload.get('agreed_to_terms')
+        default_dashboard = self.normalized_payload.get('default_dashboard')
+        can_receive_email_updates = self.normalized_payload.get(
             'can_receive_email_updates')
         bulk_email_signup_message_should_be_shown = False
 
