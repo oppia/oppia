@@ -41,7 +41,7 @@ class BeamHandlerTestBase(test_utils.GenericTestBase):
     """Common setUp() and tearDown() for Apache Beam job handler tests."""
 
     def setUp(self) -> None:
-        super(BeamHandlerTestBase, self).setUp() # type: ignore[no-untyped-call]
+        super(BeamHandlerTestBase, self).setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.add_user_role(
@@ -51,7 +51,7 @@ class BeamHandlerTestBase(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         self.logout()
-        super(BeamHandlerTestBase, self).tearDown() # type: ignore[no-untyped-call]
+        super(BeamHandlerTestBase, self).tearDown()
 
 
 class BeamJobHandlerTests(BeamHandlerTestBase):
