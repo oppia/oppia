@@ -535,7 +535,7 @@ var constants = {
       "content": {
           "html": "",
           "content_id": "content",
-          "image_size_in_bytes": {}
+          "image_sizes_in_bytes": {}
       },
       "interaction": {
             "id": null,
