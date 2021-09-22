@@ -20,7 +20,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 
 // Modules.
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './routing/app.routing.module';
 
@@ -35,6 +35,7 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
 import firebase from 'firebase/app';
+import * as hammer from 'hammerjs';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -64,6 +65,21 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     }
     super.handleError(error);
   }
+}
+
+// Config for hammer gestures.
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = {
+    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
+    pinch: { enable: false },
+    rotate: { enable: false },
+  };
+
+  options = {
+    cssProps: {
+      userSelect: true
+    }
+  };
 }
 
 @NgModule({
@@ -102,6 +118,10 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     {
       provide: ErrorHandler,
       useClass: FirebaseErrorFilterHandler,
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ],
   bootstrap: [OppiaRootComponent]

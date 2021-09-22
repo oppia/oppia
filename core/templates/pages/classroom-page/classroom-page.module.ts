@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -29,6 +29,7 @@ import { ClassroomPageComponent } from './classroom-page.component';
 import { TopicSummaryTileComponent } from
   'components/summary-tile/topic-summary-tile.component';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
+import { MyHammerConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -58,6 +59,10 @@ import { ClassroomPageRootComponent } from './classroom-page-root.component';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ],
   bootstrap: [ClassroomPageRootComponent]
