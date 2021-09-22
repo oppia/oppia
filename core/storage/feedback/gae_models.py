@@ -183,7 +183,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = {}
-        feedback_models = (
+        feedback_models: Sequence[GeneralFeedbackThreadModel] = (
             cls.get_all().filter(cls.original_author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
@@ -368,7 +368,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
 
         user_data = {}
-        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
+        feedback_models: Sequence[GeneralFeedbackMessageModel] = (
+            cls.get_all().filter(cls.author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {

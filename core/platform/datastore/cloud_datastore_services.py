@@ -107,7 +107,7 @@ def update_timestamps_multi(
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
+def put_multi(entities: Sequence[Model]) -> List[str]:
     """Stores a sequence of Model instances.
 
     Args:
@@ -116,7 +116,7 @@ def put_multi(entities: List[TYPE_MODEL_SUBCLASS]) -> List[str]:
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(entities)
+    return ndb.put_multi(list(entities))
 
 
 @transaction_services.run_in_transaction_wrapper
@@ -148,7 +148,7 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
 
 # Here Any is used in the type annotation because it mimics the types defined in
 # the stubs for this library.
-def query_everything(**kwargs: Dict[str, Any]) -> 'ndb.Query[Model]':
+def query_everything(**kwargs: Dict[str, Any]) -> Query:
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 

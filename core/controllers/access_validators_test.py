@@ -28,7 +28,7 @@ ACCESS_VALIDATION_HANDLER_PREFIX = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ClassroomPageAccessValidationHandlerTests, self).setUp() # type: ignore[no-untyped-call]
+        super(ClassroomPageAccessValidationHandlerTests, self).setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
@@ -65,7 +65,7 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
 
     def setUp(self) -> None:
         """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
-        super(ReleaseCoordinatorAccessValidationHandlerTests, self).setUp() # type: ignore[no-untyped-call]
+        super(ReleaseCoordinatorAccessValidationHandlerTests, self).setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -97,7 +97,7 @@ class AccountDeletionIsEnabledValidationHandlerTests(
         test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp() # type: ignore[no-untyped-call]
+        super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
@@ -117,7 +117,7 @@ class AccountDeletionIsEnabledValidationHandlerTests(
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ProfileExistsValidationHandlerTests, self).setUp() # type: ignore[no-untyped-call]
+        super(ProfileExistsValidationHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -161,7 +161,7 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
     user_email = 'user@example.com'
 
     def setUp(self) -> None:
-        super(ManageOwnAccountValidationHandlerTests, self).setUp() # type: ignore[no-untyped-call]
+        super(ManageOwnAccountValidationHandlerTests, self).setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.banned_user) # type: ignore[no-untyped-call]

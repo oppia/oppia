@@ -227,7 +227,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     USER_ID_2 = 'user_id_2'
 
     def setUp(self) -> None:
-        super(TopicRightsModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
+        super(TopicRightsModelUnitTests, self).setUp()
         topic_models.TopicRightsModel(
             id=self.TOPIC_4_ID,
             manager_ids=[self.USER_ID_2],

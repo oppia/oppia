@@ -128,7 +128,8 @@
         "scripts.linters.python_linter_test",
         "core.platform.auth.firebase_auth_services_test",
         "scripts.install_backend_python_libs_test",
-        "scripts.common_test"
+        "scripts.common_test",
+        "jobs.batch_jobs.test_jobs_test"
     ],
     "5": [
         "core.controllers.beam_jobs_test",

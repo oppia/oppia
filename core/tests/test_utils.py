@@ -1378,7 +1378,7 @@ class AppEngineTestBase(TestBase):
     SERVER_PORT = '8080'
     DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AppEngineTestBase, self).__init__(*args, **kwargs)
         # Defined outside of setUp() because we access it from methods, but can
         # only install it during the run() method. Defining it in __init__
@@ -1392,7 +1392,7 @@ class AppEngineTestBase(TestBase):
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         storage_services.CLIENT.reset()
@@ -1858,7 +1858,7 @@ title: Title
 
             super(GenericTestBase, self).run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()

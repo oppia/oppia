@@ -26,6 +26,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+from typing import Sequence
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -40,7 +42,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
     def setUp(self) -> None:
-        super(SentEmailModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
+        super(SentEmailModelUnitTests, self).setUp()
 
         def mock_generate_hash(
                 unused_cls: email_models.SentEmailModel,
@@ -86,7 +88,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             query = query.filter(
                 email_models.SentEmailModel.email_hash == 'Email Hash')
 
-            results = query.fetch(2)
+            results: Sequence[email_models.SentEmailModel] = query.fetch(2)
 
             self.assertEqual(len(results), 1)
 

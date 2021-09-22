@@ -86,7 +86,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up  models in datastore for use in testing."""
-        super(AppFeedbackReportModelTests, self).setUp() # type: ignore[no-untyped-call]
+        super(AppFeedbackReportModelTests, self).setUp()
 
         self.feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(

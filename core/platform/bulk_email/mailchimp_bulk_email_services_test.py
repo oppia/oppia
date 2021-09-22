@@ -33,7 +33,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     """Tests for mailchimp services."""
 
     def setUp(self) -> None:
-        super(MailchimpServicesUnitTests, self).setUp() # type: ignore[no-untyped-call]
+        super(MailchimpServicesUnitTests, self).setUp()
         self.user_email_1 = 'test1@example.com'
         self.user_email_2 = 'test2@example.com'
         self.user_email_3 = 'test3@example.com'

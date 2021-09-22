@@ -221,8 +221,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             .order(cls.next_scheduled_check_time)
         )
 
-        classifier_job_models = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+        classifier_job_models: Sequence[ClassifierTrainingJobModel] = (
+            query.fetch(
+                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset))
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 

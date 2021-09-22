@@ -64,7 +64,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(FeedbackThreadModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(FeedbackThreadModelTest, self).setUp()
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
@@ -332,7 +332,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     MESSAGE_IDS_READ_IN_THREAD_C = [5, 6, 7, 8, 9]
 
     def setUp(self) -> None:
-        super(FeedbackThreadUserModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(FeedbackThreadUserModelTest, self).setUp()
         model = feedback_models.GeneralFeedbackThreadUserModel.create(
             self.USER_ID_A, self.THREAD_ID_A)
         model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_A

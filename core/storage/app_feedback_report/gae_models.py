@@ -319,7 +319,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
         user_data = {}
-        report_models = cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
+        report_models: Sequence[AppFeedbackReportModel] = (
+            cls.get_all().filter(cls.scrubbed_by == user_id).fetch())
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)

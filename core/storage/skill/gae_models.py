@@ -344,12 +344,14 @@ class SkillSummaryModel(base_models.BaseModel):
             sort = cls.skill_model_last_updated
 
         sort_query = cls.query().order(sort)
-        query_models, next_cursor, _ = (
-            sort_query.fetch_page(page_size, start_cursor=cursor))
+        fetch_result: Tuple[
+            Sequence[SkillSummaryModel], datastore_services.Cursor, bool
+        ] = sort_query.fetch_page(page_size, start_cursor=cursor)
+        query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = (
-            sort_query.fetch_page(page_size + 1, start_cursor=cursor))
+        fetch_result = sort_query.fetch_page(page_size + 1, start_cursor=cursor)
+        plus_one_query_models, _, _ = fetch_result
         # The urlsafe returns bytes and we need to decode them to string.
         more_results = len(plus_one_query_models) == page_size + 1
         new_urlsafe_start_cursor = (

@@ -450,9 +450,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809
         # for more details.
 
-        def get_offset(
-                query: 'datastore_services.Query[QuestionSkillLinkModel]'
-        ) -> int:
+        def get_offset(query: datastore_services.Query) -> int:
             """Helper function to get the offset."""
             question_count = query.count()
             if question_count > 2 * question_count_per_skill:
@@ -469,7 +467,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = list(
+            new_question_skill_link_models: List[QuestionSkillLinkModel] = list(
                 equal_questions_query.fetch(
                     limit=question_count_per_skill * 2,
                     offset=get_offset(equal_questions_query)
@@ -487,7 +485,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # requested difficulty.
                 easier_questions_query = query.filter(
                     cls.skill_difficulty < difficulty_requested)
-                easier_question_skill_link_models = list(
+                easier_question_skill_link_models: List[
+                    QuestionSkillLinkModel
+                ] = list(
                     easier_questions_query.fetch(
                         limit=question_count_per_skill * 2,
                         offset=get_offset(easier_questions_query)
@@ -515,7 +515,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         easier_question_skill_link_models)
                     harder_questions_query = query.filter(
                         cls.skill_difficulty > difficulty_requested)
-                    harder_question_skill_link_models = list(
+                    harder_question_skill_link_models: List[
+                        QuestionSkillLinkModel
+                    ] = list(
                         harder_questions_query.fetch(
                             limit=question_count_per_skill * 2,
                             offset=get_offset(harder_questions_query)
@@ -582,9 +584,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_models = []
         existing_question_ids = []
 
-        def get_offset(
-                query: 'datastore_services.Query[QuestionSkillLinkModel]'
-        ) -> int:
+        def get_offset(query: datastore_services.Query) -> int:
             """Helper function to get the offset."""
             question_count = query.count()
             if question_count > 2 * question_count_per_skill:
@@ -598,7 +598,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = list(
+            new_question_skill_link_models: List[QuestionSkillLinkModel] = list(
                 query.fetch(
                     limit=question_count_per_skill * 2,
                     offset=get_offset(query)

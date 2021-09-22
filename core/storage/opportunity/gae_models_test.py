@@ -36,7 +36,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
 
     def setUp(self) -> None:
-        super(ExplorationOpportunitySummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
 
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id1',
@@ -186,7 +186,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunityModel class."""
 
     def setUp(self) -> None:
-        super(SkillOpportunityModelTest, self).setUp() # type: ignore[no-untyped-call]
+        super(SkillOpportunityModelTest, self).setUp()
 
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id1',

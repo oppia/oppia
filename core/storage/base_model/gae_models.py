@@ -399,7 +399,7 @@ class BaseModel(datastore_services.Model):
     @classmethod
     def get_all(
             cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
-    ) -> 'datastore_services.Query[SELF_BASE_MODEL]':
+    ) -> datastore_services.Query:
         """Gets iterable of all entities of this class.
 
         Args:
@@ -444,7 +444,7 @@ class BaseModel(datastore_services.Model):
     @classmethod
     def _fetch_page_sorted_by_last_updated(
             cls: Type[SELF_BASE_MODEL],
-            query: 'datastore_services.Query[SELF_BASE_MODEL]',
+            query: datastore_services.Query,
             page_size: int,
             urlsafe_start_cursor: Optional[str]
     ) -> Tuple[Sequence[SELF_BASE_MODEL], Optional[str], bool]:
@@ -478,12 +478,15 @@ class BaseModel(datastore_services.Model):
         )
 
         last_updated_query = query.order(-cls.last_updated)
-        query_models, next_cursor, _ = last_updated_query.fetch_page(
-            page_size, start_cursor=start_cursor)
+        fetch_result: Tuple[
+            Sequence[SELF_BASE_MODEL], datastore_services.Cursor, bool
+        ] = last_updated_query.fetch_page(page_size, start_cursor=start_cursor)
+        query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = last_updated_query.fetch_page(
+        fetch_result = last_updated_query.fetch_page(
             page_size + 1, start_cursor=start_cursor)
+        plus_one_query_models, _, _ = fetch_result
         # The urlsafe returns bytes and we need to decode them to string.
         return (
             query_models,
@@ -1586,7 +1589,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
-        metadata_models = cls.query(
+        metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(
             cls.committer_id == user_id
         ).fetch(projection=[cls.commit_type, cls.commit_message])
         user_data = {}
