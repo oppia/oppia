@@ -197,12 +197,12 @@ describe('Utils Service', () => {
     ];
 
     for (const [inputUrl, expectedUrl] of testCases) {
-      it(`should return "${expectedUrl}" from "${inputUrl}"`, () => {
+      it('should return ' + expectedUrl + ' from ' + inputUrl, () => {
         expect(uts.getSafeReturnUrl(inputUrl)).toEqual(expectedUrl);
       });
 
       const encodedInputUrl = encodeURIComponent(inputUrl);
-      it(`should return "${expectedUrl}" from "${encodedInputUrl}"`, () => {
+      it('should return ' + expectedUrl + ' from ' + encodedInputUrl, () => {
         expect(uts.getSafeReturnUrl(encodedInputUrl)).toEqual(expectedUrl);
       });
     }
