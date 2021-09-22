@@ -26,6 +26,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -69,6 +70,17 @@ class CronJobTests(test_utils.GenericTestBase):
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
+        self.task_status = 'Not Started'
+        def _mock_taskqueue_service_defer(
+                unused_function_id, unused_queue_name):
+            """Mocks taskqueue_services.defer() so that it can be checked
+            if the method is being invoked or not.
+            """
+            self.task_status = 'Started'
+
+        self.taskqueue_service_defer_swap = self.swap(
+            taskqueue_services, 'defer', _mock_taskqueue_service_defer)
+
     def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -87,7 +99,7 @@ class CronJobTests(test_utils.GenericTestBase):
         completed_activities_model.put()
 
         with self.testapp_swap:
-            self.get_html_response('/cron/models/cleanup')
+            self.get_json('/cron/models/cleanup')
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
@@ -104,7 +116,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
         with self.testapp_swap:
-            self.get_html_response('/cron/models/cleanup')
+            self.get_json('/cron/models/cleanup')
 
         self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
@@ -123,9 +135,27 @@ class CronJobTests(test_utils.GenericTestBase):
         user_query_model.put()
 
         with self.testapp_swap:
-            self.get_html_response('/cron/models/cleanup')
+            self.get_json('/cron/models/cleanup')
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
+    def test_cron_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_json('/cron/users/user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+        self.logout()
+
+    def test_cron_fully_complete_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_json('/cron/users/fully_complete_user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+            self.logout()
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
@@ -232,7 +262,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
@@ -251,7 +281,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
@@ -270,7 +300,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 1)
@@ -294,7 +324,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
@@ -467,7 +497,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                     with self.swap(
                         suggestion_models,
                         'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                        self.get_html_response(
+                        self.get_json(
                             '/cron/mail/admins/contributor_dashboard'
                             '_bottlenecks')
 
@@ -487,7 +517,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
@@ -507,7 +537,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
@@ -527,7 +557,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 1)
@@ -551,7 +581,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
-                    self.get_html_response(
+                    self.get_json(
                         '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 1)

@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -76,7 +76,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -198,7 +198,7 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -234,11 +234,7 @@ class SkillModel(base_models.VersionedModel):
             SkillModel|None. The skill model of the skill or None if not
             found.
         """
-        return cast(
-            Optional[SkillModel],
-            SkillModel.query().filter(
-                cls.description == description).filter(
-                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return cls.get_all().filter(cls.description == description).get()
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -284,7 +280,7 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -310,7 +306,7 @@ class SkillSummaryModel(base_models.BaseModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             sort_by: Optional[str]
-    ) -> Tuple[List['SkillSummaryModel'], Optional[str], bool]:
+    ) -> Tuple[Sequence['SkillSummaryModel'], Optional[str], bool]:
         """Returns the models according to values specified.
 
         Args:
@@ -361,5 +357,7 @@ class SkillSummaryModel(base_models.BaseModel):
             if (next_cursor and more_results) else None
         )
         return (
-            cast(List[SkillSummaryModel], query_models),
-            new_urlsafe_start_cursor, more_results)
+            query_models,
+            new_urlsafe_start_cursor,
+            more_results
+        )

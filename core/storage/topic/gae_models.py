@@ -24,7 +24,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Optional, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -80,7 +80,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -228,11 +228,9 @@ class TopicModel(base_models.VersionedModel):
             TopicModel|None. The topic model of the topic or None if not
             found.
         """
-        return cast(
-            Optional[TopicModel],
-            TopicModel.query().filter(
-                cls.canonical_name == topic_name.lower()).filter(
-                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return cls.get_all().filter(
+            cls.canonical_name == topic_name.lower()
+        ).get()
 
     @classmethod
     def get_by_url_fragment(cls, url_fragment: str) -> Optional['TopicModel']:
@@ -247,15 +245,11 @@ class TopicModel(base_models.VersionedModel):
             found.
         """
         # TODO(#10210): Make fetching by URL fragment faster.
-        return cast(
-            Optional[TopicModel],
-            TopicModel.query().filter(
-                cls.url_fragment == url_fragment).filter(
-                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
+        return cls.get_all().filter(cls.url_fragment == url_fragment).get()
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -360,7 +354,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -467,7 +461,7 @@ class TopicRightsModel(base_models.VersionedModel):
         ).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_user(cls, user_id: str) -> List['TopicRightsModel']:
+    def get_by_user(cls, user_id: str) -> Sequence['TopicRightsModel']:
         """Retrieves the rights object for all topics assigned to given user
 
         Args:
@@ -477,12 +471,7 @@ class TopicRightsModel(base_models.VersionedModel):
             list(TopicRightsModel). The list of TopicRightsModel objects in
             which the given user is a manager.
         """
-        topic_rights_models = cast(
-            List[TopicRightsModel],
-            cls.query(
-                cls.manager_ids == user_id
-            ).fetch())
-        return topic_rights_models
+        return cls.query(cls.manager_ids == user_id).fetch()
 
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
@@ -556,7 +545,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to topics and their rights.
         """

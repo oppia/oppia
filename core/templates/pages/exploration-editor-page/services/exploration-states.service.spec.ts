@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ContextService_,
-      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
+      _ExplorationStatesService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;

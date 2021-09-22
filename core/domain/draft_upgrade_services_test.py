@@ -164,13 +164,66 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v48_dict_to_v49_dict(self):
+        draft_change_list_v48 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'NumericInput'
+            })
+        ]
+        # Migrate exploration to state schema version 48.
+        self.create_and_migrate_new_exploration('48', '49')
+        migrated_draft_change_list_v49 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v48, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v48_dict_list = [
+            change.to_dict() for change in draft_change_list_v48
+        ]
+        migrated_draft_change_list_v49_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v49
+        ]
+        self.assertEqual(
+            draft_change_list_v48_dict_list,
+            migrated_draft_change_list_v49_dict_list)
+    
     def test_convert_states_v47_dict_to_v48_dict(self):
         draft_change_list_v47 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
-                'new_value': 'NumericInput'
+                'new_value': state_domain.SubtitledHtml(
+                    'content',
+                    '<p>àãáâäåæçèéêëìíîïóúûýö÷üÕÇÖÑÓÄÀÜ×ßğīĻıİćęąĀ<p>'
+                    '<p>İźžśşɛمшصحếở“∉⅘√∈◯–⅖⅔≤€やんもをり北木我是西错õ</p>'
+                    '<p>üóäüñıīç×÷öóûؤ¡´</p>'
+                    '<p>😕😊😉🙄🙂😊🙂💡😑😊🔖😉😃🤖📷😂📀💿💯💡</p>'
+                    '<p>👋😱😑😊🎧🎙🎼📻🤳👌🚦🤗😄👉📡📣📢🔊²</p>'
+                ).to_dict()
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            state_domain.SubtitledHtml(
+                                'ca_choices_0',
+                                '<p>àãáâäåæçèéêëìíîïóúûýö÷üÕÇÖÑÓÄÀÜ×ßğīĻıİć<p>'
+                                '<p>İźžśşɛمшصحếở“∉⅘√∈◯–⅖⅔≤ęąĀ€やんもをり</p>'
+                                '<p>üóäüñıīç×÷öóûؤ¡北木我是西错õ´😕😊😉</p>'
+                                '<p>🙄🙂😊🙂💡😑😊🔖😉😃🤖📷😂📀💿💯💡</p>'
+                                '<p>👋😱😑😊🎧🎙🎼📻🤳👌🚦🤗😄👉📡📣📢🔊²</p>'
+                            ).to_dict()
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })
         ]
         # Migrate exploration to state schema version 48.
@@ -212,6 +265,25 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
                     '</oppia-noninteractive-svgdiagram>'
                 ).to_dict()
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            state_domain.SubtitledHtml(
+                                'ca_choices_0',
+                                '<oppia-noninteractive-svgdiagram '
+                                'svg_filename-with-value="&amp;quot;'
+                                'img12.svg&amp;quot;" alt-with-value="'
+                                '&amp;quot;Image&amp;quot;">'
+                                '</oppia-noninteractive-svgdiagram>'
+                            ).to_dict()
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })
         ]
         # Migrate exploration to state schema version 47.

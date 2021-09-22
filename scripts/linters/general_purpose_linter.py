@@ -48,9 +48,7 @@ EXCLUDED_PATHS = (
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
-    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/expressions/parser.js')
+    'core/templates/expressions/parser.js',)
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
@@ -567,10 +565,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         failed = False
 
         for filepath in files_to_lint:
-            if (filepath.endswith(('.js')) and
-                    filepath.startswith(('core/templates', 'extensions')) and
-                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD and
-                    not filepath.endswith('protractor.js')):
+            if filepath.endswith(
+                ('.js')) and filepath.startswith(
+                    ('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
+                        ) and not filepath.endswith('protractor.js'):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)

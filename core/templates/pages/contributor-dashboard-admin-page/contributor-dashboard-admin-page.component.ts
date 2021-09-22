@@ -53,7 +53,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        var taskRunningInBackground = false;
+        ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
 
         var handleErrorResponse = function(errorResponse) {
@@ -80,11 +80,11 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         };
 
         ctrl.submitAddContributionRightsForm = function(formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Adding new reviewer...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .addContributionReviewerAsync(
               formResponse.category, formResponse.username,
@@ -98,15 +98,15 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
         };
 
         ctrl.submitViewContributorUsersForm = function(formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Processing query...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ctrl.contributionReviewersResult = {};
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             ContributorDashboardAdminBackendApiService
@@ -152,15 +152,15 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 refreshFormData();
               }, handleErrorResponse);
           }
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
         };
 
         ctrl.submitRemoveContributionRightsForm = function(formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Processing query...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .removeContributionReviewerAsync(
               formResponse.username, formResponse.category,
@@ -172,16 +172,16 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
         };
 
         ctrl.submitViewTranslationContributionStatsForm = function(
             formResponse) {
-          if (taskRunningInBackground) {
+          if (ctrl.taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Processing query...';
-          taskRunningInBackground = true;
+          ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .viewTranslationContributionStatsAsync(
               formResponse.username
@@ -195,7 +195,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
-          taskRunningInBackground = false;
+          ctrl.taskRunningInBackground = false;
         };
 
         var refreshFormData = function() {

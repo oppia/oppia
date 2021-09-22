@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Story editor Directive', function() {
+describe('Story editor Directive having two story nodes', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -92,7 +92,8 @@ describe('Story editor Directive', function() {
     directive = $injector.get('storyEditorDirective')[0];
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
+    spyOn(StoryEditorStateService, 'getStory')
+      .and.returnValue(story);
     spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
       'math');
     spyOn(StoryEditorStateService, 'getTopicUrlFragment').and.returnValue(
@@ -104,6 +105,10 @@ describe('Story editor Directive', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should init the controller', function() {
     expect($scope.storyPreviewCardIsShown).toEqual(false);

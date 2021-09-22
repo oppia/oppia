@@ -37,10 +37,10 @@ import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-p
 import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html'
@@ -64,10 +64,12 @@ export class BlogPostEditorComponent implements OnInit {
   newChangesAreMade: boolean = false;
   lastChangesWerePublished: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
+  MIN_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
-      hide_complex_extensions: false
+      hide_complex_extensions: false,
+      startupFocusEnabled: false
     }
   };
 
@@ -78,12 +80,12 @@ export class BlogPostEditorComponent implements OnInit {
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private blogPostUpdateService: BlogPostUpdateService,
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
   ) {}
 
   ngOnInit(): void {
@@ -95,9 +97,10 @@ export class BlogPostEditorComponent implements OnInit {
     this.title = this.blogPostData.title;
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
+    this.MIN_CHARS_IN_BLOG_POST_TITLE = (
+      AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE);
     this.loaderService.hideLoadingScreen();
     this.initEditor();
-    this.contextService.setImageSaveDestinationToLocalStorage();
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
@@ -137,14 +140,24 @@ export class BlogPostEditorComponent implements OnInit {
               this.blogDashboardPageService.imageUploaderIsNarrow = true;
             }
           }
-          if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
-            this.lastChangesWerePublished = true;
+          if (this.blogPostData.publishedOn) {
+            if (this.blogPostData.lastUpdated.slice(0, -8) === (
+              this.blogPostData.publishedOn.slice(0, -8))) {
+              this.lastChangesWerePublished = true;
+            }
           }
+          this.blogDashboardPageService.setNavTitle(
+            this.lastChangesWerePublished, this.title);
+          this.newChangesAreMade = false;
+          this.preventPageUnloadEventService.removeListener();
         }, (errorResponse) => {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
-              errorResponse.status) !== -1) {
-            this.alertsService.addWarning('Failed to get blog post data.');
+              errorResponse) !== -1) {
+            this.alertsService.addWarning(
+              'Failed to get Blog Post Data. The Blog Post was either' +
+              ' deleted or the Blog Post ID is invalid.');
+            this.blogDashboardPageService.navigateToMainTab();
           }
         });
   }
@@ -159,6 +172,9 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title);
     this.newChangesAreMade = true;
+    this.blogDashboardPageService.setNavTitle(
+      this.lastChangesWerePublished, this.title);
+    this.preventPageUnloadEventService.addListener();
   }
 
   cancelEdit(): void {
@@ -181,6 +197,7 @@ export class BlogPostEditorComponent implements OnInit {
       this.contentEditorIsActive = false;
     }
     this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   saveDraft(): void {
@@ -225,15 +242,18 @@ export class BlogPostEditorComponent implements OnInit {
       () => {
         if (isBlogPostPublished) {
           this.alertsService.addSuccessMessage(
-            'Blog Post Saved and Published Succesfully.'
+            'Blog Post Saved and Published Successfully.'
           );
           this.lastChangesWerePublished = true;
         } else {
           this.alertsService.addSuccessMessage(
-            'Blog Post Saved Succesfully.');
+            'Blog Post Saved Successfully.');
           this.lastChangesWerePublished = false;
         }
         this.newChangesAreMade = false;
+        this.blogDashboardPageService.setNavTitle(
+          this.lastChangesWerePublished, this.title);
+        this.preventPageUnloadEventService.removeListener();
       }, (errorResponse) => {
         this.alertsService.addWarning(
           `Failed to save Blog Post. Internal Error: ${errorResponse}`);
@@ -283,13 +303,16 @@ export class BlogPostEditorComponent implements OnInit {
       this.blogPostData.addTag(tag);
     }
     this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   showuploadThumbnailModal(): void {
     let modalRef = this.ngbModal.open(UploadBlogPostThumbnailModalComponent, {
       backdrop: 'static'
     });
-
+    if (this.thumbnailDataUrl) {
+      this.imageLocalStorageService.flushStoredImagesData();
+    }
     modalRef.result.then((imageDataUrl) => {
       this.saveBlogPostThumbnail(imageDataUrl);
     }, () => {
@@ -303,6 +326,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.thumbnailDataUrl = thumbnailDataUrl;
     this.postImageDataToServer();
     this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   showPreview(): void {

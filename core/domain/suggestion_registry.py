@@ -987,7 +987,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 44)
+                        'question_state_data_schema_version'] < 45)
             )
         )
 
@@ -1429,6 +1429,29 @@ class TranslationContributionStats(python_utils.OBJECT):
         self.rejected_translations_count = rejected_translations_count
         self.rejected_translation_word_count = rejected_translation_word_count
         self.contribution_dates = contribution_dates
+
+    @classmethod
+    def create_default(
+        cls, language_code=None, contributor_user_id=None, topic_id=None
+    ) -> 'TranslationContributionStats':
+        """Create default translation contribution stats.
+
+        Args:
+            language_code: str. The language code for which are these stats
+                generated.
+            contributor_user_id: str. User ID of the contributor to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the translations created.
+
+        Returns:
+            TranslationContributionStats. Default translation contribution
+            stats.
+        """
+        return cls(
+            language_code, contributor_user_id, topic_id,
+            0, 0, 0, 0, 0, 0, 0, set()
+        )
 
     def to_dict(self):
         """Returns a dict representation of a TranslationContributionStats

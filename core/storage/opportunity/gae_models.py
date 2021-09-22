@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -63,7 +63,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -94,7 +94,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             language_code: str
-    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
+    ) -> Tuple[
+        Sequence['ExplorationOpportunitySummaryModel'], Optional[str], bool
+    ]:
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -139,7 +141,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
-            cast(List[ExplorationOpportunitySummaryModel], results),
+            results,
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results
         )
@@ -152,7 +154,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             language_code: str
-    ) -> Tuple[List['ExplorationOpportunitySummaryModel'], Optional[str], bool]:
+    ) -> Tuple[
+        Sequence['ExplorationOpportunitySummaryModel'], Optional[str], bool
+    ]:
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -178,11 +182,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
+        start_cursor = datastore_services.make_cursor(
+            urlsafe_cursor=urlsafe_start_cursor)
 
         language_created_on_query = cls.query(
             cls.language_codes_needing_voice_artists == language_code
@@ -199,7 +200,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
-            cast(List[ExplorationOpportunitySummaryModel], results),
+            results,
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results
         )
@@ -208,23 +209,19 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     def get_by_topic(
             cls,
             topic_id: str
-    ) -> List['ExplorationOpportunitySummaryModel']:
+    ) -> Sequence['ExplorationOpportunitySummaryModel']:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
             list(ExplorationOpportunitySummaryModel). A list of
             ExplorationOpportunitySummaryModel having given topic_id.
         """
-        return cast(
-            List[ExplorationOpportunitySummaryModel],
-            cls.query(cls.topic_id == topic_id).fetch())
+        return cls.query(cls.topic_id == topic_id).fetch()
 
     @classmethod
     def delete_all(cls) -> None:
         """Deletes all entities of this class."""
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query().fetch(keys_only=True))
+        keys = cls.query().fetch(keys_only=True)
         datastore_services.delete_multi(keys)
 
 
@@ -252,7 +249,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user(
-        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -271,7 +268,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             cls,
             page_size: int,
             urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[List['SkillOpportunityModel'], Optional[str], bool]:
+    ) -> Tuple[Sequence['SkillOpportunityModel'], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -294,11 +291,8 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
+        start_cursor = datastore_services.make_cursor(
+            urlsafe_cursor=urlsafe_start_cursor)
 
         created_on_query = cls.get_all().order(cls.created_on)
         query_models, cursor, _ = (
@@ -306,11 +300,12 @@ class SkillOpportunityModel(base_models.BaseModel):
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
         plus_one_query_models, _, _ = (
-            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+            created_on_query.fetch_page(
+                page_size + 1, start_cursor=start_cursor))
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
-            cast(List[SkillOpportunityModel], query_models),
+            query_models,
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results
         )
@@ -318,7 +313,5 @@ class SkillOpportunityModel(base_models.BaseModel):
     @classmethod
     def delete_all(cls) -> None:
         """Deletes all entities of this class."""
-        keys = cast(
-            List[datastore_services.Key],
-            cls.query().fetch(keys_only=True))
+        keys = cls.query().fetch(keys_only=True)
         datastore_services.delete_multi(keys)

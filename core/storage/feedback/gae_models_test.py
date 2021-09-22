@@ -28,7 +28,7 @@ from core.tests import test_utils
 import feconf
 import utils
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -273,7 +273,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         test_export_text = 'Export test text.'
         test_export_received_via_email = False
 
-        self.signup('export_author_1@example.com', 'exportAuthor1') # type: ignore[no-untyped-call]
+        self.signup('export_author_1@example.com', 'exportAuthor1')
         test_export_author_id = (
             self.get_user_id_from_email('export_author_1@example.com')) # type: ignore[no-untyped-call]
 

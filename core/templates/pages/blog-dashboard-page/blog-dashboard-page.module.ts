@@ -20,7 +20,7 @@ import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -33,19 +33,22 @@ import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashb
 import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { BlogDashboardTileComponent } from 'pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component';
-import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar-breadcrumb.component';
+import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { ToastrModule } from 'ngx-toastr';
 import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
 import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
-declare var angular: ng.IAngularStatic;
+import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig),
     MatTabsModule,
     MatMenuModule,
     MatButtonToggleModule,
@@ -60,7 +63,8 @@ declare var angular: ng.IAngularStatic;
     BlogPostActionConfirmationModalComponent,
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
-    UploadBlogPostThumbnailComponent
+    UploadBlogPostThumbnailComponent,
+    BlogPostEditorNavbarPreLogoActionComponent
   ],
   entryComponents: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -72,6 +76,7 @@ declare var angular: ng.IAngularStatic;
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
+    BlogPostEditorNavbarPreLogoActionComponent
   ],
   providers: [
     {
@@ -85,6 +90,10 @@ declare var angular: ng.IAngularStatic;
       deps: [PlatformFeatureService],
       multi: true,
     },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
+    }
   ],
 })
 class BlogDashboardPageModule implements DoBootstrap {
