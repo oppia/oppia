@@ -132,7 +132,6 @@ describe('Collections', function() {
     await collectionEditorPage.saveChanges();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // In the url a # is added at the end that is not part of collection ID.
     collectionId = pathname[5];
     await users.logout();
   });
