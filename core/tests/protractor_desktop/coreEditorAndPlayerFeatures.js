@@ -101,7 +101,9 @@ describe('Enable correctness feedback and set correctness', function() {
     // Create interaction first.
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
+      await forms.toRichText('Wrong!'),
+      await forms.toRichText('Not correct'),
+      await forms.toRichText('Wrong again')
     ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
@@ -109,6 +111,8 @@ describe('Enable correctness feedback and set correctness', function() {
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await responseEditor.setFeedback(await forms.toRichText('Not correct'));
+    await responseEditor.setFeedback(await forms.toRichText('Wrong again'));
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
     // Turn on correctness feedback.
@@ -221,7 +225,9 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
+      await forms.toRichText('Wrong!'),
+      await forms.toRichText('Not correct'),
+      await forms.toRichText('Wrong again')
     ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
@@ -229,6 +235,8 @@ describe('Enable correctness feedback and set correctness', function() {
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await responseEditor.setFeedback(await forms.toRichText('Not correct'));
+    await responseEditor.setFeedback(await forms.toRichText('Wrong again'));
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
 
@@ -238,7 +246,9 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
+      await forms.toRichText('Wrong!'),
+      await forms.toRichText('Not correct'),
+      await forms.toRichText('Wrong again')
     ]);
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
@@ -347,7 +357,8 @@ describe('Core exploration functionality', function() {
         await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
       });
       await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-        await forms.toRichText('option A'), await forms.toRichText('option B')
+        await forms.toRichText('option A'), await forms.toRichText('option B'),
+        await forms.toRichText('option C'),await forms.toRichText('option D')
       ]);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(
         'default');
@@ -361,7 +372,7 @@ describe('Core exploration functionality', function() {
       await general.moveToPlayer();
       await explorationPlayerPage.expectExplorationToNotBeOver();
       await explorationPlayerPage.expectInteractionToMatch(
-        'MultipleChoiceInput', ['option A', 'option B']);
+        'MultipleChoiceInput', ['option A', 'option B', 'option C', 'option D']);
       await explorationPlayerPage.submitAnswer(
         'MultipleChoiceInput', 'option B');
       await explorationPlayerPage.expectExplorationToBeOver();
