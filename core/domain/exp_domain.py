@@ -1992,7 +1992,7 @@ class Exploration(python_utils.OBJECT):
                 })
 
         return states_dict
-    
+
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
@@ -2212,7 +2212,7 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states_schema_version'] = 49
 
         return exploration_dict
-    
+
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
@@ -2288,7 +2288,7 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
                 exploration_dict)
             exploration_schema_version = 54
-        
+
         return exploration_dict
 
     @classmethod

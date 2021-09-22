@@ -242,7 +242,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             html_validation_service.fix_incorrectly_encoded_chars)
         return cls._convert_html_in_draft_change_list(
             draft_change_list, conversion_fn)
-    
+
     @classmethod
     def _convert_states_v46_dict_to_v47_dict(cls, draft_change_list):
         """Converts draft change list from state version 46 to 47. State

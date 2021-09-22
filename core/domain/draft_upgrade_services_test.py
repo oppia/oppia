@@ -190,7 +190,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             draft_change_list_v48_dict_list,
             migrated_draft_change_list_v49_dict_list)
-    
+
     def test_convert_states_v47_dict_to_v48_dict(self):
         draft_change_list_v47 = [
             exp_domain.ExplorationChange({
