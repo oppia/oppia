@@ -400,10 +400,6 @@ def main(args=None):
         except Exception:
             task_execution_failed = True
 
-        for task in tasks:
-            if task.exception:
-                concurrent_task_utils.log(task.exception.args[0])
-
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
     python_utils.PRINT('| SUMMARY OF TESTS |')
