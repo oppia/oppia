@@ -37,7 +37,7 @@ export class DeleteAccountBackendApiService {
       this.siteAnalyticsService.registerAccountDeletion();
       setTimeout(() => {
         this.windowRef.nativeWindow.location.href = (
-          '/logout?redirect_url=pending-account-deletion');
+          '/logout?redirect_url=/pending-account-deletion');
       }, this.siteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
     });
   }
