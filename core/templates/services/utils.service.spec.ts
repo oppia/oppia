@@ -180,37 +180,31 @@ describe('Utils Service', () => {
     expect(uts.isOverflowing(null)).toBeFalse();
   });
 
-  it('should reject executable javascript code', () => {
-    expect(uts.getSafeReturnUrl('javascript:alert(1)')).toEqual('/');
-  });
+  describe('getting safe return URLs', () => {
+    // An array of (inputUrl, expectedUrl) tuples.
+    const testCases: [string, string][] = [
+      ['javascript:alert(0)', '/'],
+      ['data:text/html,<script>alert(0)</script>', '/'],
+      ['>\'>"><img src=x onerror=alert(0)>', '/'],
+      ['https://evil.com', '/'],
+      ['evil.com', '/'],
+      ['//evil.com', '/'],
+      ['///', '/'],
+      ['%', '/'],
+      ['a', '/'],
+      ['/', '/'],
+      ['/learner-dashboard', '/learner-dashboard'],
+    ];
 
-  it('should reject external URLs', () => {
-    expect(uts.getSafeReturnUrl('https://google.com')).toEqual('/');
-  });
+    for (const [inputUrl, expectedUrl] of testCases) {
+      it(`should return "${expectedUrl}" from "${inputUrl}"`, () => {
+        expect(uts.getSafeReturnUrl(inputUrl)).toEqual(expectedUrl);
+      });
 
-  it('should reject scheme-less external URLs', () => {
-    expect(uts.getSafeReturnUrl('google.com')).toEqual('/');
-  });
-
-  it('should reject malformed URLs', () => {
-    expect(uts.getSafeReturnUrl('///')).toEqual('/');
-  });
-
-  it('should reject invalid URLs', () => {
-    expect(uts.getSafeReturnUrl('%')).toEqual('/');
-  });
-
-  it('should accept root URL', () => {
-    expect(uts.getSafeReturnUrl('/')).toEqual('/');
-  });
-
-  it('should accept relative paths', () => {
-    expect(uts.getSafeReturnUrl('/learner-dashboard'))
-      .toEqual('/learner-dashboard');
-  });
-
-  it('should accept encoded URL components', () => {
-    expect(uts.getSafeReturnUrl('%2Flearner-dashboard'))
-      .toEqual('/learner-dashboard');
+      const encodedInputUrl = encodeURIComponent(inputUrl);
+      it(`should return "${expectedUrl}" from "${encodedInputUrl}"`, () => {
+        expect(uts.getSafeReturnUrl(encodedInputUrl)).toEqual(expectedUrl);
+      });
+    }
   });
 });

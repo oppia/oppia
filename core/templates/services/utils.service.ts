@@ -160,7 +160,7 @@ export class UtilsService {
       return '/';
     }
 
-    if (urlString.charAt(0) !== '/') {
+    if (urlString.charAt(0) !== '/' || urlString.charAt(1) === '/') {
       // The URL is not a relative path, so reject it and return '/' instead.
       return '/';
     } else {
