@@ -96,13 +96,11 @@ export class NumberWithUnitsValidationService {
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
       } catch (e: unknown) {
-        if (e instanceof Error) {
-          var additionalInfo = (
-            '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
-            '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
-          );
-          e.message += additionalInfo;
-        }
+        var additionalInfo = (
+          '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
+          '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
+        );
+        (e as Error).message += additionalInfo;
         throw e;
       }
     };
