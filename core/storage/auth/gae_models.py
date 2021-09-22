@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from core.platform import models
 import feconf
 
-from typing import Dict, Optional, cast
+from typing import Dict, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -148,13 +148,11 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
 
         if provider_id == feconf.GAE_AUTH_PROVIDER_ID:
-            model = cls.query(cls.gae_id == auth_id).get()
+            return cls.query(cls.gae_id == auth_id).get()
         elif provider_id == feconf.FIREBASE_AUTH_PROVIDER_ID:
-            model = cls.query(cls.firebase_auth_id == auth_id).get()
+            return cls.query(cls.firebase_auth_id == auth_id).get()
         else:
             return None
-
-        return cast(Optional[UserAuthDetailsModel], model)
 
 
 class UserIdentifiersModel(base_models.BaseModel):
@@ -237,8 +235,7 @@ class UserIdentifiersModel(base_models.BaseModel):
             UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
-        model = cls.query(cls.user_id == user_id).get()
-        return cast(Optional[UserIdentifiersModel], model)
+        return cls.query(cls.user_id == user_id).get()
 
 
 class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
@@ -309,8 +306,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
             UserIdByFirebaseAuthIdModel. The model with user_id field equal
             to user_id argument.
         """
-        model = cls.query(cls.user_id == user_id).get()
-        return cast(Optional[UserIdByFirebaseAuthIdModel], model)
+        return cls.query(cls.user_id == user_id).get()
 
 
 class FirebaseSeedModel(base_models.BaseModel):

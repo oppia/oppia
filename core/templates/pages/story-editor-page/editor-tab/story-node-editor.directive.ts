@@ -72,7 +72,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
-        'MAX_CHARS_IN_CHAPTER_TITLE', function(
+        'MAX_CHARS_IN_EXPLORATION_TITLE', function(
             $rootScope, $scope, $timeout,
             AlertsService,
             ExplorationIdValidationService, FocusManagerService, NgbModal,
@@ -80,10 +80,11 @@ angular.module('oppia').directive('storyNodeEditor', [
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
-            MAX_CHARS_IN_CHAPTER_TITLE) {
+            MAX_CHARS_IN_EXPLORATION_TITLE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+          $scope.MAX_CHARS_IN_EXPLORATION_TITLE = (
+            MAX_CHARS_IN_EXPLORATION_TITLE);
           $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
             MAX_CHARS_IN_CHAPTER_DESCRIPTION);
           var _recalculateAvailableNodes = function() {

@@ -35,25 +35,23 @@
       <mat-card-subtitle class="blog-dashboard-tile-subtitle">
         {{ lastUpdatedDateString }}
       </mat-card-subtitle>
-      <p class="blog-post-summary">
-        {{ blogPostSummary.summary }}
-      </p>
+      <angular-html-bind-wrapper [htmlData]="this.blogPostSummary.summary"
+                                 class="blog-post-summary d-block">
+      </angular-html-bind-wrapper>
     </mat-card-content>
   </div>
 </mat-card>
-<div class="d-flex row flex-grow-1 justify-content-between align-items-baseline" (click)="editBlogPost()" *ngIf="activeView === 'listView'">
-  <div class="d-flex row ml-1 align-items-baseline">
-    <span class="blog-dashboard-tile-title protractor-test-blog-post-title mr-5" *ngIf="blogPostSummary.title !== ''">
-      {{ blogPostSummary.title }}
-    </span>
-    <span class="blog-dashboard-tile-title protractor-test-blog-post-title mr-5" *ngIf="blogPostSummary.title === ''">
-      {{ 'I18N_BLOG_POST_UNTITLED_HEADING' | translate }}
-    </span>
-    <p class="blog-post-summary truncated-text">
-      {{ blogPostSummary.summary }}
-    </p>
-  </div>
-  <span class="blog-dashboard-tile-subtitle d-contents">
+<div class="d-flex flex-row flex-grow-1 justify-content-between align-items-baseline" (click)="editBlogPost()" *ngIf="activeView === 'listView'">
+  <span class="blog-dashboard-tile-title protractor-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title !== ''">
+    {{ blogPostSummary.title }}
+  </span>
+  <span class="blog-dashboard-tile-title protractor-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title === ''">
+    {{ 'I18N_BLOG_POST_UNTITLED_HEADING' | translate }}
+  </span>
+  <angular-html-bind-wrapper [htmlData]="this.blogPostSummary.summary"
+                             class="blog-post-summary truncated-text col-sm-6">
+  </angular-html-bind-wrapper>
+  <span class="blog-dashboard-tile-subtitle d-contents col-sm-2 px-0 py-0">
     {{ lastUpdatedDateString }}
   </span>
   <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
@@ -124,6 +122,7 @@
   .truncated-text {
     max-width: 400px;
     overflow: hidden;
+    padding: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

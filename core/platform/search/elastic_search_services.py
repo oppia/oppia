@@ -41,6 +41,12 @@ ES = elasticsearch.Elasticsearch(
         if feconf.ES_CLOUD_ID else None), timeout=30)
 
 
+class SearchException(Exception):
+    """Exception used when some search operation is unsuccessful."""
+
+    pass
+
+
 def _create_index(index_name: str) -> None:
     """Creates a new index.
 
@@ -73,7 +79,7 @@ def add_documents_to_index(
         index_name: str. The name of the index to insert the document into.
 
     Raises:
-        Exception. A document cannot be added to the index.
+        SearchException. A document cannot be added to the index.
     """
     assert isinstance(index_name, python_utils.BASESTRING)
 
@@ -88,8 +94,7 @@ def add_documents_to_index(
             response = ES.index(index_name, document, id=document['id'])
 
         if response is None or response['_shards']['failed'] > 0:
-            raise Exception(
-                'Failed to add document to index.')
+            raise SearchException('Failed to add document to index.')
 
 
 def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:

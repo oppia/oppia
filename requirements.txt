@@ -8,7 +8,7 @@
 #
 #    pip-compile
 #
-apache-beam[gcp]==2.31.0
+apache-beam[gcp]==2.33.0rc1
     # via -r requirements.in
 attrs==20.3.0
     # via pytest
@@ -41,6 +41,8 @@ contextlib2==0.6.0.post1
     # via -r requirements.in
 crcmod==1.7
     # via apache-beam
+defusedxml==0.7.1
+    # via -r requirements.in
 dill==0.3.1.1
     # via apache-beam
 docopt==0.6.2
@@ -57,33 +59,31 @@ future==0.18.2
     # via
     #   -r requirements.in
     #   apache-beam
-google-api-core[grpc,grpcgcp]==1.22.4
+google-api-core[grpc,grpcgcp]==1.31.2
     # via
     #   firebase-admin
     #   google-api-python-client
     #   google-cloud-bigquery
     #   google-cloud-bigtable
     #   google-cloud-core
+    #   google-cloud-dataflow-client
     #   google-cloud-datastore
     #   google-cloud-dlp
     #   google-cloud-firestore
     #   google-cloud-language
     #   google-cloud-pubsub
+    #   google-cloud-recommendations-ai
     #   google-cloud-spanner
     #   google-cloud-tasks
     #   google-cloud-translate
     #   google-cloud-videointelligence
     #   google-cloud-vision
 google-api-python-client==1.11.0
-    # via
-    #   firebase-admin
-    #   google-cloud-profiler
+    # via firebase-admin
 google-apitools==0.5.31
     # via apache-beam
 google-auth-httplib2==0.0.4
-    # via
-    #   google-api-python-client
-    #   google-cloud-profiler
+    # via google-api-python-client
 google-auth==1.34.0
     # via
     #   -r requirements.in
@@ -92,7 +92,6 @@ google-auth==1.34.0
     #   google-api-python-client
     #   google-auth-httplib2
     #   google-cloud-core
-    #   google-cloud-profiler
     #   google-cloud-storage
 google-cloud-bigquery==1.28.0
     # via apache-beam
@@ -108,6 +107,8 @@ google-cloud-core==1.6.0
     #   google-cloud-spanner
     #   google-cloud-storage
     #   google-cloud-translate
+google-cloud-dataflow-client==0.1.3
+    # via -r requirements.in
 google-cloud-datastore==1.15.3
     # via
     #   apache-beam
@@ -120,9 +121,9 @@ google-cloud-language==1.3.0
     # via apache-beam
 google-cloud-ndb==1.8.0
     # via -r requirements.in
-google-cloud-profiler==3.0.5
-    # via apache-beam
 google-cloud-pubsub==1.7.0
+    # via apache-beam
+google-cloud-recommendations-ai==0.2.0
     # via apache-beam
 google-cloud-spanner==1.19.1
     # via apache-beam
@@ -212,10 +213,14 @@ oauth2client==3.0.0
     #   google-apitools
     #   googledatastore
     #   proto-google-cloud-datastore-v1
+orjson==3.6.3
+    # via apache-beam
 packaging==20.4
     # via
     #   -r requirements.in
     #   bleach
+    #   google-api-core
+    #   google-cloud-dataflow-client
     #   pytest
 pillow==8.2.0
     # via -r requirements.in
@@ -224,12 +229,14 @@ pluggy==0.13.1
 proto-google-cloud-datastore-v1==0.90.4
     # via googledatastore
 proto-plus==1.18.1
-    # via google-cloud-firestore
+    # via
+    #   google-cloud-dataflow-client
+    #   google-cloud-firestore
+    #   google-cloud-recommendations-ai
 protobuf==3.13.0
     # via
     #   apache-beam
     #   google-api-core
-    #   google-cloud-profiler
     #   googleapis-common-protos
     #   proto-plus
 py==1.10.0
@@ -285,7 +292,6 @@ requests==2.26.0
     #   apache-beam
     #   cachecontrol
     #   google-api-core
-    #   google-cloud-profiler
     #   google-cloud-storage
     #   hdfs
     #   mailchimp3
@@ -327,8 +333,9 @@ soupsieve==1.9.5
     #   beautifulsoup4
 toml==0.10.2
     # via pytest
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.2
     # via
+    #   -r requirements.in
     #   apache-beam
     #   importlib-metadata
 uritemplate==3.0.1

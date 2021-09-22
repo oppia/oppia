@@ -39,8 +39,7 @@ if MYPY: # pragma: no cover
     [models.NAMES.blog, models.NAMES.user])
 
 
-@validation_decorators.AuditsExisting(
-    blog_models.BlogPostModel)
+@validation_decorators.AuditsExisting(blog_models.BlogPostModel)
 class ValidateBlogPostModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""

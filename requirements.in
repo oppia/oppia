@@ -3,12 +3,13 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.31.0
+apache-beam[gcp]==2.33.0rc1
 backports.functools-lru-cache==1.6.1
 beautifulsoup4==4.9.3
 bleach==3.3.0
 callbacks==0.3.0
 contextlib2==0.6.0.post1
+defusedxml==0.7.1
 firebase-admin==5.0.0
 future==0.18.2
 gunicorn==20.1.0
@@ -36,6 +37,7 @@ google-cloud-ndb==1.8.0
 google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
 pytest==6.2.3
+typing_extensions==3.10.0.2
 webapp2==3.0.0b1
 elasticsearch==7.14.0
 urllib3==1.26.6
@@ -47,3 +49,4 @@ urllib3==1.26.6
 # them earlier than we are able to install the libraries from this file.
 PyYAML==5.4.1
 certifi==2021.5.30
+google-cloud-dataflow-client==0.1.3
