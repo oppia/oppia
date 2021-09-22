@@ -70,7 +70,7 @@ describe('Subtopic object factory', () => {
 
   it('should be able to create a subtopic object with given title and id',
     () => {
-    let subtopic = Subtopic.createFromTitle(
+      let subtopic = Subtopic.createFromTitle(
         2, 'Title2', 'filename2', 'bg_color2', 'fragment2');
       expect(subtopic.getId()).toBe(2);
       expect(subtopic.getTitle()).toBe('Title2');
