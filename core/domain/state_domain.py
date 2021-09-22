@@ -1050,55 +1050,6 @@ class InteractionInstance(python_utils.OBJECT):
 
         return customization_args
 
-    @staticmethod
-    def update_image_sizes_in_bytes_in_interaction(
-            interaction_dict, entity_type, entity_id):
-        """Checks for HTML fields in the interaction and updates the
-        image_sizes_in_bytes dict according to the rich text images present
-        in the html string.
-        """
-
-        def conversion_fn(value, schema_obj_type):
-            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
-                value.image_sizes_in_bytes = (
-                    html_cleaner.get_image_sizes_in_bytes_from_html(
-                        value.html, entity_type, entity_id))
-
-            return value
-
-        interaction_id = interaction_dict['id']
-
-        # Convert the customization_args to a dictionary of customization arg
-        # name to InteractionCustomizationArg, so that we can utilize
-        # InteractionCustomizationArg helper functions.
-        # Then, convert back to original dict format afterwards, at the end.
-        customization_args = (
-            InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                interaction_id,
-                interaction_dict['customization_args']))
-
-        ca_specs = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).customization_arg_specs
-
-        for ca_spec in ca_specs:
-            ca_spec_name = ca_spec.name
-            customization_args[ca_spec_name].value = (
-                InteractionCustomizationArg.traverse_by_schema_and_convert(
-                    ca_spec.schema,
-                    customization_args[ca_spec_name].value,
-                    conversion_fn
-                )
-            )
-
-        customization_args_dict = {}
-        for ca_name in customization_args:
-            customization_args_dict[ca_name] = (
-                customization_args[ca_name].to_customization_arg_dict())
-
-        interaction_dict['customization_args'] = customization_args_dict
-        return interaction_dict
-
 
 class InteractionCustomizationArg(python_utils.OBJECT):
     """Object representing an interaction's customization argument.
@@ -3743,7 +3694,7 @@ class State(python_utils.OBJECT):
                     html_field_types_to_rule_specs,
                     interaction_spec
                 ))
-        # TODO INVESTIGATE FROM HERE.
+
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to
             # properly convert html, since past state schema v35,
@@ -3795,6 +3746,10 @@ class State(python_utils.OBJECT):
                 part of.
             entity_id: str. The ID of the entity of which the state_dict is
                 part of.
+            state_uses_old_interaction_cust_args_schema: bool. Whether the
+                interaction customization arguments contain SubtitledHtml
+                and SubtitledUnicode dicts (should be True if prior to state
+                schema v36).
 
         Returns:
             dict. The updated state_dict, which includes the mapping of all
