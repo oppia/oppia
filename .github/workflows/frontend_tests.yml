@@ -32,5 +32,5 @@ jobs:
         if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "Frontend test failed on develop branch!"
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL}}
+          message: "A frontend test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
