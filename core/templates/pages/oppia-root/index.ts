@@ -22,6 +22,7 @@ import 'zone.js';
 // TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 import 'pages/mock-ajs';
 import 'Polyfills.ts';
+require('default-passive-events');
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
