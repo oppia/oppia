@@ -17,7 +17,7 @@
  */
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -29,6 +29,7 @@ import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -58,6 +59,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
     }
   ],
   bootstrap: [PendingAccountDeletionPageRootComponent]
