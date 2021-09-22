@@ -114,9 +114,9 @@ def main(args=None):
         'Running test in development environment'])
 
     cmd = [
-            common.NODE_BIN_PATH, '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+        common.NODE_BIN_PATH, '--max-old-space-size=4096',
+        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
 
