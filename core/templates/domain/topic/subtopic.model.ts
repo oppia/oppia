@@ -190,9 +190,9 @@ export class Subtopic {
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: 'thumbnail_filename',
-      thumbnail_bg_color: 'thumbnail_bg_color',
-      url_fragment: 'url_fragment'
+      thumbnail_filename: 'null',
+      thumbnail_bg_color: 'null',
+      url_fragment: 'null'
     }, {});
   }
 }
