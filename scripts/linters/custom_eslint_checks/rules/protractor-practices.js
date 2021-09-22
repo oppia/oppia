@@ -36,7 +36,7 @@ module.exports = {
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
-      disallowFilter: 'Please do not use .filter(), consider using a for loop',
+      disallowFilter: 'Please do not use .filter(); consider using a for loop',
       disallowForEach: (
         'Please do not use .forEach(), consider using a' +
         ' "for loop" instead'),

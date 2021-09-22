@@ -159,7 +159,7 @@ ruleTester.run('protractor-practices', rule, {
       }
       gradeList.filter((name) => gradeList(name, gradebook));`,
       errors: [{
-        message: 'Please do not use .filter(), consider using a for loop',
+        message: 'Please do not use .filter(); consider using a for loop',
       }]
     },
     {
