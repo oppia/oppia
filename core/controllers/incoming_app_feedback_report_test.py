@@ -28,7 +28,7 @@ from core.tests import test_utils
 from mypy_imports import (
     app_feedback_report_models) # pylint: disable=unused-import
 
-from typing import Dict, Any, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, Any, Sequence, cast # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -86,7 +86,7 @@ ANDROID_APP_VERSION_CODE_STRING = str('2') # pylint: disable=disallowed-function
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(IncomingAndroidFeedbackReportHandlerTests, self).setUp() # type: ignore[no-untyped-call]
+        super(IncomingAndroidFeedbackReportHandlerTests, self).setUp()
         self.payload = {
             'report': REPORT_JSON
         }
@@ -102,10 +102,13 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         }
         self._post_json_with_test_headers(self.payload, headers)
 
-        all_reports = (
-            app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
+        report_model_class = app_feedback_report_models.AppFeedbackReportModel
+        all_reports: Sequence[
+            app_feedback_report_models.AppFeedbackReportModel] = (
+                report_model_class.get_all().fetch())
         self.assertEqual(len(all_reports), 1)
-        report_model = all_reports[0]
+        report_model: app_feedback_report_models.AppFeedbackReportModel = (
+            all_reports[0])
 
         self.assertEqual(report_model.platform, 'android')
         self.assertEqual(

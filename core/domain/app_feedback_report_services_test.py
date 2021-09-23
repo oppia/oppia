@@ -32,7 +32,7 @@ from mypy_imports import app_feedback_report_models
 import python_utils
 import utils
 
-from typing import Dict, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, Optional, Type, List, Any, Sequence, cast # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -148,7 +148,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     }
 
     def setUp(self) -> None:
-        super(AppFeedbackReportServicesUnitTests, self).setUp() # type: ignore[no-untyped-call]
+        super(AppFeedbackReportServicesUnitTests, self).setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL) # type: ignore[no-untyped-call]
 
@@ -1237,14 +1237,18 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self) -> None:
         current_models_query = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
-        current_models = current_models_query.fetch()
+        current_models: Sequence[
+            app_feedback_report_models.AppFeedbackReportModel] = (
+                current_models_query.fetch())
         self.assertEqual(len(current_models), 0)
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             'scrubber_user')
 
         stored_models_query = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
-        stored_models = stored_models_query.fetch()
+        stored_models: Sequence[
+            app_feedback_report_models.AppFeedbackReportStatsModel] = (
+                stored_models_query.fetch())
         self.assertEqual(len(stored_models), 0)
 
     def test_scrubbing_on_only_current_reports_does_not_scrub_models(

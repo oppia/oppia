@@ -303,7 +303,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
         # the latter throws "Cannot filter a non-Node argument; received False".
-        report_models = cls.query(
+        report_models: Sequence['AppFeedbackReportModel'] = cls.query(
             cls.created_on < datetime_before_which_to_scrub,
             cls.scrubbed_by == None).fetch()  # pylint: disable=singleton-comparison
         return report_models
