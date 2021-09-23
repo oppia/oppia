@@ -115,7 +115,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $scope.assignedSkillTopicData = null;
             $scope.topicName = null;
             $scope.subtopicName = null;
-            PageTitleService.setPageTitleForMobileView('Skill Editor');
+            PageTitleService.setNavbarTitleForMobileView('Skill Editor');
             // To ensure that the focus event function executes only after
             // all the functions in the main thread have executed,
             // $timeout is required.
