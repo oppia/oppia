@@ -95,12 +95,12 @@ export class NumberWithUnitsValidationService {
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
-      } catch (e) {
+      } catch (e: unknown) {
         var additionalInfo = (
           '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
           '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
         );
-        e.message += additionalInfo;
+        (e as Error).message += additionalInfo;
         throw e;
       }
     };
