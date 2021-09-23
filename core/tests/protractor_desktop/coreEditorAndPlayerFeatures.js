@@ -369,7 +369,7 @@ describe('Core exploration functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
       await explorationPlayerPage.expectInteractionToMatch(
         'MultipleChoiceInput', ['option A', 'option B', 'option C', 'option D'
-      ]);
+        ]);
       await explorationPlayerPage.submitAnswer(
         'MultipleChoiceInput', 'option B');
       await explorationPlayerPage.expectExplorationToBeOver();
