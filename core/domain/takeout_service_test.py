@@ -357,7 +357,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
@@ -808,6 +808,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -1575,9 +1576,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
                 'randomInteger123'): {
                     'scrubbed_by': self.USER_ID_1,
-                    'platform': self.PLATFORM_ANDROID,
                     'ticket_id': self.TICKET_ID,
                     'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                    'local_timezone_offset_hrs': 0,
                     'report_type': self.REPORT_TYPE_SUGGESTION,
                     'category': self.CATEGORY_OTHER,
                     'platform_version': self.PLATFORM_VERSION}}

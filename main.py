@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 import logging
 
+import android_validation_constants
 from constants import constants
 from core.controllers import access_validators
 from core.controllers import acl_decorators
@@ -44,6 +45,7 @@ from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
+from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
 from core.controllers import learner_goals
 from core.controllers import learner_playlist
@@ -870,6 +872,11 @@ URLS = [
         platform_feature.PlatformFeatureDummyHandler),
 
     get_redirect_route(
+        r'%s' % (
+            android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL),
+        incoming_app_feedback_report.IncomingAndroidFeedbackReportHandler),
+
+    get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',
         voice_artist.VoiceArtistManagementHandler),
 ]
@@ -927,6 +934,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/mail/reviewers/contributor_dashboard_suggestions',
         cron.CronMailReviewersContributorDashboardSuggestionsHandler),
+    get_redirect_route(
+        r'/cron/app_feedback_report/scrub_expiring_reports',
+        cron.CronAppFeedbackReportsScrubberHandlerPage),
 ))
 
 # Add tasks urls.

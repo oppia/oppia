@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import app_feedback_report_services
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
@@ -177,3 +178,20 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     info_about_suggestions_waiting_too_long_for_review)
             )
         return self.render_json({})
+
+
+class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
+    """Handler for scrubbing app feedback reports that are expiring."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests to scrub reports. This cron handler scrubs all
+        app feedback report models that are expiring; expired reports have a
+        created_on field at least feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS
+        before tthe date this services is called.
+        """
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)

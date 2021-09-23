@@ -228,7 +228,7 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The maximum number of days a feedback report can be saved in storage before it
 # must be scrubbed.
-APP_FEEDBACK_REPORT_MAXIMUM_DAYS = datetime.timedelta(days=90)
+APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN = datetime.timedelta(days=90)
 
 # The minimum version of the Android feedback report info blob schema.
 MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
@@ -635,6 +635,14 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
+# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
+# datetime that a report could be received.
+EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
+    1614556800)
+
+# The minimum and maximum package version codes for Oppia Android.
+MINIMUM_ANDROID_PACKAGE_VERSION_CODE = 1
+
 # We generate images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
 MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
@@ -677,6 +685,11 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
+# User id for scrubber bot. This bot is used to represent the cron job that
+# scrubs expired app feedback reports.
+APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID = 'AppFeedbackReportScrubberBot'
+APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME = 'AppFeedbackReportScrubberBot'
+
 # User id and username for suggestion bot. This bot will be used to accept
 # suggestions automatically after a threshold time.
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
@@ -689,7 +702,9 @@ SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 SYSTEM_USERS = {
     SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
     MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
-    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME
+    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME,
+    APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID: (
+        APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME)
 }
 
 # Ids and locations of the permitted extensions.

@@ -92,6 +92,11 @@
 /buf.gen.yaml @oppia/ml
 
 
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
+/core/controllers/incoming_app_feedback_report*.py @BenHenning @vinitamurthi
+
+
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep

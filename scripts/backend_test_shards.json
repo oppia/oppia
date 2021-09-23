@@ -107,6 +107,7 @@
         "core.domain.exp_services_test"
     ],
     "4": [
+        "core.domain.app_feedback_report_services_test",
         "core.controllers.learner_goals_test",
         "core.domain.beam_job_domain_test",
         "core.domain.beam_job_services_test",
@@ -164,6 +165,8 @@
         "core.tests.gae_suite_test"
     ],
     "6": [
+        "core.controllers.incoming_app_feedback_report_test",
+        "core.domain.app_feedback_report_domain_test",
         "core.domain.object_registry_test",
         "core.domain.translatable_object_registry_test",
         "core.domain.image_services_test",
