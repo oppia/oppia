@@ -146,26 +146,11 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         ExplorationOpportunitySummary. The exploration opportunity summary
         object.
     """
-
-    audio_language_codes = set(
-        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
-
-    complete_translation_languages = set(
+    language_codes_needing_voice_artists = set(
         exploration.get_languages_with_complete_translation())
-
-    incomplete_translation_language_codes = (
-        audio_language_codes - complete_translation_languages)
-    language_codes_needing_voice_artists = complete_translation_languages
-
-    if exploration.language_code in incomplete_translation_language_codes:
-        # Removing exploration language from incomplete translation
-        # languages list as exploration does not need any translation in
-        # its own language.
-        incomplete_translation_language_codes.discard(
-            exploration.language_code)
-        # Adding exploration language to voiceover required languages
-        # list as exploration can be voiceovered in it's own language.
-        language_codes_needing_voice_artists.add(exploration.language_code)
+    # Add exploration language to voiceover required languages list as an
+    # exploration can be voiceovered in its own language.
+    language_codes_needing_voice_artists.add(exploration.language_code)
 
     content_count = exploration.get_content_count()
     translation_counts = exploration.get_translation_counts()
@@ -181,10 +166,32 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         opportunity_domain.ExplorationOpportunitySummary(
             exploration.id, topic.id, topic.name, story.id, story.title,
             story_node.title, content_count,
-            list(incomplete_translation_language_codes), translation_counts,
-            list(language_codes_needing_voice_artists), []))
+            _compute_exploration_incomplete_translation_languages(exploration),
+            translation_counts, list(language_codes_needing_voice_artists), []))
 
     return exploration_opportunity_summary
+
+
+def _compute_exploration_incomplete_translation_languages(exploration):
+    """Computes all languages that are not 100% translated in an exploration.
+
+    Args:
+        exploration: Exploration. The exploration for which to compute
+            incomplete translation languages.
+
+    Returns:
+        list(str). List of incomplete translation language codes.
+    """
+    audio_language_codes = set(
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+    complete_translation_languages = set(
+        exploration.get_languages_with_complete_translation())
+    incomplete_translation_language_codes = (
+        audio_language_codes - complete_translation_languages)
+    # Remove exploration language from incomplete translation languages list
+    # as an exploration does not need a translation in its own language.
+    incomplete_translation_language_codes.discard(exploration.language_code)
+    return list(incomplete_translation_language_codes)
 
 
 def add_new_exploration_opportunities(story_id, exp_ids):
@@ -243,12 +250,8 @@ def update_opportunity_with_updated_exploration(exp_id):
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
     exploration_opportunity_summary.incomplete_translation_language_codes = (
-        utils.compute_list_difference(
-            exploration_opportunity_summary
-            .incomplete_translation_language_codes,
-            complete_translation_language_list
-        )
-    )
+        _compute_exploration_incomplete_translation_languages(
+            updated_exploration))
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
         exploration_opportunity_summary.
