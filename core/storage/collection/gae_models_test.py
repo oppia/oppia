@@ -150,7 +150,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_NEW = 'id_6_new'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(CollectionRightsModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -369,7 +369,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_COMMITTER = 'id_4'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelRevertUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(CollectionRightsModelRevertUnitTest, self).setUp()
         self.collection_model = collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -584,7 +584,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_NEW = 'id_3_new'
 
     def setUp(self) -> None:
-        super(CollectionSummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
+        super(CollectionSummaryModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',
