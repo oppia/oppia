@@ -25,7 +25,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 interface Dimension {
-  error?: string;
+  error: string;
 }
 
 @Component({
@@ -47,7 +47,7 @@ export class ResponseCodeReplComponent implements OnInit {
 
   ngOnInit(): void {
     this.answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answerWithValue);
+      this.answerWithValue) as Dimension;
     if (this.answer.error) {
       this.errorFocusLabel = this.focusManagerService.generateFocusLabel();
       this.focusManagerService.setFocus(this.errorFocusLabel);
