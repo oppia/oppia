@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,122 +13,137 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for suggestion modal in creator view.
+ * @fileoverview Component for suggestion modal in creator view.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ParamDict, SuggestionModalService } from 'services/suggestion-modal.service';
 
-angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
-  '$scope', '$uibModalInstance', 'SuggestionModalService',
-  'canReviewActiveThread', 'description', 'newContent', 'oldContent',
-  'stateName', 'suggestionIsHandled', 'suggestionStatus',
-  'suggestionType', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
-  'MAX_COMMIT_MESSAGE_LENGTH',
-  function(
-      $scope, $uibModalInstance, SuggestionModalService,
-      canReviewActiveThread, description, newContent, oldContent,
-      stateName, suggestionIsHandled, suggestionStatus,
-      suggestionType, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
-      MAX_COMMIT_MESSAGE_LENGTH
-  ) {
-    $scope.isNotHandled = !suggestionIsHandled;
-    $scope.canReject = $scope.isNotHandled;
-    $scope.canAccept = $scope.isNotHandled;
-    if (!$scope.isNotHandled) {
-      if (suggestionStatus === (
-        SuggestionModalService.SUGGESTION_ACCEPTED)) {
-        $scope.errorMessage = SuggestionModalService
+@Component({
+  selector: 'suggestion-modal-for-creator-view',
+})
+export class SuggestionModalForCreatorViewComponent implements OnInit {
+  @Input() suggestionIsHandled;
+  @Input() suggestionStatus: string;
+  @Input() oldContent: string;
+  @Input() newContent: { html: string; };
+  @Input() stateName;
+  @Input() suggestionType;
+  @Input() description;
+  @Input() canReviewActiveThread;
+  isNotHandled: boolean;
+  canReject: boolean;
+  canAccept: boolean;
+  errorMessage: string;
+  isSuggestionRejected: boolean;
+  reviewMessage: string;
+  summaryMessage: string;
+  suggestionData: { newSuggestionHtml: string; };
+  suggestionEditorIsShown: boolean;
+  MAX_COMMIT_MESSAGE_LENGTH: number;
+  commitMessage: string;
+
+  constructor(
+    private suggestionModalService: SuggestionModalService,
+    private ngbActiveModal: NgbActiveModal
+  ) {}
+
+  ngOnInit(): void {
+    this.isNotHandled = !this.suggestionIsHandled;
+    this.canReject = this.isNotHandled;
+    this.canAccept = this.isNotHandled;
+    if (!this.isNotHandled) {
+      if (this.suggestionStatus === (
+        this.suggestionModalService.SUGGESTION_ACCEPTED)) {
+        this.errorMessage = this.suggestionModalService
           .SUGGESTION_ACCEPTED_MSG;
-        $scope.isSuggestionRejected = false;
+        this.isSuggestionRejected = false;
       } else {
-        $scope.errorMessage = SuggestionModalService
+        this.errorMessage = this.suggestionModalService
           .SUGGESTION_REJECTED_MSG;
-        $scope.isSuggestionRejected = true;
+        this.isSuggestionRejected = true;
       }
     } else {
-      $scope.errorMessage = '';
+      this.errorMessage = '';
     }
 
-    $scope.oldContent = oldContent;
-    $scope.newContent = newContent;
-    $scope.stateName = stateName;
-    $scope.suggestionType = suggestionType;
-    $scope.commitMessage = description;
-    $scope.reviewMessage = null;
-    $scope.summaryMessage = null;
-    $scope.canReviewActiveThread = canReviewActiveThread;
+    this.reviewMessage = null;
+    this.summaryMessage = null;
     // The ng-model needs to bind to a property of an object on
     // the scope (the property cannot sit directly on the scope)
     // Reference https://stackoverflow.com/q/12618342
-    $scope.suggestionData = {newSuggestionHtml: newContent.html};
-    $scope.suggestionEditorIsShown = false;
-    $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
-
-    $scope.acceptSuggestion = function() {
-      SuggestionModalService.acceptSuggestion(
-        $uibModalInstance,
-        {
-          action: ACTION_ACCEPT_SUGGESTION,
-          commitMessage: $scope.commitMessage,
-          reviewMessage: $scope.reviewMessage,
-        });
-    };
-
-    $scope.rejectSuggestion = function() {
-      SuggestionModalService.rejectSuggestion(
-        $uibModalInstance,
-        {
-          action: ACTION_REJECT_SUGGESTION,
-          commitMessage: null,
-          reviewMessage: $scope.reviewMessage
-        });
-    };
-
-    $scope.editSuggestion = function() {
-      $scope.suggestionEditorIsShown = true;
-    };
-
-    $scope.cancel = function() {
-      SuggestionModalService.cancelSuggestion($uibModalInstance);
-    };
-
-    $scope.isEditButtonShown = function() {
-      return (
-        !$scope.isNotHandled && $scope.isSuggestionRejected &&
-        !$scope.suggestionEditorIsShown);
-    };
-
-    $scope.isResubmitButtonShown = function() {
-      return (
-        !$scope.isNotHandled && $scope.isSuggestionRejected &&
-        $scope.suggestionEditorIsShown);
-    };
-
-    $scope.isResubmitButtonDisabled = function() {
-      return !(
-        $scope.summaryMessage &&
-        (
-          $scope.suggestionData.newSuggestionHtml.trim() !==
-          newContent.html.trim()));
-    };
-
-    $scope.cancelEditMode = function() {
-      $scope.suggestionEditorIsShown = false;
-    };
-
-    $scope.updateValue = function(value: string) {
-      $scope.suggestionData.newSuggestionHtml = value;
-      $scope.$applyAsync();
-    };
-
-    $scope.resubmitChanges = function() {
-      $uibModalInstance.close({
-        action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,
-        newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
-        summaryMessage: $scope.summaryMessage,
-        stateName: $scope.stateName,
-        suggestionType: $scope.suggestionType,
-        oldContent: $scope.oldContent
-      });
-    };
+    this.suggestionData = {newSuggestionHtml: this.newContent.html};
+    this.suggestionEditorIsShown = false;
+    this.MAX_COMMIT_MESSAGE_LENGTH = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
   }
-]);
+
+
+  acceptSuggestion(): void {
+    this.suggestionModalService.acceptSuggestion(
+      this.ngbActiveModal,
+      {
+        action: AppConstants.ACTION_ACCEPT_SUGGESTION,
+        commitMessage: this.commitMessage,
+        reviewMessage: this.reviewMessage,
+      } as ParamDict);
+  }
+
+  rejectSuggestion(): void {
+    this.suggestionModalService.rejectSuggestion(
+      this.ngbActiveModal,
+      {
+        action: AppConstants.ACTION_REJECT_SUGGESTION,
+        commitMessage: null,
+        reviewMessage: this.reviewMessage
+      } as ParamDict);
+  }
+
+  editSuggestion(): void {
+    this.suggestionEditorIsShown = true;
+  }
+
+  cancel(): void {
+    this.suggestionModalService.cancelSuggestion(this.ngbActiveModal);
+  }
+
+  isEditButtonShown(): boolean {
+    return (
+      !this.isNotHandled && this.isSuggestionRejected &&
+      !this.suggestionEditorIsShown);
+  }
+
+  isResubmitButtonShown(): boolean {
+    return (
+      !this.isNotHandled && this.isSuggestionRejected &&
+      this.suggestionEditorIsShown);
+  }
+
+  isResubmitButtonDisabled(): boolean {
+    return !(
+      this.summaryMessage &&
+      (
+        this.suggestionData.newSuggestionHtml.trim() !==
+        this.newContent.html.trim()));
+  }
+
+  cancelEditMode(): void {
+    this.suggestionEditorIsShown = false;
+  }
+
+  updateValue(value: string): void {
+    this.suggestionData.newSuggestionHtml = value;
+  }
+
+  resubmitChanges(): void {
+    this.ngbActiveModal.close({
+      action: this.suggestionModalService.ACTION_RESUBMIT_SUGGESTION,
+      newSuggestionHtml: this.suggestionData.newSuggestionHtml,
+      summaryMessage: this.summaryMessage,
+      stateName: this.stateName,
+      suggestionType: this.suggestionType,
+      oldContent: this.oldContent
+    });
+  }
+}
