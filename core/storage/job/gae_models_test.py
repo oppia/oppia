@@ -56,7 +56,7 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
     """Tests for Oppia job models with setUp."""
 
     def setUp(self) -> None:
-        super(JobModelSetUpJobsTest, self).setUp() # type: ignore[no-untyped-call]
+        super(JobModelSetUpJobsTest, self).setUp()
         job_models.JobModel(
             id='MyJobId1', job_type='JobType1',
             status_code=job_models.STATUS_CODE_FAILED).put()

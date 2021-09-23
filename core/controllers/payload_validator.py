@@ -36,7 +36,6 @@ def validate(
         allowed_extra_args: bool,
         allow_string_to_bool_conversion: bool = False
 ) -> Tuple[Dict[str, Any], List[str]]:
-
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
@@ -95,7 +94,6 @@ def validate(
 
 
 def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
-
     """Converts a request param of type string into expected bool type.
 
     Args:
@@ -166,8 +164,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PretestHandler',
     'ProfileHandler',
     'ProfilePage',
-    'ProfilePictureHandler',
-    'ProfilePictureHandlerByUsernameHandler',
     'PromoBarHandler',
     'QuebstionsListHandler',
     'QuestionCountDataHandler',

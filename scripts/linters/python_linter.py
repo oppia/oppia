@@ -151,65 +151,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, errors_found, error_messages, full_error_messages)
 
-    def lint_py_files_for_python3_compatibility(self):
-        """Prints a list of Python 3 compatibility errors in the given list of
-        Python files.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        files_to_lint = self.all_filepaths
-        any_errors = False
-        error_messages = []
-        full_error_messages = []
-        name = 'Pylint for Python 3 compatibility'
-
-        files_to_lint_for_python3_compatibility = [
-            file_name for file_name in files_to_lint if not re.match(
-                r'^.*python_utils.*\.py$', file_name)]
-        if not files_to_lint_for_python3_compatibility:
-            return [
-                concurrent_task_utils.TaskResult(
-                    name, False, [],
-                    [
-                        'There are no Python files to lint for Python 3 '
-                        'compatibility.'])]
-
-        _batch_size = 50
-        current_batch_start_index = 0
-
-        while current_batch_start_index < len(
-                files_to_lint_for_python3_compatibility):
-            # Note that this index is an exclusive upper bound -- i.e.,
-            # the current batch of files ranges from 'start_index' to
-            # 'end_index - 1'.
-            current_batch_end_index = min(
-                current_batch_start_index + _batch_size, len(
-                    files_to_lint_for_python3_compatibility))
-            current_files_to_lint = files_to_lint_for_python3_compatibility[
-                current_batch_start_index: current_batch_end_index]
-
-            pylint_report = python_utils.string_io()
-            pylinter_for_python3 = lint.Run(
-                current_files_to_lint + ['--py3k'],
-                reporter=text.TextReporter(pylint_report),
-                exit=False).linter
-
-            if pylinter_for_python3.msg_status != 0:
-                lint_message = pylint_report.getvalue()
-                pylint_error_messages = (
-                    self.get_trimmed_error_output(lint_message))
-                error_messages.append(pylint_error_messages)
-                full_error_messages.append('Messages for Python 3 support:')
-                full_error_messages.append(lint_message)
-                any_errors = True
-
-            current_batch_start_index = current_batch_end_index
-
-        return concurrent_task_utils.TaskResult(
-            name, any_errors, error_messages, full_error_messages)
-
     def check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
@@ -253,9 +194,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     ['There are no Python files to lint.'])]
 
         linter_stdout.append(self.lint_py_files())
-
-        linter_stdout.append(self.lint_py_files_for_python3_compatibility())
-
         linter_stdout.append(self.check_import_order())
 
         return linter_stdout
