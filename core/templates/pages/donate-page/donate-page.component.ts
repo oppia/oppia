@@ -47,7 +47,7 @@ export class DonatePageComponent implements OnInit {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
-    this.pageTitleService.setPageTitle(
+    this.pageTitleService.setDocumentTitle(
       'Donate | Make a Positive Impact | Oppia');
   }
 
