@@ -43,12 +43,11 @@ class ProfileHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
-            'schema':{
+            'schema': {
                 'type': 'basestring',
                 'validators': [{
-                    'id': "is_valid_username_string"
+                    'id': 'is_valid_username_string'
                 }]
-
             }
         }
     }
@@ -162,7 +161,7 @@ class PreferencesHandler(base.BaseHandler):
         'PUT': {
             'update_type': {
                 'schema': {
-                    'type': 'list(str)'
+                    'type': 'basestring'
                 }
             },
             'data': {
@@ -354,23 +353,29 @@ class SignupHandler(base.BaseHandler):
         'POST': {
             'username': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
                 }
             },
             'agreed_to_terms': {
                 'schema': {
                     'type': 'bool'
                 },
+                'default_value': None
             },
             'default_dashboard': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'can_receive_email_updates': {
                 'schema': {
-                    'type': 'bool'                    
+                    'type': 'bool'
                 },
+                'default_value': None
             }
         }
     }
