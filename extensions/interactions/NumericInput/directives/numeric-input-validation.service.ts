@@ -99,6 +99,17 @@ export class NumericInputValidationService {
           'is greater than the first number.')
       });
     };
+    var raiseWarningForRequireNonnegativeInput = function(
+        ruleIndex: number, input: number) {
+      if (input < 0 && customizationArgs.requireNonnegativeInput.value) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Rule ' + (ruleIndex + 1) + ' input ' +
+            'should be greater than or equal to zero.')
+        });
+      }
+    };
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
@@ -115,6 +126,7 @@ export class NumericInputValidationService {
           case 'Equals':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
+            raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsInclusivelyBetween':
             var a = <number> rule.inputs.a;
@@ -123,6 +135,17 @@ export class NumericInputValidationService {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
+            if (
+              a < 0 &&
+              customizationArgs.requireNonnegativeInput.value
+            ) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' upper bound of the range ' +
+                  'should be greater than or equal to zero.')
+              });
+            }
             break;
           case 'IsGreaterThan':
             var x = (<number>rule.inputs.x);
@@ -135,15 +158,28 @@ export class NumericInputValidationService {
           case 'IsLessThan':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
+            raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsLessThanOrEqualTo':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
+            raiseWarningForRequireNonnegativeInput(j, x);
             break;
           case 'IsWithinTolerance':
             var x = (<number>rule.inputs.x);
             var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
+            if (
+              (x + tol) < 0 &&
+              customizationArgs.requireNonnegativeInput.value
+            ) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' Upper bound of the tolerance range ' +
+                  'should be greater than or equal to zero.')
+              });
+            }
             break;
           default:
         }
@@ -170,7 +206,9 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
-  getErrorString(value: number): string | undefined {
+  getErrorString(
+      value: number, customizationArgs: boolean
+  ): string | undefined {
     let stringValue = null;
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
@@ -198,7 +236,13 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    if (stringValueRegExp === null || stringValueRegExp.length > 15) {
+    if (
+      customizationArgs &&
+      (stringValueRegExp === null || stringValueRegExp.length > 15)
+    ) {
+      return 'The answer should be greater than or equal to zero and ' +
+      'can contain at most 15 digits (0-9) or symbols(.).';
+    } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
         '(. or -).';
     }

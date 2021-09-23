@@ -392,12 +392,24 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': new_exp.init_state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'NumericInput'
-        })]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': new_exp.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'NumericInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': new_exp.init_state_name,
+                'new_value': {
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                }
+            })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(

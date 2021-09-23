@@ -1,10 +1,10 @@
-<span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($value)'">
+<span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($value, $ctrl.uiConfig())'">
   <span ng-form="$ctrl.floatForm">
     <span ng-if="!expressionMode">
       <input type="number" step="any" autocomplete="off" ng-model="$ctrl.localValue" class="form-control display-inline oppia-float-form-input protractor-test-float-form-input"
              name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>"
              focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)"
-             apply-validation validators="$ctrl.validators()"
+             apply-validation validators="$ctrl.validators()" min="<[$ctrl.minValue]>"
              ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()"
              ng-change="$ctrl.generateErrors()">
 

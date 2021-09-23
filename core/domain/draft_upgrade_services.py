@@ -212,6 +212,21 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         return draft_change_list
 
     @classmethod
+    def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
+        """Converts draft change list from state version 48 to 49. State
+        version 49 adds requireNonnegativeInput customization_arg to
+        NumericInput interaction.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v47_dict_to_v48_dict(cls, draft_change_list):
         """Converts draft change list from state version 47 to 48. State
         version 48 fixes encoding issues in HTML fields.

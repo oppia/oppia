@@ -355,14 +355,21 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        requireNonnegativeInput: {
+          value: true
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
-
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      requireNonnegativeInput: {
+        value: true
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +
@@ -370,14 +377,22 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        requireNonnegativeInput: {
+          value: false
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      requireNonnegativeInput: {
+        value: false
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +
