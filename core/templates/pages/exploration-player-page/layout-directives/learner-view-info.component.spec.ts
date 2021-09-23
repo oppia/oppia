@@ -93,7 +93,7 @@ describe('Learner view info component', () => {
     componentInstance.ngOnDestory();
   });
 
-  it('should initialize the component properties correctly', fakeAsync(() => {
+  it('should initialize when component loads into view', fakeAsync(() => {
     let explorationId = 'expId';
     let explorationTitle = 'Exploration Title';
     let topicUrl = 'topic_url';
