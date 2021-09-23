@@ -4732,3 +4732,8 @@ div.oppia-issues-learner-action {
   color: #bdc3c7;
   cursor: default;
 }
+.conversation-skin-help-card-content {
+  max-height: 235px;
+  overflow-y: auto;
+  width: 270px;
+}

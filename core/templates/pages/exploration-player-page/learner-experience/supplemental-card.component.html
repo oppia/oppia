@@ -1,7 +1,7 @@
 <div class="conversation-skin-supplemental-card">
   <div *ngIf="helpCardHtml"
        class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
-       [ngStyle]="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}"
+       [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
     <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
        [href]="OPPIA_AVATAR_LINK_URL"
@@ -76,12 +76,6 @@
   .conversation-skin-help-card .conversation-skin-oppia-avatar {
     left: -15px;
     top: 12px;
-  }
-
-  .conversation-skin-help-card-content {
-    max-height: 235px;
-    overflow-y: auto;
-    width: 270px;
   }
 
   .conversation-skin-close-help-card-button {
