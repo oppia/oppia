@@ -27,7 +27,7 @@ import { QuestionPlayerConstants } from '../question-directives/question-player/
 export class ScoreRingComponent implements OnInit, OnChanges {
   constructor() {}
   @Input() score;
-  @Input() isTestPassed: boolean;
+  @Input() testIsPassed: boolean;
   circle: SVGCircleElement;
   radius: number;
   circumference: number;
@@ -39,7 +39,7 @@ export class ScoreRingComponent implements OnInit, OnChanges {
   }
 
   getScoreRingColor(): string {
-    if (this.isTestPassed) {
+    if (this.testIsPassed) {
       return this.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
     } else {
       return this.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
@@ -47,7 +47,7 @@ export class ScoreRingComponent implements OnInit, OnChanges {
   }
 
   getScoreOuterRingColor(): string {
-    if (this.isTestPassed) {
+    if (this.testIsPassed) {
       // Return color green when passed.
       return this.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
     } else {
