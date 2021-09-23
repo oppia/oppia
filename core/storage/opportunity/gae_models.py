@@ -132,12 +132,17 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.incomplete_translation_language_codes == language_code
         ).order(cls.incomplete_translation_language_codes)
 
-        results, cursor, _ = (
-            language_query.fetch_page(page_size, start_cursor=start_cursor))
+        fetch_result: Tuple[
+            Sequence[ExplorationOpportunitySummaryModel],
+            datastore_services.Cursor,
+            bool
+        ] = language_query.fetch_page(page_size, start_cursor=start_cursor)
+        results, cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = (
+        fetch_result = (
             language_query.fetch_page(page_size + 1, start_cursor=start_cursor))
+        plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
@@ -189,14 +194,18 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.language_codes_needing_voice_artists == language_code
         ).order(cls.created_on)
 
-        results, cursor, _ = (
-            language_created_on_query.fetch_page(
-                page_size, start_cursor=start_cursor))
+        fetch_result: Tuple[
+            Sequence[ExplorationOpportunitySummaryModel],
+            datastore_services.Cursor,
+            bool
+        ] = language_created_on_query.fetch_page(
+            page_size, start_cursor=start_cursor)
+        results, cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = (
-            language_created_on_query.fetch_page(
-                page_size + 1, start_cursor=start_cursor))
+        fetch_result = language_created_on_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor)
+        plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
@@ -295,13 +304,15 @@ class SkillOpportunityModel(base_models.BaseModel):
             urlsafe_cursor=urlsafe_start_cursor)
 
         created_on_query = cls.get_all().order(cls.created_on)
-        query_models, cursor, _ = (
-            created_on_query.fetch_page(page_size, start_cursor=start_cursor))
+        fetch_result: Tuple[
+            Sequence[SkillOpportunityModel], datastore_services.Cursor, bool
+        ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
+        query_models, cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = (
-            created_on_query.fetch_page(
-                page_size + 1, start_cursor=start_cursor))
+        fetch_result = created_on_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor)
+        plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         return (
