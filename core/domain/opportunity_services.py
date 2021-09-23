@@ -145,10 +145,13 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         ExplorationOpportunitySummary. The exploration opportunity summary
         object.
     """
-    language_codes_needing_voice_artists = set(
+    complete_translation_language_list = (
         exploration.get_languages_with_complete_translation())
+    language_codes_needing_voice_artists = set(
+        complete_translation_language_list)
     incomplete_translation_language_codes = (
-        _compute_exploration_incomplete_translation_languages(exploration))
+        _compute_exploration_incomplete_translation_languages(
+            exploration.language_code, complete_translation_language_list))
     if exploration.language_code in incomplete_translation_language_codes:
         # Add exploration language to voiceover required languages list as an
         # exploration can be voiceovered in its own language.
@@ -174,12 +177,14 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
     return exploration_opportunity_summary
 
 
-def _compute_exploration_incomplete_translation_languages(exploration):
+def _compute_exploration_incomplete_translation_languages(
+        exploration_language_code, complete_translation_languages):
     """Computes all languages that are not 100% translated in an exploration.
 
     Args:
-        exploration: Exploration. The exploration for which to compute
-            incomplete translation languages.
+        exploration_language_code: str. The exploration language code.
+        complete_translation_languages: list(str). List of complete translation
+            language codes in the exploration.
 
     Returns:
         list(str). List of incomplete translation language codes sorted
@@ -187,13 +192,11 @@ def _compute_exploration_incomplete_translation_languages(exploration):
     """
     audio_language_codes = set(
         language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
-    complete_translation_languages = set(
-        exploration.get_languages_with_complete_translation())
     incomplete_translation_language_codes = (
         audio_language_codes - complete_translation_languages)
     # Remove exploration language from incomplete translation languages list
     # as an exploration does not need a translation in its own language.
-    incomplete_translation_language_codes.discard(exploration.language_code)
+    incomplete_translation_language_codes.discard(exploration_language_code)
     return list(incomplete_translation_language_codes).sort()
 
 
@@ -254,7 +257,8 @@ def update_opportunity_with_updated_exploration(exp_id):
     exploration_opportunity_summary.translation_counts = translation_counts
     exploration_opportunity_summary.incomplete_translation_language_codes = (
         _compute_exploration_incomplete_translation_languages(
-            updated_exploration))
+            updated_exploration.language_code,
+            complete_translation_language_list))
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
         exploration_opportunity_summary.
