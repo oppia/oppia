@@ -28,7 +28,6 @@ from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
-import utils
 
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
