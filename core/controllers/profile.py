@@ -52,7 +52,7 @@ class ProfileHandler(base.BaseHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET':{}
+        'GET': {}
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
