@@ -100,6 +100,7 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 
 @NgModule({
   imports: [
@@ -162,8 +163,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     QuestionDifficultySelectorComponent,
-    SelectSkillModalComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
+    SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -223,6 +225,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     KeyboardShortcutHelpModalComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
@@ -274,6 +277,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
     PreviewThumbnailComponent,
+    RatingDisplayComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
