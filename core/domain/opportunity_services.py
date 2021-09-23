@@ -145,6 +145,8 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         ExplorationOpportunitySummary. The exploration opportunity summary
         object.
     """
+    # TODO(#13903): Find a way to reduce runtime of computing the complete
+    # languages.
     complete_translation_language_list = (
         exploration.get_languages_with_complete_translation())
     language_codes_needing_voice_artists = set(
@@ -247,7 +249,7 @@ def update_opportunity_with_updated_exploration(exp_id):
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     content_count = updated_exploration.get_content_count()
     translation_counts = updated_exploration.get_translation_counts()
-    # TODO(#13903): Potentially reduce runtime of computing the complete
+    # TODO(#13903): Find a way to reduce runtime of computing the complete
     # languages.
     complete_translation_language_list = (
         updated_exploration.get_languages_with_complete_translation())
