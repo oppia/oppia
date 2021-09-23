@@ -55,7 +55,6 @@ class ProfileHandler(base.BaseHandler):
         'GET':{}
     }
 
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
@@ -344,7 +343,6 @@ class SignupPage(base.BaseHandler):
 class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
 
-
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
@@ -377,8 +375,6 @@ class SignupHandler(base.BaseHandler):
             }
         }
     }
-
-
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
