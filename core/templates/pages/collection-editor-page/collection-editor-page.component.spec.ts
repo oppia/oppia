@@ -103,15 +103,15 @@ describe('Collection editor page component', () => {
     {
       getTitle: () => ''
     } as Collection);
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
 
     componentInstance.setTitle();
     componentInstance.setTitle();
 
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledTimes(2);
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       pageTitle + ' - Oppia Editor');
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'Untitled Collection - Oppia Editor');
   });
 

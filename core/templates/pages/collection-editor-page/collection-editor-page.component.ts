@@ -57,9 +57,9 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     var title = (
       this.collectionEditorStateService.getCollection().getTitle());
     if (title) {
-      this.pageTitleService.setPageTitle(title + ' - Oppia Editor');
+      this.pageTitleService.setDocumentTitle(title + ' - Oppia Editor');
     } else {
-      this.pageTitleService.setPageTitle(
+      this.pageTitleService.setDocumentTitle(
         'Untitled Collection - Oppia Editor');
     }
   }
