@@ -342,7 +342,7 @@ export class CollectionPlayerPageComponent implements OnInit {
       this.collectionId).then(
       (collection) => {
         this.updateCollection(collection);
-        this.pageTitleService.setPageTitle(
+        this.pageTitleService.setDocumentTitle(
           this.collection.getTitle() + ' - Oppia');
 
         // Load the user's current progress in the collection. If the
