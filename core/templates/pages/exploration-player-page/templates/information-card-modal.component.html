@@ -17,7 +17,7 @@
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}</span>
         </span>
         <span *ngIf="!averageRating">{{ 'I18N_PLAYER_UNRATED' | translate }}</span>
-        <span *ngIf="averageRating">{{ math.round(averageRating) }}</span>
+        <span *ngIf="averageRating">{{ averageRating | number:'1.1-1'}}</span>
       </li>
 
       <li class="row-item">

@@ -50,7 +50,6 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
   numViews: number;
   objective: string;
   explorationIsPrivate: boolean;
-  math = Math;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
