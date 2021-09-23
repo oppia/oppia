@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -133,39 +133,5 @@ describe('Collection Player Backend Api Service', () => {
     req2.flush({stringified_collection_ids: ''});
 
     flushMicrotasks();
-  }));
-
-  it('should elements with attributes', fakeAsync(() => {
-    let requestUrl = '/collection_handler/data/collectionId';
-
-    cpbas.bindAttr('collectionId');
-    tick(150);
-
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-
-    var angularElementSpy = spyOn(angular, 'element');
-
-    var elementNameItemProp = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[itemprop="name"]').and.returnValue(elementNameItemProp);
-
-    var elementDescriptionItemProp = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[itemprop="description"]').and.returnValue(
-      elementDescriptionItemProp);
-
-    var elementTitleProperty = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[property="og:title"]').and.returnValue(elementTitleProperty);
-
-    var elementDescriptionProperty = $('<div>');
-    angularElementSpy.withArgs(
-      'meta[property="og:description"]').and.returnValue(
-      elementDescriptionProperty);
-
-    expect(elementNameItemProp.attr('content')).toBe(sampleCollection.title);
-    expect(elementDescriptionItemProp.attr('content')).toBe(
-      sampleCollection.objective);
   }));
 });

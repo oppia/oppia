@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CollectionHandler, CollectionSummary } from '../collection-player-page.component';
+import { CollectionSummary } from '../collection-player-page.component';
 
 @Injectable({
   providedIn: 'root'
@@ -39,22 +39,6 @@ export class CollectionPlayerBackendApiService {
     }).toPromise().then((response: CollectionSummary) => {
       return response;
     });
-  }
-
-  bindAttr(collectionId: string): void {
-    this.http.get(
-      '/collection_handler/data/' + collectionId).toPromise().then(
-      (response: CollectionHandler) => {
-        angular.element('meta[itemprop="name"]').attr(
-          'content', response.meta_name);
-        angular.element('meta[itemprop="description"]').attr(
-          'content', response.meta_description);
-        angular.element('meta[property="og:title"]').attr(
-          'content', response.meta_name);
-        angular.element('meta[property="og:description"]').attr(
-          'content', response.meta_description);
-      }
-    );
   }
 }
 

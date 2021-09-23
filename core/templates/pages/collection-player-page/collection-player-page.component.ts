@@ -333,8 +333,6 @@ export class CollectionPlayerPageComponent implements OnInit {
       }
     });
 
-    this.collectionPlayerBackendApiService.bindAttr(this.collectionId);
-
     this.fetchSummaryAsync(this.collectionId);
 
     // Load the collection the learner wants to view.
