@@ -147,9 +147,12 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
     """
     language_codes_needing_voice_artists = set(
         exploration.get_languages_with_complete_translation())
-    # Add exploration language to voiceover required languages list as an
-    # exploration can be voiceovered in its own language.
-    language_codes_needing_voice_artists.add(exploration.language_code)
+    incomplete_translation_language_codes = (
+        _compute_exploration_incomplete_translation_languages(exploration))
+    if exploration.language_code in incomplete_translation_language_codes:
+        # Add exploration language to voiceover required languages list as an
+        # exploration can be voiceovered in its own language.
+        language_codes_needing_voice_artists.add(exploration.language_code)
 
     content_count = exploration.get_content_count()
     translation_counts = exploration.get_translation_counts()
@@ -165,7 +168,7 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         opportunity_domain.ExplorationOpportunitySummary(
             exploration.id, topic.id, topic.name, story.id, story.title,
             story_node.title, content_count,
-            _compute_exploration_incomplete_translation_languages(exploration),
+            incomplete_translation_language_codes,
             translation_counts, list(language_codes_needing_voice_artists), []))
 
     return exploration_opportunity_summary
