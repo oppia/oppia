@@ -111,7 +111,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
     def test_can_see_completed_stories(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['completed_stories_list']), 0)
 
         self.save_new_topic(
@@ -130,7 +131,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
 
         learner_progress_services.mark_story_as_completed(
             self.viewer_id, self.STORY_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['completed_stories_list']), 1)
         self.assertEqual(
             response['completed_stories_list'][0]['id'], self.STORY_ID_1)
@@ -139,7 +141,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
     def test_can_see_learnt_topics(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['learnt_topics_list']), 0)
 
         self.save_new_topic(
@@ -160,7 +163,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
             self.viewer_id, self.STORY_ID_1)
         learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['learnt_topics_list']), 1)
         self.assertEqual(
             response['learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
@@ -169,7 +173,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
     def test_can_see_partially_learnt_topics(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['partially_learnt_topics_list']), 0)
 
         self.save_new_topic(
@@ -182,7 +187,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
 
         learner_progress_services.record_topic_started(
             self.viewer_id, self.TOPIC_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['partially_learnt_topics_list']), 1)
         self.assertEqual(
             response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
@@ -191,7 +197,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
     def test_can_see_topics_to_learn(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['topics_to_learn_list']), 0)
 
         self.save_new_topic(
@@ -209,7 +216,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
 
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['topics_to_learn_list']), 1)
         self.assertEqual(
             response['topics_to_learn_list'][0]['id'], self.TOPIC_ID_1)
@@ -218,7 +226,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
     def test_can_see_all_topics(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['all_topics_list']), 0)
 
         self.save_new_topic(
@@ -253,7 +262,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['all_topics_list']), 1)
         self.assertEqual(
             response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
@@ -262,7 +272,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
     def test_can_see_untracked_topics(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['untracked_topics']), 0)
 
         self.save_new_topic(
@@ -297,7 +308,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['untracked_topics']), 1)
         self.logout()
 
@@ -497,7 +509,8 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
     def test_can_see_completed_collections(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['completed_collections_list']), 0)
 
         self.save_new_default_collection(
@@ -506,7 +519,8 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
 
         learner_progress_services.mark_collection_as_completed(
             self.viewer_id, self.COL_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['completed_collections_list']), 1)
         self.assertEqual(
             response['completed_collections_list'][0]['id'], self.COL_ID_1)
@@ -515,7 +529,7 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
     def test_can_see_incomplete_collections(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['incomplete_collections_list']), 0)
 
         self.save_new_default_collection(
@@ -524,7 +538,7 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
 
         learner_progress_services.mark_collection_as_incomplete(
             self.viewer_id, self.COL_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['incomplete_collections_list']), 1)
         self.assertEqual(
             response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
@@ -533,7 +547,7 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
     def test_can_see_collection_playlist(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['collection_playlist']), 0)
 
         self.save_new_default_collection(
@@ -542,7 +556,7 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
 
         learner_progress_services.add_collection_to_learner_playlist(
             self.viewer_id, self.COL_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['collection_playlist']), 1)
         self.assertEqual(
             response['collection_playlist'][0]['id'], self.COL_ID_1)
@@ -614,7 +628,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
     def test_can_see_completed_explorations(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['completed_explorations_list']), 0)
 
         self.save_new_default_exploration(
@@ -623,7 +637,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
 
         learner_progress_services.mark_exploration_as_completed(
             self.viewer_id, self.EXP_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['completed_explorations_list']), 1)
         self.assertEqual(
             response['completed_explorations_list'][0]['id'], self.EXP_ID_1)
@@ -632,7 +646,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
     def test_can_see_incomplete_explorations(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['incomplete_explorations_list']), 0)
 
         self.save_new_default_exploration(
@@ -644,7 +658,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
 
         learner_progress_services.mark_exploration_as_incomplete(
             self.viewer_id, self.EXP_ID_1, state_name, version)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['incomplete_explorations_list']), 1)
         self.assertEqual(
             response['incomplete_explorations_list'][0]['id'], self.EXP_ID_1)
@@ -653,7 +667,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
     def test_can_see_exploration_playlist(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['exploration_playlist']), 0)
 
         self.save_new_default_exploration(
@@ -662,7 +676,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
 
         learner_progress_services.add_exp_to_learner_playlist(
             self.viewer_id, self.EXP_ID_1)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['exploration_playlist']), 1)
         self.assertEqual(
             response['exploration_playlist'][0]['id'], self.EXP_ID_1)
@@ -671,12 +685,12 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
     def test_can_see_subscription(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 0)
 
         subscription_services.subscribe_to_creator(
             self.viewer_id, self.owner_id)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 1)
         self.assertEqual(
             response['subscription_list'][0]['creator_username'],
@@ -686,7 +700,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         thread_summaries = response['thread_summaries']
         self.assertEqual(thread_summaries, [])
 
@@ -696,7 +710,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, self.owner_id, 'a subject',
             'some text')
 
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)
