@@ -1960,9 +1960,12 @@ class Exploration(python_utils.OBJECT):
         """
 
         for state_dict in states_dict.values():
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.fix_incorrectly_encoded_chars)
+            interaction_customisation_args = state_dict['interaction'][
+                'customization_args']
+            if interaction_customisation_args:
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service.fix_incorrectly_encoded_chars)
         return states_dict
 
     @classmethod
