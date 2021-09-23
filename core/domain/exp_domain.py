@@ -1958,9 +1958,34 @@ class Exploration(python_utils.OBJECT):
                 html_validation_service.fix_incorrectly_encoded_chars)
         return states_dict
 
+    def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
+        """Converts from version 48 to 49. Version 49 adds
+        requireNonnegativeInput customization arg to NumericInput
+        interaction which allows creators to set input should be greater
+        than or equal to zero.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'NumericInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
     @classmethod
-    def _convert_states_v48_dict_to_v49_dict(cls, exp_id, states_dict):
-        """Converts from version 48 to 49. Version 49 contains the attribute
+    def _convert_states_v49_dict_to_v50_dict(cls, exp_id, states_dict):
+        """Converts from version 49 to 50. Version 50 contains the attribute
         image_sizes_in_bytes for subtitled_html.
 
         Args:
@@ -2178,26 +2203,46 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _convert_v53_dict_to_v54_dict(cls, exp_id, exploration_dict):
+    def _convert_v53_dict_to_v54_dict(cls, exploration_dict):
         """Converts a v53 exploration dict into a v54 exploration dict.
-        Version 54 includes a new attribute image_size_in_bytes for the
-        SubtitledHtml and WrittenTranslation fields.
-
+        Adds a new customization arg to NumericInput interaction
+        which allows creators to set input greator than or equal to zero.
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v53.
-            exp_id: str. The ID of the exploration.
-
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v54.
         """
-
         exploration_dict['schema_version'] = 54
 
         exploration_dict['states'] = cls._convert_states_v48_dict_to_v49_dict(
-            exp_id, exploration_dict['states'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 49
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v54_dict_to_v55_dict(cls, exp_id, exploration_dict):
+        """Converts a v54 exploration dict into a v55 exploration dict.
+        Version 55 includes a new attribute image_size_in_bytes for the
+        SubtitledHtml and WrittenTranslation fields.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+            exp_id: str. The ID of the exploration.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+
+        exploration_dict['schema_version'] = 55
+
+        exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
+            exp_id, exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 50
 
         return exploration_dict
 
@@ -2275,8 +2320,12 @@ class Exploration(python_utils.OBJECT):
 
         if exploration_schema_version == 53:
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
-                exp_id, exploration_dict)
+                exploration_dict)
             exploration_schema_version = 54
+
+        if exploration_schema_version == 54:
+            exploration_dict = cls._convert_v54_dict_to_v55_dict(
+                exp_id, exploration_dict)
 
         return exploration_dict
 

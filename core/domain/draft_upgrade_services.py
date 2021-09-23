@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import logging
 
 from core.domain import exp_domain
+from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
@@ -210,6 +211,109 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'new_value': new_value
                 })
         return draft_change_list
+
+    @classmethod
+    def _update_image_sizes_in_bytes_in_draft_change_list(
+            cls, draft_change_list, entity_type, entity_id):
+        """Checks for all the HTML fields in the provided draft change list,
+        and updates the image_sizes_in_bytes dict with the entries of rich text
+        images to their sizes in bytes.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+            entity_type: The type of the Entity, to which the draft change list
+                belongs to.
+            entity_id: The ID of the Entity, to which the draft change list
+                belongs to.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for i, change in enumerate(draft_change_list):
+            new_value = None
+            if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+
+            new_value = change.new_value
+            if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                new_value['image_sizes_in_bytes'] = (
+                    html_cleaner.get_image_sizes_in_bytes_from_html(
+                        new_value['html'],
+                        entity_type,
+                        entity_id))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                if 'choices' in new_value.keys():
+                    for value_index, value in enumerate(
+                            new_value['choices']['value']):
+                        if isinstance(value, dict) and 'html' in value:
+                            new_value['choices']['value'][value_index][
+                                'image_sizes_in_bytes'] = (
+                                html_cleaner.
+                                    get_image_sizes_in_bytes_from_html(
+                                    new_value['choices']['value'][
+                                        value_index]['html'],
+                                    entity_type,
+                                    entity_id))
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    for content_id, language_code_to_written_translation in (
+                        new_value['translations_mapping'].items()):
+                        for language_code in (
+                            language_code_to_written_translation.keys()):
+                            new_value['translations_mapping'][
+                                content_id][language_code][
+                                'image_sizes_in_bytes'] = (
+                                html_cleaner.get_image_sizes_in_bytes_from_html(
+                                    new_value['translations_mapping'][
+                                        content_id][language_code]['html'],
+                                    entity_type,
+                                    entity_id))
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+                      new_value is not None):
+                    new_value = (
+                        state_domain.Outcome.update_image_sizes_in_bytes_in_outcome(
+                            new_value,
+                            entity_type,
+                            entity_id))
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    new_value = [
+                        (state_domain.Hint.update_image_sizes_in_bytes_in_hint(
+                            hint_dict,
+                            entity_type,
+                            entity_id))
+                        for hint_dict in new_value]
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
+                      new_value is not None):
+                    new_value['explanation']['image_sizes_in_bytes'] = (
+                        html_cleaner.get_image_sizes_in_bytes_from_html(
+                            new_value['explanation']['html'],
+                            entity_type,
+                            entity_id))
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    html_field_types_to_rule_specs = (
+                        rules_registry.Registry.get_html_field_types_to_rule_specs(
+                            state_schema_version=41))
+                    new_value = [
+                        state_domain.AnswerGroup.
+                            update_image_sizes_in_bytes_in_answer_group(
+                            answer_group,
+                            entity_type,
+                            entity_id
+                        ) for answer_group in new_value]
+                if new_value is not None:
+                    draft_change_list[i] = exp_domain.ExplorationChange({
+                        'cmd': change.cmd,
+                        'property_name': change.property_name,
+                        'state_name': change.state_name,
+                        'new_value': new_value
+                    })
+            return draft_change_list
 
     @classmethod
     def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
