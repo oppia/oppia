@@ -54,7 +54,7 @@ export class VolunteerPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.pageTitleService.setPageTitle('Volunteer | Oppia');
+    this.pageTitleService.setDocumentTitle('Volunteer | Oppia');
     this.mapImgPath = '/volunteer/map.png';
 
     this.art = {

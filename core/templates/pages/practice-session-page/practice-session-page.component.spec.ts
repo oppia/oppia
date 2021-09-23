@@ -63,7 +63,7 @@ describe('Practice session page', function() {
       '["1","2","3","4","5"]');
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
 
     $httpBackend.expectGET(
       '/practice_session/data/math/abbrev-topic?' +
@@ -103,7 +103,7 @@ describe('Practice session page', function() {
       questionCount: 20,
       questionsSortedByDifficulty: false
     });
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'Practice Session: Foo Topic - Oppia');
   });
 });

@@ -50,9 +50,9 @@ angular.module('oppia').directive('collectionEditorPage', [
             var title = (
               CollectionEditorStateService.getCollection().getTitle());
             if (title) {
-              PageTitleService.setPageTitle(title + ' - Oppia Editor');
+              PageTitleService.setDocumentTitle(title + ' - Oppia Editor');
             } else {
-              PageTitleService.setPageTitle(
+              PageTitleService.setDocumentTitle(
                 'Untitled Collection - Oppia Editor');
             }
           };

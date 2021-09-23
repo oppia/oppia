@@ -40,7 +40,7 @@ export class PartnershipsPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
   ngOnInit(): void {
-    this.pageTitleService.setPageTitle('Partnerships | Oppia');
+    this.pageTitleService.setDocumentTitle('Partnerships | Oppia');
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/partnerships_hero_image.png');
     this.formIconUrl = this.urlInterpolationService.getStaticImageUrl(

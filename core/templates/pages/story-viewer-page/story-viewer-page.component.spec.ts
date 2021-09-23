@@ -351,13 +351,13 @@ describe('Story Viewer Page component', () => {
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         Promise.resolve(_samplePlaythroughObject));
 
-      spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+      spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
       spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
       component.ngOnInit();
 
       flushMicrotasks();
 
-      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
         'Learn Topic 1 | Story | Oppia');
       expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
         'Story meta tag content');

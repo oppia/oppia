@@ -89,7 +89,7 @@ describe('Topic viewer page', () => {
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
 
-    spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
 
     topicViewerPageComponent.ngOnInit();
@@ -103,7 +103,7 @@ describe('Topic viewer page', () => {
 
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       `Learn ${topicName} | Topic page title | Oppia`);
     expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
       'Topic Meta Tag');

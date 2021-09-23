@@ -133,7 +133,7 @@ describe('Topic Landing Page', () => {
     component.ngOnInit();
     tick(150);
     fixture.detectChanges();
-    expect(pageTitleService.getPageTitle()).toBe(
+    expect(pageTitleService.getDocumentTitle()).toBe(
       'Fractions | Add, Subtract, Multiply and Divide | Oppia');
   }));
 

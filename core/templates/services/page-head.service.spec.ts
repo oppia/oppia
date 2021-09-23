@@ -39,14 +39,14 @@ describe('Page head service', () => {
       PROPERTY_VALUE: '',
       CONTENT: ''
     };
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
     pageHeadService.updateTitleAndMetaTags({
       ROUTE: '',
       TITLE: title,
       META: [meta]
     });
-    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(title);
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(title);
     expect(metaTagCustomizationService.addOrReplaceMetaTags)
       .toHaveBeenCalledWith([
         {

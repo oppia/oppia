@@ -89,11 +89,11 @@ export class BaseContentComponent {
   }
 
   getHeaderText(): string {
-    return this.pageTitleService.getPageTitleForMobileView();
+    return this.pageTitleService.getNavbarTitleForMobileView();
   }
 
   getSubheaderText(): string {
-    return this.pageTitleService.getPageSubtitleForMobileView();
+    return this.pageTitleService.getNavbarSubtitleForMobileView();
   }
 
   isMainProdServer(): boolean {

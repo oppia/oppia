@@ -145,12 +145,12 @@ describe('Story editor page', function() {
       StoryEditorStateService, 'onStoryReinitialized').and.returnValue(
       storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
     ctrl.$onInit();
 
     expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledTimes(2);
 
     ctrl.$onDestroy();
   });
@@ -158,7 +158,7 @@ describe('Story editor page', function() {
   it('should addListener by passing getChangeCount to ' +
   'PreventPageUnloadEventService', function() {
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle');
+    spyOn(PageTitleService, 'setDocumentTitle');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     spyOn(PreventPageUnloadEventService, 'addListener').and
       .callFake((callback) => callback());
@@ -215,7 +215,7 @@ describe('Story editor page', function() {
   it('should return warning count', function() {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     MockStoryEditorNavigationService.navigateToStoryEditor();
     ctrl.$onInit();
     expect(ctrl.getTotalWarningsCount()).toEqual(0);
@@ -235,7 +235,7 @@ describe('Story editor page', function() {
       StoryEditorStateService, 'onStoryReinitialized').and.returnValue(
       storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(
       StoryEditorStateService,
       'getStoryWithUrlFragmentExists').and.returnValue(true);
@@ -271,7 +271,7 @@ describe('Story editor page', function() {
   it('should check if url contains story preview', function() {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     MockStoryEditorNavigationService.activeTab = 'story_preview';
     MockStoryEditorNavigationService.checkIfPresentInChapterEditor = (
       () => false);
@@ -319,10 +319,10 @@ describe('Story editor page', function() {
     spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
       mockUndoRedoChangeEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle');
+    spyOn(PageTitleService, 'setDocumentTitle');
     ctrl.$onInit();
     mockUndoRedoChangeEventEmitter.emit();
-    expect(PageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalled();
     ctrl.$onDestroy();
   });
 });

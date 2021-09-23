@@ -75,11 +75,11 @@ angular.module('oppia').directive('topicEditorPage', [
             return ContextService.getEntityType();
           };
 
-          var setPageTitle = function() {
+          var setDocumentTitle = function() {
             let topicName = TopicEditorStateService.getTopic().getName();
-            PageTitleService.setPageTitle(
+            PageTitleService.setDocumentTitle(
               topicName + ' - Oppia');
-            PageTitleService.setPageSubtitleForMobileView(topicName);
+            PageTitleService.setNavbarSubtitleForMobileView(topicName);
             ctrl.topic = TopicEditorStateService.getTopic();
             ctrl._validateTopic();
           };
@@ -184,14 +184,14 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicInitialized.subscribe(
                 () => {
                   LoaderService.hideLoadingScreen();
-                  setPageTitle();
+                  setDocumentTitle();
                   $rootScope.$applyAsync();
                 }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => {
-                  setPageTitle();
+                  setDocumentTitle();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -204,7 +204,7 @@ angular.module('oppia').directive('topicEditorPage', [
               )
             );
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
-            PageTitleService.setPageTitleForMobileView('Topic Editor');
+            PageTitleService.setNavbarTitleForMobileView('Topic Editor');
             PreventPageUnloadEventService.addListener(
               UndoRedoService.getChangeCount.bind(UndoRedoService));
             ctrl.validationIssues = [];
@@ -213,7 +213,7 @@ angular.module('oppia').directive('topicEditorPage', [
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
               UndoRedoService.onUndoRedoChangeApplied$().subscribe(
-                () => setPageTitle()
+                () => setDocumentTitle()
               )
             );
           };

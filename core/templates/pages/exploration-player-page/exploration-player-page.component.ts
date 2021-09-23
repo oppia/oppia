@@ -48,7 +48,7 @@ angular.module('oppia').component('explorationPlayerPage', {
         ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
           explorationId, null)
           .then(function(response) {
-            PageTitleService.setPageTitle(
+            PageTitleService.setDocumentTitle(
               response.exploration.title + ' - Oppia');
             angular.element('meta[itemprop="name"]').attr(
               'content', response.exploration.title);

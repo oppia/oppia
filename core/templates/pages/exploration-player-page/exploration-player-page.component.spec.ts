@@ -72,7 +72,7 @@ describe('Exploration player page', function() {
       .returnValue($q.resolve({
         exploration: exploration
       }));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
 
     var angularElementSpy = spyOn(angular, 'element');
 
@@ -97,7 +97,7 @@ describe('Exploration player page', function() {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');
     expect(elementNameItemProp.attr('content')).toBe(exploration.title);
     expect(elementDescriptionItemProp.attr('content')).toBe(

@@ -131,7 +131,7 @@ export class TopicLandingPageComponent implements OnInit {
             topic: topicName,
             filename: 'lesson_in_devices.webp'
           })));
-    this.pageTitleService.setPageTitle(
+    this.pageTitleService.setDocumentTitle(
       [this.topicTitle, this.topicData.topicTagline, 'Oppia'].join(' | '));
   }
 

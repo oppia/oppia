@@ -106,7 +106,7 @@ describe('Subtopic viewer page', function() {
   });
 
   it('should succesfully get subtopic data and set context', fakeAsync(() => {
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(pageTitleService, 'updateMetaTag');
     spyOn(contextService, 'setCustomEntityContext');
     spyOn(contextService, 'removeCustomEntityContext');
@@ -136,7 +136,7 @@ describe('Subtopic viewer page', function() {
     expect(component.nextSubtopicSummaryIsShown).toBeTrue();
 
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(pageTitleService.updateMetaTag).toHaveBeenCalled();
 
     component.ngOnDestroy();

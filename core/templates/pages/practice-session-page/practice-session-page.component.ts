@@ -100,7 +100,7 @@ angular.module('oppia').component('practiceSessionPage', {
           };
           ctrl.questionPlayerConfig = questionPlayerConfig;
           ctrl.topicName = result.data.topic_name;
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
