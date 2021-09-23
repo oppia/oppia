@@ -74,6 +74,6 @@ describe('Error page', () => {
     component.ngOnInit();
     expect(component.getStaticImageUrl('/general/oops_mint.webp'))
       .toBe('/assets/images/general/oops_mint.webp');
-    expect(pageTitle.getPageTitle()).toBe('Error 404 - Oppia');
+    expect(pageTitle.getDocumentTitle()).toBe('Error 404 - Oppia');
   });
 });
