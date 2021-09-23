@@ -103,6 +103,41 @@ describe('Collection editor navbar component', () => {
     let mockOnCollectionEventEmitter = new EventEmitter<void>();
     let mockUndoRedoChangeAppliedEventEmitter = new EventEmitter<void>();
 
+    spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
+      .and.returnValue(mockOnCollectionEventEmitter);
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter')
+      .and.returnValue(mockUndoRedoChangeAppliedEventEmitter);
+    spyOn(urlService, 'getCollectionIdFromEditorUrl').and.returnValue(
+      collectionId);
+    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
+      mockCollection);
+    spyOn(collectionEditorStateService, 'getCollectionRights')
+      .and.returnValue(mockPrivateCollectionRights);
+    spyOn(
+      collectionValidationService, 'findValidationIssuesForPrivateCollection')
+      .and.returnValue([]);
+    spyOn(
+      collectionValidationService, 'findValidationIssuesForPublicCollection')
+      .and.returnValue([]);
+
+    componentInstance.ngOnInit();
+
+    spyOn(componentInstance.collectionRights, 'isPrivate')
+      .and.returnValue(true);
+
+    mockOnCollectionEventEmitter.emit();
+    tick();
+    mockUndoRedoChangeAppliedEventEmitter.emit();
+    tick();
+
+    expect(componentInstance.collectionId).toEqual(collectionId);
+    expect(componentInstance.collection).toEqual(mockCollection);
+    expect(urlService.getCollectionIdFromEditorUrl).toHaveBeenCalled();
+    expect(collectionEditorStateService.getCollection).toHaveBeenCalled();
+    expect(collectionEditorStateService.getCollectionRights).toHaveBeenCalled();
+  }));
+
+  it('should validate public collection', fakeAsync(() => {
     let mockPublicCollectionRights = new CollectionRights({
       collection_id: collectionId,
       can_edit: true,
@@ -110,6 +145,9 @@ describe('Collection editor navbar component', () => {
       is_private: false,
       owner_names: []
     });
+
+    let mockOnCollectionEventEmitter = new EventEmitter<void>();
+    let mockUndoRedoChangeAppliedEventEmitter = new EventEmitter<void>();
 
     spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
       .and.returnValue(mockOnCollectionEventEmitter);
@@ -120,8 +158,7 @@ describe('Collection editor navbar component', () => {
     spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
       mockCollection);
     spyOn(collectionEditorStateService, 'getCollectionRights')
-      .and.returnValues(
-        mockPrivateCollectionRights, mockPublicCollectionRights);
+      .and.returnValue(mockPublicCollectionRights);
     spyOn(
       collectionValidationService, 'findValidationIssuesForPrivateCollection')
       .and.returnValue([]);
@@ -129,23 +166,15 @@ describe('Collection editor navbar component', () => {
       collectionValidationService, 'findValidationIssuesForPublicCollection')
       .and.returnValue([]);
 
-    let emitMockEvents = () => {
-      mockOnCollectionEventEmitter.emit();
-      tick();
-      mockUndoRedoChangeAppliedEventEmitter.emit();
-      tick();
-    };
-
     componentInstance.ngOnInit();
 
-    emitMockEvents();
-    componentInstance.ngOnInit();
-    emitMockEvents();
+    mockOnCollectionEventEmitter.emit();
+    tick();
+    mockUndoRedoChangeAppliedEventEmitter.emit();
+    tick();
 
     expect(componentInstance.collectionId).toEqual(collectionId);
     expect(componentInstance.collection).toEqual(mockCollection);
-    expect(componentInstance.collectionRights).toEqual(
-      mockPublicCollectionRights);
     expect(urlService.getCollectionIdFromEditorUrl).toHaveBeenCalled();
     expect(collectionEditorStateService.getCollection).toHaveBeenCalled();
     expect(collectionEditorStateService.getCollectionRights).toHaveBeenCalled();
