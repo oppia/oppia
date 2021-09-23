@@ -22,13 +22,13 @@ from __future__ import unicode_literals
 import json
 import logging
 import re
-import xml
 
 import bs4
 from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
+import defusedxml.ElementTree
 from extensions.objects.models import objects
 from extensions.rich_text_components import components
 import feconf
@@ -1004,9 +1004,9 @@ def is_parsable_as_xml(xml_string):
     if not isinstance(xml_string, python_utils.BASESTRING):
         return False
     try:
-        xml.etree.ElementTree.fromstring(xml_string)
+        defusedxml.ElementTree.fromstring(xml_string)
         return True
-    except xml.etree.ElementTree.ParseError:
+    except defusedxml.ElementTree.ParseError:
         return False
 
 
