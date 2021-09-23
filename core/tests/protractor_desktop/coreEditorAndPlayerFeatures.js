@@ -111,8 +111,6 @@ describe('Enable correctness feedback and set correctness', function() {
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
-    await responseEditor.setFeedback(await forms.toRichText('Not correct'));
-    await responseEditor.setFeedback(await forms.toRichText('Wrong again'));
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
     // Turn on correctness feedback.
@@ -235,8 +233,6 @@ describe('Enable correctness feedback and set correctness', function() {
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
-    await responseEditor.setFeedback(await forms.toRichText('Not correct'));
-    await responseEditor.setFeedback(await forms.toRichText('Wrong again'));
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
 
