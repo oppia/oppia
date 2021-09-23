@@ -186,16 +186,14 @@ export class Subtopic {
   }
 
   static createFromTitle(
-      subtopicId: number, title: string,
-      thumbnailFilename: string, thumbnailBgColor: string,
-      urlFragment: string): Subtopic {
+      subtopicId: number, title: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: thumbnailFilename,
-      thumbnail_bg_color: thumbnailBgColor,
-      url_fragment: urlFragment
+      thumbnail_filename: "",
+      thumbnail_bg_color: "",
+      url_fragment: ""
     }, {});
   }
 }
