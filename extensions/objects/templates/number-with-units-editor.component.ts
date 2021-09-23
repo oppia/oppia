@@ -65,12 +65,14 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         value: false,
         modalId: this.modalId
       }));
-    } catch (parsingError) {
+    } catch (parsingError: unknown) {
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         value: true,
         modalId: this.modalId
       }));
-      this.errorMessage = parsingError.message;
+      if (parsingError instanceof Error) {
+        this.errorMessage = parsingError.message;
+      }
     }
   }
 }

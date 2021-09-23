@@ -62,8 +62,8 @@ export class LoginPageComponent implements OnInit {
       let authSucceeded = false;
       try {
         authSucceeded = await this.authService.handleRedirectResultAsync();
-      } catch (error) {
-        this.onSignInError(error);
+      } catch (error: unknown) {
+        this.onSignInError(error as firebase.auth.Error);
         return;
       }
 
@@ -74,8 +74,8 @@ export class LoginPageComponent implements OnInit {
 
       try {
         await this.authService.signInWithRedirectAsync();
-      } catch (error) {
-        this.onSignInError(error);
+      } catch (error: unknown) {
+        this.onSignInError(error as firebase.auth.Error);
       }
     },
     error => {
@@ -88,8 +88,8 @@ export class LoginPageComponent implements OnInit {
 
     try {
       await this.authService.signInWithEmail(email);
-    } catch (error) {
-      this.onSignInError(error);
+    } catch (error: unknown) {
+      this.onSignInError(error as firebase.auth.Error);
       return;
     }
 

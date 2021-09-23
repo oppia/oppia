@@ -74,8 +74,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 task,
                 {
                     'app_engine_http_request': {
-                        'http_method': (
-                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'http_method': tasks_v2.types.HttpMethod.POST,
                         'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'
@@ -124,8 +123,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 task,
                 {
                     'app_engine_http_request': {
-                        'http_method': (
-                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'http_method': tasks_v2.types.HttpMethod.POST,
                         'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'

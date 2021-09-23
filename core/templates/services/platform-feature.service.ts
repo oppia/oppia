@@ -167,10 +167,12 @@ export class PlatformFeatureService {
       PlatformFeatureService.featureStatusSummary = await this
         .loadFeatureFlagsFromServer();
       this.saveResults();
-    } catch (err) {
-      this.loggerService.error(
-        'Error during initialization of PlatformFeatureService: ' +
-        `${err.message ? err.message : err}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.loggerService.error(
+          'Error during initialization of PlatformFeatureService: ' +
+          `${err.message ? err.message : err}`);
+      }
       // If any error, just disable all features.
       PlatformFeatureService.featureStatusSummary =
         FeatureStatusSummary.createDefault();

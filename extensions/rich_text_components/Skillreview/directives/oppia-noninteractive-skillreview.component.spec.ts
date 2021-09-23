@@ -170,11 +170,11 @@ describe('NoninteractiveSkillreview', () => {
     try {
       component.openConceptCard(e);
       flush();
-    } catch (e) {
-      error = e;
+    } catch (e: unknown) {
+      error = e as Error;
+      expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
     }
-
-    expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
+    expect(error).not.toBeUndefined();
   }));
 
   it('should not open modal when ck Editor copy mode is active',

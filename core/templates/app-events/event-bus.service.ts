@@ -58,8 +58,12 @@ export class EventBusService {
       (event: T): void => {
         try {
           action.call(callbackContext, event);
-        } catch (error) {
-          this._errorHandler(error);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            this._errorHandler(error as Error);
+          } else {
+            throw error;
+          }
         }
       }
     );

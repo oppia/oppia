@@ -105,6 +105,6 @@ describe('NumberWithUnitsEditorComponent', () => {
   it('should display error message when user enters incorrect units', () => {
     component.updateValue('23 kf');
 
-    expect(component.errorMessage).toBe('SyntaxError: Unit "kf" not found.');
+    expect(component.errorMessage).toBe('Unit "kf" not found.');
   });
 });

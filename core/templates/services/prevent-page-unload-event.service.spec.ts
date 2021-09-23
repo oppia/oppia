@@ -129,6 +129,9 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.addListener(validationCallback);
     spyOn(reloadEvt, 'preventDefault');
 
+    // This throws "Expected 0 arguments, but got 1.". We need to suppress this
+    // error because the nativeWindow is mocked and allows 1 argument.
+    // @ts-ignore
     windowRef.nativeWindow.location.reload(validationCallback());
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
