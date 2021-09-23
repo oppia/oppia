@@ -149,6 +149,7 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
     # languages.
     complete_translation_language_list = (
         exploration.get_languages_with_complete_translation())
+    # TODO(#13912): Revisit voiceover language logic.
     language_codes_needing_voice_artists = set(
         complete_translation_language_list)
     incomplete_translation_language_codes = (
