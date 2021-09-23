@@ -2217,13 +2217,15 @@ class UserQueryModel(base_models.BaseModel):
         start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
 
         created_on_query = cls.query().order(-cls.created_on)
-        query_models, next_cursor, _ = (
-            created_on_query.fetch_page(page_size, start_cursor=start_cursor))
+        fetch_result: Tuple[
+            Sequence[UserQueryModel], datastore_services.Cursor, bool
+        ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
+        query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        plus_one_query_models, _, _ = (
-            created_on_query.fetch_page(
-                page_size + 1, start_cursor=start_cursor))
+        fetch_result = created_on_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor)
+        plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         next_cursor_str = (
@@ -2370,7 +2372,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
 
         user_data = {}
-        mastery_models = cls.get_all().filter(cls.user_id == user_id).fetch()
+        mastery_models: Sequence[UserSkillMasteryModel] = (
+            cls.get_all().filter(cls.user_id == user_id).fetch())
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
             user_data[mastery_model_skill_id] = {
@@ -2440,7 +2443,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             dict. Dictionary of the data from UserContributionProficiencyModel.
         """
         user_data = {}
-        scoring_models = cls.query(cls.user_id == user_id).fetch()
+        scoring_models: Sequence[UserContributionProficiencyModel] = (
+            cls.query(cls.user_id == user_id).fetch())
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
@@ -2485,10 +2489,11 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             list(str). A list of score_categories where the user has score above
             the threshold.
         """
-        scoring_models = cls.get_all().filter(datastore_services.all_of(
-            cls.user_id == user_id,
-            cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
-        )).fetch()
+        scoring_models: Sequence[UserContributionProficiencyModel] = (
+            cls.get_all().filter(datastore_services.all_of(
+                cls.user_id == user_id,
+                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+            )).fetch())
         return (
             [scoring_model.score_category for scoring_model in scoring_models])
 
