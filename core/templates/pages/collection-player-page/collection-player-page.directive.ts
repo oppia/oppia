@@ -309,7 +309,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
               function(collection) {
                 ctrl.collection = collection;
 
-                PageTitleService.setPageTitle(
+                PageTitleService.setDocumentTitle(
                   ctrl.collection.getTitle() + ' - Oppia');
 
                 // Load the user's current progress in the collection. If the
