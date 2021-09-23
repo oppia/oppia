@@ -2296,13 +2296,16 @@ title: Title
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, data, csrf_token=None, expected_status_int=200,
-            upload_files=None, use_payload=True, source=None):
+            self, url, data, headers=None, csrf_token=None,
+            expected_status_int=200, upload_files=None, use_payload=True,
+            source=None):
+
         """Post an object to the server by JSON; return the received object.
 
         Args:
             url: str. The URL to send the POST request to.
             data: dict. The dictionary that acts as the body of the request.
+            headers: dict. The headers set in the request.
             csrf_token: str. The csrf token to identify the user.
             expected_status_int: int. Expected return status of the POST
                 request.
@@ -2332,7 +2335,8 @@ title: Title
 
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors,
-            expected_status_int=expected_status_int, upload_files=upload_files)
+            expected_status_int=expected_status_int, upload_files=upload_files,
+            headers=headers)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
