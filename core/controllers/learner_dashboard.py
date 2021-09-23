@@ -56,7 +56,7 @@ class LearnerDashboardPage(base.BaseHandler):
         self.render_template('learner-dashboard-page.mainpage.html')
 
 
-class LearnerDashboardHandlerForTopicsAndStories(base.BaseHandler):
+class LearnerDashboardTopicsAndStoriesProgressHandler(base.BaseHandler):
     """Provides data of the user's topics and stories for the learner
     dashboard page."""
 
@@ -130,7 +130,7 @@ class LearnerDashboardHandlerForTopicsAndStories(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerDashboardHandlerForCollections(base.BaseHandler):
+class LearnerDashboardCollectionsProgressHandler(base.BaseHandler):
     """Provides data of the user's collections for the learner
     dashboard page."""
 
@@ -168,7 +168,7 @@ class LearnerDashboardHandlerForCollections(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerDashboardHandlerForExplorations(base.BaseHandler):
+class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
     """Provides data for the user's learner dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

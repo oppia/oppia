@@ -453,11 +453,11 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
   let LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
-    '/learnerdashboardhandlerfortopicsandstories/data');
+    '/learnerdashboardtopicsandstoriesprogresshandler/data');
   let LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
-    '/learnerdashboardhandlerforcollections/data');
+    '/learnerdashboardcollectionsprogresshandler/data');
   let LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
-    '/learnerdashboardhandlerforexplorations/data');
+    '/learnerdashboardexplorationsprogresshandler/data');
   let ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {

@@ -53,7 +53,7 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/learner-dashboard', response.headers['location'])
 
 
-class LearnerDashboardHandlerForTopicsAndStoriesTests(
+class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
     test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
@@ -98,7 +98,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardHandlerForTopicsAndStoriesTests, self).setUp()
+        super(
+            LearnerDashboardTopicsAndStoriesProgressHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -452,7 +453,8 @@ class LearnerDashboardHandlerForTopicsAndStoriesTests(
         self.logout()
 
 
-class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
+class LearnerDashboardCollectionsProgressHandlerTests(
+    test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
@@ -496,7 +498,7 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardHandlerForCollectionsTests, self).setUp()
+        super(LearnerDashboardCollectionsProgressHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -571,7 +573,8 @@ class LearnerDashboardHandlerForCollectionsTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
+class LearnerDashboardExplorationsProgressHandlerTests(
+    test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
@@ -615,7 +618,7 @@ class LearnerDashboardHandlerForExplorationsTests(test_utils.GenericTestBase):
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardHandlerForExplorationsTests, self).setUp()
+        super(LearnerDashboardExplorationsProgressHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

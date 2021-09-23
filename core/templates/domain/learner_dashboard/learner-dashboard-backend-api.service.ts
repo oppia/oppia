@@ -157,7 +157,8 @@ export class LearnerDashboardBackendApiService {
   Promise<LearnerDashboardTopicsAndStoriesData> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardTopicsAndStoriesDataBackendDict>(
-        '/learnerdashboardhandlerfortopicsandstories/data').toPromise().then(
+        '/learnerdashboardtopicsandstoriesprogresshandler/data'
+        ).toPromise().then(
         dashboardData => {
           resolve({
             completedStoriesList: (
@@ -200,7 +201,7 @@ export class LearnerDashboardBackendApiService {
   Promise<LearnerDashboardCollectionsData> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardCollectionsDataBackendDict>(
-        '/learnerdashboardhandlerforcollections/data').toPromise().then(
+        '/learnerdashboardcollectionsprogresshandler/data').toPromise().then(
         dashboardData => {
           resolve({
             completedCollectionsList: (
@@ -231,7 +232,7 @@ export class LearnerDashboardBackendApiService {
   Promise<LearnerDashboardExplorationsData> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardExplorationsDataBackendDict>(
-        '/learnerdashboardhandlerforexplorations/data').toPromise().then(
+        '/learnerdashboardexplorationsprogresshandler/data').toPromise().then(
         dashboardData => {
           resolve({
             completedExplorationsList: (
