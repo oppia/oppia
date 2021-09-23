@@ -185,8 +185,7 @@ export class Subtopic {
       subtopicBackendDict.url_fragment);
   }
 
-  static createFromTitle(
-      subtopicId: number, title: string): Subtopic {
+  static createFromTitle(subtopicId: number, title: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,
