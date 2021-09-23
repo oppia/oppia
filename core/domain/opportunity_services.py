@@ -182,7 +182,8 @@ def _compute_exploration_incomplete_translation_languages(exploration):
             incomplete translation languages.
 
     Returns:
-        list(str). List of incomplete translation language codes.
+        list(str). List of incomplete translation language codes sorted
+        alphabetically.
     """
     audio_language_codes = set(
         language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
@@ -193,7 +194,7 @@ def _compute_exploration_incomplete_translation_languages(exploration):
     # Remove exploration language from incomplete translation languages list
     # as an exploration does not need a translation in its own language.
     incomplete_translation_language_codes.discard(exploration.language_code)
-    return list(incomplete_translation_language_codes)
+    return list(incomplete_translation_language_codes).sort()
 
 
 def add_new_exploration_opportunities(story_id, exp_ids):
