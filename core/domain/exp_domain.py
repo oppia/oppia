@@ -1609,7 +1609,6 @@ class Exploration(python_utils.OBJECT):
         """
         content_count = self.get_content_count()
         language_code_list = []
-        # TODO(#13903): Think of ways of reducing this runtime.
         for language_code, count in self.get_translation_counts().items():
             if count == content_count:
                 language_code_list.append(language_code)

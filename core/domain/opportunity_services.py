@@ -247,6 +247,8 @@ def update_opportunity_with_updated_exploration(exp_id):
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     content_count = updated_exploration.get_content_count()
     translation_counts = updated_exploration.get_translation_counts()
+    # TODO(#13903): Potentially reduce runtime of computing the complete
+    # languages.
     complete_translation_language_list = (
         updated_exploration.get_languages_with_complete_translation())
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
