@@ -33,6 +33,35 @@ import feconf
 import utils
 
 
+SCHEMA_FOR_CLASSROOM_URL_FRAGMENT = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_url_fragment'
+    }, {
+        'id': 'has_length_at_most',
+        'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+    }]
+}
+SCHEMA_FOR_TOPIC_URL_FRAGMENT = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_url_fragment'
+    }, {
+        'id': 'has_length_at_most',
+        'max_value': constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+    }]
+}
+SCHEMA_FOR_STORY_URL_FRAGMENT = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_url_fragment'
+    }, {
+        'id': 'has_length_at_most',
+        'max_value': constants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+    }]
+}
+
+
 class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
@@ -41,28 +70,13 @@ class StoryPageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_url_fragment'
-                }]
-            }
+            'schema': SCHEMA_FOR_CLASSROOM_URL_FRAGMENT
         },
         'topic_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_url_fragment'
-                }]
-            }
+            'schema': SCHEMA_FOR_TOPIC_URL_FRAGMENT
         },
         'story_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_url_fragment'
-                }]
-            }
+            'schema': SCHEMA_FOR_STORY_URL_FRAGMENT
         },
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -116,28 +130,13 @@ class StoryProgressHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_url_fragment'
-                }]
-            }
+            'schema': SCHEMA_FOR_CLASSROOM_URL_FRAGMENT
         },
         'topic_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_url_fragment'
-                }]
-            }
+            'schema': SCHEMA_FOR_TOPIC_URL_FRAGMENT
         },
         'story_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_url_fragment'
-                }]
-            }
+            'schema': SCHEMA_FOR_STORY_URL_FRAGMENT
         },
         'node_id': {
             'schema': {
