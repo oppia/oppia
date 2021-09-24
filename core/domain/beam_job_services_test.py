@@ -107,6 +107,36 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             beam_job_services.get_beam_job_run_from_model(run_model).to_dict(),
             run.to_dict())
 
+    def test_cancel_beam_job(self) -> None:
+        run_model = beam_job_services.create_beam_job_run_model(
+            'WorkingJob', dataflow_job_id='123')
+        run_model.put()
+
+        with self.swap_to_always_return(jobs_manager, 'cancel_job'):
+            run = beam_job_services.cancel_beam_job(run_model.id)
+
+        self.assertEquals(
+            run.to_dict(),
+            beam_job_services.get_beam_job_run_from_model(run_model).to_dict())
+
+    def test_cancel_beam_job_which_does_not_exist_raises_an_error(self) -> None:
+        with self.swap_to_always_return(jobs_manager, 'cancel_job'):
+            self.assertRaisesRegexp(
+                ValueError, 'No such job',
+                lambda: beam_job_services.cancel_beam_job('123'))
+
+    def test_cancel_beam_job_which_has_no_dataflow_job_id_raises_an_error(
+        self
+    ) -> None:
+        run_model = beam_job_services.create_beam_job_run_model(
+            'WorkingJob', dataflow_job_id=None)
+        run_model.put()
+
+        with self.swap_to_always_return(jobs_manager, 'cancel_job'):
+            self.assertRaisesRegexp(
+                ValueError, 'cannot be cancelled',
+                lambda: beam_job_services.cancel_beam_job(run_model.id))
+
     def test_get_beam_job_runs(self):
         beam_job_run_models = [
             self.create_beam_job_run_model(

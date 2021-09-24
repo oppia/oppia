@@ -118,17 +118,27 @@ def run_job(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
             options=job_options.JobOptions(namespace=namespace))
 
-    with _job_bookkeeping_context(job_class.__name__) as run_model:
-        _ = job_class(pipeline).run() | job_io.PutResults(run_model.id)
+    job = job_class(pipeline)
+    job_name = job_class.__name__
+
+    # NOTE: Exceptions raised within this context are logged and suppressed.
+    with _job_bookkeeping_context(job_name) as run_model:
+        _ = job.run() | job_io.PutResults(run_model.id)
 
         run_result = pipeline.run()
 
         if sync:
             run_result.wait_until_finish()
             run_model.latest_job_state = beam_job_models.BeamJobState.DONE.value
-        else:
+
+        elif run_result.has_job:
             run_model.dataflow_job_id = run_result.job_id()
             run_model.latest_job_state = run_result.state
+
+        else:
+            raise RuntimeError(
+                'Failed to deploy %s to the Dataflow service. Please try again '
+                'after a few minutes.' % job_name)
 
     return run_model
 
@@ -158,6 +168,45 @@ def refresh_state_of_beam_job_run_model(
         job_state_updated = beam_job_run_model.last_updated
 
         logging.exception('Failed to update job_id="%s"!' % job_id)
+
+    else:
+        job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
+            job.current_state, beam_job_models.BeamJobState.UNKNOWN).value
+        job_state_updated = job.current_state_time.replace(tzinfo=None)
+
+        if (
+                beam_job_run_model.latest_job_state != job_state and
+                job_state == beam_job_models.BeamJobState.FAILED.value
+        ):
+            _put_job_stderr(beam_job_run_model.id, pprint.pformat(job))
+
+    beam_job_run_model.latest_job_state = job_state
+    beam_job_run_model.last_updated = job_state_updated
+    beam_job_run_model.update_timestamps(update_last_updated_time=False)
+
+
+def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
+    """Refreshs the state of the given BeamJobRunModel.
+
+    Args:
+        beam_job_run_model: BeamJobRunModel. The model to update.
+    """
+    job_id = beam_job_run_model.dataflow_job_id
+    if job_id is None:
+        raise ValueError('dataflow_job_id must not be None')
+
+    try:
+        job = dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
+            job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
+            location=feconf.GOOGLE_APP_ENGINE_REGION,
+            job=dataflow.Job(
+                requested_state=dataflow.JobState.JOB_STATE_CANCELLED)))
+
+    except Exception:
+        job_state = beam_job_models.BeamJobState.UNKNOWN.value
+        job_state_updated = beam_job_run_model.last_updated
+
+        logging.exception('Failed to cancel job_id="%s"!' % job_id)
 
     else:
         job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
