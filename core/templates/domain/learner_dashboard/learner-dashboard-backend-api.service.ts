@@ -158,7 +158,7 @@ export class LearnerDashboardBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardTopicsAndStoriesDataBackendDict>(
         '/learnerdashboardtopicsandstoriesprogresshandler/data'
-        ).toPromise().then(
+      ).toPromise().then(
         dashboardData => {
           resolve({
             completedStoriesList: (
