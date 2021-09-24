@@ -97,7 +97,7 @@ describe('ContinueValidationService', () => {
         'Expected customization arguments to have property: buttonText');
     });
 
-    it('should expect a button text having length less than 20',
+  it('should expect a button text having length less than 20',
     () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
