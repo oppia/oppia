@@ -196,32 +196,17 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
         raise ValueError('dataflow_job_id must not be None')
 
     try:
-        job = dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
+        dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
             job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             job=dataflow.Job(
                 requested_state=dataflow.JobState.JOB_STATE_CANCELLED)))
-
     except Exception:
-        job_state = beam_job_models.BeamJobState.UNKNOWN.value
-        job_state_updated = beam_job_run_model.last_updated
-
         logging.exception('Failed to cancel job_id="%s"!' % job_id)
-
     else:
-        job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
-            job.current_state, beam_job_models.BeamJobState.UNKNOWN).value
-        job_state_updated = job.current_state_time.replace(tzinfo=None)
-
-        if (
-                beam_job_run_model.latest_job_state != job_state and
-                job_state == beam_job_models.BeamJobState.FAILED.value
-        ):
-            _put_job_stderr(beam_job_run_model.id, pprint.pformat(job))
-
-    beam_job_run_model.latest_job_state = job_state
-    beam_job_run_model.last_updated = job_state_updated
-    beam_job_run_model.update_timestamps(update_last_updated_time=False)
+        beam_job_run_model.latest_job_state = (
+            beam_job_models.BeamJobState.CANCELLING.value)
+        beam_job_run_model.update_timestamps()
 
 
 @contextlib.contextmanager
