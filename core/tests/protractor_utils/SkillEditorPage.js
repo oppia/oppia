@@ -140,18 +140,14 @@ var SkillEditorPage = function() {
     await this.selectDifficultyForRubric(difficulty);
     var addRubricExplanationButton = element(
       by.css('.protractor-test-add-explanation-button-' + difficulty));
-    await waitFor.elementToBeClickable(
-      addRubricExplanationButton,
-      'Add Rubric Explanation button takes too long to be clickable');
-    await addRubricExplanationButton.click();
+    await action.click(
+      'Add Rubric Explanation Button', addRubricExplanationButton);
     await waitFor.visibilityOf(
       rubricExplanationEditorElement,
       'Rubric explanation editor takes too long to appear');
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
-    await waitFor.elementToBeClickable(
-      saveRubricExplanationButton,
-      'Save Rubric Explanation button takes too long to be clickable');
-    await saveRubricExplanationButton.click();
+    await action.click(
+      'Save Rubric Explanation Button', saveRubricExplanationButton);
     await waitFor.invisibilityOf(
       saveRubricExplanationButton,
       'Save Rubric Explanation editor takes too long to close.');
@@ -165,14 +161,15 @@ var SkillEditorPage = function() {
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
-    var button = editRubricExplanationButtons.get(explIndex);
-    await waitFor.elementToBeClickable(
-      button, 'Edit Rubric Explanation button takes too long to be clickable');
-    await button.click();
+    var editRubricExplanantionbutton =
+      editRubricExplanationButtons.get(explIndex);
+    await action.click(
+      'Edit Rubric Explanation Button', editRubricExplanantionbutton);
     await waitFor.visibilityOf(
       rubricExplanationEditorElement,
       'Rubric explanation editor takes too long to appear');
-    await deleteRubricExplanationButton.click();
+    await action.click(
+      'Delete Rubric Explanation Button', deleteRubricExplanationButton);
   };
 
   this.editRubricExplanationWithIndex = async function(
@@ -183,18 +180,15 @@ var SkillEditorPage = function() {
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
-    await waitFor.elementToBeClickable(
-      editRubricExplanationButtons.get(explIndex),
-      'Edit Rubric Explanation button takes too long to be clickable');
-    await editRubricExplanationButtons.get(explIndex).click();
+    await action.click(
+      'Edit Rubric Explanation Button',
+      editRubricExplanationButtons.get(explIndex));
     await waitFor.visibilityOf(
       rubricExplanationEditorElement,
       'Rubric explanation editor takes too long to appear');
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
-    await waitFor.elementToBeClickable(
-      saveRubricExplanationButton,
-      'Save Rubric Explanation button takes too long to be clickable');
-    await saveRubricExplanationButton.click();
+    await action.click(
+      'Save Rubric Explanation Button', saveRubricExplanationButton);
   };
 
   this.expectRubricExplanationsToMatch = async function(
@@ -204,14 +198,16 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-' + difficulty));
     var explanationCount = await rubricExplanationsForDifficulty.count();
     for (var i = 0; i < explanationCount; i++) {
-      var text = await rubricExplanationsForDifficulty.get(i).getText();
+      var text = await action.getText(
+        'Rubric Explanations for difficulty ',
+        rubricExplanationsForDifficulty.get(i));
       expect(text).toMatch(explanations[i]);
     }
   };
 
   this.expectNumberOfQuestionsToBe = async function(count) {
     await waitFor.visibilityOf(
-      questionItem, 'Question takes too long to appear');
+      questionItem, 'Question taking too long to appear.');
     expect(await questionItems.count()).toEqual(count);
   };
 
@@ -257,6 +253,8 @@ var SkillEditorPage = function() {
     await waitFor.invisibilityOf(
       skillChangeCount, 'Skill change count takes too long to update.');
     await waitFor.visibilityOfSuccessToast('Changes Saved.');
+    await waitFor.visibilityOf(
+      aveOrPublishSkill, 'Save or publishSkill taking too long to appear.');
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
   };
 
@@ -267,7 +265,6 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       conceptCardTextElement,
       'Concept card text Editor takes too long to appear');
-
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
     await action.click(
@@ -279,7 +276,8 @@ var SkillEditorPage = function() {
   };
 
   this.expectConceptCardExplanationToMatch = async function(explanation) {
-    var text = await conceptCardExplanationText.getText();
+    var text = await action.getText(
+      'Concept card Explanation Text', conceptCardExplanationText);
     expect(text).toMatch(explanation);
   };
 
@@ -290,10 +288,10 @@ var SkillEditorPage = function() {
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    await workedExampleQuestion.click();
+    await action.click('Worked Example Question', workedExampleQuestion);
     await browser.switchTo().activeElement().sendKeys(question);
 
-    await workedExampleExplanation.click();
+    await action.click('Worked Example Explanation', workedExampleExplanation);
     await browser.switchTo().activeElement().sendKeys(explanation);
 
     await action.click(
@@ -329,16 +327,12 @@ var SkillEditorPage = function() {
     for (var index in questions) {
       await action.click(
         'Worked Example Summary', workedExampleSummary(index));
-      await waitFor.visibilityOf(
-        workedExampleQuestionField,
-        'Worked example question field takes too long to appear.');
-      var text = await workedExampleQuestionField.getText();
+      var text = await action.getText(
+        'Worked Example Question Field', workedExampleQuestionField);
       expect(text).toMatch(questions[questionIndexToCheck]);
       questionIndexToCheck++;
-      await waitFor.visibilityOf(
-        workedExampleExplanationField,
-        'Worked example explanation field takes too long to appear.');
-      var text = await workedExampleExplanationField.getText();
+      var text = await action.getText(
+        'Worked Example Explanation Field', workedExampleExplanationField);
       expect(text).toMatch(explanations[explanationIndexToCheck]);
       explanationIndexToCheck++;
       await action.click(
@@ -353,13 +347,14 @@ var SkillEditorPage = function() {
       addMisconceptionModal,
       'Add Misconception Modal takes too long to appear');
 
-    await misconceptionNameField.click();
+    await action.click('Misconception name field', misconceptionNameField);
     await browser.switchTo().activeElement().sendKeys(name);
 
-    await misconceptionNotesField.click();
+    await action.click('Misconception notes field', misconceptionNotesField);
     await browser.switchTo().activeElement().sendKeys(notes);
 
-    await misconceptionFeedbackField.click();
+    await action.click(
+      'Misconception feedback field', misconceptionFeedbackField);
     await browser.switchTo().activeElement().sendKeys(feedback);
 
     await action.click('Confirm add misconception', confirmAddMisconception);
@@ -373,6 +368,9 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       misconceptionListContainer,
       'Misconception list container takes too long to appear.');
+    await waitFor.visibilityOf(
+      misconceptionListItems,
+      'Misconception list items taking too long to appear.');
     expect(await misconceptionListItems.count()).toBe(number);
   };
 
