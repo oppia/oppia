@@ -67,7 +67,7 @@ angular.module('oppia').directive('stateContentEditor', [
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.isCardContentLengthLimitReached = function() {
-            if(StateContentService.displayed == undefined){
+            if (StateContentService.displayed === undefined) {
               return false;
             }
             var content = StateContentService.displayed.html;
