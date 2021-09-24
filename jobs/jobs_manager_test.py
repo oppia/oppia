@@ -168,6 +168,22 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
         result = beam_job_services.get_beam_job_run_result(self.run_model.id)
         self.assertIn(self.dataflow_job.id, result.stderr)
 
+    def test_job_with_cancelling_status_but_job_is_cancelled(self) -> None:
+        self.run_model.latest_job_state = 'CANCELLING'
+        self.dataflow_job.current_state = dataflow.JobState.JOB_STATE_CANCELLED
+
+        jobs_manager.refresh_state_of_beam_job_run_model(self.run_model)
+
+        self.assertEqual(self.run_model.latest_job_state, 'CANCELLED')
+
+    def test_job_with_cancelling_status_but_job_is_running(self) -> None:
+        self.run_model.latest_job_state = 'CANCELLING'
+        self.dataflow_job.current_state = dataflow.JobState.JOB_STATE_RUNNING
+
+        jobs_manager.refresh_state_of_beam_job_run_model(self.run_model)
+
+        self.assertEqual(self.run_model.latest_job_state, 'CANCELLING')
+
     def test_failed_api_call_logs_the_exception(self) -> None:
         self.run_model.latest_job_state = 'PENDING'
         self.dataflow_client_mock.get_job.side_effect = Exception('uh-oh')
