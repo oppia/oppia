@@ -39,6 +39,35 @@ class StoryPageDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_url_fragment'
+                }]
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_url_fragment'
+                }]
+            }
+        },
+        'story_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_url_fragment'
+                }]
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
@@ -85,6 +114,41 @@ class StoryProgressHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_url_fragment'
+                }]
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_url_fragment'
+                }]
+            }
+        },
+        'story_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_url_fragment'
+                }]
+            }
+        },
+        'node_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {}
+    }
 
     def _record_node_completion(
             self, story_id, node_id, completed_node_ids, ordered_nodes):
