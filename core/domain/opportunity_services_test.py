@@ -477,6 +477,21 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
 
+        # The translation opportunity should be returned after marking a
+        # translation as stale.
+        translation_needs_update_change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, '0', translation_needs_update_change_list,
+            'commit message')
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
     def test_create_new_skill_creates_new_skill_opportunity(self):
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
