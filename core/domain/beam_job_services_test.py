@@ -97,6 +97,10 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         """
         self.assertEqual(len(beam_job_runs), len(beam_job_run_models))
         runs = sorted(beam_job_runs, key=lambda j: j.job_id)
+        # The key for sorting is defined separately because of a mypy bug.
+        # A [no-any-return] is thrown if key is defined in the sort() method
+        # instead. Reference: https://github.com/python/mypy/issues/9590.
+
         by_id = lambda model: model.id
         run_models = sorted(beam_job_run_models, key=by_id)
         for i, (run, model) in enumerate(python_utils.ZIP(runs, run_models)):
