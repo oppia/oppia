@@ -97,8 +97,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         """
         self.assertEqual(len(beam_job_runs), len(beam_job_run_models))
         runs = sorted(beam_job_runs, key=lambda j: j.job_id)
-        # NOTE: MyPy is wrong, ID is a string.
-        run_models = sorted(beam_job_run_models, key=lambda m: m.id) # type: ignore[no-any-return]
+        by_id = lambda m: m.id
+        run_models = sorted(beam_job_run_models, key=by_id)
         for i, (r, m) in enumerate(python_utils.ZIP(runs, run_models)):
             with self.subTest('i=%d' % i):
                 self.assertEqual(r.job_id, m.id)

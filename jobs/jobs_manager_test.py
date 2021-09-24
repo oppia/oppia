@@ -216,24 +216,12 @@ class CancelJobTests(test_utils.GenericTestBase):
 
     def test_job_with_cancelling_status(self) -> None:
         self.run_model.latest_job_state = 'RUNNING'
-        self.dataflow_job.current_state = dataflow.JobState.JOB_STATE_CANCELLING
 
         jobs_manager.cancel_job(self.run_model)
 
         self.assertEqual(self.run_model.latest_job_state, 'CANCELLING')
 
-    def test_job_with_failed_status(self) -> None:
-        self.run_model.latest_job_state = 'RUNNING'
-        self.dataflow_job.current_state = dataflow.JobState.JOB_STATE_FAILED
-
-        jobs_manager.cancel_job(self.run_model)
-
-        self.assertEqual(self.run_model.latest_job_state, 'FAILED')
-        result = beam_job_services.get_beam_job_run_result(self.run_model.id)
-        self.assertIn(self.dataflow_job.id, result.stderr)
-
     def test_failed_api_call_logs_the_exception(self) -> None:
-        self.run_model.latest_job_state = 'PENDING'
         self.dataflow_client_mock.update_job.side_effect = Exception('uh-oh')
 
         with self.capture_logging() as logs:
@@ -241,4 +229,3 @@ class CancelJobTests(test_utils.GenericTestBase):
 
         self.assertGreater(len(logs), 0)
         self.assertIn('uh-oh', logs[0])
-        self.assertEqual(self.run_model.latest_job_state, 'UNKNOWN')
