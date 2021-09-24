@@ -98,14 +98,16 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
             beam_job_services.get_beam_job_run_from_model(model).to_dict())
 
     def test_delete_cancels_job(self) -> None:
+        model = beam_job_services.create_beam_job_run_model('FooJob')
+        model.put()
         run = beam_job_domain.BeamJobRun(
-            '123', 'WorkingJob', 'CANCELLING',
+            model.id, 'FooJob', 'CANCELLING',
             datetime.datetime.utcnow(), datetime.datetime.utcnow(), False)
 
         swap_cancel_beam_job = self.swap_to_always_return(
             beam_job_services, 'cancel_beam_job', value=run)
         with swap_cancel_beam_job:
-            response = self.delete_json('/beam_job_run', {'job_id': '123'}) # type: ignore[no-untyped-call]
+            response = self.delete_json('/beam_job_run', {'job_id': model.id}) # type: ignore[no-untyped-call]
 
         self.assertEqual(response, run.to_dict())
 

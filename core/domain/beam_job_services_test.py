@@ -97,17 +97,21 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         """
         self.assertEqual(len(beam_job_runs), len(beam_job_run_models))
         runs = sorted(beam_job_runs, key=lambda j: j.job_id)
-        by_id = lambda m: m.id
+        # The key for sorting is defined separately because of a mypy bug.
+        # A [no-any-return] is thrown if key is defined in the sort() method
+        # instead. Reference: https://github.com/python/mypy/issues/9590.
+
+        by_id = lambda model: model.id
         run_models = sorted(beam_job_run_models, key=by_id)
-        for i, (r, m) in enumerate(python_utils.ZIP(runs, run_models)):
+        for i, (run, model) in enumerate(python_utils.ZIP(runs, run_models)):
             with self.subTest('i=%d' % i):
-                self.assertEqual(r.job_id, m.id)
-                self.assertEqual(r.job_name, m.job_name)
-                self.assertEqual(r.job_state, m.latest_job_state)
-                self.assertEqual(r.job_started_on, m.created_on)
-                self.assertEqual(r.job_updated_on, m.last_updated)
+                self.assertEqual(run.job_id, model.id)
+                self.assertEqual(run.job_name, model.job_name)
+                self.assertEqual(run.job_state, model.latest_job_state)
+                self.assertEqual(run.job_started_on, model.created_on)
+                self.assertEqual(run.job_updated_on, model.last_updated)
                 self.assertEqual(
-                    r.job_is_synchronous, m.dataflow_job_id is None)
+                    run.job_is_synchronous, model.dataflow_job_id is None)
 
     def test_run_beam_job(self) -> None:
         run_model = beam_job_services.create_beam_job_run_model('WorkingJob')

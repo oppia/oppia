@@ -60,7 +60,11 @@ class BeamJobRunHandler(base.BaseHandler):
         'DELETE': {
             'job_id': {
                 'schema': {
-                    'type': 'unicode'
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'[A-Za-z0-9]{22}'
+                    }]
                 }
             }
         },
