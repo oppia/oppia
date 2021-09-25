@@ -36,14 +36,14 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './progress-nav.component.html'
 })
 export class ProgressNavComponent {
-  @Output() submit: EventEmitter<void> = (
-    new EventEmitter());
-  @Output() clickContinueButton: EventEmitter<void> = (
-    new EventEmitter());
   @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
   @Input() submitButtonIsDisabled: boolean;
+  @Output() submit: EventEmitter<void> = (
+    new EventEmitter());
+  @Output() clickContinueButton: EventEmitter<void> = (
+    new EventEmitter());
 
   directiveSubscriptions = new Subscription();
   transcriptLength = 0;

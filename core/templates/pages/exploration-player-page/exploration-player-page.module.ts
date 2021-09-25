@@ -67,7 +67,6 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
