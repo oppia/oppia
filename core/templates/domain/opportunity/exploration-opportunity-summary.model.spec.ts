@@ -76,20 +76,22 @@ describe('Exploration opportunity summary model', () => {
         .toEqual(20);
     });
 
-    it('should return a correct translations counts if available', () => {
+    it('should return correct translations count if translations are ' +
+      'available for the given language_code', () => {
       expect(
         explorationOpportunitySummary.getTranslationsCount('hi'))
         .toEqual(15);
     });
 
-    it('should return a correct translations counts if not available', () => {
+    it('should return correct translations count if translations are not ' +
+      'available for the given language_code', () => {
       expect(
         explorationOpportunitySummary.getTranslationsCount('en'))
         .toEqual(0);
     });
 
-    it('should return a correct translations counts if no contents ' +
-      'available', () => {
+    it('should return correct translations count if no contents ' +
+      'are available', () => {
       const backendDictWithNoContents = {
         id: 'exp_id',
         topic_name: 'Topic',

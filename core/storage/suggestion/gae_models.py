@@ -321,6 +321,49 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_multiple_translation_suggestions_in_review(
+            cls, thread_ids: List[str]
+    ) -> List['GeneralSuggestionModel']:
+        """Returns translation suggestions which are in review from multiple
+        thread ids.
+
+        Args:
+            thread_ids: list(str). Suggestion ids of translations that are in
+                review.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions in review
+            with given suggestion ids.
+        """
+        return cast(
+            List[GeneralSuggestionModel],
+            GeneralSuggestionModel.get_multi(thread_ids)
+        )
+
+    @classmethod
+    def get_translation_suggestions_in_review_ids_with_exp_id(
+            cls, target_ids: List[str]
+    ) -> List['GeneralSuggestionModel']:
+        """Returns ids of translation suggestions which are in review with
+        target ids.
+
+        Args:
+            target_ids: list(str). Exploration IDs matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(str). A list of ids of translation suggestions in review
+            with target_id of exp_id.
+        """
+        suggestion_keys = cast(
+            List[datastore_services.Key],
+            GeneralSuggestionModel.query(
+                GeneralSuggestionModel.target_id.IN(target_ids) # pylint: disable=singleton-comparison
+            ).fetch(keys_only=True))
+        
+        return [suggestion_key.id() for suggestion_key in suggestion_keys]
+
+    @classmethod
     def get_translation_suggestion_ids_with_exp_ids(
             cls, exp_ids: List[str]
     ) -> List[str]:

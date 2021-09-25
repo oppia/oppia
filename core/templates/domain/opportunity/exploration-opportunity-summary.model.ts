@@ -92,7 +92,7 @@ export class ExplorationOpportunitySummary {
     let inReviewCount = 0;
     if (this.translationInReviewCount.hasOwnProperty(languageCode)) {
       inReviewCount = (
-        (this.translationInReviewCount[languageCode]));
+        this.translationInReviewCount[languageCode]);
     }
     return inReviewCount;
   }
