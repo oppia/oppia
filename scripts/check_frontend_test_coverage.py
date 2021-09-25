@@ -58,6 +58,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'contributor-dashboard-admin-page.component.ts',
     'conversation-skin.directive.ts',
     'current-interaction.service.ts',
+    'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
