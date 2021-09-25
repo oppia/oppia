@@ -343,7 +343,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_translation_suggestions_in_review_ids_with_exp_id(
             cls, target_ids: List[str]
-    ) -> List['GeneralSuggestionModel']:
+    ) -> List[str]:
         """Returns ids of translation suggestions which are in review with
         target ids.
 
