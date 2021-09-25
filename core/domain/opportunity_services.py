@@ -459,10 +459,13 @@ def get_translation_opportunities(language_code, cursor):
     if len(opportunity_ids) > 0:
         suggestion_ids = (
             suggestion_models
-            .GeneralSuggestionModel.get_translation_suggestions_in_review_ids_with_exp_id(opportunity_ids))
+            .GeneralSuggestionModel
+            .get_translation_suggestions_in_review_ids_with_exp_id(
+                opportunity_ids))
         translations_in_review = (
             suggestion_models
-            .GeneralSuggestionModel.get_multiple_translation_suggestions_in_review(suggestion_ids))
+            .GeneralSuggestionModel
+            .get_multiple_translation_suggestions_in_review(suggestion_ids))
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
