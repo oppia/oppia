@@ -92,7 +92,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
     'story-editor.directive.ts',
-    'story-node-editor.directive.ts',
     'story-node.model.ts',
     'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
