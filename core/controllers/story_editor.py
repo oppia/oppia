@@ -38,7 +38,10 @@ class StoryEditorPage(base.BaseHandler):
         'story_id': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'is_valid_story_id',
+            }]
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -159,7 +162,10 @@ class StoryPublishHandler(base.BaseHandler):
         'story_id': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'is_valid_story_id',
+            }]
         }
     }
     HANDLER_ARGS_SCHEMAS = {
