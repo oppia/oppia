@@ -21,12 +21,24 @@ import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 
 describe('Testing filters', function() {
-  let truncatePipe: TruncatePipe = null;
+  let truncatePipe: TruncatePipe;
   beforeEach(() => {
     truncatePipe = new TruncatePipe(new ConvertToPlainTextPipe());
   });
 
   it('should have all expected filters', () => {
     expect(truncatePipe).not.toEqual(null);
+  });
+
+  it('should correctly truncate', () => {
+    expect(truncatePipe.transform('testcool', 7)).toBe('test...');
+    expect(truncatePipe.transform(Array(80).join('a'), NaN))
+      .toBe(Array(68).join('a') + '...');
+    expect(truncatePipe.transform('HelloWorld', 10)).toBe('HelloWorld');
+    expect(truncatePipe.transform('HelloWorld', 8, 'contd'))
+      .toBe('Helcontd');
+    expect(truncatePipe.transform('', 10)).toBe('');
+    expect(truncatePipe.transform((12345678) as unknown as string, 7))
+      .toBe('1234...');
   });
 });

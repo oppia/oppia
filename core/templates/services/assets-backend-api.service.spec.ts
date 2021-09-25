@@ -41,11 +41,11 @@ describe('Assets Backend API Service', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [HttpClientTestingModule]
       });
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      csrfTokenService = TestBed.get(CsrfTokenService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
@@ -177,6 +177,27 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
+    it('should successfully post a thumbnail to server', fakeAsync(() => {
+      const successMessage = 'Thumbnail SVG was successfully saved.';
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
+      assetsBackendApiService.postThumbnailFile(
+        new Blob(['abc']),
+        'filename.svg',
+        'entity_type',
+        'entity_id'
+      ).subscribe(onSuccess, onFailure);
+      flushMicrotasks();
+
+      httpTestingController.expectOne(
+        '/createhandler/imageupload/entity_type/entity_id'
+      ).flush(successMessage);
+
+      expect(onSuccess).toHaveBeenCalledWith(successMessage);
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
     it('should handle rejection when saving a math SVG fails', fakeAsync(() => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
@@ -195,6 +216,29 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).toHaveBeenCalled();
     }));
 
+    it('should handle rejection when saving a math SVG fails with non HTTP err',
+      fakeAsync(() => {
+        const onSuccess = jasmine.createSpy('onSuccess');
+        const onFailure = jasmine.createSpy('onFailure');
+
+        spyOn(
+          // This throws "Argument of type 'getImageUploadUrl' is not assignable
+          // to parameter of type 'keyof AssetsBackendApiService'. We need to
+          // suppress this error because of strict type checking.
+          // @ts-ignore
+          assetsBackendApiService, 'getImageUploadUrl'
+        ).and.throwError(Error('token'));
+
+        assetsBackendApiService.saveMathExpresionImage(
+          imageBlob, 'new.svg', 'exploration', 'expid12345'
+        ).then(onSuccess, onFailure);
+        flushMicrotasks();
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onFailure).toHaveBeenCalled();
+      })
+    );
+
     it('should handle rejection when saving a file fails', fakeAsync(() => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
@@ -211,6 +255,29 @@ describe('Assets Backend API Service', () => {
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();
     }));
+
+    it('should handle rejection when saving a file fails with non HTTP error',
+      fakeAsync(() => {
+        const onSuccess = jasmine.createSpy('onSuccess');
+        const onFailure = jasmine.createSpy('onFailure');
+
+        spyOn(
+          // This throws "Argument of type 'getImageUploadUrl' is not assignable
+          // to parameter of type 'keyof AssetsBackendApiService'. We need to
+          // suppress this error because of strict type checking.
+          // @ts-ignore
+          assetsBackendApiService, 'getAudioUploadUrl'
+        ).and.throwError(Error('token'));
+
+        assetsBackendApiService.saveAudio(
+          '0', 'a.mp3', audioBlob
+        ).then(onSuccess, onFailure);
+        flushMicrotasks();
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onFailure).toHaveBeenCalled();
+      })
+    );
 
     it('should successfully fetch and cache image', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
@@ -364,8 +431,8 @@ describe('Assets Backend API Service', () => {
   });
 
   describe('on emulator mode', () => {
-    let assetsBackendApiService: AssetsBackendApiService = null;
-    let httpTestingController: HttpTestingController = null;
+    let assetsBackendApiService: AssetsBackendApiService;
+    let httpTestingController: HttpTestingController;
     const gcsPrefix: string =
       'https://storage.googleapis.com/app_default_bucket';
 
@@ -376,8 +443,8 @@ describe('Assets Backend API Service', () => {
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
-      httpTestingController = TestBed.get(HttpTestingController);
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+      httpTestingController = TestBed.inject(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     });
 
     it('should correctly formulate the download URL for audios', () => {

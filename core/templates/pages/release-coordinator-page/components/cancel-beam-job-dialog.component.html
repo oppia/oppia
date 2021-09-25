@@ -1,0 +1,74 @@
+<div class="cancel-beam-job-dialog">
+  <mat-card class="beam-job-run-summary-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon class="beam-job-run-summary-icon"
+                  [color]="beamJobRun.getJobStatusMaterialThemeColor()"
+                  [matTooltip]="beamJobRun.getJobStatusTooltipString()">
+          {{ beamJobRun.getJobStatusMaterialIconCode() }}
+        </mat-icon>
+      </div>
+      <mat-card-title>{{ beamJobRun.jobName }}</mat-card-title>
+      <mat-card-subtitle>ID: {{ beamJobRun.jobId }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <table class="beam-job-run-summary-table">
+        <tr>
+          <th>Started on</th>
+          <td>{{ beamJobRun.jobStartedOnMsecs | date:'short' }}</td>
+        </tr>
+        <tr>
+          <th>Last updated</th>
+          <td>{{ beamJobRun.jobUpdatedOnMsecs | date:'short' }}</td>
+        </tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-progress-bar *ngIf="isRunning" color="warn" mode="indeterminate"></mat-progress-bar>
+
+  <mat-dialog-actions class="beam-job-actions">
+    <button mat-button mat-dialog-close [disabled]="isRunning">Close</button>
+    <button mat-raised-button color="warn" (click)="onActionClick()" [disabled]="isRunning">
+      Cancel this Job
+    </button>
+  </mat-dialog-actions>
+</div>
+
+<style>
+  .cancel-beam-job-dialog .mat-raised-button.mat-warn:not(.mat-button-disabled) {
+    background-color: #f44336;
+    color: #fff;
+  }
+  .cancel-beam-job-dialog .mat-progress-bar.mat-warn /deep/ .mat-progress-bar-fill::after {
+    background-color: #f44336;
+  }
+  .cancel-beam-job-dialog .mat-progress-bar.mat-warn /deep/ .mat-progress-bar-buffer {
+    background: #ff7961;
+  }
+  .cancel-beam-job-dialog .beam-job-run-summary-card {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 20px;
+  }
+  .cancel-beam-job-dialog .beam-job-run-summary-card mat-card-header {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+  .cancel-beam-job-dialog .beam-job-run-summary-card mat-card-title {
+    font-weight: bold;
+  }
+  .cancel-beam-job-dialog .beam-job-run-summary-icon {
+    font-size: 40px;
+    margin-top: 8px;
+    width: 40px;
+  }
+  .cancel-beam-job-dialog .beam-job-run-summary-table td,
+  .cancel-beam-job-dialog .beam-job-run-summary-table th {
+    padding: 10px;
+  }
+  .cancel-beam-job-dialog .beam-job-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+</style>

@@ -24,17 +24,22 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class PageTitleService {
-  pageTitleForMobile: string = null;
-  pageSubtitleForMobile: string = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  pageTitleForMobile!: string;
+  pageSubtitleForMobile!: string;
+
   constructor(
     private metaTagService: Meta,
-    private titleService: Title) {}
+    private titleService: Title
+  ) {}
 
-  setPageTitle(title: string): void {
+  setDocumentTitle(title: string): void {
     this.titleService.setTitle(title);
   }
 
-  getPageTitle(): string {
+  getDocumentTitle(): string {
     return this.titleService.getTitle();
   }
 
@@ -57,19 +62,19 @@ export class PageTitleService {
     });
   }
 
-  setPageTitleForMobileView(title: string): void {
+  setNavbarTitleForMobileView(title: string): void {
     this.pageTitleForMobile = title;
   }
 
-  setPageSubtitleForMobileView(subtitle: string): void {
+  setNavbarSubtitleForMobileView(subtitle: string): void {
     this.pageSubtitleForMobile = subtitle;
   }
 
-  getPageTitleForMobileView(): string {
+  getNavbarTitleForMobileView(): string {
     return this.pageTitleForMobile;
   }
 
-  getPageSubtitleForMobileView(): string {
+  getNavbarSubtitleForMobileView(): string {
     return this.pageSubtitleForMobile;
   }
 }

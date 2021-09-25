@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -29,24 +28,24 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
 import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.component';
-import { NoninteractiveSvgdiagram } from './Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { PortalModule } from '@angular/cdk/portal';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,
     NgbModalModule,
     NgbNavModule,
     NgbTooltipModule,
+    PortalModule,
     YouTubePlayerModule
   ],
   declarations: [
@@ -56,7 +55,6 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent
@@ -67,7 +65,6 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent
@@ -79,7 +76,6 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent

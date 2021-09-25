@@ -27,5 +27,9 @@ angular.module('oppia').constant(
 );
 
 angular.module('oppia').constant(
+  'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
+  ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
+
+angular.module('oppia').constant(
   'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
   ContributorDashboardConstants.DEFAULT_OPPORTUNITY_LANGUAGE_CODE);

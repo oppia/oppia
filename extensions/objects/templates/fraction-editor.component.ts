@@ -19,9 +19,10 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { FractionAnswer } from 'interactions/answer-defs';
 
 @Component({
   selector: 'fraction-editor',
@@ -29,23 +30,25 @@ import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
   styleUrls: []
 })
 export class FractionEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: FractionAnswer;
   @Output() valueChanged = new EventEmitter();
   errorMessage: string = '';
   fractionString: string = '0';
   currentFractionValueIsValid = false;
   eventBus: EventBusGroup;
+
   constructor(
-    private fractionObjectFactory: FractionObjectFactory,
     private eventBusService: EventBusService) {
     this.eventBus = new EventBusGroup(this.eventBusService);
   }
 
   ngOnInit(): void {
     if (this.value !== null) {
-      this.fractionString = this.fractionObjectFactory.fromDict(
-        this.value).toString();
+      this.fractionString = Fraction.fromDict(this.value).toString();
     }
   }
 
@@ -53,17 +56,20 @@ export class FractionEditorComponent implements OnInit {
     if (newFraction.length === 0) {
       this.errorMessage = 'Please enter a non-empty fraction value.';
       this.currentFractionValueIsValid = false;
+      return;
     }
     try {
       const INTERMEDIATE_REGEX = /^\s*-?\s*$/;
       if (!INTERMEDIATE_REGEX.test(newFraction)) {
-        this.value = this.fractionObjectFactory.fromRawInputString(newFraction);
+        this.value = Fraction.fromRawInputString(newFraction);
         this.valueChanged.emit(this.value);
       }
       this.errorMessage = '';
       this.currentFractionValueIsValid = true;
-    } catch (parsingError) {
-      this.errorMessage = parsingError.message;
+    } catch (parsingError: unknown) {
+      if (parsingError instanceof Error) {
+        this.errorMessage = parsingError.message;
+      }
       this.currentFractionValueIsValid = false;
     } finally {
       this.eventBus.emit(new ObjectFormValidityChangeEvent(

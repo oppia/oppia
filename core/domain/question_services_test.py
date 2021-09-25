@@ -16,8 +16,8 @@
 
 """Tests for core.domain.question_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 import re
@@ -28,6 +28,8 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -45,9 +47,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
@@ -55,14 +57,26 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
-
-        self.topic_manager = user_services.get_user_actions_info(
-            self.topic_manager_id)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+
+        self.topic_manager = user_services.get_user_actions_info(
+            self.topic_manager_id)
 
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')
@@ -154,18 +168,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
-        _, merged_question_skill_links, _ = (
+        _, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.3])
 
         question_services.update_question_skill_link_difficulty(
             self.question_id, 'skill_1', 0.9)
 
-        _, merged_question_skill_links, _ = (
+        _, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.9])
 
@@ -289,15 +303,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
 
-        question_summaries, merged_question_skill_links, _ = (
+        question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_1', 'skill_2', 'skill_3'], ''))
+                5, ['skill_1', 'skill_2', 'skill_3'], 0))
 
         with self.assertRaisesRegexp(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
+                5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], 0)
         question_ids = [summary.id for summary in question_summaries]
 
         self.assertEqual(len(question_ids), 3)
@@ -329,9 +343,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual(
                     [0.2], link_object.skill_difficulties)
 
-        question_summaries, merged_question_skill_links, _ = (
+        question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_1', 'skill_3'], ''))
+                5, ['skill_1', 'skill_3'], 0))
         question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)
         self.assertItemsEqual(
@@ -352,9 +366,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
 
-        question_summaries, merged_question_skill_links, _ = (
+        question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                2, [], ''))
+                2, [], 0))
 
         self.assertEqual(question_summaries, [])
         self.assertEqual(merged_question_skill_links, [])
@@ -558,7 +572,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, '\'unicode\' object has no attribute \'cmd\'')
+            Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(
@@ -996,7 +1010,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
         self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
         updated_question = question_services.get_question_by_id(
             self.question_id)
         updated_answer_groups = (
@@ -3133,3 +3146,92 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         linked_skill_id = question.question_state_data.linked_skill_id
         self.assertEqual(
             linked_skill_id, None)
+
+    def test_migrate_question_state_from_v44_to_latest(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['Test']
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'requireNonnegativeInput': {
+                        'value': False
+                    },
+                    'rows': {'value': 1}
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'NumericInput'
+            },
+            'next_content_id_index': 4,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'linked_skill_id': None,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=44)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        cust_args = question.question_state_data.interaction.customization_args
+        self.assertEqual(
+            cust_args['requireNonnegativeInput'].value, False)

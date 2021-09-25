@@ -42,7 +42,8 @@ import { PlatformFeatureBackendApiService } from
 import {
   FeatureNames,
   FeatureStatusSummary,
-  FeatureStatusChecker
+  FeatureStatusChecker,
+  FeatureNamesKeys
 } from 'domain/platform_feature/feature-status-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -62,15 +63,15 @@ interface FeatureFlagsCacheItem {
 })
 export class PlatformFeatureService {
   private static SESSION_STORAGE_KEY = 'SAVED_FEATURE_FLAGS';
-  private static SESSION_STORAGE_CACHE_TTL = 12 * 3600 * 1000; // 12 hours
+  private static SESSION_STORAGE_CACHE_TTL = 12 * 3600 * 1000; // 12 hours.
 
   private static COOKIE_NAME_FOR_SESSION_ID = 'SACSID';
   private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = 'dev_appserver_login';
 
   // The following attributes are made static to avoid potential inconsistencies
   // caused by multi-instantiation of the service.
-  static featureStatusSummary: FeatureStatusSummary = null;
-  static initializationPromise: Promise<void> = null;
+  static featureStatusSummary: FeatureStatusSummary;
+  static initializationPromise: Promise<void>;
   static _isInitializedWithError = false;
   static _isSkipped = false;
 
@@ -166,10 +167,12 @@ export class PlatformFeatureService {
       PlatformFeatureService.featureStatusSummary = await this
         .loadFeatureFlagsFromServer();
       this.saveResults();
-    } catch (err) {
-      this.loggerService.error(
-        'Error during initialization of PlatformFeatureService: ' +
-        `${err.message ? err.message : err}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.loggerService.error(
+          'Error during initialization of PlatformFeatureService: ' +
+          `${err.message ? err.message : err}`);
+      }
       // If any error, just disable all features.
       PlatformFeatureService.featureStatusSummary =
         FeatureStatusSummary.createDefault();
@@ -253,9 +256,12 @@ export class PlatformFeatureService {
 
     const storedFeatures: string[] = Array.from(
       item.featureStatusSummary.featureNameToFlag.keys());
-    const requiredFeatures: string[] = Object.keys(FeatureNames)
-      .map(name => FeatureNames[name]);
-
+    const featureNamesKeys = (
+      <FeatureNamesKeys> Object.keys(FeatureNames)
+    );
+    const requiredFeatures: string[] = featureNamesKeys.map(
+      name => FeatureNames[name]
+    );
     if (!isEqual(storedFeatures.sort(), requiredFeatures.sort())) {
       return false;
     }
@@ -286,14 +292,17 @@ export class PlatformFeatureService {
     const cookieStrs = this.windowRef.nativeWindow.document.cookie.split('; ');
     const cookieMap = new Map(
       cookieStrs.map(cookieStr => <[string, string]>cookieStr.split('=')));
-
-    if (cookieMap.has(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID)) {
-      return cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID);
+    const sessionId = (
+      cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID)
+    );
+    if (sessionId !== undefined) {
+      return sessionId;
     }
-    if (cookieMap.has(
-      PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV)) {
-      return cookieMap.get(
-        PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV);
+    const sessionIdInDev = (
+      cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV)
+    );
+    if (sessionIdInDev !== undefined) {
+      return sessionIdInDev;
     }
     return null;
   }

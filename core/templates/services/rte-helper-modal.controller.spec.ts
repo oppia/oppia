@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
@@ -75,7 +75,7 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should close modal when clicking on cancel button', function() {
       $scope.cancel();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith(false);
     });
 
     it('should save modal customization args when closing it', function() {
@@ -144,13 +144,14 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should close modal when clicking on cancel button', function() {
       $scope.cancel();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith(false);
     });
 
     it('should save modal customization args when closing it', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -188,6 +189,7 @@ describe('Rte Helper Modal Controller', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -324,7 +326,7 @@ describe('Rte Helper Modal Controller', function() {
 
       it('should close modal when clicking on cancel button', function() {
         $scope.cancel();
-        expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+        expect($uibModalInstance.dismiss).toHaveBeenCalledWith(false);
       });
 
       it('should save modal customization args when closing it', function() {
@@ -337,4 +339,52 @@ describe('Rte Helper Modal Controller', function() {
         });
       });
     });
+
+  describe('when cancel is clicked with default customization args', () => {
+    var customizationArgSpecs = [{
+      name: 'filepath',
+      default_value: ''
+    }, {
+      name: 'caption',
+      default_value: ''
+    }, {
+      name: 'alt',
+      default_value: ''
+    }];
+
+    beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalRteSaveEventEmitter = new EventEmitter();
+      $provide.value('ExternalRteSaveService', {
+        onExternalRteSave: mockExternalRteSaveEventEmitter
+      });
+    }));
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $timeout = $injector.get('$timeout');
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller(
+        'RteHelperModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          attrsCustomizationArgsDict: {
+            alt: '',
+            caption: '',
+            filepath: ''
+          },
+          customizationArgSpecs: customizationArgSpecs,
+        });
+    }));
+
+    it('should close modal and remove the tag', function() {
+      $scope.cancel();
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith(true);
+    });
+  });
 });

@@ -34,12 +34,15 @@ export interface PositionOfTerm {
   styleUrls: []
 })
 export class PositionOfTermsEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string;
+  localValue!: PositionOfTerm;
   @Output() valueChanged = new EventEmitter();
   alwaysEditable = true;
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
-  localValue: PositionOfTerm;
   constructor() { }
 
   ngOnInit(): void {
@@ -48,6 +51,10 @@ export class PositionOfTermsEditorComponent implements OnInit {
       if (this.positionOfTerms[i].name === this.value) {
         this.localValue = this.positionOfTerms[i] as unknown as PositionOfTerm;
       }
+    }
+    if (this.value === null || this.value === undefined) {
+      this.value = this.localValue.name;
+      this.valueChanged.emit(this.value);
     }
   }
   onChangePosition(name: string): void {

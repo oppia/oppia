@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
+  'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { TextInputRulesService } from
@@ -58,8 +58,6 @@ import { WrapTextWithEllipsisPipe } from
   'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { ContinueValidationService } from
@@ -74,7 +72,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
@@ -415,7 +413,6 @@ describe('State translation component', function() {
     $provide.value(
       'ExplorationStatsService', TestBed.get(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value(
       'NumberWithUnitsObjectFactory',
       TestBed.get(NumberWithUnitsObjectFactory));

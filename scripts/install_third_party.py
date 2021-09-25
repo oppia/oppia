@@ -14,8 +14,8 @@
 
 """Installation script for Oppia third-party libraries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import contextlib
@@ -199,7 +199,7 @@ def download_and_untar_files(
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
     with python_utils.open_file(filepath, mode) as f:
-        return f.read().decode('utf-8')
+        return f.read()
 
 
 def return_json(filepath):

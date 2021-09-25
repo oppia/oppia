@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
@@ -30,13 +30,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -56,8 +51,9 @@ describe('Story Viewer Page component', () => {
   let windowRef: WindowRef;
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
+    roles: ['USER_ROLE'],
     is_moderator: false,
-    is_admin: false,
+    is_curriculum_admin: false,
     is_super_admin: false,
     is_topic_manager: false,
     can_create_collections: true,
@@ -355,13 +351,13 @@ describe('Story Viewer Page component', () => {
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         Promise.resolve(_samplePlaythroughObject));
 
-      spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+      spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
       spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
       component.ngOnInit();
 
       flushMicrotasks();
 
-      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
         'Learn Topic 1 | Story | Oppia');
       expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
         'Story meta tag content');

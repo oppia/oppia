@@ -17,7 +17,7 @@
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { MathEquationEditorComponent } from './math-equation-editor.component';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -65,24 +65,33 @@ describe('MathEquationEditor', () => {
       MathEquationEditorComponent);
     component = fixture.componentInstance;
     window.Guppy = MockGuppy;
-    component.currentValue = '';
   });
 
   afterEach(() => {
+    // This throws "The operand of a 'delete' operator must be optional".
+    // We need to suppress this error because "Property Guppy is not an
+    // optional property in global interface Window. A property needs to
+    // be optional or have undefined as a union type in order to be deleted".
+    // @ts-ignore
     delete window.Guppy;
   });
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not show warnings if the editor is active', () => {
-    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+    // This throws "Type 'undefined' is not assignable to type 'string'".
+    // We need to suppress this error because we are testing validations here.
+    // Validation here refers to the 'if' checks defined in ngOnInit() which
+    // replaces 'value' with empty strings if null or undefined.
+    // @ts-ignore
     component.currentValue = undefined;
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
@@ -90,8 +99,7 @@ describe('MathEquationEditor', () => {
 
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
-    component.value = null;
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
@@ -99,13 +107,11 @@ describe('MathEquationEditor', () => {
 
   it('should correctly validate current answer', () => {
     // This should not show warnings if the editor hasn't been touched.
-    component.currentValue = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
 
     component.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    component.currentValue = '';
     expect(component.isCurrentAnswerValid()).toBeFalse();
     expect(
       component.warningText).toBe('Please enter an answer before submitting.');
@@ -125,7 +131,7 @@ describe('MathEquationEditor', () => {
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });

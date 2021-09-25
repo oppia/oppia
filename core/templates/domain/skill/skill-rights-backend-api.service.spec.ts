@@ -27,13 +27,13 @@ import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service';
 
 describe('Skill rights backend API service', () => {
-  let skillRightsBackendApiService: SkillRightsBackendApiService = null;
-  let httpTestingController: HttpTestingController = null;
+  let skillRightsBackendApiService: SkillRightsBackendApiService;
+  let httpTestingController: HttpTestingController;
   let sampleSkillRights: SkillRightsBackendDict = {
     skill_id: '0',
     can_edit_skill_description: true
   };
-  let skillRightsObject: SkillRights = null;
+  let skillRightsObject: SkillRights;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

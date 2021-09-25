@@ -28,14 +28,38 @@ describe('Promo bar model', () => {
     var promoBar = PromoBar.createFromBackendDict(
       samplePromoBarBackendObject);
 
-    expect(promoBar.isPromoBarEnabled()).toBe(true);
-    expect(promoBar.getPromoBarMessage()).toBe('hello');
+    expect(promoBar.promoBarEnabled).toBe(true);
+    expect(promoBar.promoBarMessage).toBe('hello');
   });
 
   it('should create correct default PromoBar object', () => {
     var promoBar = PromoBar.createEmpty();
 
-    expect(promoBar.isPromoBarEnabled()).toBe(false);
-    expect(promoBar.getPromoBarMessage()).toBe('');
+    expect(promoBar.promoBarEnabled).toBe(false);
+    expect(promoBar.promoBarMessage).toBe('');
+  });
+
+  it('should set and get correct promoBarEnabled value', () => {
+    var promoBar = PromoBar.createEmpty();
+
+    expect(promoBar.promoBarEnabled).toBe(false);
+    expect(promoBar.promoBarMessage).toBe('');
+
+    promoBar.promoBarEnabled = true;
+
+    expect(promoBar.promoBarEnabled).toBe(true);
+    expect(promoBar.promoBarMessage).toBe('');
+  });
+
+  it('should set and get correct promoBarMessage value', () => {
+    var promoBar = PromoBar.createEmpty();
+
+    expect(promoBar.promoBarEnabled).toBe(false);
+    expect(promoBar.promoBarMessage).toBe('');
+
+    promoBar.promoBarMessage = 'New message';
+
+    expect(promoBar.promoBarEnabled).toBe(false);
+    expect(promoBar.promoBarMessage).toBe('New message');
   });
 });

@@ -23,7 +23,7 @@ import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 
 describe('Collection Creation backend service', () => {
-  let collectionCreationBackendService: CollectionCreationBackendService = null;
+  let collectionCreationBackendService: CollectionCreationBackendService;
   let httpTestingController: HttpTestingController;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
   let ERROR_STATUS_CODE = 500;

@@ -28,6 +28,7 @@ import { SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { Observable } from 'rxjs';
 
 interface FetchSkillBackendResponse {
   'skill': SkillBackendDict;
@@ -93,6 +94,12 @@ export class SkillBackendApiService {
     });
   }
 
+  fetchAllSkills(): Observable<{skills: SkillBackendDict[]}> {
+    return this.http.get<{skills: SkillBackendDict[]}>(
+      SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE
+    );
+  }
+
   async fetchMultiSkillsAsync(skillIds: string[]): Promise<Skill[]> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -119,7 +126,6 @@ export class SkillBackendApiService {
           skill_id: skillId
         });
 
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(skillDataUrl).toPromise().then(() => {
         resolve();
       }, function(errorResponse) {

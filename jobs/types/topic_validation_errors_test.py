@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for base model validator errors."""
+"""Unit tests for topic model validator errors."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 from jobs.types import base_validation_errors_test
@@ -45,7 +45,7 @@ class ModelCanonicalNameMismatchErrorTests(
         error = topic_validation_errors.ModelCanonicalNameMismatchError(model)
 
         self.assertEqual(
-            error.message,
-            'ModelCanonicalNameMismatchError in TopicModel(id=\'test\'): '
+            error.stderr,
+            'ModelCanonicalNameMismatchError in TopicModel(id="test"): '
             'Entity name %s in lowercase does not match canonical name %s' %
             (model.name, model.canonical_name))

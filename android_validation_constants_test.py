@@ -16,8 +16,8 @@
 constants are the same.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import android_validation_constants
 from constants import constants
@@ -27,7 +27,7 @@ from core.tests import test_utils
 class AndroidValidationConstantsTest(test_utils.GenericTestBase):
     """Tests verifying the character limits."""
 
-    def test_that_character_limits_in_both_files_are_equal(self):
+    def test_that_character_limits_in_both_files_are_equal(self) -> None:
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME,
             constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
@@ -47,8 +47,8 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
             android_validation_constants.MAX_CHARS_IN_STORY_TITLE,
             constants.MAX_CHARS_IN_STORY_TITLE)
         self.assertEqual(
-            android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE,
-            constants.MAX_CHARS_IN_CHAPTER_TITLE)
+            android_validation_constants.MAX_CHARS_IN_EXPLORATION_TITLE,
+            constants.MAX_CHARS_IN_EXPLORATION_TITLE)
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION,
             constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION)
@@ -56,7 +56,7 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
             android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME,
             constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
 
-    def test_exploration_constants_in_both_files_are_equal(self):
+    def test_exploration_constants_in_both_files_are_equal(self) -> None:
         interaction_ids_in_constants = []
         language_ids_in_constants = []
         constants_interactions_list = (
@@ -68,12 +68,12 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         for obj in constants_languages_list:
             language_ids_in_constants.append(obj['code'])
 
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             interaction_ids_in_constants,
             android_validation_constants.VALID_INTERACTION_IDS)
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             constants.VALID_RTE_COMPONENTS_FOR_ANDROID,
             android_validation_constants.VALID_RTE_COMPONENTS)
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             language_ids_in_constants,
             android_validation_constants.SUPPORTED_LANGUAGES)

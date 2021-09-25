@@ -13,70 +13,76 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing search results.
+ * @fileoverview Component for showing search results.
  */
 
-require(
-  'pages/library-page/search-results/' +
-  'activity-tiles-infinity-grid.component.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require('services/search.service.ts');
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
-
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
+import { SearchService } from 'services/search.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
 
-angular.module('oppia').component('searchResults', {
-  template: require('./search-results.component.html'),
-  controller: [
-    '$rootScope', '$timeout', '$window', 'LoaderService', 'SearchService',
-    'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    function(
-        $rootScope, $timeout, $window, LoaderService, SearchService,
-        SiteAnalyticsService, UrlInterpolationService, UserService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
+@Component({
+  selector: 'oppia-search-results',
+  templateUrl: './search-results.component.html'
+})
+export class SearchResultsComponent {
+  directiveSubscriptions = new Subscription();
+  someResultsExist: boolean = true;
+  userIsLoggedIn: boolean = null;
 
-      ctrl.onRedirectToLogin = function(destinationUrl) {
-        SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
-        $timeout(function() {
-          $window.location = destinationUrl;
-        }, 150);
-        return false;
-      };
-      ctrl.$onInit = function() {
-        ctrl.someResultsExist = true;
+  constructor(
+    private windowRef: WindowRef,
+    private loaderService: LoaderService,
+    private searchService: SearchService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService
+  ) {}
 
-        ctrl.userIsLoggedIn = null;
-        LoaderService.showLoadingScreen('Loading');
-        var userInfoPromise = UserService.getUserInfoAsync();
-        userInfoPromise.then(function(userInfo) {
-          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticAssetUrl(imagePath);
+  }
 
-        // Called when the first batch of search results is retrieved from
-        // the server.
-        ctrl.directiveSubscriptions.add(
-          SearchService.onInitialSearchResultsLoaded.subscribe(
-            (activityList) => {
-              ctrl.someResultsExist = activityList.length > 0;
-              userInfoPromise.then(function(userInfo) {
-                ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-                LoaderService.hideLoadingScreen();
-              });
-            })
-        );
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }
-  ]
-});
+  onRedirectToLogin(destinationUrl: string): boolean {
+    this.siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = destinationUrl;
+    }, 150);
+    return false;
+  }
+
+  ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
+    let userInfoPromise = this.userService.getUserInfoAsync();
+    userInfoPromise.then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
+
+    // Called when the first batch of search results is retrieved from
+    // the server.
+    this.directiveSubscriptions.add(
+      this.searchService.onInitialSearchResultsLoaded.subscribe(
+        (activityList) => {
+          this.someResultsExist = activityList.length > 0;
+          userInfoPromise.then((userInfo) => {
+            this.userIsLoggedIn = userInfo.isLoggedIn();
+            this.loaderService.hideLoadingScreen();
+          });
+        })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaSearchResults',
+  downgradeComponent({
+    component: SearchResultsComponent
+  }) as angular.IDirectiveFactory);

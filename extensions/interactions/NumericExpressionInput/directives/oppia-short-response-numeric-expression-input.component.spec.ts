@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,25 +17,29 @@
  * component.
  */
 
-require(
-  'interactions/NumericExpressionInput/directives/' +
-  'oppia-short-response-numeric-expression-input.component.ts');
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ShortResponseNumericExpressionInput } from './oppia-short-response-numeric-expression-input.component';
 
-describe('NumericExpressionInputShortResponse', function() {
-  let ctrl = null;
+describe('ShortResponseNumericExpressionInput', function() {
+  let component: ShortResponseNumericExpressionInput;
+  let fixture: ComponentFixture<ShortResponseNumericExpressionInput>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$attrs', {
-      answer: '&quot;answer&quot;',
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaShortResponseNumericExpressionInput');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ShortResponseNumericExpressionInput]
+      }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ShortResponseNumericExpressionInput);
+    component = fixture.componentInstance;
+    component.answer = '&quot;answer&quot;';
+    fixture.detectChanges();
+  });
   it('should correctly escape characters in the answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toBe('answer');
+    component.ngOnInit();
+    expect(component.displayAnswer).toBe('answer');
   });
 });

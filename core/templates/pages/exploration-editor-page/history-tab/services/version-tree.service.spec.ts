@@ -16,12 +16,11 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
-import { ExplorationSnapshot, VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
+import { ExplorationSnapshot, VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 
 describe('Versions tree service', () => {
   describe('versions tree service', () => {
-    let vts: VersionTreeService = null;
+    let vts: VersionTreeService;
     var snapshots: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
@@ -124,6 +123,10 @@ describe('Versions tree service', () => {
     });
 
     it('should get correct list of parents', () => {
+      // Prechecks: If we try to get version tree without initializing it.
+      expect(() => {
+        vts.getVersionTree();
+      }).toThrowError('version tree not initialized.');
       vts.init(snapshots);
       var expectedParents = {
         1: -1,
@@ -148,7 +151,26 @@ describe('Versions tree service', () => {
       expect(vts.findLCA(2, 4)).toBe(2);
     });
 
+    it('should throw error if we try access elements which ' +
+      'are not in version tree when finding lowes common ancestor', () => {
+      vts.init(snapshots);
+
+      // Checking path 1, Here 10 is not in the list.
+      expect(() => {
+        vts.findLCA(10, 1);
+      }).toThrowError('Could not find parent of 10');
+
+      // Checking path 2, Here 11 is not in the list.
+      expect(() => {
+        vts.findLCA(1, 11);
+      }).toThrowError('Could not find parent of 11');
+    });
+
     it('should get correct change list', () => {
+      // Prechecks: If we try to access snapshots without initializing them.
+      expect(() => {
+        vts.getChangeList(1);
+      }).toThrowError('snapshots is not initialized');
       vts.init(snapshots);
       expect(() => {
         vts.getChangeList(1);

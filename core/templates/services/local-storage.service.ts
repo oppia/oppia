@@ -82,7 +82,10 @@ export class LocalStorageService {
     if (this.isStorageAvailable()) {
       let draftDict = ExplorationDraft.toLocalStorageDict(
         changeList, draftChangeListId);
-      this.storage.setItem(localSaveKey, JSON.stringify(draftDict));
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (<Storage> this.storage).setItem(localSaveKey, JSON.stringify(draftDict));
     }
   }
   /**
@@ -95,10 +98,15 @@ export class LocalStorageService {
    */
   getExplorationDraft(explorationId: string): ExplorationDraft | null {
     if (this.isStorageAvailable()) {
-      let draftDict = JSON.parse(
-        this.storage.getItem(this._createExplorationDraftKey(explorationId)));
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      let draftDict = (<Storage> this.storage).getItem(
+        this._createExplorationDraftKey(explorationId));
       if (draftDict) {
-        return ExplorationDraft.createFromLocalStorageDict(draftDict);
+        return (
+          ExplorationDraft.createFromLocalStorageDict(JSON.parse(draftDict))
+        );
       }
     }
     return null;
@@ -111,7 +119,11 @@ export class LocalStorageService {
    */
   removeExplorationDraft(explorationId: string): void {
     if (this.isStorageAvailable()) {
-      this.storage.removeItem(this._createExplorationDraftKey(explorationId));
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (<Storage> this.storage).removeItem(
+        this._createExplorationDraftKey(explorationId));
     }
   }
 
@@ -121,7 +133,10 @@ export class LocalStorageService {
    */
   updateLastSelectedTranslationLanguageCode(languageCode: string): void {
     if (this.isStorageAvailable()) {
-      this.storage.setItem(
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (<Storage> this.storage).setItem(
         this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
     }
   }
@@ -133,7 +148,11 @@ export class LocalStorageService {
   getLastSelectedTranslationLanguageCode(): string | null {
     if (this.isStorageAvailable()) {
       return (
-        this.storage.getItem(this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (<Storage> this.storage).getItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
     }
     return null;
   }

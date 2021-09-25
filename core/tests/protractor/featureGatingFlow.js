@@ -16,21 +16,21 @@
  * @fileoverview End-to-end tests to login, enable feature and re-login.
  */
 
-const AdminPage = require('../protractor_utils/AdminPage.js');
-const general = require('../protractor_utils/general.js');
-const users = require('../protractor_utils/users.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
 
 describe('Feature Gating Flow', function() {
   // Indicator in Angular component that is visible if the dummy_feature
   // is enabled, and the feature status is successfully loaded in the
   // Angular component.
-  const agDummyFeatureIndicator = element(
+  var agDummyFeatureIndicator = element(
     by.css('.protractor-test-angular-dummy-feature-indicator'));
 
   // Indicator in AngularJS directive that is visible if the dummy_feature
   // is enabled, and the feature status is successfully loaded in the
   // AngularJS directive.
-  const ajsDummyFeatureIndicator = element(
+  var ajsDummyFeatureIndicator = element(
     by.css('.protractor-test-angularjs-dummy-feature-indicator'));
 
   let adminPage = null;
@@ -44,11 +44,11 @@ describe('Feature Gating Flow', function() {
   });
 
   afterAll(async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'admin1@featureGatingFlow.com', 'featuregating1');
 
     await adminPage.getFeaturesTab();
-    const dummy = await adminPage.getDummyFeatureElement();
+    var dummy = await adminPage.getDummyFeatureElement();
     await adminPage.enableFeatureForDev(dummy);
     await adminPage.removeAllRulesOfFeature(dummy);
     await adminPage.saveChangeOfFeature(dummy);
@@ -58,7 +58,7 @@ describe('Feature Gating Flow', function() {
 
   it('should not show indicators gated by dummy feature when disabled',
     async() => {
-      await users.createAndLoginAdminUser(
+      await users.createAndLoginCurriculumAdminUser(
         'admin2@featureGatingFlow.com', 'featuregating2');
 
       await adminPage.getFeaturesTab();
@@ -70,12 +70,12 @@ describe('Feature Gating Flow', function() {
   );
 
   it('should show dummy feature in the features tab', async() => {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'admin3@featureGatingFlow.com', 'featuregating3');
 
     await adminPage.getFeaturesTab();
 
-    const dummy = await adminPage.getDummyFeatureElement();
+    var dummy = await adminPage.getDummyFeatureElement();
 
     expect(await dummy.isPresent()).toBe(true);
     await users.logout();

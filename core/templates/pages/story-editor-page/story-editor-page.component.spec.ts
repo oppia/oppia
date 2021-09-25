@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import { EventEmitter } from '@angular/core';
 
@@ -33,6 +33,7 @@ describe('Story editor page', function() {
   var $rootScope = null;
   var $uibModal = null;
   var PageTitleService = null;
+  var PreventPageUnloadEventService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
@@ -69,6 +70,8 @@ describe('Story editor page', function() {
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     PageTitleService = $injector.get('PageTitleService');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
@@ -142,23 +145,28 @@ describe('Story editor page', function() {
       StoryEditorStateService, 'onStoryReinitialized').and.returnValue(
       storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
     ctrl.$onInit();
 
     expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalledTimes(2);
 
     ctrl.$onDestroy();
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should return to topic editor page when closing confirmation modal',
@@ -207,7 +215,7 @@ describe('Story editor page', function() {
   it('should return warning count', function() {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     MockStoryEditorNavigationService.navigateToStoryEditor();
     ctrl.$onInit();
     expect(ctrl.getTotalWarningsCount()).toEqual(0);
@@ -227,7 +235,7 @@ describe('Story editor page', function() {
       StoryEditorStateService, 'onStoryReinitialized').and.returnValue(
       storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(
       StoryEditorStateService,
       'getStoryWithUrlFragmentExists').and.returnValue(true);
@@ -263,7 +271,7 @@ describe('Story editor page', function() {
   it('should check if url contains story preview', function() {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
     MockStoryEditorNavigationService.activeTab = 'story_preview';
     MockStoryEditorNavigationService.checkIfPresentInChapterEditor = (
       () => false);
@@ -311,10 +319,10 @@ describe('Story editor page', function() {
     spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
       mockUndoRedoChangeEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
-    spyOn(PageTitleService, 'setPageTitle');
+    spyOn(PageTitleService, 'setDocumentTitle');
     ctrl.$onInit();
     mockUndoRedoChangeEventEmitter.emit();
-    expect(PageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(PageTitleService.setDocumentTitle).toHaveBeenCalled();
     ctrl.$onDestroy();
   });
 });

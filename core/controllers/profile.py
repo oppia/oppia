@@ -14,9 +14,10 @@
 
 """Controllers for the profile page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import io
 import json
 import logging
 import re
@@ -34,23 +35,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 import feconf
-import python_utils
 import utils
-
-
-class ProfilePage(base.BaseHandler):
-    """The world-viewable profile page."""
-
-    @acl_decorators.open_access
-    def get(self, username):
-        """Handles GET requests for the publicly-viewable profile page."""
-
-        user_settings = user_services.get_user_settings_from_username(username)
-
-        if not user_settings:
-            raise self.PageNotFoundException
-
-        self.render_template('profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -104,13 +89,51 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class PreferencesPage(base.BaseHandler):
-    """The preferences page."""
+class BulkEmailWebhookEndpoint(base.BaseHandler):
+    """The endpoint for the webhook that is triggered when a user
+    subscribes/unsubscribes to the bulk email service provider externally.
+    """
 
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('preferences-page.mainpage.html')
+    @acl_decorators.is_source_mailchimp
+    def get(self, _):
+        """Handles GET requests. This is just an empty endpoint that is
+        required since when the webhook is updated in the bulk email service
+        provider, a GET request is sent initially to validate the endpoint.
+        """
+        pass
+
+    @acl_decorators.is_source_mailchimp
+    def post(self, _):
+        """Handles POST requests."""
+        if self.request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
+            self.render_json({})
+            return
+
+        email = self.request.get('data[email]')
+        user_settings = user_services.get_user_settings_from_email(email)
+
+        # Ignore the request if the user does not exist in Oppia.
+        if user_settings is None:
+            self.render_json({})
+            return
+
+        user_id = user_settings.user_id
+        user_email_preferences = user_services.get_email_preferences(user_id)
+        if self.request.get('type') == 'subscribe':
+            user_services.update_email_preferences(
+                user_id, True,
+                user_email_preferences.can_receive_editor_role_email,
+                user_email_preferences.can_receive_feedback_message_email,
+                user_email_preferences.can_receive_subscription_email,
+                bulk_email_db_already_updated=True)
+        elif self.request.get('type') == 'unsubscribe':
+            user_services.update_email_preferences(
+                user_id, False,
+                user_email_preferences.can_receive_editor_role_email,
+                user_email_preferences.can_receive_feedback_message_email,
+                user_email_preferences.can_receive_subscription_email,
+                bulk_email_db_already_updated=True)
+        self.render_json({})
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -170,7 +193,7 @@ class PreferencesHandler(base.BaseHandler):
         """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
-
+        bulk_email_signup_message_should_be_shown = False
         if update_type == 'user_bio':
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
                 raise self.InvalidInputException(
@@ -193,22 +216,31 @@ class PreferencesHandler(base.BaseHandler):
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':
-            user_services.update_email_preferences(
-                self.user_id, data['can_receive_email_updates'],
-                data['can_receive_editor_role_email'],
-                data['can_receive_feedback_message_email'],
-                data['can_receive_subscription_email'])
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    self.user_id, data['can_receive_email_updates'],
+                    data['can_receive_editor_role_email'],
+                    data['can_receive_feedback_message_email'],
+                    data['can_receive_subscription_email']))
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
 
-        self.render_json({})
+        self.render_json({
+            'bulk_email_signup_message_should_be_shown': (
+                bulk_email_signup_message_should_be_shown)
+        })
 
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
     picture is uploaded.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -228,6 +260,20 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, username):
@@ -259,7 +305,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.render_template('signup-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -292,6 +338,22 @@ class SignupHandler(base.BaseHandler):
         default_dashboard = self.payload.get('default_dashboard')
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
+        bulk_email_signup_message_should_be_shown = False
+
+        if can_receive_email_updates is not None:
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    self.user_id, can_receive_email_updates,
+                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            )
+            if bulk_email_signup_message_should_be_shown:
+                self.render_json({
+                    'bulk_email_signup_message_should_be_shown': (
+                        bulk_email_signup_message_should_be_shown)
+                })
+                return
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered_account = (
@@ -314,13 +376,6 @@ class SignupHandler(base.BaseHandler):
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 
-        if can_receive_email_updates is not None:
-            user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-
         # Note that an email is only sent when the user registers for the first
         # time.
         if feconf.CAN_SEND_EMAILS and not has_ever_registered:
@@ -333,22 +388,19 @@ class SignupHandler(base.BaseHandler):
             user_services.update_user_default_dashboard(
                 self.user_id, default_dashboard)
 
-        self.render_json({})
-
-
-class DeleteAccountPage(base.BaseHandler):
-    """The delete account page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('delete-account-page.mainpage.html')
+        self.render_json({
+            'bulk_email_signup_message_should_be_shown': (
+                bulk_email_signup_message_should_be_shown)
+        })
 
 
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def delete(self):
@@ -390,9 +442,10 @@ class ExportAccountHandler(base.BaseHandler):
             user_images = []
 
         # Create zip file.
-        temp_file = python_utils.string_io()
+        temp_file = io.BytesIO()
         with zipfile.ZipFile(
-            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED
+        ) as zfile:
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
                 decoded_png = utils.convert_png_data_url_to_binary(
@@ -401,21 +454,7 @@ class ExportAccountHandler(base.BaseHandler):
 
         # Render file for download.
         self.render_downloadable_file(
-            temp_file.getvalue(), 'oppia_takeout_data.zip', 'text/plain')
-
-
-class PendingAccountDeletionPage(base.BaseHandler):
-    """The account pending deletion page. This page is accessible by all users
-    even if they are not scheduled for deletion. This is because users that are
-    scheduled for deletion are logged out instantly when they try to login.
-    """
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('pending-account-deletion-page.mainpage.html')
+            temp_file, 'oppia_takeout_data.zip', 'text/plain')
 
 
 class UsernameCheckHandler(base.BaseHandler):
@@ -469,9 +508,11 @@ class UserInfoHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             self.render_json({
+                'roles': self.roles,
                 'is_moderator': (
-                    user_services.is_at_least_moderator(self.user_id)),
-                'is_admin': user_services.is_admin(self.user_id),
+                    user_services.is_moderator(self.user_id)),
+                'is_curriculum_admin': user_services.is_curriculum_admin(
+                    self.user_id),
                 'is_super_admin': self.current_user_is_super_admin,
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),

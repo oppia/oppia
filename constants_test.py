@@ -14,8 +14,8 @@
 
 """Tests for Constants object and cosntants.json file."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 
@@ -27,20 +27,20 @@ import python_utils
 
 class ConstantsTests(test_utils.GenericTestBase):
 
-    def test_constants_file_is_existing(self):
+    def test_constants_file_is_existing(self) -> None:
         """Test if the constants file is existing."""
         self.assertTrue(os.path.isfile(os.path.join(
             'assets', 'constants.ts')))
 
-    def test_constants_file_contains_valid_json(self):
+    def test_constants_file_contains_valid_json(self) -> None:
         """Test if the constants file is valid json file."""
-        with python_utils.open_file(
+        with python_utils.open_file( # type: ignore[no-untyped-call]
             os.path.join('assets', 'constants.ts'), 'r') as f:
             json = constants.parse_json_from_js(f)
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
 
-    def test_difficulty_values_are_matched(self):
+    def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the
         various constants.
         """
@@ -49,7 +49,7 @@ class ConstantsTests(test_utils.GenericTestBase):
                 constants.constants.SKILL_DIFFICULTY_EASY,
                 constants.constants.SKILL_DIFFICULTY_MEDIUM,
                 constants.constants.SKILL_DIFFICULTY_HARD])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             list(constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.keys()),
             constants.constants.SKILL_DIFFICULTIES)
         self.assertEqual(
@@ -57,7 +57,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
                 constants.constants.SKILL_DIFFICULTY_EASY])
 
-    def test_constants_and_feconf_are_consistent(self):
+    def test_constants_and_feconf_are_consistent(self) -> None:
         """Test if constants that are related are consistent between feconf and
         constants.js.
         """
@@ -67,11 +67,11 @@ class ConstantsTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, constants.constants.SYSTEM_USER_IDS)
         self.assertEqual(len(constants.constants.SYSTEM_USER_IDS), 2)
 
-    def test_all_comments_are_removed_from_json_text(self):
+    def test_all_comments_are_removed_from_json_text(self) -> None:
         """Tests if comments are removed from json text."""
         dummy_constants_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'dummy_constants.js')
-        with python_utils.open_file(dummy_constants_filepath, 'r') as f:
+        with python_utils.open_file(dummy_constants_filepath, 'r') as f: # type: ignore[no-untyped-call]
             actual_text_without_comments = constants.remove_comments(f.read())
             expected_text_without_comments = (
                 'var dummy_constants = {\n'
@@ -87,7 +87,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 actual_text_without_comments, expected_text_without_comments)
 
-    def test_language_constants_are_in_sync(self):
+    def test_language_constants_are_in_sync(self) -> None:
         """Test if SUPPORTED_CONTENT_LANGUAGES and SUPPORTED_AUDIO_LANGUAGES
         constants have any conflicting values.
         """

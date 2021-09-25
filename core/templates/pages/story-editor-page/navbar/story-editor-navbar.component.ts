@@ -25,8 +25,10 @@ import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
+import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
@@ -43,17 +45,14 @@ export class StoryEditorNavbarComponent implements OnInit {
   showNavigationOptions: boolean;
   showStoryEditOptions: boolean;
   activeTab: string;
-  storyEditorNavigationService: {
-    navigateToStoryEditor: () => void;
-    navigateToStoryPreviewTab: () => void;
-  };
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
     private storyValidationService: StoryValidationService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private ngbModal: NgbModal,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private storyEditorNavigationService: StoryEditorNavigationService
   ) {}
 
   EDITOR = 'Editor';
@@ -102,7 +101,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.forceValidateExplorations = true;
   }
 
-  _validateStory(): void {
+  private _validateStory(): void {
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
     let skillIdsInTopic = (
@@ -133,7 +132,7 @@ export class StoryEditorNavbarComponent implements OnInit {
         nodePrepublishValidationIssues));
   }
 
-  _validateExplorations(): void {
+  private _validateExplorations(): void {
     let nodes = this.story.getStoryContents().getNodes();
     let explorationIds = [];
 
@@ -190,13 +189,22 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   unpublishStory(): void {
-    this.storyEditorStateService.changeStoryPublicationStatus(
-      false, () => {
-        this.storyIsPublished =
-          this.storyEditorStateService.isStoryPublished();
-        this.forceValidateExplorations = true;
-        this._validateStory();
-      });
+    this.ngbModal.open(
+      StoryEditorUnpublishModalComponent,
+      { backdrop: 'static' }
+    ).result.then(() => {
+      this.storyEditorStateService.changeStoryPublicationStatus(
+        false, () => {
+          this.storyIsPublished =
+            this.storyEditorStateService.isStoryPublished();
+          this.forceValidateExplorations = true;
+          this._validateStory();
+        });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   toggleWarningText(): void {

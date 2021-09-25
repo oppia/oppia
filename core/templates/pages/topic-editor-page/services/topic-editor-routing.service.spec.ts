@@ -16,107 +16,90 @@
  * @fileoverview Unit tests for TopicEditorRoutingService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { PageTitleService } from 'services/page-title.service';
+import { TopicEditorRoutingService } from './topic-editor-routing.service';
 
-require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
+describe('Topic Editor Routing Service', () => {
+  let ters: TopicEditorRoutingService;
+  let mockWindowRef: MockWindowRef;
 
-describe('Topic editor routing service', function() {
-  beforeEach(angular.mock.module('oppia'));
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: '',
+        hash: '/'
+      },
+      open: (url) => {}
+    };
+  }
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        PageTitleService,
+        UrlInterpolationService
+      ]
+    }).compileComponents();
   }));
 
-  var $rootScope = null;
-  var $location = null;
-  var $window = null;
-  var TopicEditorRoutingService = null;
+  beforeEach(() => {
+    ters = TestBed.inject(TopicEditorRoutingService);
+    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $location = $injector.get('$location');
-    $window = $injector.get('$window');
-    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
-  }));
-
-  it('should return the default active tab name', function() {
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
+  it('should return the default active tab name', () => {
+    expect(ters.getActiveTabName()).toEqual('main');
   });
 
   it('should navigate to different tabs', function() {
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
-
-    TopicEditorRoutingService.navigateToSubtopicPreviewTab(1);
-    $rootScope.$apply();
-    expect(
-      TopicEditorRoutingService.getActiveTabName()).toEqual('subtopic_preview');
-
-    TopicEditorRoutingService.navigateToSubtopicEditorWithId(1);
-    $rootScope.$apply();
-    expect(
-      TopicEditorRoutingService.getActiveTabName()).toEqual('subtopic_editor');
-
-    TopicEditorRoutingService.navigateToQuestionsTab();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('questions');
-
-    TopicEditorRoutingService.navigateToMainTab();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
-
-    TopicEditorRoutingService.navigateToTopicPreviewTab();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual(
-      'topic_preview');
+    expect(ters.getActiveTabName()).toEqual('main');
+    ters.navigateToSubtopicEditorWithId(1);
+    expect(ters.getActiveTabName()).toEqual('subtopic_editor');
+    ters.navigateToQuestionsTab();
+    expect(ters.getActiveTabName()).toEqual('questions');
+    ters.navigateToMainTab();
+    expect(ters.getActiveTabName()).toEqual('main');
+    ters.navigateToTopicPreviewTab();
+    expect(ters.getActiveTabName()).toEqual('topic_preview');
+    ters.navigateToSubtopicPreviewTab(1);
+    expect(ters.getActiveTabName()).toEqual('subtopic_preview');
   });
 
-  it('should handle calls with unexpect paths', function() {
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
+  it('should handle calls with unexpect paths', () => {
+    expect(ters.getActiveTabName()).toEqual('main');
 
-    $location.path();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
-
-    $location.path('');
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
+    mockWindowRef.nativeWindow.location.hash = '';
+    expect(ters.getActiveTabName()).toEqual('main');
   });
 
   it('should navigate to skill editor', function() {
-    spyOn($window, 'open').and.callFake(function() {
-      return true;
-    });
-    TopicEditorRoutingService.navigateToSkillEditorWithId('10');
-    expect($window.open).toHaveBeenCalled();
-    expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
+    spyOn(mockWindowRef.nativeWindow, 'open');
+    ters.navigateToSkillEditorWithId('10');
+    expect(mockWindowRef.nativeWindow.open)
+      .toHaveBeenCalledWith('/skill_editor/10');
   });
 
-  it('should return last tab visited', function() {
-    TopicEditorRoutingService.navigateToSubtopicEditorWithId(1);
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('subtopic');
-    TopicEditorRoutingService.navigateToMainTab();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('topic');
+  it('should return last tab visited', () => {
+    ters.navigateToSubtopicEditorWithId(1);
+    expect(ters.getLastTabVisited()).toEqual('subtopic');
+    ters.navigateToMainTab();
+    expect(ters.getLastTabVisited()).toEqual('topic');
   });
 
-  it('should return last visited subtopic id', function() {
-    TopicEditorRoutingService.navigateToSubtopicPreviewTab(1);
-    $rootScope.$apply();
-    TopicEditorRoutingService.navigateToQuestionsTab();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(1);
+  it('should return last visited subtopic id', () => {
+    ters.navigateToSubtopicPreviewTab(1);
+    ters.navigateToQuestionsTab();
+    expect(ters.getLastSubtopicIdVisited()).toEqual(1);
 
-    TopicEditorRoutingService.navigateToSubtopicPreviewTab(5);
-    $rootScope.$apply();
-    TopicEditorRoutingService.navigateToQuestionsTab();
-    $rootScope.$apply();
-    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(5);
+    ters.navigateToSubtopicPreviewTab(5);
+    ters.navigateToQuestionsTab();
+    expect(ters.getLastSubtopicIdVisited()).toEqual(5);
   });
 });

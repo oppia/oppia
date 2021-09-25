@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for contributor dashboard page component.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -148,11 +148,10 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should call scrollFunction on scroll', function() {
-      var e = document.createEvent('Event');
+      var dummyScrollEvent = new Event('scroll');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
-      e.initEvent('scroll', true, true);
 
-      window.dispatchEvent(e);
+      windowRef.nativeWindow.dispatchEvent(dummyScrollEvent);
 
       expect(scrollSpy).toHaveBeenCalled();
     });

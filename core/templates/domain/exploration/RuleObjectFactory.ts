@@ -19,7 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
@@ -66,7 +66,7 @@ export class RuleObjectFactory {
   createNew(
       type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
   ): Rule {
-    if (!_.isEqual(
+    if (!isEqual(
       new Set(Object.keys(inputs)),
       new Set(Object.keys(inputTypes))
     )) {
@@ -76,13 +76,16 @@ export class RuleObjectFactory {
   }
 
   createFromBackendDict(
-      ruleDict: RuleBackendDict, interactionId: string
+      ruleDict: RuleBackendDict, interactionId: string | null
   ): Rule {
     let ruleType = ruleDict.rule_type;
     let ruleInputTypes: RuleInputTypes = {};
+    let ruleDescription = null;
 
-    let ruleDescription = INTERACTION_SPECS[
-      interactionId].rule_descriptions[ruleType];
+    if (interactionId !== null) {
+      ruleDescription = INTERACTION_SPECS[
+        interactionId].rule_descriptions[ruleType];
+    }
 
     const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (ruleDescription.match(PATTERN)) {

@@ -18,8 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
+
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 describe('Contributions and review component', function() {
   var ctrl = null;
@@ -463,7 +465,9 @@ describe('Contributions and review component', function() {
             expect(opportunitiesDicts).toEqual([{
               id: 'suggestion_1',
               heading: 'Tradução',
-              subheading: '[The corresponding opportunity has been deleted.]',
+              subheading: (
+                ContributorDashboardConstants
+                  .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
               labelText: 'Awaiting review',
               labelColor: '#eeeeee',
               actionButtonTitle: 'View'
@@ -493,7 +497,9 @@ describe('Contributions and review component', function() {
         expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
           heading: 'Question 1',
-          subheading: '[The corresponding opportunity has been deleted.]',
+          subheading: (
+            ContributorDashboardConstants
+              .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
           labelText: 'Accepted',
           labelColor: '#8ed274',
           actionButtonTitle: 'View'
@@ -615,37 +621,38 @@ describe('Contributions and review component', function() {
             details: 'skill_1'
           }
         }));
-      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-        $q.resolve({
-          skill: skillObjectFactory.createFromBackendDict({
-            id: 'skill1',
-            description: 'test description 1',
-            misconceptions: [{
-              id: '2',
-              name: 'test name',
-              notes: 'test notes',
-              feedback: 'test feedback',
-              must_be_addressed: true
-            }],
-            rubrics: [{
-              difficulty: 'Easy',
-              explanations: ['explanation']
-            }],
-            skill_contents: {
-              explanation: {
-                html: 'test explanation',
-                content_id: 'explanation',
+      spyOn(skillBackendApiService, 'fetchSkillAsync')
+        .and.returnValue(
+          $q.resolve({
+            skill: skillObjectFactory.createFromBackendDict({
+              id: 'skill1',
+              description: 'test description 1',
+              misconceptions: [{
+                id: '2',
+                name: 'test name',
+                notes: 'test notes',
+                feedback: 'test feedback',
+                must_be_addressed: true
+              }],
+              rubrics: [{
+                difficulty: 'Easy',
+                explanations: ['explanation']
+              }],
+              skill_contents: {
+                explanation: {
+                  html: 'test explanation',
+                  content_id: 'explanation',
+                },
+                worked_examples: [],
+                recorded_voiceovers: {
+                  voiceovers_mapping: {}
+                }
               },
-              worked_examples: [],
-              recorded_voiceovers: {
-                voiceovers_mapping: {}
-              }
-            },
-            language_code: 'en',
-            version: 3,
-            prerequisite_skill_ids: ['skill_1']
-          })
-        }));
+              language_code: 'en',
+              version: 3,
+              prerequisite_skill_ids: ['skill_1']
+            })
+          }));
 
       spyOn(
         contributionAndReviewService,
@@ -746,20 +753,13 @@ describe('Contributions and review component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
+
       ctrl.loadContributions().then(function() {
         ctrl.onClickViewSuggestion('suggestion_1');
         $scope.$apply();
 
         expect($uibModal.open).toHaveBeenCalled();
       });
-    });
-
-    it('should return correctly check the active tab', function() {
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-      ctrl.isActiveTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-
-      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
     });
   });
 });

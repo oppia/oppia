@@ -20,50 +20,24 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from './alerts.service';
 import { ImageLocalStorageService } from './image-local-storage.service';
-import { ImageUploadHelperService } from './image-upload-helper.service';
 
 
 describe('ImageLocalStorageService', () => {
-  let alertsService: AlertsService = null;
-  let imageLocalStorageService: ImageLocalStorageService = null;
+  let alertsService: AlertsService;
+  let imageLocalStorageService: ImageLocalStorageService;
   let sampleImageData = 'data:image/png;base64,xyz';
   let imageFilename = 'filename';
-  let imageUploadHelperService: ImageUploadHelperService;
-  class MockImageUploadHelperService {
-    convertImageDataToImageFile(imageData) {
-      return imageData;
-    }
-  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{
-        provide: ImageUploadHelperService,
-        useClass: MockImageUploadHelperService
-      }]
+      imports: [HttpClientTestingModule]
     });
   });
 
   beforeEach(() => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     alertsService = TestBed.inject(AlertsService);
-    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
-
-  it(
-    'should call helper service function correctly when getting' +
-    ' object url', () => {
-      const imageUploaderSpy = spyOn(
-        imageUploadHelperService, 'convertImageDataToImageFile');
-      spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
-      imageLocalStorageService.saveImage(imageFilename, sampleImageData);
-      expect(
-        imageLocalStorageService.getObjectUrlForImage(imageFilename)
-      ).toBe('objectUrl');
-      expect(imageUploaderSpy).toHaveBeenCalledWith(sampleImageData);
-    }
-  );
 
   it('should delete images from localStorage correctly', () => {
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
@@ -106,7 +80,7 @@ describe('ImageLocalStorageService', () => {
   );
 
   it('should set and clear the thumbnail background color', () => {
-    expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(null);
+    expect(imageLocalStorageService.getThumbnailBgColor()).toBeNull();
     let bgColor = '#e34d43';
     imageLocalStorageService.setThumbnailBgColor(bgColor);
     expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(bgColor);

@@ -52,6 +52,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    var ctrl = this;
     $scope.directiveSubscriptions = new Subscription();
     $scope.StateSolutionService = StateSolutionService;
     $scope.savedMemento = () => {
@@ -125,7 +126,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
       }
     };
 
-    $scope.$onInit = function() {
+    ctrl.$onInit = function() {
       $scope.directiveSubscriptions.add(
         // TODO(#11996): Remove when migrating to Angular2+.
         CurrentInteractionService.onAnswerChanged$.subscribe(() => {

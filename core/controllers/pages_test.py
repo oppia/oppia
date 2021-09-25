@@ -14,8 +14,8 @@
 
 """Tests for various static pages (like the About page)."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.tests import test_utils
 import feconf
@@ -36,7 +36,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
     def test_redirect_foundation(self):
         response = self.get_html_response(
             '/foundation', expected_status_int=302)
-        self.assertIn(feconf.FOUNDATION_SITE_URL, response.headers['location'])
+        self.assertIn('about-foundation', response.headers['location'])
 
     def test_redirect_teach(self):
         response = self.get_html_response(

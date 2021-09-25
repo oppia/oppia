@@ -20,7 +20,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -32,7 +32,7 @@ import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.componen
   templateUrl: './topics-list.component.html'
 })
 export class TopicsListComponent {
-  @Input() topicSummaries: TopicSummary[];
+  @Input() topicSummaries: CreatorTopicSummary[];
   @Input() pageNumber: number;
   @Input() itemsPerPage: number;
   @Input() userCanDeleteTopic: boolean;

@@ -30,7 +30,7 @@ import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Question opportunities component', function() {
   var ctrl = null;

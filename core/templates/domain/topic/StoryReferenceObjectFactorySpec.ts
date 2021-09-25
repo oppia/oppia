@@ -22,15 +22,15 @@ import { StoryReference, StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 
 describe('Story reference object factory', () => {
-  let storyReferenceObjectFactory: StoryReferenceObjectFactory = null;
-  let _sampleStoryReference: StoryReference = null;
+  let storyReferenceObjectFactory: StoryReferenceObjectFactory;
+  let _sampleStoryReference: StoryReference;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [StoryReferenceObjectFactory]
     });
 
-    storyReferenceObjectFactory = TestBed.get(StoryReferenceObjectFactory);
+    storyReferenceObjectFactory = TestBed.inject(StoryReferenceObjectFactory);
 
     var sampleStoryReferenceBackendObject = {
       story_id: 'story_id',

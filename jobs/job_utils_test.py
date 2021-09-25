@@ -16,16 +16,22 @@
 
 """Unit tests for jobs.job_utils."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import datetime
 
 from core.platform import models
 from core.tests import test_utils
 import feconf
 from jobs import job_utils
-import python_utils
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -52,7 +58,7 @@ class CoreModel(base_models.BaseModel):
 
 class CloneTests(test_utils.TestBase):
 
-    def test_clone_model(self):
+    def test_clone_model(self) -> None:
         model = base_models.BaseModel(id='123', deleted=True)
         clone = job_utils.clone_model(model)
 
@@ -61,7 +67,7 @@ class CloneTests(test_utils.TestBase):
         self.assertIsNot(model, clone)
         self.assertIsInstance(clone, base_models.BaseModel)
 
-    def test_clone_with_changes(self):
+    def test_clone_with_changes(self) -> None:
         model = base_models.BaseModel(id='123', deleted=True)
         clone = job_utils.clone_model(model, deleted=False)
 
@@ -71,7 +77,7 @@ class CloneTests(test_utils.TestBase):
         self.assertTrue(model.deleted)
         self.assertFalse(clone.deleted)
 
-    def test_clone_with_changes_to_id(self):
+    def test_clone_with_changes_to_id(self) -> None:
         model = base_models.BaseModel(id='123')
         clone = job_utils.clone_model(model, id='124')
 
@@ -81,7 +87,7 @@ class CloneTests(test_utils.TestBase):
         self.assertEqual(model.id, '123')
         self.assertEqual(clone.id, '124')
 
-    def test_clone_sub_class(self):
+    def test_clone_sub_class(self) -> None:
         model = FooModel(prop='original')
         clone = job_utils.clone_model(model)
 
@@ -91,7 +97,7 @@ class CloneTests(test_utils.TestBase):
         self.assertEqual(model.prop, 'original')
         self.assertEqual(clone.prop, 'original')
 
-    def test_clone_sub_class_with_changes(self):
+    def test_clone_sub_class_with_changes(self) -> None:
         model = FooModel(prop='original')
         clone = job_utils.clone_model(model, prop='updated')
 
@@ -104,128 +110,136 @@ class CloneTests(test_utils.TestBase):
 
 class GetModelClassTests(test_utils.TestBase):
 
-    def test_get_from_existing_model(self):
+    def test_get_from_existing_model(self) -> None:
         self.assertIs(
             job_utils.get_model_class('BaseModel'), base_models.BaseModel)
 
-    def test_get_from_non_existing_model(self):
-        with self.assertRaisesRegexp(Exception, 'No model class found'):
+    def test_get_from_non_existing_model(self) -> None:
+        with self.assertRaisesRegexp(Exception, 'No model class found'): # type: ignore[no-untyped-call]
             job_utils.get_model_class('InvalidModel')
 
 
 class GetModelKindTests(test_utils.TestBase):
 
-    def test_get_from_datastore_model(self):
+    def test_get_from_datastore_model(self) -> None:
         model = base_models.BaseModel()
 
         self.assertEqual(job_utils.get_model_kind(model), 'BaseModel')
 
-    def test_get_from_datastore_model_class(self):
+    def test_get_from_datastore_model_class(self) -> None:
         self.assertEqual(
             job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
-    def test_get_from_bad_value(self):
-        self.assertRaisesRegexp(
-            TypeError, 'not a model type',
-            lambda: job_utils.get_model_kind(123))
+    def test_get_from_bad_value(self) -> None:
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            TypeError, 'not a model type or instance',
+            lambda: job_utils.get_model_kind(123)) # type: ignore[arg-type]
 
 
 class GetModelPropertyTests(test_utils.TestBase):
 
-    def test_get_id_from_datastore_model(self):
+    def test_get_id_from_datastore_model(self) -> None:
         model = FooModel(id='123')
 
         self.assertEqual(job_utils.get_model_property(model, 'id'), '123')
 
-    def test_get_key_from_datastore_model(self):
-        model = FooModel(id='123')
-
-        self.assertEqual(
-            job_utils.get_model_property(model, '__key__'), model.key)
-
-    def test_get_property_from_datastore_model(self):
+    def test_get_property_from_datastore_model(self) -> None:
         model = FooModel(prop='abc')
 
         self.assertEqual(job_utils.get_model_property(model, 'prop'), 'abc')
 
-    def test_get_missing_property_from_datastore_model(self):
+    def test_get_missing_property_from_datastore_model(self) -> None:
         model = FooModel()
 
         self.assertEqual(job_utils.get_model_property(model, 'prop'), None)
 
-    def test_get_property_from_bad_value(self):
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
-            job_utils.get_model_property(123, 'prop')
+    def test_get_property_from_bad_value(self) -> None:
+        with self.assertRaisesRegexp(TypeError, 'not a model instance'): # type: ignore[no-untyped-call]
+            job_utils.get_model_property(123, 'prop') # type: ignore[arg-type]
 
 
 class GetModelIdTests(test_utils.TestBase):
 
-    def test_get_id_from_datastore_model(self):
+    def test_get_id_from_datastore_model(self) -> None:
         model = FooModel(id='123')
 
         self.assertEqual(job_utils.get_model_id(model), '123')
 
-    def test_get_id_from_bad_value(self):
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
-            job_utils.get_model_id(123)
-
-
-class GetModelKeyTests(test_utils.TestBase):
-
-    def test_get_key_from_datastore_model(self):
-        model = FooModel(id='123')
-
-        self.assertEqual(job_utils.get_model_key(model), model.key)
-
-    def test_get_key_from_bad_value(self):
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
-            job_utils.get_model_key(123)
+    def test_get_id_from_bad_value(self) -> None:
+        with self.assertRaisesRegexp(TypeError, 'not a model instance'): # type: ignore[no-untyped-call]
+            job_utils.get_model_id(123) # type: ignore[arg-type]
 
 
 class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
-    def test_get_beam_entity_from_model(self):
-        model = FooModel(id='abc', prop='123')
+    def test_get_beam_entity_from_model(self) -> None:
+        model = FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123')
 
-        beam_entity = job_utils.get_beam_entity_from_model(model)
+        beam_entity = job_utils.get_beam_entity_from_ndb_model(model)
 
         self.assertEqual(beam_entity.key.path_elements, ('FooModel', 'abc'))
         self.assertEqual(beam_entity.key.project, feconf.OPPIA_PROJECT_ID)
         self.assertEqual(beam_entity.properties, {'prop': '123'})
 
-    def test_get_model_from_beam_entity(self):
+    def test_get_model_from_beam_entity(self) -> None:
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
-                ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
+                ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
+                namespace=self.namespace))
         beam_entity.set_properties({'prop': '123'})
 
         self.assertEqual(
-            FooModel(id='abc', prop='123'),
-            job_utils.get_model_from_beam_entity(beam_entity))
+            FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123'),
+            job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
-    def test_from_and_then_to_model(self):
-        model = FooModel(id='abc', prop='123')
+    def test_get_model_from_beam_entity_with_time(self) -> None:
+        utcnow = datetime.datetime.utcnow()
+
+        beam_entity = beam_datastore_types.Entity(
+            beam_datastore_types.Key(
+                ('CoreModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
+                namespace=self.namespace))
+        beam_entity.set_properties({
+            'prop': 3.14,
+            'created_on': utcnow.replace(tzinfo=datetime.timezone.utc),
+            'last_updated': None,
+            'deleted': False,
+        })
+
+        self.assertEqual(
+            CoreModel(
+                id='abc', project=feconf.OPPIA_PROJECT_ID, prop=3.14,
+                created_on=utcnow),
+            job_utils.get_ndb_model_from_beam_entity(beam_entity))
+
+    def test_from_and_then_to_model(self) -> None:
+        model = FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123')
 
         self.assertEqual(
             model,
-            job_utils.get_model_from_beam_entity(
-                job_utils.get_beam_entity_from_model(model)))
+            job_utils.get_ndb_model_from_beam_entity(
+                job_utils.get_beam_entity_from_ndb_model(model)))
 
-    def test_from_and_then_to_beam_entity(self):
+    def test_from_and_then_to_beam_entity(self) -> None:
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
-                ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
-        beam_entity.set_properties({'prop': '123'})
+                ('CoreModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
+        beam_entity.set_properties({
+            'prop': 123,
+            'created_on': datetime.datetime.utcnow(),
+            'last_updated': datetime.datetime.utcnow(),
+            'deleted': False,
+        })
 
         self.assertEqual(
             beam_entity,
-            job_utils.get_beam_entity_from_model(
-                job_utils.get_model_from_beam_entity(beam_entity)))
+            job_utils.get_beam_entity_from_ndb_model(
+                job_utils.get_ndb_model_from_beam_entity(beam_entity)))
 
 
 class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
 
-    def test_query_everything(self):
+    def test_query_everything(self) -> None:
         query = datastore_services.query_everything()
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
@@ -233,28 +247,28 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         self.assertIsNone(beam_query.kind)
         self.assertEqual(beam_query.order, ('__key__',))
 
-    def test_query_with_kind(self):
+    def test_query_with_kind(self) -> None:
         query = base_models.BaseModel.query()
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.kind, 'BaseModel')
 
-    def test_query_with_namespace(self):
+    def test_query_with_namespace(self) -> None:
         query = datastore_services.Query(namespace='abc')
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.namespace, 'abc')
 
-    def test_query_with_filter(self):
+    def test_query_with_filter(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop >= 3)
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.filters, [('prop', '>=', 3)])
 
-    def test_query_with_range_like_filter(self):
+    def test_query_with_range_like_filter(self) -> None:
         query = datastore_services.Query(filters=datastore_services.all_of(
             BarModel.prop >= 3, BarModel.prop < 6))
 
@@ -263,194 +277,42 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         self.assertEqual(
             beam_query.filters, [('prop', '>=', 3), ('prop', '<', 6)])
 
-    def test_query_with_or_filter_raises_type_error(self):
+    def test_query_with_or_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=datastore_services.any_of(
             BarModel.prop == 1, BarModel.prop == 2))
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'):
+        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
             job_utils.get_beam_query_from_ndb_query(query)
 
-    def test_query_with_in_filter_raises_type_error(self):
+    def test_query_with_in_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop.IN([1, 2, 3]))
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'):
+        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
             job_utils.get_beam_query_from_ndb_query(query)
 
-    def test_query_with_not_equal_filter_raises_type_error(self):
+    def test_query_with_not_equal_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop != 1)
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'):
+        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
             job_utils.get_beam_query_from_ndb_query(query)
 
-    def test_query_with_order(self):
+    def test_query_with_order(self) -> None:
         query = BarModel.query().order(BarModel.prop)
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.order, ('prop',))
 
-    def test_query_with_multiple_orders(self):
+    def test_query_with_multiple_orders(self) -> None:
         query = BarModel.query().order(BarModel.prop, BarModel.prop)
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.order, ('prop', 'prop'))
 
-    def test_query_with_descending_order(self):
+    def test_query_with_descending_order(self) -> None:
         query = BarModel.query().order(-BarModel.prop)
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.order, ('-prop',))
-
-
-class ApplyQueryToModelsTests(test_utils.TestBase):
-
-    def make_query(
-            self, kind=None, namespace=None, filters=None, order=None,
-            limit=None):
-        """Returns a new beam_datastore_types.Query object.
-
-        Args:
-            kind: str|None. The kind to query. If None, all kinds are eligible.
-            namespace: str|None. Namespace to restrict results to.
-            filters: list(tuple(str,str,str))|None. Property filters applied
-                by this query. The sequence is:
-                `(property_name, operator, value)`.
-            order: list(str)|None. Field names used to order query results.
-                Prepend `-` to a field name to sort it in descending order.
-            limit: int|None. Maximum amount of results to return.
-
-        Returns:
-            beam_datastore_types.Query. The Query object.
-        """
-        if kind is None and order is None:
-            order = ('__key__',)
-        return beam_datastore_types.Query(
-            kind=kind, namespace=namespace, filters=filters, order=order,
-            limit=limit)
-
-    def test_query_by_kind(self):
-        foo_model = FooModel()
-        bar_model = BarModel()
-        model_list = [foo_model, bar_model]
-
-        job_utils.apply_query_to_models(
-            self.make_query(kind='FooModel'), model_list)
-
-        self.assertEqual(model_list, [foo_model])
-
-    def test_query_by_namespace(self):
-        namespace_a_model = FooModel(namespace='a')
-        namespace_b_model = FooModel(namespace='b')
-        model_list = [namespace_a_model, namespace_b_model]
-
-        job_utils.apply_query_to_models(
-            self.make_query(namespace='a'), model_list)
-
-        self.assertEqual(model_list, [namespace_a_model])
-
-    def test_query_with_filter(self):
-        model_list = [BarModel(prop=i) for i in python_utils.RANGE(1, 10)]
-
-        job_utils.apply_query_to_models(
-            self.make_query(filters=[('prop', '>=', 3), ('prop', '<', 6)]),
-            model_list)
-
-        self.assertEqual(
-            model_list, [BarModel(prop=i) for i in python_utils.RANGE(3, 6)])
-
-    def test_query_with_order(self):
-        model_a = FooModel(prop='a')
-        model_b = FooModel(prop='b')
-        model_c = FooModel(prop='c')
-        model_list = [model_c, model_a, model_b]
-
-        job_utils.apply_query_to_models(
-            self.make_query(kind='FooModel', order=('prop',)), model_list)
-
-        self.assertEqual(model_list, [model_a, model_b, model_c])
-
-    def test_query_with_limit(self):
-        model_list = [BarModel(prop=i) for i in python_utils.RANGE(10)]
-
-        job_utils.apply_query_to_models(self.make_query(limit=3), model_list)
-
-        self.assertEqual(
-            model_list, [BarModel(prop=i) for i in python_utils.RANGE(3)])
-
-    def test_query_with_no_kind_and_wrong_order_raises_value_error(self):
-        self.assertRaisesRegexp(
-            ValueError,
-            r'Query\(kind=None\) must also have order=\(\'__key__\',\)',
-            lambda: job_utils.apply_query_to_models(
-                self.make_query(kind=None, order=('prop',)), []))
-
-    def test_query_filter_with_less_than_operator(self):
-        model_list = [BarModel(prop=1), BarModel(prop=2), BarModel(prop=3)]
-
-        job_utils.apply_query_to_models(
-            self.make_query(filters=[('prop', '<', 2)]), model_list)
-
-        self.assertEqual(model_list, [BarModel(prop=1)])
-
-    def test_query_filter_with_less_than_or_equal_operator(self):
-        model_list = [BarModel(prop=1), BarModel(prop=2), BarModel(prop=3)]
-
-        job_utils.apply_query_to_models(
-            self.make_query(filters=[('prop', '<=', 2)]), model_list)
-
-        self.assertEqual(model_list, [BarModel(prop=1), BarModel(prop=2)])
-
-    def test_query_filter_with_equal_operator(self):
-        model_list = [BarModel(prop=1), BarModel(prop=2), BarModel(prop=3)]
-
-        job_utils.apply_query_to_models(
-            self.make_query(filters=[('prop', '=', 2)]), model_list)
-
-        self.assertEqual(model_list, [BarModel(prop=2)])
-
-    def test_query_filter_with_greater_than_or_equal_operator(self):
-        model_list = [BarModel(prop=1), BarModel(prop=2), BarModel(prop=3)]
-
-        job_utils.apply_query_to_models(
-            self.make_query(filters=[('prop', '>=', 2)]), model_list)
-
-        self.assertEqual(model_list, [BarModel(prop=2), BarModel(prop=3)])
-
-    def test_query_filter_with_greater_than_operator(self):
-        model_list = [BarModel(prop=1), BarModel(prop=2), BarModel(prop=3)]
-
-        job_utils.apply_query_to_models(
-            self.make_query(filters=[('prop', '>', 2)]), model_list)
-
-        self.assertEqual(model_list, [BarModel(prop=3)])
-
-    def test_query_filter_with_unsupported_operator_raises_value_error(self):
-        model_list = [BarModel(prop=1), BarModel(prop=2), BarModel(prop=3)]
-
-        with self.assertRaisesRegexp(ValueError, 'Unsupported comparison'):
-            job_utils.apply_query_to_models(
-                self.make_query(filters=[('prop', '!=', 2)]), model_list)
-
-    def test_query_with_order_by_property_ascending(self):
-        model_a = FooModel(prop='a')
-        model_b = FooModel(prop='b')
-        model_c = FooModel(prop='c')
-        model_list = [model_c, model_a, model_b]
-
-        job_utils.apply_query_to_models(
-            self.make_query(kind='FooModel', order=('prop',)), model_list)
-
-        self.assertEqual(model_list, [model_a, model_b, model_c])
-
-    def test_query_with_order_by_property_descending(self):
-        model_a = FooModel(prop='a')
-        model_b = FooModel(prop='b')
-        model_c = FooModel(prop='c')
-        model_list = [model_c, model_a, model_b]
-
-        job_utils.apply_query_to_models(
-            self.make_query(kind='FooModel', order=('-prop',)), model_list)
-
-        self.assertEqual(model_list, [model_c, model_b, model_a])

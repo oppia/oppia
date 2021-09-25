@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for ExplorationPlayerStateService.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { EditableExplorationBackendApiService }
   from 'domain/exploration/editable-exploration-backend-api.service';
@@ -94,28 +95,6 @@ describe('Exploration Player State Service', () => {
     inapplicable_skill_misconception_ids: []
   };
 
-  class MockUrlService {
-    getCollectionIdFromExplorationUrl(): string {
-      return '';
-    }
-
-    getExplorationVersionFromUrl(): string {
-      return null;
-    }
-
-    getStoryUrlFragmentFromLearnerUrl(): string {
-      return '1';
-    }
-
-    getUrlParams(): object {
-      return {};
-    }
-
-    getPathname(): string {
-      return '/no_skill_editor/in/path/name';
-    }
-  }
-
   class MockContextService {
     isInExplorationEditorPage(): boolean {
       return false;
@@ -144,6 +123,7 @@ describe('Exploration Player State Service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         ExplorationPlayerStateService,
         PlayerTranscriptService,
@@ -152,10 +132,7 @@ describe('Exploration Player State Service', () => {
           provide: ContextService,
           useClass: MockContextService
         },
-        {
-          provide: UrlService,
-          useClass: MockUrlService
-        },
+        UrlService,
         {
           provide: ReadOnlyExplorationBackendApiService,
           useClass: MockReadOnlyExplorationBackendApiService
@@ -528,5 +505,32 @@ describe('Exploration Player State Service', () => {
     expect(explorationPlayerStateService.onPlayerStateChange).toBeDefined();
     expect(explorationPlayerStateService.onOppiaFeedbackAvailable)
       .toBeDefined();
+  });
+
+  it('should set exploration version from url if the url' +
+    'has exploration context when initialized', () => {
+    // Here exploration context consists of 'explore', 'create',
+    // 'skill_editor' and 'embed'.
+    spyOn(urlService, 'getPathname')
+      .and.returnValue('/create/in/path/name');
+    spyOn(urlService, 'getExplorationVersionFromUrl')
+      .and.returnValue(2);
+
+    explorationPlayerStateService.version = null;
+
+    explorationPlayerStateService.init();
+    expect(explorationPlayerStateService.version).toBe(2);
+  });
+
+  it('should set exploration version to default value if the url' +
+    'does not have exploration context when initialized', () => {
+    // Here default value is 1.
+    spyOn(urlService, 'getPathname')
+      .and.returnValue('/create_is_not/in/path/name');
+
+    explorationPlayerStateService.version = null;
+
+    explorationPlayerStateService.init();
+    expect(explorationPlayerStateService.version).toBe(1);
   });
 });

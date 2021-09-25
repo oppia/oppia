@@ -35,10 +35,6 @@ export class SortByPipe implements PipeTransform {
   transform<T>(
       value: T[], isDescending: boolean,
       sortKey?: string): T[] {
-    if (!value) {
-      return value;
-    }
-
     if (sortKey === 'default') {
       return value.reverse();
     }
@@ -50,14 +46,15 @@ export class SortByPipe implements PipeTransform {
       numberArray = value.filter(item => typeof item === 'number').sort();
       stringArray = value.filter(item => typeof item === 'string').sort();
     } else {
-      numberArray = value.filter(item => typeof item[sortKey] === 'number')
-        .sort((a, b) => a[sortKey] - b[sortKey]);
+      const _sortKey = sortKey as keyof T;
+      numberArray = value.filter(item => typeof item[_sortKey] === 'number')
+        .sort((a, b) => Number(a[_sortKey]) - Number(b[_sortKey]));
       stringArray = value
-        .filter(item => typeof item[sortKey] === 'string')
+        .filter(item => typeof item[_sortKey] === 'string')
         .sort((a, b) => {
-          if (a[sortKey] < b[sortKey]) {
+          if (a[_sortKey] < b[_sortKey]) {
             return -1;
-          } else if (a[sortKey] > b[sortKey]) {
+          } else if (a[_sortKey] > b[_sortKey]) {
             return 1;
           } else {
             return 0;

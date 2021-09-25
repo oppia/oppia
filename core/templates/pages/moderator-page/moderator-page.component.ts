@@ -20,7 +20,7 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
@@ -28,8 +28,6 @@ import { Schema } from 'services/schema-default-value.service';
 import { ActivityIdTypeDict, CommitMessage,
   ExplorationDict, ModeratorPageBackendApiService }
   from './services/moderator-page-backend-api.service';
-
-require('base-components/base-content.directive.ts');
 
 @Component({
   selector: 'oppia-moderator-page',
@@ -134,7 +132,7 @@ export class ModeratorPageComponent {
   }
 
   isSaveFeaturedActivitiesButtonDisabled(): boolean {
-    return _.isEqual(
+    return isEqual(
       this.displayedFeaturedActivityReferences,
       this.lastSavedFeaturedActivityReferences);
   }

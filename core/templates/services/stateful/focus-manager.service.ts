@@ -30,7 +30,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class FocusManagerService {
-  private nextLabelToFocusOn: string = null;
+  // This property can be undefined but not null because we need to emit it.
+  private nextLabelToFocusOn: string | undefined;
   private focusEventEmitter: EventEmitter<string> = new EventEmitter();
 
   constructor(
@@ -43,11 +44,11 @@ export class FocusManagerService {
   }
 
   setFocus(name: string): void {
-    if (this.nextLabelToFocusOn === null) {
+    if (this.nextLabelToFocusOn === undefined) {
       this.nextLabelToFocusOn = name;
       setTimeout(() => {
         this.focusEventEmitter.emit(this.nextLabelToFocusOn);
-        this.nextLabelToFocusOn = null;
+        this.nextLabelToFocusOn = undefined;
       });
     }
   }

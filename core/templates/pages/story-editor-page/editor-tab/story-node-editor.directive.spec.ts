@@ -17,7 +17,8 @@
  */
 import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -42,7 +43,7 @@ describe('Story node editor directive', function() {
   var directive = null;
   var story = null;
   var WindowDimensionsService = null;
-  var StoryUpdateService = null;
+  var storyUpdateService: StoryUpdateService = null;
   var ExplorationIdValidationService = null;
   var AlertsService = null;
   var StoryEditorStateService = null;
@@ -56,10 +57,11 @@ describe('Story node editor directive', function() {
     ExplorationIdValidationService = $injector.get(
       'ExplorationIdValidationService');
     AlertsService = $injector.get('AlertsService');
-    StoryUpdateService = $injector.get('StoryUpdateService');
+    storyUpdateService = $injector.get('StoryUpdateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     $q = $injector.get('$q');
+
 
     var sampleStoryBackendObject = {
       id: 'sample_story_id',
@@ -140,6 +142,10 @@ describe('Story node editor directive', function() {
     $rootScope.$apply();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should init the controller', function() {
     $scope.viewNodeEditor();
     expect($scope.chapterPreviewCardIsShown).toEqual(false);
@@ -160,13 +166,13 @@ describe('Story node editor directive', function() {
   it('should call StoryUpdate service remove prerequisite skill id',
     function() {
       var skillSpy = spyOn(
-        StoryUpdateService, 'removePrerequisiteSkillIdFromNode');
+        storyUpdateService, 'removePrerequisiteSkillIdFromNode');
       $scope.removePrerequisiteSkillId('skill_3');
       expect(skillSpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service remove acquired skill id', function() {
-    var skillSpy = spyOn(StoryUpdateService, 'removeAcquiredSkillIdFromNode');
+    var skillSpy = spyOn(storyUpdateService, 'removeAcquiredSkillIdFromNode');
     $scope.removeAcquiredSkillId();
     expect(skillSpy).toHaveBeenCalled();
   });
@@ -188,40 +194,40 @@ describe('Story node editor directive', function() {
 
   it('should call StoryUpdate service to set story thumbnail filename',
     function() {
-      var storySpy = spyOn(StoryUpdateService, 'setStoryNodeThumbnailFilename');
+      var storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailFilename');
       $scope.updateThumbnailFilename('new_file.png');
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to set story thumbnail filename',
     function() {
-      var storySpy = spyOn(StoryUpdateService, 'setStoryNodeThumbnailBgColor');
+      var storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailBgColor');
       $scope.updateThumbnailBgColor('#333');
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
     function() {
-      var storySpy = spyOn(StoryUpdateService, 'unfinalizeStoryNodeOutline');
+      var storySpy = spyOn(storyUpdateService, 'unfinalizeStoryNodeOutline');
       $scope.unfinalizeOutline();
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
     function() {
-      var storySpy = spyOn(StoryUpdateService, 'finalizeStoryNodeOutline');
+      var storySpy = spyOn(storyUpdateService, 'finalizeStoryNodeOutline');
       $scope.finalizeOutline();
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to update outline', function() {
-    var storySpy = spyOn(StoryUpdateService, 'setStoryNodeOutline');
+    var storySpy = spyOn(storyUpdateService, 'setStoryNodeOutline');
     $scope.updateOutline('New outline');
     expect(storySpy).toHaveBeenCalled();
   });
 
   it('should call StoryUpdate service to update description', function() {
-    var storySpy = spyOn(StoryUpdateService, 'setStoryNodeDescription');
+    var storySpy = spyOn(storyUpdateService, 'setStoryNodeDescription');
     $scope.updateDescription('New description');
     expect(storySpy).toHaveBeenCalled();
   });
@@ -320,7 +326,7 @@ describe('Story node editor directive', function() {
     var expSpy = spyOn(
       ExplorationIdValidationService, 'isExpPublishedAsync').and.returnValue(
       deferred.promise);
-    var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeExplorationId');
+    var storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
 
     $scope.updateExplorationId('exp10');
     $rootScope.$apply();
@@ -339,7 +345,7 @@ describe('Story node editor directive', function() {
       ExplorationIdValidationService, 'isExpPublishedAsync').and.returnValue(
       deferred.promise);
     var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'setStoryNodeExplorationId');
+      storyUpdateService, 'setStoryNodeExplorationId');
 
     $scope.updateExplorationId('exp10');
     $rootScope.$apply();
@@ -353,7 +359,7 @@ describe('Story node editor directive', function() {
     var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
 
     var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'setStoryNodeExplorationId');
+      storyUpdateService, 'setStoryNodeExplorationId');
 
     $scope.updateExplorationId(null);
     expect(storyUpdateSpy).not.toHaveBeenCalled();
@@ -368,15 +374,15 @@ describe('Story node editor directive', function() {
     deferred.resolve(false);
 
     var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'setStoryNodeExplorationId');
+      storyUpdateService, 'setStoryNodeExplorationId');
 
-    $scope.updateExplorationId('exp10');
+    $scope.updateExplorationId(null);
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should call StoryUpdate service to set story node title', function() {
     var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'setStoryNodeTitle');
+      storyUpdateService, 'setStoryNodeTitle');
     $scope.updateTitle('Title 10');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
@@ -384,7 +390,7 @@ describe('Story node editor directive', function() {
   it('should not call StoryUpdate service to set story node title and ' +
       'call AlertsService if the name is a duplicate', function() {
     var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'setStoryNodeTitle');
+      storyUpdateService, 'setStoryNodeTitle');
     var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
     $scope.updateTitle('Title 2');
     expect(storyUpdateSpy).not.toHaveBeenCalled();

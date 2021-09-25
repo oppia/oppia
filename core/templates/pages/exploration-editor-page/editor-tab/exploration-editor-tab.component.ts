@@ -54,7 +54,10 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
-require('components/state-editor/state-editor.directive.ts');
+require('components/state-editor/state-editor.component.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-card-is-checkpoint.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -77,20 +80,23 @@ angular.module('oppia').component('explorationEditorTab', {
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
     'LoaderService',
-    'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
-    'StateEditorService', 'StateTutorialFirstTimeService',
-    'UrlInterpolationService', 'UserExplorationPermissionsService',
+    'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
+    'StateEditorRefreshService', 'StateEditorService',
+    'StateTutorialFirstTimeService',
+    'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService, GraphDataService,
         LoaderService,
-        RouterService, SiteAnalyticsService, StateEditorRefreshService,
-        StateEditorService, StateTutorialFirstTimeService,
-        UrlInterpolationService, UserExplorationPermissionsService) {
+        RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
+        StateEditorRefreshService, StateEditorService,
+        StateTutorialFirstTimeService,
+        UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.stateCardIsCheckpointService = StateCardIsCheckpointService;
       // Replace the ng-joyride template with one that uses <[...]>
       // interpolators instead of/ {{...}} interpolators.
       var ngJoyrideTemplate = $templateCache.get(
@@ -286,8 +292,8 @@ angular.module('oppia').component('explorationEditorTab', {
         });
         if (shouldPrompt) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/mark-all-audio-and-' +
+            template: require(
+              'components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
@@ -303,8 +309,8 @@ angular.module('oppia').component('explorationEditorTab', {
                 contentId)) {
                 writtenTranslations.markAllTranslationsAsNeedingUpdate(
                   contentId);
-                ExplorationStatesService.saveWrittenTranslations(
-                  stateName, writtenTranslations);
+                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
+                  contentId, stateName);
               }
             });
           }, function() {
@@ -320,6 +326,17 @@ angular.module('oppia').component('explorationEditorTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.onChangeCardIsCheckpoint = function() {
+        var displayedValue = ctrl.stateCardIsCheckpointService.displayed;
+        ExplorationStatesService.saveCardIsCheckpoint(
+          StateEditorService.getActiveStateName(),
+          angular.copy(displayedValue));
+        StateEditorService.setCardIsCheckpoint(
+          angular.copy(displayedValue));
+        StateCardIsCheckpointService.saveDisplayedValue();
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           StateEditorRefreshService.onRefreshStateEditor.subscribe(() => {

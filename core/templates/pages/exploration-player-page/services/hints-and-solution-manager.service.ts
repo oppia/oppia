@@ -29,7 +29,15 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
   providedIn: 'root'
 })
 export class HintsAndSolutionManagerService {
-  timeout = null;
+  // This in initialized using the the class methods
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  solutionForLatestCard!: Solution;
+  // The following are set to null when the timeouts are cleared
+  // or when the service is reset.
+  timeout: NodeJS.Timeout | null = null;
+  tooltipTimeout: NodeJS.Timeout | null = null;
+
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
 
@@ -42,7 +50,6 @@ export class HintsAndSolutionManagerService {
   solutionReleased: boolean = false;
   solutionConsumed: boolean = false;
   hintsForLatestCard: Hint[] = [];
-  solutionForLatestCard: Solution = null;
   wrongAnswersSinceLastHintConsumed: number = 0;
   correctAnswerSubmitted: boolean = false;
 
@@ -54,7 +61,6 @@ export class HintsAndSolutionManagerService {
   // This is set to true as soon as a hint/solution is clicked or when the
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
-  tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -113,8 +119,8 @@ export class HintsAndSolutionManagerService {
       clearTimeout(this.tooltipTimeout);
       this.tooltipTimeout = null;
     }
-    this._hintConsumedEventEmitter.emit();
     this.numHintsConsumed++;
+    this._hintConsumedEventEmitter.emit();
     this.wrongAnswersSinceLastHintConsumed = 0;
 
     let funcToEnqueue = null;

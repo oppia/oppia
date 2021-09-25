@@ -14,17 +14,20 @@
 
 """Base constants and handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import datetime
+import functools
 import hmac
 import json
 import logging
 import os
+import re
 import time
 
+from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
@@ -34,9 +37,9 @@ import feconf
 import python_utils
 import utils
 
-import backports.functools_lru_cache
 import webapp2
 
+from typing import Any, Dict, Optional # isort: skip
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -44,17 +47,18 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
-# NOTE: These handlers manage user sessions. Thus, we should never reject or
-# replace them when running in maintenance mode; otherwise admins will be unable
-# to access the site.
+# NOTE: These handlers manage user sessions and serve auth pages. Thus, we
+# should never reject or replace them when running in maintenance mode;
+# otherwise admins will be unable to access the site.
 AUTH_HANDLER_PATHS = (
     '/csrfhandler',
+    '/login',
     '/session_begin',
     '/session_end',
 )
 
 
-@backports.functools_lru_cache.lru_cache(maxsize=128)
+@functools.lru_cache(maxsize=128)
 def load_template(filename):
     """Return the HTML file contents at filepath.
 
@@ -145,6 +149,15 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
+    URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
+    HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
+
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -154,6 +167,8 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
@@ -166,6 +181,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
+        # Once the attribute `normalized_request` is type annotated here, make
+        # sure to fix all the subclasses using normalized_request.get() method
+        # by removing their type: ignore[union-attr] and using a type cast
+        # instead to eliminate the possibility on union types.
+        # e.g. ClassroomAccessValidationHandler.
+        self.normalized_request = None
+        self.normalized_payload = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -181,12 +203,6 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.current_user_is_super_admin = (
                 auth_claims is not None and auth_claims.role_is_super_admin)
-
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not self.current_user_is_super_admin
-                and self.request.path not in AUTH_HANDLER_PATHS):
-            auth_services.destroy_auth_session(self.response)
-            return
 
         if auth_claims:
             auth_id = auth_claims.auth_id
@@ -227,16 +243,15 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.role = (
-            feconf.ROLE_ID_GUEST
-            if self.user_id is None else user_settings.role)
+        self.roles = (
+            [feconf.ROLE_ID_GUEST]
+            if self.user_id is None else user_settings.roles)
         self.user = user_services.get_user_actions_info(self.user_id)
 
-        self.values['is_moderator'] = (
-            user_services.is_at_least_moderator(self.user_id))
-        self.values['is_admin'] = user_services.is_admin(self.user_id)
-        self.values['is_topic_manager'] = (
-            user_services.is_topic_manager(self.user_id))
+        if not self._is_requested_path_currently_accessible_to_user():
+            auth_services.destroy_auth_session(self.response)
+            return
+
         self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):
@@ -246,16 +261,17 @@ class BaseHandler(webapp2.RequestHandler):
             Exception. The CSRF token is missing.
             UnauthorizedUserException. The CSRF token is invalid.
         """
+        request_split = python_utils.url_split(self.request.uri)
         # If the request is to the old demo server, redirect it permanently to
-        # the new demo server.
-        if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect(
-                b'https://oppiatestserver.appspot.com', permanent=True)
+        # the new demo server. (Unless it is a cron job request, because cron
+        # job destination URLs are generated by App Engine and we can't change
+        # their destination.)
+        if (request_split.netloc == 'oppiaserver.appspot.com' and
+                not request_split.path.startswith('/cron/')):
+            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not self.current_user_is_super_admin
-                and self.request.path not in AUTH_HANDLER_PATHS):
+        if not self._is_requested_path_currently_accessible_to_user():
             self.handle_exception(
                 self.TemporaryMaintenanceException(), self.app.debug)
             return
@@ -265,7 +281,7 @@ class BaseHandler(webapp2.RequestHandler):
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
-        if self.partially_logged_in:
+        if self.partially_logged_in and request_split.path != '/logout':
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
@@ -299,7 +315,157 @@ class BaseHandler(webapp2.RequestHandler):
                 self.handle_exception(e, self.app.debug)
                 return
 
+        schema_validation_succeeded = True
+        try:
+            self.validate_and_normalize_args()
+        except self.InvalidInputException as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+        # TODO(#13155): Remove this clause once all the handlers have had
+        # schema validation implemented.
+        except NotImplementedError as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+
+        if not schema_validation_succeeded:
+            return
+
         super(BaseHandler, self).dispatch()
+
+    def validate_and_normalize_args(self):
+        """Validates schema for controller layer handler class arguments.
+
+        Raises:
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
+        """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url_path_args = self.request.route_kwargs
+        handler_class_names_with_no_schema = (
+            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if handler_class_name in handler_class_names_with_no_schema:
+            return
+
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg == 'csrf_token':
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
+                continue
+            elif arg == 'source':
+                source_url = self.request.get('source')
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
+            elif arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = list(payload_args.keys())
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
+                handler_args[arg] = self.request.get(arg)
+
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
+        extra_args_are_allowed = (
+            self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+            request_method == 'GET')
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
+
+        schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
+        normalized_arg_values, errors = (
+            payload_validator.validate(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        )
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+        # This check ensures that if a request method is not defined
+        # in the handler class then schema validation will not raise
+        # NotImplementedError for that corresponding request method.
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
+                getattr(self.__class__, request_method.lower()) ==
+                getattr(BaseHandler, request_method.lower())):
+            return
+
+        try:
+            schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
+                request_method]
+        except Exception:
+            raise NotImplementedError(
+                'Missing schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name))
+
+        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
+        normalized_arg_values, errors = (
+            payload_validator.validate(
+                handler_args, schema_for_request_method, extra_args_are_allowed,
+                allow_string_to_bool_conversion)
+        )
+
+        self.normalized_payload = {
+            arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_arg_values.get(arg) for arg in request_arg_keys
+        }
+
+        # The following keys are absent in request/payload but present in
+        # normalized_arg_values because these args are populated from their
+        # default_value provided in the schema.
+        keys_that_correspond_to_default_values = list(
+            set(normalized_arg_values.keys()) -
+            set(payload_arg_keys + request_arg_keys)
+        )
+        # Populate the payload/request with the default args before passing
+        # execution onwards to the handler.
+        for arg in keys_that_correspond_to_default_values:
+            if request_method in ['GET', 'DELETE']:
+                self.normalized_request[arg] = normalized_arg_values.get(arg)
+            else:
+                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
+
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
+        """
+        return (
+            self.current_user_is_super_admin or
+            feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
@@ -308,7 +474,6 @@ class BaseHandler(webapp2.RequestHandler):
         self._render_exception(
             404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
-        return
 
     def post(self, *args):  # pylint: disable=unused-argument
         """Base method to handle POST requests.
@@ -334,37 +499,41 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
-    def render_json(self, values):
+    def render_json(self, values: Dict[Any, Any]) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = b'application/json; charset=utf-8'
-        self.response.headers[b'Content-Disposition'] = (
-            b'attachment; filename="oppia-attachment.txt"')
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
+        self.response.content_type = 'application/json; charset=utf-8'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
-        self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
+        # Write expects bytes, thus we need to encode the JSON output.
+        self.response.write(
+            b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
-    def render_downloadable_file(self, values, filename, content_type):
+    def render_downloadable_file(self, file, filename, content_type):
         """Prepares downloadable content to be sent to the client.
 
         Args:
-            values: dict. The key-value pairs to include in the response.
+            file: BytesIO. The data of the downloadable file.
             filename: str. The name of the file to be rendered.
             content_type: str. The type of file to be rendered.
         """
-        self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
-            content_type)
-        self.response.headers[
-            b'Content-Disposition'] = python_utils.convert_to_bytes(
-                'attachment; filename=%s' % filename)
-        self.response.write(values)
+        self.response.headers['Content-Type'] = content_type
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s' % filename)
+        self.response.charset = 'utf-8'
+        # We use this super in order to bypass the write method
+        # in webapp2.Response, since webapp2.Response doesn't support writing
+        # bytes.
+        super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
@@ -383,16 +552,15 @@ class BaseHandler(webapp2.RequestHandler):
         # deploy a new version, using only 'no-cache' doesn't work properly.
         self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers[
-                    b'X-Frame-Options'] = python_utils.convert_to_bytes(
-                        iframe_restriction)
+                self.response.headers['X-Frame-Options'] = (
+                    python_utils.UNICODE(iframe_restriction))
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -419,12 +587,17 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html', iframe_restriction=None)
             elif values['status_code'] == 503:
                 self.render_template('maintenance-page.mainpage.html')
+            elif values['status_code'] == 404:
+                # Only 404 routes can be handled with angular router as it only
+                # has access to the path, not to the status code.
+                # That's why 404 status code is treated differently.
+                self.render_template('oppia-root.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
         else:
-            if return_type != feconf.HANDLER_TYPE_JSON and (
-                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
+            if return_type not in (
+                    feconf.HANDLER_TYPE_JSON, feconf.HANDLER_TYPE_DOWNLOADABLE):
                 logging.warning(
                     'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
@@ -498,31 +671,31 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                401, {'error': python_utils.UNICODE(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                400, {'error': python_utils.UNICODE(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                500, {'error': python_utils.UNICODE(exception)})
             return
 
         if isinstance(exception, self.TemporaryMaintenanceException):
             self.error(503)
-            self._render_exception(503, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                503, {'error': python_utils.UNICODE(exception)})
             return
 
         self.error(500)
         self._render_exception(
-            500, {'error': python_utils.convert_to_bytes(exception)})
+            500, {'error': python_utils.UNICODE(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -580,15 +753,18 @@ class CsrfTokenManager(python_utils.OBJECT):
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = int(issued_on)
+        issued_on = python_utils.UNICODE(int(issued_on))
 
-        digester = hmac.new(python_utils.convert_to_bytes(CSRF_SECRET.value))
-        digester.update(python_utils.convert_to_bytes(user_id))
-        digester.update(':')
-        digester.update(python_utils.convert_to_bytes(issued_on))
+        digester = hmac.new(CSRF_SECRET.value.encode('utf-8'))
+        digester.update(user_id.encode('utf-8'))
+        digester.update(b':')
+        digester.update(issued_on.encode('utf-8'))
 
         digest = digester.digest()
-        token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))
+        # The b64encode returns bytes, so we first need to decode the returned
+        # bytes to string.
+        token = '%s/%s' % (
+            issued_on, base64.urlsafe_b64encode(digest).decode('utf-8'))
 
         return token
 

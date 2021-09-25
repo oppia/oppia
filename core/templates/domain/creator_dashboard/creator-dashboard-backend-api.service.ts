@@ -51,9 +51,9 @@ import {
   SuggestionThreadObjectFactory
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict
+} from 'domain/topic/creator-topic-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';
@@ -69,12 +69,13 @@ interface CreatorDashboardDataBackendDict {
   'suggestions_to_review_list': SuggestionBackendDict[];
   'explorations_list': CreatorExplorationSummaryBackendDict[];
   'collections_list': CollectionSummaryBackendDict[];
-  'topic_summary_dicts': TopicSummaryBackendDict[];
+  'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
 }
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  lastWeekStats: CreatorDashboardStats;
+  // 'lastWeekStats' is null for a new creator.
+  lastWeekStats: CreatorDashboardStats | null;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
@@ -85,7 +86,7 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
-  topicSummaries: TopicSummary[];
+  topicSummaries: CreatorTopicSummary[];
 }
 
 @Injectable({
@@ -172,8 +173,8 @@ export class CreatorDashboardBackendApiService {
         topicSummaries: (
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
-              topicSummaryDict => TopicSummary.createFromBackendDict(
-                topicSummaryDict))) : null)
+              topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
+                topicSummaryDict))) : [])
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
@@ -182,6 +183,12 @@ export class CreatorDashboardBackendApiService {
 
   async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardDataAsync();
+  }
+
+  async postExplorationViewAsync(newViewType: string): Promise<void> {
+    return this.http.post<void>('/creatordashboardhandler/data', {
+      display_preference: newViewType
+    }).toPromise();
   }
 }
 
