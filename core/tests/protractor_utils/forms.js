@@ -57,7 +57,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createVertex = async function(xOffset, yOffset) {
-    await addNodeButton.click();
+    await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -65,7 +65,7 @@ var GraphEditor = function(graphInputContainer) {
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
-    await addEdgeButton.click();
+    await action.click('Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -91,10 +91,10 @@ var GraphEditor = function(graphInputContainer) {
       }
     },
     clearDefaultGraph: async function() {
-      await deleteButton.click();
+      await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await vertexElement(i).click();
+        await action.click(`Vertex Element ${i}`, vertexElement);
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -132,7 +132,8 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    await elem.element(addListEntryLocator).click();
+    var addListEntryButton = elem.element(addListEntryLocator);
+    await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -185,23 +186,22 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = by.css(
     '.protractor-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(rteElements.first());
-  await (await rteElements.first()).click();
+  var rteElementFirst = await rteElements.first();
+  await action.click('rte Element First', rteElementFirst);
 
   var _appendContentText = async function(text) {
-    await (await rteElements.first()).sendKeys(text);
+    await action.sendKeys('First rte Element ', rteElementFirst, text);
   };
   var _clickToolbarButton = async function(buttonName) {
-    await waitFor.elementToBeClickable(
-      elem.element(by.css('.' + buttonName)),
-      'Toolbar button takes too long to be clickable.');
-    await elem.element(by.css('.' + buttonName)).click();
+    await action.click(
+      'Toolbar Button',
+      elem.element(by.css('.' + buttonName)));
   };
   var _clearContent = async function() {
     expect(
       await (await rteElements.first()).isPresent()
     ).toBe(true);
-    await (await rteElements.first()).clear();
+    await action.click('First rte Element', rteElementFirst);
   };
 
   return {
@@ -260,10 +260,7 @@ var RichTextEditor = async function(elem) {
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
       var doneButton = modal.element(closeRteComponentButtonLocator);
-      await waitFor.elementToBeClickable(
-        doneButton,
-        'save button taking too long to be clickable');
-      await doneButton.click();
+      await action.click('Save Button', doneButton);
       await waitFor.invisibilityOf(
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
@@ -272,11 +269,17 @@ var RichTextEditor = async function(elem) {
         [
           'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
-        await rteElements.first().sendKeys(protractor.Key.DOWN);
+        // RteElementFirst can be found in beginning of RichTextEditor function.
+        await action.sendKeys(
+          'First rte Elements',
+          rteElements.first(),
+          protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await rteElements.first().sendKeys(
+      await action.sendKeys(
+        'First rte Elements',
+        rteElements.first(),
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -298,8 +301,10 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(text);
+      await action.clear('Input Field', elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Input Field',
+        elem.element(by.tagName('input')), text);
     }
   };
 };
@@ -310,23 +315,29 @@ var AutocompleteDropdownEditor = function(elem) {
   var searchInputLocator = by.css('.select2-search input');
   return {
     setValue: async function(text) {
-      await elem.element(containerLocator).click();
+      await action.click('Container Element', elem.element(containerLocator));
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await dropdownElement.element(searchInputLocator).sendKeys(text + '\n');
+      await action.sendKeys(
+        'Dropdown Element',
+        dropdownElement.element(searchInputLocator),
+        text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await elem.element(containerLocator).click();
+      await action.click('Container Element', elem.element(containerLocator));
       var actualOptions = await dropdownElement.all(by.tagName('li')).map(
         async function(optionElem) {
-          return await optionElem.getText();
+          return await action.getText('Option Elem', optionElem);
         }
       );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      await dropdownElement.element(searchInputLocator).sendKeys('\n');
+      await action.sendKeys(
+        'Dropdown Element',
+        dropdownElement.element(searchInputLocator),
+        '\n');
     }
   };
 };
@@ -335,7 +346,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   var selectionChoiceRemoveLocator = by.css(
     '.select2-selection__choice__remove');
   var selectionRenderedLocator = by.css('.select2-selection__rendered');
-  var saerchFieldElement = elem.element(by.css('.select2-search__field'));
+  var searchFieldElement = elem.element(by.css('.select2-search__field'));
   return {
     setValues: async function(texts) {
       // Clear all existing choices.
@@ -347,12 +358,14 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       // removes the element from the DOM. We also omit the last element
       // because it is the field for new input.
       for (var i = deleteButtons.length - 2; i >= 0; i--) {
-        await deleteButtons[i].click();
+        await action.click(`Delete Buttons ${i}`, deleteButtons[i]);
       }
 
       for (var i = 0; i < texts.length; i++) {
-        await elem.element(containerLocator).click();
-        await saerchFieldElement.sendKeys(
+        await action.click('Container Element', elem.element(containerLocator));
+        await action.sendKeys(
+          'Search Field Element',
+          searchFieldElement,
           texts[i] + '\n');
       }
     },
@@ -380,7 +393,9 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    await searchBarDropdownToggleElement.click();
+    await action.click(
+      'Searchbar DropDown Toggle Element',
+      searchBarDropdownToggleElement);
 
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
@@ -391,7 +406,7 @@ var MultiSelectEditor = function(elem) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
-        await filteredElement.click();
+        await action.click('Filtered Element', filteredElement);
       }
     }
 
@@ -402,7 +417,9 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    await searchBarDropdownToggleElement.click();
+    await action.click(
+      'Searchbar Dropdown Toggle Element',
+      searchBarDropdownToggleElement);
   };
 
   return {
@@ -416,17 +433,21 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      await searchBarDropdownToggleElement.click();
+      await action.click(
+        'Searchbar Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
 
       // Find the selected elements.
       var actualSelection = await elem.element(searchBarDropdownMenuLocator)
         .all(selectedLocator).map(async function(selectedElem) {
-          return await selectedElem.getText();
+          return await action.getText('Selected Elem', selectedElem);
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      await searchBarDropdownToggleElement.click();
+      await action.click(
+        'Searchbar Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
     }
   };
 };
@@ -461,11 +482,11 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await entry.getText();
+        return await action.getText('Entry', entry);
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
-    var fullText = await elem.getText();
+    var fullText = await action.getText('Elem', elem);
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
