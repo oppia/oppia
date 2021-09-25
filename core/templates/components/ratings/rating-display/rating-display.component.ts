@@ -48,7 +48,6 @@ export class RatingDisplayComponent {
   STATUS_INACTIVE = 'inactive';
   STATUS_RATING_SET = 'rating_set';
 
-
   ngOnInit(): void {
     this.stars = this.POSSIBLE_RATINGS.map((starValue) => {
       return {
