@@ -18,7 +18,7 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Subscription } from 'rxjs';
@@ -44,6 +44,7 @@ export class ProgressNavComponent {
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
   @Input() submitButtonIsDisabled: boolean;
+
   directiveSubscriptions = new Subscription();
   transcriptLength = 0;
   interactionIsInline = true;
@@ -73,6 +74,8 @@ export class ProgressNavComponent {
 
   updateDisplayedCardInfo(): void {
     this.transcriptLength = this.playerTranscriptService.getNumCards();
+    this.displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex());
     this.hasPrevious = this.displayedCardIndex > 0;
     this.hasNext = !this.playerTranscriptService.isLastCard(
       this.displayedCardIndex);
@@ -170,6 +173,15 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
+
+    this.directiveSubscriptions.add(
+      this.playerPositionService.displayedCardIndexChangedEventEmitter
+        .subscribe(
+          () => {
+            this.updateDisplayedCardInfo();
+          }
+        )
+    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(

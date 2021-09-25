@@ -104,7 +104,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 
 @NgModule({
   imports: [
@@ -167,7 +166,6 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     ProgressNavComponent,
-    PromoBarComponent,
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
@@ -229,7 +227,6 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     ProgressNavComponent,
-    PromoBarComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
