@@ -336,7 +336,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_models: List[GeneralSuggestionModel] = []
         offset, more = (0, True)
         while more:
-            results = query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset)
+            results: Sequence[GeneralSuggestionModel] = (
+                query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset))
             if len(results):
                 offset = offset + len(results)
                 suggestion_models.extend(results)
@@ -355,9 +356,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
-        suggestion_models = cls.get_all().filter(
-            cls.status == STATUS_IN_REVIEW
-        ).filter(cls.last_updated < threshold_time).fetch()
+        suggestion_models: Sequence[GeneralSuggestionModel] = (
+            cls.get_all().filter(
+                cls.status == STATUS_IN_REVIEW
+            ).filter(cls.last_updated < threshold_time).fetch()
+        )
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
@@ -557,7 +560,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
 
         user_data = {}
-        suggestion_models = (
+        suggestion_models: Sequence[GeneralSuggestionModel] = (
             cls.get_all().filter(cls.author_id == user_id).fetch())
 
         for suggestion_model in suggestion_models:
@@ -744,7 +747,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         user_data = {}
 
-        voiceover_models = cls.query(cls.author_id == user_id).fetch()
+        voiceover_models: Sequence[GeneralVoiceoverApplicationModel] = (
+            cls.query(cls.author_id == user_id).fetch())
 
         for voiceover_model in voiceover_models:
             user_data[voiceover_model.id] = {
@@ -1074,9 +1078,8 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             dict. Dictionary of the data from TranslationContributionStatsModel.
         """
         user_data = {}
-        stats_models = cls.get_all().filter(
-            cls.contributor_user_id == user_id
-        ).fetch()
+        stats_models: Sequence[TranslationContributionStatsModel] = (
+            cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
         for model in stats_models:
             user_data[model.id] = {
                 'language_code': model.language_code,

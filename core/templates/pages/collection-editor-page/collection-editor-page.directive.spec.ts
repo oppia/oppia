@@ -74,21 +74,21 @@ describe('Collection Editor Page', () => {
     }, {
       getTitle: () => undefined
     });
-    spyOn(PageTitleService, 'setPageTitle');
+    spyOn(PageTitleService, 'setDocumentTitle');
 
     ctrl.$onInit();
 
     onCollectionInitializedEmitter.emit();
     $scope.$apply();
 
-    expect(PageTitleService.setPageTitle)
+    expect(PageTitleService.setDocumentTitle)
       .toHaveBeenCalledWith('title - Oppia Editor');
 
     // When title does not exist. Sets default page title.
     onCollectionInitializedEmitter.emit();
     $scope.$apply();
 
-    expect(PageTitleService.setPageTitle)
+    expect(PageTitleService.setDocumentTitle)
       .toHaveBeenCalledWith('Untitled Collection - Oppia Editor');
   });
 
