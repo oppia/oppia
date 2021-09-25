@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -42,10 +41,8 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    ContentLanguageSelectorComponent,
   ],
   entryComponents: [
-    ContentLanguageSelectorComponent,
   ],
   providers: [
     {
