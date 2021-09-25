@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 import base64
 import datetime
+import functools
 import hmac
 import json
 import logging
@@ -36,7 +37,6 @@ import feconf
 import python_utils
 import utils
 
-import backports.functools_lru_cache
 import webapp2
 
 from typing import Any, Dict, Optional # isort: skip
@@ -58,7 +58,7 @@ AUTH_HANDLER_PATHS = (
 )
 
 
-@backports.functools_lru_cache.lru_cache(maxsize=128)
+@functools.lru_cache(maxsize=128)
 def load_template(filename):
     """Return the HTML file contents at filepath.
 
