@@ -142,9 +142,13 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    await elem.element(
-      await by.repeater('item in localValue track by $index').row(index)
-    ).element(deleteListEntryLocator).click();
+    var deleteItemField = await by
+      .repeater('item in localValue track by $index')
+      .row(index);
+    var deleteItemFieldElem = elem.element(
+      deleteItemField,
+    ).element(deleteListEntryLocator);
+    await action.click('Delete Item Field Elem', deleteItemFieldElem);
   };
 
   return {
@@ -510,7 +514,7 @@ var expectRichText = function(elem) {
 //   the rich-text area, obtained from getText(), e.g. ['bold'].
 // 'fullText': a string consisting of all the visible text in the rich text
 //   area (including both element and text nodes, so more than just the
-//   concatenation of arrayOfTexts), e.g. 'textbold'.
+//   concatenation of arrayOfTexts), e.g. 'textBold'.
 var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
@@ -564,7 +568,8 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      expect(await action.getText('Read Rte Component Elem', elem))
+        .toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
@@ -622,7 +627,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    * This recursive function is used by expectTextWithHighlightingToBe().
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
-   * codemirror should scroll to,
+   * codeMirror should scroll to,
    * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
    * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
@@ -630,9 +635,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'text': the exact string of text expected on that line
    *  - 'highlighted': true or false, whether the line is highlighted
    *  - 'checked': true or false, whether the line has been checked
-   * compareHightlighting: Whether highlighting should be compared.
+   * compareHighLighting: Whether highlighting should be compared.
    */
-  var _compareText = async function(compareDict, compareHightlighting) {
+  var _compareText = async function(compareDict, compareHighLighting) {
     var scrollTo = 0;
     var prevScrollTop = -1;
     var actualDiffDict = {};
@@ -643,7 +648,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       scrollBarWebElement = await scrollBarElements.last().getWebElement();
     }
     while (true) {
-      // This is used to match and scroll the text in codemirror to a point
+      // This is used to match and scroll the text in codeMirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
       await browser.executeScript(
@@ -663,7 +668,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var totalCount = await lineNumberElements.count();
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = await lineNumberElements.get(i);
-        var lineNumber = await lineNumberElement.getText();
+        var lineNumber = await action.getText(
+          'Line Number Element',
+          lineNumberElement);
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -671,7 +678,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
           codeMirrorLineBackgroundLocator).isPresent();
-        var text = await lineElement.getText();
+        var text = await action.getText('Line Element', lineElement);
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
@@ -682,7 +689,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     for (var lineNumber in compareDict) {
       expect(actualDiffDict[lineNumber].text).toEqual(
         compareDict[lineNumber].text);
-      if (compareHightlighting) {
+      if (compareHighLighting) {
         expect(actualDiffDict[lineNumber].highlighted).toEqual(
           compareDict[lineNumber].highlighted);
       }
@@ -691,7 +698,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 
   return {
     /**
-     * Compares text and highlighting with codemirror-mergeview. The input
+     * Compares text and highlighting with codeMirror-mergeView. The input
      * should be an object whose keys are line numbers and whose values should
      * be an object with the following key-value pairs:
      *  - text: the exact string of text expected on that line
@@ -706,8 +713,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await _compareText(expectedTextDict, true);
     },
     /**
-     * Compares text with codemirror. The input should be a string (with
-     * line breaks) of the expected display on codemirror.
+     * Compares text with codeMirror. The input should be a string (with
+     * line breaks) of the expected display on codeMirror.
      */
     expectTextToBe: async function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
@@ -727,8 +734,12 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 var CodeStringEditor = function(elem) {
   return {
     setValue: async function(code) {
-      await elem.element(by.tagName('textarea')).clear();
-      await elem.element(by.tagName('textarea')).sendKeys(code);
+      var stringEditorTextArea = elem.element(by.tagName('textarea'));
+      await action.clear('String Editor Text Area', stringEditorTextArea);
+      await action.sendKeys(
+        'String Editor Text Area',
+        stringEditorTextArea,
+        code);
     }
   };
 };
