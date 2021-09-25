@@ -133,9 +133,7 @@ class JobModel(base_models.BaseModel):
         ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
-    def get_unfinished_jobs(
-            cls, job_type: str
-    ) -> 'datastore_services.Query[JobModel]':
+    def get_unfinished_jobs(cls, job_type: str) -> datastore_services.Query:
         """Gets jobs that are unfinished.
 
         Args:

@@ -215,12 +215,12 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
 
-      var setPageTitle = function() {
+      var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             ExplorationTitleService.savedMemento + ' - Oppia Editor');
         } else {
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             'Untitled Exploration - Oppia Editor');
         }
       };
@@ -502,7 +502,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
-              setPageTitle();
+              setDocumentTitle();
               $rootScope.$applyAsync();
             }
           )
