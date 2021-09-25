@@ -360,7 +360,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             GeneralSuggestionModel.query(
                 GeneralSuggestionModel.target_id.IN(target_ids) # pylint: disable=singleton-comparison
             ).fetch(keys_only=True))
-        
+
         return [suggestion_key.id() for suggestion_key in suggestion_keys]
 
     @classmethod

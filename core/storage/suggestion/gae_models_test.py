@@ -24,7 +24,6 @@ import datetime
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 
 from typing import Any, Dict
 

@@ -26,7 +26,6 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import question_fetchers
 from core.domain import story_fetchers
-from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import utils
@@ -57,7 +56,8 @@ def is_exploration_available_for_contribution(exp_id):
     return model is not None
 
 
-def get_exploration_opportunity_summary_from_model(model, translations_in_review):
+def get_exploration_opportunity_summary_from_model(
+    model, translations_in_review):
     """Returns the ExplorationOpportunitySummary object out of the model.
 
     Args:
@@ -93,7 +93,10 @@ def get_exploration_opportunity_summary_from_model(model, translations_in_review
     for language_code in constants.SUPPORTED_CONTENT_LANGUAGES:
         in_review_count = 0
         for suggestion in translations_in_review:
-            if suggestion is not None and suggestion.language_code == language_code['code'] and suggestion.target_id == model.id:
+            if (
+                suggestion is not None and
+                suggestion.language_code == language_code['code'] and
+                suggestion.target_id == model.id):
                 in_review_count = in_review_count + 1
         if in_review_count > 0:
             translation_in_review_counts[
@@ -451,10 +454,15 @@ def get_translation_opportunities(language_code, cursor):
     suggestion_ids = []
     opportunity_ids = []
     translations_in_review = []
-    opportunity_ids = [opportunity.id for opportunity in exp_opportunity_summary_models]
+    opportunity_ids = [
+        opportunity.id for opportunity in exp_opportunity_summary_models]
     if len(opportunity_ids) > 0:
-        suggestion_ids = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_ids_with_exp_id(opportunity_ids)
-        translations_in_review = suggestion_models.GeneralSuggestionModel.get_multiple_translation_suggestions_in_review(suggestion_ids)
+        suggestion_ids = (
+            suggestion_models
+            .GeneralSuggestionModel.get_translation_suggestions_in_review_ids_with_exp_id(opportunity_ids))
+        translations_in_review = (
+            suggestion_models
+            .GeneralSuggestionModel.get_multiple_translation_suggestions_in_review(suggestion_ids))
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
