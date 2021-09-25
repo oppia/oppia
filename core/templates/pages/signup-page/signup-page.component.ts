@@ -25,6 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { UtilsService } from 'services/utils.service';
 import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
 import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
 import { SignupPageBackendApiService } from './services/signup-page-backend-api.service';
@@ -58,7 +59,8 @@ export class SignupPageComponent {
     private loaderService: LoaderService,
     private signupPageBackendApiService: SignupPageBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private utilsService: UtilsService
   ) {}
 
   ngOnInit(): void {
@@ -163,8 +165,8 @@ export class SignupPageComponent {
     }
 
     let defaultDashboard: string = AppConstants.DASHBOARD_TYPE_LEARNER;
-    let returnUrl = decodeURIComponent(
-      this.urlService.getUrlParams().return_url);
+    let returnUrl = (
+      decodeURIComponent(this.urlService.getUrlParams().return_url));
 
     if (returnUrl.indexOf('creator-dashboard') !== -1) {
       defaultDashboard = AppConstants.DASHBOARD_TYPE_CREATOR;
@@ -210,8 +212,8 @@ export class SignupPageComponent {
         }
         this.siteAnalyticsService.registerNewSignupEvent();
         setTimeout(() => {
-          this.windowRef.nativeWindow.location.href = decodeURIComponent(
-            this.urlService.getUrlParams().return_url);
+          this.windowRef.nativeWindow.location.href = (
+            this.utilsService.getSafeReturnUrl(returnUrl));
         }, AppConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
       }, (rejection) => {
         if (rejection && rejection.status_code === 401) {

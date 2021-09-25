@@ -282,7 +282,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if self.partially_logged_in and request_split.path != '/logout':
-            self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
