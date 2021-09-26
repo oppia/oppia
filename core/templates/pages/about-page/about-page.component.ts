@@ -47,17 +47,17 @@ export class AboutPageComponent {
     i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
     imageFilename: '/about/language_icon.svg'
   }];
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService) {
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickVisitClassroomButton(): void {
+  onClickVisitClassroomButton (): void {
     let classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
@@ -66,12 +66,12 @@ export class AboutPageComponent {
     this.windowRef.nativeWindow.location.href = classroomUrl;
   }
 
-  onClickBrowseLibraryButton(): void {
+  onClickBrowseLibraryButton (): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
     this.windowRef.nativeWindow.location.href = '/community-library';
   }
 
-  onClickCreateLessonButton(): void {
+  onClickCreateLessonButton (): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
     this.windowRef.nativeWindow.location.href = (
       '/creator-dashboard?mode=create');

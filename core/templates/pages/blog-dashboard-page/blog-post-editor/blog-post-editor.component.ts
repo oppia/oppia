@@ -73,7 +73,7 @@ export class BlogPostEditorComponent implements OnInit {
     }
   };
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private blogDashboardPageService: BlogDashboardPageService,
@@ -88,7 +88,7 @@ export class BlogPostEditorComponent implements OnInit {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
@@ -110,11 +110,11 @@ export class BlogPostEditorComponent implements OnInit {
     });
   }
 
-  getSchema(): EditorSchema {
+  getSchema (): EditorSchema {
     return this.HTML_SCHEMA;
   }
 
-  initEditor(): void {
+  initEditor (): void {
     this.blogPostEditorBackendService.fetchBlogPostEditorData(this.blogPostId)
       .then(
         (editorData: BlogPostEditorData) => {
@@ -162,13 +162,13 @@ export class BlogPostEditorComponent implements OnInit {
         });
   }
 
-  getDateStringInWords(naiveDateTime: string): string {
+  getDateStringInWords (naiveDateTime: string): string {
     let datestring = naiveDateTime.substring(0, naiveDateTime.length - 7);
     return dayjs(
       datestring, 'MM-DD-YYYY, HH:mm:ss').format('MMMM D, YYYY [at] hh:mm A');
   }
 
-  updateLocalTitleValue(): void {
+  updateLocalTitleValue (): void {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title);
     this.newChangesAreMade = true;
@@ -177,20 +177,20 @@ export class BlogPostEditorComponent implements OnInit {
     this.preventPageUnloadEventService.addListener();
   }
 
-  cancelEdit(): void {
+  cancelEdit (): void {
     if (this.blogPostData.content.length > 0) {
       this.contentEditorIsActive = false;
     }
   }
 
-  updateLocalEditedContent($event: string): void {
+  updateLocalEditedContent ($event: string): void {
     if (this.localEditedContent !== $event) {
       this.localEditedContent = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  updateContentValue(): void {
+  updateContentValue (): void {
     this.blogPostUpdateService.setBlogPostContent(
       this.blogPostData, this.localEditedContent);
     if (this.blogPostData.content.length > 0) {
@@ -200,7 +200,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.preventPageUnloadEventService.addListener();
   }
 
-  saveDraft(): void {
+  saveDraft (): void {
     let issues = this.blogPostData.validate();
     if (issues.length === 0) {
       this.updateBlogPostData(false);
@@ -211,11 +211,11 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 
-  headersAreEnabledCallBack(): boolean {
+  headersAreEnabledCallBack (): boolean {
     return true;
   }
 
-  publishBlogPost(): void {
+  publishBlogPost (): void {
     let issues = this.blogPostData.prepublishValidate(this.maxAllowedTags);
     if (issues.length === 0) {
       this.blogDashboardPageService.blogPostAction = (
@@ -233,7 +233,7 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 
-  updateBlogPostData(isBlogPostPublished: boolean): void {
+  updateBlogPostData (isBlogPostPublished: boolean): void {
     this.blogPostUpdateService.setBlogPostTags(
       this.blogPostData, this.blogPostData.tags);
     let changeDict = this.blogPostUpdateService.getBlogPostChangeDict();
@@ -261,7 +261,7 @@ export class BlogPostEditorComponent implements OnInit {
     );
   }
 
-  postImageDataToServer(): void {
+  postImageDataToServer (): void {
     let imagesData = this.imageLocalStorageService.getStoredImagesData();
     this.blogPostUpdateService.setBlogPostThumbnail(
       this.blogPostData, imagesData);
@@ -282,7 +282,7 @@ export class BlogPostEditorComponent implements OnInit {
       });
   }
 
-  deleteBlogPost(): void {
+  deleteBlogPost (): void {
     this.blogDashboardPageService.blogPostAction = 'delete';
     this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
       backdrop: 'static',
@@ -296,7 +296,7 @@ export class BlogPostEditorComponent implements OnInit {
     });
   }
 
-  onTagChange(tag: string): void {
+  onTagChange (tag: string): void {
     if ((this.blogPostData.tags).includes(tag)) {
       this.blogPostData.removeTag(tag);
     } else if ((this.blogPostData.tags).length < this.maxAllowedTags) {
@@ -306,7 +306,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.preventPageUnloadEventService.addListener();
   }
 
-  showuploadThumbnailModal(): void {
+  showuploadThumbnailModal (): void {
     let modalRef = this.ngbModal.open(UploadBlogPostThumbnailModalComponent, {
       backdrop: 'static'
     });
@@ -322,14 +322,14 @@ export class BlogPostEditorComponent implements OnInit {
     });
   }
 
-  saveBlogPostThumbnail(thumbnailDataUrl: string): void {
+  saveBlogPostThumbnail (thumbnailDataUrl: string): void {
     this.thumbnailDataUrl = thumbnailDataUrl;
     this.postImageDataToServer();
     this.newChangesAreMade = true;
     this.preventPageUnloadEventService.addListener();
   }
 
-  showPreview(): void {
+  showPreview (): void {
     this.blogDashboardPageService.blogPostData = this.blogPostData;
     this.blogDashboardPageService.authorPictureUrl = (
       this.authorProfilePictureUrl);
@@ -338,7 +338,7 @@ export class BlogPostEditorComponent implements OnInit {
     });
   }
 
-  isPublishButtonDisabled(): boolean {
+  isPublishButtonDisabled (): boolean {
     if (this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {
       return true;
     } else if (this.newChangesAreMade) {

@@ -45,7 +45,7 @@ export class ThreadMessage {
   updatedSubject: string | null = null;
   summary: ThreadMessageSummary;
 
-  constructor(
+  constructor (
       authorUsername: string, createdOnMsecs: number, entityType: string,
       entityId: string, messageId: number, text: string,
       updatedStatus: string | null, updatedSubject: string | null,
@@ -61,19 +61,19 @@ export class ThreadMessage {
     this.summary = summary;
   }
 
-  hasText(): boolean {
+  hasText (): boolean {
     return this.text.length > 0;
   }
 
-  hasStatusUpdate(): boolean {
+  hasStatusUpdate (): boolean {
     return this.updatedStatus !== null;
   }
 
-  hasSubjectUpdate(): boolean {
+  hasSubjectUpdate (): boolean {
     return this.updatedSubject !== null;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,

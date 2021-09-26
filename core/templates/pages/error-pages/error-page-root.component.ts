@@ -29,12 +29,12 @@ import { PageTitleService } from 'services/page-title.service';
 export class ErrorPageRootComponent {
   statusCode: string;
 
-  constructor(
+  constructor (
     private pageTitleService: PageTitleService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let bodyTag = (
       this.windowRef.nativeWindow.document.getElementsByTagName('body'));
     // Read status code from errorCode attribute on body tag.

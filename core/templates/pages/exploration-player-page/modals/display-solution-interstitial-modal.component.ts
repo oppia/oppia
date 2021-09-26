@@ -26,7 +26,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class DisplaySolutionInterstititalModalComponent
   extends ConfirmOrCancelModal {
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);

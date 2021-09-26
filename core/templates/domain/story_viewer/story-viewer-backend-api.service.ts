@@ -54,14 +54,14 @@ export interface StoryDataDict {
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
   private _storyDataEventEmitter = new EventEmitter<StoryDataDict>();
 
-  _fetchStoryData(
+  _fetchStoryData (
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string,
@@ -87,7 +87,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  _recordChapterCompletion(
+  _recordChapterCompletion (
       topicUrlFragment: string, classroomUrlFragment: string,
       storyUrlFragment: string, nodeId: string,
       successCallback: (value: StoryChapterCompletionResponse) => void,
@@ -113,7 +113,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  async fetchStoryDataAsync(
+  async fetchStoryDataAsync (
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string): Promise<StoryPlaythrough> {
@@ -124,7 +124,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  async recordChapterCompletionAsync(
+  async recordChapterCompletionAsync (
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string,
@@ -136,7 +136,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  get onSendStoryData(): EventEmitter<StoryDataDict> {
+  get onSendStoryData (): EventEmitter<StoryDataDict> {
     return this._storyDataEventEmitter;
   }
 }

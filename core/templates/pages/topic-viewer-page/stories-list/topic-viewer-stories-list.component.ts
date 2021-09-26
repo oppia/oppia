@@ -32,7 +32,7 @@ export class StoriesListComponent {
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
   @Input() topicDescription: string;
-  constructor() {}
+  constructor () {}
 }
 angular.module('oppia').directive(
   'storiesList', downgradeComponent(

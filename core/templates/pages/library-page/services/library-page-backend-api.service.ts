@@ -81,21 +81,21 @@ export class LibraryPageBackendApiService {
   CREATOR_DASHBOARD_HANDLER: string = '/creatordashboardhandler/data';
   LIBRARY_GROUP_HANDLER: string = '/librarygrouphandler';
 
-  constructor(
+  constructor (
      private http: HttpClient,
   ) {}
 
-  async fetchLibraryIndexDataAsync(): Promise<LibraryIndexData> {
+  async fetchLibraryIndexDataAsync (): Promise<LibraryIndexData> {
     return this.http.get<LibraryIndexData>(
       this.LIBRARY_INDEX_HANDLER).toPromise();
   }
 
-  async fetchCreatorDashboardDataAsync(): Promise<CreatorDashboardData> {
+  async fetchCreatorDashboardDataAsync (): Promise<CreatorDashboardData> {
     return this.http.get<CreatorDashboardDataBackendDict>(
       this.CREATOR_DASHBOARD_HANDLER).toPromise();
   }
 
-  async fetchLibraryGroupDataAsync(groupName: string):
+  async fetchLibraryGroupDataAsync (groupName: string):
   Promise<LibraryGroupData> {
     return this.http.get<LibraryGroupDataBackendDict>(
       this.LIBRARY_GROUP_HANDLER, {

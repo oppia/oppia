@@ -35,7 +35,7 @@ describe('Featured Translation Language model', () => {
   });
 
   it('should correctly evaluate all the values based on backend' +
-     ' dict', function() {
+     ' dict', function () {
     expect(sampleFTL.languageCode).toBe('en');
     expect(sampleFTL.explanation).toBe('English');
   });

@@ -47,7 +47,7 @@ export class ExplorationDataService {
   resolvedAnswersUrlPrefix: string;
   data: ExplorationBackendDict;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
@@ -87,7 +87,7 @@ export class ExplorationDataService {
     }
   }
 
-  private async _autosaveChangeListAsync(
+  private async _autosaveChangeListAsync (
       changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
       this.explorationId, changeList, this.draftChangeListId);
@@ -106,7 +106,7 @@ export class ExplorationDataService {
 
   // Note that the changeList is the full changeList since the last
   // committed version (as opposed to the most recent autosave).
-  async autosaveChangeListAsync(
+  async autosaveChangeListAsync (
       changeList: ExplorationChange[],
       successCallback: (response: DraftAutoSaveResponse) => void,
       errorCallback: () => void
@@ -125,12 +125,12 @@ export class ExplorationDataService {
     );
   }
 
-  async discardDraftAsync(): Promise<void> {
+  async discardDraftAsync (): Promise<void> {
     return this.explorationDataBackendApiService.discardDraft(
       this.explorationDraftAutosaveUrl).toPromise();
   }
 
-  async getDataAsync(errorCallback: (
+  async getDataAsync (errorCallback: (
     explorationId: string,
     lostChanges: ExplorationChange[]) => void | undefined
   ): Promise<ExplorationBackendDict> {
@@ -180,7 +180,7 @@ export class ExplorationDataService {
 
   // Returns a promise supplying the last saved version for the current
   // exploration.
-  async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
+  async getLastSavedDataAsync (): Promise<ReadOnlyExplorationBackendDict> {
     return this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
       this.explorationId).then(response => {
       this.loggerService.info('Retrieved saved exploration data.');
@@ -199,7 +199,7 @@ export class ExplorationDataService {
    * @param {string} commitMessage - The user-entered commit message for
    *   this save operation.
    */
-  save(
+  save (
       changeList: ExplorationChange[],
       commitMessage: string,
       successCallback: (

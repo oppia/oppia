@@ -62,7 +62,7 @@ export class ExplorationPlayerStateService {
   private _playerStateChangeEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
-  constructor(
+  constructor (
     private contextService: ContextService,
     private editableExplorationBackendApiService:
     EditableExplorationBackendApiService,
@@ -87,7 +87,7 @@ export class ExplorationPlayerStateService {
   ) {
     this.init();
   }
-  init(): void {
+  init (): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
@@ -125,7 +125,7 @@ export class ExplorationPlayerStateService {
     this.storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
   }
 
-  initializeExplorationServices(
+  initializeExplorationServices (
       returnDict: FetchExplorationBackendResponse,
       arePretestsAvailable: boolean,
       callback: (stateCard: StateCard, str: string) => void
@@ -163,7 +163,7 @@ export class ExplorationPlayerStateService {
       arePretestsAvailable ? () => {} : callback);
   }
 
-  initializePretestServices(
+  initializePretestServices (
       pretestQuestionDicts: QuestionBackendDict[],
       callback: (
         initialCard: StateCard, nextFocusLabel: string) => void): void {
@@ -172,7 +172,7 @@ export class ExplorationPlayerStateService {
       pretestQuestionDicts, callback, () => {});
   }
 
-  initializeQuestionPlayerServices(
+  initializeQuestionPlayerServices (
       questionDicts: QuestionBackendDict[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
@@ -181,30 +181,30 @@ export class ExplorationPlayerStateService {
       questionDicts, successCallback, errorCallback);
   }
 
-  setExplorationMode(): void {
+  setExplorationMode (): void {
     this.explorationMode = ExplorationPlayerConstants
       .EXPLORATION_MODE.EXPLORATION;
     this.currentEngineService = this.explorationEngineService;
   }
 
-  setPretestMode(): void {
+  setPretestMode (): void {
     this.explorationMode = ExplorationPlayerConstants.EXPLORATION_MODE.PRETEST;
     this.currentEngineService = this.questionPlayerEngineService;
   }
 
-  setQuestionPlayerMode(): void {
+  setQuestionPlayerMode (): void {
     this.explorationMode = ExplorationPlayerConstants
       .EXPLORATION_MODE.QUESTION_PLAYER;
     this.currentEngineService = this.questionPlayerEngineService;
   }
 
-  setStoryChapterMode(): void {
+  setStoryChapterMode (): void {
     this.explorationMode = ExplorationPlayerConstants
       .EXPLORATION_MODE.STORY_CHAPTER;
     this.currentEngineService = this.explorationEngineService;
   }
 
-  initExplorationPreviewPlayer(
+  initExplorationPreviewPlayer (
       callback: (sateCard: StateCard, str: string) => void): void {
     this.setExplorationMode();
     Promise.all([
@@ -228,7 +228,7 @@ export class ExplorationPlayerStateService {
     });
   }
 
-  initQuestionPlayer(
+  initQuestionPlayer (
       questionPlayerConfig: QuestionPlayerConfigDict,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
@@ -244,7 +244,7 @@ export class ExplorationPlayerStateService {
     });
   }
 
-  initExplorationPlayer(
+  initExplorationPlayer (
       callback: (stateCard: StateCard, str: string) => void): void {
     let explorationDataPromise = this.version ?
       this.readOnlyExplorationBackendApiService.loadExplorationAsync(
@@ -280,7 +280,7 @@ export class ExplorationPlayerStateService {
     });
   }
 
-  initializePlayer(
+  initializePlayer (
       callback: (stateCard: StateCard, str: string) => void): void {
     this.playerTranscriptService.init();
     if (this.editorPreviewMode) {
@@ -290,7 +290,7 @@ export class ExplorationPlayerStateService {
     }
   }
 
-  initializeQuestionPlayer(
+  initializeQuestionPlayer (
       config: QuestionPlayerConfigDict,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
@@ -298,33 +298,33 @@ export class ExplorationPlayerStateService {
     this.initQuestionPlayer(config, successCallback, errorCallback);
   }
 
-  getCurrentEngineService():
+  getCurrentEngineService ():
     ExplorationEngineService | QuestionPlayerEngineService {
     return this.currentEngineService;
   }
 
-  isInPretestMode(): boolean {
+  isInPretestMode (): boolean {
     return this.explorationMode ===
     ExplorationPlayerConstants.EXPLORATION_MODE.PRETEST;
   }
 
-  isInQuestionMode(): boolean {
+  isInQuestionMode (): boolean {
     return this.explorationMode === ExplorationPlayerConstants
       .EXPLORATION_MODE.PRETEST || this.explorationMode ===
       ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER;
   }
 
-  isInQuestionPlayerMode(): boolean {
+  isInQuestionPlayerMode (): boolean {
     return this.explorationMode === ExplorationPlayerConstants
       .EXPLORATION_MODE.QUESTION_PLAYER;
   }
 
-  isInStoryChapterMode(): boolean {
+  isInStoryChapterMode (): boolean {
     return this.explorationMode ===
     ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER;
   }
 
-  moveToExploration(
+  moveToExploration (
       callback: (stateCard: StateCard, label: string) => void): void {
     if (
       this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
@@ -336,23 +336,23 @@ export class ExplorationPlayerStateService {
     this.explorationEngineService.moveToExploration(callback);
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this.currentEngineService.getLanguageCode();
   }
 
-  recordNewCardAdded(): void {
+  recordNewCardAdded (): void {
     return this.currentEngineService.recordNewCardAdded();
   }
 
-  get onTotalQuestionsReceived(): EventEmitter<number> {
+  get onTotalQuestionsReceived (): EventEmitter<number> {
     return this._totalQuestionsReceivedEventEmitter;
   }
 
-  get onPlayerStateChange(): EventEmitter<void> {
+  get onPlayerStateChange (): EventEmitter<void> {
     return this._playerStateChangeEventEmitter;
   }
 
-  get onOppiaFeedbackAvailable(): EventEmitter<void> {
+  get onOppiaFeedbackAvailable (): EventEmitter<void> {
     return this._oppiaFeedbackAvailableEventEmitter;
   }
 }

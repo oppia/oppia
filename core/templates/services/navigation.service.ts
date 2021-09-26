@@ -73,7 +73,7 @@ export class NavigationService {
     }
   };
 
-  constructor() {}
+  constructor () {}
 
   /**
   * Opens the submenu.
@@ -81,12 +81,12 @@ export class NavigationService {
   * @param {String} menuName - name of menu, on which
   * open/close action to be performed (category,language).
   */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu (evt: KeyboardEvent, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.activeMenuName = menuName;
   }
 
-  closeSubmenu(evt: KeyboardEvent): void {
+  closeSubmenu (evt: KeyboardEvent): void {
     this.activeMenuName = '';
   }
   /**
@@ -100,7 +100,7 @@ export class NavigationService {
    * @example
    *  onMenuKeypress($event, 'category', {enter: 'open'})
    */
-  onMenuKeypress(
+  onMenuKeypress (
       evt: KeyboardEvent,
       menuName: string,
       eventsTobeHandled: EventToCodes): void {

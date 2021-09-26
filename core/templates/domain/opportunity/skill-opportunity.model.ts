@@ -29,7 +29,7 @@ export class SkillOpportunity {
   topicName: string;
   questionCount: number;
 
-  constructor(
+  constructor (
       skillId: string, skillDescription: string, topicName: string,
       questionCount: number) {
     this.id = skillId;
@@ -38,26 +38,26 @@ export class SkillOpportunity {
     this.questionCount = questionCount;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: SkillOpportunityBackendDict): SkillOpportunity {
     return new SkillOpportunity(
       backendDict.id, backendDict.skill_description, backendDict.topic_name,
       backendDict.question_count);
   }
 
-  getSkillId(): string {
+  getSkillId (): string {
     return this.id;
   }
 
-  getOpportunityHeading(): string {
+  getOpportunityHeading (): string {
     return this.skillDescription;
   }
 
-  getOpportunitySubheading(): string {
+  getOpportunitySubheading (): string {
     return this.topicName;
   }
 
-  getQuestionCount(): number {
+  getQuestionCount (): number {
     return this.questionCount;
   }
 }

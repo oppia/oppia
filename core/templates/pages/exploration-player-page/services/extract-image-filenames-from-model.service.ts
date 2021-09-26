@@ -42,7 +42,7 @@ type CustomizationArgsWithChoices = (
   providedIn: 'root'
 })
 export class ExtractImageFilenamesFromModelService {
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private contentTranslationLanguageService: ContentTranslationLanguageService
@@ -60,7 +60,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {object} state - The state from which the html of the content
      *                         should be returned.
      */
-    _getStateContentHtml(state: State): string {
+    _getStateContentHtml (state: State): string {
       let languageCode = (
         this.contentTranslationLanguageService.getCurrentContentLanguageCode());
       return this.contentTranslationManagerService.getTranslatedHtml(
@@ -73,7 +73,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {object} state - The state from which the html of the outcomes of
      *                         the answer groups should be returned.
      */
-    _getOutcomesHtml(state: State): string {
+    _getOutcomesHtml (state: State): string {
       let outcomesHtml = '';
       let languageCode = (
         this.contentTranslationLanguageService.getCurrentContentLanguageCode());
@@ -98,7 +98,7 @@ export class ExtractImageFilenamesFromModelService {
      * Gets the html from the hints in the state.
      * @param {object} state - The state whose hints' html should be returned.
      */
-    _getHintsHtml(state: State): string {
+    _getHintsHtml (state: State): string {
       let hintsHtml = '';
       let languageCode = (
         this.contentTranslationLanguageService.getCurrentContentLanguageCode());
@@ -117,7 +117,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {object} state - The state whose solution's html should be
      *                         returned.
      */
-    _getSolutionHtml(state: State): string {
+    _getSolutionHtml (state: State): string {
       let languageCode = (
         this.contentTranslationLanguageService.getCurrentContentLanguageCode());
       return this.contentTranslationManagerService.getTranslatedHtml(
@@ -129,7 +129,7 @@ export class ExtractImageFilenamesFromModelService {
      * Gets all the html in a state.
      * @param {object} state - The state whose html is to be fetched.
      */
-    _getAllHtmlOfState(state: State): string[] {
+    _getAllHtmlOfState (state: State): string[] {
       let _allHtmlInTheState = [];
       // The order of the extracted image names is same as they appear in a
       // state. The images should be preloaded in the following order ---
@@ -147,7 +147,7 @@ export class ExtractImageFilenamesFromModelService {
         );
         const self = this;
         (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
-          .choices.value.forEach(function(value) {
+          .choices.value.forEach(function (value) {
             customizationArgsHtml = (
               customizationArgsHtml.concat(
                 self.contentTranslationManagerService.getTranslatedHtml(
@@ -172,7 +172,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
-    _extractFilepathValueFromOppiaNonInteractiveImageTag(
+    _extractFilepathValueFromOppiaNonInteractiveImageTag (
         htmlString: string): string[] {
       let filenames = [];
       let unescapedHtmlString = (
@@ -237,7 +237,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
-    _extractSvgFilenameFromOppiaNonInteractiveMathTag(
+    _extractSvgFilenameFromOppiaNonInteractiveMathTag (
         htmlString: string): string[] {
       let filenames = [];
       let unescapedHtmlString = (
@@ -260,7 +260,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {object} state - The state from which the filenames of the image
      *                         should be extracted.
      */
-    _getImageFilenamesInState(state: State): string[] {
+    _getImageFilenamesInState (state: State): string[] {
       let filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
@@ -283,7 +283,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {object} skill - The skill from which the filenames of the image
      *                         should be extracted.
      */
-    _getImageFilenamesInSkill(skill: Skill): string[] {
+    _getImageFilenamesInSkill (skill: Skill): string[] {
       let htmlList = [];
       for (let misconception of skill.getMisconceptions()) {
         htmlList.push(misconception.getFeedback(), misconception.getNotes());
@@ -300,7 +300,7 @@ export class ExtractImageFilenamesFromModelService {
       return this._extractFilenamesFromHtmlList(htmlList);
     }
 
-    _extractFilenamesFromHtmlList(htmlList: string[]): string[] {
+    _extractFilenamesFromHtmlList (htmlList: string[]): string[] {
       let filenames = [];
       htmlList.forEach((htmlStr) => {
         filenames.push(

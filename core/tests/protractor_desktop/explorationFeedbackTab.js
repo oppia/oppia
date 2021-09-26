@@ -29,7 +29,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('ExplorationFeedback', function() {
+describe('ExplorationFeedback', function () {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration to test feedback status';
   var EXPLORATION_TITLE_3 = 'Exploration to test feedback message';
@@ -42,7 +42,7 @@ describe('ExplorationFeedback', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -72,7 +72,7 @@ describe('ExplorationFeedback', function() {
       'superUserExplorationFeedback');
   });
 
-  it('should add feedback to an exploration', async function() {
+  it('should add feedback to an exploration', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
@@ -118,7 +118,7 @@ describe('ExplorationFeedback', function() {
     await users.logout();
   });
 
-  it('should change status of feedback thread', async function() {
+  it('should change status of feedback thread', async function () {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
@@ -173,7 +173,7 @@ describe('ExplorationFeedback', function() {
     await users.logout();
   });
 
-  it('should send message to feedback thread', async function() {
+  it('should send message to feedback thread', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
@@ -231,7 +231,7 @@ describe('ExplorationFeedback', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

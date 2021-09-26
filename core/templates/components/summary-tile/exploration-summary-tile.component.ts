@@ -83,7 +83,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   avgRating!: number | null;
   thumbnailIcon!: string;
 
-  constructor(
+  constructor (
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -93,7 +93,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
@@ -133,22 +133,22 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
   }
 
-  setHoverState(hoverState: boolean): void {
+  setHoverState (hoverState: boolean): void {
     this.explorationIsCurrentlyHoveredOver = hoverState;
   }
 
-  loadParentExploration(): void {
+  loadParentExploration (): void {
     this.windowRef.nativeWindow.location.href = this.getExplorationLink();
   }
 
   // Function will return null when Exploration Ratings are not present.
-  getAverageRating(): number | null {
+  getAverageRating (): number | null {
     if (this.ratings) {
       return this.ratingComputationService.computeAverageRating(
         this.ratings);
@@ -158,7 +158,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   // Function will return null when the property 'lastUpdatedMsecs' is null
   // or undefined.
-  getLastUpdatedDatetime(): string | null {
+  getLastUpdatedDatetime (): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
         this.lastUpdatedMsec);
@@ -166,7 +166,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  getExplorationLink(): string {
+  getExplorationLink (): string {
     if (!this.explorationId) {
       return '#';
     } else {
@@ -213,7 +213,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
   }
 
-  getCompleteThumbnailIconUrl(): string {
+  getCompleteThumbnailIconUrl (): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.thumbnailIconUrl);
   }

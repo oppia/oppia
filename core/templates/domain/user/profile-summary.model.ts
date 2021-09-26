@@ -29,12 +29,12 @@ export interface CreatorSummaryBackendDict {
 }
 
 export class ProfileSummary {
-  constructor(
+  constructor (
     public pictureDataUrl: string,
     public username: string,
     public impact: number) { }
 
-  static createFromSubscriberBackendDict(
+  static createFromSubscriberBackendDict (
       sumamryBackendDict: SubscriberSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
       sumamryBackendDict.subscriber_picture_data_url,
@@ -42,7 +42,7 @@ export class ProfileSummary {
       sumamryBackendDict.subscriber_impact);
   }
 
-  static createFromCreatorBackendDict(
+  static createFromCreatorBackendDict (
       sumamryBackendDict: CreatorSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
       sumamryBackendDict.creator_picture_data_url,

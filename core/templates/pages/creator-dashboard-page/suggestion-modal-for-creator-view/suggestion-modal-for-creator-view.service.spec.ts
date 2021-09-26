@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Suggestion Modal for Creator View Service', function() {
+describe('Suggestion Modal for Creator View Service', function () {
   var SuggestionModalForCreatorDashboardService = null;
   var CsrfService = null;
   var $rootScope = null;
@@ -34,13 +34,13 @@ describe('Suggestion Modal for Creator View Service', function() {
   var extraParams = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
     $rootScope = $injector.get('$rootScope');
@@ -50,7 +50,7 @@ describe('Suggestion Modal for Creator View Service', function() {
     $q = $injector.get('$q');
     CsrfService = $injector.get('CsrfTokenService');
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function () {
       var deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
@@ -58,8 +58,8 @@ describe('Suggestion Modal for Creator View Service', function() {
 
     cleanActiveThreadSpy = jasmine.createSpy('cleanActiveThread');
     activeThread = {
-      isSuggestionHandled: function() {},
-      getSuggestionStatus: function() {},
+      isSuggestionHandled: function () {},
+      getSuggestionStatus: function () {},
       description: '',
       suggestion: {
         targetType: 'exploration',
@@ -79,7 +79,7 @@ describe('Suggestion Modal for Creator View Service', function() {
     };
   }));
 
-  it('should call $uibModal open when opening suggestion modal', function() {
+  it('should call $uibModal open when opening suggestion modal', function () {
     var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
 
     SuggestionModalForCreatorDashboardService.showSuggestionModal(
@@ -89,7 +89,7 @@ describe('Suggestion Modal for Creator View Service', function() {
   });
 
   it('should open suggestion modal when suggestion has resubmit action',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           action: 'resubmit',
@@ -109,7 +109,7 @@ describe('Suggestion Modal for Creator View Service', function() {
     });
 
   it('should handle rejects when resolving suggestion with resubmit' +
-    ' action fails', function() {
+    ' action fails', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         action: 'resubmit',
@@ -131,7 +131,7 @@ describe('Suggestion Modal for Creator View Service', function() {
   });
 
   it('should open suggestion modal when suggestion has no resubmit action',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           action: 'accept',
@@ -151,7 +151,7 @@ describe('Suggestion Modal for Creator View Service', function() {
     });
 
   it('should handle rejects when resolving suggestion with no resubmit' +
-    ' action fails', function() {
+    ' action fails', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         action: 'accept',
@@ -172,7 +172,7 @@ describe('Suggestion Modal for Creator View Service', function() {
     expect(logSpy).toHaveBeenCalledWith('Error resolving suggestion');
   });
 
-  it('should not open suggestion modal', function() {
+  it('should not open suggestion modal', function () {
     var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
 
     SuggestionModalForCreatorDashboardService.showSuggestionModal(

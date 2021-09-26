@@ -22,7 +22,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('EndExplorationValidationService', function() {
+describe('EndExplorationValidationService', function () {
   let ctrl;
   let $httpBackend;
   let $q;
@@ -43,14 +43,14 @@ describe('EndExplorationValidationService', function() {
     collection: {
       id: '0',
       title: 'Collection Under Test',
-      getTitle: function() {
+      getTitle: function () {
         return 'Collection Under Test';
       }
     }
   };
 
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function (interactionId, attrs) {
       return attrs;
     }
   };
@@ -59,12 +59,12 @@ describe('EndExplorationValidationService', function() {
 
   importAllAngularServices();
 
-  describe('Valid exploration id provided', function() {
+  describe('Valid exploration id provided', function () {
     const explorationIds = ['0'];
     const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value(
         'InteractionAttributesExtractorService',
         mockInteractionAttributesExtractorService);
@@ -73,7 +73,7 @@ describe('EndExplorationValidationService', function() {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
@@ -90,7 +90,7 @@ describe('EndExplorationValidationService', function() {
       spyOn(ContextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
       spyOn(ReadOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(function() {
+        .and.callFake(function () {
           var deferred = $q.defer();
           deferred.resolve(sampleCollection.collection);
           return deferred.promise;
@@ -105,7 +105,7 @@ describe('EndExplorationValidationService', function() {
       $scope.$apply();
     }));
 
-    it('should initialize ctrl variables', function() {
+    it('should initialize ctrl variables', function () {
       expect(ctrl.isIframed).toBe(true);
       expect(ctrl.isInEditorPage).toBe(true);
       expect(ctrl.isInEditorPreviewMode).toBe(true);
@@ -115,19 +115,19 @@ describe('EndExplorationValidationService', function() {
       expect(ctrl.errorMessage).toBe('');
     });
 
-    it('should not display error message', function() {
+    it('should not display error message', function () {
       expect(ctrl.isInEditorPage).toBe(true);
       expect(ctrl.isInEditorPreviewMode).toBe(true);
       expect(ctrl.errorMessage).toBe('');
     });
   });
 
-  describe('Invalid exploration Id provided', function() {
+  describe('Invalid exploration Id provided', function () {
     const explorationIds = ['0', '1'];
     const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value(
         'InteractionAttributesExtractorService',
         mockInteractionAttributesExtractorService);
@@ -136,7 +136,7 @@ describe('EndExplorationValidationService', function() {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
@@ -153,7 +153,7 @@ describe('EndExplorationValidationService', function() {
       spyOn(ContextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
       spyOn(ReadOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(function() {
+        .and.callFake(function () {
           var deferred = $q.defer();
           deferred.resolve(sampleCollection.collection);
           return deferred.promise;
@@ -168,7 +168,7 @@ describe('EndExplorationValidationService', function() {
       $scope.$apply();
     }));
 
-    it('should display error message', function() {
+    it('should display error message', function () {
       expect(ctrl.isIframed).toBe(true);
       expect(ctrl.isInEditorPage).toBe(true);
       expect(ctrl.isInEditorPreviewMode).toBe(true);
@@ -182,10 +182,10 @@ describe('EndExplorationValidationService', function() {
     });
   });
 
-  describe('Data should not be fetched from backend ', function() {
+  describe('Data should not be fetched from backend ', function () {
     const explorationIds = ['0', '1'];
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value(
         'InteractionAttributesExtractorService',
         mockInteractionAttributesExtractorService);
@@ -194,7 +194,7 @@ describe('EndExplorationValidationService', function() {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
@@ -211,7 +211,7 @@ describe('EndExplorationValidationService', function() {
       spyOn(ContextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
       spyOn(ReadOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(function() {
+        .and.callFake(function () {
           var deferred = $q.defer();
           deferred.resolve(sampleCollection.collection);
           return deferred.promise;
@@ -223,14 +223,14 @@ describe('EndExplorationValidationService', function() {
       $scope.$apply();
     }));
 
-    it('should not load collection data', function() {
+    it('should not load collection data', function () {
       expect(ctrl.collectionId).toBe('');
       expect(ReadOnlyCollectionBackendApiService.loadCollectionAsync)
         .not.toHaveBeenCalled();
     });
 
     it('should not check if any author-recommended explorations are' +
-    ' invalid.', function() {
+    ' invalid.', function () {
       expect(ctrl.isInEditorPage).toBe(false);
       expect($httpBackend.flush).toThrowError();
       $httpBackend.verifyNoOutstandingRequest();

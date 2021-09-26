@@ -45,7 +45,7 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ALL_CATEGORIES', 'DEFAULT_LANGUAGE_CODE',
   'TAG_REGEX',
-  function(
+  function (
       $controller, $scope, $timeout, $uibModalInstance,
       AlertsService, ExplorationCategoryService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
@@ -57,7 +57,7 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
       $uibModalInstance: $uibModalInstance
     });
 
-    var areRequiredFieldsFilled = function() {
+    var areRequiredFieldsFilled = function () {
       if (!ExplorationTitleService.displayed) {
         AlertsService.addWarning('Please specify a title');
         return false;
@@ -112,7 +112,7 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
     if (ExplorationStatesService.isInitialized()) {
       var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
         .some(
-          function(categoryItem) {
+          function (categoryItem) {
             return categoryItem.id ===
           ExplorationCategoryService.savedMemento;
           }
@@ -129,7 +129,7 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
       }
     }
 
-    $scope.isSavingAllowed = function() {
+    $scope.isSavingAllowed = function () {
       return Boolean(
         ExplorationTitleService.displayed &&
         ExplorationObjectiveService.displayed &&
@@ -138,7 +138,7 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
         ExplorationLanguageCodeService.displayed);
     };
 
-    $scope.save = function() {
+    $scope.save = function () {
       if (!areRequiredFieldsFilled()) {
         return;
       }
@@ -174,7 +174,7 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
       // These race with the discardDraft() call that
       // will be called when the draft changes entered here
       // are properly saved to the backend.
-      $timeout(function() {
+      $timeout(function () {
         $uibModalInstance.close(metadataList);
       }, 500);
     };

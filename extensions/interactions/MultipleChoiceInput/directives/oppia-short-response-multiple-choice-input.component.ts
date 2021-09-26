@@ -38,13 +38,13 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
   @Input() choices!: string;
   response!: string;
 
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private truncateAtFirstLine: TruncateAtFirstLinePipe
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as string;
     const _choices = this.htmlEscaperService.escapedJsonToObj(

@@ -45,7 +45,7 @@ export interface InteractionRulesService {
 
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
-  constructor(
+  constructor (
       private alertsService: AlertsService,
       private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
@@ -65,7 +65,7 @@ export class AnswerClassificationService {
    *
    * @return AnswerClassificationResult domain object.
    */
-  private classifyAnswer(
+  private classifyAnswer (
       answer: InteractionAnswer,
       answerGroups: AnswerGroup[],
       defaultOutcome: Outcome,
@@ -110,7 +110,7 @@ export class AnswerClassificationService {
    *
    * @return The resulting AnswerClassificationResult domain object.
    */
-  getMatchingClassificationResult(
+  getMatchingClassificationResult (
       stateName: string,
       interactionInOldState: Interaction,
       answer: InteractionAnswer,
@@ -184,7 +184,7 @@ export class AnswerClassificationService {
     return answerClassificationResult;
   }
 
-  isClassifiedExplicitlyOrGoesToNewState(
+  isClassifiedExplicitlyOrGoesToNewState (
       stateName: string, state: State, answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService): boolean {
     const result = this.getMatchingClassificationResult(

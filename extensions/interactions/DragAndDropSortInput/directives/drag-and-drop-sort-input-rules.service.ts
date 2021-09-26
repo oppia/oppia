@@ -32,7 +32,7 @@ import {
   providedIn: 'root'
 })
 export class DragAndDropSortInputRulesService {
-  static checkEquality(
+  static checkEquality (
       answer: DragAndDropAnswer,
       inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     for (var i: number = 0; i < answer.length; i++) {
@@ -49,7 +49,7 @@ export class DragAndDropSortInputRulesService {
     return true;
   }
 
-  static checkEqualityWithIncorrectPositions(
+  static checkEqualityWithIncorrectPositions (
       answer: DragAndDropAnswer,
       inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     var noOfMismatches: number = 0;
@@ -71,7 +71,7 @@ export class DragAndDropSortInputRulesService {
     return noOfMismatches === 1;
   }
 
-  IsEqualToOrdering(
+  IsEqualToOrdering (
       answer: DragAndDropAnswer,
       inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     return answer.length === inputs.x.length && (
@@ -79,14 +79,14 @@ export class DragAndDropSortInputRulesService {
         answer, inputs));
   }
 
-  IsEqualToOrderingWithOneItemAtIncorrectPosition(
+  IsEqualToOrderingWithOneItemAtIncorrectPosition (
       answer: DragAndDropAnswer,
       inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     return DragAndDropSortInputRulesService.checkEqualityWithIncorrectPositions(
       answer, inputs);
   }
 
-  HasElementXAtPositionY(
+  HasElementXAtPositionY (
       answer: DragAndDropAnswer,
       inputs: DragAndDropHasElementXAtPositionYRuleInputs): boolean {
     for (var i: number = 0; i < answer.length; i++) {
@@ -98,7 +98,7 @@ export class DragAndDropSortInputRulesService {
     return false;
   }
 
-  HasElementXBeforeElementY(
+  HasElementXBeforeElementY (
       answer: DragAndDropAnswer,
       inputs: DragAndDropHasElementXBeforeElementYRuleInputs): boolean {
     var indX = -1;

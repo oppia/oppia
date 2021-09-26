@@ -18,7 +18,7 @@
 
 import { of } from 'rxjs';
 
-describe('Pie Chart component', function() {
+describe('Pie Chart component', function () {
   var ctrl = null;
   var $flushPendingTasks = null;
   var $scope = null;
@@ -26,7 +26,7 @@ describe('Pie Chart component', function() {
   var mockedChart = null;
   var resizeEvent = new Event('resize');
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('WindowDimensionsService', {
       getResizeEvent: () => of(resizeEvent)
     });
@@ -37,8 +37,8 @@ describe('Pie Chart component', function() {
     }
   });
 
-  describe('when $scope data is not an array', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when $scope data is not an array', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
@@ -76,7 +76,7 @@ describe('Pie Chart component', function() {
       ctrl.$onInit();
     }));
 
-    it('should not redraw chart', function() {
+    it('should not redraw chart', function () {
       const drawSpy = spyOn(mockedChart, 'draw');
       angular.element(window).triggerHandler('resize');
 
@@ -87,8 +87,8 @@ describe('Pie Chart component', function() {
     });
   });
 
-  describe('when chart is not defined', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when chart is not defined', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
@@ -127,7 +127,7 @@ describe('Pie Chart component', function() {
       ctrl.$onInit();
     }));
 
-    it('should not redraw chart', function() {
+    it('should not redraw chart', function () {
       const pieChartSpy = spyOn(window.google.visualization, 'PieChart');
       angular.element(window).triggerHandler('resize');
 
@@ -138,10 +138,10 @@ describe('Pie Chart component', function() {
     });
   });
 
-  describe('when chart is defined and $scope data is an array', function() {
+  describe('when chart is defined and $scope data is an array', function () {
     let drawSpy: jasmine.Spy<() => void>;
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
       drawSpy = jasmine.createSpy('draw', () => {});
@@ -160,7 +160,7 @@ describe('Pie Chart component', function() {
       spyOnProperty(window, 'google').and.returnValue({
         visualization: {
           arrayToDataTable: () => {},
-          PieChart: function() {
+          PieChart: function () {
             this.draw = drawSpy;
           }
         },
@@ -190,7 +190,7 @@ describe('Pie Chart component', function() {
       ctrl.$onInit();
     }));
 
-    it('should redraw chart', function() {
+    it('should redraw chart', function () {
       angular.element(window).triggerHandler('resize');
 
       // Waiting for $applyAsync be called, which can take ~10 miliseconds

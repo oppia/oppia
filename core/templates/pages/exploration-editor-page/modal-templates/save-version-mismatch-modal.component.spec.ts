@@ -33,11 +33,11 @@ class ChangesInHumanReadableFormComponentStub {
 }
 
 class MockActiveModal {
-  close(): void {
+  close (): void {
     return;
   }
 
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
@@ -49,10 +49,10 @@ class MockWindowRef {
     location: {
       _hash: '',
       _hashChange: null,
-      get hash() {
+      get hash () {
         return this._hash;
       },
-      set hash(val) {
+      set hash (val) {
         this._hash = val;
         if (this._hashChange === null) {
           return;
@@ -61,21 +61,21 @@ class MockWindowRef {
       },
       reload: (val) => val
     },
-    get onhashchange() {
+    get onhashchange () {
       return this.location._hashChange;
     },
 
-    set onhashchange(val) {
+    set onhashchange (val) {
       this.location._hashChange = val;
     }
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
 class MockExplorationDataService {
-  discardDraftAsync(): Promise<void> {
+  discardDraftAsync (): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });

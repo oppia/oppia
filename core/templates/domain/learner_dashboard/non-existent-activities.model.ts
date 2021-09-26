@@ -31,7 +31,7 @@ export interface NonExistentActivitiesBackendDict {
 }
 
 export class NonExistentActivities {
-  constructor(
+  constructor (
     public incompleteExplorations: number,
     public incompleteCollections: number,
     public partiallyLearntTopics: number,
@@ -43,7 +43,7 @@ export class NonExistentActivities {
     public explorationPlaylist: number,
     public collectionPlaylist: number) { }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: NonExistentActivitiesBackendDict): NonExistentActivities {
     return new NonExistentActivities(
       backendDict.incomplete_explorations,

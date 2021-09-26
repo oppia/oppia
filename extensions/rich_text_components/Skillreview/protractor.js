@@ -22,7 +22,7 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeComponent = async function(modal, text, skillDescription) {
+var customizeComponent = async function (modal, text, skillDescription) {
   await objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(text);
@@ -31,7 +31,8 @@ var customizeComponent = async function(modal, text, skillDescription) {
   ).setValue(skillDescription);
 };
 
-var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
+var expectComponentDetailsToMatch =
+async function (elem, text, reviewMaterial) {
   var link = elem.element(by.tagName('a'));
   expect(await link.getText()).toBe(text);
   await link.click();

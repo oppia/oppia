@@ -140,7 +140,7 @@ describe('StateTopAnswersStatsService', () => {
     expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeFalse();
   });
 
-  it('should identify unaddressed issues', fakeAsync(async() => {
+  it('should identify unaddressed issues', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
       {answer: 'hola', frequency: 5, is_addressed: false},
@@ -157,7 +157,7 @@ describe('StateTopAnswersStatsService', () => {
     expect(stateStats).toContain(joC({answer: 'ciao', isAddressed: false}));
   }));
 
-  it('should reject with error', fakeAsync(async() => {
+  it('should reject with error', fakeAsync(async () => {
     const states = makeStates();
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
@@ -173,7 +173,7 @@ describe('StateTopAnswersStatsService', () => {
     expect(failHandler).toHaveBeenCalledWith(new Error('Random Error'));
   }));
 
-  it('should order results by frequency', fakeAsync(async() => {
+  it('should order results by frequency', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
       {answer: 'hola', frequency: 7, is_addressed: false},
@@ -191,7 +191,7 @@ describe('StateTopAnswersStatsService', () => {
     ]);
   }));
 
-  it('should throw when stats for state do not exist', fakeAsync(async() => {
+  it('should throw when stats for state do not exist', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
       {answer: 'hola', frequency: 7, is_addressed: false},
@@ -206,7 +206,7 @@ describe('StateTopAnswersStatsService', () => {
       .toThrowError('Me Llamo does not exist.');
   }));
 
-  it('should have stats for state provided by backend', fakeAsync(async() => {
+  it('should have stats for state provided by backend', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync(
       'Hola', [{answer: 'hola', frequency: 3, is_addressed: false}]);
@@ -217,7 +217,7 @@ describe('StateTopAnswersStatsService', () => {
     expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
   }));
 
-  it('should have stats for state without any answers', fakeAsync(async() => {
+  it('should have stats for state without any answers', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
@@ -228,7 +228,7 @@ describe('StateTopAnswersStatsService', () => {
   }));
 
   it('should not have stats for state not provided by backend',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       const states = makeStates();
       spyOnBackendApiFetchStatsAsync('Hola', []);
       stateTopAnswersStatsService.initAsync(expId, states);
@@ -238,7 +238,7 @@ describe('StateTopAnswersStatsService', () => {
       expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
     }));
 
-  it('should only returns state names with stats', fakeAsync(async() => {
+  it('should only returns state names with stats', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
@@ -249,7 +249,7 @@ describe('StateTopAnswersStatsService', () => {
       .toEqual(['Hola']);
   }));
 
-  it('should return empty stats for a newly added state', fakeAsync(async() => {
+  it('should return empty stats for a newly added state', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
@@ -265,7 +265,7 @@ describe('StateTopAnswersStatsService', () => {
       .toEqual([]);
   }));
 
-  it('should throw when accessing a deleted state', fakeAsync(async() => {
+  it('should throw when accessing a deleted state', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
@@ -279,7 +279,7 @@ describe('StateTopAnswersStatsService', () => {
       .toThrowError('Hola does not exist.');
   }));
 
-  it('should respond to changes in state names', fakeAsync(async() => {
+  it('should respond to changes in state names', fakeAsync(async () => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
@@ -297,7 +297,7 @@ describe('StateTopAnswersStatsService', () => {
       .toThrowError('Hola does not exist.');
   }));
 
-  it('should recognize newly resolved answers', fakeAsync(async() => {
+  it('should recognize newly resolved answers', fakeAsync(async () => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
@@ -330,7 +330,7 @@ describe('StateTopAnswersStatsService', () => {
   }));
 
   it('should add new answer when Interaction Id\'s are not equal',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       const states = makeStates();
       spyOnBackendApiFetchStatsAsync(
         'Hola', [{answer: 'adios', frequency: 3, is_addressed: false}]);
@@ -365,7 +365,7 @@ describe('StateTopAnswersStatsService', () => {
       expect(stateTopAnswersStatsService.getStateStats('Hola')).toEqual([]);
     }));
 
-  it('should recognize newly unresolved answers', fakeAsync(async() => {
+  it('should recognize newly unresolved answers', fakeAsync(async () => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
@@ -398,7 +398,7 @@ describe('StateTopAnswersStatsService', () => {
       .toContain(joC({answer: 'hola'}));
   }));
 
-  it('should throw error if state does not exist', fakeAsync(async() => {
+  it('should throw error if state does not exist', fakeAsync(async () => {
     const states = makeStates();
 
     const updatedState = states.getState('Hola');

@@ -29,7 +29,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
-describe('Creator dashboard functionality', function() {
+describe('Creator dashboard functionality', function () {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
   var EXPLORATION_TITLE_2 = 'Exploration 2';
   var EXPLORATION_TITLE_3 = 'Exploration 3';
@@ -45,7 +45,7 @@ describe('Creator dashboard functionality', function() {
   var libraryPage = null;
   var subscriptionDashboardPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -53,7 +53,7 @@ describe('Creator dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should display correct stats on dashboard', async function() {
+  it('should display correct stats on dashboard', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser(
@@ -126,7 +126,7 @@ describe('Creator dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should work fine in grid view', async function() {
+  it('should work fine in grid view', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser('user5@creatorDashboard.com', 'creatorDashboard');
@@ -205,7 +205,7 @@ describe('Creator dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should work fine in list view', async function() {
+  it('should work fine in list view', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser('user8@creatorDashboard.com', 'newCreatorDashboard');
@@ -287,7 +287,7 @@ describe('Creator dashboard functionality', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

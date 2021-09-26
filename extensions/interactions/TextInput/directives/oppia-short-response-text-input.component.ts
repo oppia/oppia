@@ -35,9 +35,9 @@ export class ShortResponseTextInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input('answer') answerWithValue!: string;
   answer!: string;
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor (private htmlEscaperService: HtmlEscaperService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.answer = this.htmlEscaperService.escapedJsonToObj(
       this.answerWithValue) as string;
   }

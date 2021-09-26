@@ -29,7 +29,7 @@ import { UrlService } from 'services/contextual/url.service';
   providedIn: 'root'
 })
 export class ContextService {
-  constructor(
+  constructor (
     private urlService: UrlService) {}
 
   // Entity context needs to be a static variable since multiple instances of
@@ -56,20 +56,20 @@ export class ContextService {
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.
 
-  init(editorName: string): void {
+  init (editorName: string): void {
     this.editorContext = editorName;
   }
   // Following method helps to know the whether the context of editor is
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
   // respective editors.
-  getEditorContext(): string | null {
+  getEditorContext (): string | null {
     return this.editorContext;
   }
   // Returns a string representing the current tab of the editor (either
   // 'editor' or 'preview'), or null if the current tab is neither of these,
   // or the current page is not the editor.
-  getEditorTabContext(): string | null {
+  getEditorTabContext (): string | null {
     let hash = this.urlService.getHash();
     if (hash.indexOf('#/gui') === 0) {
       return ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR;
@@ -84,7 +84,7 @@ export class ContextService {
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
   // If the current page is not one in either EXPLORATION_EDITOR or
   // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER.
-  getPageContext(): string {
+  getPageContext (): string {
     if (this.pageContext) {
       return this.pageContext;
     } else {
@@ -138,27 +138,27 @@ export class ContextService {
   }
   // This is required in cases like when we need to access question player
   // from the skill editor preview tab.
-  setQuestionPlayerIsOpen(): void {
+  setQuestionPlayerIsOpen (): void {
     this.questionPlayerIsManuallySet = true;
   }
 
-  clearQuestionPlayerIsOpen(): void {
+  clearQuestionPlayerIsOpen (): void {
     this.questionPlayerIsManuallySet = false;
   }
 
-  getQuestionPlayerIsManuallySet(): boolean {
+  getQuestionPlayerIsManuallySet (): boolean {
     return this.questionPlayerIsManuallySet;
   }
 
-  setExplorationIsLinkedToStory(): void {
+  setExplorationIsLinkedToStory (): void {
     this.explorationIsLinkedToStory = true;
   }
 
-  isExplorationLinkedToStory(): boolean {
+  isExplorationLinkedToStory (): boolean {
     return this.explorationIsLinkedToStory;
   }
 
-  isInExplorationContext(): boolean {
+  isInExplorationContext (): boolean {
     return (
       this.getPageContext() ===
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
@@ -169,16 +169,16 @@ export class ContextService {
   // This function is used in cases where the URL does not specify the
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
-  setCustomEntityContext(entityType: string, entityId: string): void {
+  setCustomEntityContext (entityType: string, entityId: string): void {
     ContextService.customEntityContext = new EntityContext(
       entityId, entityType);
   }
 
-  removeCustomEntityContext(): void {
+  removeCustomEntityContext (): void {
     ContextService.customEntityContext = null;
   }
 
-  getEntityId(): string {
+  getEntityId (): string {
     if (ContextService.customEntityContext !== null) {
       return ContextService.customEntityContext.getId();
     }
@@ -199,7 +199,7 @@ export class ContextService {
   }
 
   // Add constants for entity type.
-  getEntityType(): string | undefined {
+  getEntityType (): string | undefined {
     if (ContextService.customEntityContext !== null) {
       return ContextService.customEntityContext.getType();
     }
@@ -234,7 +234,7 @@ export class ContextService {
 
   // Returns a string representing the explorationId (obtained from the
   // URL).
-  getExplorationId(): string {
+  getExplorationId (): string {
     if (this.explorationId) {
       return this.explorationId;
     } else if (
@@ -265,7 +265,7 @@ export class ContextService {
 
   // Following method helps to know whether exploration editor is
   // in main editing mode or preview mode.
-  isInExplorationEditorMode(): boolean {
+  isInExplorationEditorMode (): boolean {
     return (
       this.getPageContext() ===
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
@@ -273,26 +273,26 @@ export class ContextService {
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
   }
 
-  isInQuestionPlayerMode(): boolean {
+  isInQuestionPlayerMode (): boolean {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
         this.questionPlayerIsManuallySet);
   }
 
-  isInExplorationPlayerPage(): boolean {
+  isInExplorationPlayerPage (): boolean {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
-  isInExplorationEditorPage(): boolean {
+  isInExplorationEditorPage (): boolean {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   }
 
-  canAddOrEditComponents(): boolean {
+  canAddOrEditComponents (): boolean {
     var currentPageContext = this.getPageContext();
     var allowedPageContext: string[] = [
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR,
@@ -309,17 +309,17 @@ export class ContextService {
   }
 
   // Sets the current context to save images to the server.
-  resetImageSaveDestination(): void {
+  resetImageSaveDestination (): void {
     ContextService.imageSaveDestination = (
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
   }
 
-  setImageSaveDestinationToLocalStorage(): void {
+  setImageSaveDestinationToLocalStorage (): void {
     ContextService.imageSaveDestination = (
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
   }
 
-  getImageSaveDestination(): string {
+  getImageSaveDestination (): string {
     return ContextService.imageSaveDestination;
   }
 }

@@ -39,9 +39,9 @@ export class ResponseImageClickInput implements OnInit {
   @Input() answer!: string;
   clickRegionLabel!: string;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor (private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as ClickRegion;
     this.clickRegionLabel = '(Clicks on ' + (

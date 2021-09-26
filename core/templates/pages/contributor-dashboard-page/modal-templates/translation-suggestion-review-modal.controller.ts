@@ -34,7 +34,7 @@ angular.module('oppia').controller(
     'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
     'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
-    function(
+    function (
         $http, $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
@@ -68,7 +68,7 @@ angular.module('oppia').controller(
       };
       $scope.canEditTranslation = false;
 
-      $scope.updateSuggestion = function() {
+      $scope.updateSuggestion = function () {
         const updatedTranslation = $scope.editedContent;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
@@ -94,7 +94,7 @@ angular.module('oppia').controller(
 
       // The length of the commit message should not exceed 375 characters,
       // since this is the maximum allowed commit message size.
-      var generateCommitMessage = function() {
+      var generateCommitMessage = function () {
         var contentId = $scope.activeSuggestion.change.content_id;
         var stateName = $scope.activeSuggestion.change.state_name;
         var contentType = contentId.split('_')[0];
@@ -104,12 +104,12 @@ angular.module('oppia').controller(
         return commitMessage;
       };
 
-      var _getThreadHandlerUrl = function(suggestionId) {
+      var _getThreadHandlerUrl = function (suggestionId) {
         return UrlInterpolationService.interpolateUrl(
           '/threadhandler/<suggestionId>', { suggestionId });
       };
 
-      var _getThreadMessagesAsync = function(threadId) {
+      var _getThreadMessagesAsync = function (threadId) {
         return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
           let threadMessageBackendDicts = response.data.messages;
           return threadMessageBackendDicts.map(
@@ -117,7 +117,7 @@ angular.module('oppia').controller(
         });
       };
 
-      $scope.init = function() {
+      $scope.init = function () {
         let userCanReviewTranslationSuggestionsInLanguages: string[] = [];
         const languageCode: string = $scope.activeSuggestion.change.
           language_code;
@@ -162,7 +162,7 @@ angular.module('oppia').controller(
             $scope.activeSuggestion.status === 'rejected');
           if ($scope.suggestionIsRejected) {
             _getThreadMessagesAsync($scope.activeSuggestionId).then(
-              function(messageSummaries) {
+              function (messageSummaries) {
                 $scope.reviewMessage = messageSummaries[1].text;
               }
             );
@@ -172,7 +172,7 @@ angular.module('oppia').controller(
 
       $scope.init();
 
-      $scope.showNextItemToReview = function(suggestionId) {
+      $scope.showNextItemToReview = function (suggestionId) {
         resolvedSuggestionIds.push($scope.activeSuggestionId);
         var suggestionId = null;
         if ($scope.lastSuggestionToReview) {
@@ -194,7 +194,7 @@ angular.module('oppia').controller(
         $scope.init();
       };
 
-      $scope.acceptAndReviewNext = function() {
+      $scope.acceptAndReviewNext = function () {
         $scope.finalCommitMessage = generateCommitMessage();
         if ($scope.translationUpdated) {
           $scope.reviewMessage = $scope.reviewMessage + ': This suggestion' +
@@ -215,7 +215,7 @@ angular.module('oppia').controller(
           });
       };
 
-      $scope.rejectAndReviewNext = function(reviewMessage) {
+      $scope.rejectAndReviewNext = function (reviewMessage) {
         if (ValidatorsService.isValidReviewMessage(reviewMessage,
           /* ShowWarnings= */ true)) {
           $scope.resolvingSuggestion = true;
@@ -229,20 +229,20 @@ angular.module('oppia').controller(
         }
       };
 
-      $scope.editSuggestion = function() {
+      $scope.editSuggestion = function () {
         $scope.startedEditing = true;
       };
 
-      $scope.cancelEdit = function() {
+      $scope.cancelEdit = function () {
         $scope.startedEditing = false;
         $scope.editedContent = $scope.translationHtml;
       };
 
-      $scope.cancel = function() {
+      $scope.cancel = function () {
         $uibModalInstance.close(resolvedSuggestionIds);
       };
 
-      $scope.showTranslationSuggestionUpdateError = function(error) {
+      $scope.showTranslationSuggestionUpdateError = function (error) {
         AlertsService.clearWarnings();
         AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
       };

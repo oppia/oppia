@@ -24,13 +24,13 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import constants from 'assets/constants';
 
 class MockActiveModal {
-  close(value): void {
+  close (value): void {
     return;
   }
 }
 
 class MockSkillEditorStateService {
-  getSkill(): Skill {
+  getSkill (): Skill {
     return null;
   }
 }

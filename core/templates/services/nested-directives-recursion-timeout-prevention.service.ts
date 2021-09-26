@@ -19,7 +19,7 @@
 
 angular.module('oppia').factory(
   'NestedDirectivesRecursionTimeoutPreventionService', [
-    '$compile', function($compile) {
+    '$compile', function ($compile) {
       return {
         /**
          * Manually compiles the element, fixing the recursion loop.
@@ -28,7 +28,7 @@ angular.module('oppia').factory(
          *   with function(s) registered via pre and post properties.
          * @return {object} An object containing the linking functions.
          */
-        compile: function(element, link) {
+        compile: function (element, link) {
           // Normalize the link parameter.
           if (angular.isFunction(link)) {
             link = {
@@ -41,13 +41,13 @@ angular.module('oppia').factory(
           var compiledContents;
           return {
             pre: (link && link.pre) ? link.pre : null,
-            post: function(scope, element) {
+            post: function (scope, element) {
               // Compile the contents.
               if (!compiledContents) {
                 compiledContents = $compile(contents);
               }
               // Re-add the compiled contents to the element.
-              compiledContents(scope, function(clone) {
+              compiledContents(scope, function (clone) {
                 element.append(clone);
               });
 

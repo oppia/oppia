@@ -22,12 +22,12 @@ export interface FeaturedTranslationLanguageBackendDict {
 }
 
 export class FeaturedTranslationLanguage {
-  constructor(
+  constructor (
       readonly languageCode: string,
       readonly explanation: string
   ) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       featuredTranslationBackendDict: FeaturedTranslationLanguageBackendDict
   ): FeaturedTranslationLanguage {
     return new FeaturedTranslationLanguage(

@@ -150,11 +150,11 @@ export interface AdminPageData {
   providedIn: 'root'
 })
 export class AdminBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async getDataAsync(): Promise<AdminPageData> {
+  async getDataAsync (): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
       this.http.get<AdminPageDataBackendDict>(
         AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
@@ -182,7 +182,7 @@ export class AdminBackendApiService {
 
   // This is a helper function to handle all post<void>
   // requests in admin page.
-  private async _postRequestAsync(
+  private async _postRequestAsync (
       handlerUrl: string, payload?: Object, action?: string):
       Promise<void> {
     return new Promise((resolve, reject) => {
@@ -197,7 +197,7 @@ export class AdminBackendApiService {
   }
 
   // Admin Roles Tab Services.
-  async viewUsersRoleAsync(
+  async viewUsersRoleAsync (
       username: string): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<UserRolesBackendResponse>(
@@ -215,7 +215,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async fetchUsersAssignedToRoleAsync(
+  async fetchUsersAssignedToRoleAsync (
       role: string): Promise<AssignedUsersBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<AssignedUsersBackendResponse>(
@@ -233,7 +233,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async addUserRoleAsync(
+  async addUserRoleAsync (
       newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
@@ -249,7 +249,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async removeUserRoleAsync(
+  async removeUserRoleAsync (
       roleToRemove: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
@@ -265,7 +265,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async assignManagerToTopicAsync(
+  async assignManagerToTopicAsync (
       username: string, topicId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
@@ -280,7 +280,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async deassignManagerFromTopicAsync(
+  async deassignManagerFromTopicAsync (
       username: string, topicId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
@@ -296,12 +296,12 @@ export class AdminBackendApiService {
   }
 
   // Admin Misc Tab Services.
-  async clearSearchIndexAsync(): Promise<void> {
+  async clearSearchIndexAsync (): Promise<void> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
-  async regenerateOpportunitiesRelatedToTopicAsync(
+  async regenerateOpportunitiesRelatedToTopicAsync (
       topicId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http.post<number>(
@@ -317,7 +317,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async uploadTopicSimilaritiesAsync(data: string):
+  async uploadTopicSimilaritiesAsync (data: string):
   Promise<void> {
     let action = 'upload_topic_similarities';
     let payload = {
@@ -327,12 +327,12 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
-  async sendDummyMailToAdminAsync(): Promise<void> {
+  async sendDummyMailToAdminAsync (): Promise<void> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL);
   }
 
-  async updateUserNameAsync(
+  async updateUserNameAsync (
       oldUsername: string, newUsername: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
@@ -348,7 +348,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async updateBlogPostDataAsync(
+  async updateBlogPostDataAsync (
       blogPostId: string, authorUsername: string, publishedOn: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -366,7 +366,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async getNumberOfPendingDeletionRequestAsync(
+  async getNumberOfPendingDeletionRequestAsync (
   ): Promise<PendingDeletionRequestBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<PendingDeletionRequestBackendResponse>(
@@ -379,13 +379,13 @@ export class AdminBackendApiService {
     });
   }
 
-  async grantSuperAdminPrivilegesAsync(username: string): Promise<void> {
+  async grantSuperAdminPrivilegesAsync (username: string): Promise<void> {
     return this.http.put<void>(
       AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {username}
     ).toPromise();
   }
 
-  async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
+  async revokeSuperAdminPrivilegesAsync (username: string): Promise<void> {
     return this.http.delete<void>(
       AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
         params: {username},
@@ -393,7 +393,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  async getModelsRelatedToUserAsync(userId: string): Promise<boolean> {
+  async getModelsRelatedToUserAsync (userId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.http.get<ModelsRelatedToUserBackendResponse>(
         AdminPageConstants.ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL, {
@@ -409,7 +409,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async deleteUserAsync(userId: string, username: string): Promise<void> {
+  async deleteUserAsync (userId: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
         AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {
@@ -427,7 +427,7 @@ export class AdminBackendApiService {
   }
 
   // Admin Config Tab Services.
-  async revertConfigPropertyAsync(configPropertyId: string):
+  async revertConfigPropertyAsync (configPropertyId: string):
   Promise<void> {
     let action = 'revert_config_property';
     let payload = {
@@ -437,7 +437,7 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
-  async saveConfigPropertiesAsync(
+  async saveConfigPropertiesAsync (
       newConfigPropertyValues: ConfigPropertyValues):
       Promise<void> {
     let action = 'save_config_properties';
@@ -449,7 +449,7 @@ export class AdminBackendApiService {
   }
 
   // Admin Dev Mode Activities Tab Services.
-  async generateDummyExplorationsAsync(
+  async generateDummyExplorationsAsync (
       numDummyExpsToGenerate: number,
       numDummyExpsToPublish: number): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
@@ -459,7 +459,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async reloadExplorationAsync(explorationId: string):
+  async reloadExplorationAsync (explorationId: string):
   Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
@@ -467,19 +467,19 @@ export class AdminBackendApiService {
     });
   }
 
-  async generateDummyNewStructuresDataAsync(): Promise<void> {
+  async generateDummyNewStructuresDataAsync (): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_structures_data'
     });
   }
 
-  async generateDummyNewSkillDataAsync(): Promise<void> {
+  async generateDummyNewSkillDataAsync (): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
     });
   }
 
-  async reloadCollectionAsync(collectionId: string):
+  async reloadCollectionAsync (collectionId: string):
   Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
@@ -487,7 +487,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async markUserBannedAsync(username: string): Promise<void> {
+  async markUserBannedAsync (username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
         AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
@@ -500,7 +500,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async unmarkUserBannedAsync(username: string): Promise<void> {
+  async unmarkUserBannedAsync (username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
         AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,

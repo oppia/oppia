@@ -31,7 +31,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplaySolutionModalComponent } from './display-solution-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-let MockAngularHtmlBindWrapperDirective = function(
+let MockAngularHtmlBindWrapperDirective = function (
     options: Component): Directive {
   const metadata: Directive = {
     selector: options.selector,
@@ -54,16 +54,16 @@ describe('Display Solution Modal', () => {
   let solutionHtml: string = 'solution_html';
 
   class MockHintsAndSolutionManagerService {
-    displaySolution(): object {
+    displaySolution (): object {
       return {
         explanation: {
           contentId: contentId,
           html: 'html',
         },
-        getOppiaShortAnswerResponseHtml(): string {
+        getOppiaShortAnswerResponseHtml (): string {
           return shortAnswerHtml;
         },
-        getOppiaSolutionExplanationResponseHtml(): string {
+        getOppiaSolutionExplanationResponseHtml (): string {
           return solutionHtml;
         }
       };

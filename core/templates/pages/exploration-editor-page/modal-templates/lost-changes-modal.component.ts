@@ -33,7 +33,7 @@ export class LostChangesModalComponent
   @Input() lostChanges: LostChange[];
   hasLostChanges: boolean;
 
-  constructor(
+  constructor (
     private elRef: ElementRef,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
@@ -43,17 +43,17 @@ export class LostChangesModalComponent
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     this.lostChanges = this.lostChanges.map(
       this.lostChangeObjectFactory.createNew);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.ngbActiveModal.dismiss();
   }
 
-  exportChangesAndClose(): void {
+  exportChangesAndClose (): void {
     let lostChangesData: HTMLElement = (
       this.elRef.nativeElement.getElementsByClassName(
         'oppia-lost-changes'));

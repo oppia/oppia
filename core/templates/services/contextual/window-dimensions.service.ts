@@ -25,20 +25,20 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class WindowDimensionsService {
-  constructor(private windowRef: WindowRef) {}
+  constructor (private windowRef: WindowRef) {}
 
-  getResizeEvent(): Observable<Event> {
+  getResizeEvent (): Observable<Event> {
     return fromEvent(this.windowRef.nativeWindow, 'resize');
   }
 
-  getWidth(): number {
+  getWidth (): number {
     return (
       this.windowRef.nativeWindow.innerWidth ||
       this.windowRef.nativeWindow.document.documentElement.clientWidth ||
       this.windowRef.nativeWindow.document.body.clientWidth);
   }
 
-  isWindowNarrow(): boolean {
+  isWindowNarrow (): boolean {
     let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
     return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
   }

@@ -48,13 +48,13 @@ export class PlatformParameterFilter {
   type: PlatformParameterFilterType;
   conditions: [string, string][];
 
-  constructor(
+  constructor (
       type: PlatformParameterFilterType, conditions: [string, string][]) {
     this.type = type;
     this.conditions = conditions;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       platformParameterFiliterBackendDict: PlatformParameterFilterBackendDict):
       PlatformParameterFilter {
     return new PlatformParameterFilter(
@@ -68,7 +68,7 @@ export class PlatformParameterFilter {
    * @returns {PlatformParameterFilterBackendDict} - The dict representation
    * of the instance.
    */
-  toBackendDict(): PlatformParameterFilterBackendDict {
+  toBackendDict (): PlatformParameterFilterBackendDict {
     return {
       type: this.type,
       conditions: cloneDeep(this.conditions)

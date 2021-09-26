@@ -33,12 +33,12 @@ import {
   providedIn: 'root'
 })
 export class LocalStorageService {
-  constructor() {}
+  constructor () {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
   // else storage is undefined or false.
-  storage = (function() {
+  storage = (function () {
     let test = 'test';
     let result;
     try {
@@ -56,7 +56,7 @@ export class LocalStorageService {
    * @param {String} explorationId - The exploration id of the changeList
    *   to be accessed.
    */
-  _createExplorationDraftKey(explorationId: string): string {
+  _createExplorationDraftKey (explorationId: string): string {
     return 'draft_' + explorationId;
   }
 
@@ -64,7 +64,7 @@ export class LocalStorageService {
    * Check that localStorage is available to the client.
    * @returns {boolean} true iff the client has access to localStorage.
    */
-  isStorageAvailable(): boolean {
+  isStorageAvailable (): boolean {
     return Boolean(this.storage);
   }
   /**
@@ -75,7 +75,7 @@ export class LocalStorageService {
    * @param {List} changeList - The exploration change list to be saved.
    * @param {Integer} draftChangeListId - The id of the draft to be saved.
    */
-  saveExplorationDraft(
+  saveExplorationDraft (
       explorationId: string, changeList: ExplorationChange[],
       draftChangeListId: number): void {
     let localSaveKey = this._createExplorationDraftKey(explorationId);
@@ -96,7 +96,7 @@ export class LocalStorageService {
    * @returns {Object} The local save draft object if it exists,
    *   else null.
    */
-  getExplorationDraft(explorationId: string): ExplorationDraft | null {
+  getExplorationDraft (explorationId: string): ExplorationDraft | null {
     if (this.isStorageAvailable()) {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
@@ -117,7 +117,7 @@ export class LocalStorageService {
    * @param {String} explorationId - The exploration id of the change list
    *   to be removed.
    */
-  removeExplorationDraft(explorationId: string): void {
+  removeExplorationDraft (explorationId: string): void {
     if (this.isStorageAvailable()) {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
@@ -131,7 +131,7 @@ export class LocalStorageService {
    * Save the given language code to localStorage along.
    * @param languageCode
    */
-  updateLastSelectedTranslationLanguageCode(languageCode: string): void {
+  updateLastSelectedTranslationLanguageCode (languageCode: string): void {
     if (this.isStorageAvailable()) {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
@@ -145,7 +145,7 @@ export class LocalStorageService {
    * @returns {String} The local save of the last selected language for
    *   translation if it exists, else null.
    */
-  getLastSelectedTranslationLanguageCode(): string | null {
+  getLastSelectedTranslationLanguageCode (): string | null {
     if (this.isStorageAvailable()) {
       return (
         // It is possible that storage does not exist or the user does not have

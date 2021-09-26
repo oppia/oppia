@@ -44,7 +44,7 @@ export class QuestionPlayerEngineService {
   private currentIndex: number = null;
   private nextIndex: number = null;
 
-  constructor(
+  constructor (
       private alertsService: AlertsService,
       private answerClassificationService: AnswerClassificationService,
       private audioTranslationLanguageService: AudioTranslationLanguageService,
@@ -56,19 +56,19 @@ export class QuestionPlayerEngineService {
   }
 
   // Evaluate feedback.
-  private makeFeedback(
+  private makeFeedback (
       feedbackHtml: string, envs: Record<string, string>[]): string {
     return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
   }
 
   // Evaluate question string.
-  private makeQuestion(
+  private makeQuestion (
       newState: State, envs: Record<string, string>[]): string {
     return this.expressionInterpolationService.processHtml(
       newState.content.html, envs);
   }
 
-  private getRandomSuffix(): string {
+  private getRandomSuffix (): string {
     // This is a bit of a hack. When a refresh to a $scope variable
     // happens,
     // AngularJS compares the new value of the variable to its previous
@@ -84,7 +84,7 @@ export class QuestionPlayerEngineService {
   }
 
   // This should only be called when 'exploration' is non-null.
-  private loadInitialQuestion(
+  private loadInitialQuestion (
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.contextService.setCustomEntityContext(
@@ -121,15 +121,15 @@ export class QuestionPlayerEngineService {
     successCallback(initialCard, nextFocusLabel);
   }
 
-  private getCurrentStateData() {
+  private getCurrentStateData () {
     return this.questions[this.currentIndex].getStateData();
   }
 
-  private getNextStateData() {
+  private getNextStateData () {
     return this.questions[this.nextIndex].getStateData();
   }
 
-  private getNextInteractionHtml(labelForFocusTarget: string): string {
+  private getNextInteractionHtml (labelForFocusTarget: string): string {
     const interactionId = this.getNextStateData().interaction.id;
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
@@ -139,7 +139,7 @@ export class QuestionPlayerEngineService {
       null);
   }
 
-  init(
+  init (
       questionDicts: QuestionBackendDict[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
@@ -157,55 +157,55 @@ export class QuestionPlayerEngineService {
     this.loadInitialQuestion(successCallback, errorCallback);
   }
 
-  recordNewCardAdded(): void {
+  recordNewCardAdded (): void {
     this.currentIndex = this.nextIndex;
   }
 
-  getCurrentIndex(): number {
+  getCurrentIndex (): number {
     return this.currentIndex;
   }
 
-  setCurrentIndex(value: number): void {
+  setCurrentIndex (value: number): void {
     this.currentIndex = value;
   }
 
-  getCurrentQuestion(): Question {
+  getCurrentQuestion (): Question {
     return this.questions[this.currentIndex];
   }
 
-  getCurrentQuestionId(): string {
+  getCurrentQuestionId (): string {
     return this.questions[this.currentIndex].getId();
   }
 
-  getQuestionCount(): number {
+  getQuestionCount (): number {
     return this.questions.length;
   }
 
-  clearQuestions(): void {
+  clearQuestions (): void {
     this.questions = [];
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this.questions[this.currentIndex].getLanguageCode();
   }
 
-  isInPreviewMode(): boolean {
+  isInPreviewMode (): boolean {
     return false;
   }
 
-  isAnswerBeingProcessed(): boolean {
+  isAnswerBeingProcessed (): boolean {
     return this.answerIsBeingProcessed;
   }
 
-  setAnswerIsBeingProcessed(value: boolean): void {
+  setAnswerIsBeingProcessed (value: boolean): void {
     this.answerIsBeingProcessed = value;
   }
 
-  addQuestion(question: Question): void {
+  addQuestion (question: Question): void {
     this.questions.push(question);
   }
 
-  submitAnswer(
+  submitAnswer (
       answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService,
       successCallback: (

@@ -23,11 +23,11 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 
-  close(): void {
+  close (): void {
     return;
   }
 }

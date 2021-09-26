@@ -50,14 +50,14 @@ export class MultiSelectionFieldComponent {
   @ViewChild('newSelectionInput') newSelectionInput!:
   ElementRef<HTMLInputElement>;
 
-  constructor() {
+  constructor () {
     this.filteredSelections = this.formCtrl.valueChanges.pipe(
       startWith(null),
       map((interest: string | null) => interest ? this.filter(
         interest) : this.readOnlySelections.slice()));
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
         this.chipList.errorState = true;
@@ -68,12 +68,12 @@ export class MultiSelectionFieldComponent {
     this.readOnlySelections = cloneDeep(this.selections);
   }
 
-  validInput(value: string): boolean {
+  validInput (value: string): boolean {
     return this.selections.map(s => s.toLowerCase()).indexOf(
       value.toLowerCase()) < 0 ? true : false;
   }
 
-  add(event: { value: string }): void {
+  add (event: { value: string }): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -89,7 +89,7 @@ export class MultiSelectionFieldComponent {
     }
   }
 
-  remove(interest: string): void {
+  remove (interest: string): void {
     const index = this.selections.indexOf(interest);
 
     if (index >= 0) {
@@ -98,7 +98,7 @@ export class MultiSelectionFieldComponent {
     }
   }
 
-  selected(event: { option: {value: string }}): void {
+  selected (event: { option: {value: string }}): void {
     if (this.selections.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -106,7 +106,7 @@ export class MultiSelectionFieldComponent {
     }
   }
 
-  filter(value: string): string[] {
+  filter (value: string): string[] {
     const filterValue = value.toLocaleLowerCase();
 
     return this.readOnlySelections.filter((selection) => {

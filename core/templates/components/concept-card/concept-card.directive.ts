@@ -20,7 +20,7 @@ require('domain/skill/concept-card-backend-api.service.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/format-rte-preview.filter.ts');
 
-angular.module('oppia').directive('conceptCard', [function() {
+angular.module('oppia').directive('conceptCard', [function () {
   return {
     restrict: 'E',
     scope: {},
@@ -32,25 +32,25 @@ angular.module('oppia').directive('conceptCard', [function() {
     controllerAs: '$ctrl',
     controller: [
       '$rootScope', '$scope', 'ConceptCardBackendApiService',
-      function(
+      function (
           $rootScope, $scope, ConceptCardBackendApiService) {
         var ctrl = this;
-        ctrl.isLastWorkedExample = function() {
+        ctrl.isLastWorkedExample = function () {
           return ctrl.numberOfWorkedExamplesShown ===
               ctrl.currentConceptCard.getWorkedExamples().length;
         };
 
-        ctrl.showMoreWorkedExamples = function() {
+        ctrl.showMoreWorkedExamples = function () {
           ctrl.explanationIsShown = false;
           ctrl.numberOfWorkedExamplesShown++;
         };
 
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           ctrl.conceptCards = [];
           ctrl.currentConceptCard = null;
           ctrl.numberOfWorkedExamplesShown = 0;
           ctrl.loadingMessage = 'Loading';
-          $scope.$watch('$ctrl.index', function(newIndex) {
+          $scope.$watch('$ctrl.index', function (newIndex) {
             ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
             if (ctrl.currentConceptCard) {
               ctrl.numberOfWorkedExamplesShown = 0;
@@ -61,8 +61,8 @@ angular.module('oppia').directive('conceptCard', [function() {
           });
           ConceptCardBackendApiService.loadConceptCardsAsync(
             ctrl.skillIds
-          ).then(function(conceptCardObjects) {
-            conceptCardObjects.forEach(function(conceptCardObject) {
+          ).then(function (conceptCardObjects) {
+            conceptCardObjects.forEach(function (conceptCardObject) {
               ctrl.conceptCards.push(conceptCardObject);
             });
             ctrl.loadingMessage = '';
@@ -73,7 +73,7 @@ angular.module('oppia').directive('conceptCard', [function() {
             }
             // TODO(#8521): Remove when this directive is migrated to Angular.
             $rootScope.$apply();
-          }, function(errorResponse) {
+          }, function (errorResponse) {
             ctrl.loadingMessage = '';
             ctrl.skillDeletedMessage = 'Oops, it looks like this skill has' +
               ' been deleted.';
@@ -102,7 +102,7 @@ export class ConceptCardComponent extends UpgradeComponent {
   @Input() skillIds;
   @Input() index;
 
-  constructor(elementRef: ElementRef, injector: Injector) {
+  constructor (elementRef: ElementRef, injector: Injector) {
     super('conceptCard', elementRef, injector);
   }
 }

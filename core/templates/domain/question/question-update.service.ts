@@ -31,19 +31,19 @@ angular.module('oppia').factory('QuestionUpdateService', [
   'CMD_UPDATE_QUESTION_PROPERTY',
   'QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS',
   'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
-  function(
+  function (
       QuestionUndoRedoService,
       CMD_UPDATE_QUESTION_PROPERTY,
       QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA) {
-    var _applyChange = function(question, command, params, apply, reverse) {
+    var _applyChange = function (question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
       var changeObj = new Change(changeDict, apply, reverse);
       QuestionUndoRedoService.applyChange(changeObj, question);
     };
 
-    var _applyPropertyChange = function(
+    var _applyPropertyChange = function (
         question, propertyName, newValue, oldValue, apply, reverse) {
       _applyChange(question, CMD_UPDATE_QUESTION_PROPERTY, {
         property_name: propertyName,
@@ -52,18 +52,18 @@ angular.module('oppia').factory('QuestionUpdateService', [
       }, apply, reverse);
     };
 
-    var _getParameterFromChangeDict = function(changeDict, paramName) {
+    var _getParameterFromChangeDict = function (changeDict, paramName) {
       return changeDict[paramName];
     };
 
-    var _getNewPropertyValueFromChangeDict = function(changeDict) {
+    var _getNewPropertyValueFromChangeDict = function (changeDict) {
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
-    var _getAllContentIds = function(state) {
+    var _getAllContentIds = function (state) {
       var allContentIdsSet = new Set();
       allContentIdsSet.add(state.content.contentId);
-      state.interaction.answerGroups.forEach(function(answerGroup) {
+      state.interaction.answerGroups.forEach(function (answerGroup) {
         allContentIdsSet.add(answerGroup.outcome.feedback.contentId);
         answerGroup.rules.forEach(rule => {
           Object.keys(rule.inputs).forEach(inputName => {
@@ -77,7 +77,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
         allContentIdsSet.add(
           state.interaction.defaultOutcome.feedback.contentId);
       }
-      state.interaction.hints.forEach(function(hint) {
+      state.interaction.hints.forEach(function (hint) {
         allContentIdsSet.add(hint.hintContent.contentId);
       });
       if (state.interaction.solution) {
@@ -90,44 +90,44 @@ angular.module('oppia').factory('QuestionUpdateService', [
       return allContentIdsSet;
     };
 
-    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      var diffList = Array.from(setA).filter(function(element) {
+    var _getElementsInFirstSetButNotInSecond = function (setA, setB) {
+      var diffList = Array.from(setA).filter(function (element) {
         return !setB.has(element);
       });
       return diffList;
     };
 
-    var _updateContentIdsInAssets = function(newState, oldState) {
+    var _updateContentIdsInAssets = function (newState, oldState) {
       var newContentIds = _getAllContentIds(newState);
       var oldContentIds = _getAllContentIds(oldState);
       var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
         oldContentIds, newContentIds);
       var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
         newContentIds, oldContentIds);
-      contentIdsToDelete.forEach(function(contentId) {
+      contentIdsToDelete.forEach(function (contentId) {
         newState.recordedVoiceovers.deleteContentId(contentId);
         newState.writtenTranslations.deleteContentId(contentId);
       });
-      contentIdsToAdd.forEach(function(contentId) {
+      contentIdsToAdd.forEach(function (contentId) {
         newState.recordedVoiceovers.addContentId(contentId);
         newState.writtenTranslations.addContentId(contentId);
       });
     };
 
     return {
-      setQuestionLanguageCode: function(question, newLanguageCode) {
+      setQuestionLanguageCode: function (question, newLanguageCode) {
         var oldLanguageCode = angular.copy(question.getLanguageCode());
         _applyPropertyChange(
           question, QUESTION_PROPERTY_LANGUAGE_CODE,
           newLanguageCode, oldLanguageCode,
-          function(changeDict, question) {
+          function (changeDict, question) {
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             question.setLanguageCode(languageCode);
-          }, function(changeDict, question) {
+          }, function (changeDict, question) {
             question.setLanguageCode(oldLanguageCode);
           });
       },
-      setQuestionInapplicableSkillMisconceptionIds: function(
+      setQuestionInapplicableSkillMisconceptionIds: function (
           question, newInapplicableSkillMisconceptionIds) {
         var oldInapplicableSkillMisconceptionIds = angular.copy(
           question.getInapplicableSkillMisconceptionIds());
@@ -135,15 +135,15 @@ angular.module('oppia').factory('QuestionUpdateService', [
           question, QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
           newInapplicableSkillMisconceptionIds,
           oldInapplicableSkillMisconceptionIds,
-          function(changeDict, question) {
+          function (changeDict, question) {
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             question.setInapplicableSkillMisconceptionIds(languageCode);
-          }, function(changeDict, question) {
+          }, function (changeDict, question) {
             question.setInapplicableSkillMisconceptionIds(
               oldInapplicableSkillMisconceptionIds);
           });
       },
-      setQuestionStateData: function(question, updateFunction) {
+      setQuestionStateData: function (question, updateFunction) {
         var oldStateData = angular.copy(question.getStateData());
         // We update the question here before making the change,
         // so that we can obtain the new state to save to the backend via
@@ -165,9 +165,9 @@ angular.module('oppia').factory('QuestionUpdateService', [
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,
           newStateData.toBackendDict(),
           oldStateData.toBackendDict(),
-          function(changeDict, question) {
+          function (changeDict, question) {
             // Unused (see comment above).
-          }, function(changeDict, question) {
+          }, function (changeDict, question) {
             question.setStateData(oldStateData);
           });
       }

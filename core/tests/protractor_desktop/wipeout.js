@@ -27,7 +27,7 @@ var ExplorationEditorPage = require(
 var pendingAccountDeletionHeading =
   element(by.css('.protractor-test-pending-account-deletion'));
 
-describe('When account is deleted it', function() {
+describe('When account is deleted it', function () {
   var EXPLORATION_TITLE = 'Exploration';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
@@ -36,7 +36,7 @@ describe('When account is deleted it', function() {
   var explorationEditorSettingsTab = null;
   var expectedConsoleErrors = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     deleteAccountPage = new DeleteAccountPage.DeleteAccountPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -49,7 +49,7 @@ describe('When account is deleted it', function() {
     ];
   });
 
-  it('should request account deletion', async function() {
+  it('should request account deletion', async function () {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
@@ -62,7 +62,7 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
   });
 
-  it('should delete private exploration', async function() {
+  it('should delete private exploration', async function () {
     await users.createUser('ExpCollaborator@oppia.com', 'ExpCollaborator');
     await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
     await workflow.createExploration(true);
@@ -83,7 +83,7 @@ describe('When account is deleted it', function() {
     await users.logout();
   });
 
-  it('should set published exploration as community owned', async function() {
+  it('should set published exploration as community owned', async function () {
     await users.createUser('user@check.com', 'userForChecking');
     await users.createAndLoginUser('user3@delete.com', 'userToDelete3');
     await workflow.createAndPublishExploration(
@@ -103,7 +103,7 @@ describe('When account is deleted it', function() {
     await users.logout();
   });
 
-  it('should keep published exploration with other owner', async function() {
+  it('should keep published exploration with other owner', async function () {
     await users.createUser('secondOwner@check.com', 'secondOwner');
     await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
     await workflow.createExploration(true);
@@ -121,7 +121,7 @@ describe('When account is deleted it', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors(expectedConsoleErrors);
   });
 });

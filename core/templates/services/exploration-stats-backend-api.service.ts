@@ -30,11 +30,11 @@ import { UrlInterpolationService } from
 
 @Injectable({providedIn: 'root'})
 export class ExplorationStatsBackendApiService {
-  constructor(
+  constructor (
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async fetchExplorationStatsAsync(expId: string): Promise<ExplorationStats> {
+  async fetchExplorationStatsAsync (expId: string): Promise<ExplorationStats> {
     return this.http.get<ExplorationStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/statistics/<exploration_id>', {

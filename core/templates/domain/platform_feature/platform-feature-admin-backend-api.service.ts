@@ -31,11 +31,11 @@ import { PlatformParameterRule } from
   providedIn: 'root'
 })
 export class PlatformFeatureAdminBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
   ) {}
 
-  async updateFeatureFlag(
+  async updateFeatureFlag (
       name: string, message: string, newRules: PlatformParameterRule[]):
       Promise<void> {
     await this.http.post(

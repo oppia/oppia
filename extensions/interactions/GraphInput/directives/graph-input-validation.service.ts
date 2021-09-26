@@ -35,13 +35,13 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class GraphInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
   VERTICES_LIMIT = 50;
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: GraphInputCustomizationArgs): Warning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -77,7 +77,7 @@ export class GraphInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: GraphInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var ISOMORPHISM_VERTICES_LIMIT = 10;

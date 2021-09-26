@@ -34,7 +34,7 @@ import { ExplorationTagsService } from './exploration-tags.service';
 
 describe('Exploration save service ' +
   'when draft changes are present and there ' +
-  'is version mismatch it', function() {
+  'is version mismatch it', function () {
   let $rootScope = null;
   let $uibModal = null;
   let explorationSaveService = null;
@@ -53,7 +53,7 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(changeList, message, successCb, errorCb) {
+            save (changeList, message, successCb, errorCb) {
               successCb(false, [
                 {
                   cmd: 'add_state',
@@ -66,15 +66,15 @@ describe('Exploration save service ' +
     });
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$window', {
       location: {
-        reload() {}
+        reload () {}
       }
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -84,7 +84,7 @@ describe('Exploration save service ' +
     ExplorationTitleService = $injector.get('ExplorationTitleService');
   }));
 
-  it('should open version mismatch modal', fakeAsync(function() {
+  it('should open version mismatch modal', fakeAsync(function () {
     let modalSpy = spyOn(
       autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
@@ -112,7 +112,7 @@ describe('Exploration save service ' +
   }));
 
   it('should restore all memento\'s after modal was ' +
-    'closed', fakeAsync(function() {
+    'closed', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let restoreSpy = spyOn(ExplorationTitleService, 'restoreFromMemento')
@@ -132,7 +132,7 @@ describe('Exploration save service ' +
   }));
 
   it('should open confirm discard changes modal when clicked ' +
-    'on discard changes button', fakeAsync(function() {
+    'on discard changes button', fakeAsync(function () {
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
       {
         result: Promise.resolve()
@@ -153,7 +153,7 @@ describe('Exploration save service ' +
   }));
 
   it('should return \'initExplorationPageEventEmitter\' ' +
-    'when calling \'onInitExplorationPage\'', fakeAsync(function() {
+    'when calling \'onInitExplorationPage\'', fakeAsync(function () {
     let mockEventEmitter = new EventEmitter();
 
     expect(explorationSaveService.onInitExplorationPage)
@@ -162,7 +162,7 @@ describe('Exploration save service ' +
 });
 
 describe('Exploration save service ' +
-  'when there are no pending draft changes it', function() {
+  'when there are no pending draft changes it', function () {
   let $uibModal = null;
   let $rootScope = null;
   let explorationSaveService = null;
@@ -186,7 +186,7 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(changeList, message, successCb, errorCb) {
+            save (changeList, message, successCb, errorCb) {
               successCb(true, []);
             }
           }
@@ -195,7 +195,7 @@ describe('Exploration save service ' +
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
@@ -211,7 +211,7 @@ describe('Exploration save service ' +
     ExplorationTitleService = $injector.get('ExplorationTitleService');
   }));
 
-  it('should not open version mismatch modal', fakeAsync(function() {
+  it('should not open version mismatch modal', fakeAsync(function () {
     let modalSpy = spyOn(
       autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
@@ -240,7 +240,7 @@ describe('Exploration save service ' +
     expect(modalSpy).not.toHaveBeenCalled();
   }));
 
-  it('should show congratulatory sharing modal', fakeAsync(function() {
+  it('should show congratulatory sharing modal', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(changeListService, 'discardAllChanges')
@@ -267,7 +267,7 @@ describe('Exploration save service ' +
   }));
 
   it('should not publish exploration in case of backend ' +
-    'error', fakeAsync(function() {
+    'error', fakeAsync(function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: Promise.reject('failure')
     });
@@ -292,7 +292,7 @@ describe('Exploration save service ' +
     expect(publishSpy).not.toHaveBeenCalled();
   }));
 
-  it('should mark exploaration as editable', fakeAsync(function() {
+  it('should mark exploaration as editable', fakeAsync(function () {
     let editableSpy = spyOn(editabilityService, 'markNotEditable')
       .and.returnValue(null);
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
@@ -318,7 +318,7 @@ describe('Exploration save service ' +
     expect(editableSpy).toHaveBeenCalled();
   }));
 
-  it('should open publish exploration modal', fakeAsync(function() {
+  it('should open publish exploration modal', fakeAsync(function () {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
@@ -336,7 +336,7 @@ describe('Exploration save service ' +
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should check whether the exploration is saveable', function() {
+  it('should check whether the exploration is saveable', function () {
     spyOn(changeListService, 'isExplorationLockedForEditing')
       .and.returnValue(false);
 
@@ -348,7 +348,7 @@ describe('Exploration save service ' +
 
 describe('Exploration save service ' +
   'in case of backend error while saving ' +
-  'exploration data it', function() {
+  'exploration data it', function () {
   let $uibModal = null;
   let $rootScope = null;
   let explorationSaveService = null;
@@ -363,7 +363,7 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(changeList, message, successCb, errorCb) {
+            save (changeList, message, successCb, errorCb) {
               errorCb();
             }
           }
@@ -372,13 +372,13 @@ describe('Exploration save service ' +
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
   }));
 
-  it('should call error callback', fakeAsync(function() {
+  it('should call error callback', fakeAsync(function () {
     let successCb = jasmine.createSpy('success');
     let errorCb = jasmine.createSpy('error');
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -403,7 +403,7 @@ describe('Exploration save service ' +
 });
 
 describe('Exploration save service ' +
-  'while saving changes', function() {
+  'while saving changes', function () {
   let $uibModal = null;
   let $timeout = null;
   let $rootScope = null;
@@ -590,13 +590,13 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            getLastSavedDataAsync() {
+            getLastSavedDataAsync () {
               return Promise.resolve({
                 states: statesBackendDict,
                 init_state_name: 'Hola'
               });
             },
-            save(changeList, message, successCb, errorCb) {
+            save (changeList, message, successCb, errorCb) {
               successCb(true, []);
             }
           }
@@ -606,7 +606,7 @@ describe('Exploration save service ' +
     focusManagerService = TestBed.inject(FocusManagerService);
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
@@ -620,7 +620,7 @@ describe('Exploration save service ' +
     statesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
-  it('should open exploration save modal', fakeAsync(function() {
+  it('should open exploration save modal', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
@@ -653,7 +653,7 @@ describe('Exploration save service ' +
   }));
 
   it('should not open exploration save modal in case of ' +
-    'backend error', fakeAsync(function() {
+    'backend error', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
@@ -687,7 +687,7 @@ describe('Exploration save service ' +
   }));
 
   it('should not open exploration save modal if ' +
-    'it is already opened', fakeAsync(function() {
+    'it is already opened', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
@@ -723,7 +723,7 @@ describe('Exploration save service ' +
   }));
 
   it('should focus on the exploration save modal ' +
-    'when modal is opened', fakeAsync(function() {
+    'when modal is opened', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
@@ -765,7 +765,7 @@ describe('Exploration save service ' +
   }));
 
   it('should not focus on exploration save modal in case ' +
-    'of backend error', fakeAsync(function() {
+    'of backend error', fakeAsync(function () {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(

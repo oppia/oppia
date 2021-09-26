@@ -16,23 +16,23 @@
  * @fileoverview Unit tests for the MusicNotesInput short response.
  */
 
-describe('oppiaShortResponseMusicNotesInput', function() {
+describe('oppiaShortResponseMusicNotesInput', function () {
   let ctrl = null;
   let directive = null;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
   }));
 
   describe('when user provides an answer', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('$attrs', {
         answer: [{
           readableNoteName: 'B4',
@@ -44,30 +44,30 @@ describe('oppiaShortResponseMusicNotesInput', function() {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       directive =
         $injector.get('oppiaShortResponseMusicNotesInputDirective')[0];
       ctrl = $injector.instantiate(directive.controller);
     }));
 
-    it('should initialise the component when submits answer', function() {
+    it('should initialise the component when submits answer', function () {
       ctrl.$onInit();
       expect(ctrl.displayedAnswer).toEqual('B4');
     });
   });
 
   describe('when user does not provides an answer', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('$attrs', {
         answer: []
       });
     }));
 
-    beforeEach(angular.mock.inject(function($componentController) {
+    beforeEach(angular.mock.inject(function ($componentController) {
       ctrl = $componentController('oppiaShortResponseMusicNotesInput');
     }));
 
-    it('should initialise the component when submits answer', function() {
+    it('should initialise the component when submits answer', function () {
       ctrl.$onInit();
       expect(ctrl.displayedAnswer).toEqual('No answer given.');
     });

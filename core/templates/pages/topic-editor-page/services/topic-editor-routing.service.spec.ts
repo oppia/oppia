@@ -58,7 +58,7 @@ describe('Topic Editor Routing Service', () => {
     expect(ters.getActiveTabName()).toEqual('main');
   });
 
-  it('should navigate to different tabs', function() {
+  it('should navigate to different tabs', function () {
     expect(ters.getActiveTabName()).toEqual('main');
     ters.navigateToSubtopicEditorWithId(1);
     expect(ters.getActiveTabName()).toEqual('subtopic_editor');
@@ -79,7 +79,7 @@ describe('Topic Editor Routing Service', () => {
     expect(ters.getActiveTabName()).toEqual('main');
   });
 
-  it('should navigate to skill editor', function() {
+  it('should navigate to skill editor', function () {
     spyOn(mockWindowRef.nativeWindow, 'open');
     ters.navigateToSkillEditorWithId('10');
     expect(mockWindowRef.nativeWindow.open)

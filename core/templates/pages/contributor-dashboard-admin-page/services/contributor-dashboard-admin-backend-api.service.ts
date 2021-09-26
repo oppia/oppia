@@ -56,11 +56,11 @@ interface TranslationContributionStats {
   providedIn: 'root'
 })
 export class ContributorDashboardAdminBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async addContributionReviewerAsync(
+  async addContributionReviewerAsync (
       category: string, username: string, languageCode: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -78,7 +78,7 @@ export class ContributorDashboardAdminBackendApiService {
     });
   }
 
-  async viewContributionReviewersAsync(
+  async viewContributionReviewersAsync (
       category: string, languageCode: string
   ): Promise<ViewContributionBackendResponse> {
     let params = {};
@@ -101,7 +101,7 @@ export class ContributorDashboardAdminBackendApiService {
     });
   }
 
-  async contributionReviewerRightsAsync(
+  async contributionReviewerRightsAsync (
       username: string): Promise<ContributionRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<ContributionRightsBackendResponse>(
@@ -118,7 +118,7 @@ export class ContributorDashboardAdminBackendApiService {
     });
   }
 
-  async removeContributionReviewerAsync(
+  async removeContributionReviewerAsync (
       username: string, category: string, languageCode: string): Promise<void> {
     var url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
@@ -138,7 +138,7 @@ export class ContributorDashboardAdminBackendApiService {
     });
   }
 
-  async viewTranslationContributionStatsAsync(
+  async viewTranslationContributionStatsAsync (
       username: string): Promise<TranslationContributionStatsBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<TranslationContributionStatsBackendResponse>(

@@ -54,7 +54,7 @@ angular.module('oppia').controller('TeachOppiaModalController', [
   'TrainingDataService', 'TrainingModalService',
   'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
   'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
-  function(
+  function (
       $controller, $filter, $http, $injector, $log,
       $scope, $uibModalInstance, AlertsService,
       AngularNameService, AnswerClassificationService,
@@ -85,7 +85,7 @@ angular.module('oppia').controller('TeachOppiaModalController', [
     // been confirmed or fixed.
     var TOAST_TIMEOUT = 2000;
 
-    var fetchAndShowUnresolvedAnswers = function(
+    var fetchAndShowUnresolvedAnswers = function (
         expId, stateName) {
       var unresolvedAnswersUrl = (
         UrlInterpolationService.interpolateUrl(
@@ -97,9 +97,9 @@ angular.module('oppia').controller('TeachOppiaModalController', [
         params: {
           state_name: stateName
         }
-      }).then(function(response) {
+      }).then(function (response) {
         $scope.showUnresolvedAnswers(response.data.unresolved_answers);
-      }, function(response) {
+      }, function (response) {
         $log.error(
           'Error occurred while fetching unresolved answers ' +
           'for exploration ' + _explorationId + ' state ' +
@@ -108,11 +108,11 @@ angular.module('oppia').controller('TeachOppiaModalController', [
       });
     };
 
-    $scope.showUnresolvedAnswers = function(unresolvedAnswers) {
+    $scope.showUnresolvedAnswers = function (unresolvedAnswers) {
       $scope.loadingDotsAreShown = false;
       $scope.unresolvedAnswers = [];
 
-      unresolvedAnswers.forEach(function(item) {
+      unresolvedAnswers.forEach(function (item) {
         var acs = AnswerClassificationService;
         var answer = item.answer;
         var classificationResult = (
@@ -140,7 +140,7 @@ angular.module('oppia').controller('TeachOppiaModalController', [
       });
     };
 
-    $scope.confirmAnswerAssignment = function(answerIndex) {
+    $scope.confirmAnswerAssignment = function (answerIndex) {
       var unresolvedAnswer = $scope.unresolvedAnswers[answerIndex];
       $scope.unresolvedAnswers.splice(answerIndex, 1);
 
@@ -168,13 +168,13 @@ angular.module('oppia').controller('TeachOppiaModalController', [
         successToast, TOAST_TIMEOUT);
     };
 
-    $scope.openTrainUnresolvedAnswerModal = function(
+    $scope.openTrainUnresolvedAnswerModal = function (
         answerIndex) {
       var unresolvedAnswer = (
         $scope.unresolvedAnswers[answerIndex]);
       var answer = unresolvedAnswer.answer;
       return TrainingModalService.openTrainUnresolvedAnswerModal(
-        answer, function() {
+        answer, function () {
           $scope.unresolvedAnswers.splice(answerIndex, 1);
           var truncatedAnswer = $filter(
             'truncateInputBasedOnInteractionAnswerType')(

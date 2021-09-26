@@ -34,13 +34,13 @@ export class RealEditorComponent implements OnInit {
   schema: RealSchema = {
     type: 'float'
   };
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor (private changeDetectorRef: ChangeDetectorRef) {}
 
-  getSchema(): RealSchema {
+  getSchema (): RealSchema {
     return this.schema;
   }
 
-  updateValue(newValue: number | string): void {
+  updateValue (newValue: number | string): void {
     if (
       this.value === newValue ||
       (newValue === '' || newValue === null) && this.value === 0.0) {
@@ -58,7 +58,7 @@ export class RealEditorComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.value === '' || this.value === undefined) {
       this.value = 0.0;
     }

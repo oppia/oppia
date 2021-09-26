@@ -142,7 +142,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     $log = $injector.get('$log');

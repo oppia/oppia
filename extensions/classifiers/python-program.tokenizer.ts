@@ -39,17 +39,17 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class PythonProgramTokenizer {
   private PythonProgramTokenType = (
     ClassifiersExtensionConstants.PythonProgramTokenType);
-  constructor(private loggerService: LoggerService) {}
+  constructor (private loggerService: LoggerService) {}
 
-  private groupOfRegEx(...params: (string | string[])[]): string {
+  private groupOfRegEx (...params: (string | string[])[]): string {
     return '(' + Array.prototype.join.call(params, '|') + ')';
   }
 
-  private regExMayBePresent(params: string | string[]): string {
+  private regExMayBePresent (params: string | string[]): string {
     return this.groupOfRegEx(params) + '?';
   }
 
-  private repeatedRegEx(params: string | string[]): string {
+  private repeatedRegEx (params: string | string[]): string {
     return this.groupOfRegEx(params) + '*';
   }
 
@@ -153,7 +153,7 @@ export class PythonProgramTokenizer {
 
   private tabsize = 8;
 
-  generateTokens(program: string[]): string[][] {
+  generateTokens (program: string[]): string[][] {
     const tokenizedProgram = [];
     let parenlev = 0;
     let continued = 0;

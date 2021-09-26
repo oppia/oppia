@@ -38,7 +38,7 @@ import { Subject } from 'rxjs/internal/Subject';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
@@ -48,12 +48,12 @@ class MockWindowRef {
     location: {
       pathname: '/search/find',
       href: '',
-      toString() {
+      toString () {
         return 'http://localhost/test_path';
       }
     },
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState (data, title: string, url?: string | null) {}
     }
   };
 }
@@ -61,7 +61,7 @@ class MockWindowRef {
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
 
-  instant(key: string, interpolateParams?: Object): string {
+  instant (key: string, interpolateParams?: Object): string {
     return key;
   }
 }
@@ -82,9 +82,9 @@ class MockNavigationService {
     }
   };
 
-  onMenuKeypress(): void {}
+  onMenuKeypress (): void {}
 
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {}
+  openSubmenu (evt: KeyboardEvent, menuName: string): void {}
 
   ACTION_OPEN: string = 'open';
   ACTION_CLOSE: string = 'close';
@@ -336,7 +336,7 @@ describe('Search bar component', () => {
     component.searchQueryChanged = {
       pipe: (param1, parm2) => {
         return {
-          subscribe(callb) {
+          subscribe (callb) {
             callb();
           }
         };

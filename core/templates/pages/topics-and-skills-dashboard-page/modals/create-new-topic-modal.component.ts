@@ -43,7 +43,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   topicUrlFragmentExists: boolean = false;
   topicNameExists: boolean = false;
 
-  constructor(
+  constructor (
     private contextService: ContextService,
     private ngbActiveModal: NgbActiveModal,
     private imageLocalStorageService: ImageLocalStorageService,
@@ -53,26 +53,26 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.contextService.setImageSaveDestinationToLocalStorage();
   }
 
-  save(): void {
+  save (): void {
     this.ngbActiveModal.close(this.newlyCreatedTopic);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.ngbActiveModal.dismiss('cancel');
   }
 
-  isValid(): boolean {
+  isValid (): boolean {
     return Boolean(
       this.newlyCreatedTopic.isValid() &&
       this.imageLocalStorageService.getStoredImagesData().length > 0
     );
   }
 
-  onTopicUrlFragmentChange(): void {
+  onTopicUrlFragmentChange (): void {
     if (!this.newlyCreatedTopic.urlFragment) {
       return;
     }
@@ -84,7 +84,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
       });
   }
 
-  onTopicNameChange(): void {
+  onTopicNameChange (): void {
     if (!this.newlyCreatedTopic.name) {
       return;
     }

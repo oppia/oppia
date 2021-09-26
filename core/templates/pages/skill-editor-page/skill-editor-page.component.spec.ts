@@ -30,7 +30,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/skill-editor-page/skill-editor-page.component.ts');
 
-describe('Skill editor page', function() {
+describe('Skill editor page', function () {
   var ctrl = null;
   var PreventPageUnloadEventService = null;
   var SkillEditorRoutingService = null;
@@ -43,7 +43,7 @@ describe('Skill editor page', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     PreventPageUnloadEventService = $injector.get(
       'PreventPageUnloadEventService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
@@ -56,7 +56,7 @@ describe('Skill editor page', function() {
   }));
 
   it('should load skill based on its id in url when component is initialized',
-    function() {
+    function () {
       spyOn(SkillEditorStateService, 'loadSkill').and.stub();
       spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
 
@@ -77,7 +77,7 @@ describe('Skill editor page', function() {
   });
 
   it('should addListener by passing getChangeCount to ' +
-  'PreventPageUnloadEventService', function() {
+  'PreventPageUnloadEventService', function () {
     spyOn(SkillEditorStateService, 'loadSkill').and.stub();
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
@@ -91,20 +91,20 @@ describe('Skill editor page', function() {
   });
 
   it('should get active tab name from skill editor routing service',
-    function() {
+    function () {
       spyOn(SkillEditorRoutingService, 'getActiveTabName').and.returnValue(
         'questions');
       expect(ctrl.getActiveTabName()).toBe('questions');
     });
 
-  it('should go to main tab when selecting main tab', function() {
+  it('should go to main tab when selecting main tab', function () {
     var routingSpy = spyOn(
       SkillEditorRoutingService, 'navigateToMainTab');
     ctrl.selectMainTab();
     expect(routingSpy).toHaveBeenCalled();
   });
 
-  it('should go to preview tab when selecting preview tab', function() {
+  it('should go to preview tab when selecting preview tab', function () {
     var routingSpy = spyOn(
       SkillEditorRoutingService, 'navigateToPreviewTab');
     ctrl.selectPreviewTab();
@@ -112,7 +112,7 @@ describe('Skill editor page', function() {
   });
 
   it('should open save changes modal with $uibModal when unsaved changes are' +
-    ' present', function() {
+    ' present', function () {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
     ctrl.selectQuestionsTab();
@@ -120,7 +120,7 @@ describe('Skill editor page', function() {
   });
 
   it('should navigate to questions tab when unsaved changes are not present',
-    function() {
+    function () {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
       var routingSpy = spyOn(
         SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
@@ -128,7 +128,7 @@ describe('Skill editor page', function() {
       expect(routingSpy).toHaveBeenCalled();
     });
 
-  it('should return warnings count for the skill', function() {
+  it('should return warnings count for the skill', function () {
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
         'review material', AppConstants.COMPONENT_NAME_EXPLANATION),

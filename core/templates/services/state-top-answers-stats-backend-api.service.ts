@@ -31,13 +31,13 @@ import { UrlInterpolationService } from
 
 @Injectable({providedIn: 'root'})
 export class StateTopAnswersStatsBackendApiService {
-  constructor(
+  constructor (
       private http: HttpClient,
       private stateTopAnswersStatsObjectFactory:
         StateTopAnswersStatsObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  async fetchStatsAsync(expId: string): Promise<StateTopAnswersStats> {
+  async fetchStatsAsync (expId: string): Promise<StateTopAnswersStats> {
     return this.http.get<StateTopAnswersStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.STATE_ANSWER_STATS_URL, {exploration_id: expId}))

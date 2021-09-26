@@ -27,7 +27,7 @@ require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {
@@ -48,13 +48,13 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         '$scope', '$timeout', 'FocusManagerService',
         'NumericInputValidationService',
         'SchemaFormSubmittedService',
-        function(
+        function (
             $scope, $timeout, FocusManagerService,
             NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.validate = function(localValue, customizationArg) {
+          ctrl.validate = function (localValue, customizationArg) {
             let { checkRequireNonnegativeInput } = customizationArg || {};
             let checkRequireNonnegativeInputValue = (
             checkRequireNonnegativeInput === undefined ? false :
@@ -68,14 +68,14 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                   localValue, checkRequireNonnegativeInputValue)));
           };
 
-          ctrl.onFocus = function() {
+          ctrl.onFocus = function () {
             ctrl.hasFocusedAtLeastOnce = true;
             if (ctrl.onInputFocus) {
               ctrl.onInputFocus();
             }
           };
 
-          ctrl.onBlur = function() {
+          ctrl.onBlur = function () {
             ctrl.isUserCurrentlyTyping = false;
             if (ctrl.onInputBlur) {
               ctrl.onInputBlur();
@@ -83,7 +83,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-          ctrl.getMinValue = function() {
+          ctrl.getMinValue = function () {
             for (var i = 0; i < ctrl.validators().length; i++) {
               if (ctrl.validators()[i].id === 'is_at_least') {
                 return ctrl.validators()[i].min_value;
@@ -91,7 +91,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.getMaxValue = function() {
+          ctrl.getMaxValue = function () {
             for (var i = 0; i < ctrl.validators().length; i++) {
               if (ctrl.validators()[i].id === 'is_at_most') {
                 return ctrl.validators()[i].max_value;
@@ -99,13 +99,13 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.generateErrors = function() {
+          ctrl.generateErrors = function () {
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
                 ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
           };
 
-          ctrl.onKeypress = function(evt) {
+          ctrl.onKeypress = function (evt) {
             if (evt.keyCode === 13) {
               if (
                 Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
@@ -119,7 +119,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
             ctrl.hasFocusedAtLeastOnce = false;
@@ -140,12 +140,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.minValue = checkRequireNonnegativeInput && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.
-            $timeout(function() {
+            $timeout(function () {
               FocusManagerService.setFocusWithoutScroll(labelForFocus);
             }, 50);
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.
-            $timeout(function() {
+            $timeout(function () {
               ctrl.hasLoaded = true;
             });
           };

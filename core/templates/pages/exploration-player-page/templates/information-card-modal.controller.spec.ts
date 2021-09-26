@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Information Card Modal Controller', function() {
+describe('Information Card Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var DateTimeFormatService = null;
@@ -27,7 +27,7 @@ describe('Information Card Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     DateTimeFormatService = $injector.get('DateTimeFormatService');
 
@@ -82,7 +82,7 @@ describe('Information Card Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.averageRating).toBe(3.3333333333333335);
       expect($scope.contributorNames).toEqual(
         ['contributor_1', 'contributor_2']);
@@ -113,7 +113,7 @@ describe('Information Card Modal Controller', function() {
     });
 
   it('should wrapper text of given html element when getting css properties',
-    function() {
+    function () {
       spyOn(document, 'querySelectorAll')
         // This throws "Type '{ clientWidth: number; }' is missing the following
         // properties from type 'Element': assignedSlot, attributes, classList,
@@ -132,7 +132,7 @@ describe('Information Card Modal Controller', function() {
     });
 
   it('should get complete image path corresponding to a given' +
-    ' relative path', function() {
+    ' relative path', function () {
     expect($scope.getStaticImageUrl('/path/to/image.png')).toBe(
       '/assets/images/path/to/image.png');
   });

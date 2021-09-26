@@ -30,20 +30,20 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class ErrorPageComponent implements OnInit {
   @Input() statusCode: string;
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageTitleService.setDocumentTitle(
       'Error ' + this.statusCode + ' - Oppia');
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getStatusCode(): number {
+  getStatusCode (): number {
     return Number(this.statusCode);
   }
 }

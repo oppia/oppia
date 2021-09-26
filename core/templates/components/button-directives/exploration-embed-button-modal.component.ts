@@ -32,19 +32,19 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
   @Input() explorationId!: string;
   @Input() serverName!: string;
 
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
     private siteAnalyticsService: SiteAnalyticsService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.siteAnalyticsService.registerOpenEmbedInfoEvent(this.explorationId);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 
-  selectText(event: MouseEvent): void {
+  selectText (event: MouseEvent): void {
     const codeDiv = event.currentTarget;
     if (codeDiv === null) {
       throw new Error('No CodeDiv was found!');

@@ -34,7 +34,7 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 // ^^^ This block is to be removed.
 
-describe('Skill editor main tab Component', function() {
+describe('Skill editor main tab Component', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -48,12 +48,12 @@ describe('Skill editor main tab Component', function() {
 
   let mockUi = {
     placeholder: {
-      height() {
+      height () {
         return;
       }
     },
     item: {
-      height() {
+      height () {
         return;
       }
     }
@@ -71,7 +71,7 @@ describe('Skill editor main tab Component', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
@@ -103,7 +103,7 @@ describe('Skill editor main tab Component', function() {
     });
   }));
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     expect($scope.WORKED_EXAMPLES_SORTABLE_OPTIONS).toBe(undefined);
 
     ctrl.$onInit();
@@ -122,7 +122,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should get static image url when calling ' +
-    '\getStaticImageUrl\'', function() {
+    '\getStaticImageUrl\'', function () {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('imagePath');
     let result = $scope.getStaticImageUrl('/imagePath');
@@ -146,7 +146,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should change current index when calling ' +
-    '\changeActiveWorkedExampleIndex\'', function() {
+    '\changeActiveWorkedExampleIndex\'', function () {
     ctrl.$onInit();
 
     // Case: 1
@@ -163,7 +163,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should open delete worked example modal when ' +
-    'clicking on delete button', function() {
+    'clicking on delete button', function () {
     let deferred = $q.defer();
     deferred.resolve();
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -180,7 +180,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should close delete worked example modal when ' +
-    'clicking on cancel button', function() {
+    'clicking on cancel button', function () {
     let deferred = $q.defer();
     deferred.reject();
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -197,7 +197,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should open add worked example modal when ' +
-    'clicking on add button', function() {
+    'clicking on add button', function () {
     let deferred = $q.defer();
     deferred.resolve({
       workedExampleQuestionHtml: 'questionHtml',
@@ -217,7 +217,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should close add worked example modal when ' +
-    'clicking on cancel button', function() {
+    'clicking on cancel button', function () {
     let deferred = $q.defer();
     deferred.reject();
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -234,7 +234,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should open show skill preview modal when ' +
-    'clicking on preview button', function() {
+    'clicking on preview button', function () {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
     ctrl.$onInit();
@@ -245,7 +245,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should toggle worked example list when calling ' +
-    '\toggleWorkedExampleList\'', function() {
+    '\toggleWorkedExampleList\'', function () {
     $scope.workedExamplesListIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
@@ -258,7 +258,7 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should toggle skill editor card when calling ' +
-    '\toggleSkillEditorCard\'', function() {
+    '\toggleSkillEditorCard\'', function () {
     $scope.skillEditorCardIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);

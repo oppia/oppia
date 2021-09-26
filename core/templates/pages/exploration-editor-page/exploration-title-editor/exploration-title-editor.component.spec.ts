@@ -28,14 +28,14 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
-  get onRefreshSettingsTab() {
+  get onRefreshSettingsTab () {
     return this.refreshSettingsTabEventEmitter;
   }
-  set refreshSettingsTabEmitter(val) {
+  set refreshSettingsTabEmitter (val) {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-describe('Exploration Title Editor directive', function() {
+describe('Exploration Title Editor directive', function () {
   var $scope = null;
   var $rootScope = null;
   var ExplorationTitleService = null;
@@ -56,15 +56,15 @@ describe('Exploration Title Editor directive', function() {
   });
 
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('RouterService', {
-      getActiveTabName() {
+      getActiveTabName () {
         return ('main');
       },
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
     focusManagerService = $injector.get('FocusManagerService');
@@ -81,7 +81,7 @@ describe('Exploration Title Editor directive', function() {
   }));
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect($scope.explorationTitleService).toEqual(ExplorationTitleService);
     });
 

@@ -37,16 +37,16 @@ export interface InterpolationValuesType {
   providedIn: 'root'
 })
 export class UrlInterpolationService {
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private urlService: UrlService,
     private utilsService: UtilsService) {}
 
-  get DEV_MODE(): boolean {
+  get DEV_MODE (): boolean {
     return AppConstants.DEV_MODE;
   }
 
-  validateResourcePath(resourcePath: string): void {
+  validateResourcePath (resourcePath: string): void {
     if (!resourcePath) {
       this.alertsService.fatalWarning('Empty path passed in method.');
     }
@@ -63,7 +63,7 @@ export class UrlInterpolationService {
    * Given a resource path relative to subfolder in /,
    * returns resource path with cache slug.
    */
-  _getUrlWithSlug(resourcePath: string): string {
+  _getUrlWithSlug (resourcePath: string): string {
     if (!this.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
@@ -80,7 +80,7 @@ export class UrlInterpolationService {
    * returns complete resource path with cache slug and prefixed with url
    * depending on dev/prod mode.
    */
-  _getCompleteUrl(prefix: string, path: string): string {
+  _getCompleteUrl (prefix: string, path: string): string {
     if (this.DEV_MODE) {
       return prefix + this._getUrlWithSlug(path);
     } else {
@@ -92,7 +92,7 @@ export class UrlInterpolationService {
    * Given a resource path relative to extensions folder,
    * returns the complete url path to that resource.
    */
-  getExtensionResourceUrl(resourcePath: string): string {
+  getExtensionResourceUrl (resourcePath: string): string {
     this.validateResourcePath(resourcePath);
     return this._getCompleteUrl('/extensions', resourcePath);
   }
@@ -114,7 +114,7 @@ export class UrlInterpolationService {
    * interpolationValues object, the function execution will stop
    * after throwing an error.
    */
-  interpolateUrl(
+  interpolateUrl (
       urlTemplate: string,
       interpolationValues: InterpolationValuesType): string {
     if (!urlTemplate) {
@@ -182,7 +182,7 @@ export class UrlInterpolationService {
    * Given an image path relative to /assets/images folder,
    * returns the complete url path to that image.
    */
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     this.validateResourcePath(imagePath);
     return this._getCompleteUrl('/assets', '/images' + imagePath);
   }
@@ -191,7 +191,7 @@ export class UrlInterpolationService {
    * Given a video path relative to /assets/videos folder,
    * returns the complete url path to that image.
    */
-  getStaticVideoUrl(videoPath: string): string {
+  getStaticVideoUrl (videoPath: string): string {
     this.validateResourcePath(videoPath);
     return this._getCompleteUrl('/assets', '/videos' + videoPath);
   }
@@ -200,12 +200,12 @@ export class UrlInterpolationService {
    * Given a path relative to /assets folder, returns the complete url path
    * to that asset.
    */
-  getStaticAssetUrl(assetPath: string): string {
+  getStaticAssetUrl (assetPath: string): string {
     this.validateResourcePath(assetPath);
     return this._getCompleteUrl('/assets', assetPath);
   }
 
-  getFullStaticAssetUrl(path: string): string {
+  getFullStaticAssetUrl (path: string): string {
     this.validateResourcePath(path);
     if (this.DEV_MODE) {
       return this.urlService.getOrigin() + path;
@@ -218,7 +218,7 @@ export class UrlInterpolationService {
    * Given an interaction id, returns the complete url path to
    * the thumbnail image for the interaction.
    */
-  getInteractionThumbnailImageUrl(interactionId: string): string {
+  getInteractionThumbnailImageUrl (interactionId: string): string {
     if (!interactionId) {
       this.alertsService.fatalWarning(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.');
@@ -231,7 +231,7 @@ export class UrlInterpolationService {
    * Given a directive path relative to head folder,
    * returns the complete url path to that directive.
    */
-  getDirectiveTemplateUrl(path: string): string {
+  getDirectiveTemplateUrl (path: string): string {
     this.validateResourcePath(path);
     if (this.DEV_MODE) {
       return '/templates' + this._getUrlWithSlug(path);

@@ -58,7 +58,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     type: 'unicode',
     ui_config: {}
   };
-  constructor(
+  constructor (
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
     private focusManagerService: FocusManagerService,
@@ -111,7 +111,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     }));
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const {
       requireSimplestForm,
       allowImproperFraction,
@@ -143,7 +143,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       }, 0);
   }
 
-  private getAttributesObject() {
+  private getAttributesObject () {
     return {
       requireSimplestFormWithValue: this.requireSimplestFormWithValue,
       allowImproperFractionWithValue: this.allowImproperFractionWithValue,
@@ -152,7 +152,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     };
   }
 
-  submitAnswer(): void {
+  submitAnswer (): void {
     const answer: string = this.answer;
     try {
       const fraction = Fraction.fromRawInputString(answer);
@@ -192,22 +192,22 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     }
   }
 
-  isAnswerValid(): boolean {
+  isAnswerValid (): boolean {
     return this.isValid && this.answer !== '';
   }
 
-  answerValueChanged(): void {
+  answerValueChanged (): void {
     this.answerChanged.next(this.answer);
   }
 
-  getPlaceholderText(): string {
+  getPlaceholderText (): string {
     if (this.allowNonzeroIntegerPart) {
       return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER';
     }
     return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER';
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.componentSubscriptions.unsubscribe();
   }
 }

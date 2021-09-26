@@ -24,7 +24,7 @@ import { UrlInterpolationService } from
 import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 
 describe('Volunteer page', () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [VolunteerPageComponent],
       providers: [

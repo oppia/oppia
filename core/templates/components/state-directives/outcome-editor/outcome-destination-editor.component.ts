@@ -45,7 +45,7 @@ angular.module('oppia').component('outcomeDestinationEditor', {
     'UserService', 'ENABLE_PREREQUISITE_SKILLS',
     'EXPLORATION_AND_SKILL_ID_PATTERN', 'MAX_STATE_NAME_LENGTH',
     'PLACEHOLDER_OUTCOME_DEST',
-    function(
+    function (
         $rootScope, $timeout, EditorFirstTimeEventsService,
         FocusManagerService, StateEditorService, StateGraphLayoutService,
         UserService, ENABLE_PREREQUISITE_SKILLS,
@@ -54,22 +54,22 @@ angular.module('oppia').component('outcomeDestinationEditor', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var currentStateName = null;
-      ctrl.isSelfLoop = function() {
+      ctrl.isSelfLoop = function () {
         return ctrl.outcome.dest === currentStateName;
       };
 
-      ctrl.onDestSelectorChange = function() {
+      ctrl.onDestSelectorChange = function () {
         if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
           FocusManagerService.setFocus('newStateNameInputField');
         }
       };
 
-      ctrl.isCreatingNewState = function(outcome) {
+      ctrl.isCreatingNewState = function (outcome) {
         ctrl.maxLen = MAX_STATE_NAME_LENGTH;
         return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
       };
 
-      ctrl.updateOptionNames = function() {
+      ctrl.updateOptionNames = function () {
         // $timeout is being used here to update the view.
         // $scope.$applyAsync() doesn't work and $scope.$apply() causes
         // console errors.
@@ -126,7 +126,7 @@ angular.module('oppia').component('outcomeDestinationEditor', {
               }
             }
 
-            stateNames = allStateNames.sort(function(a, b) {
+            stateNames = allStateNames.sort(function (a, b) {
               return allStateScores[a] - allStateScores[b];
             });
           }
@@ -150,7 +150,7 @@ angular.module('oppia').component('outcomeDestinationEditor', {
         }, 10);
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           StateEditorService.onSaveOutcomeDestDetails.subscribe(() => {
             if (ctrl.isSelfLoop()) {
@@ -177,7 +177,7 @@ angular.module('oppia').component('outcomeDestinationEditor', {
           ENABLE_PREREQUISITE_SKILLS &&
           StateEditorService.isExplorationWhitelisted());
         ctrl.canEditRefresherExplorationId = null;
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function (userInfo) {
           // We restrict editing of refresher exploration IDs to
           // admins/moderators for now, since the feature is still in
           // development.
@@ -193,7 +193,7 @@ angular.module('oppia').component('outcomeDestinationEditor', {
         ctrl.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
         ctrl.destChoices = [];
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

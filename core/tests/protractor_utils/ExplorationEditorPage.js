@@ -38,7 +38,7 @@ var ExplorationEditorTranslationTab = require(
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 
-var ExplorationEditorPage = function() {
+var ExplorationEditorPage = function () {
   /*
   * Interactive elements
   */
@@ -122,30 +122,30 @@ var ExplorationEditorPage = function() {
   /*
    * Components
    */
-  this.getImprovementsTab = function() {
+  this.getImprovementsTab = function () {
     return (
       new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
   };
-  this.getFeedbackTab = function() {
+  this.getFeedbackTab = function () {
     return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
   };
-  this.getHistoryTab = function() {
+  this.getHistoryTab = function () {
     return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
   };
-  this.getMainTab = function() {
+  this.getMainTab = function () {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
   };
-  this.getSettingsTab = function() {
+  this.getSettingsTab = function () {
     return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
   };
-  this.getStatsTab = function() {
+  this.getStatsTab = function () {
     return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
   };
-  this.getTranslationTab = function() {
+  this.getTranslationTab = function () {
     return new ExplorationEditorTranslationTab
       .ExplorationEditorTranslationTab();
   };
-  this.getPreviewTab = function() {
+  this.getPreviewTab = function () {
     return new ExplorationPlayerPage.ExplorationPlayerPage();
   };
 
@@ -154,7 +154,7 @@ var ExplorationEditorPage = function() {
    */
   // ---- CONTROLS ----
 
-  this.publishCardExploration = async function(
+  this.publishCardExploration = async function (
       title, objective, category, language, tags) {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
@@ -219,7 +219,7 @@ var ExplorationEditorPage = function() {
       closeButton, 'Close button taking too long to disappear');
   };
 
-  this.verifyExplorationSettingFields = async function(
+  this.verifyExplorationSettingFields = async function (
       title, category, objective, language, tags) {
     var explorationCategory = await selectionRenderedElement.getText();
     var explorationLanguage = await expLanguageSelectorElement.$(
@@ -237,7 +237,7 @@ var ExplorationEditorPage = function() {
     }
   };
 
-  this.saveChanges = async function(commitMessage) {
+  this.saveChanges = async function (commitMessage) {
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
@@ -253,7 +253,7 @@ var ExplorationEditorPage = function() {
       'Changes could not be saved');
   };
 
-  this.publishChanges = async function(commitMessage) {
+  this.publishChanges = async function (commitMessage) {
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     await action.sendKeys(
@@ -267,7 +267,7 @@ var ExplorationEditorPage = function() {
       'Changes could not be saved');
   };
 
-  this.discardChanges = async function() {
+  this.discardChanges = async function () {
     await action.waitForAutosave();
     await action.click('Save Discard Toggle button', saveDiscardToggleButton);
     await action.click('Discard Changes button', discardChangesButton);
@@ -281,13 +281,13 @@ var ExplorationEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.discardLostChanges = async function() {
+  this.discardLostChanges = async function () {
     await action.click('Discard Lost Changes button', discardLostChangesButton);
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };
 
-  this.discardAndExportLostChanges = async function() {
+  this.discardAndExportLostChanges = async function () {
     await action.click(
       'Discard Lost Changes button', discardAndExportLostChangesButton);
     await browser.driver.get('chrome://downloads/');
@@ -300,22 +300,22 @@ var ExplorationEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectCannotSaveChanges = async function() {
+  this.expectCannotSaveChanges = async function () {
     await action.waitForAutosave();
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
-  this.expectCanPublishChanges = async function() {
+  this.expectCanPublishChanges = async function () {
     await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeTrue();
   };
 
-  this.expectCannotPublishChanges = async function() {
+  this.expectCannotPublishChanges = async function () {
     await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
-  this.acceptSaveRecommendationPrompt = async function(commitMessage) {
+  this.acceptSaveRecommendationPrompt = async function (commitMessage) {
     await action.click(
       'Recommendation prompt Save button', recommendationPromptSaveButton);
     await waitFor.invisibilityOf(
@@ -331,57 +331,57 @@ var ExplorationEditorPage = function() {
     await action.click('Save draft button', commitChangesButton);
   };
 
-  this.expectSaveChangesButtonEnabled = async function() {
+  this.expectSaveChangesButtonEnabled = async function () {
     await action.waitForAutosave();
     expect(await saveChangesButton.isEnabled()).toBe(true);
   };
 
-  this.expectSaveChangesButtonDisabled = async function() {
+  this.expectSaveChangesButtonDisabled = async function () {
     await action.waitForAutosave();
     expect(await saveChangesButton.isEnabled()).toBe(false);
   };
 
   // ---- NAVIGATION ----
 
-  this.navigateToImprovementsTab = async function() {
+  this.navigateToImprovementsTab = async function () {
     await action.click(
       'Improvements tab button', navigateToImprovementsTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToHistoryTab = async function() {
+  this.navigateToHistoryTab = async function () {
     await action.click('History tab button', navigateToHistoryTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToFeedbackTab = async function() {
+  this.navigateToFeedbackTab = async function () {
     await action.click('Feedback tab button', navigateToFeedbackTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToMainTab = async function() {
+  this.navigateToMainTab = async function () {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
     await action.click('Neutral element', neutralElement);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToPreviewTab = async function() {
+  this.navigateToPreviewTab = async function () {
     await action.click('Preview tab button', navigateToPreviewTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSettingsTab = async function() {
+  this.navigateToSettingsTab = async function () {
     await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToStatsTab = async function() {
+  this.navigateToStatsTab = async function () {
     await action.click('Statistics tab button', navigateToStatsTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToTranslationTab = async function() {
+  this.navigateToTranslationTab = async function () {
     await action.click(
       'Translation tab button', navigateToTranslationTabButton);
     await waitFor.pageToFullyLoad();
@@ -389,7 +389,7 @@ var ExplorationEditorPage = function() {
 
   // ---- INTERNET CONNECTION ----
 
-  this.waitForOnlineAlert = async function() {
+  this.waitForOnlineAlert = async function () {
     await waitFor.visibilityOf(
       toastMessage,
       'Online info toast message taking too long to appear.');
@@ -400,7 +400,7 @@ var ExplorationEditorPage = function() {
       'Online info toast message taking too long to disappear.');
   };
 
-  this.waitForOfflineAlert = async function() {
+  this.waitForOfflineAlert = async function () {
     await waitFor.visibilityOf(
       toastMessage,
       'Offline warning toast message taking too long to appear.');

@@ -28,12 +28,12 @@ import { FlagExplorationModalResult } from '../modals/flag-exploration-modal.com
 export class LearnerLocalNavBackendApiService {
   flagExplorationUrl: string;
 
-  constructor(
+  constructor (
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  async postReportAsync(
+  async postReportAsync (
       explorationId: string, result: FlagExplorationModalResult):
     Promise<Object> {
     this.flagExplorationUrl = this.urlInterpolationService.interpolateUrl(

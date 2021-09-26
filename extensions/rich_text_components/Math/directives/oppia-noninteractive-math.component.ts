@@ -65,7 +65,7 @@ export class NoninteractiveMath implements OnInit, OnChanges {
   imageContainerStyle: ImageContainerStyle;
   imageUrl: string | ArrayBuffer | SafeResourceUrl;
 
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
@@ -74,7 +74,7 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  private _updateImage() {
+  private _updateImage () {
     if (!this.mathContentWithValue) {
       return;
     }
@@ -145,11 +145,11 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateImage();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.mathContentWithValue) {
       this._updateImage();
     }

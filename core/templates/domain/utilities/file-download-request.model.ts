@@ -22,7 +22,7 @@ export class FileDownloadRequest {
   filename: string;
   subscription: Subscription;
 
-  constructor(filename: string, subscription: Subscription) {
+  constructor (filename: string, subscription: Subscription) {
     this.filename = filename;
     this.subscription = subscription;
   }

@@ -32,7 +32,7 @@ export interface CollectionSummaryBackendDict {
 }
 
 export class CollectionSummary {
-  constructor(
+  constructor (
     public category: string,
     public communityOwned: boolean,
     public lastUpdatedMsec: number,
@@ -46,7 +46,7 @@ export class CollectionSummary {
     public title: string,
     public nodeCount: number) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       collectionSummaryDict: CollectionSummaryBackendDict): CollectionSummary {
     return new CollectionSummary(
       collectionSummaryDict.category,

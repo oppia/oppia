@@ -43,19 +43,19 @@ angular.module('oppia').component('hintEditor', {
   controller: [
     'ContextService', 'EditabilityService',
     'ExternalSaveService', 'StateHintsService',
-    function(
+    function (
         ContextService, EditabilityService,
         ExternalSaveService, StateHintsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.openHintEditor = function() {
+      ctrl.openHintEditor = function () {
         if (ctrl.isEditable) {
           ctrl.hintMemento = angular.copy(ctrl.hint);
           ctrl.hintEditorIsOpen = true;
         }
       };
 
-      ctrl.saveThisHint = function() {
+      ctrl.saveThisHint = function () {
         ctrl.hintEditorIsOpen = false;
         var contentHasChanged = (
           ctrl.hintMemento.hintContent.html !==
@@ -69,14 +69,14 @@ angular.module('oppia').component('hintEditor', {
         ctrl.getOnSaveFn()();
       };
 
-      ctrl.cancelThisHintEdit = function() {
+      ctrl.cancelThisHintEdit = function () {
         ctrl.hint.hintContent =
           angular.copy(ctrl.hintMemento.hintContent);
         ctrl.hintMemento = null;
         ctrl.hintEditorIsOpen = false;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(() => {
             if (ctrl.hintEditorIsOpen &&
@@ -99,7 +99,7 @@ angular.module('oppia').component('hintEditor', {
 
         ctrl.hintMemento = null;
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

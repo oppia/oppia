@@ -26,11 +26,11 @@ import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } fr
   providedIn: 'root'
 })
 export class ExplorationIdValidationService {
-  constructor(
+  constructor (
     private explorationSummartBackendApiService:
       ExplorationSummaryBackendApiService) {}
 
-  async isExpPublishedAsync(explorationId: string): Promise<boolean> {
+  async isExpPublishedAsync (explorationId: string): Promise<boolean> {
     return this.explorationSummartBackendApiService.
       loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {

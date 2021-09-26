@@ -33,13 +33,13 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   allowSkillsFromOtherTopics: boolean;
   selectedSkillId: string = null;
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
 
-  confirm(): void {
+  confirm (): void {
     let totalSkills = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
@@ -59,7 +59,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
     this.ngbActiveModal.close(summary);
   }
 
-  setSelectedSkillId(skillId: string): void {
+  setSelectedSkillId (skillId: string): void {
     this.selectedSkillId = skillId;
   }
 }

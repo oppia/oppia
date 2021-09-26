@@ -17,8 +17,8 @@
    args.
  */
 
-angular.module('oppia').filter('isAtMost', [function() {
-  return function(input, args) {
+angular.module('oppia').filter('isAtMost', [function () {
+  return function (input, args) {
     return (input <= args.maxValue);
   };
 }]);

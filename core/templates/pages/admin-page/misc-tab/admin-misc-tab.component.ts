@@ -53,13 +53,13 @@ export class AdminMiscTabComponent {
   authorUsername: string;
   publishedOn: string;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
     private adminTaskManagerService: AdminTaskManagerService
   ) {}
 
-  clearSearchIndex(): void {
+  clearSearchIndex (): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -80,7 +80,7 @@ export class AdminMiscTabComponent {
       });
   }
 
-  regenerateOpportunitiesRelatedToTopic(): void {
+  regenerateOpportunitiesRelatedToTopic (): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -98,7 +98,7 @@ export class AdminMiscTabComponent {
     });
   }
 
-  uploadTopicSimilaritiesFile(): void {
+  uploadTopicSimilaritiesFile (): void {
     let file = (
       <HTMLInputElement>document.getElementById(
         'topicSimilaritiesFile')).files[0];
@@ -116,17 +116,17 @@ export class AdminMiscTabComponent {
     reader.readAsText(file);
   }
 
-  downloadTopicSimilaritiesFile(): void {
+  downloadTopicSimilaritiesFile (): void {
     this.windowRef.nativeWindow.location.href = (
       AdminPageConstants.ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL);
   }
 
-  setDataExtractionQueryStatusMessage(message: string): void {
+  setDataExtractionQueryStatusMessage (message: string): void {
     this.showDataExtractionQueryStatus = true;
     this.dataExtractionQueryStatusMessage = message;
   }
 
-  sendDummyMailToAdmin(): void {
+  sendDummyMailToAdmin (): void {
     this.adminBackendApiService.sendDummyMailToAdminAsync()
       .then(() => {
         this.setStatusMessage.emit('Success! Mail sent to admin.');
@@ -135,7 +135,7 @@ export class AdminMiscTabComponent {
       });
   }
 
-  updateUsername(): void {
+  updateUsername (): void {
     this.setStatusMessage.emit('Updating username...');
     this.adminBackendApiService.updateUserNameAsync(
       this.oldUsername, this.newUsername)
@@ -148,7 +148,7 @@ export class AdminMiscTabComponent {
       });
   }
 
-  updateBlogPostData(): void {
+  updateBlogPostData (): void {
     this.setStatusMessage.emit('Updating blog post data...');
     this.adminBackendApiService.updateBlogPostDataAsync(
       this.blogPostId, this.authorUsername, this.publishedOn)
@@ -160,7 +160,7 @@ export class AdminMiscTabComponent {
       });
   }
 
-  getNumberOfPendingDeletionRequestModels(): void {
+  getNumberOfPendingDeletionRequestModels (): void {
     this.setStatusMessage.emit(
       'Getting the number of users that are being deleted...');
     this.adminBackendApiService.getNumberOfPendingDeletionRequestAsync()
@@ -174,7 +174,7 @@ export class AdminMiscTabComponent {
       );
   }
 
-  grantSuperAdminPrivileges(): void {
+  grantSuperAdminPrivileges (): void {
     this.setStatusMessage.emit('Communicating with Firebase server...');
     this.adminBackendApiService.grantSuperAdminPrivilegesAsync(
       this.usernameToGrant
@@ -187,7 +187,7 @@ export class AdminMiscTabComponent {
       });
   }
 
-  revokeSuperAdminPrivileges(): void {
+  revokeSuperAdminPrivileges (): void {
     this.setStatusMessage.emit('Communicating with Firebase server...');
     this.adminBackendApiService.revokeSuperAdminPrivilegesAsync(
       this.usernameToRevoke
@@ -200,7 +200,7 @@ export class AdminMiscTabComponent {
       });
   }
 
-  getModelsRelatedToUser(): void {
+  getModelsRelatedToUser (): void {
     this.setStatusMessage.emit('Getting the models related to user...');
     this.adminBackendApiService.getModelsRelatedToUserAsync(this.userIdToGet)
       .then(isModal => {
@@ -219,7 +219,7 @@ export class AdminMiscTabComponent {
       );
   }
 
-  deleteUser(): void {
+  deleteUser (): void {
     this.setStatusMessage.emit('Starting the deletion of the user...');
     this.adminBackendApiService.deleteUserAsync(
       this.userIdToDelete, this.usernameToDelete)
@@ -231,7 +231,7 @@ export class AdminMiscTabComponent {
       );
   }
 
-  submitQuery(): void {
+  submitQuery (): void {
     let STATUS_PENDING = (
       'Data extraction query has been submitted. Please wait.');
 
@@ -250,7 +250,7 @@ export class AdminMiscTabComponent {
     this.windowRef.nativeWindow.open(downloadUrl);
   }
 
-  resetForm(): void {
+  resetForm (): void {
     this.expId = '';
     this.expVersion = 0;
     this.stateName = '';

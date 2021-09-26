@@ -43,7 +43,7 @@ import { OppiaAngularRootComponent } from
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('learnerViewInfo', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -55,7 +55,7 @@ angular.module('oppia').directive('learnerViewInfo', [
         'ReadOnlyExplorationBackendApiService', 'SiteAnalyticsService',
         'StatsReportingService', 'UrlInterpolationService', 'UrlService',
         'TOPIC_VIEWER_STORY_URL_TEMPLATE',
-        function(
+        function (
             $log, $rootScope, $uibModal, ContextService,
             LearnerViewInfoBackendApiService,
             ReadOnlyExplorationBackendApiService, SiteAnalyticsService,
@@ -67,7 +67,7 @@ angular.module('oppia').directive('learnerViewInfo', [
           var expInfo = null;
           ctrl.directiveSubscriptions = new Subscription();
 
-          ctrl.showInformationCard = function() {
+          ctrl.showInformationCard = function () {
             let stringifiedExpIds = JSON.stringify(
               [explorationId]);
             let includePrivateExplorations = JSON.stringify(true);
@@ -77,11 +77,11 @@ angular.module('oppia').directive('learnerViewInfo', [
               LearnerViewInfoBackendApiService.fetchLearnerInfoAsync(
                 stringifiedExpIds,
                 includePrivateExplorations
-              ).then(function(response) {
+              ).then(function (response) {
                 expInfo = response.summaries[0];
                 openInformationCardModal();
                 $rootScope.$applyAsync();
-              }, function() {
+              }, function () {
                 $log.error(
                   'Information card failed to load for exploration ' +
                   explorationId);
@@ -90,7 +90,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             }
           };
 
-          var openInformationCardModal = function() {
+          var openInformationCardModal = function () {
             $uibModal.open({
               animation: true,
               template: require(
@@ -98,7 +98,7 @@ angular.module('oppia').directive('learnerViewInfo', [
                 'information-card-modal.directive.html'),
               windowClass: 'oppia-modal-information-card',
               resolve: {
-                expInfo: function() {
+                expInfo: function () {
                   return expInfo;
                 }
               },
@@ -110,7 +110,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             });
           };
 
-          ctrl.getTopicUrl = function() {
+          ctrl.getTopicUrl = function () {
             var topicUrlFragment = (
               UrlService.getTopicUrlFragmentFromLearnerUrl());
             var classroomUrlFragment = (
@@ -124,11 +124,11 @@ angular.module('oppia').directive('learnerViewInfo', [
                 });
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.explorationTitle = 'Loading...';
             ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
               explorationId, UrlService.getExplorationVersionFromUrl())
-              .then(function(response) {
+              .then(function (response) {
                 ctrl.explorationTitle = response.exploration.title;
                 $rootScope.$applyAsync();
               });
@@ -155,7 +155,7 @@ angular.module('oppia').directive('learnerViewInfo', [
                 topicUrlFragment,
                 classroomUrlFragment,
                 storyUrlFragment).then(
-                function(storyDataDict) {
+                function (storyDataDict) {
                   ctrl.storyPlaythroughObject = storyDataDict;
                   var topicName = ctrl.storyPlaythroughObject.topicName;
                   ctrl.topicName = topicName;
@@ -165,7 +165,7 @@ angular.module('oppia').directive('learnerViewInfo', [
                 });
             }
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

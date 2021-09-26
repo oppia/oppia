@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Question Suggestion Review Modal Controller', function() {
+describe('Question Suggestion Review Modal Controller', function () {
   let $scope = null;
   let $http = null;
   let $httpBackend = null;
@@ -51,27 +51,27 @@ describe('Question Suggestion Review Modal Controller', function() {
   let suggestion = null;
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     SuggestionModalService = $injector.get('SuggestionModalService');
     acceptSuggestionSpy = spyOn(SuggestionModalService, 'acceptSuggestion');
     rejectSuggestionSpy = spyOn(SuggestionModalService, 'rejectSuggestion');
     cancelSuggestionSpy = spyOn(SuggestionModalService, 'cancelSuggestion');
   }));
 
-  describe('when skill rubrics is specified', function() {
+  describe('when skill rubrics is specified', function () {
     const skillRubrics = [{
       explanations: ['explanation'],
       difficulty: 'Easy'
     }];
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       const $http = $injector.get('$http');
       $q = $injector.get('$q');
@@ -211,7 +211,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     }));
 
     it('should open edit question modal when clicking on' +
-      ' edit button', function() {
+      ' edit button', function () {
       spyOn($uibModal, 'open').and.callThrough();
 
       $scope.edit();
@@ -221,7 +221,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should return nothing when edit question modal is' +
-      ' resolved', function() {
+      ' resolved', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({})
       });
@@ -233,7 +233,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.authorName).toBe(authorName);
         expect($scope.contentHtml).toBe(contentHtml);
         expect($scope.reviewable).toBe(reviewable);
@@ -249,7 +249,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
 
     it('should register Contributor Dashboard view suggestion for review' +
-      ' event after controller is initialized', function() {
+      ' event after controller is initialized', function () {
       expect(
         // eslint-disable-next-line max-len
         SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
@@ -257,14 +257,14 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should reset validation error message when user updates question',
-      function() {
+      function () {
         $scope.validationError = 'This is an error message';
         $scope.questionChanged();
         expect($scope.validationError).toBe(null);
       });
 
     it('should accept suggestion in suggestion modal when clicking accept' +
-      ' suggestion', function() {
+      ' suggestion', function () {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
@@ -284,7 +284,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should reject suggestion in suggestion modal when clicking reject' +
-    ' suggestion button', function() {
+    ' suggestion button', function () {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
@@ -303,7 +303,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should cancel suggestion in suggestion modal when clicking cancel' +
-    ' suggestion button', function() {
+    ' suggestion button', function () {
       $scope.cancel();
 
       expect(cancelSuggestionSpy).toHaveBeenCalledWith(
@@ -311,10 +311,10 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
   });
 
-  describe('when skill rubrics is not specified', function() {
+  describe('when skill rubrics is not specified', function () {
     const skillRubrics = [];
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
 
@@ -407,15 +407,15 @@ describe('Question Suggestion Review Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.skillRubricExplanations).toBe(
           'This rubric has not yet been specified.');
       });
   });
 
-  describe('when a suggestion is rejected', function() {
+  describe('when a suggestion is rejected', function () {
     let $rootScope = null;
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
       $httpBackend = $injector.get('$httpBackend');
       const skillRubrics = [{
@@ -512,7 +512,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should fetch the rejection message', function() {
+    it('should fetch the rejection message', function () {
       const responseDict = {
         messages: [
           { text: 'Question submitted.' },

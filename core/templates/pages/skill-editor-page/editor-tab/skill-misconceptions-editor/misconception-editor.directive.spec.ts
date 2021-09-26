@@ -29,7 +29,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
-describe('Misconception Editor Directive', function() {
+describe('Misconception Editor Directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -50,7 +50,7 @@ describe('Misconception Editor Directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
@@ -72,20 +72,20 @@ describe('Misconception Editor Directive', function() {
       $scope: $scope
     });
     $scope.misconception = sampleMisconception;
-    $scope.isEditable = function() {
+    $scope.isEditable = function () {
       return true;
     };
     ctrl.$onInit();
   }));
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     expect($scope.nameEditorIsOpen).toEqual(false);
     expect($scope.notesEditorIsOpen).toEqual(false);
     expect($scope.feedbackEditorIsOpen).toEqual(false);
     expect($scope.skill).toEqual(sampleSkill);
   });
 
-  it('should open name editor when clicking on edit button', function() {
+  it('should open name editor when clicking on edit button', function () {
     expect($scope.nameEditorIsOpen).toBe(false);
 
     $scope.openNameEditor();
@@ -93,7 +93,7 @@ describe('Misconception Editor Directive', function() {
     expect($scope.nameEditorIsOpen).toBe(true);
   });
 
-  it('should open notes editor when clicking on edit button', function() {
+  it('should open notes editor when clicking on edit button', function () {
     expect($scope.notesEditorIsOpen).toBe(false);
 
     $scope.openNotesEditor();
@@ -101,7 +101,7 @@ describe('Misconception Editor Directive', function() {
     expect($scope.notesEditorIsOpen).toBe(true);
   });
 
-  it('should open feedback editor when clicking on edit button', function() {
+  it('should open feedback editor when clicking on edit button', function () {
     expect($scope.feedbackEditorIsOpen).toBe(false);
 
     $scope.openFeedbackEditor();
@@ -109,7 +109,7 @@ describe('Misconception Editor Directive', function() {
     expect($scope.feedbackEditorIsOpen).toBe(true);
   });
 
-  it('should save name when clicking on save button', function() {
+  it('should save name when clicking on save button', function () {
     let updateNameSpy = spyOn(
       skillUpdateService, 'updateMisconceptionName').and.returnValue(null);
 
@@ -121,7 +121,7 @@ describe('Misconception Editor Directive', function() {
     expect(updateNameSpy).toHaveBeenCalled();
   });
 
-  it('should save notes when clicking on save button', function() {
+  it('should save notes when clicking on save button', function () {
     let updateNotesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionNotes').and.returnValue(null);
 
@@ -133,7 +133,7 @@ describe('Misconception Editor Directive', function() {
     expect(updateNotesSpy).toHaveBeenCalled();
   });
 
-  it('should save feedback when clicking on save button', function() {
+  it('should save feedback when clicking on save button', function () {
     let updateFeedbackSpy = spyOn(
       skillUpdateService, 'updateMisconceptionFeedback').and.returnValue(null);
 
@@ -146,7 +146,7 @@ describe('Misconception Editor Directive', function() {
       sampleSkill, 'misconceptionId', 'feedback', 'newFeedback');
   });
 
-  it('should close name editor when clicking on cancel button', function() {
+  it('should close name editor when clicking on cancel button', function () {
     expect($scope.nameEditorIsOpen).toBe(false);
 
     $scope.openNameEditor();
@@ -156,7 +156,7 @@ describe('Misconception Editor Directive', function() {
     expect($scope.nameEditorIsOpen).toBe(false);
   });
 
-  it('should close notes editor when clicking on cancel button', function() {
+  it('should close notes editor when clicking on cancel button', function () {
     expect($scope.notesEditorIsOpen).toBe(false);
     $scope.openNotesEditor();
 
@@ -166,7 +166,7 @@ describe('Misconception Editor Directive', function() {
     expect($scope.notesEditorIsOpen).toBe(false);
   });
 
-  it('should close feedback editor when clicking on cancel button', function() {
+  it('should close feedback editor when clicking on cancel button', function () {
     expect($scope.feedbackEditorIsOpen).toBe(false);
     $scope.openFeedbackEditor();
 
@@ -176,7 +176,7 @@ describe('Misconception Editor Directive', function() {
     expect($scope.feedbackEditorIsOpen).toBe(false);
   });
 
-  it('should address the misconception\'s updates', function() {
+  it('should address the misconception\'s updates', function () {
     let updatesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionMustBeAddressed')
       .and.returnValue(null);

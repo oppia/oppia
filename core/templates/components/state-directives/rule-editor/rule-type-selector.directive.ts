@@ -27,7 +27,7 @@ require(
   'state-interaction-id.service');
 require('third-party-imports/select2.import.ts');
 
-angular.module('oppia').directive('ruleTypeSelector', [function() {
+angular.module('oppia').directive('ruleTypeSelector', [function () {
   return {
     restrict: 'E',
     scope: {},
@@ -40,11 +40,11 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
     controller: [
       '$element', '$filter', '$scope',
       'StateInteractionIdService', 'INTERACTION_SPECS',
-      function(
+      function (
           $element, $filter, $scope,
           StateInteractionIdService, INTERACTION_SPECS) {
         var ctrl = this;
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           var choices = [];
 
           var ruleTypesToDescriptions = INTERACTION_SPECS[
@@ -77,7 +77,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
             minimumResultsForSearch: -1,
             width: '100%',
             dropdownParent: $(select2Node).parent(),
-            templateSelection: function(object) {
+            templateSelection: function (object) {
               return $filter('truncateAtFirstEllipsis')(object.text);
             }
           });
@@ -91,7 +91,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           // Initialize the dropdown.
           $(select2Node).val(ctrl.localValue).trigger('change');
 
-          $(select2Node).on('change', function(e) {
+          $(select2Node).on('change', function (e) {
             ctrl.onSelectionChange()($(select2Node).val());
             // This is needed to propagate the change and display input fields
             // for parameterizing the rule. Otherwise, the input fields do not

@@ -23,9 +23,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('filters/convert-unicode-to-html.filter.ts');
 
-describe('HTML to text', function() {
+describe('HTML to text', function () {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -43,8 +43,8 @@ describe('HTML to text', function() {
   ];
 
   it('should convert HTML from raw text correctly', angular.mock.inject(
-    function($filter) {
-      htmlUnicodeHtmlPairings.forEach(function(pairing) {
+    function ($filter) {
+      htmlUnicodeHtmlPairings.forEach(function (pairing) {
         expect($filter('convertUnicodeToHtml')(pairing[1])).toEqual(pairing[2]);
       });
     }

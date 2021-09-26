@@ -55,9 +55,9 @@ export class NoninteractiveTabs implements OnInit, OnChanges {
   @Input() tabContentsWithValue!: string;
   tabContents: TabContent[] = [];
 
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor (private htmlEscaperService: HtmlEscaperService) {}
 
-  private _updateViewOnTabContentChange(): void {
+  private _updateViewOnTabContentChange (): void {
     if (!this.tabContentsWithValue) {
       return;
     }
@@ -65,11 +65,11 @@ export class NoninteractiveTabs implements OnInit, OnChanges {
       this.tabContentsWithValue) as TabContent[];
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateViewOnTabContentChange();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.tabContentsWithValue) {
       this._updateViewOnTabContentChange();
     }

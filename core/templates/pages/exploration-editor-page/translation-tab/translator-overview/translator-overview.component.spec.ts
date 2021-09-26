@@ -37,7 +37,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-var MockWindow = function() {
+var MockWindow = function () {
   var language = 'en';
   this.localStorage = {
     getItem: () => language,
@@ -47,7 +47,7 @@ var MockWindow = function() {
   };
 };
 
-describe('Translator Overview component', function() {
+describe('Translator Overview component', function () {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
@@ -66,7 +66,7 @@ describe('Translator Overview component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
@@ -75,7 +75,7 @@ describe('Translator Overview component', function() {
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('LanguageUtilService', languageUtilService);
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
@@ -92,7 +92,7 @@ describe('Translator Overview component', function() {
     $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     explorationLanguageCodeService = $injector.get(
       'ExplorationLanguageCodeService');
@@ -123,7 +123,7 @@ describe('Translator Overview component', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.languageCode).toBe('en');
       expect($scope.inTranslationMode).toBe(true);
       expect($scope.inVoiceoverMode).toBe(true);
@@ -139,12 +139,12 @@ describe('Translator Overview component', function() {
     });
 
   it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code', function() {
+    ' from exploration\'s language code', function () {
     expect($scope.canShowTabModeSwitcher()).toBe(true);
   });
 
   it('should change to voiceover active mode when changing translation tab',
-    function() {
+    function () {
       spyOn(translationTabActiveModeService, 'activateVoiceoverMode');
       $scope.changeActiveMode('Voiceover');
 
@@ -153,7 +153,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should change to translation active mode when changing translation tab',
-    function() {
+    function () {
       spyOn(translationTabActiveModeService, 'activateTranslationMode');
       $scope.changeActiveMode('Translate');
 
@@ -162,7 +162,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should change translation language when translation tab is not busy',
-    function() {
+    function () {
       spyOn(translationLanguageService, 'setActiveLanguageCode');
       $scope.languageCode = 'es';
       $scope.changeTranslationLanguage();
@@ -172,7 +172,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should not change translation language when translation tab is busy',
-    function() {
+    function () {
       ctrl.isTranslationTabBusy = true;
       var showTranslationTabBusyModalEmitter = new EventEmitter();
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
@@ -188,7 +188,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should get translation bar progress data when there are more' +
-    ' than 1 item to be translated', function() {
+    ' than 1 item to be translated', function () {
     spyOn(translationStatusService, 'getExplorationContentRequiredCount').and
       .returnValue(3);
     spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
@@ -199,7 +199,7 @@ describe('Translator Overview component', function() {
   });
 
   it('should get translation bar progress data when there is 1 item to be' +
-    ' translated', function() {
+    ' translated', function () {
     spyOn(translationStatusService, 'getExplorationContentRequiredCount')
       .and.returnValue(2);
     spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
@@ -210,7 +210,7 @@ describe('Translator Overview component', function() {
   });
 
   it('should apply autofocus to history tab element when tab is switched',
-    function() {
+    function () {
       spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
       spyOn(focusManagerService, 'setFocus');
       ctrl.$onInit();

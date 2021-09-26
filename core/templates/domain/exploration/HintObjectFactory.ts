@@ -31,11 +31,11 @@ export interface HintBackendDict {
 
 export class Hint {
   hintContent: SubtitledHtml;
-  constructor(hintContent: SubtitledHtml) {
+  constructor (hintContent: SubtitledHtml) {
     this.hintContent = hintContent;
   }
 
-  toBackendDict(): HintBackendDict {
+  toBackendDict (): HintBackendDict {
     return {
       hint_content: this.hintContent.toBackendDict()
     };
@@ -46,15 +46,15 @@ export class Hint {
   providedIn: 'root'
 })
 export class HintObjectFactory {
-  constructor() {}
+  constructor () {}
 
-  createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
+  createFromBackendDict (hintBackendDict: HintBackendDict): Hint {
     return new Hint(
       SubtitledHtml.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId: string, hintContent: string): Hint {
+  createNew (hintContentId: string, hintContent: string): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
         hintContent, hintContentId));

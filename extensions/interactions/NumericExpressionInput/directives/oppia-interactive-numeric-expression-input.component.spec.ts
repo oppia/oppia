@@ -38,36 +38,36 @@ describe('NumericExpressionInputInteractive', () => {
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
-      asciimath: function() {
+      asciimath: function () {
         return 'Dummy value';
       }
     }
   };
   class MockGuppy {
-    constructor(id: string, config: Object) {}
+    constructor (id: string, config: Object) {}
 
-    asciimath() {
+    asciimath () {
       return 'Dummy value';
     }
-    configure(name: string, val: Object): void {}
-    static event(name: string, handler: Function): void {
+    configure (name: string, val: Object): void {}
+    static event (name: string, handler: Function): void {
       handler({focused: true});
     }
-    static configure(name: string, val: Object): void {}
-    static 'remove_global_symbol'(symbol: string): void {}
-    static 'add_global_symbol'(name: string, symbol: Object): void {}
+    static configure (name: string, val: Object): void {}
+    static 'remove_global_symbol' (symbol: string): void {}
+    static 'add_global_symbol' (name: string, symbol: Object): void {}
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit (answer, rulesService) {}
+    registerCurrentInteraction (submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();
     }
   }
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(inputType: string, attributes: Object) {
+    getValuesFromAttributes (inputType: string, attributes: Object) {
       return {
         useFractionForDivision: {
           value: {}
@@ -117,7 +117,7 @@ describe('NumericExpressionInputInteractive', () => {
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
-  it('should not submit the answer if invalid', function() {
+  it('should not submit the answer if invalid', function () {
     component.hasBeenTouched = true;
     // Invalid answer.
     component.value = '1/';
@@ -129,7 +129,7 @@ describe('NumericExpressionInputInteractive', () => {
       'Your answer seems to be missing a variable/number after the "/".');
   });
 
-  it('should submit the answer if valid', function() {
+  it('should submit the answer if valid', function () {
     component.hasBeenTouched = true;
     component.value = '1+1';
     spyOn(mockCurrentInteractionService, 'onSubmit');
@@ -138,7 +138,7 @@ describe('NumericExpressionInputInteractive', () => {
     expect(component.warningText).toBe('');
   });
 
-  it('should correctly validate current answer', function() {
+  it('should correctly validate current answer', function () {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
     fixture.detectChanges();
@@ -154,7 +154,7 @@ describe('NumericExpressionInputInteractive', () => {
       component.warningText).toBe('Please enter an answer before submitting.');
   });
 
-  it('should set the value of showOSK to true', function() {
+  it('should set the value of showOSK to true', function () {
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 

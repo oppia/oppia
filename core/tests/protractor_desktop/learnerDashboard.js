@@ -40,7 +40,7 @@ var ExplorationEditorPage =
 var Constants = require('../protractor_utils/ProtractorConstants.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Learner dashboard functionality', function () {
   var explorationPlayerPage = null;
   var topicsAndSkillsDashboardPage = null;
   var adminPage = null;
@@ -54,7 +54,7 @@ describe('Learner dashboard functionality', function() {
   var skillEditorPage = null;
   var dummyExplorationIds = [];
 
-  var createDummyExplorations = async function() {
+  var createDummyExplorations = async function () {
     var EXPLORATION = {
       category: 'Learning',
       objective: 'The goal is to check story viewer functionality.',
@@ -74,7 +74,7 @@ describe('Learner dashboard functionality', function() {
     }
   };
 
-  beforeAll(function() {
+  beforeAll(function () {
     libraryPage = new LibraryPage.LibraryPage();
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
@@ -92,7 +92,7 @@ describe('Learner dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should display learners subscriptions', async function() {
+  it('should display learners subscriptions', async function () {
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
@@ -137,7 +137,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display learner feedback threads', async function() {
+  it('should display learner feedback threads', async function () {
     await users.createUser(
       'learner2@learnerDashboard.com', 'learner2learnerDashboard');
     await users.createUser(
@@ -168,7 +168,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should add exploration to play later list', async function() {
+  it('should add exploration to play later list', async function () {
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -217,7 +217,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display correct topics in edit goals, suggested for you section,' +
-    ' current goals and continue where you left off section', async function() {
+    ' current goals and continue where you left off section', async function () {
     var TOPIC_NAME = 'Learner Dashboard Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';
@@ -254,7 +254,7 @@ describe('Learner dashboard functionality', function() {
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
       'List',
-      async function(elem) {
+      async function (elem) {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
@@ -313,7 +313,7 @@ describe('Learner dashboard functionality', function() {
 
   it('should display all the topics that are partially learnt or learnt ' +
     'in skill proficiency section, learnt topics in completed goals section ' +
-    'and completed stories in completed stories section', async function() {
+    'and completed stories in completed stories section', async function () {
     var TOPIC_NAME = 'Learner Dashboard Topic 2';
     var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-two';
     var TOPIC_DESCRIPTION = 'Topic description';
@@ -331,7 +331,7 @@ describe('Learner dashboard functionality', function() {
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
       'List',
-      async function(elem) {
+      async function (elem) {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
@@ -462,7 +462,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

@@ -26,11 +26,11 @@ import { RefresherExplorationConfirmationModal } from '../modals/refresher-explo
   providedIn: 'root'
 })
 export class RefresherExplorationConfirmationModalService {
-  constructor(
+  constructor (
     private ngbModal: NgbModal
   ) {}
 
-  displayRedirectConfirmationModal(
+  displayRedirectConfirmationModal (
       refresherExplorationId: string,
       redirectConfirmationCallback: () => void): void {
     let modalRef: NgbModalRef = this.ngbModal.open(

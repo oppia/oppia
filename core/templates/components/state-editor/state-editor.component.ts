@@ -105,7 +105,7 @@ angular.module('oppia').component('stateEditor', {
     'StateNextContentIdIndexService', 'StateParamChangesService',
     'StateSolicitAnswerDetailsService', 'StateSolutionService',
     'UrlInterpolationService', 'WindowDimensionsService', 'INTERACTION_SPECS',
-    function(
+    function (
         $scope, StateCardIsCheckpointService, StateContentService,
         StateCustomizationArgsService, StateEditorService,
         StateHintsService, StateInteractionIdService,
@@ -115,7 +115,7 @@ angular.module('oppia').component('stateEditor', {
         UrlInterpolationService, WindowDimensionsService, INTERACTION_SPECS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var updateInteractionVisibility = function(newInteractionId) {
+      var updateInteractionVisibility = function (newInteractionId) {
         $scope.interactionIdIsSet = Boolean(newInteractionId);
         $scope.currentInteractionCanHaveSolution = Boolean(
           $scope.interactionIdIsSet &&
@@ -125,15 +125,15 @@ angular.module('oppia').component('stateEditor', {
             newInteractionId].is_terminal);
       };
 
-      $scope.reinitializeEditor = function() {
+      $scope.reinitializeEditor = function () {
         StateEditorService.onStateEditorInitialized.emit($scope.stateData);
       };
 
-      $scope.toggleConceptCard = function() {
+      $scope.toggleConceptCard = function () {
         $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/avatar/oppia_avatar_100px.svg');
         $scope.currentStateIsTerminal = false;
@@ -190,7 +190,7 @@ angular.module('oppia').component('stateEditor', {
         StateEditorService.onStateEditorDirectiveInitialized.emit();
         StateEditorService.updateStateEditorDirectiveInitialised();
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

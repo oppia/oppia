@@ -61,7 +61,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
   interactionIsActive: boolean = false;
   errorMessage: string = '';
 
-  constructor(
+  constructor (
     private currentInteractionService: CurrentInteractionService,
     private graphInputRulesService: GraphInputRulesService,
     private interactionAttributesExtractorService:
@@ -69,7 +69,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     private playerPositionService: PlayerPositionService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => {
@@ -130,7 +130,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
       canEditEdgeWeight.value : false;
   }
 
-  private _getAttrs() {
+  private _getAttrs () {
     return {
       graphWithValue: this.graphWithValue,
       canAddVertexWithValue: this.canAddVertexWithValue,
@@ -143,13 +143,13 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     };
   }
 
-  submitGraph(): void {
+  submitGraph (): void {
     this.currentInteractionService.onSubmit(
       cloneDeep<GraphAnswer>(this.graph) as unknown as string,
       this.graphInputRulesService as unknown as InteractionRulesService);
   }
 
-  resetGraph(): void {
+  resetGraph (): void {
     const {
       graph
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
@@ -165,15 +165,15 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
   }
 
   // TODO(#12104): Write this function.
-  checkValidGraph(graph: GraphAnswer): boolean {
+  checkValidGraph (graph: GraphAnswer): boolean {
     return Boolean(graph);
   }
 
-  validityCheckFn(): boolean {
+  validityCheckFn (): boolean {
     return this.checkValidGraph(this.graph);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.componentSubscriptions.unsubscribe();
   }
 }

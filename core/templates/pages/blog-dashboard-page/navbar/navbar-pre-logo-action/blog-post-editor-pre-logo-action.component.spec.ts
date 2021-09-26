@@ -36,7 +36,7 @@ describe('Blog Dashboard Page Component', () => {
         hash: '/'
       },
       open: (url) => { },
-      onhashchange() {
+      onhashchange () {
         return this.location._hashChange;
       },
     };

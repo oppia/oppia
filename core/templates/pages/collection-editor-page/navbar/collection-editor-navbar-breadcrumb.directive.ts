@@ -29,7 +29,7 @@ require('services/stateful/focus-manager.service.ts');
 // it does not yet have one) or setting a new title in the case of an untitled
 // collection.
 angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,7 +41,7 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
       controller: [
         'CollectionEditorStateService', 'FocusManagerService',
         'RouterService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
-        function(
+        function (
             CollectionEditorStateService, FocusManagerService,
             RouterService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
@@ -53,16 +53,16 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
             improvements: 'Improvements',
             history: 'History',
           };
-          ctrl.getCurrentTabName = function() {
+          ctrl.getCurrentTabName = function () {
             return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
               RouterService.getActiveTabName()];
           };
 
-          ctrl.editCollectionTitle = function() {
+          ctrl.editCollectionTitle = function () {
             RouterService.navigateToSettingsTab();
             FocusManagerService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.collection = CollectionEditorStateService.getCollection();
           };
         }

@@ -43,16 +43,16 @@ interface Range {
   providedIn: 'root'
 })
 export class NumericInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: NumericInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
@@ -89,7 +89,7 @@ export class NumericInputValidationService {
     };
 
     var ranges = [];
-    var raiseWarningForRuleIsInclusivelyBetween = function(
+    var raiseWarningForRuleIsInclusivelyBetween = function (
         ruleIndex: number, answerGroupIndex: number) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -99,7 +99,7 @@ export class NumericInputValidationService {
           'is greater than the first number.')
       });
     };
-    var raiseWarningForRequireNonnegativeInput = function(
+    var raiseWarningForRequireNonnegativeInput = function (
         ruleIndex: number, input: number) {
       if (input < 0 && customizationArgs.requireNonnegativeInput.value) {
         warningsList.push({
@@ -206,7 +206,7 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
-  getErrorString(
+  getErrorString (
       value: number, customizationArgs: boolean
   ): string | undefined {
     let stringValue = null;

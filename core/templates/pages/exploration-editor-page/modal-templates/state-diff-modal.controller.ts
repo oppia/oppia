@@ -27,7 +27,7 @@ angular.module('oppia').controller('StateDiffModalController', [
   '$controller', '$http', '$scope', '$timeout', '$uibModalInstance',
   'ContextService', 'UrlInterpolationService', 'headers', 'newState',
   'newStateName', 'oldState', 'oldStateName',
-  function(
+  function (
       $controller, $http, $scope, $timeout, $uibModalInstance,
       ContextService, UrlInterpolationService, headers, newState,
       newStateName, oldState, oldStateName) {
@@ -55,14 +55,14 @@ angular.module('oppia').controller('StateDiffModalController', [
       $http.post(STATE_YAML_URL, {
         state_dict: oldState.toBackendDict(),
         width: 50
-      }).then(function(response) {
+      }).then(function (response) {
         $scope.yamlStrs.leftPane = response.data.yaml;
       });
     } else {
       // Note: the timeout is needed or the string will be sent
       // before codemirror has fully loaded and will not be
       // displayed. This causes issues with the e2e tests.
-      $timeout(function() {
+      $timeout(function () {
         $scope.yamlStrs.leftPane = '';
       }, 200);
     }
@@ -71,14 +71,14 @@ angular.module('oppia').controller('StateDiffModalController', [
       $http.post(STATE_YAML_URL, {
         state_dict: newState.toBackendDict(),
         width: 50
-      }).then(function(response) {
+      }).then(function (response) {
         $scope.yamlStrs.rightPane = response.data.yaml;
       });
     } else {
       // Note: the timeout is needed or the string will be sent
       // before codemirror has fully loaded and will not be
       // displayed. This causes issues with the e2e tests.
-      $timeout(function() {
+      $timeout(function () {
         $scope.yamlStrs.rightPane = '';
       }, 200);
     }

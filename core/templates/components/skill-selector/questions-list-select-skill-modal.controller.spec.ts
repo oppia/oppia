@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for QuestionsListSelectSkillModalController.
  */
 
-describe('Questions List Select Skill Modal Controller', function() {
+describe('Questions List Select Skill Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var skillsInSameTopicCount = 3;
@@ -29,7 +29,7 @@ describe('Questions List Select Skill Modal Controller', function() {
   }];
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -45,13 +45,13 @@ describe('Questions List Select Skill Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
       expect($scope.selectedSkillId).toBe(null);
       expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
     });
 
-  it('should save selected skill when closing the modal', function() {
+  it('should save selected skill when closing the modal', function () {
     $scope.selectedSkillId = '2';
     $scope.save();
     expect($scope.selectedSkillId).toBe('2');

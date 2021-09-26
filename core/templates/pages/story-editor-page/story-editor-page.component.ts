@@ -57,7 +57,7 @@ angular.module('oppia').component('storyEditorPage', {
     'StoryValidationService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
-    function(
+    function (
         $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService, LoaderService,
         PageTitleService, PreventPageUnloadEventService,
@@ -69,7 +69,7 @@ angular.module('oppia').component('storyEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-      ctrl.returnToTopicEditorPage = function() {
+      ctrl.returnToTopicEditorPage = function () {
         if (UndoRedoService.getChangeCount() > 0) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -77,7 +77,7 @@ angular.module('oppia').component('storyEditorPage', {
               'story-save-pending-changes-modal.template.html'),
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {}, function() {
+          }).result.then(function () {}, function () {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -93,18 +93,18 @@ angular.module('oppia').component('storyEditorPage', {
             ), '_self');
         }
       };
-      var setDocumentTitle = function() {
+      var setDocumentTitle = function () {
         PageTitleService.setDocumentTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
         PageTitleService.setNavbarSubtitleForMobileView(
           StoryEditorStateService.getStory().getTitle());
       };
 
-      ctrl.getActiveTab = function() {
+      ctrl.getActiveTab = function () {
         return StoryEditorNavigationService.getActiveTab();
       };
 
-      ctrl.getNavbarText = function() {
+      ctrl.getNavbarText = function () {
         const activeTab = StoryEditorNavigationService.getActiveTab();
         if (activeTab === 'story_editor') {
           return 'Story Editor';
@@ -115,16 +115,16 @@ angular.module('oppia').component('storyEditorPage', {
         }
       };
 
-      ctrl.toggleWarnings = function() {
+      ctrl.toggleWarnings = function () {
         ctrl.warningsAreShown = !ctrl.warningsAreShown;
       };
 
-      ctrl.isMainEditorTabSelected = function() {
+      ctrl.isMainEditorTabSelected = function () {
         const activeTab = StoryEditorNavigationService.getActiveTab();
         return activeTab === 'story_editor' || activeTab === 'chapter_editor';
       };
 
-      var _validateStory = function() {
+      var _validateStory = function () {
         ctrl.validationIssues = ctrl.story.validate();
         var nodes = ctrl.story.getStoryContents().getNodes();
         let skillIdsInTopic = StoryEditorStateService.getSkillSummaries().map(
@@ -151,7 +151,7 @@ angular.module('oppia').component('storyEditorPage', {
             nodePrepublishValidationIssues));
       };
 
-      var _validateExplorations = function() {
+      var _validateExplorations = function () {
         var nodes = ctrl.story.getStoryContents().getNodes();
         var explorationIds = [];
 
@@ -171,7 +171,7 @@ angular.module('oppia').component('storyEditorPage', {
           if (explorationIds.length > 0) {
             EditableStoryBackendApiService.validateExplorationsAsync(
               ctrl.story.getId(), explorationIds
-            ).then(function(validationIssues) {
+            ).then(function (validationIssues) {
               ctrl.explorationValidationIssues =
                   ctrl.explorationValidationIssues.concat(validationIssues);
             });
@@ -180,28 +180,28 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorStateService.resetExpIdsChanged();
       };
 
-      ctrl.getTotalWarningsCount = function() {
+      ctrl.getTotalWarningsCount = function () {
         return (
           ctrl.validationIssues.length +
             ctrl.explorationValidationIssues.length +
             ctrl.prepublishValidationIssues.length);
       };
 
-      var _initPage = function() {
+      var _initPage = function () {
         ctrl.story = StoryEditorStateService.getStory();
         setDocumentTitle();
         _validateStory();
       };
 
-      ctrl.navigateToStoryPreviewTab = function() {
+      ctrl.navigateToStoryPreviewTab = function () {
         StoryEditorNavigationService.navigateToStoryPreviewTab();
       };
 
-      ctrl.navigateToStoryEditor = function() {
+      ctrl.navigateToStoryEditor = function () {
         StoryEditorNavigationService.navigateToStoryEditor();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         LoaderService.showLoadingScreen('Loading Story');
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryInitialized.subscribe(
@@ -240,7 +240,7 @@ angular.module('oppia').component('storyEditorPage', {
         );
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

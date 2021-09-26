@@ -66,7 +66,7 @@ angular.module('oppia').controller('TrainingModalController', [
   'ExplorationStatesService', 'ExplorationWarningsService', 'GraphDataService',
   'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
   'TrainingDataService', 'finishTrainingCallback', 'unhandledAnswer',
-  function(
+  function (
       $injector, $scope, $uibModalInstance, AngularNameService,
       AnswerClassificationService, AnswerGroupObjectFactory,
       ExplorationStatesService, ExplorationWarningsService, GraphDataService,
@@ -82,12 +82,12 @@ angular.module('oppia').controller('TrainingModalController', [
     };
     $scope.addingNewResponse = false;
 
-    var _saveNewAnswerGroup = function(newAnswerGroup) {
+    var _saveNewAnswerGroup = function (newAnswerGroup) {
       var answerGroups = ResponsesService.getAnswerGroups();
       answerGroups.push(newAnswerGroup);
       ResponsesService.save(
         answerGroups, ResponsesService.getDefaultOutcome(),
-        function(newAnswerGroups, newDefaultOutcome) {
+        function (newAnswerGroups, newDefaultOutcome) {
           ExplorationStatesService.saveInteractionAnswerGroups(
             StateEditorService.getActiveStateName(),
             angular.copy(newAnswerGroups));
@@ -101,11 +101,11 @@ angular.module('oppia').controller('TrainingModalController', [
         });
     };
 
-    $scope.exitTrainer = function() {
+    $scope.exitTrainer = function () {
       $uibModalInstance.close();
     };
 
-    $scope.onConfirm = function() {
+    $scope.onConfirm = function () {
       var index = $scope.classification.answerGroupIndex;
       if (index > ResponsesService.getAnswerGroupCount()) {
         var newOutcome = $scope.classification.newOutcome;
@@ -126,7 +126,7 @@ angular.module('oppia').controller('TrainingModalController', [
       $uibModalInstance.close();
     };
 
-    $scope.init = function() {
+    $scope.init = function () {
       var currentStateName =
         StateEditorService.getActiveStateName();
       var state = ExplorationStatesService.getState(currentStateName);

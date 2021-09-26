@@ -109,7 +109,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-  constructor(
+  constructor (
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
@@ -128,7 +128,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.getProfileImageDataAsync();
     this.currentUrl =
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
@@ -244,16 +244,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(this.truncateNavbar, 0);
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
+  async getProfileImageDataAsync (): Promise<void> {
     let dataUrl = await this.userService.getProfileImageDataUrlAsync();
     this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  changeLanguage(languageCode: string, languageText: string): void {
+  changeLanguage (languageCode: string, languageText: string): void {
     this.currentLanguageCode = languageCode;
     this.currentLanguageText = languageText;
     this.i18nLanguageCodeService.setI18nLanguageCode(languageCode);
@@ -265,7 +265,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  onLoginButtonClicked(): void {
+  onLoginButtonClicked (): void {
     this.userService.getLoginUrlAsync().then(
       (loginUrl) => {
         if (loginUrl) {
@@ -280,7 +280,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  onLogoutButtonClicked(): void {
+  onLogoutButtonClicked (): void {
     this.windowRef.nativeWindow.localStorage.removeItem(
       'last_uploaded_audio_lang');
   }
@@ -291,16 +291,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (aboutMenu,profileMenu).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu (evt: KeyboardEvent, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.navigationService.openSubmenu(evt, menuName);
   }
 
-  closeSubmenu(evt: KeyboardEvent): void {
+  closeSubmenu (evt: KeyboardEvent): void {
     this.navigationService.closeSubmenu(evt);
   }
 
-  closeSubmenuIfNotMobile(evt: KeyboardEvent): void {
+  closeSubmenuIfNotMobile (evt: KeyboardEvent): void {
     if (this.deviceInfoService.isMobileDevice()) {
       return;
     }
@@ -318,7 +318,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * @example
    *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
    */
-  onMenuKeypress(
+  onMenuKeypress (
       evt: KeyboardEvent, menuName: string,
       eventsTobeHandled: EventToCodes): void {
     this.navigationService.onMenuKeypress(
@@ -326,15 +326,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 
-  isSidebarShown(): boolean {
+  isSidebarShown (): boolean {
     return this.sidebarStatusService.isSidebarShown();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar (): void {
     this.sidebarStatusService.toggleSidebar();
   }
 
-  navigateToClassroomPage(classroomUrl: string): void {
+  navigateToClassroomPage (classroomUrl: string): void {
     this.siteAnalyticsService.registerClassroomHeaderClickEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = classroomUrl;
@@ -347,7 +347,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * no text content, so their innerText.length value will be 0.
    * @returns {boolean}
    */
-  checkIfI18NCompleted(): boolean {
+  checkIfI18NCompleted (): boolean {
     var i18nCompleted = true;
     var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
     for (var i = 0; i < tabs.length; i++) {
@@ -364,7 +364,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * for overflow. If overflow is detected, hides the least important
    * tab and then calls itself again after a 50ms delay.
    */
-  truncateNavbar(): void {
+  truncateNavbar (): void {
     // If the window is narrow, the standard nav tabs are not shown.
     if (this.windowDimensionsService?.isWindowNarrow()) {
       return;
@@ -400,7 +400,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

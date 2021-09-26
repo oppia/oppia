@@ -26,7 +26,7 @@ export class NgInitDirective implements OnInit {
   // This should be same as the selector. Please change both if changing one.
   @Output() oppiaNgInit: EventEmitter<void> = new EventEmitter<void>();
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.oppiaNgInit.emit();
   }
 }

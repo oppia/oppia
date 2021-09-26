@@ -45,7 +45,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('History tab component', function() {
+describe('History tab component', function () {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
@@ -79,13 +79,13 @@ describe('History tab component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
     editabilityService = TestBed.get(EditabilityService);
     windowRef = TestBed.get(WindowRef);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', TestBed.get(AnswerGroupObjectFactory));
     $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
@@ -121,7 +121,7 @@ describe('History tab component', function() {
     });
     $provide.value('RouterService', {
       onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
-      getActiveTabName() {
+      getActiveTabName () {
         return ('main');
       },
     });
@@ -130,7 +130,7 @@ describe('History tab component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -158,7 +158,7 @@ describe('History tab component', function() {
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect(ctrl.explorationId).toBe(explorationId);
       expect(ctrl.explorationAllSnapshotsUrl).toBe(
         '/createhandler/snapshots/exp1');
@@ -172,7 +172,7 @@ describe('History tab component', function() {
     });
 
   it('should refresh version history when refreshVersionHistory flag is' +
-    ' broadcasted and force refresh is true', function() {
+    ' broadcasted and force refresh is true', function () {
     $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
       snapshots: snapshots
     });
@@ -195,7 +195,7 @@ describe('History tab component', function() {
     expect(ctrl.comparisonsAreDisabled).toBe(false);
   });
 
-  it('should compare selected versions successfully', function() {
+  it('should compare selected versions successfully', function () {
     $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
       snapshots: snapshots
     });
@@ -234,7 +234,7 @@ describe('History tab component', function() {
         ' This is the commit message 2');
   });
 
-  it('should open a new tab for download exploration with version', function() {
+  it('should open a new tab for download exploration with version', function () {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       open: jasmine.createSpy('open', () => {})
     });
@@ -244,7 +244,7 @@ describe('History tab component', function() {
       '/createhandler/download/exp1?v=1', '&output_format=zip');
   });
 
-  it('should open revert exploration modal', function() {
+  it('should open revert exploration modal', function () {
     spyOn($uibModal, 'open').and.callThrough();
 
     ctrl.showRevertExplorationModal();
@@ -252,7 +252,7 @@ describe('History tab component', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('should reload page when closing revert exploration modal', function() {
+  it('should reload page when closing revert exploration modal', function () {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         reload: jasmine.createSpy('reload', () => {})
@@ -271,7 +271,7 @@ describe('History tab component', function() {
   });
 
   it('should not reload page when dismissing revert exploration modal',
-    function() {
+    function () {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           reload: jasmine.createSpy('reload', () => {})
@@ -287,12 +287,12 @@ describe('History tab component', function() {
       expect(windowRef.nativeWindow.location.reload).not.toHaveBeenCalled();
     });
 
-  it('should return if the content is editable', function() {
+  it('should return if the content is editable', function () {
     spyOn(editabilityService, 'isEditable').and.returnValue(false);
     expect(ctrl.isEditable()).toEqual(false);
   });
 
-  it('should filter the history by username', function() {
+  it('should filter the history by username', function () {
     var snapshots = [{
       commit_message: 'This is the commit message',
       committerId: 'committer_3',
@@ -330,13 +330,13 @@ describe('History tab component', function() {
     expect(ctrl.explorationVersionMetadata).toEqual([snapshots[2]]);
   });
 
-  it('should reset the graph', function() {
+  it('should reset the graph', function () {
     ctrl.hideHistoryGraph = false;
     ctrl.resetGraph();
     expect(ctrl.hideHistoryGraph).toBe(true);
   });
 
-  it('should reverse the array when the date filter is applied', function() {
+  it('should reverse the array when the date filter is applied', function () {
     var snapshots = [{
       commit_message: 'This is the commit message',
       committerId: 'committer_3',
@@ -369,7 +369,7 @@ describe('History tab component', function() {
     expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(3);
   });
 
-  it('should find the versions to compare', function() {
+  it('should find the versions to compare', function () {
     ctrl.selectedVersionsArray = [1, 4];
     ctrl.compareVersionMetadata = {};
     ctrl.totalExplorationVersionMetadata = [

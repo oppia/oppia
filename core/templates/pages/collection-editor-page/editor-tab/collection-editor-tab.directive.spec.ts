@@ -29,7 +29,7 @@ describe('Collection Editor Tab', () => {
   let CollectionEditorStateService = null;
   let CollectionLinearizerService = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');

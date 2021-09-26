@@ -57,7 +57,7 @@ describe('QuestionPlayerComponent', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     mockWindow = {
       location: {
         href: ''
@@ -67,7 +67,7 @@ describe('QuestionPlayerComponent', () => {
   }));
 
   beforeEach(angular.mock.inject(
-    function($injector, $componentController) {
+    function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $location = $injector.get('$location');

@@ -47,9 +47,9 @@ export interface BlogDashboardData {
   providedIn: 'root'
 })
 export class BlogDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  async fetchBlogDashboardDataAsync(): Promise<BlogDashboardData> {
+  async fetchBlogDashboardDataAsync (): Promise<BlogDashboardData> {
     return new Promise((resolve, reject) => {
       this.http.get<BlogDashboardBackendResponse>(
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE).toPromise()
@@ -76,7 +76,7 @@ export class BlogDashboardBackendApiService {
     });
   }
 
-  async createBlogPostAsync(): Promise<string> {
+  async createBlogPostAsync (): Promise<string> {
     return new Promise((resolve, reject) => {
       this.http.post<NewBlogPostBackendResponse>(
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}

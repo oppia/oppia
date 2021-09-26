@@ -42,7 +42,7 @@ export class AnswerGroup {
   outcome: Outcome;
   trainingData: readonly InteractionAnswer[];
   taggedSkillMisconceptionId: string | null;
-  constructor(
+  constructor (
       rules: Rule[], outcome: Outcome,
       trainingData: readonly InteractionAnswer[],
       taggedSkillMisconceptionId: string | null) {
@@ -52,7 +52,7 @@ export class AnswerGroup {
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
   }
 
-  toBackendDict(): AnswerGroupBackendDict {
+  toBackendDict (): AnswerGroupBackendDict {
     return {
       rule_specs: this.rules.map(rule => rule.toBackendDict()),
       outcome: this.outcome.toBackendDict(),
@@ -66,11 +66,11 @@ export class AnswerGroup {
   providedIn: 'root'
 })
 export class AnswerGroupObjectFactory {
-  constructor(
+  constructor (
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
 
-  generateRulesFromBackendDict(
+  generateRulesFromBackendDict (
       ruleBackendDicts: RuleBackendDict[],
       interactionId: string | null
   ): Rule[] {
@@ -80,7 +80,7 @@ export class AnswerGroupObjectFactory {
     );
   }
 
-  createNew(
+  createNew (
       rules: Rule[], outcome: Outcome,
       trainingData: readonly InteractionAnswer[],
       taggedSkillMisconceptionId: string | null): AnswerGroup {
@@ -88,7 +88,7 @@ export class AnswerGroupObjectFactory {
       rules, outcome, trainingData, taggedSkillMisconceptionId);
   }
 
-  createFromBackendDict(
+  createFromBackendDict (
       answerGroupBackendDict: AnswerGroupBackendDict,
       interactionId: string | null
   ): AnswerGroup {

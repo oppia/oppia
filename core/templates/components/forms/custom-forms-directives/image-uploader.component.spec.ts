@@ -263,7 +263,7 @@ describe('ImageUploaderComponent', () => {
   it('should prevent default browser behavior if user drops an image outside' +
     ' of image-uploader', () => {
     let mockWindow = {
-      addEventListener: function(eventname: string, callback: () => {}) {
+      addEventListener: function (eventname: string, callback: () => {}) {
         document.addEventListener('mock' + eventname, callback);
       }
     };

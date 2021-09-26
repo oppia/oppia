@@ -20,7 +20,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'truncateAtFirstLine'})
 export class TruncateAtFirstLinePipe implements PipeTransform {
-  transform(input: string): string {
+  transform (input: string): string {
     if (!input) {
       return input;
     }

@@ -65,9 +65,9 @@ export interface BlogAdminPageData {
 })
 
 export class BlogAdminBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  async getDataAsync(): Promise<BlogAdminPageData> {
+  async getDataAsync (): Promise<BlogAdminPageData> {
     return new Promise((resolve, reject) => {
       this.http.get<BlogAdminPageDataBackendDict>(
         '/blogadminhandler').toPromise().then(response => {
@@ -82,7 +82,7 @@ export class BlogAdminBackendApiService {
     });
   }
 
-  private async _postRequestAsync(
+  private async _postRequestAsync (
       handlerUrl: string, payload: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (action) {
@@ -101,7 +101,7 @@ export class BlogAdminBackendApiService {
     });
   }
 
-  async saveConfigPropertiesAsync(
+  async saveConfigPropertiesAsync (
       newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
     let action = 'save_config_properties';
     let payload = {
@@ -110,7 +110,7 @@ export class BlogAdminBackendApiService {
     return this._postRequestAsync('/blogadminhandler', payload, action);
   }
 
-  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
+  async revertConfigPropertyAsync (configPropertyId: string): Promise<void> {
     let action = 'revert_config_property';
     let payload = {
       config_property_id: configPropertyId
@@ -118,7 +118,7 @@ export class BlogAdminBackendApiService {
     return this._postRequestAsync('/blogadminhandler', payload, action);
   }
 
-  async updateUserRoleAsync(
+  async updateUserRoleAsync (
       newRole: string, username: string): Promise<void> {
     let payload = {
       role: newRole,
@@ -128,7 +128,7 @@ export class BlogAdminBackendApiService {
       '/blogadminrolehandler', payload);
   }
 
-  async removeBlogEditorAsync(username: string): Promise<Object> {
+  async removeBlogEditorAsync (username: string): Promise<Object> {
     return this.http.put(
       '/blogadminrolehandler', {
         username: username,

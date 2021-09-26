@@ -28,7 +28,7 @@ describe('datetimeformatter', () => {
   beforeEach(() => {
     df = new DateTimeFormatService();
 
-    let MockDateContructor = function(millisSinceEpoch = 0) {
+    let MockDateContructor = function (millisSinceEpoch = 0) {
       if (millisSinceEpoch === 0) {
         return new OldDate(NOW_MILLIS);
       } else {

@@ -27,9 +27,9 @@ import constants from 'assets/constants';
   providedIn: 'root'
 })
 export class ImageUploadHelperService {
-  constructor(private assetsBackendApiService: AssetsBackendApiService) {}
+  constructor (private assetsBackendApiService: AssetsBackendApiService) {}
 
-  private _generateDateTimeStringForFilename(): string {
+  private _generateDateTimeStringForFilename (): string {
     let date = new Date();
     return date.getFullYear() +
       ('0' + (date.getMonth() + 1)).slice(-2) +
@@ -44,7 +44,7 @@ export class ImageUploadHelperService {
   // 'image', blob size is zero or dataURI is null.
   // 'dataURI' here will be null if imageFilename does not exist in
   // local storage.
-  convertImageDataToImageFile(dataURI: string | null): Blob | null {
+  convertImageDataToImageFile (dataURI: string | null): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     if (dataURI !== null) {
@@ -69,14 +69,14 @@ export class ImageUploadHelperService {
     return null;
   }
 
-  getTrustedResourceUrlForThumbnailFilename(
+  getTrustedResourceUrlForThumbnailFilename (
       imageFileName: string, entityType: string, entityId: string): string {
     let encodedFilepath = window.encodeURIComponent(imageFileName);
     return this.assetsBackendApiService.getThumbnailUrlForPreview(
       entityType, entityId, encodedFilepath);
   }
 
-  generateImageFilename(
+  generateImageFilename (
       height: number, width: number, extension: string): string {
     return 'img_' +
       this._generateDateTimeStringForFilename() +
@@ -85,7 +85,7 @@ export class ImageUploadHelperService {
       '.' + extension;
   }
 
-  generateMathExpressionImageFilename(
+  generateMathExpressionImageFilename (
       height: string, width: string, verticalPadding: string): string {
     let filename = (
       'mathImg_' +

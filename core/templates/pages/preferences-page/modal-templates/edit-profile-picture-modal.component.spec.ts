@@ -29,7 +29,7 @@ describe('Edit Profile Picture Modal Component', () => {
   let componentInstance: EditProfilePictureModalComponent;
 
   class MockChangeDetectorRef {
-    detectChanges(): void {}
+    detectChanges (): void {}
   }
 
   beforeEach(waitForAsync(() => {
@@ -94,7 +94,7 @@ describe('Edit Profile Picture Modal Component', () => {
   it('should confirm profile picture', () => {
     let pictureDataUrl = 'picture_data';
     componentInstance.cropper = {
-      getCroppedCanvas(options) {
+      getCroppedCanvas (options) {
         return {
           toDataURL: () => pictureDataUrl
         };

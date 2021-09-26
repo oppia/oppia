@@ -22,7 +22,7 @@ require(
 
 angular.module('oppia').controller('AddWorkedExampleModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  function($controller, $scope, $uibModalInstance) {
+  function ($controller, $scope, $uibModalInstance) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -36,7 +36,7 @@ angular.module('oppia').controller('AddWorkedExampleModalController', [
     $scope.tmpWorkedExampleQuestionHtml = '';
     $scope.tmpWorkedExampleExplanationHtml = '';
 
-    $scope.saveWorkedExample = function() {
+    $scope.saveWorkedExample = function () {
       $uibModalInstance.close({
         workedExampleQuestionHtml:
           $scope.tmpWorkedExampleQuestionHtml,

@@ -49,18 +49,18 @@ export class IntEditorComponent implements OnInit {
 
 
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.value = 0;
       this.valueChanged.emit(this.value);
     }
   }
 
-  getSchema(): IntValidatorSchema {
+  getSchema (): IntValidatorSchema {
     return this.SCHEMA;
   }
 
-  updateValue(value: number): void {
+  updateValue (value: number): void {
     this.value = value;
     this.valueChanged.emit(value);
   }

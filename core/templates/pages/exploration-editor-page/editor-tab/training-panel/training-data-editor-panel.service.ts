@@ -54,13 +54,13 @@ require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
   '$uibModal', 'AlertsService', 'ExternalSaveService',
-  function(
+  function (
       $uibModal, AlertsService, ExternalSaveService) {
     return {
       /**
       * Opens training data editor for currently selected answer group.
       */
-      openTrainingDataEditor: function() {
+      openTrainingDataEditor: function () {
         AlertsService.clearWarnings();
         $uibModal.open({
           template: require(

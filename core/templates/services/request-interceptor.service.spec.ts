@@ -76,7 +76,7 @@ describe('Request Interceptor Service', () => {
 
   it('should expect request body to be a FormData constructor', () => {
     httpClient.post('/api', {data: 'test'}).subscribe(
-      async(response) => expect(response).toBeTruthy());
+      async (response) => expect(response).toBeTruthy());
 
     let req = httpTestingController.expectOne('/api');
     expect(req.request.method).toEqual('POST');
@@ -86,7 +86,7 @@ describe('Request Interceptor Service', () => {
 
   it('should modify http requests body when they are intercepted', () => {
     httpClient.patch('/api', {data: 'test'}).subscribe(
-      async(response) => expect(response).toBeTruthy());
+      async (response) => expect(response).toBeTruthy());
 
     let req = httpTestingController.expectOne('/api');
     expect(req.request.method).toEqual('PATCH');
@@ -101,9 +101,9 @@ describe('Request Interceptor Service', () => {
 
   it('should not handle http requests when the body is null', () => {
     httpClient.get('/api').subscribe(
-      async(response) => expect(response).toBeTruthy());
+      async (response) => expect(response).toBeTruthy());
     httpClient.patch('/api2', {data: 'test'}).subscribe(
-      async(response) => expect(response).toBeTruthy());
+      async (response) => expect(response).toBeTruthy());
 
     let req = httpTestingController.expectOne('/api');
     let req2 = httpTestingController.expectOne('/api2');
@@ -135,7 +135,7 @@ describe('Request Interceptor Service', () => {
   it('should correctly set the csrf token', (done) => {
     mockCsrfTokenService.initializeToken();
 
-    mockCsrfTokenService.getTokenAsync().then(function(token) {
+    mockCsrfTokenService.getTokenAsync().then(function (token) {
       expect(token).toEqual('sample-csrf-token');
     }).then(done, done.fail);
   });

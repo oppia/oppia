@@ -24,20 +24,20 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
   let ctrl = null;
 
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    onSubmit: function (answer, rulesService) {},
+    registerCurrentInteraction: function (submitAnswerFn, isAnswerValid) {
       submitAnswerFn();
     }
   };
   let mockDragAndDropSortInputRulesService = {};
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function (interactionId, attrs) {
       return attrs;
     }
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'CurrentInteractionService', mockCurrentInteractionService);
     $provide.value(
@@ -49,7 +49,7 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
   }));
 
   describe('when multiple items in the same position are allowed', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('$attrs', {
         choices: [
           {
@@ -73,7 +73,7 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       ctrl = $componentController('oppiaInteractiveDragAndDropSortInput');
 
       ctrl.savedSolution = [
@@ -197,7 +197,7 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
   });
 
   describe('when multiple items in the same position are not allowed', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('$attrs', {
         choices: [
           {
@@ -217,7 +217,7 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       ctrl = $componentController('oppiaInteractiveDragAndDropSortInput');
 
       ctrl.savedSolution = [

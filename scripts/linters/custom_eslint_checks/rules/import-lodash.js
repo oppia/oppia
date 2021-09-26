@@ -36,10 +36,10 @@ module.exports = {
     }
   },
 
-  create: function(context) {
+  create: function (context) {
     var importSelector = 'ImportDeclaration[source.value=/^lodash/]';
 
-    var catchAndReportInvalidImportLodash = function(node) {
+    var catchAndReportInvalidImportLodash = function (node) {
       if (node.specifiers[0].type !== 'ImportDefaultSpecifier' ||
        node.specifiers[0].local.name === '_') {
         context.report({
@@ -50,7 +50,7 @@ module.exports = {
     };
 
     return {
-      [importSelector]: function(node) {
+      [importSelector]: function (node) {
         catchAndReportInvalidImportLodash(node);
       }
     };

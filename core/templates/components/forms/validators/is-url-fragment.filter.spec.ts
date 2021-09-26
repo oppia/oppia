@@ -17,7 +17,7 @@
  */
 
 
-describe('IsUrlFragment Filter', function() {
+describe('IsUrlFragment Filter', function () {
   var filterName = 'isUrlFragment';
   var args = {
     charLimit: 20
@@ -25,32 +25,32 @@ describe('IsUrlFragment Filter', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  it('should exist', angular.mock.inject(function($filter) {
+  it('should exist', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
-  it('should validate non-emptiness', angular.mock.inject(function($filter) {
+  it('should validate non-emptiness', angular.mock.inject(function ($filter) {
     var filter = $filter(filterName);
     expect(filter('abc', args)).toBe(true);
     expect(filter('', args)).toBe(false);
   }));
 
   it('should fail when there are caps characters',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter(filterName);
       expect(filter('aBc', args)).toBe(false);
       expect(filter('aaaAAA', args)).toBe(false);
     }));
 
   it('should fail when there are numeric characters',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter(filterName);
       expect(filter('abc-123', args)).toBe(false);
       expect(filter('h4ck3r', args)).toBe(false);
     }));
 
   it('should fail when there are special characters other than hyphen',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter(filterName);
       expect(filter('special~chars', args)).toBe(false);
       expect(filter('special`chars', args)).toBe(false);
@@ -86,20 +86,20 @@ describe('IsUrlFragment Filter', function() {
     }));
 
   it('should fail when there are spaces',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter(filterName);
       expect(filter('url with spaces', args)).toBe(false);
       expect(filter(' trailing space ', args)).toBe(false);
     }));
 
   it('should fail when the length of the input is greater than the char limit',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter(filterName);
       expect(filter('a-lengthy-url-fragment', args)).toBe(false);
     }));
 
   it('should pass when the passed value is a valid url fragment',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter(filterName);
       expect(filter('math', args)).toBe(true);
       expect(filter('computer-science', args)).toBe(true);

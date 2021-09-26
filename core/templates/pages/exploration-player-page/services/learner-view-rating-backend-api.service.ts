@@ -32,7 +32,7 @@ export class LearnerViewRatingBackendApiService {
   explorationId: string;
   ratingsUrl: string;
 
-  constructor(
+  constructor (
     private httpClient: HttpClient,
     private explorationEngineService: ExplorationEngineService
   ) {
@@ -40,12 +40,12 @@ export class LearnerViewRatingBackendApiService {
     this.ratingsUrl = '/explorehandler/rating/' + this.explorationId;
   }
 
-  async getUserRatingAsync(): Promise<LearnerViewRatingBackendResponse> {
+  async getUserRatingAsync (): Promise<LearnerViewRatingBackendResponse> {
     return this.httpClient.get<LearnerViewRatingBackendResponse>(
       this.ratingsUrl).toPromise();
   }
 
-  async submitUserRatingAsync(ratingValue: number):
+  async submitUserRatingAsync (ratingValue: number):
   Promise<LearnerViewRatingBackendResponse> {
     return this.httpClient.put<LearnerViewRatingBackendResponse>(
       this.ratingsUrl, {

@@ -27,12 +27,12 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   templateUrl: './error-404-page-root.component.html'
 })
 export class Error404PageRootComponent {
-  constructor(
+  constructor (
     private loggerService: LoggerService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let pathname = this.windowRef.nativeWindow.location.pathname;
     // Raise a path not found error. So, e2e tests block the regressions due to
     // wrong route order where an unexpected 404 page shows up instead of

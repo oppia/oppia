@@ -20,7 +20,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  * @fileoverview Unit tests for RevertExplorationModalController.
  */
 
-describe('Revert Exploration Modal Controller', function() {
+describe('Revert Exploration Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var version = '1';
@@ -41,7 +41,7 @@ describe('Revert Exploration Modal Controller', function() {
   });
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -56,11 +56,11 @@ describe('Revert Exploration Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.version).toBe(version);
     });
 
-  it('should get exploration url when exploration id is provided', function() {
+  it('should get exploration url when exploration id is provided', function () {
     expect($scope.getExplorationUrl('0')).toBe('/explore/exp1?v=0');
     expect($scope.getExplorationUrl('1')).toBe('/explore/exp1?v=1');
     expect($scope.getExplorationUrl()).toBe('/explore/exp1?v=undefined');

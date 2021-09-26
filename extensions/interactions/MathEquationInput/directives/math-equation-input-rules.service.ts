@@ -35,7 +35,7 @@ import {
   providedIn: 'root'
 })
 export class MathEquationInputRulesService {
-  MatchesExactlyWith(
+  MatchesExactlyWith (
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
@@ -70,7 +70,7 @@ export class MathEquationInputRulesService {
     }
   }
 
-  IsEquivalentTo(
+  IsEquivalentTo (
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithoutSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
@@ -123,7 +123,7 @@ export class MathEquationInputRulesService {
     return false;
   }
 
-  ContainsSomeOf(
+  ContainsSomeOf (
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
@@ -158,7 +158,7 @@ export class MathEquationInputRulesService {
     }
   }
 
-  OmitsSomeOf(
+  OmitsSomeOf (
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
@@ -193,7 +193,7 @@ export class MathEquationInputRulesService {
     }
   }
 
-  MatchesWithGeneralForm(
+  MatchesWithGeneralForm (
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithPlaceholder): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();

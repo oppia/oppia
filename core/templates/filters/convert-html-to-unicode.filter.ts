@@ -20,8 +20,8 @@ export const convertHtmlToUnicode = (html: string): string => {
   return angular.element('<div>' + html + '</div>').text();
 };
 
-angular.module('oppia').filter('convertHtmlToUnicode', [function() {
-  return function(html: string) {
+angular.module('oppia').filter('convertHtmlToUnicode', [function () {
+  return function (html: string) {
     return convertHtmlToUnicode(html);
   };
 }]);

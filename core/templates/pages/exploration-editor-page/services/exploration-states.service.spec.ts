@@ -26,7 +26,7 @@ require(
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
-describe('ExplorationStatesService', function() {
+describe('ExplorationStatesService', function () {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
@@ -49,7 +49,7 @@ describe('ExplorationStatesService', function() {
     changeListService = TestBed.inject(ChangeListService);
   });
 
-  beforeEach(angular.mock.inject(function(
+  beforeEach(angular.mock.inject(function (
       _$q_, _$rootScope_, _$uibModal_, _ContextService_,
       _ExplorationStatesService_) {
     $q = _$q_;
@@ -59,7 +59,7 @@ describe('ExplorationStatesService', function() {
     ExplorationStatesService = _ExplorationStatesService_;
   }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.EXP_ID = '7';
     spyOn(ContextService, 'getExplorationId').and.returnValue(this.EXP_ID);
 
@@ -129,9 +129,9 @@ describe('ExplorationStatesService', function() {
     });
   });
 
-  describe('Callback Registration', function() {
-    describe('.registerOnStateAddedCallback', function() {
-      it('should callback when a new state is added', function() {
+  describe('Callback Registration', function () {
+    describe('.registerOnStateAddedCallback', function () {
+      it('should callback when a new state is added', function () {
         var spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'addState');
 
@@ -142,9 +142,9 @@ describe('ExplorationStatesService', function() {
       });
     });
 
-    describe('.registerOnStateDeletedCallback', function() {
-      it('should callback when a state is deleted', function(done) {
-        spyOn($uibModal, 'open').and.callFake(function() {
+    describe('.registerOnStateDeletedCallback', function () {
+      it('should callback when a state is deleted', function (done) {
+        spyOn($uibModal, 'open').and.callFake(function () {
           return {result: $q.resolve()};
         });
         spyOn(changeListService, 'deleteState');
@@ -152,15 +152,15 @@ describe('ExplorationStatesService', function() {
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
 
-        ExplorationStatesService.deleteState('Hola').then(function() {
+        ExplorationStatesService.deleteState('Hola').then(function () {
           expect(spy).toHaveBeenCalledWith('Hola');
         }).then(done, done.fail);
         $rootScope.$digest();
       });
     });
 
-    describe('.registerOnStateRenamedCallback', function() {
-      it('should callback when a state is renamed', function() {
+    describe('.registerOnStateRenamedCallback', function () {
+      it('should callback when a state is renamed', function () {
         var spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'renameState');
 
@@ -171,9 +171,9 @@ describe('ExplorationStatesService', function() {
       });
     });
 
-    describe('.registerOnStateInteractionSaved', function() {
+    describe('.registerOnStateInteractionSaved', function () {
       it('should callback when answer groups of a state are saved',
-        function() {
+        function () {
           var spy = jasmine.createSpy('callback');
           spyOn(changeListService, 'editStateProperty');
 
@@ -186,7 +186,7 @@ describe('ExplorationStatesService', function() {
     });
   });
 
-  it('should save the solicitAnswerDetails correctly', function() {
+  it('should save the solicitAnswerDetails correctly', function () {
     expect(
       ExplorationStatesService.getSolicitAnswerDetailsMemento(
         'Hola', 'solicit_answer_details')).toEqual(false);

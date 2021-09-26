@@ -34,9 +34,9 @@ export class ResponseMultipleChoiceInputComponent implements OnInit {
   @Input() answer!: string;
   @Input() choices!: string;
   response!: string;
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor (private htmlEscaperService: HtmlEscaperService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as string;
     const _choices = this.htmlEscaperService.escapedJsonToObj(

@@ -46,25 +46,25 @@ export class ResponseGraphInput {
   EDGE_WIDTH!: number;
   GRAPH_INPUT_LEFT_MARGIN = (
     InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);
-  constructor(
+  constructor (
     private graphDetailService: GraphDetailService,
     private htmlEscaperService: HtmlEscaperService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.graph = (
       this.htmlEscaperService.escapedJsonToObj(this.answer) as GraphAnswer);
     this.VERTEX_RADIUS = this.graphDetailService.VERTEX_RADIUS;
     this.EDGE_WIDTH = this.graphDetailService.EDGE_WIDTH;
   }
 
-  getDirectedEdgeArrowPoints(index: number): string {
+  getDirectedEdgeArrowPoints (index: number): string {
     return this.graphDetailService.getDirectedEdgeArrowPoints(
       this.graph, index
     );
   }
 
-  getEdgeCenter(index: number): EdgeCentre {
+  getEdgeCenter (index: number): EdgeCentre {
     return this.graphDetailService.getEdgeCentre(this.graph, index);
   }
 }

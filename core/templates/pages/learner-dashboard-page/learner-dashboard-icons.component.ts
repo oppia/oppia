@@ -44,21 +44,21 @@ export class LearnerDashboardIconsComponent implements OnInit {
   activityIsCurrentlyHoveredOver: boolean = true;
   playlistTooltipIsEnabled: boolean = false;
   @Input()
-  get activityActive(): boolean {
+  get activityActive (): boolean {
     return this.activityIsCurrentlyHoveredOver;
   }
-  set activityActive(hoverState: boolean) {
+  set activityActive (hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }
 
-  constructor(
+  constructor (
     private learnerDashboardIdsBackendApiService:
       LearnerDashboardIdsBackendApiService,
     private learnerDashboardActivityBackendApiService:
       LearnerDashboardActivityBackendApiService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.learnerDashboardIdsBackendApiService.
       fetchLearnerDashboardIdsAsync().then(
         (learnerDashboardActivityIds) => {
@@ -67,19 +67,19 @@ export class LearnerDashboardIconsComponent implements OnInit {
       );
   }
 
-  enablePlaylistTooltip(): void {
+  enablePlaylistTooltip (): void {
     this.playlistTooltipIsEnabled = true;
   }
 
-  disablePlaylistTooltip(): void {
+  disablePlaylistTooltip (): void {
     this.playlistTooltipIsEnabled = false;
   }
 
-  setHoverState(hoverState: boolean): void {
+  setHoverState (hoverState: boolean): void {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }
 
-  canActivityBeAddedToLearnerPlaylist(activityId: string): boolean {
+  canActivityBeAddedToLearnerPlaylist (activityId: string): boolean {
     if (this.learnerDashboardActivityIds) {
       if (this.learnerDashboardActivityIds.includesActivity(
         activityId)) {
@@ -95,7 +95,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     return false;
   }
 
-  belongsToLearnerPlaylist(): boolean {
+  belongsToLearnerPlaylist (): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -111,7 +111,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     return false;
   }
 
-  belongsToCompletedActivities(): boolean {
+  belongsToCompletedActivities (): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -135,7 +135,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     return false;
   }
 
-  belongsToIncompleteActivities(): boolean {
+  belongsToIncompleteActivities (): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -155,7 +155,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     return false;
   }
 
-  addToLearnerPlaylist(activityId: string, activityType: string): void {
+  addToLearnerPlaylist (activityId: string, activityType: string): void {
     var isSuccessfullyAdded = (
       this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
         activityId, activityType));
@@ -171,7 +171,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
-  removeFromLearnerPlaylist(
+  removeFromLearnerPlaylist (
       activityId: string, activityTitle: string, activityType: string): void {
     this.learnerDashboardActivityBackendApiService
       .removeFromLearnerPlaylistModal(

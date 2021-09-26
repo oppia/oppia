@@ -20,13 +20,13 @@ describe('oppiaResponseDragAndDropSortInput', () => {
   let ctrl = null;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
     $provide.value('$attrs', {
       answer: [
@@ -43,7 +43,7 @@ describe('oppiaResponseDragAndDropSortInput', () => {
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     ctrl = $componentController('oppiaResponseDragAndDropSortInput');
   }));
 

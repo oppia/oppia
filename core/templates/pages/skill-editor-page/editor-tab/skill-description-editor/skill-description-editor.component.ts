@@ -38,21 +38,21 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   skill: Skill = null;
   skillDescriptionEditorIsShown: boolean = null;
   tmpSkillDescription: string = null;
-  constructor(
+  constructor (
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,
     private skillObjectFactory: SkillObjectFactory
   ) {}
 
-  canEditSkillDescription(): boolean {
+  canEditSkillDescription (): boolean {
     return this.skillRights.canEditSkillDescription();
   }
 
-  resetErrorMsg(): void {
+  resetErrorMsg (): void {
     this.errorMsg = '';
   }
 
-  saveSkillDescription(newSkillDescription: string): void {
+  saveSkillDescription (newSkillDescription: string): void {
     if (newSkillDescription === this.skill.getDescription()) {
       return;
     }
@@ -69,11 +69,11 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.skill = this.skillEditorStateService.getSkill();
     this.tmpSkillDescription = this.skill.getDescription();
     this.skillRights = this.skillEditorStateService.getSkillRights();

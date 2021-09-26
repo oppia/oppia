@@ -24,14 +24,14 @@
 require('filters/convert-unicode-to-html.filter.ts');
 
 angular.module('oppia').filter('convertUnicodeWithParamsToHtml', [
-  '$filter', function($filter) {
-    var assert = function(text) {
+  '$filter', function ($filter) {
+    var assert = function (text) {
       if (!text) {
         throw new Error('Invalid unicode-string-with-parameters: ' + text);
       }
     };
 
-    return function(text) {
+    return function (text) {
       // The parsing here needs to be done with more care because we are
       // replacing two-character strings. We can't naively break by {{ because
       // in strings like \{{{ the second and third characters will be taken as
@@ -86,7 +86,7 @@ angular.module('oppia').filter('convertUnicodeWithParamsToHtml', [
       });
 
       var result = '';
-      textFragments.forEach(function(fragment) {
+      textFragments.forEach(function (fragment) {
         result += (
           fragment.type === 'text' ?
           $filter('convertUnicodeToHtml')(fragment.data) :

@@ -21,7 +21,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('State Stats Modal Controller', function() {
+describe('State Stats Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var RouterService = null;
@@ -46,7 +46,7 @@ describe('State Stats Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     RouterService = $injector.get('RouterService');
 
@@ -66,7 +66,7 @@ describe('State Stats Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.stateName).toBe(stateName);
       expect($scope.numEnters).toEqual(stateStats.totalHitCount);
       expect($scope.numQuits)
@@ -75,7 +75,7 @@ describe('State Stats Modal Controller', function() {
       expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
     });
 
-  it('should navigate to state editor', function() {
+  it('should navigate to state editor', function () {
     spyOn(RouterService, 'navigateToMainTab').and.callThrough();
     $scope.navigateToStateEditor();
 

@@ -206,7 +206,7 @@ describe('Stats reporting backend API Service', () => {
     flushMicrotasks();
   }));
 
-  it('should handle errors correctly.', fakeAsync(async() => {
+  it('should handle errors correctly.', fakeAsync(async () => {
     let mockGetExpId = () => {
       return 'expId';
     };

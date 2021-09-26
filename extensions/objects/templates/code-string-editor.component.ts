@@ -37,7 +37,7 @@ export class CodeStringEditorComponent implements OnInit {
   debounceInputSubject: Subject<string> = new Subject<string>();
   warningText: string = '';
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._checkForWarnings();
     this.debounceInputSubject
       .pipe(debounceTime(50))
@@ -49,7 +49,7 @@ export class CodeStringEditorComponent implements OnInit {
       });
   }
 
-  private _checkForWarnings(): void {
+  private _checkForWarnings (): void {
     if (this.value.indexOf('\t') !== -1) {
       this.warningText = 'Code may not contain tab characters.';
       return;
@@ -57,7 +57,7 @@ export class CodeStringEditorComponent implements OnInit {
     this.warningText = '';
   }
 
-  onEdit(e: {target: {value: string}}): void {
+  onEdit (e: {target: {value: string}}): void {
     this.debounceInputSubject.next(e.target.value);
   }
 }

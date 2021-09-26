@@ -25,17 +25,17 @@ require(
   'pages/exploration-editor-page/' +
   'services/exploration-param-specs.service.ts');
 
-describe('Exploration Param Specs Service', function() {
+describe('Exploration Param Specs Service', function () {
   let epcs = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     epcs = $injector.get('ExplorationParamSpecsService');
   }));
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(epcs.propertyName).toBe('param_specs');
   });
 });

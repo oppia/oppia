@@ -27,11 +27,11 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: []
 })
 export class ProfilePageNavbarComponent implements OnInit {
-  constructor(
+  constructor (
     private urlService: UrlService
   ) {}
   username: string = '';
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.username = this.urlService.getUsernameFromProfileUrl();
   }
 }

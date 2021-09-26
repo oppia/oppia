@@ -27,13 +27,13 @@ var TopicsAndSkillsDashboardPage =
 var SkillEditorPage =
   require('../protractor_utils/SkillEditorPage.js');
 
-describe('Skill Editor functionality', function() {
+describe('Skill Editor functionality', function () {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var skillId = null;
   var explorationEditorPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
@@ -51,12 +51,12 @@ describe('Skill Editor functionality', function() {
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await users.login('creator@skillEditor.com');
     await skillEditorPage.get(skillId);
   });
 
-  it('should edit description and concept card explanation', async function() {
+  it('should edit description and concept card explanation', async function () {
     await skillEditorPage.changeSkillDescription('Skill 1 edited');
     await skillEditorPage.editConceptCard('Test concept card explanation');
     await skillEditorPage.saveOrPublishSkill(
@@ -72,7 +72,7 @@ describe('Skill Editor functionality', function() {
       'Test concept card explanation');
   });
 
-  it('should create and delete worked examples', async function() {
+  it('should create and delete worked examples', async function () {
     await skillEditorPage.addWorkedExample(
       'Example Question 1', 'Example Explanation 1');
     await skillEditorPage.addWorkedExample(
@@ -94,7 +94,7 @@ describe('Skill Editor functionality', function() {
     );
   });
 
-  it('should edit rubrics for the skill', async function() {
+  it('should edit rubrics for the skill', async function () {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Explanation for easy difficulty');
     await skillEditorPage.addRubricExplanationForDifficulty(
@@ -143,14 +143,14 @@ describe('Skill Editor functionality', function() {
       'Hard', ['Hard explanation 1 edited', 'Hard explanation 2 edited']);
   });
 
-  it('should create a question for the skill', async function() {
+  it('should create a question for the skill', async function () {
     await workflow.createQuestion();
     await skillEditorPage.get(skillId);
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
-  it('should create and delete misconceptions', async function() {
+  it('should create and delete misconceptions', async function () {
     await skillEditorPage.addMisconception(
       'Misconception 1', 'Notes 1', 'Feedback 1');
     await skillEditorPage.addMisconception(
@@ -167,7 +167,7 @@ describe('Skill Editor functionality', function() {
     await skillEditorPage.expectNumberOfMisconceptionsToBe(1);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });

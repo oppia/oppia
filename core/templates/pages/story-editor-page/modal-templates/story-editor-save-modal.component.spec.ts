@@ -22,10 +22,10 @@ import { StoryEditorSaveModalComponent } from './story-editor-save-modal.compone
 import { FormsModule } from '@angular/forms';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
-  close(): void {
+  close (): void {
     return;
   }
 }

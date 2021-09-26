@@ -51,14 +51,14 @@ export class ClassroomBackendApiService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   classroomData!: ClassroomData;
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
 
   private _initializeTranslationEventEmitter = new EventEmitter<void>();
 
-  _fetchClassroomData(
+  _fetchClassroomData (
       classroomUrlFragment: string,
       successCallback: (value: ClassroomData) => void,
       errorCallback: (reason: string) => void): void {
@@ -84,7 +84,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  _fetchClassroomPromosAreEnabledStatus(
+  _fetchClassroomPromosAreEnabledStatus (
       successCallback: (value: boolean) => void,
       errorCallback: (reason: string) => void): void {
     const classroomPromosAreEnabledStatusHandlerUrl = (
@@ -102,7 +102,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async fetchClassroomDataAsync(
+  async fetchClassroomDataAsync (
       classroomUrlFragment: string
   ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
@@ -110,13 +110,13 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async fetchClassroomPromosAreEnabledStatusAsync(): Promise<boolean> {
+  async fetchClassroomPromosAreEnabledStatusAsync (): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomPromosAreEnabledStatus(resolve, reject);
     });
   }
 
-  get onInitializeTranslation(): EventEmitter<void> {
+  get onInitializeTranslation (): EventEmitter<void> {
     return this._initializeTranslationEventEmitter;
   }
 }

@@ -22,10 +22,10 @@ var general = require('../protractor_utils/general.js');
 
 var BlogDashboardPage = require('../protractor_utils/BlogDashboardPage.js');
 
-describe('Blog dashboard functionality', function() {
+describe('Blog dashboard functionality', function () {
   var blogDashboardPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     blogDashboardPage = (
       new BlogDashboardPage.BlogDashboardPage());
     await users.createUserWithRole(
@@ -37,7 +37,7 @@ describe('Blog dashboard functionality', function() {
   });
 
   it('should check user profile is visible on both blog dashboard and editor,' +
-  ' create, edit and delete a blog post from blog dashboard', async function() {
+  ' create, edit and delete a blog post from blog dashboard', async function () {
     await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
     await blogDashboardPage.expectCurrUsernameToBeVisible();
     await blogDashboardPage.blogDashboardIntroMessageIsVisible();
@@ -60,7 +60,7 @@ describe('Blog dashboard functionality', function() {
   });
 
   it('should create, publish, and delete the published blog post from' +
-    ' dashboard.', async function() {
+    ' dashboard.', async function () {
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.publishNewBlogPost(
       'Sample blog post Title', await forms.toRichText(
@@ -77,7 +77,7 @@ describe('Blog dashboard functionality', function() {
   });
 
   it('should create, publish, check for thumbnail uploading error,' +
-  ' unpublish and delete the blog post', async function() {
+  ' unpublish and delete the blog post', async function () {
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
     await blogDashboardPage.expectNumberOfDraftBlogPostsToBe(1);
@@ -107,7 +107,7 @@ describe('Blog dashboard functionality', function() {
   });
 
   it('should create multiple blog posts both published and drafts and' +
-  ' check for navigation through list view', async function() {
+  ' check for navigation through list view', async function () {
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title1', await forms.toRichText(
@@ -148,11 +148,11 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 });

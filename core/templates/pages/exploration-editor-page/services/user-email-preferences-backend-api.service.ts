@@ -28,13 +28,13 @@ import { EmailPreferencesData, RequestParams } from './user-email-preferences.se
   providedIn: 'root'
 })
 export class UserEmailPreferencesBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
     private explorationDataService: ExplorationDataService
   ) { }
 
-  async saveChangeToBackendAsync(
+  async saveChangeToBackendAsync (
       requestParams: RequestParams
   ): Promise<EmailPreferencesData> {
     let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(

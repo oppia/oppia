@@ -27,15 +27,15 @@ import { Injectable } from '@angular/core';
 export class AudioBarStatusService {
   audioBarIsExpanded: boolean = false;
 
-  markAudioBarExpanded(): void {
+  markAudioBarExpanded (): void {
     this.audioBarIsExpanded = true;
   }
 
-  markAudioBarCollapsed(): void {
+  markAudioBarCollapsed (): void {
     this.audioBarIsExpanded = false;
   }
 
-  isAudioBarExpanded(): boolean {
+  isAudioBarExpanded (): boolean {
     return this.audioBarIsExpanded;
   }
 }

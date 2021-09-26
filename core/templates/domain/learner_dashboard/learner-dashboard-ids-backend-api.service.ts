@@ -34,10 +34,10 @@ interface LearnerDashboardIdsBackendResponse {
   providedIn: 'root'
 })
 export class LearnerDashboardIdsBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient) {}
 
-  async _fetchLearnerDashboardIdsAsync(): Promise<LearnerDashboardActivityIds> {
+  async _fetchLearnerDashboardIdsAsync (): Promise<LearnerDashboardActivityIds> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardIdsBackendResponse>(
         '/learnerdashboardidshandler/data').toPromise().then(response => {
@@ -50,7 +50,7 @@ export class LearnerDashboardIdsBackendApiService {
     });
   }
 
-  async fetchLearnerDashboardIdsAsync(): Promise<LearnerDashboardActivityIds> {
+  async fetchLearnerDashboardIdsAsync (): Promise<LearnerDashboardActivityIds> {
     return this._fetchLearnerDashboardIdsAsync();
   }
 }

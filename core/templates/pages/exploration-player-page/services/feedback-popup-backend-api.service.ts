@@ -26,7 +26,7 @@ import { ExplorationEngineService } from './exploration-engine.service';
 export class FeedbackPopupBackendApiService {
   feedbackUrl: string;
 
-  constructor(
+  constructor (
     private httpClient: HttpClient,
     private explorationEngineService: ExplorationEngineService
   ) {
@@ -34,7 +34,7 @@ export class FeedbackPopupBackendApiService {
       this.explorationEngineService.getExplorationId();
   }
 
-  async submitFeedbackAsync(
+  async submitFeedbackAsync (
       subject: string,
       feedback: string,
       includeAuthor: boolean,

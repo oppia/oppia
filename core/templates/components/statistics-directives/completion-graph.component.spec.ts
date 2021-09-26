@@ -22,7 +22,7 @@ import { ImprovementsConstants } from
 
 require('components/statistics-directives/completion-graph.component.ts');
 
-describe('Completion graph', function() {
+describe('Completion graph', function () {
   let $componentController;
 
   beforeEach(angular.mock.module('oppia'));

@@ -88,7 +88,7 @@ angular.module('oppia').component('stateTranslation', {
     'COMPONENT_NAME_RULE_INPUT',
     'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
     'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-    function(
+    function (
         $filter, $scope, CkEditorCopyContentService,
         ExplorationCorrectnessFeedbackService,
         ExplorationHtmlFormatterService, ExplorationLanguageCodeService,
@@ -113,16 +113,16 @@ angular.module('oppia').component('stateTranslation', {
 
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.isVoiceoverModeActive = function() {
+      $scope.isVoiceoverModeActive = function () {
         return (TranslationTabActiveModeService.isVoiceoverModeActive());
       };
-      var isTranslatedTextRequired = function() {
+      var isTranslatedTextRequired = function () {
         return (
           TranslationTabActiveModeService.isVoiceoverModeActive() &&
           TranslationLanguageService.getActiveLanguageCode() !== (
             ExplorationLanguageCodeService.displayed));
       };
-      $scope.getRequiredHtml = function(subtitledHtml) {
+      $scope.getRequiredHtml = function (subtitledHtml) {
         var html = null;
         if (isTranslatedTextRequired()) {
           var contentId = subtitledHtml.contentId;
@@ -144,7 +144,7 @@ angular.module('oppia').component('stateTranslation', {
         return html;
       };
 
-      $scope.getEmptyContentMessage = function() {
+      $scope.getEmptyContentMessage = function () {
         if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
           return (
             'The translation for this section has not been created yet. ' +
@@ -154,26 +154,26 @@ angular.module('oppia').component('stateTranslation', {
         }
       };
 
-      $scope.isActive = function(tabId) {
+      $scope.isActive = function (tabId) {
         return ($scope.activatedTabId === tabId);
       };
 
-      $scope.navigateToState = function(stateName) {
+      $scope.navigateToState = function (stateName) {
         RouterService.navigateToMainTab(stateName);
       };
 
-      $scope.onContentClick = function($event) {
+      $scope.onContentClick = function ($event) {
         if ($scope.isCopyModeActive()) {
           $event.stopPropagation();
         }
         CkEditorCopyContentService.broadcastCopy($event.target);
       };
 
-      $scope.isCopyModeActive = function() {
+      $scope.isCopyModeActive = function () {
         return CkEditorCopyContentService.copyModeActive;
       };
 
-      $scope.onTabClick = function(tabId) {
+      $scope.onTabClick = function (tabId) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
@@ -228,7 +228,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.activatedTabId = tabId;
       };
 
-      $scope.getHumanReadableRuleInputValues = function(inputValue, inputType) {
+      $scope.getHumanReadableRuleInputValues = function (inputValue, inputType) {
         if (inputType === 'TranslatableSetOfNormalizedString') {
           return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
         } else if (inputType === 'TranslatableSetOfUnicodeString') {
@@ -238,7 +238,7 @@ angular.module('oppia').component('stateTranslation', {
         }
       };
 
-      $scope.summarizeDefaultOutcome = function(
+      $scope.summarizeDefaultOutcome = function (
           defaultOutcome, interactionId, answerGroupCount, shortenRule) {
         if (!defaultOutcome) {
           return '';
@@ -271,7 +271,7 @@ angular.module('oppia').component('stateTranslation', {
         return summary;
       };
 
-      $scope.summarizeAnswerGroup = function(
+      $scope.summarizeAnswerGroup = function (
           answerGroup, interactionId, answerChoices, shortenRule) {
         var summary = '';
         var outcome = answerGroup.outcome;
@@ -299,7 +299,7 @@ angular.module('oppia').component('stateTranslation', {
         return summary;
       };
 
-      $scope.isDisabled = function(tabId) {
+      $scope.isDisabled = function (tabId) {
         if (tabId === $scope.TAB_ID_CONTENT) {
           return false;
         }
@@ -342,7 +342,7 @@ angular.module('oppia').component('stateTranslation', {
         }
       };
 
-      $scope.changeActiveHintIndex = function(newIndex) {
+      $scope.changeActiveHintIndex = function (newIndex) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
@@ -357,7 +357,7 @@ angular.module('oppia').component('stateTranslation', {
           activeContentId, TRANSLATION_DATA_FORMAT_HTML);
       };
 
-      $scope.changeActiveRuleContentIndex = function(newIndex) {
+      $scope.changeActiveRuleContentIndex = function (newIndex) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
@@ -376,7 +376,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.activeRuleContentIndex = newIndex;
       };
 
-      $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
+      $scope.changeActiveCustomizationArgContentIndex = function (newIndex) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
@@ -400,7 +400,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.activeCustomizationArgContentIndex = newIndex;
       };
 
-      $scope.changeActiveAnswerGroupIndex = function(newIndex) {
+      $scope.changeActiveAnswerGroupIndex = function (newIndex) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
@@ -421,7 +421,7 @@ angular.module('oppia').component('stateTranslation', {
         }
       };
 
-      $scope.tabStatusColorStyle = function(tabId) {
+      $scope.tabStatusColorStyle = function (tabId) {
         if (!$scope.isDisabled(tabId)) {
           var color = TranslationStatusService
             .getActiveStateComponentStatusColor(tabId);
@@ -429,23 +429,23 @@ angular.module('oppia').component('stateTranslation', {
         }
       };
 
-      $scope.tabNeedUpdatesStatus = function(tabId) {
+      $scope.tabNeedUpdatesStatus = function (tabId) {
         if (!$scope.isDisabled(tabId)) {
           return TranslationStatusService
             .getActiveStateComponentNeedsUpdateStatus(tabId);
         }
       };
-      $scope.contentIdNeedUpdates = function(contentId) {
+      $scope.contentIdNeedUpdates = function (contentId) {
         return TranslationStatusService
           .getActiveStateContentIdNeedsUpdateStatus(contentId);
       };
-      $scope.contentIdStatusColorStyle = function(contentId) {
+      $scope.contentIdStatusColorStyle = function (contentId) {
         var color = TranslationStatusService
           .getActiveStateContentIdStatusColor(contentId);
         return {'border-left': '3px solid ' + color};
       };
 
-      $scope.getSubtitledContentSummary = function(subtitledContent) {
+      $scope.getSubtitledContentSummary = function (subtitledContent) {
         if (subtitledContent instanceof SubtitledHtml) {
           return $filter('formatRtePreview')(subtitledContent.html);
         } else if (subtitledContent instanceof SubtitledUnicode) {
@@ -474,7 +474,7 @@ angular.module('oppia').component('stateTranslation', {
         return interactionRuleTranslatableContent;
       };
 
-      $scope.getInteractionCustomizationArgTranslatableContents = function(
+      $scope.getInteractionCustomizationArgTranslatableContents = function (
           customizationArgs: InteractionCustomizationArgs
       ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
         const translatableContents = [];
@@ -523,7 +523,7 @@ angular.module('oppia').component('stateTranslation', {
         return translatableContents;
       };
 
-      $scope.initStateTranslation = function() {
+      $scope.initStateTranslation = function () {
         $scope.stateName = StateEditorService.getActiveStateName();
         $scope.stateContent = ExplorationStatesService
           .getStateContentMemento($scope.stateName);
@@ -567,7 +567,7 @@ angular.module('oppia').component('stateTranslation', {
         }
         $scope.onTabClick($scope.TAB_ID_CONTENT);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         // Define tab constants.
         $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
         $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
@@ -601,7 +601,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.initStateTranslation();
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

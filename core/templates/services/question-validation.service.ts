@@ -27,11 +27,11 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
   providedIn: 'root'
 })
 export class QuestionValidationService {
-  constructor(
+  constructor (
     private stateEditorService: StateEditorService
   ) { }
 
-  isQuestionValid(
+  isQuestionValid (
       question: Question,
       misconceptionsBySkill: Misconception[]): boolean {
     return !(

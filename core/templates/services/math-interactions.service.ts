@@ -30,7 +30,7 @@ export class MathInteractionsService {
   private warningText = '';
   private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
-  private cleanErrorMessage(
+  private cleanErrorMessage (
       errorMessage: string, expressionString: string): string {
     // The error thrown by nerdamer includes the index of the violation which
     // starts with a colon. That part needs to be removed before displaying
@@ -96,7 +96,7 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
-  _validateExpression(expressionString: string): boolean {
+  _validateExpression (expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -136,7 +136,7 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateAlgebraicExpression(
+  validateAlgebraicExpression (
       expressionString: string, validVariablesList: string[]): boolean {
     if (!this._validateExpression(expressionString)) {
       return false;
@@ -179,7 +179,7 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateNumericExpression(expressionString: string): boolean {
+  validateNumericExpression (expressionString: string): boolean {
     if (!this._validateExpression(expressionString)) {
       return false;
     }
@@ -195,7 +195,7 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateEquation(
+  validateEquation (
       equationString: string, validVariablesList: string[]): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
@@ -251,11 +251,11 @@ export class MathInteractionsService {
     return false;
   }
 
-  getWarningText(): string {
+  getWarningText (): string {
     return this.warningText;
   }
 
-  insertMultiplicationSigns(expressionString: string): string {
+  insertMultiplicationSigns (expressionString: string): string {
     let greekLetters = Object.keys(
       AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
@@ -322,7 +322,7 @@ export class MathInteractionsService {
     return expressionString;
   }
 
-  replaceAbsSymbolWithText(expressionString: string): string {
+  replaceAbsSymbolWithText (expressionString: string): string {
     // The guppy editor outputs abs as a symbol '|x|' but that is incompatible
     // with nerdamer and the backend validations. Both of them need 'abs(x)',
     // hence the replacement.
@@ -344,12 +344,12 @@ export class MathInteractionsService {
     return modifiedExpressionList.join('');
   }
 
-  getTerms(expressionString: string, splitByAddition = true): string[] {
+  getTerms (expressionString: string, splitByAddition = true): string[] {
     let listOfTerms: string[] = [];
     let currentTerm: string = '';
     let bracketBalance: number = 0;
     let shouldModifyNextTerm: boolean = false;
-    let modifyTerm = function(termString: string): string {
+    let modifyTerm = function (termString: string): string {
       // If the shouldModifyNextTerm flag is set to true, we add the '-' sign,
       // or raise the term to a power of -1. This ensures that when the final
       // list is joined by the '+'/'*' sign, it matches with the original
@@ -419,7 +419,7 @@ export class MathInteractionsService {
 
   // The input terms to this function should be the terms split by '+'/'-'
   // from an expression.
-  termsMatch(term1: string, term2: string): boolean {
+  termsMatch (term1: string, term2: string): boolean {
     // We split both terms by multiplication and division into separate parts
     // and try to match these parts from both inputs by checking equivalency.
     let partsList1 = this.getTerms(term1, false);
@@ -442,7 +442,7 @@ export class MathInteractionsService {
     return partsList1.length === 0 && partsList2.length === 0;
   }
 
-  expressionMatchWithPlaceholders(
+  expressionMatchWithPlaceholders (
       expressionWithPlaceholders: string, inputExpression: string,
       placeholders: string[]): boolean {
     // Check if inputExpression contains any placeholders.

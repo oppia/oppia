@@ -74,7 +74,7 @@ export class InteractiveCodeReplComponent implements
     theme: 'preview default'
   };
 
-  constructor(
+  constructor (
     private changeDetectionRef: ChangeDetectorRef,
     private currentInteractionService: CurrentInteractionService,
     private codeReplRulesService: CodeReplRulesService,
@@ -83,7 +83,7 @@ export class InteractiveCodeReplComponent implements
     private playerPositionService: PlayerPositionService
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => this.interactionIsActive = false
@@ -161,7 +161,7 @@ export class InteractiveCodeReplComponent implements
       () => this.submitAnswer(), null);
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit (): void {
     const runAfterTimeout = () => {
       this.initMarkers(this.codeMirrorComponent.codeMirror);
       this.hasLoaded = true;
@@ -172,20 +172,20 @@ export class InteractiveCodeReplComponent implements
     }, 0);
   }
 
-  runAndSubmitCode(codeInput: string): void {
+  runAndSubmitCode (codeInput: string): void {
     this.runCode(codeInput, (evaluation, err) => {
       this.sendResponse(evaluation, err);
     });
   }
-  private submitAnswer() {
+  private submitAnswer () {
     this.runAndSubmitCode(this.code);
   }
 
-  onEditorChange(code: string): void {
+  onEditorChange (code: string): void {
     this.code = code;
   }
 
-  runCode(
+  runCode (
       codeInput: string,
       onFinishRunCallback: (x: string, error: string) => void
   ): void {
@@ -215,7 +215,7 @@ export class InteractiveCodeReplComponent implements
     });
   }
 
-  private initMarkers(editor) {
+  private initMarkers (editor) {
     var doc = editor.getDoc();
 
     // The -1 here is because prepended code ends with a newline.
@@ -272,7 +272,7 @@ export class InteractiveCodeReplComponent implements
     }
   }
 
-  sendResponse(evaluation: string, err: string): void {
+  sendResponse (evaluation: string, err: string): void {
     this.currentInteractionService.onSubmit({
       // Replace tabs with 2 spaces.
       // TODO(#12712): (1) CodeRepl interaction.
@@ -284,7 +284,7 @@ export class InteractiveCodeReplComponent implements
     this.codeReplRulesService as unknown as InteractionRulesService);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.componentSubscriptions.unsubscribe();
   }
 }

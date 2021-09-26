@@ -23,7 +23,7 @@ require(
 angular.module('oppia').controller('SkillMasteryModalController', [
   '$controller', '$scope', '$uibModalInstance', 'masteryPerSkillMapping',
   'openConceptCardModal', 'skillId', 'userIsLoggedIn',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, masteryPerSkillMapping,
       openConceptCardModal, skillId, userIsLoggedIn) {
     $controller('ConfirmOrCancelModalController', {
@@ -36,7 +36,7 @@ angular.module('oppia').controller('SkillMasteryModalController', [
       $scope.masteryChange = masteryPerSkillMapping[skillId];
     }
 
-    $scope.openConceptCardModal = function() {
+    $scope.openConceptCardModal = function () {
       openConceptCardModal([skillId]);
     };
   }

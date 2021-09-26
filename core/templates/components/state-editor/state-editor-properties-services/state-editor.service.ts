@@ -54,7 +54,7 @@ type CustomizationArgs = (
   providedIn: 'root'
 })
 export class StateEditorService {
-  constructor(private solutionValidityService: SolutionValidityService) {}
+  constructor (private solutionValidityService: SolutionValidityService) {}
 
   private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
   private _stateEditorDirectiveInitializedEventEmitter =
@@ -95,54 +95,54 @@ export class StateEditorService {
   currentRuleInputIsValid: boolean = false;
   inapplicableSkillMisconceptionIds: string[] = [];
 
-  updateStateContentEditorInitialised(): void {
+  updateStateContentEditorInitialised (): void {
     this.stateContentEditorInitialised = true;
   }
 
-  updateStateInteractionEditorInitialised(): void {
+  updateStateInteractionEditorInitialised (): void {
     this.stateInteractionEditorInitialised = true;
   }
 
-  updateStateResponsesInitialised(): void {
+  updateStateResponsesInitialised (): void {
     this.stateResponsesInitialised = true;
   }
 
-  updateStateHintsEditorInitialised(): void {
+  updateStateHintsEditorInitialised (): void {
     this.stateHintsEditorInitialised = true;
   }
 
-  updateStateSolutionEditorInitialised(): void {
+  updateStateSolutionEditorInitialised (): void {
     this.stateSolutionEditorInitialised = true;
   }
 
-  updateStateEditorDirectiveInitialised(): void {
+  updateStateEditorDirectiveInitialised (): void {
     this.stateEditorDirectiveInitialised = true;
   }
 
-  updateCurrentRuleInputIsValid(value: boolean): void {
+  updateCurrentRuleInputIsValid (value: boolean): void {
     this.currentRuleInputIsValid = value;
   }
 
-  get onStateNamesChanged(): Observable<void> {
+  get onStateNamesChanged (): Observable<void> {
     return this._stateNamesChangedEventEmitter;
   }
 
-  checkCurrentRuleInputIsValid(): boolean {
+  checkCurrentRuleInputIsValid (): boolean {
     return this.currentRuleInputIsValid;
   }
 
-  checkEventListenerRegistrationStatus(): boolean {
+  checkEventListenerRegistrationStatus (): boolean {
     return (
       this.stateInteractionEditorInitialised &&
       this.stateResponsesInitialised &&
       this.stateEditorDirectiveInitialised);
   }
 
-  getActiveStateName(): string | null {
+  getActiveStateName (): string | null {
     return this.activeStateName;
   }
 
-  setActiveStateName(newActiveStateName: string): void {
+  setActiveStateName (newActiveStateName: string): void {
     if (newActiveStateName === '' || newActiveStateName === null) {
       console.error('Invalid active state name: ' + newActiveStateName);
       return;
@@ -150,67 +150,67 @@ export class StateEditorService {
     this.activeStateName = newActiveStateName;
   }
 
-  isExplorationWhitelisted(): boolean {
+  isExplorationWhitelisted (): boolean {
     return this.explorationIsWhitelisted;
   }
 
-  updateExplorationWhitelistedStatus(value: boolean): void {
+  updateExplorationWhitelistedStatus (value: boolean): void {
     this.explorationIsWhitelisted = value;
   }
 
-  setMisconceptionsBySkill(newMisconceptionsBySkill: {}): void {
+  setMisconceptionsBySkill (newMisconceptionsBySkill: {}): void {
     this.misconceptionsBySkill = newMisconceptionsBySkill;
   }
 
-  getMisconceptionsBySkill(): {} {
+  getMisconceptionsBySkill (): {} {
     return this.misconceptionsBySkill;
   }
 
-  setInteraction(newInteraction: Interaction): void {
+  setInteraction (newInteraction: Interaction): void {
     this.interaction = newInteraction;
   }
 
-  setInteractionId(newId: string): void {
+  setInteractionId (newId: string): void {
     this.interaction.setId(newId);
   }
 
-  setLinkedSkillId(newLinkedSkillId: string): void {
+  setLinkedSkillId (newLinkedSkillId: string): void {
     this.linkedSkillId = newLinkedSkillId;
   }
 
-  getLinkedSkillId(): string {
+  getLinkedSkillId (): string {
     return this.linkedSkillId;
   }
 
-  setInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
+  setInteractionAnswerGroups (newAnswerGroups: AnswerGroup[]): void {
     this.interaction.setAnswerGroups(newAnswerGroups);
   }
 
-  setInteractionDefaultOutcome(newOutcome: Outcome): void {
+  setInteractionDefaultOutcome (newOutcome: Outcome): void {
     this.interaction.setDefaultOutcome(newOutcome);
   }
 
-  setInteractionCustomizationArgs(
+  setInteractionCustomizationArgs (
       newArgs: InteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 
-  setInteractionSolution(solution: Solution): void {
+  setInteractionSolution (solution: Solution): void {
     this.interaction.setSolution(solution);
   }
 
-  setInteractionHints(hints: Hint[]): void {
+  setInteractionHints (hints: Hint[]): void {
     this.interaction.setHints(hints);
   }
 
-  getInteraction(): Interaction {
+  getInteraction (): Interaction {
     return cloneDeep(this.interaction);
   }
 
   // Function will return null if interactionId does not exist or is not
   // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
   // 'DragAndDropSortInput'.
-  getAnswerChoices(
+  getAnswerChoices (
       interactionId: string,
       customizationArgs: InteractionCustomizationArgs
   ): AnswerChoice[] | null {
@@ -251,104 +251,104 @@ export class StateEditorService {
     }
   }
 
-  setInQuestionMode(newModeValue: boolean): void {
+  setInQuestionMode (newModeValue: boolean): void {
     this.inQuestionMode = newModeValue;
   }
 
-  isInQuestionMode(): boolean {
+  isInQuestionMode (): boolean {
     return this.inQuestionMode;
   }
 
-  setCorrectnessFeedbackEnabled(newCorrectnessFeedbackEnabled: boolean): void {
+  setCorrectnessFeedbackEnabled (newCorrectnessFeedbackEnabled: boolean): void {
     this.correctnessFeedbackEnabled = newCorrectnessFeedbackEnabled;
   }
 
-  getCorrectnessFeedbackEnabled(): boolean {
+  getCorrectnessFeedbackEnabled (): boolean {
     return this.correctnessFeedbackEnabled;
   }
 
-  setSolicitAnswerDetails(newSolicitAnswerDetails: boolean): void {
+  setSolicitAnswerDetails (newSolicitAnswerDetails: boolean): void {
     this.solicitAnswerDetails = newSolicitAnswerDetails;
   }
 
-  getSolicitAnswerDetails(): boolean {
+  getSolicitAnswerDetails (): boolean {
     return this.solicitAnswerDetails;
   }
 
-  setCardIsCheckpoint(newCardIsCheckpoint: boolean): void {
+  setCardIsCheckpoint (newCardIsCheckpoint: boolean): void {
     this.cardIsCheckpoint = newCardIsCheckpoint;
   }
 
-  getCardIsCheckpoint(): boolean {
+  getCardIsCheckpoint (): boolean {
     return this.cardIsCheckpoint;
   }
 
-  setStateNames(newStateNames: string[]): void {
+  setStateNames (newStateNames: string[]): void {
     this.stateNames = newStateNames;
     this._stateNamesChangedEventEmitter.emit();
   }
 
-  getStateNames(): string[] {
+  getStateNames (): string[] {
     return this.stateNames;
   }
 
-  setInapplicableSkillMisconceptionIds(
+  setInapplicableSkillMisconceptionIds (
       newInapplicableSkillMisconceptionIds: string[]): void {
     this.inapplicableSkillMisconceptionIds = (
       newInapplicableSkillMisconceptionIds);
   }
 
-  getInapplicableSkillMisconceptionIds(): string[] {
+  getInapplicableSkillMisconceptionIds (): string[] {
     return this.inapplicableSkillMisconceptionIds;
   }
 
-  isCurrentSolutionValid(): boolean {
+  isCurrentSolutionValid (): boolean {
     if (this.activeStateName === null) {
       return false;
     }
     return this.solutionValidityService.isSolutionValid(this.activeStateName);
   }
 
-  deleteCurrentSolutionValidity(): void {
+  deleteCurrentSolutionValidity (): void {
     if (this.activeStateName === null) {
       throw new Error('Active State for this solution is not set');
     }
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
-  get onStateEditorInitialized(): EventEmitter<State> {
+  get onStateEditorInitialized (): EventEmitter<State> {
     return this._stateEditorInitializedEventEmitter;
   }
 
-  get onStateEditorDirectiveInitialized(): EventEmitter<void> {
+  get onStateEditorDirectiveInitialized (): EventEmitter<void> {
     return this._stateEditorDirectiveInitializedEventEmitter;
   }
 
-  get onInteractionEditorInitialized(): EventEmitter<void> {
+  get onInteractionEditorInitialized (): EventEmitter<void> {
     return this._interactionEditorInitializedEventEmitter;
   }
 
-  get onShowTranslationTabBusyModal(): EventEmitter<void> {
+  get onShowTranslationTabBusyModal (): EventEmitter<void> {
     return this._showTranslationTabBusyModalEventEmitter;
   }
 
-  get onRefreshStateTranslation(): EventEmitter<void> {
+  get onRefreshStateTranslation (): EventEmitter<void> {
     return this._refreshStateTranslationEventEmitter;
   }
 
-  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[]> {
+  get onUpdateAnswerChoices (): EventEmitter<AnswerChoice[]> {
     return this._updateAnswerChoicesEventEmitter;
   }
 
-  get onSaveOutcomeDestDetails(): EventEmitter<void> {
+  get onSaveOutcomeDestDetails (): EventEmitter<void> {
     return this._saveOutcomeDestDetailsEventEmitter;
   }
 
-  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
+  get onHandleCustomArgsUpdate (): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
   }
 
-  get onObjectFormValidityChange(): EventEmitter<boolean> {
+  get onObjectFormValidityChange (): EventEmitter<boolean> {
     return this._objectFormValidityChangeEventEmitter;
   }
 }

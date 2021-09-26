@@ -35,14 +35,14 @@ export class StartNewBeamJobDialogComponent {
   readonly DEV_MODE: boolean = AppConstants.DEV_MODE;
   isRunning = false;
 
-  constructor(
+  constructor (
       @Inject(MAT_DIALOG_DATA) public beamJob: BeamJob,
       private matDialogRef:
         MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun>,
       private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 
-  onActionClick(): void {
+  onActionClick (): void {
     this.isRunning = true;
     this.matDialogRef.disableClose = true;
 

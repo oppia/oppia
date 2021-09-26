@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { UrlService } from 'services/contextual/url.service';
 
-describe('Question Player Concept Card Modal Controller', function() {
+describe('Question Player Concept Card Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var urlService: UrlService = null;
@@ -38,20 +38,20 @@ describe('Question Player Concept Card Modal Controller', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$window', mockWindow);
     $provide.value('UrlService', {
       getPathname: () => 'pathname',
       getUrlParams: () => 'getUrlParams'
     });
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
@@ -114,7 +114,7 @@ describe('Question Player Concept Card Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.skillIds).toEqual(skillIds);
       expect($scope.skills).toEqual(skillsObject);
       expect($scope.index).toBe(0);
@@ -123,7 +123,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     });
 
   it('should go to next concept card, and identify when it is the last' +
-    ' concept card.', function() {
+    ' concept card.', function () {
     expect($scope.isLastConceptCard()).toBe(false);
     $scope.goToNextConceptCard();
     expect($scope.index).toBe(1);
@@ -135,7 +135,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     expect($scope.modalHeader).toBe(undefined);
   });
 
-  it('should refresh page when retrying a practice test', function() {
+  it('should refresh page when retrying a practice test', function () {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       selected_subtopic_ids: 'selected_subtopic_ids'
     });

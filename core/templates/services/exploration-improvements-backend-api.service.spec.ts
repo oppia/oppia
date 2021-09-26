@@ -52,7 +52,7 @@ describe('Exploration stats back-end API service', () => {
     httpTestingController.verify();
   });
 
-  it('should return an ExplorationImprovementsResponse', fakeAsync(async() => {
+  it('should return an ExplorationImprovementsResponse', fakeAsync(async () => {
     const taskDict: ExplorationTaskBackendDict = {
       entity_type: 'exploration',
       entity_id: 'eid',
@@ -86,7 +86,7 @@ describe('Exploration stats back-end API service', () => {
   }));
 
   it('should return an ExplorationImprovementsHistoryResponse',
-    fakeAsync(async() => {
+    fakeAsync(async () => {
       const taskDict: ExplorationTaskBackendDict = {
         entity_type: 'exploration',
         entity_id: 'eid',
@@ -122,7 +122,7 @@ describe('Exploration stats back-end API service', () => {
     }));
 
   it('should return an ExplorationImprovementsHistoryResponse when given a ' +
-    'cursor', fakeAsync(async() => {
+    'cursor', fakeAsync(async () => {
     const taskDict: ExplorationTaskBackendDict = {
       entity_type: 'exploration',
       entity_id: 'eid',
@@ -158,7 +158,7 @@ describe('Exploration stats back-end API service', () => {
         false));
   }));
 
-  it('should try to post a task dict to the back-end', fakeAsync(async() => {
+  it('should try to post a task dict to the back-end', fakeAsync(async () => {
     const task = ExplorationTaskModel.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
@@ -191,7 +191,7 @@ describe('Exploration stats back-end API service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
-  it('should not make HTTP call when posting empty list', fakeAsync(async() => {
+  it('should not make HTTP call when posting empty list', fakeAsync(async () => {
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
     explorationImprovementsBackendApiService.postTasksAsync('eid', [])
@@ -204,7 +204,7 @@ describe('Exploration stats back-end API service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
-  it('should return an ExplorationImprovementsConfig', fakeAsync(async() => {
+  it('should return an ExplorationImprovementsConfig', fakeAsync(async () => {
     const response = (
       explorationImprovementsBackendApiService.getConfigAsync('eid'));
 

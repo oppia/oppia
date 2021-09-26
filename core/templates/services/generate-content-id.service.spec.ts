@@ -48,7 +48,7 @@ describe('GenerateContentIdService', () => {
   });
 
   it('should throw error for unknown content id', () => {
-    expect(function() {
+    expect(function () {
       gcis.getNextId(['xyz'], 'random_component_name');
     }).toThrowError('Unknown component name provided.');
   });

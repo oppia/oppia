@@ -49,10 +49,10 @@ interface Range {
   providedIn: 'root'
 })
 export class FractionInputValidationService {
-  constructor(
+  constructor (
     private bivs: baseInteractionValidationService) {}
 
-  getNonIntegerInputWarning(i: number, j: number): FractionWarning {
+  getNonIntegerInputWarning (i: number, j: number): FractionWarning {
     return {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
@@ -61,11 +61,11 @@ export class FractionInputValidationService {
         'integer.')
     };
   }
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: FractionInputCustomizationArgs): Warning[] {
     return [];
   }
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: FractionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome
   ): (Warning | FractionWarning)[] {

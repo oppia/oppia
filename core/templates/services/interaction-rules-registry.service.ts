@@ -78,7 +78,7 @@ interface InteractionRulesService {
 export class InteractionRulesRegistryService {
   private rulesServiceRegistry: Map<string, object>;
 
-  constructor(
+  constructor (
       private algebraicExpressionInputRulesService:
         AlgebraicExpressionInputRulesService,
       private codeReplRulesService: CodeReplRulesService,
@@ -129,7 +129,7 @@ export class InteractionRulesRegistryService {
     }));
   }
 
-  getRulesServiceByInteractionId(
+  getRulesServiceByInteractionId (
       interactionId: string): InteractionRulesService {
     if (!interactionId) {
       throw new Error('Interaction ID must not be empty');

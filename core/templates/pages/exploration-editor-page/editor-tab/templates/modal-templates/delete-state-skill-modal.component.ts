@@ -26,7 +26,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class DeleteStateSkillModalComponent
   extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
+  constructor (ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

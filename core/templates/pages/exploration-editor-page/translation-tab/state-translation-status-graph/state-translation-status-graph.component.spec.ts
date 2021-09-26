@@ -39,7 +39,7 @@ import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('State Translation Status Graph Component', function() {
+describe('State Translation Status Graph Component', function () {
   var $rootScope = null;
   var $scope = null;
   var explorationStatesService = null;
@@ -62,7 +62,7 @@ describe('State Translation Status Graph Component', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AlertsService', TestBed.get(AlertsService));
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
@@ -78,7 +78,7 @@ describe('State Translation Status Graph Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     stateEditorService = TestBed.get(StateEditorService);
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
@@ -97,8 +97,8 @@ describe('State Translation Status Graph Component', function() {
     testSubscriptions.unsubscribe();
   });
 
-  describe('when translation tab is not busy', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when translation tab is not busy', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       graphDataService = $injector.get('GraphDataService');
@@ -119,7 +119,7 @@ describe('State Translation Status Graph Component', function() {
       });
     }));
 
-    it('should get graph data from graph data service', function() {
+    it('should get graph data from graph data service', function () {
       var graphData = {
         finalStateIds: [],
         initStateId: 'property_1',
@@ -132,7 +132,7 @@ describe('State Translation Status Graph Component', function() {
       expect(graphDataService.getGraphData).toHaveBeenCalled();
     });
 
-    it('should get node colors from translation status', function() {
+    it('should get node colors from translation status', function () {
       var nodeColors = {};
       spyOn(translationStatusService, 'getAllStateStatusColors').and
         .returnValue(nodeColors);
@@ -142,12 +142,12 @@ describe('State Translation Status Graph Component', function() {
         .toHaveBeenCalled();
     });
 
-    it('should get active state name from state editor', function() {
+    it('should get active state name from state editor', function () {
       expect($scope.getActiveStateName()).toBe(stateName);
     });
 
     it('should set new active state name and refresh state when clicking' +
-      ' on state in map', function() {
+      ' on state in map', function () {
       spyOn(stateEditorService, 'setActiveStateName');
       $scope.onClickStateInMap('State2');
 
@@ -157,8 +157,8 @@ describe('State Translation Status Graph Component', function() {
     });
   });
 
-  describe('when translation tab is busy', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when translation tab is busy', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       graphDataService = $injector.get('GraphDataService');
@@ -193,7 +193,7 @@ describe('State Translation Status Graph Component', function() {
     });
 
     it('should show translation tab busy modal when clicking on state in map',
-      function() {
+      function () {
         spyOn(stateEditorService, 'setActiveStateName');
         $scope.onClickStateInMap('State2');
 

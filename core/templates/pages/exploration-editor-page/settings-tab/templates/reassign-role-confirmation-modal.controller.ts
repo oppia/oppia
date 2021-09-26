@@ -24,7 +24,7 @@ angular.module('oppia').controller(
   'ReassignRoleConfirmationModalController', [
     '$controller', '$scope', '$uibModalInstance', 'newRole', 'oldRole',
     'username',
-    function(
+    function (
         $controller, $scope, $uibModalInstance, newRole, oldRole,
         username) {
       $controller('ConfirmOrCancelModalController', {

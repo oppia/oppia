@@ -26,13 +26,13 @@ require('services/validators.service.ts');
 angular.module('oppia').factory('ExplorationObjectiveService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',
-  function(
+  function (
       $filter, ExplorationPropertyService, ExplorationRightsService,
       ValidatorsService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');
-    child._isValid = function(value) {
+    child._isValid = function (value) {
       return (
         ExplorationRightsService.isPrivate() ||
         ValidatorsService.isNonempty(value, false));

@@ -29,12 +29,12 @@ export class EmailDashboardResultBackendApiService {
   CANCEL_EMAIL_HANDLER_URL = '/emaildashboardcancelresult/<query_id>';
   TEST_BULK_EMAIL_URL = '/emaildashboardtestbulkemailhandler/<query_id>';
 
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  async submitEmailAsync(data: EmailData, queryId: string): Promise<Object> {
+  async submitEmailAsync (data: EmailData, queryId: string): Promise<Object> {
     let resultHandlerUrl = this.urlInterpolationService.interpolateUrl(
       this.RESULT_HANDLER_URL, {
         query_id: queryId
@@ -44,7 +44,7 @@ export class EmailDashboardResultBackendApiService {
     }).toPromise();
   }
 
-  async cancelEmailAsync(queryId: string): Promise<Object> {
+  async cancelEmailAsync (queryId: string): Promise<Object> {
     let cancelUrlHandler = this.urlInterpolationService.interpolateUrl(
       this.CANCEL_EMAIL_HANDLER_URL, {
         query_id: queryId
@@ -52,7 +52,7 @@ export class EmailDashboardResultBackendApiService {
     return this.http.post(cancelUrlHandler, {}).toPromise();
   }
 
-  async sendTestEmailAsync(
+  async sendTestEmailAsync (
       emailSubject: string, emailBody: string, queryId: string
   ): Promise<Object> {
     let testEmailHandlerUrl = this.urlInterpolationService.interpolateUrl(

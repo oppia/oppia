@@ -117,12 +117,12 @@ describe('Blog Post Editor Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent() {
+            getResizeEvent () {
               return {
                 subscribe: (callb) => {
                   callb();
                   return {
-                    unsubscribe() {}
+                    unsubscribe () {}
                   };
                 }
               };

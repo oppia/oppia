@@ -30,7 +30,7 @@ import { TestBed } from '@angular/core/testing';
 import { SubtopicPage } from './subtopic-page.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
-describe('Topic update service', function() {
+describe('Topic update service', function () {
   let topicUpdateService: TopicUpdateService;
   let topicObjectFactory: TopicObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
@@ -298,7 +298,7 @@ describe('Topic update service', function() {
     }]);
   });
 
-  it('should set/unset changes to a topic\'s page title', function() {
+  it('should set/unset changes to a topic\'s page title', function () {
     expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
     topicUpdateService.setPageTitleFragmentForWeb(
       _sampleTopic, 'new page title');
@@ -310,7 +310,7 @@ describe('Topic update service', function() {
   });
 
   it('should create a proper backend change dict ' +
-    'for changing a topic\'s page title', function() {
+    'for changing a topic\'s page title', function () {
     topicUpdateService.setPageTitleFragmentForWeb(
       _sampleTopic, 'new page title');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{

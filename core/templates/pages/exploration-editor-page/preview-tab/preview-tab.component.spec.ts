@@ -26,7 +26,7 @@ import { EventEmitter } from '@angular/core';
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Preview Tab Component', function() {
+describe('Preview Tab Component', function () {
   importAllAngularServices();
 
   var ctrl = null;
@@ -72,12 +72,12 @@ describe('Preview Tab Component', function() {
     paramName: 'paramName2'
   }];
 
-  beforeEach(function() {
+  beforeEach(function () {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
-  beforeEach(angular.mock.module(function($provide) {
+  beforeEach(angular.mock.module(function ($provide) {
     $provide.value('ExplorationDataService', {
       getDataAsync: () => $q.resolve({
         param_changes: [
@@ -89,8 +89,8 @@ describe('Preview Tab Component', function() {
     });
   }));
 
-  describe('when there are manual param changes', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when there are manual param changes', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
@@ -143,7 +143,7 @@ describe('Preview Tab Component', function() {
     });
 
     it('should initialize controller properties after its initialization',
-      function() {
+      function () {
         spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
           stateName);
 
@@ -154,7 +154,7 @@ describe('Preview Tab Component', function() {
         expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
       });
 
-    it('should init param changes if they are undefined', function() {
+    it('should init param changes if they are undefined', function () {
       spyOn(explorationParamChangesService, 'init').and.callThrough();
       spyOn(explorationStatesService, 'init');
       spyOn(explorationInitStateNameService, 'init').and.callThrough();
@@ -186,7 +186,7 @@ describe('Preview Tab Component', function() {
     });
 
     it('should set active state name when broadcasting' +
-      ' updateActiveStateIfInEditor', function() {
+      ' updateActiveStateIfInEditor', function () {
       spyOn(stateEditorService, 'setActiveStateName');
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
@@ -197,7 +197,7 @@ describe('Preview Tab Component', function() {
     });
 
     it('should get all learner params when broadcasting playerStateChange',
-      function() {
+      function () {
         spyOn(learnerParamsService, 'getAllParams').and.returnValue({
           foo: []
         });
@@ -208,7 +208,7 @@ describe('Preview Tab Component', function() {
         });
       });
 
-    it('should evaluate whenever parameter summary is shown', function() {
+    it('should evaluate whenever parameter summary is shown', function () {
       spyOn(explorationFeaturesService, 'areParametersEnabled')
         .and.returnValue(true);
       expect(ctrl.showParameterSummary()).toBe(false);
@@ -220,7 +220,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
-    it('should open set params modal', function() {
+    it('should open set params modal', function () {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn($uibModal, 'open').and.callThrough();
@@ -231,7 +231,7 @@ describe('Preview Tab Component', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should load preview state when closing set params modal', function() {
+    it('should load preview state when closing set params modal', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -250,7 +250,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.isExplorationPopulated).toBeTrue();
     });
 
-    it('should go to main tab when dismissing set params modal', function() {
+    it('should go to main tab when dismissing set params modal', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -266,8 +266,8 @@ describe('Preview Tab Component', function() {
     });
   });
 
-  describe('when there are no manual param changes', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when there are no manual param changes', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
@@ -300,7 +300,7 @@ describe('Preview Tab Component', function() {
       ];
 
       // Mock init just to call the callback directly.
-      spyOn(explorationEngineService, 'init').and.callFake(function(
+      spyOn(explorationEngineService, 'init').and.callFake(function (
           explorationDict, explorationVersion, preferredAudioLanguage,
           autoTtsEnabled, preferredContentLanguageCodes,
           successCallback) {
@@ -316,7 +316,7 @@ describe('Preview Tab Component', function() {
     }));
 
     it('should initialize controller properties after its initialization',
-      function() {
+      function () {
         // Get data from exploration data service.
         $scope.$apply();
 
@@ -324,7 +324,7 @@ describe('Preview Tab Component', function() {
         expect(ctrl.previewWarning).toBe('');
       });
 
-    it('should load preview state when closing set params modal', function() {
+    it('should load preview state when closing set params modal', function () {
       spyOn($uibModal, 'open');
       spyOn(explorationEngineService, 'initSettingsFromEditor');
 
@@ -339,7 +339,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.isExplorationPopulated).toBe(true);
     });
 
-    it('should reset preview settings', function() {
+    it('should reset preview settings', function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });

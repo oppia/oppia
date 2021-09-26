@@ -36,14 +36,14 @@ export class AttributionGuideComponent implements OnInit {
   generateAttibutionIsAllowed: boolean = false;
   maskIsShown: boolean = false;
   printAttributionLink: string = '';
-  constructor(
+  constructor (
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
     private contextService: ContextService,
     private urlService: UrlService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
     this.printAttributionLink = (
@@ -59,37 +59,37 @@ export class AttributionGuideComponent implements OnInit {
     }
   }
 
-  getAttributionModalStatus(): boolean {
+  getAttributionModalStatus (): boolean {
     return this.attributionService.isAttributionModalShown();
   }
 
-  showAttributionModal(): void {
+  showAttributionModal (): void {
     this.attributionService.showAttributionModal();
     this.maskIsShown = true;
   }
 
-  hideAttributionModal(): void {
+  hideAttributionModal (): void {
     this.attributionService.hideAttributionModal();
     this.maskIsShown = false;
   }
 
-  getPageUrl(): string {
+  getPageUrl (): string {
     return this.urlService.getCurrentLocation().href;
   }
 
-  getAuthors(): string {
+  getAuthors (): string {
     return this.attributionService.getAuthors().join(', ');
   }
 
-  getExplorationTitle(): string {
+  getExplorationTitle (): string {
     return this.attributionService.getExplorationTitle();
   }
 
-  getExplorationId(): string {
+  getExplorationId (): string {
     return this.contextService.getExplorationId();
   }
 
-  copyAttribution(className: string): void {
+  copyAttribution (className: string): void {
     const codeDiv = document.getElementsByClassName(className)[0];
     const range = document.createRange();
     range.setStartBefore(<Node>(<HTMLDivElement>codeDiv).firstChild);

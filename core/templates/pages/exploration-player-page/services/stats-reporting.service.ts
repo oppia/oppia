@@ -33,7 +33,7 @@ import { ServicesConstants } from 'services/services.constants';
   providedIn: 'root'
 })
 export class StatsReportingService {
-  constructor(
+  constructor (
       private contextService: ContextService,
       private messengerService: MessengerService,
       private playthroughService: PlaythroughService,
@@ -73,7 +73,7 @@ export class StatsReportingService {
   // recording.
   aggregatedStats: AggregatedStats = null;
 
-  private refreshAggregatedStats(): void {
+  private refreshAggregatedStats (): void {
     this.aggregatedStats = {
       num_starts: 0,
       num_completions: 0,
@@ -82,7 +82,7 @@ export class StatsReportingService {
     };
   }
 
-  private createDefaultStateStatsMappingIfMissing(stateName: string): void {
+  private createDefaultStateStatsMappingIfMissing (stateName: string): void {
     if (
       this.aggregatedStats.state_stats_mapping.hasOwnProperty(
         stateName)) {
@@ -98,7 +98,7 @@ export class StatsReportingService {
     };
   }
 
-  private startStatsTimer(): void {
+  private startStatsTimer (): void {
     if (!this.editorPreviewMode &&
       !this.questionPlayerMode) {
       this.ngZone.runOutsideAngular(() => {
@@ -114,7 +114,7 @@ export class StatsReportingService {
   // This method is called whenever a learner tries to leave an exploration,
   // when a learner starts an exploration, when a learner completes an
   // exploration and also every five minutes.
-  private postStatsToBackend(): void {
+  private postStatsToBackend (): void {
     if (this.explorationIsComplete) {
       return;
     }
@@ -133,11 +133,11 @@ export class StatsReportingService {
     this.refreshAggregatedStats();
   }
 
-  setTopicName(newTopicName: string): void {
+  setTopicName (newTopicName: string): void {
     this.topicName = newTopicName;
   }
 
-  initSession(
+  initSession (
       newExplorationId: string, newExplorationTitle: string,
       newExplorationVersion: number, newSessionId: string,
       collectionId: string): void {
@@ -154,7 +154,7 @@ export class StatsReportingService {
   // Note that this also resets the stateStopwatch.
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
-  recordExplorationStarted(stateName: string, params: Object): void {
+  recordExplorationStarted (stateName: string, params: Object): void {
     if (this.explorationStarted) {
       return;
     }
@@ -207,7 +207,7 @@ export class StatsReportingService {
       this.explorationId);
   }
 
-  recordExplorationActuallyStarted(stateName: string): void {
+  recordExplorationActuallyStarted (stateName: string): void {
     if (this.explorationActuallyStarted) {
       return;
     }
@@ -229,7 +229,7 @@ export class StatsReportingService {
     this.explorationActuallyStarted = true;
   }
 
-  recordSolutionHit(stateName: string): void {
+  recordSolutionHit (stateName: string): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
     this.aggregatedStats.state_stats_mapping[
       stateName].num_times_solution_viewed += 1;
@@ -249,7 +249,7 @@ export class StatsReportingService {
     });
   }
 
-  recordLeaveForRefresherExp(
+  recordLeaveForRefresherExp (
       stateName: string, refresherExpId: string): void {
     this.currentStateName = stateName;
     this.nextExpId = refresherExpId;
@@ -272,7 +272,7 @@ export class StatsReportingService {
   // Note that this also resets the stateStopwatch.
   // The type of oldParams is declared as Object since it can vary depending
   // on the oldStateName.
-  recordStateTransition(
+  recordStateTransition (
       oldStateName: string, newStateName: string, answer: string,
       oldParams: Object, isFirstHit: boolean): void {
     this.createDefaultStateStatsMappingIfMissing(newStateName);
@@ -328,7 +328,7 @@ export class StatsReportingService {
     this.stateStopwatch.reset();
   }
 
-  recordStateCompleted(stateName: string): void {
+  recordStateCompleted (stateName: string): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
     this.aggregatedStats.state_stats_mapping[
       stateName].num_completions += 1;
@@ -351,7 +351,7 @@ export class StatsReportingService {
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
-  recordExplorationCompleted(stateName: string, params: Object): void {
+  recordExplorationCompleted (stateName: string, params: Object): void {
     this.aggregatedStats.num_completions += 1;
     this.currentStateName = stateName;
 
@@ -393,7 +393,7 @@ export class StatsReportingService {
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
-  recordAnswerSubmitted(
+  recordAnswerSubmitted (
       stateName: string, params: Object, answer: string,
       answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string, feedbackIsUseful: boolean): void {
@@ -425,7 +425,7 @@ export class StatsReportingService {
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
-  recordMaybeLeaveEvent(stateName: string, params: Object): void {
+  recordMaybeLeaveEvent (stateName: string, params: Object): void {
     this.currentStateName = stateName;
 
     this.statsReportingBackendApiService.recordMaybeLeaveEventAsync(
@@ -450,7 +450,7 @@ export class StatsReportingService {
     this.playthroughService.storePlaythrough();
   }
 
-  recordAnswerSubmitAction(
+  recordAnswerSubmitAction (
       stateName: string, destStateName: string,
       interactionId: string, answer: string, feedback: string): void {
     this.playthroughService.recordAnswerSubmitAction(

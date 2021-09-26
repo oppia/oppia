@@ -34,7 +34,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'SchemaDefaultValueService', 'SchemaFormSubmittedService',
   'SchemaUndefinedLastElementService',
-  function(
+  function (
       FocusManagerService, IdGenerationService,
       NestedDirectivesRecursionTimeoutPreventionService,
       SchemaDefaultValueService, SchemaFormSubmittedService,
@@ -56,13 +56,13 @@ angular.module('oppia').directive('schemaBasedListEditor', [
       template: require('./schema-based-list-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
+      controller: ['$scope', function ($scope) {
         var ctrl = this;
         ctrl.directiveSubscriptions = new Subscription();
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
           IdGenerationService.generateNewId() + '-');
-        $scope.getFocusLabel = function(index) {
+        $scope.getFocusLabel = function (index) {
           // Treat the first item in the list as a special case -- if this list
           // is contained in another list, and the outer list is opened with a
           // desire to autofocus on the first input field, we can then focus on
@@ -75,7 +75,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             index === 0 ? baseFocusLabel : baseFocusLabel + index.toString());
         };
 
-        $scope.hasDuplicates = function() {
+        $scope.hasDuplicates = function () {
           var valuesSoFar = {};
           for (var i = 0; i < $scope.localValue.length; i++) {
             var value = $scope.localValue[i];
@@ -88,14 +88,14 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return false;
         };
 
-        var validate = function() {
+        var validate = function () {
           if ($scope.showDuplicatesWarning) {
             $scope.listEditorForm.$setValidity(
               'isUniquified',
               !$scope.hasDuplicates());
           }
         };
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           $scope.isAddItemButtonPresent = true;
           $scope.addElementText = 'Add element';
           if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
@@ -140,7 +140,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           $scope.$watch('localValue', validate, true);
 
           if ($scope.len === undefined) {
-            $scope.addElement = function() {
+            $scope.addElement = function () {
               if ($scope.isOneLineInput) {
                 $scope.hideAddItemButton();
               }
@@ -151,7 +151,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                 $scope.getFocusLabel($scope.localValue.length - 1));
             };
 
-            var _deleteLastElementIfUndefined = function() {
+            var _deleteLastElementIfUndefined = function () {
               var lastValueIndex = $scope.localValue.length - 1;
               var valueToConsiderUndefined = (
                 SchemaUndefinedLastElementService.getUndefinedValue(
@@ -162,7 +162,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               }
             };
 
-            var deleteEmptyElements = function() {
+            var deleteEmptyElements = function () {
               for (var i = 0; i < $scope.localValue.length - 1; i++) {
                 if ($scope.localValue[i].length === 0) {
                   $scope.deleteElement(i);
@@ -177,21 +177,21 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               }
             }
 
-            $scope.lastElementOnBlur = function() {
+            $scope.lastElementOnBlur = function () {
               _deleteLastElementIfUndefined();
               $scope.showAddItemButton();
             };
 
-            $scope.showAddItemButton = function() {
+            $scope.showAddItemButton = function () {
               deleteEmptyElements();
               $scope.isAddItemButtonPresent = true;
             };
 
-            $scope.hideAddItemButton = function() {
+            $scope.hideAddItemButton = function () {
               $scope.isAddItemButtonPresent = false;
             };
 
-            $scope._onChildFormSubmit = function() {
+            $scope._onChildFormSubmit = function () {
               if (!$scope.isAddItemButtonPresent) {
                 /**
                  * If form submission happens on last element of the set (i.e
@@ -217,7 +217,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               )
             );
 
-            $scope.deleteElement = function(index) {
+            $scope.deleteElement = function (index) {
               // Need to let the RTE know that HtmlContent has been changed.
               $scope.localValue.splice(index, 1);
             };
@@ -233,7 +233,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             }
           }
         };
-        ctrl.$onDestroy = function() {
+        ctrl.$onDestroy = function () {
           ctrl.directiveSubscriptions.unsubscribe();
         };
       }]

@@ -19,7 +19,7 @@
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Exploration Graph Component', function() {
+describe('Exploration Graph Component', function () {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -33,7 +33,7 @@ describe('Exploration Graph Component', function() {
   var stateEditorService = null;
 
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -51,25 +51,25 @@ describe('Exploration Graph Component', function() {
   }));
 
   it('should show graph when exploration states service is initialized',
-    function() {
+    function () {
       expect(ctrl.isGraphShown()).toBe(false);
       explorationStatesService.init({});
       expect(ctrl.isGraphShown()).toBe(true);
     });
 
-  it('should get name from the active state', function() {
+  it('should get name from the active state', function () {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
     expect(ctrl.getActiveStateName()).toBe('Introduction');
   });
 
   it('should get null graph data from graph data service when it is not' +
-    ' recomputed', function() {
+    ' recomputed', function () {
     expect(ctrl.isGraphShown()).toBe(false);
     expect(ctrl.getGraphData()).toBe(null);
   });
 
-  it('should evaluate if exploration graph is editable', function() {
+  it('should evaluate if exploration graph is editable', function () {
     var isEditableSpy = spyOn(editabilityService, 'isEditable');
     isEditableSpy.and.returnValue(true);
     expect(ctrl.isEditable()).toBe(true);
@@ -77,7 +77,7 @@ describe('Exploration Graph Component', function() {
     expect(ctrl.isEditable()).toBe(false);
   });
 
-  it('should open state graph modal', function() {
+  it('should open state graph modal', function () {
     var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
 
     ctrl.openStateGraphModal();
@@ -86,7 +86,7 @@ describe('Exploration Graph Component', function() {
     expect(modalOpenSpy).toHaveBeenCalled();
   });
 
-  it('should delete state when closing state graph modal', function() {
+  it('should delete state when closing state graph modal', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         action: 'delete',
@@ -103,7 +103,7 @@ describe('Exploration Graph Component', function() {
   });
 
   it('should navigate to main tab when closing state graph modal',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           action: 'navigate',
@@ -120,7 +120,7 @@ describe('Exploration Graph Component', function() {
     });
 
   it('should handle invalid actions when state graph modal is opened',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           action: 'add',
@@ -136,7 +136,7 @@ describe('Exploration Graph Component', function() {
         'Invalid closeDict action: add');
     });
 
-  it('should dismiss state graph modal', function() {
+  it('should dismiss state graph modal', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -148,13 +148,13 @@ describe('Exploration Graph Component', function() {
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   });
 
-  it('should return checkpoint count', function() {
+  it('should return checkpoint count', function () {
     spyOn(explorationStatesService, 'getCheckpointCount').and.returnValue(5);
 
     expect(ctrl.getCheckpointCount()).toEqual(5);
   });
 
-  it('should return checkpoint count warning', function() {
+  it('should return checkpoint count warning', function () {
     spyOn(explorationWarningsService, 'getCheckpointCountWarning').and
       .returnValue('Only a maximum of 8 checkpoints are allowed per lesson.');
 

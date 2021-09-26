@@ -40,7 +40,7 @@ export class QuestionDifficultySelectorComponent {
     new EventEmitter());
   availableDifficultyValues: number[] = [];
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     for (let difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
       this.availableDifficultyValues.push(
         AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
@@ -48,7 +48,7 @@ export class QuestionDifficultySelectorComponent {
     }
   }
 
-  updateSkillWithDifficulty(event: MatRadioChange): void {
+  updateSkillWithDifficulty (event: MatRadioChange): void {
     this.skillWithDifficulty.setDifficulty(event.value);
     this.skillWithDifficultyChange.emit(this.skillWithDifficulty);
   }

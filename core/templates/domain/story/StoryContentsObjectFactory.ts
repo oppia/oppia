@@ -42,43 +42,43 @@ export class StoryContents {
   _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
-  constructor(
+  constructor (
       initialNodeId: string, nodes: StoryNode[], nextNodeId: string) {
     this._initialNodeId = initialNodeId;
     this._nodes = nodes;
     this._nextNodeId = nextNodeId;
   }
 
-  getIncrementedNodeId(nodeId: string): string {
+  getIncrementedNodeId (nodeId: string): string {
     var index = parseInt(
       nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
     ++index;
     return StoryEditorPageConstants.NODE_ID_PREFIX + index;
   }
 
-  getInitialNodeId(): string | null {
+  getInitialNodeId (): string | null {
     return this._initialNodeId;
   }
 
-  getLinearNodesList(): StoryNode[] {
+  getLinearNodesList (): StoryNode[] {
     return this._nodes.slice();
   }
 
-  getNextNodeId(): string {
+  getNextNodeId (): string {
     return this._nextNodeId;
   }
 
-  getNodes(): StoryNode[] {
+  getNodes (): StoryNode[] {
     return this._nodes;
   }
 
-  rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
+  rearrangeNodeInStory (fromIndex: number, toIndex: number): void {
     const nodeToMove: StoryNode = this._nodes[fromIndex];
     this._nodes.splice(fromIndex, 1);
     this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
-  getNodeIdsToTitleMap(nodeIds: string[]): {} {
+  getNodeIdsToTitleMap (nodeIds: string[]): {} {
     var nodes = this._nodes;
     var nodeTitles: NodeTitles = {};
     for (var i = 0; i < nodes.length; i++) {
@@ -96,7 +96,7 @@ export class StoryContents {
     return nodeTitles;
   }
 
-  getNodeIds(): string[] {
+  getNodeIds (): string[] {
     return this._nodes.map((node: StoryNode) => {
       return node.getId();
     });
@@ -105,7 +105,7 @@ export class StoryContents {
   // A nodeId will be null if the initial node does not exist.
   // A nodeId will be undefined if the pending nodes to visit are not present.
   // If the nodeId is null, empty or undefined then the function returns -1.
-  getNodeIndex(nodeId: string | null | undefined): number {
+  getNodeIndex (nodeId: string | null | undefined): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
         return i;
@@ -114,7 +114,7 @@ export class StoryContents {
     return -1;
   }
 
-  validate(): string[] {
+  validate (): string[] {
     var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
@@ -169,14 +169,14 @@ export class StoryContents {
     return issues;
   }
 
-  setInitialNodeId(nodeId: string): void {
+  setInitialNodeId (nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
     this._initialNodeId = nodeId;
   }
 
-  addNode(title: string): void {
+  addNode (title: string): void {
     this._nodes.push(
       StoryNode.createFromIdAndTitle(
         this._nextNodeId, title));
@@ -186,7 +186,7 @@ export class StoryContents {
     this._nextNodeId = this.getIncrementedNodeId(this._nextNodeId);
   }
 
-  deleteNode(nodeId: string): void {
+  deleteNode (nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
       throw new Error('The node does not exist');
     }
@@ -205,7 +205,7 @@ export class StoryContents {
     this._nodes.splice(this.getNodeIndex(nodeId), 1);
   }
 
-  setNodeOutline(nodeId: string, outline: string): void {
+  setNodeOutline (nodeId: string, outline: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -213,7 +213,7 @@ export class StoryContents {
     this._nodes[index].setOutline(outline);
   }
 
-  setNodeTitle(nodeId: string, title: string): void {
+  setNodeTitle (nodeId: string, title: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -221,7 +221,7 @@ export class StoryContents {
     this._nodes[index].setTitle(title);
   }
 
-  setNodeDescription(nodeId: string, description: string): void {
+  setNodeDescription (nodeId: string, description: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -229,7 +229,7 @@ export class StoryContents {
     this._nodes[index].setDescription(description);
   }
 
-  setNodeExplorationId(nodeId: string, explorationId: string): void {
+  setNodeExplorationId (nodeId: string, explorationId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -247,7 +247,7 @@ export class StoryContents {
     }
   }
 
-  markNodeOutlineAsFinalized(nodeId: string): void {
+  markNodeOutlineAsFinalized (nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -255,7 +255,7 @@ export class StoryContents {
     this._nodes[index].markOutlineAsFinalized();
   }
 
-  markNodeOutlineAsNotFinalized(nodeId: string): void {
+  markNodeOutlineAsNotFinalized (nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -263,7 +263,7 @@ export class StoryContents {
     this._nodes[index].markOutlineAsNotFinalized();
   }
 
-  addPrerequisiteSkillIdToNode(nodeId: string, skillId: string): void {
+  addPrerequisiteSkillIdToNode (nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -271,7 +271,7 @@ export class StoryContents {
     this._nodes[index].addPrerequisiteSkillId(skillId);
   }
 
-  removePrerequisiteSkillIdFromNode(nodeId: string, skillId: string): void {
+  removePrerequisiteSkillIdFromNode (nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -279,7 +279,7 @@ export class StoryContents {
     this._nodes[index].removePrerequisiteSkillId(skillId);
   }
 
-  addAcquiredSkillIdToNode(nodeId: string, skillId: string): void {
+  addAcquiredSkillIdToNode (nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -287,7 +287,7 @@ export class StoryContents {
     this._nodes[index].addAcquiredSkillId(skillId);
   }
 
-  removeAcquiredSkillIdFromNode(nodeId: string, skillId: string): void {
+  removeAcquiredSkillIdFromNode (nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -295,7 +295,7 @@ export class StoryContents {
     this._nodes[index].removeAcquiredSkillId(skillId);
   }
 
-  addDestinationNodeIdToNode(nodeId: string, destinationNodeId: string): void {
+  addDestinationNodeIdToNode (nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
@@ -306,7 +306,7 @@ export class StoryContents {
     this._nodes[index].addDestinationNodeId(destinationNodeId);
   }
 
-  removeDestinationNodeIdFromNode(
+  removeDestinationNodeIdFromNode (
       nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
@@ -320,8 +320,8 @@ export class StoryContents {
   providedIn: 'root'
 })
 export class StoryContentsObjectFactory {
-  constructor() {}
-  createFromBackendDict(
+  constructor () {}
+  createFromBackendDict (
       storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {

@@ -49,7 +49,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   currentValue: string = '';
   eventBusGroup: EventBusGroup;
 
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
@@ -59,7 +59,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.value === undefined || this.value === null) {
       this.value = '';
       this.valueChanged.emit(this.value);
@@ -112,7 +112,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     }
   }
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid (): boolean {
     // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
     // is not compatible with nerdamer or with the backend validations.
     this.currentValue = this.mathInteractionsService.replaceAbsSymbolWithText(
@@ -143,7 +143,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     return answerIsValid;
   }
 
-  showOSK(): void {
+  showOSK (): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
   }

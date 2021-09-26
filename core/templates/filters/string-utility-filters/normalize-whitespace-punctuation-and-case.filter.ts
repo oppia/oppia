@@ -21,10 +21,10 @@
 // result in two alphanumeric "words" being joined together are also removed,
 // so "hello ? " becomes "hello?".
 angular.module('oppia').filter('normalizeWhitespacePunctuationAndCase', [
-  function() {
-    return function(input) {
+  function () {
+    return function (input) {
       if (typeof input === 'string' || input instanceof String) {
-        var isAlphanumeric = function(character) {
+        var isAlphanumeric = function (character) {
           return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
             character.toLowerCase()) !== -1;
         };

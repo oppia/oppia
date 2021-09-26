@@ -30,7 +30,7 @@ var RICH_TEXT_COMPONENTS = {
   Video: require('./Video/protractor.js')
 };
 
-var getComponent = function(componentName) {
+var getComponent = function (componentName) {
   if (RICH_TEXT_COMPONENTS.hasOwnProperty(componentName)) {
     return RICH_TEXT_COMPONENTS[componentName];
   } else {

@@ -22,7 +22,7 @@ import { ImprovementsConstants } from
 angular.module('oppia').component('completionGraph', {
   bindings: { completionRate: '<' },
   template: require('./completion-graph.component.html'),
-  controller: function() {
+  controller: function () {
     this.$onInit = () => {
       this.completionBarStyle = {
         'stroke-dasharray': ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH,

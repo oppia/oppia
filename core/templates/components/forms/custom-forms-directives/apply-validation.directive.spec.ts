@@ -25,18 +25,18 @@ require(
   'components/forms/custom-forms-directives/' +
   'apply-validation.directive.ts');
 
-describe('Testing apply-validation directive', function() {
+describe('Testing apply-validation directive', function () {
   var element, scope, testInput;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($rootScope) {
+  beforeEach(angular.mock.inject(function ($rootScope) {
     scope = $rootScope.$new();
     element = '<form name="testForm">' +
       '<input name="inputValue" type="number" ng-model="localValue" ' +
@@ -45,8 +45,8 @@ describe('Testing apply-validation directive', function() {
   }));
 
   it('should apply isAtLeast validation', angular.mock.inject(
-    function($compile) {
-      scope.validators = function() {
+    function ($compile) {
+      scope.validators = function () {
         return [{
           id: 'isAtLeast',
           minValue: -2.5
@@ -82,8 +82,8 @@ describe('Testing apply-validation directive', function() {
     }));
 
   it('should apply isAtMost validation', angular.mock.inject(
-    function($compile) {
-      scope.validators = function() {
+    function ($compile) {
+      scope.validators = function () {
         return [{
           id: 'isAtMost',
           maxValue: 5
@@ -119,8 +119,8 @@ describe('Testing apply-validation directive', function() {
     }));
 
   it('should apply isNonempty validation', angular.mock.inject(
-    function($compile) {
-      scope.validators = function() {
+    function ($compile) {
+      scope.validators = function () {
         return [{
           id: 'isNonempty'
         }];
@@ -145,8 +145,8 @@ describe('Testing apply-validation directive', function() {
     }));
 
   it('should apply isInteger validation', angular.mock.inject(
-    function($compile) {
-      scope.validators = function() {
+    function ($compile) {
+      scope.validators = function () {
         return [{
           id: 'isInteger'
         }];
@@ -180,8 +180,8 @@ describe('Testing apply-validation directive', function() {
       expect(Object.keys(testInput.$error).length).not.toEqual(0);
     }));
 
-  it('should apply isFloat validation', angular.mock.inject(function($compile) {
-    scope.validators = function() {
+  it('should apply isFloat validation', angular.mock.inject(function ($compile) {
+    scope.validators = function () {
       return [{
         id: 'isFloat'
       }];
@@ -236,8 +236,8 @@ describe('Testing apply-validation directive', function() {
   }));
 
   it('should not apply nonexistent validation', angular.mock.inject(
-    function($compile) {
-      scope.validators = function() {
+    function ($compile) {
+      scope.validators = function () {
         return [{
           id: 'testFilterFilter'
         }];

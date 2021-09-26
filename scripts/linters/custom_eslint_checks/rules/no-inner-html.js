@@ -32,10 +32,10 @@ module.exports = {
       disallowInnerhtml: 'Please do not use innerHTML property.'
     }
   },
-  create: function(context) {
+  create: function (context) {
     var selector = 'MemberExpression[property.name=innerHTML]';
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         context.report({
           node: node.property,
           messageId: 'disallowInnerhtml'

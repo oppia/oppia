@@ -34,32 +34,32 @@ export class StoryEditorNavigationService {
     // 'chapterIndex' is null when we are navigating to a chapter with its ID.
     chapterIndex: number | null = null;
 
-    constructor(private windowRef: WindowRef) {}
+    constructor (private windowRef: WindowRef) {}
 
-    getActiveTab(): string {
+    getActiveTab (): string {
       return this.activeTab;
     }
 
-    setChapterId(id: string): void {
+    setChapterId (id: string): void {
       this.chapterId = id;
     }
 
-    getChapterIndex(): number | null {
+    getChapterIndex (): number | null {
       return this.chapterIndex;
     }
 
-    getChapterId(): string {
+    getChapterId (): string {
       return this.chapterId;
     }
 
-    navigateToChapterEditorWithId(id: string, index: number | null): void {
+    navigateToChapterEditorWithId (id: string, index: number | null): void {
       this.activeTab = CHAPTER_EDITOR;
       this.setChapterId(id);
       this.chapterIndex = index;
       this.windowRef.nativeWindow.location.hash = '/chapter_editor/' + id;
     }
 
-    checkIfPresentInChapterEditor(): boolean {
+    checkIfPresentInChapterEditor (): boolean {
       const chapterId = this.windowRef.nativeWindow.location.hash.split('/')[2];
       if (chapterId) {
         this.chapterId = chapterId;
@@ -68,22 +68,22 @@ export class StoryEditorNavigationService {
       return false;
     }
 
-    checkIfPresentInStoryPreviewTab(): boolean {
+    checkIfPresentInStoryPreviewTab (): boolean {
       return (
         this.windowRef.nativeWindow.location.hash.split('/')[1] ===
           'story_preview');
     }
 
-    navigateToChapterEditor(): void {
+    navigateToChapterEditor (): void {
       this.navigateToChapterEditorWithId(this.chapterId, null);
     }
 
-    navigateToStoryEditor(): void {
+    navigateToStoryEditor (): void {
       this.activeTab = STORY_EDITOR;
       this.windowRef.nativeWindow.location.hash = '';
     }
 
-    navigateToStoryPreviewTab(): void {
+    navigateToStoryPreviewTab (): void {
       this.windowRef.nativeWindow.location.hash = '/story_preview/';
       this.activeTab = STORY_PREVIEW;
     }

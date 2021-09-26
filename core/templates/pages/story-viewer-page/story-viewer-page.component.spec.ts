@@ -34,7 +34,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
 class MockAssetsBackendApiService {
-  getThumbnailUrlForPreview() {
+  getThumbnailUrlForPreview () {
     return 'thumbnail-url';
   }
 }
@@ -254,28 +254,28 @@ describe('Story Viewer Page component', () => {
         description: 'description',
         topicName: 'topic_name',
         metaTagContent: 'this is meta tag content',
-        getInitialNode() {
+        getInitialNode () {
           return null;
         },
-        getStoryNodeCount(): number {
+        getStoryNodeCount (): number {
           return 2;
         },
-        getStoryNodes() {
+        getStoryNodes () {
           return null;
         },
-        hasFinishedStory() {
+        hasFinishedStory () {
           return null;
         },
-        getNextPendingNodeId(): string {
+        getNextPendingNodeId (): string {
           return null;
         },
-        hasStartedStory(): boolean {
+        hasStartedStory (): boolean {
           return null;
         },
-        getStoryId(): string {
+        getStoryId (): string {
           return this.id;
         },
-        getMetaTagContent(): string {
+        getMetaTagContent (): string {
           return this.metaTagContent;
         }
       };

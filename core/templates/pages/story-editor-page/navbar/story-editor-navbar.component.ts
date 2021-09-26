@@ -45,7 +45,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   showNavigationOptions: boolean;
   showStoryEditOptions: boolean;
   activeTab: string;
-  constructor(
+  constructor (
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
     private storyValidationService: StoryValidationService,
@@ -60,30 +60,30 @@ export class StoryEditorNavbarComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   explorationValidationIssues = [];
 
-  isStoryPublished(): boolean {
+  isStoryPublished (): boolean {
     return this.storyEditorStateService.isStoryPublished();
   }
 
-  isSaveInProgress(): boolean {
+  isSaveInProgress (): boolean {
     return this.storyEditorStateService.isSavingStory();
   }
 
-  getChangeListLength(): number {
+  getChangeListLength (): number {
     return this.undoRedoService.getChangeCount();
   }
 
-  getWarningsCount(): number {
+  getWarningsCount (): number {
     return this.validationIssues.length;
   }
 
-  getTotalWarningsCount(): number {
+  getTotalWarningsCount (): number {
     return (
       this.validationIssues.length +
       this.explorationValidationIssues.length +
       this.prepublishValidationIssues.length);
   }
 
-  isStorySaveable(): boolean {
+  isStorySaveable (): boolean {
     if (this.storyEditorStateService.isStoryPublished()) {
       return (
         this.getChangeListLength() > 0 &&
@@ -94,14 +94,14 @@ export class StoryEditorNavbarComponent implements OnInit {
       this.getWarningsCount() === 0);
   }
 
-  discardChanges(): void {
+  discardChanges (): void {
     this.undoRedoService.clearChanges();
     this.storyEditorStateService.loadStory(this.story.getId());
     this._validateStory();
     this.forceValidateExplorations = true;
   }
 
-  private _validateStory(): void {
+  private _validateStory (): void {
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
     let skillIdsInTopic = (
@@ -132,7 +132,7 @@ export class StoryEditorNavbarComponent implements OnInit {
         nodePrepublishValidationIssues));
   }
 
-  private _validateExplorations(): void {
+  private _validateExplorations (): void {
     let nodes = this.story.getStoryContents().getNodes();
     let explorationIds = [];
 
@@ -161,7 +161,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.storyEditorStateService.resetExpIdsChanged();
   }
 
-  saveChanges(): void {
+  saveChanges (): void {
     const modalRef = this.ngbModal.open(
       StoryEditorSaveModalComponent,
       { backdrop: 'static' });
@@ -180,7 +180,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     });
   }
 
-  publishStory(): void {
+  publishStory (): void {
     this.storyEditorStateService.changeStoryPublicationStatus(
       true, () => {
         this.storyIsPublished =
@@ -188,7 +188,7 @@ export class StoryEditorNavbarComponent implements OnInit {
       });
   }
 
-  unpublishStory(): void {
+  unpublishStory (): void {
     this.ngbModal.open(
       StoryEditorUnpublishModalComponent,
       { backdrop: 'static' }
@@ -207,31 +207,31 @@ export class StoryEditorNavbarComponent implements OnInit {
     });
   }
 
-  toggleWarningText(): void {
+  toggleWarningText (): void {
     this.warningsAreShown = !this.warningsAreShown;
   }
 
-  toggleNavigationOptions(): void {
+  toggleNavigationOptions (): void {
     this.showNavigationOptions = !this.showNavigationOptions;
   }
 
-  toggleStoryEditOptions(): void {
+  toggleStoryEditOptions (): void {
     this.showStoryEditOptions = !this.showStoryEditOptions;
   }
 
-  selectMainTab(): void {
+  selectMainTab (): void {
     this.activeTab = this.EDITOR;
     this.storyEditorNavigationService.navigateToStoryEditor();
     this.showNavigationOptions = false;
   }
 
-  selectPreviewTab(): void {
+  selectPreviewTab (): void {
     this.activeTab = this.PREVIEW;
     this.storyEditorNavigationService.navigateToStoryPreviewTab();
     this.showNavigationOptions = false;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.storyEditorStateService.onStoryInitialized.subscribe(
         () => this._validateStory()
@@ -255,7 +255,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

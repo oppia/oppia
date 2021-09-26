@@ -28,7 +28,7 @@ export class LearnerAnswerDetails {
   customizationArgs: InteractionCustomizationArgs;
   learnerAnswerInfoData: LearnerAnswerInfo[];
 
-  constructor(
+  constructor (
       expId: string, stateName: string, interactionId: string,
       customizationArgs: InteractionCustomizationArgs,
       learnerAnswerInfoData: LearnerAnswerInfo[]) {
@@ -39,7 +39,7 @@ export class LearnerAnswerDetails {
     this.learnerAnswerInfoData = learnerAnswerInfoData;
   }
 
-  static createDefaultLearnerAnswerDetails(
+  static createDefaultLearnerAnswerDetails (
       expId: string, stateName: string, interactionId: string,
       customizationArgs: InteractionCustomizationArgs,
       learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {
@@ -48,19 +48,19 @@ export class LearnerAnswerDetails {
       learnerAnswerInfoData);
   }
 
-  getExpId(): string {
+  getExpId (): string {
     return this.expId;
   }
 
-  getStateName(): string {
+  getStateName (): string {
     return this.stateName;
   }
 
-  getLearnerAnswerInfoData(): LearnerAnswerInfo[] {
+  getLearnerAnswerInfoData (): LearnerAnswerInfo[] {
     return this.learnerAnswerInfoData;
   }
 
-  getLastUpdatedTime(): number {
+  getLastUpdatedTime (): number {
     var createdOnValues =
       this.learnerAnswerInfoData.map(info => info.getCreatedOn());
     return Math.max(...createdOnValues);

@@ -25,7 +25,7 @@ import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 
-describe('Exploration stats service', function() {
+describe('Exploration stats service', function () {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
   let explorationStatsService: ExplorationStatsService;
   let explorationStats: ExplorationStats;

@@ -24,16 +24,16 @@ angular.module('oppia').component('scoreRing', {
   template: require('./score-ring.component.html'),
   controllerAs: '$ctrl',
   controller: ['$scope', 'COLORS_FOR_PASS_FAIL_MODE',
-    function($scope, COLORS_FOR_PASS_FAIL_MODE) {
+    function ($scope, COLORS_FOR_PASS_FAIL_MODE) {
       var ctrl = this;
       let circle, radius, circumference;
 
-      var setScore = function(percent) {
+      var setScore = function (percent) {
         const offset = circumference - percent / 100 * circumference;
         circle.style.strokeDashoffset = offset.toString();
       };
 
-      ctrl.getScoreRingColor = function() {
+      ctrl.getScoreRingColor = function () {
         if (ctrl.testIsPassed()) {
           return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
         } else {
@@ -41,7 +41,7 @@ angular.module('oppia').component('scoreRing', {
         }
       };
 
-      ctrl.getScoreOuterRingColor = function() {
+      ctrl.getScoreOuterRingColor = function () {
         if (ctrl.testIsPassed()) {
           // Return color green when passed.
           return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
@@ -50,16 +50,16 @@ angular.module('oppia').component('scoreRing', {
           return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
         }
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         circle = <SVGCircleElement>(
           document.querySelector('.score-ring-circle'));
         radius = circle.r.baseVal.value;
         circumference = (radius * 2 * Math.PI);
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
         circle.style.strokeDashoffset = circumference.toString();
-        $scope.$watch(function() {
+        $scope.$watch(function () {
           return ctrl.getScore();
-        }, function(newScore) {
+        }, function (newScore) {
           if (newScore && newScore > 0) {
             setScore(newScore);
           }

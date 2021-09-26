@@ -30,13 +30,13 @@ export class LearnerViewRatingService {
   userRating: number;
   private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
 
-  constructor(
+  constructor (
     private explorationEngineService: ExplorationEngineService,
     private learnerViewRatingBackendApiService:
     LearnerViewRatingBackendApiService
   ) {}
 
-  init(successCallback: (usrRating) => void): void {
+  init (successCallback: (usrRating) => void): void {
     this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then((response) => {
         successCallback(response.user_rating);
@@ -44,7 +44,7 @@ export class LearnerViewRatingService {
       });
   }
 
-  submitUserRating(ratingValue: number): void {
+  submitUserRating (ratingValue: number): void {
     this.learnerViewRatingBackendApiService.submitUserRatingAsync(ratingValue)
       .then(() => {
         this.userRating = ratingValue;
@@ -52,11 +52,11 @@ export class LearnerViewRatingService {
       });
   }
 
-  getUserRating(): number {
+  getUserRating (): number {
     return this.userRating;
   }
 
-  get onRatingUpdated(): EventEmitter<void> {
+  get onRatingUpdated (): EventEmitter<void> {
     return this._ratingUpdatedEventEmitter;
   }
 }

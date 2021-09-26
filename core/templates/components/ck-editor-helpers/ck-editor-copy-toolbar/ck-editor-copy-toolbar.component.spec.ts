@@ -101,7 +101,7 @@ describe('CkEditor copy toolbar', () => {
 class MockCkEditorCopyContentService {
   copyModeActive = false;
 
-  toggleCopyMode() {
+  toggleCopyMode () {
     this.copyModeActive = !this.copyModeActive;
   }
 }

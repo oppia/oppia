@@ -54,11 +54,11 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   text: string = '';
   showUrlInTooltip: boolean = false;
   tabIndexVal: number = 0;
-  constructor(
+  constructor (
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService) {}
 
-  private _updateViewOnLinkChange(): void {
+  private _updateViewOnLinkChange (): void {
     if (!this.urlWithValue || !this.textWithValue) {
       return;
     }
@@ -94,11 +94,11 @@ export class NoninteractiveLink implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateViewOnLinkChange();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.urlWithValue || changes.textWithValue) {
       this._updateViewOnLinkChange();
     }

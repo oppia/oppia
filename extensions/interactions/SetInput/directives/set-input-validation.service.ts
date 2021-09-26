@@ -42,7 +42,7 @@ interface PreviousRule {
   providedIn: 'root'
 })
 export class SetInputValidationService {
-  constructor(
+  constructor (
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
@@ -53,7 +53,7 @@ export class SetInputValidationService {
    * @param {string[]} inputB second set.
    * @return {boolean} True if the two sets are identical.
    */
-  private areSameSet(inputA: string[], inputB: string[]): boolean {
+  private areSameSet (inputA: string[], inputB: string[]): boolean {
     let setA = new Set(inputA);
     let setB = new Set(inputB);
     if (setA.size !== setB.size) {
@@ -69,7 +69,7 @@ export class SetInputValidationService {
    * @param {string[]} inputB second set.
    * @return {boolean} True if the first set is a subset of the second set.
    */
-  private isSubset(inputA: string[], inputB: string[]): boolean {
+  private isSubset (inputA: string[], inputB: string[]): boolean {
     let setB = new Set(inputB);
     return inputA.every(val => setB.has(val));
   }
@@ -81,14 +81,14 @@ export class SetInputValidationService {
    * @param {Rule} ruleB second rule.
    * @return {boolean} True if the two rules are identical.
    */
-  private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
+  private areSameRule (ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
       this.areSameSet(
         (<TranslatableSetOfUnicodeString>ruleA.inputs.x).unicodeStrSet,
         (<TranslatableSetOfUnicodeString>ruleB.inputs.x).unicodeStrSet);
   }
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: SetInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
@@ -116,7 +116,7 @@ export class SetInputValidationService {
    * @param {AnswerGroup[]} answerGroups answer groups created from user input.
    * @return {Warning[]} Array of warnings.
    */
-  getRedundantRuleWarnings(answerGroups: AnswerGroup[]): Warning[] {
+  getRedundantRuleWarnings (answerGroups: AnswerGroup[]): Warning[] {
     let warningsList: Warning[] = [];
 
     let previousRules: PreviousRule[] = [];
@@ -193,7 +193,7 @@ export class SetInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: SetInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return [

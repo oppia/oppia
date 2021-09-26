@@ -49,7 +49,7 @@ require(
   'components/question-directives/question-editor/' +
   'question-editor.component.ts');
 
-describe('Question update service', function() {
+describe('Question update service', function () {
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
@@ -62,7 +62,7 @@ describe('Question update service', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
@@ -85,13 +85,13 @@ describe('Question update service', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
@@ -234,7 +234,7 @@ describe('Question update service', function() {
       sampleQuestionBackendObject);
   }));
 
-  it('should update the language code of the question', function() {
+  it('should update the language code of the question', function () {
     expect(sampleQuestion.getLanguageCode()).toEqual('en');
     QuestionUpdateService.setQuestionLanguageCode(sampleQuestion, 'zh');
     expect(sampleQuestion.getLanguageCode()).toEqual('zh');
@@ -242,9 +242,9 @@ describe('Question update service', function() {
     expect(sampleQuestion.getLanguageCode()).toEqual('en');
   });
 
-  it('should update the state data of the question', function() {
+  it('should update the state data of the question', function () {
     var oldStateData = angular.copy(sampleQuestion.getStateData());
-    var updateFunction = function() {
+    var updateFunction = function () {
       var stateData = sampleQuestion.getStateData();
       stateData.content = SubtitledHtml.createDefault(
         'test content', 'content');

@@ -68,7 +68,7 @@ describe('Release coordinator backend api service', () => {
         Job.createFromBackendDict),
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -269,7 +269,7 @@ describe('Release coordinator backend api service', () => {
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
   }));
 
-  it('should get all beam jobs', fakeAsync(async() => {
+  it('should get all beam jobs', fakeAsync(async () => {
     const beamJobsPromise = rcbas.getBeamJobs().toPromise();
     const req = httpTestingController.expectOne('/beam_job');
     expect(req.request.method).toEqual('GET');
@@ -285,7 +285,7 @@ describe('Release coordinator backend api service', () => {
     ]);
   }));
 
-  it('should get all beam job runs', fakeAsync(async() => {
+  it('should get all beam job runs', fakeAsync(async () => {
     const beamJobRunsPromise = rcbas.getBeamJobRuns().toPromise();
     const req = httpTestingController.expectOne('/beam_job_run');
     expect(req.request.method).toEqual('GET');
@@ -308,7 +308,7 @@ describe('Release coordinator backend api service', () => {
     ]);
   }));
 
-  it('should start a new job', fakeAsync(async() => {
+  it('should start a new job', fakeAsync(async () => {
     const beamJob = new BeamJob('FooJob');
     const beamJobRunPromise = rcbas.startNewBeamJob(beamJob).toPromise();
     const req = httpTestingController.expectOne('/beam_job_run');
@@ -328,7 +328,7 @@ describe('Release coordinator backend api service', () => {
       new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false));
   }));
 
-  it('should cancel a running beam job', fakeAsync(async() => {
+  it('should cancel a running beam job', fakeAsync(async () => {
     const beamJobRun = (
       new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false));
     const beamJobRunPromise = rcbas.cancelBeamJobRun(beamJobRun).toPromise();
@@ -348,7 +348,7 @@ describe('Release coordinator backend api service', () => {
       new BeamJobRun('abc', 'FooJob', 'CANCELLING', 0, 0, false));
   }));
 
-  it('should get the output of a beam job run', fakeAsync(async() => {
+  it('should get the output of a beam job run', fakeAsync(async () => {
     const beamJobRun = (
       new BeamJobRun('abc', 'FooJob', 'DONE', 0, 0, false));
     const resultPromise = rcbas.getBeamJobRunOutput(beamJobRun).toPromise();

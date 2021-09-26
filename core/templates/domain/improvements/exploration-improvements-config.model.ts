@@ -26,7 +26,7 @@ export interface ExplorationImprovementsConfigBackendDict {
 }
 
 export class ExplorationImprovementsConfig {
-  constructor(
+  constructor (
       public readonly explorationId: string,
       public readonly explorationVersion: number,
       public readonly improvementsTabIsEnabled: boolean,
@@ -63,7 +63,7 @@ export class ExplorationImprovementsConfig {
     }
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ExplorationImprovementsConfigBackendDict
   ): ExplorationImprovementsConfig {
     return new ExplorationImprovementsConfig(

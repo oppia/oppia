@@ -37,7 +37,7 @@ describe('Editable topic backend API service', () => {
       EditableTopicBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
 
@@ -193,7 +193,7 @@ describe('Editable topic backend API service', () => {
 
       // Loading a topic the first time should fetch it from the backend.
       editableTopicBackendApiService.fetchTopicAsync('0').then(
-        function(data) {
+        function (data) {
           topic = data.topicDict;
         });
       let req = httpTestingController.expectOne('/topic_editor_handler/data/0');

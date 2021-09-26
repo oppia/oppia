@@ -41,8 +41,8 @@ module.exports = {
     },
   },
 
-  create: function(context) {
-    var checkAndReportAngularJsProperties = function(node) {
+  create: function (context) {
+    var checkAndReportAngularJsProperties = function (node) {
       if (node.property.name === '$parent') {
         context.report({
           node: node,
@@ -58,7 +58,7 @@ module.exports = {
     };
 
     return {
-      MemberExpression: function(node) {
+      MemberExpression: function (node) {
         checkAndReportAngularJsProperties(node);
       }
     };

@@ -26,7 +26,7 @@ require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-and-review.service.ts');
 
-describe('ContributionAndReviewService', function() {
+describe('ContributionAndReviewService', function () {
   var ContributionAndReviewService, $httpBackend;
   var suggestion1;
   var opportunityDict1;
@@ -35,14 +35,14 @@ describe('ContributionAndReviewService', function() {
   var onSuccess;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ContributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
     $httpBackend = $injector.get('$httpBackend');
@@ -69,20 +69,20 @@ describe('ContributionAndReviewService', function() {
     };
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe('getUserCreatedQuestionSuggestionsAsync', function() {
+  describe('getUserCreatedQuestionSuggestionsAsync', function () {
     it('should return available question suggestions and opportunity details',
-      function() {
+      function () {
         $httpBackend.expect(
           'GET', '/getsubmittedsuggestions/skill/add_question').respond(
           200, mockSuggestionsBackendObject);
 
         ContributionAndReviewService.getUserCreatedQuestionSuggestionsAsync(
-        ).then(function(suggestionIdToSuggestions) {
+        ).then(function (suggestionIdToSuggestions) {
           expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
             expectedSuggestionDict);
         });
@@ -90,15 +90,15 @@ describe('ContributionAndReviewService', function() {
       });
   });
 
-  describe('getReviewableQuestionSuggestionsAsync', function() {
+  describe('getReviewableQuestionSuggestionsAsync', function () {
     it('should return available question suggestions and opportunity details',
-      function() {
+      function () {
         $httpBackend.expect(
           'GET', '/getreviewablesuggestions/skill/add_question').respond(
           200, mockSuggestionsBackendObject);
 
         ContributionAndReviewService.getReviewableQuestionSuggestionsAsync(
-          onSuccess).then(function(suggestionIdToSuggestions) {
+          onSuccess).then(function (suggestionIdToSuggestions) {
           expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
             expectedSuggestionDict);
         });

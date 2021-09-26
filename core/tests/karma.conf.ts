@@ -9,7 +9,7 @@ if (argv.prodEnv) {
     'third_party/generated/js/third_party.min.js');
 }
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],

@@ -18,7 +18,7 @@
 
 angular.module('oppia').controller('AnswerContentModalController', [
   '$scope', '$uibModalInstance', 'answerHtml',
-  function($scope, $uibModalInstance, answerHtml) {
+  function ($scope, $uibModalInstance, answerHtml) {
     $scope.answerHtml = answerHtml;
     $scope.close = $uibModalInstance.close;
   }

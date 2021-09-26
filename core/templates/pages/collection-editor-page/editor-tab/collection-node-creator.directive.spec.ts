@@ -32,7 +32,7 @@ import { ValidatorsService } from 'services/validators.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 // ^^^ This block is to be removed.
 
-describe('Collection node creator directive', function() {
+describe('Collection node creator directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -65,7 +65,7 @@ describe('Collection node creator directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function ($injector, $q) {
     $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
@@ -135,7 +135,7 @@ describe('Collection node creator directive', function() {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function () {
       let deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
@@ -153,16 +153,16 @@ describe('Collection node creator directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     expect(ctrl.collection).toEqual(sampleCollection);
     expect(ctrl.newExplorationId).toEqual('');
     expect(ctrl.newExplorationTitle).toEqual('');
     expect(ctrl.searchQueryHasError).toEqual(false);
   });
 
-  describe('while fetching type head exploration results ', function() {
+  describe('while fetching type head exploration results ', function () {
     it('should fetch type head exploration results ' +
-      'successfully', fakeAsync(function() {
+      'successfully', fakeAsync(function () {
       let metadataList = [
         {
           id: 'id1',
@@ -187,7 +187,7 @@ describe('Collection node creator directive', function() {
     }));
 
     it('should show an alert message in case of ' +
-      'backend error', fakeAsync(function() {
+      'backend error', fakeAsync(function () {
       spyOn(searchExplorationsBackendApiService, 'fetchExplorationsAsync')
         .and.returnValue(Promise.reject());
 
@@ -200,7 +200,7 @@ describe('Collection node creator directive', function() {
     }));
 
     it('should not fetch type head exploration results ' +
-      'if search query is invalid', fakeAsync(function() {
+      'if search query is invalid', fakeAsync(function () {
       let fetchExplorationSpy = spyOn(
         searchExplorationsBackendApiService, 'fetchExplorationsAsync');
 
@@ -211,9 +211,9 @@ describe('Collection node creator directive', function() {
     }));
   });
 
-  describe('while adding exploration to collection ', function() {
+  describe('while adding exploration to collection ', function () {
     it('should show alert message if we try to add ' +
-      'an empty exploration', function() {
+      'an empty exploration', function () {
       // Setting exploration Id to be empty.
       ctrl.newExplorationId = '';
       ctrl.addExploration();
@@ -223,7 +223,7 @@ describe('Collection node creator directive', function() {
     });
 
     it('should show alert message if we try to add ' +
-      'an exploration which is already exist', function() {
+      'an exploration which is already exist', function () {
       ctrl.newExplorationId = 'exp_id0';
       ctrl.addExploration();
 
@@ -233,7 +233,7 @@ describe('Collection node creator directive', function() {
     });
 
     it('should show alert message if we try to add ' +
-      'an exploration that does not exist', fakeAsync(function() {
+      'an exploration that does not exist', fakeAsync(function () {
       spyOn(
         explorationSummaryBackendApiService,
         'loadPublicAndPrivateExplorationSummariesAsync')
@@ -256,7 +256,7 @@ describe('Collection node creator directive', function() {
     }));
 
     it('should show alert message in case of ' +
-      'backend error', fakeAsync(function() {
+      'backend error', fakeAsync(function () {
       spyOn(
         explorationSummaryBackendApiService,
         'loadPublicAndPrivateExplorationSummariesAsync')
@@ -272,7 +272,7 @@ describe('Collection node creator directive', function() {
     }));
 
     it('should add exploration to collection ' +
-      'successfully', fakeAsync(function() {
+      'successfully', fakeAsync(function () {
       spyOn(
         explorationSummaryBackendApiService,
         'loadPublicAndPrivateExplorationSummariesAsync')
@@ -294,9 +294,9 @@ describe('Collection node creator directive', function() {
     }));
   });
 
-  describe('while creating a new exploration ', function() {
+  describe('while creating a new exploration ', function () {
     it('should create an exploration ' +
-      'successfully', fakeAsync(function() {
+      'successfully', fakeAsync(function () {
       spyOn(validatorsService, 'isValidExplorationTitle')
         .and.returnValue(true);
       let registerNewExplorationSpy = spyOn(
@@ -317,7 +317,7 @@ describe('Collection node creator directive', function() {
     }));
 
     it('should not create an exploration if' +
-      'exploration title is not valid', function() {
+      'exploration title is not valid', function () {
       spyOn(validatorsService, 'isValidExplorationTitle')
         .and.returnValue(false);
       let registerNewExplorationSpy = spyOn(
@@ -331,7 +331,7 @@ describe('Collection node creator directive', function() {
   });
 
   it('should check whether the given exploration id ' +
-    'is malformed', function() {
+    'is malformed', function () {
     let result = ctrl.isMalformedId('expId');
 
     expect(result).toBe(false);

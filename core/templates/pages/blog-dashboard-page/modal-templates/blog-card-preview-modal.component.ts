@@ -35,7 +35,7 @@ export class BlogCardPreviewModalComponent
     blogPostSummary: BlogPostSummary;
     summaryContent: string;
     profilePicUrl: string;
-    constructor(
+    constructor (
         ngbActiveModal: NgbActiveModal,
         private blogDashboardPageService: BlogDashboardPageService,
         private truncatePipe: TruncatePipe,
@@ -43,7 +43,7 @@ export class BlogCardPreviewModalComponent
       super(ngbActiveModal);
     }
 
-    ngOnInit(): void {
+    ngOnInit (): void {
       this.blogPostData = this.blogDashboardPageService.blogPostData;
       this.summaryContent = this.truncatePipe.transform(
         this.blogPostData.content, 300);

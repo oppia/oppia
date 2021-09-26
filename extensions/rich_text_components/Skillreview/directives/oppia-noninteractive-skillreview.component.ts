@@ -55,14 +55,14 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   skillId!: string;
   linkText!: string;
 
-  constructor(
+  constructor (
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
     private ngbModal: NgbModal
   ) {}
 
-  private _updateViewOnNewSkillSelected(): void {
+  private _updateViewOnNewSkillSelected (): void {
     if (!this.skillIdWithValue || !this.textWithValue) {
       return;
     }
@@ -72,7 +72,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
       this.textWithValue) as string;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this._updateViewOnNewSkillSelected();
   }
 
@@ -86,7 +86,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   // instance, then open the concept card modal. To determine if the
   // RTE is inside a CKEditor instance, check if the offsetParent
   // element contains the data attribute ckeWidgetId.
-  private _shouldOpenRTEModal(event: Event): boolean {
+  private _shouldOpenRTEModal (event: Event): boolean {
     const target = <HTMLElement> event.currentTarget;
     const offsetParent = <HTMLElement> target.offsetParent;
     return (
@@ -95,7 +95,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
   }
 
-  openConceptCard(event: MouseEvent): void {
+  openConceptCard (event: MouseEvent): void {
     if (this._shouldOpenRTEModal(event)) {
       return;
     }
@@ -121,7 +121,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (changes.skillIdWithValue || changes.textWithValue) {
       this._updateViewOnNewSkillSelected();
     }

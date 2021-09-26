@@ -45,23 +45,23 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 class MockContentTranslationLanguageService {
   currentLanguageCode: string;
 
-  getCurrentContentLanguageCode() {
+  getCurrentContentLanguageCode () {
     return this.currentLanguageCode;
   }
-  getLanguageOptionsForDropdown() {
+  getLanguageOptionsForDropdown () {
     return [
       {value: 'fr', displayed: 'français (French)'},
       {value: 'zh', displayed: '中文 (Chinese)'},
       {value: 'en', displayed: 'English'}
     ];
   }
-  setCurrentContentLanguageCode(languageCode: string) {
+  setCurrentContentLanguageCode (languageCode: string) {
     this.currentLanguageCode = languageCode;
   }
 }
 
 class MockI18nLanguageCodeService {
-  getCurrentI18nLanguageCode() {
+  getCurrentI18nLanguageCode () {
     return 'fr';
   }
 }

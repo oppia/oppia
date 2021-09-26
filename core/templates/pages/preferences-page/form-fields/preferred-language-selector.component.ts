@@ -39,16 +39,16 @@ export class PreferredSiteLanguageSelectorComponent {
     new EventEmitter());
   filteredChoices!: Language[];
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.filteredChoices = this.choices;
   }
 
-  filterChoices(searchTerm: string): void {
+  filterChoices (searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
       lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
   }
 
-  updateLanguage(code: string): void {
+  updateLanguage (code: string): void {
     this.preferredLanguageCode = code;
     this.preferredLanguageCodeChange.emit(this.preferredLanguageCode);
   }

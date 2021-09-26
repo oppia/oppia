@@ -23,11 +23,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './story-save-pending-changes-modal.component.html'
 })
 export class StorySavePendingChangesModalComponent {
-  constructor(
+  constructor (
       private activeModal: NgbActiveModal
   ) {}
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 }

@@ -26,7 +26,7 @@ import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/task-entry.model';
 
 export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
-  constructor(backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {
+  constructor (backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -48,17 +48,17 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
     super(backendDict);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: TaskEntryBackendDict<'high_bounce_rate'>
   ): HighBounceRateTask {
     return new HighBounceRateTask(backendDict);
   }
 
-  public resolve(): void {
+  public resolve (): void {
     this.markAsResolved();
   }
 
-  public refreshStatus(
+  public refreshStatus (
       expStats: ExplorationStats,
       numEarlyQuitPlaythroughs: number,
       config: ExplorationImprovementsConfig): void {
@@ -86,7 +86,7 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
     }
   }
 
-  private meetsCreationConditions(
+  private meetsCreationConditions (
       bounceRate: number, numEarlyQuitPlaythroughs: number,
       config: ExplorationImprovementsConfig): boolean {
     return (
@@ -95,14 +95,14 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
       bounceRate >= config.highBounceRateTaskStateBounceRateCreationThreshold);
   }
 
-  private meetsObsoletionConditions(
+  private meetsObsoletionConditions (
       bounceRate: number, config: ExplorationImprovementsConfig): boolean {
     return (
       this.isOpen() &&
       bounceRate < config.highBounceRateTaskStateBounceRateObsoletionThreshold);
   }
 
-  private generateIssueDescription(bounceRate: number): void {
+  private generateIssueDescription (bounceRate: number): void {
     const bounceRateAsPercentString = Math.round(100 * bounceRate) + '%';
     this.issueDescription = (
       bounceRateAsPercentString + ' of learners had dropped off at this card.');

@@ -33,7 +33,7 @@ import { StateCard } from 'domain/state_card/state-card.model';
   providedIn: 'root'
 })
 export class PlayerTranscriptService {
-  constructor(private log: LoggerService) {}
+  constructor (private log: LoggerService) {}
   // Each element of this array represents a 'StateCard' domain object.
   //
   // Note that every card in this transcript is visible on the screen. The
@@ -44,33 +44,33 @@ export class PlayerTranscriptService {
   transcript: StateCard[] = [];
   numAnswersSubmitted = 0;
 
-  restore(oldTranscript: StateCard[]): void {
+  restore (oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
   }
 
-  restoreImmutably(oldTranscript: StateCard[]): void {
+  restoreImmutably (oldTranscript: StateCard[]): void {
     for (let i = 0; i < this.transcript.length; i++) {
       // Immutably restore the cards so that Angular can detect changes.
       this.transcript[i].restoreImmutable(oldTranscript[i]);
     }
   }
 
-  init(): void {
+  init (): void {
     this.transcript = [];
     this.numAnswersSubmitted = 0;
   }
 
-  hasEncounteredStateBefore(stateName: string): boolean {
+  hasEncounteredStateBefore (stateName: string): boolean {
     return this.transcript.some(transcriptItem => {
       return transcriptItem.getStateName() === stateName;
     });
   }
-  addNewCard(newCard: StateCard): void {
+  addNewCard (newCard: StateCard): void {
     this.transcript.push(newCard);
     this.numAnswersSubmitted = 0;
   }
 
-  addPreviousCard(): void {
+  addPreviousCard (): void {
     if (this.transcript.length === 1) {
       throw new Error(
         'Exploration player is on the first card and hence no previous ' +
@@ -84,7 +84,7 @@ export class PlayerTranscriptService {
     this.transcript.push(copyOfPreviousCard);
   }
 
-  addNewInput(input: string, isHint: boolean): void {
+  addNewInput (input: string, isHint: boolean): void {
     let card = this.getLastCard();
     let pairs = card.getInputResponsePairs();
     if (pairs.length > 0 && card.getLastOppiaResponse() === null) {
@@ -103,16 +103,16 @@ export class PlayerTranscriptService {
     });
   }
 
-  addNewResponse(response: string): void {
+  addNewResponse (response: string): void {
     let card = this.getLastCard();
     card.setLastOppiaResponse(response);
   }
 
-  getNumCards(): number {
+  getNumCards (): number {
     return this.transcript.length;
   }
 
-  getCard(index: number): StateCard {
+  getCard (index: number): StateCard {
     if (index !== null && (index < 0 || index >= this.transcript.length)) {
       this.log.error(
         'Requested card with index ' + index +
@@ -122,7 +122,7 @@ export class PlayerTranscriptService {
     return this.transcript[index];
   }
 
-  getLastAnswerOnDisplayedCard(displayedCardIndex: number): string | null {
+  getLastAnswerOnDisplayedCard (displayedCardIndex: number): string | null {
     if (
       this.isLastCard(displayedCardIndex) ||
         this.transcript[displayedCardIndex].getStateName() === null ||
@@ -135,23 +135,23 @@ export class PlayerTranscriptService {
     }
   }
 
-  isLastCard(index: number): boolean {
+  isLastCard (index: number): boolean {
     return index === this.transcript.length - 1;
   }
 
-  getLastCard(): StateCard {
+  getLastCard (): StateCard {
     return this.getCard(this.transcript.length - 1);
   }
 
-  getNumSubmitsForLastCard(): number {
+  getNumSubmitsForLastCard (): number {
     return this.numAnswersSubmitted;
   }
 
-  updateLatestInteractionHtml(newInteractionHtml: string): void {
+  updateLatestInteractionHtml (newInteractionHtml: string): void {
     this.getLastCard().setInteractionHtml(newInteractionHtml);
   }
 
-  getLastStateName(): string {
+  getLastStateName (): string {
     return this.getLastCard().getStateName();
   }
 }

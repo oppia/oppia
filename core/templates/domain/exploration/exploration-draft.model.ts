@@ -127,7 +127,7 @@ export class ExplorationDraft {
   draftChanges: ExplorationChange[];
   draftChangeListId: number;
 
-  constructor(
+  constructor (
       draftChanges: ExplorationChange[], draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
@@ -142,22 +142,22 @@ export class ExplorationDraft {
    * @returns {Boolean} - True iff the currentDraftId is the same as the
    * draftChangeListId corresponding to this draft.
    */
-  isValid(currentDraftId: number): boolean {
+  isValid (currentDraftId: number): boolean {
     return (currentDraftId === this.draftChangeListId);
   }
 
-  getChanges(): ExplorationChange[] {
+  getChanges (): ExplorationChange[] {
     return this.draftChanges;
   }
 
-  static createFromLocalStorageDict(
+  static createFromLocalStorageDict (
       explorationDraftDict: ExplorationDraftDict): ExplorationDraft {
     return new ExplorationDraft(
       explorationDraftDict.draftChanges,
       explorationDraftDict.draftChangeListId);
   }
 
-  static toLocalStorageDict(
+  static toLocalStorageDict (
       changeList: ExplorationChange[],
       draftChangeListId: number): ExplorationDraftDict {
     return {

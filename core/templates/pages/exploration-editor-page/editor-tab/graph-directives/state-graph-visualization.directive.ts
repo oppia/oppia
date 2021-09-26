@@ -35,7 +35,7 @@ import { Subscription } from 'rxjs';
 
 /* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('stateGraphVisualization', [
-  function() {
+  function () {
     return {
       // Note: This directive is used as attribute because pannability does not
       //    work when directive is used as element. (Convention in the codebase
@@ -93,7 +93,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
         'RouterService', 'StateCardIsCheckpointService',
         'StateGraphLayoutService', 'TranslationStatusService',
         'WindowDimensionsService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
-        function(
+        function (
             $element, $filter, $scope, $timeout,
             ExplorationStatesService, ExplorationWarningsService,
             RouterService, StateCardIsCheckpointService,
@@ -111,7 +111,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
           var nodeData = {};
           // The translation applied when the graph is first loaded.
           var origTranslations = [0, 0];
-          var redrawGraph = function() {
+          var redrawGraph = function () {
             if ($scope.graphData()) {
               $scope.graphLoaded = false;
               $scope.drawGraph(
@@ -120,21 +120,21 @@ angular.module('oppia').directive('stateGraphVisualization', [
               );
 
               // Wait for the graph to finish loading before showing it again.
-              $timeout(function() {
+              $timeout(function () {
                 $scope.graphLoaded = true;
               });
             }
           };
 
-          var makeGraphPannable = function() {
+          var makeGraphPannable = function () {
             // Without the timeout, $element.find fails to find the required
             // rect in the state graph modal dialog.
-            $timeout(function() {
+            $timeout(function () {
               var dimensions = getElementDimensions();
 
               d3.select($element.find('rect.pannable-rect')[0])
                 .call(
-                  d3.zoom().scaleExtent([1, 1]).on('zoom', function() {
+                  d3.zoom().scaleExtent([1, 1]).on('zoom', function () {
                     if (graphBounds.right - graphBounds.left < dimensions.w) {
                       (d3.event).transform.x = 0;
                     } else {
@@ -167,13 +167,13 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }, 10);
           };
 
-          var centerGraph = function() {
+          var centerGraph = function () {
             if ($scope.graphData() && $scope.centerAtCurrentState) {
               if ($scope.allowPanning) {
                 makeGraphPannable();
               }
 
-              $timeout(function() {
+              $timeout(function () {
                 var dimensions = getElementDimensions();
 
                 // Center the graph at the node representing the current state.
@@ -213,7 +213,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }
           };
 
-          var getElementDimensions = function() {
+          var getElementDimensions = function () {
             return {
               h: $element.height(),
               w: $element.width()
@@ -222,22 +222,22 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
           // Returns the closest number to `value` in the range
           // [bound1, bound2].
-          var clamp = function(value, bound1, bound2) {
+          var clamp = function (value, bound1, bound2) {
             var minValue = Math.min(bound1, bound2);
             var maxValue = Math.max(bound1, bound2);
             return Math.min(Math.max(value, minValue), maxValue);
           };
 
-          $scope.isCheckpoint = function(nodeId) {
+          $scope.isCheckpoint = function (nodeId) {
             var state = ExplorationStatesService.getState(nodeId);
             return !!state && state.cardIsCheckpoint;
           };
 
-          $scope.getGraphHeightInPixels = function() {
+          $scope.getGraphHeightInPixels = function () {
             return Math.max($scope.GRAPH_HEIGHT, 300);
           };
 
-          $scope.drawGraph = function(
+          $scope.drawGraph = function (
               nodes, originalLinks, initStateId, finalStateIds) {
             $scope.finalStateIds = finalStateIds;
             var links = angular.copy(originalLinks);
@@ -281,7 +281,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
               }
             }
 
-            var getNodeStrokeWidth = function(nodeId) {
+            var getNodeStrokeWidth = function (nodeId) {
               var currentNodeIsTerminal = (
                 $scope.finalStateIds.indexOf(nodeId) !== -1);
               return (
@@ -290,11 +290,11 @@ angular.module('oppia').directive('stateGraphVisualization', [
                   '2' : '1');
             };
 
-            var getNodeFillOpacity = function(nodeId) {
+            var getNodeFillOpacity = function (nodeId) {
               return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
             };
 
-            $scope.getNodeTitle = function(node) {
+            $scope.getNodeTitle = function (node) {
               var warning = '';
               if (node.reachable === false) {
                 warning = 'Warning: this state is unreachable.';
@@ -316,25 +316,25 @@ angular.module('oppia').directive('stateGraphVisualization', [
               return tooltip;
             };
 
-            $scope.onNodeDeletionClick = function(nodeId) {
+            $scope.onNodeDeletionClick = function (nodeId) {
               if (nodeId !== initStateId) {
                 $scope.onDeleteFunction(nodeId);
               }
             };
 
-            $scope.getHighlightTransform = function(x0, y0) {
+            $scope.getHighlightTransform = function (x0, y0) {
               return 'rotate(-10,' + (x0 - 10) + ',' + (y0 - 5) + ')';
             };
 
-            $scope.getHighlightTextTransform = function(x0, y0) {
+            $scope.getHighlightTextTransform = function (x0, y0) {
               return 'rotate(-10,' + x0 + ',' + (y0 - 4) + ')';
             };
 
-            $scope.canNavigateToNode = function(nodeId) {
+            $scope.canNavigateToNode = function (nodeId) {
               return nodeId !== $scope.currentStateId();
             };
 
-            $scope.getTruncatedLabel = function(nodeLabel) {
+            $scope.getTruncatedLabel = function (nodeLabel) {
               return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
             };
 
@@ -380,7 +380,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
               $scope.nodeList.push(nodeData[nodeId]);
             }
 
-            $scope.getNodeErrorMessage = function(nodeLabel) {
+            $scope.getNodeErrorMessage = function (nodeLabel) {
               var warnings = null;
               if ($scope.showTranslationWarnings) {
                 warnings =
@@ -405,7 +405,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
               centerGraph();
             }
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.directiveSubscriptions.add(
               RouterService.onCenterGraph.subscribe(() => {
                 centerGraph();
@@ -427,7 +427,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             );
           };
 
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

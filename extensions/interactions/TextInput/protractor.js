@@ -19,7 +19,7 @@ var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
+var customizeInteraction = async function (elem, placeholderText, heightOfBox) {
   await objects.UnicodeStringEditor(
     elem.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(placeholderText);
@@ -28,7 +28,7 @@ var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
   ).setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = async function(
+var expectInteractionDetailsToMatch = async function (
     elem, placeholderText, heightOfBox) {
   const textInputInteraction = (
     element(by.tagName('oppia-interactive-text-input')));
@@ -54,7 +54,7 @@ var expectInteractionDetailsToMatch = async function(
   ).toBe(true);
 };
 
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   // Try to get the text area element. If it doesn't exist, try input instead.
   // They are different depending on the height of the box.
   var textInputElem = elem.element(by.tagName('oppia-interactive-text-input'));

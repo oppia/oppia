@@ -19,7 +19,7 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = async function(
+var customizeComponent = async function (
     modal, youtubeId, startTime, endTime, ifAutoplay) {
   await objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
@@ -35,7 +35,7 @@ var customizeComponent = async function(
   ).setValue(ifAutoplay);
 };
 
-var expectComponentDetailsToMatch = async function(
+var expectComponentDetailsToMatch = async function (
     elem, youtubeId, startTime, endTime, ifAutoplay) {
   var youtubePlayer = await elem.element(
     by.css('.protractor-test-youtube-player'));

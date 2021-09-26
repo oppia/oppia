@@ -30,7 +30,7 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
   template: require('./oppia-visualization-sorted-tiles.directive.html'),
   style: require('./oppia-visualization-sorted-tiles.directive.css'),
   controller: ['$scope', '$uibModal', 'UtilsService',
-    function($scope, $uibModal, UtilsService) {
+    function ($scope, $uibModal, UtilsService) {
       this.$onInit = () => {
         const data = <AnswerStats[]> $scope.data;
         const totalFrequency = (

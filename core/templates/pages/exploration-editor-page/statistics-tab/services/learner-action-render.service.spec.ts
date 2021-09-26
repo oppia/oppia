@@ -36,13 +36,13 @@ require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
 
-describe('Learner Action Render Service', function() {
+describe('Learner Action Render Service', function () {
   let explorationStatesService = null;
   let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let learnerActionRenderService = null;
 
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     explorationStatesService = $injector.get('ExplorationStatesService');
     learnerActionObjectFactory = $injector.get('LearnerActionObjectFactory');
     learnerActionRenderService = $injector.get('LearnerActionRenderService');

@@ -32,7 +32,7 @@ interface ApplyValidationCustomScope extends ng.IScope {
 
 /* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('applyValidation', [
-  '$filter', function($filter) {
+  '$filter', function ($filter) {
     return {
       require: 'ngModel',
       restrict: 'A',
@@ -41,11 +41,11 @@ angular.module('oppia').directive('applyValidation', [
         validators: '&'
       },
       controllerAs: '$ctrl',
-      controller: [function() {}],
-      link: function(scope: ApplyValidationCustomScope, elm, attrs, ctrl) {
+      controller: [function () {}],
+      link: function (scope: ApplyValidationCustomScope, elm, attrs, ctrl) {
         // Add validators in reverse order.
         if (scope.$ctrl.validators()) {
-          scope.$ctrl.validators().forEach(function(validatorSpec) {
+          scope.$ctrl.validators().forEach(function (validatorSpec) {
             var frontendName = $filter('underscoresToCamelCase')(
               validatorSpec.id);
 
@@ -65,7 +65,7 @@ angular.module('oppia').directive('applyValidation', [
               }
             }
 
-            var customValidator = function(viewValue) {
+            var customValidator = function (viewValue) {
               ctrl.$setValidity(
                 frontendName, $filter(frontendName)(viewValue, filterArgs));
               return viewValue;

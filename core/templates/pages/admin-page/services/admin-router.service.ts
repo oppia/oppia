@@ -35,7 +35,7 @@ export class AdminRouterService {
    * @returns {string|null} The corresponding tab name, or null
    *  if the URL hash does not correspond to a valid tab.
    */
-  getTabNameByHash(tabHash: string): string | null {
+  getTabNameByHash (tabHash: string): string | null {
     for (const [tabName, tabUrl] of Object.entries(
       AdminPageConstants.ADMIN_TAB_URLS)) {
       if (tabUrl === tabHash) {
@@ -49,7 +49,7 @@ export class AdminRouterService {
    * Navigates the page to the specified tab based on its HTML hash.
    * @param {string} tabHash The string after the '#' character in the URL.
    */
-  showTab(tabHash: string): void {
+  showTab (tabHash: string): void {
     if (this.getTabNameByHash(tabHash)) {
       this.currentTabHash = tabHash;
     }
@@ -58,7 +58,7 @@ export class AdminRouterService {
   /**
    * @returns {boolean} Whether the activities tab is open.
    */
-  isActivitiesTabOpen(): boolean {
+  isActivitiesTabOpen (): boolean {
     return this.currentTabHash === (
       AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
   }
@@ -66,28 +66,28 @@ export class AdminRouterService {
   /**
    * @returns {boolean} Whether the config tab is open.
    */
-  isConfigTabOpen(): boolean {
+  isConfigTabOpen (): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.CONFIG;
   }
 
   /**
    * @returns {boolean} Whether the features tab is open.
    */
-  isFeaturesTabOpen(): boolean {
+  isFeaturesTabOpen (): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.FEATURES;
   }
 
   /**
    * @returns {boolean} Whether the roles tab is open.
    */
-  isRolesTabOpen(): boolean {
+  isRolesTabOpen (): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.ROLES;
   }
 
   /**
    * @returns {boolean} Whether the miscellaneous tab is open.
    */
-  isMiscTabOpen(): boolean {
+  isMiscTabOpen (): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.MISC;
   }
 }

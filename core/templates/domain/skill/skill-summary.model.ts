@@ -28,7 +28,7 @@ export interface SkillSummaryBackendDict {
 }
 
 export class SkillSummary {
-  constructor(
+  constructor (
     public id: string,
     public description: string,
     public languageCode: string,
@@ -38,7 +38,7 @@ export class SkillSummary {
     public skillModelCreatedOn: number,
     public skillModelLastUpdated: number) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       summaryDict: SkillSummaryBackendDict): SkillSummary {
     return new SkillSummary(
       summaryDict.id,

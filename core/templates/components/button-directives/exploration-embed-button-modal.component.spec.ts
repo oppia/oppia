@@ -26,13 +26,13 @@ import { ExplorationEmbedButtonModalComponent } from
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
 
 class MockSiteAnalyticsService {
-  registerOpenEmbedInfoEvent(id: string): void {
+  registerOpenEmbedInfoEvent (id: string): void {
     return;
   }
 }

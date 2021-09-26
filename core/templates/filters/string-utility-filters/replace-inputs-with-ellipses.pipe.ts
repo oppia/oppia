@@ -23,7 +23,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ReplaceInputsWithEllipsesPipe implements PipeTransform {
     pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
 
-    transform(input: string): string {
+    transform (input: string): string {
       return input ? input.replace(this.pattern, '...') : '';
     }
 }

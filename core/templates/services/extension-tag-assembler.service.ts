@@ -37,10 +37,10 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
   providedIn: 'root'
 })
 export class ExtensionTagAssemblerService {
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService,
     private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
-  _convertCustomizationArgsToBackendDict(
+  _convertCustomizationArgsToBackendDict (
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
     // Because of issues with circular dependencies, we cannot import
@@ -80,7 +80,7 @@ export class ExtensionTagAssemblerService {
     return customizationArgsBackendDict;
   }
 
-  formatCustomizationArgAttrs(
+  formatCustomizationArgAttrs (
       element: JQuery,
       customizationArgs: InteractionCustomizationArgs
   ): JQuery {

@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var LearnerDashboardPage = function() {
+var LearnerDashboardPage = function () {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
   var homeSection =
     element(by.css('.protractor-test-home-section'));
@@ -63,36 +63,36 @@ var LearnerDashboardPage = function() {
   var completeCommunityLessonsSection = element(by.css(
     '.protractor-test-completed-community-lessons-section'));
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(LEARNER_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToHomeSection = async function() {
+  this.navigateToHomeSection = async function () {
     await action.click('Home Section', homeSection);
   };
 
-  this.navigateToGoalsSection = async function() {
+  this.navigateToGoalsSection = async function () {
     await action.click('Goals Section', goalsSection);
   };
 
-  this.navigateToProgressSection = async function() {
+  this.navigateToProgressSection = async function () {
     await action.click('Progress Section', progressSection);
   };
 
-  this.navigateToCommunityLessonsSection = async function() {
+  this.navigateToCommunityLessonsSection = async function () {
     await action.click('Community Lessons Section', communityLessonsSection);
   };
 
-  this.navigateToFeedbackSection = async function() {
+  this.navigateToFeedbackSection = async function () {
     await action.click('Feedback Section', feedbackSection);
   };
 
-  this.navigateToFeedbackThread = async function() {
+  this.navigateToFeedbackThread = async function () {
     await action.click('Feedback Thread', feedbackThread);
   };
 
-  this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
+  this.expectTitleOfCollectionSummaryTileToMatch = async function (title) {
     var collectionTitle = element(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title));
     await waitFor.visibilityOf(
@@ -100,13 +100,13 @@ var LearnerDashboardPage = function() {
     expect(await collectionTitle.isDisplayed()).toBe(true);
   };
 
-  this.expectTitleOfExplorationSummaryTileToBeHidden = async function(title) {
+  this.expectTitleOfExplorationSummaryTileToBeHidden = async function (title) {
     var items = element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', title));
     expect(await items.count()).toBe(0);
   };
 
-  this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
+  this.expectTitleOfExplorationSummaryTileToMatch = async function (title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter.
     var explorationTitle = element(
@@ -115,7 +115,7 @@ var LearnerDashboardPage = function() {
       'Exploration title', explorationTitle)).toMatch(title);
   };
 
-  this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
+  this.expectNameOfTopicInEditGoalsToMatch = async function (name) {
     await waitFor.visibilityOf(
       editGoalsTopicName,
       'Topic in Edit Goals takes too long to appear');
@@ -127,7 +127,7 @@ var LearnerDashboardPage = function() {
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
-  this.expectNameOfTopicInCurrentGoalsToMatch = async function(name) {
+  this.expectNameOfTopicInCurrentGoalsToMatch = async function (name) {
     await waitFor.visibilityOf(
       currentGoalsTopicName,
       'Topic in Current Goals takes too long to appear');
@@ -139,7 +139,7 @@ var LearnerDashboardPage = function() {
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
-  this.expectNameOfTopicInSkillProficiencyToMatch = async function(name) {
+  this.expectNameOfTopicInSkillProficiencyToMatch = async function (name) {
     await waitFor.visibilityOf(
       skillProficiencyTopicTitle,
       'Topic in Skill Proficiency takes too long to appear'
@@ -152,7 +152,7 @@ var LearnerDashboardPage = function() {
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
-  this.expectNameOfTopicInCompletedGoalsToMatch = async function(name) {
+  this.expectNameOfTopicInCompletedGoalsToMatch = async function (name) {
     await waitFor.visibilityOf(
       completedGoalsTopicName,
       'Topic in completed goals takes too long to appear'
@@ -165,7 +165,7 @@ var LearnerDashboardPage = function() {
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
-  this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
+  this.expectNumberOfTopicsInSuggestedForYou = async function (value) {
     if (value > 0) {
       await waitFor.visibilityOf(
         topicNamesInLearnerTopicSummaryTiles.first(),
@@ -174,7 +174,7 @@ var LearnerDashboardPage = function() {
     expect(await topicNamesInLearnerTopicSummaryTiles.count()).toEqual(value);
   };
 
-  this.expectNumberOfStoriesInCompletedStory = async function(value) {
+  this.expectNumberOfStoriesInCompletedStory = async function (value) {
     if (value > 0) {
       await waitFor.visibilityOf(
         storyNamesInLearnerStorySummaryTiles.first(),
@@ -183,7 +183,7 @@ var LearnerDashboardPage = function() {
     expect(await storyNamesInLearnerStorySummaryTiles.count()).toEqual(value);
   };
 
-  this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
+  this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function (value) {
     if (value > 0) {
       await waitFor.visibilityOf(
         topicNamesInLearnerStorySummaryTiles.first(),
@@ -192,39 +192,39 @@ var LearnerDashboardPage = function() {
     expect(await topicNamesInLearnerStorySummaryTiles.count()).toEqual(value);
   };
 
-  this.addTopicToLearnerGoals = async function() {
+  this.addTopicToLearnerGoals = async function () {
     await action.click('Add to learner goals button', addToLearnerGoalsButton);
   };
 
-  this.expectSubscriptionFirstNameToMatch = async function(name) {
+  this.expectSubscriptionFirstNameToMatch = async function (name) {
     await waitFor.visibilityOf(
       subscriptionName.first(),
       'Subscription First Name takes too long to appear');
     expect(await subscriptionName.first().getText()).toMatch(name);
   };
 
-  this.expectSubscriptionLastNameToMatch = async function(name) {
+  this.expectSubscriptionLastNameToMatch = async function (name) {
     await waitFor.visibilityOf(
       subscriptionName.last(),
       'Subscription Last Name takes too long to appear');
     expect(await subscriptionName.last().getText()).toMatch(name);
   };
 
-  this.expectFeedbackExplorationTitleToMatch = async function(title) {
+  this.expectFeedbackExplorationTitleToMatch = async function (title) {
     await waitFor.visibilityOf(
       feedbackExplorationTitle.first(),
       'Feedback Exploration Title takes too long to appear');
     expect(await feedbackExplorationTitle.first().getText()).toMatch(title);
   };
 
-  this.expectFeedbackMessageToMatch = async function(message) {
+  this.expectFeedbackMessageToMatch = async function (message) {
     await waitFor.visibilityOf(
       feedbackMessage.first(), 'Feedback Message takes too long to appear');
     expect(await feedbackMessage.first().getText()).toMatch(message);
   };
 
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
-    async function(explorationTitle) {
+    async function (explorationTitle) {
       await this.navigateToCommunityLessonsSection();
       var explorationTitleInIncompleteSection = (
         incompleteCommunityLessonsSection.element(by.cssContainingText(
@@ -234,7 +234,7 @@ var LearnerDashboardPage = function() {
         explorationTitleInIncompleteSection)).toMatch(explorationTitle);
     });
 
-  this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
+  this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function (
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
     var explorationTitleInCompleteSection = (
@@ -245,7 +245,7 @@ var LearnerDashboardPage = function() {
       explorationTitleInCompleteSection)).toMatch(explorationTitle);
   };
 
-  this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
+  this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function (
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInIncompleteSection = (
@@ -256,7 +256,7 @@ var LearnerDashboardPage = function() {
       collectionTitleInIncompleteSection)).toMatch(collectionTitle);
   };
 
-  this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
+  this.navigateToCommunityLessonsAndCheckCompleteCollections = async function (
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInCompleteSection = (

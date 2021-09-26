@@ -43,7 +43,7 @@ var EXPLORATION = {
   language: 'English'
 };
 
-describe('screenreader and keyboard user accessibility features', function() {
+describe('screenreader and keyboard user accessibility features', function () {
   var oppiaContentContainer = element(
     by.css('.protractor-test-content-container'));
   var ERROR_MESSAGE = 'Content container taking too long to load';
@@ -57,23 +57,23 @@ describe('screenreader and keyboard user accessibility features', function() {
   var PRIVACY_POLICY_URL = 'http://localhost:9001/privacy-policy';
   var DONATE_URL = 'http://localhost:9001/donate';
 
-  var holdCtrlAndPressKey = async function(key) {
+  var holdCtrlAndPressKey = async function (key) {
     await browser.actions().sendKeys(
       protractor.Key.chord(protractor.Key.CONTROL, key)).perform();
   };
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     // Should create a user and login.
     await users.createAndLoginSuperAdminUser(
       'user11@accessibility.com', 'user11accessibility');
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 
-  var checkActionShortcuts = async function(key, elementToFocus) {
+  var checkActionShortcuts = async function (key, elementToFocus) {
     await waitFor.presenceOf(elementToFocus, 'Element took too long to load');
     // Should move the focus to the elementToFocus.
     await browser.actions().sendKeys(key).perform();
@@ -100,7 +100,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await elementToFocus.getAttribute('class'));
   };
 
-  it('should skip to the main content element', async function() {
+  it('should skip to the main content element', async function () {
     await libraryPage.get();
     await browser.actions().sendKeys('s').perform();
     await action.click('Skip link', skipLink);
@@ -110,7 +110,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   it('should navigate to the get-started page when ctrl+0 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -165,7 +165,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should navigate to the community-library page when ctrl+1 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -220,7 +220,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should navigate to the learner-dashboard page when ctrl+2 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -276,7 +276,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should navigate to the creator-dashboard page when ctrl+3 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -332,7 +332,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should navigate to about page when ctrl+4 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -388,7 +388,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should navigate to the notifications page when ctrl+5 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -423,7 +423,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should navigate to the preferences page when ctrl+5 is pressed',
-    async function() {
+    async function () {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
@@ -476,7 +476,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
 
   it('should test the action shortcuts in library page',
-    async function() {
+    async function () {
       // Should test the skip to main content shortcut.
       await libraryPage.get();
       await waitFor.pageToFullyLoad();
@@ -492,7 +492,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should move focus to skip to main content button in exploration player',
-    async function() {
+    async function () {
       // Should create and play a dummy exploration.
       await workflow.createAndPublishTwoCardExploration(
         EXPLORATION.title,
@@ -510,7 +510,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should move focus to next and back buttons in exploration player',
-    async function() {
+    async function () {
       // Play a dummy exploration.
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');
@@ -537,14 +537,14 @@ describe('screenreader and keyboard user accessibility features', function() {
       await action.click('Oppia Logo', oppiaLogo);
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
-describe('Cache Slugs', function() {
+describe('Cache Slugs', function () {
   it('should check that errors get logged for missing resources',
-    async function() {
+    async function () {
       await browser.get('/console_errors');
       var expectedErrors = [
         'http://localhost:9001/build/fail/logo/288x128_logo_white.png',

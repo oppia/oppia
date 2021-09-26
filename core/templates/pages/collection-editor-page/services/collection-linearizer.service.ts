@@ -41,11 +41,11 @@ interface SwapFunction {
 export class CollectionLinearizerService {
   explorationIds: string[];
   explorationId: number;
-  constructor(
+  constructor (
       private collectionUpdateService: CollectionUpdateService
   ) {}
 
-  _getNextExplorationId(
+  _getNextExplorationId (
       collection: Collection,
       completedExpIds: string[]): string | null {
     this.explorationIds = collection.getExplorationIds();
@@ -60,15 +60,15 @@ export class CollectionLinearizerService {
 
   // Given a non linear collection input, the function will linearize it by
   // picking the first node it encounters on the branch and ignore the others.
-  _getCollectionNodesInPlayableOrder(collection: Collection): CollectionNode[] {
+  _getCollectionNodesInPlayableOrder (collection: Collection): CollectionNode[] {
     return collection.getCollectionNodes();
   }
 
-  addAfter(collection: Collection, curExplorationId: string): void {
+  addAfter (collection: Collection, curExplorationId: string): void {
     collection.getCollectionNodeByExplorationId(curExplorationId);
   }
 
-  findNodeIndex(
+  findNodeIndex (
       linearNodeList: CollectionNode[],
       explorationId: string): number {
     let index = -1;
@@ -106,7 +106,7 @@ export class CollectionLinearizerService {
     );
   };
 
-  shiftNode(
+  shiftNode (
       collection: Collection, explorationId: string,
       swapFunction: SwapFunction): boolean {
     // There is nothing to shift if the collection has only 1 node.
@@ -127,7 +127,7 @@ export class CollectionLinearizerService {
      * collection is immediately playable by the user. NOTE: This function
      * does not assume that the collection is linear.
      */
-  getNextExplorationId(
+  getNextExplorationId (
       collection: Collection, completedExpIds: string[]): string {
     return this._getNextExplorationId(collection, completedExpIds);
   }
@@ -136,7 +136,7 @@ export class CollectionLinearizerService {
      * Given a collection, returns a linear list of collection nodes which
      * represents a valid path for playing through this collection.
      */
-  getCollectionNodesInPlayableOrder(collection: Collection): CollectionNode[] {
+  getCollectionNodesInPlayableOrder (collection: Collection): CollectionNode[] {
     return this._getCollectionNodesInPlayableOrder(collection);
   }
 
@@ -145,7 +145,7 @@ export class CollectionLinearizerService {
      * list of explorations, based on the specified exploration ID and
      * exploration summary backend object.
      */
-  appendCollectionNode(
+  appendCollectionNode (
       collection: Collection, explorationId: string,
       summaryBackendObject: LearnerExplorationSummaryBackendDict): void {
     let linearNodeList = this._getCollectionNodesInPlayableOrder(collection);
@@ -164,7 +164,7 @@ export class CollectionLinearizerService {
      * ID is contained within the linearly playable path of the specified
      * collection.
      */
-  removeCollectionNode(collection: Collection, explorationId: string): boolean {
+  removeCollectionNode (collection: Collection, explorationId: string): boolean {
     if (!collection.containsCollectionNode(explorationId)) {
       return false;
     }
@@ -182,7 +182,7 @@ export class CollectionLinearizerService {
      * then this function is a no-op. Returns false if the specified
      * exploration ID does not associate to any nodes in the collection.
      */
-  shiftNodeLeft(collection: Collection, explorationId: string): boolean {
+  shiftNodeLeft (collection: Collection, explorationId: string): boolean {
     return this.shiftNode(collection, explorationId, this.swapLeft);
   }
 
@@ -193,7 +193,7 @@ export class CollectionLinearizerService {
      * then this function is a no-op. Returns false if the specified
      * exploration ID does not associate to any nodes in the collection.
      */
-  shiftNodeRight(collection: Collection, explorationId: string): boolean {
+  shiftNodeRight (collection: Collection, explorationId: string): boolean {
     return this.shiftNode(collection, explorationId, this.swapRight);
   }
 }

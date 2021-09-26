@@ -41,7 +41,7 @@ export class AudioFileUploaderComponent {
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   // Returns 'null' when the uploaded file is valid.
-  validateUploadedFile(file: File): string | null {
+  validateUploadedFile (file: File): string | null {
     if (!file.size || !file.type.match('audio.*')) {
       return 'This file is not recognized as an audio file.';
     }
@@ -61,7 +61,7 @@ export class AudioFileUploaderComponent {
     return null;
   }
 
-  addAudio(evt: Event): void {
+  addAudio (evt: Event): void {
     let file = this.fileInputRef.nativeElement.files[0];
     if (!file) {
       this.fileClear.emit();

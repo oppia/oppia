@@ -32,7 +32,7 @@ export interface TokenToId {
   providedIn: 'root'
 })
 export class WinnowingPreprocessingService {
-  static generateHashValue(tokens: string[], tokenToId: TokenToId): number {
+  static generateHashValue (tokens: string[], tokenToId: TokenToId): number {
     var hashVal = 0;
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
@@ -45,7 +45,7 @@ export class WinnowingPreprocessingService {
     return hashVal;
   }
 
-  getKGramHashes(
+  getKGramHashes (
       tokens: string[], tokenToId: TokenToId, K: number): number[] {
     // Generate all possible k-gram hashes from tokens.
     var kGramHashes = [];
@@ -58,7 +58,7 @@ export class WinnowingPreprocessingService {
     return kGramHashes;
   }
 
-  getFingerprintFromHashes(
+  getFingerprintFromHashes (
       kGramHashes: number[], T: number, K: number): number[][] {
     // Generate fingerprint of a document from its k-gram hashes.
     var windowSize = T - K + 1;

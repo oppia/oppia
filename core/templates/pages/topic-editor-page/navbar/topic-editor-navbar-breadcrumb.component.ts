@@ -29,23 +29,23 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 export class TopicEditorNavbarBreadcrumbComponent {
   topic: Topic;
 
-  constructor(
+  constructor (
     private topicEditorRoutingService: TopicEditorRoutingService,
     private topicEditorStateService: TopicEditorStateService
   ) {}
 
-  canNavigateToTopicEditorPage(): boolean {
+  canNavigateToTopicEditorPage (): boolean {
     const activeTab = this.topicEditorRoutingService.getActiveTabName();
     return (
       activeTab.startsWith('subtopic') ||
       this.topicEditorRoutingService.getLastTabVisited() === 'subtopic');
   }
 
-  navigateToMainTab(): void {
+  navigateToMainTab (): void {
     this.topicEditorRoutingService.navigateToMainTab();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.topic = this.topicEditorStateService.getTopic();
   }
 }

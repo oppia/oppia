@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
 
-describe('Editor Reloading Modal Controller', function() {
+describe('Editor Reloading Modal Controller', function () {
   var $flushPendingTasks = null;
   var $scope = null;
   var $uibModalInstance = null;
   var $verifyNoPendingTasks = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
     $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
@@ -38,7 +38,7 @@ describe('Editor Reloading Modal Controller', function() {
     });
   }));
 
-  it('should dismiss modal after waiting timeout to finish', function() {
+  it('should dismiss modal after waiting timeout to finish', function () {
     $flushPendingTasks();
     $verifyNoPendingTasks('$timeout');
 

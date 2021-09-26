@@ -89,7 +89,7 @@ export class LostChange {
   translationHTML?: string;
   utilsService: UtilsService;
 
-  constructor(
+  constructor (
       utilsService: UtilsService, cmd: string, newStateName?: string,
       oldStateName?: string, stateName?: string,
       newValue?: LostChangeValue | null, oldValue?: LostChangeValue | null,
@@ -111,29 +111,29 @@ export class LostChange {
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return
   // the last item.
-  getStatePropertyValue(
+  getStatePropertyValue (
       statePropertyValue: string[] | Object): string | Object {
     return Array.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
 
-  isEndingExploration(): boolean {
+  isEndingExploration (): boolean {
     return this.oldValue === null && this.newValue === 'EndExploration';
   }
 
-  isAddingInteraction(): boolean {
+  isAddingInteraction (): boolean {
     return this.oldValue === null && this.newValue !== 'EndExploration';
   }
 
-  isOldValueEmpty(): boolean {
+  isOldValueEmpty (): boolean {
     return this.utilsService.isEmpty(this.oldValue);
   }
 
-  isNewValueEmpty(): boolean {
+  isNewValueEmpty (): boolean {
     return this.utilsService.isEmpty(this.newValue);
   }
 
-  isOutcomeFeedbackEqual(): boolean {
+  isOutcomeFeedbackEqual (): boolean {
     let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
     let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
     if (
@@ -145,7 +145,7 @@ export class LostChange {
     return false;
   }
 
-  isOutcomeDestEqual(): boolean {
+  isOutcomeDestEqual (): boolean {
     let newValueOutcome = (<LostChangeValues> this.newValue).outcome;
     let oldValueOutcome = (<LostChangeValues> this.oldValue).outcome;
     if (newValueOutcome && oldValueOutcome) {
@@ -154,12 +154,12 @@ export class LostChange {
     return false;
   }
 
-  isDestEqual(): boolean {
+  isDestEqual (): boolean {
     return (<LostChangeValues> this.oldValue).dest ===
       (<LostChangeValues> this.newValue).dest;
   }
 
-  isFeedbackEqual(): boolean {
+  isFeedbackEqual (): boolean {
     let newValueFeedback = (<LostChangeValues> this.newValue).feedback;
     let oldValueFeedback = (<LostChangeValues> this.oldValue).feedback;
     if (newValueFeedback && oldValueFeedback) {
@@ -168,7 +168,7 @@ export class LostChange {
     return false;
   }
 
-  isRulesEqual(): boolean {
+  isRulesEqual (): boolean {
     return isEqual(
       (<LostChangeValues> this.newValue).rules,
       (<LostChangeValues> this.oldValue).rules);
@@ -177,7 +177,7 @@ export class LostChange {
   // Detects whether an object of the type 'answer_group' or
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
-  getRelativeChangeToGroups(): string {
+  getRelativeChangeToGroups (): string {
     let result = '';
 
     if (Array.isArray(this.newValue) && Array.isArray(this.oldValue)) {
@@ -202,7 +202,7 @@ export class LostChange {
     return result;
   }
 
-  getLanguage(): string {
+  getLanguage (): string {
     let language = '';
     let supportedLanguages = constants.SUPPORTED_CONTENT_LANGUAGES;
     if (this.cmd === 'add_written_translation') {
@@ -226,7 +226,7 @@ export class LostChange {
   providedIn: 'root'
 })
 export class LostChangeObjectFactory {
-  constructor(private utilsService: UtilsService) {
+  constructor (private utilsService: UtilsService) {
     // The createNew function needs to be binded because it's used a lot in
     // calbacks and then `this` would refer to window instead of the service
     // itself.
@@ -237,7 +237,7 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(
+  createNew (
       lostChangeDict: ExplorationChange | LostChangeBackendDict): LostChange {
     lostChangeDict = lostChangeDict as unknown as LostChangeBackendDict;
     return new LostChange(

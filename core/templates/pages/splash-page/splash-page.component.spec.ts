@@ -35,11 +35,11 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmitter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
+  getCurrentI18nLanguageCode () {
     return 'en';
   }
 
-  get onI18nLanguageCodeChange() {
+  get onI18nLanguageCodeChange () {
     return this.codeChangeEventEmitter;
   }
 }
@@ -50,7 +50,7 @@ describe('Splash Page', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [SplashPageComponent, MockTranslatePipe],
       providers: [
@@ -98,12 +98,12 @@ describe('Splash Page', () => {
     component = splashPageComponent.componentInstance;
   });
 
-  it('should get static image url', function() {
+  it('should get static image url', function () {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should record analytics when Browse Lessons is clicked', function() {
+  it('should record analytics when Browse Lessons is clicked', function () {
     spyOn(
       siteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
@@ -112,7 +112,7 @@ describe('Splash Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Start Contributing is clicked', function() {
+  it('should record analytics when Start Contributing is clicked', function () {
     spyOn(
       siteAnalyticsService, 'registerClickStartContributingButtonEvent')
       .and.callThrough();
@@ -121,7 +121,7 @@ describe('Splash Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Start Teaching is clicked', function() {
+  it('should record analytics when Start Teaching is clicked', function () {
     spyOn(
       siteAnalyticsService, 'registerClickStartTeachingButtonEvent'
     ).and.callThrough();
@@ -130,7 +130,7 @@ describe('Splash Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should increment and decrement testimonial IDs correctly', function() {
+  it('should increment and decrement testimonial IDs correctly', function () {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
     component.incrementDisplayedTestimonialId();
@@ -146,7 +146,7 @@ describe('Splash Page', () => {
     expect(component.displayedTestimonialId).toBe(2);
   });
 
-  it('should get testimonials correctly', function() {
+  it('should get testimonials correctly', function () {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });

@@ -41,7 +41,7 @@ describe('Contributor dashboard admin backend api service', () => {
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });

@@ -36,23 +36,23 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Interaction validator', function() {
+describe('Interaction validator', function () {
   var bivs, WARNING_TYPES, agof;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups;
   var agof, oof;
 
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('oppia');
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
@@ -65,7 +65,7 @@ describe('Interaction validator', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function ($injector, $rootScope) {
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -113,16 +113,16 @@ describe('Interaction validator', function() {
     ];
   }));
 
-  describe('baseValidator', function() {
+  describe('baseValidator', function () {
     it('should have no warnings for good answer groups with no ' +
-        'confusing outcomes', function() {
+        'confusing outcomes', function () {
       var warnings = bivs.getAnswerGroupWarnings(
         goodAnswerGroups, currentState);
       expect(warnings).toEqual([]);
     });
 
     it('should have a warning for an answer group with a confusing outcome',
-      function() {
+      function () {
         var answerGroups = [
           agof.createNew([], goodOutcomeDest, false, null),
           agof.createNew([], badOutcome, false, null),
@@ -137,7 +137,7 @@ describe('Interaction validator', function() {
     );
 
     it('should have a warning for an answer group with a self-loop labelled' +
-    ' as correct', function() {
+    ' as correct', function () {
       goodOutcomeFeedback.labelledAsCorrect = true;
       var answerGroups = [
         agof.createNew([], goodOutcomeFeedback, false, null)
@@ -151,7 +151,7 @@ describe('Interaction validator', function() {
     });
 
     it('should not have any warnings for a non-confusing default outcome',
-      function() {
+      function () {
         var warnings = bivs.getDefaultOutcomeWarnings(
           goodOutcomeDest, currentState);
         expect(warnings).toEqual([]);
@@ -162,7 +162,7 @@ describe('Interaction validator', function() {
       }
     );
 
-    it('should have a warning for a confusing default outcome', function() {
+    it('should have a warning for a confusing default outcome', function () {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
@@ -172,7 +172,7 @@ describe('Interaction validator', function() {
     });
 
     it('should have a warning for a default outcome with a self-loop' +
-    ' labelled as correct', function() {
+    ' labelled as correct', function () {
       goodOutcomeFeedback.labelledAsCorrect = true;
       var warnings = bivs.getDefaultOutcomeWarnings(
         goodOutcomeFeedback, currentState);
@@ -185,13 +185,13 @@ describe('Interaction validator', function() {
     });
 
     it('should not have any warnings for no answer groups and a null default ' +
-        'outcome.', function() {
+        'outcome.', function () {
       var warnings = bivs.getAllOutcomeWarnings([], null, currentState);
       expect(warnings).toEqual([]);
     });
 
     it('should be able to concatenate warnings for both answer groups and ' +
-        'the default outcome', function() {
+        'the default outcome', function () {
       var badAnswerGroups = [
         agof.createNew([], goodOutcomeDest, false, null),
         agof.createNew([], badOutcome, false, null),
@@ -214,13 +214,13 @@ describe('Interaction validator', function() {
     });
   });
 
-  describe('customizationValidator', function() {
-    it('should not throw for no arguments', function() {
+  describe('customizationValidator', function () {
+    it('should not throw for no arguments', function () {
       bivs.requireCustomizationArguments({}, []);
     });
 
-    it('should throw a warning for a missing top-level field', function() {
-      expect(function() {
+    it('should throw a warning for a missing top-level field', function () {
+      expect(function () {
         bivs.requireCustomizationArguments({}, ['levelone']);
       }).toThrowError(
         'Expected customization arguments to have property: levelone'
@@ -228,9 +228,9 @@ describe('Interaction validator', function() {
     });
 
     it('should throw warnings for multiple missing top-level fields',
-      function() {
+      function () {
         var expectedArgs = ['first', 'second'];
-        expect(function() {
+        expect(function () {
           bivs.requireCustomizationArguments({}, expectedArgs);
         }).toThrowError(
           'Expected customization arguments to have properties: first, second'

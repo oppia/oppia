@@ -56,7 +56,7 @@ describe('Base Content Component', () => {
   let oldDate = Date;
 
   class MockUrlService {
-    isIframed(): boolean {
+    isIframed (): boolean {
       return isIframed;
     }
   }
@@ -71,7 +71,7 @@ describe('Base Content Component', () => {
         hash: hash
       },
       document: {
-        addEventListener(event: string, callback: () => void) {
+        addEventListener (event: string, callback: () => void) {
           callback();
         }
       }
@@ -83,11 +83,11 @@ describe('Base Content Component', () => {
   }
 
   class MockPageTitleService {
-    getNavbarTitleForMobileView(): string {
+    getNavbarTitleForMobileView (): string {
       return 'Page Title';
     }
 
-    getNavbarSubtitleForMobileView(): string {
+    getNavbarSubtitleForMobileView (): string {
       return 'Page Subtitle';
     }
   }

@@ -22,7 +22,7 @@ require(
 
 angular.module('oppia').controller('ConfirmDeleteStateModalController', [
   '$controller', '$scope', '$uibModalInstance', 'deleteStateName',
-  function($controller, $scope, $uibModalInstance, deleteStateName) {
+  function ($controller, $scope, $uibModalInstance, deleteStateName) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

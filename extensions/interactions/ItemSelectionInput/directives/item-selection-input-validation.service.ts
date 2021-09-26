@@ -34,11 +34,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class ItemSelectionInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: ItemSelectionInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
@@ -109,7 +109,7 @@ export class ItemSelectionInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs:
       ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): Warning[] {

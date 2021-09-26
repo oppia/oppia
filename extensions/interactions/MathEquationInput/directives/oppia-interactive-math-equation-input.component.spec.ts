@@ -34,29 +34,29 @@ describe('MathEquationInputInteractive', () => {
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
-      asciimath: function() {
+      asciimath: function () {
         return 'Dummy value';
       }
     }
   };
   class MockGuppy {
-    constructor(id: string, config: Object) {}
+    constructor (id: string, config: Object) {}
 
-    asciimath() {
+    asciimath () {
       return 'Dummy value';
     }
-    configure(name: string, val: Object): void {}
-    static event(name: string, handler: Function): void {
+    configure (name: string, val: Object): void {}
+    static event (name: string, handler: Function): void {
       handler({focused: true});
     }
-    static configure(name: string, val: Object): void {}
-    static 'remove_global_symbol'(symbol: string): void {}
-    static 'add_global_symbol'(name: string, symbol: Object): void {}
+    static configure (name: string, val: Object): void {}
+    static 'remove_global_symbol' (symbol: string): void {}
+    static 'add_global_symbol' (name: string, symbol: Object): void {}
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit (answer, rulesService) {}
+    registerCurrentInteraction (submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -94,7 +94,7 @@ describe('MathEquationInputInteractive', () => {
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
-  it('should not submit the answer if invalid', function() {
+  it('should not submit the answer if invalid', function () {
     component.hasBeenTouched = true;
     // Invalid answer.
     component.value = '(x + y)) = 3';
@@ -106,7 +106,7 @@ describe('MathEquationInputInteractive', () => {
       'It looks like your answer has an invalid bracket pairing.');
   });
 
-  it('should submit the answer if valid', function() {
+  it('should submit the answer if valid', function () {
     component.hasBeenTouched = true;
     // Invalid answer.
     component.value = '(x + y) = 3';
@@ -118,7 +118,7 @@ describe('MathEquationInputInteractive', () => {
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
   });
 
-  it('should correctly validate current answer', function() {
+  it('should correctly validate current answer', function () {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
     expect(component.isCurrentAnswerValid()).toBeTrue();
@@ -133,7 +133,7 @@ describe('MathEquationInputInteractive', () => {
     );
   });
 
-  it('should set the value of showOSK to true', function() {
+  it('should set the value of showOSK to true', function () {
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 

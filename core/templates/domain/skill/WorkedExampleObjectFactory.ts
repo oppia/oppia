@@ -32,23 +32,23 @@ export class WorkedExample {
   _question: SubtitledHtml;
   _explanation: SubtitledHtml;
 
-  constructor(question: SubtitledHtml, explanation: SubtitledHtml) {
+  constructor (question: SubtitledHtml, explanation: SubtitledHtml) {
     this._question = question;
     this._explanation = explanation;
   }
 
-  toBackendDict(): WorkedExampleBackendDict {
+  toBackendDict (): WorkedExampleBackendDict {
     return {
       question: this._question.toBackendDict(),
       explanation: this._explanation.toBackendDict()
     };
   }
 
-  getQuestion(): SubtitledHtml {
+  getQuestion (): SubtitledHtml {
     return this._question;
   }
 
-  getExplanation(): SubtitledHtml {
+  getExplanation (): SubtitledHtml {
     return this._explanation;
   }
 }
@@ -57,10 +57,10 @@ export class WorkedExample {
   providedIn: 'root'
 })
 export class WorkedExampleObjectFactory {
-  constructor() {}
+  constructor () {}
 
 
-  createFromBackendDict(
+  createFromBackendDict (
       workedExampleDict: WorkedExampleBackendDict): WorkedExample {
     return new WorkedExample(
       SubtitledHtml.createFromBackendDict(
@@ -70,7 +70,7 @@ export class WorkedExampleObjectFactory {
     );
   }
 
-  create(question: SubtitledHtml, explanation: SubtitledHtml): WorkedExample {
+  create (question: SubtitledHtml, explanation: SubtitledHtml): WorkedExample {
     return new WorkedExample(question, explanation);
   }
 }

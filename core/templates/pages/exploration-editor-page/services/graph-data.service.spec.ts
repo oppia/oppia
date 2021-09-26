@@ -22,14 +22,14 @@ require('pages/exploration-editor-page/services/exploration-property.service');
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-init-state-name.service');
 
-describe('Graph Data Service', function() {
+describe('Graph Data Service', function () {
   var GraphDataService;
   var ExplorationInitStateNameService;
   var ExplorationStatesService;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     GraphDataService = $injector.get('GraphDataService');
     ExplorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
@@ -101,7 +101,7 @@ describe('Graph Data Service', function() {
     });
   }));
 
-  it('should recompute graph data', function() {
+  it('should recompute graph data', function () {
     var graphData = {
       finalStateIds: [],
       initStateId: 'property_1',

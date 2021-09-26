@@ -42,7 +42,7 @@ export class SummaryListHeaderComponent {
   @Input() isDeleteAvailable: boolean = false;
   @Input() numItems!: number;
 
-  deleteItem(evt: Event): void {
+  deleteItem (evt: Event): void {
     let eventData = {
       index: this.index,
       event: evt

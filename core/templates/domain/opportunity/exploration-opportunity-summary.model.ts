@@ -37,7 +37,7 @@ export class ExplorationOpportunitySummary {
   contentCount: number;
   translationCounts: TranslationCountsDict;
 
-  constructor(
+  constructor (
       expId: string, topicName: string, storyTitle: string,
       chapterTitle: string, contentCount: number,
       translationCounts: TranslationCountsDict) {
@@ -49,7 +49,7 @@ export class ExplorationOpportunitySummary {
     this.translationCounts = translationCounts;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: ExplorationOpportunitySummaryBackendDict):
       ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
@@ -58,23 +58,23 @@ export class ExplorationOpportunitySummary {
       backendDict.translation_counts);
   }
 
-  getExplorationId(): string {
+  getExplorationId (): string {
     return this.id;
   }
 
-  getOpportunityHeading(): string {
+  getOpportunityHeading (): string {
     return this.chapterTitle;
   }
 
-  getOpportunitySubheading(): string {
+  getOpportunitySubheading (): string {
     return (this.topicName + ' - ' + this.storyTitle);
   }
 
-  getContentCount(): number {
+  getContentCount (): number {
     return this.contentCount;
   }
 
-  getTranslationProgressPercentage(languageCode: string): number {
+  getTranslationProgressPercentage (languageCode: string): number {
     let progressPercentage = 0;
     if (this.translationCounts.hasOwnProperty(languageCode) && (
       this.contentCount > 0)) {

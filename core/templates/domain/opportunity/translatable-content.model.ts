@@ -25,7 +25,7 @@ export interface TranslatableItemBackendDict {
 }
 
 export class TranslatableItem {
-  constructor(
+  constructor (
     readonly content: string | string[],
     readonly dataFormat: string,
     readonly contentType: string,
@@ -33,7 +33,7 @@ export class TranslatableItem {
     readonly ruleType: string | null
   ) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: TranslatableItemBackendDict): TranslatableItem {
     return new TranslatableItem(
       backendDict.content,

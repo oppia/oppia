@@ -24,7 +24,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 
-describe('Contributor dashboard page', function() {
+describe('Contributor dashboard page', function () {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -42,7 +42,7 @@ describe('Contributor dashboard page', function() {
   var focusManagerService = null;
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('WindowRef', windowRef);
   }));
 
@@ -53,7 +53,7 @@ describe('Contributor dashboard page', function() {
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     UserService = $injector.get('UserService');
@@ -69,20 +69,20 @@ describe('Contributor dashboard page', function() {
       .callThrough();
   }));
 
-  it('should set focus on select lang field', function() {
+  it('should set focus on select lang field', function () {
     var focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
     ctrl.onTabClick('translateTextTab');
     $timeout.flush();
     expect(focusSpy).toHaveBeenCalled();
   });
 
-  describe('when user is logged in', function() {
+  describe('when user is logged in', function () {
     var userInfo = {
       isLoggedIn: () => true,
       getUsername: () => 'username1'
     };
 
-    beforeEach(function() {
+    beforeEach(function () {
       spyOn(UserService, 'getProfileImageDataUrlAsync')
         .and.returnValue($q.resolve(userProfileImage));
       spyOn(UserService, 'getUserContributionRightsDataAsync')
@@ -93,7 +93,7 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should set specific properties after $onInit is called', function() {
+    it('should set specific properties after $onInit is called', function () {
       expect(ctrl.languageCode).toBe('hi');
       expect(TranslationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalledWith('hi');
@@ -103,7 +103,7 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should initialize $scope properties after controller is initialized' +
-      ' and get data from backend', function() {
+      ' and get data from backend', function () {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
@@ -116,7 +116,7 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should change active tab name when clicking on translate text tab',
-      function() {
+      function () {
         var changedTab = 'translateTextTab';
         expect(ctrl.activeTabName).toBe('myContributionTab');
         ctrl.onTabClick(changedTab);
@@ -124,7 +124,7 @@ describe('Contributor dashboard page', function() {
       });
 
     it('should change active language when clicking on language selector',
-      function() {
+      function () {
         spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
           .and.callThrough();
 
@@ -136,7 +136,7 @@ describe('Contributor dashboard page', function() {
           .toHaveBeenCalledWith('hi');
       });
 
-    it('should show language selector based on active tab', function() {
+    it('should show language selector based on active tab', function () {
       var changedTab = 'translateTextTab';
 
       expect(ctrl.activeTabName).toBe('myContributionTab');
@@ -147,7 +147,7 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.showLanguageSelector()).toBe(true);
     });
 
-    it('should call scrollFunction on scroll', function() {
+    it('should call scrollFunction on scroll', function () {
       var dummyScrollEvent = new Event('scroll');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
 
@@ -157,7 +157,7 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should show default header if window pageYOffset is ' +
-      'less than 5', function() {
+      'less than 5', function () {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 4
@@ -169,7 +169,7 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 5', function() {
+      ' scrolled greater than 5', function () {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 6
@@ -181,12 +181,12 @@ describe('Contributor dashboard page', function() {
     });
   });
 
-  describe('when user is not logged in', function() {
+  describe('when user is not logged in', function () {
     var userInfo = {
       isLoggedIn: () => false
     };
 
-    beforeEach(function() {
+    beforeEach(function () {
       spyOn(UserService, 'getProfileImageDataUrlAsync')
         .and.returnValue($q.resolve(userProfileImage));
       spyOn(UserService, 'getUserContributionRightsDataAsync')
@@ -197,7 +197,7 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should have no user data in dashboard page', function() {
+    it('should have no user data in dashboard page', function () {
       expect(ctrl.userIsLoggedIn).toBe(false);
       expect(ctrl.username).toBe('');
     });

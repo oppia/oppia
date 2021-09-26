@@ -20,7 +20,7 @@
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { ShortResponseAlgebraicExpressionInputComponent } from './oppia-short-response-algebraic-expression-input.component';
 
-describe('AlgebraicExpressionInputShortResponse', function() {
+describe('AlgebraicExpressionInputShortResponse', function () {
   let component: ShortResponseAlgebraicExpressionInputComponent;
   let fixture: ComponentFixture<ShortResponseAlgebraicExpressionInputComponent>;
 
@@ -38,7 +38,7 @@ describe('AlgebraicExpressionInputShortResponse', function() {
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.escapedAnswer).toBe('answer');
   });

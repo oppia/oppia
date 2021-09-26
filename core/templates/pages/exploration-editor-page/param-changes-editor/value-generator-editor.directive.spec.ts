@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for valueGeneratorEditor.
  */
 
-describe('Value Generator Editor directive', function() {
+describe('Value Generator Editor directive', function () {
   var $scope = null;
   var elem = null;
 
@@ -25,7 +25,7 @@ describe('Value Generator Editor directive', function() {
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.inject(function($compile, $injector) {
+  beforeEach(angular.mock.inject(function ($compile, $injector) {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
@@ -43,7 +43,7 @@ describe('Value Generator Editor directive', function() {
     $rootScope.$digest();
   }));
 
-  it('should add new attributes in the compiled one', function() {
+  it('should add new attributes in the compiled one', function () {
     expect(compiledElement.html()).toContain(
       'get-generator-id="getGeneratorId()"');
     expect(compiledElement.html()).toContain(

@@ -28,7 +28,7 @@ import { AdminMiscTabComponent } from './admin-misc-tab.component';
 
 class MockWindowRef {
   nativeWindow = {
-    confirm() {
+    confirm () {
       return true;
     },
     location: {
@@ -38,7 +38,7 @@ class MockWindowRef {
       search: 'search',
       hash: 'hash'
     },
-    open() {
+    open () {
       return;
     }
   };
@@ -47,12 +47,12 @@ class MockWindowRef {
 class MockReaderObject {
   result = null;
   onload = null;
-  constructor() {
+  constructor () {
     this.onload = ($evt) => {
       return 'Fake onload executed';
     };
   }
-  readAsText(file) {
+  readAsText (file) {
     this.onload({target: {result: 'result'}});
     return 'The file is loaded';
   }

@@ -39,7 +39,7 @@ export class ExplorationPropertyService {
   propertyName: string = null;
 
   @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
-  constructor(
+  constructor (
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
     protected loggerService: LoggerService,
@@ -56,7 +56,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string): void {
+  init (value: string): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
@@ -77,27 +77,27 @@ export class ExplorationPropertyService {
   }
 
   // Returns whether the current value has changed from the memento.
-  hasChanged(): boolean {
+  hasChanged (): boolean {
     return !angular.equals(this.savedMemento, this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: string): string {
+  _normalize (value: string): string {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: string): boolean {
+  _isValid (value: string): boolean {
     return true;
   }
 
   // Normalizes the displayed value. Then, if the memento and the displayed
   // value are the same, does nothing. Otherwise, creates a new entry in the
   // change list, and updates the memento to the displayed value.
-  saveDisplayedValue(): void {
+  saveDisplayedValue (): void {
     if (this.propertyName === null) {
       throw new Error('Exploration property name cannot be null.');
     }
@@ -129,11 +129,11 @@ export class ExplorationPropertyService {
   }
 
   // Reverts the displayed value to the saved memento.
-  restoreFromMemento(): void {
+  restoreFromMemento (): void {
     this.displayed = cloneDeep(this.savedMemento);
   }
 
-  get onExplorationPropertyChanged(): EventEmitter<void> {
+  get onExplorationPropertyChanged (): EventEmitter<void> {
     return this._explorationPropertyChangedEventEmitter;
   }
 }

@@ -22,7 +22,7 @@ export class Classifier {
   classifierData: ArrayBuffer;
   algorithmVersion: number;
 
-  constructor(
+  constructor (
       algorithmId: string, classifierData: ArrayBuffer,
       algorithmVersion: number) {
     this.algorithmId = algorithmId;

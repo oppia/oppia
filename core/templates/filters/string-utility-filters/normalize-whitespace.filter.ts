@@ -21,8 +21,8 @@ require('services/utils.service.ts');
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
 angular.module('oppia').filter('normalizeWhitespace', [
-  'UtilsService', function(UtilsService) {
-    return function(input) {
+  'UtilsService', function (UtilsService) {
+    return function (input) {
       if (UtilsService.isString(input)) {
         // Remove whitespace from the beginning and end of the string, and
         // replace interior whitespace with a single space character.

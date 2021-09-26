@@ -33,7 +33,7 @@ import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widg
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
 
-describe('OppiaAngularRootComponent', function() {
+describe('OppiaAngularRootComponent', function () {
   let emitSpy: jasmine.Spy;
 
   beforeEach(async(() => {

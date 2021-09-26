@@ -145,7 +145,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
-  constructor(
+  constructor (
     private classroomBackendApiService: ClassroomBackendApiService,
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
@@ -181,7 +181,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
-  public ngAfterViewInit(): void {
+  public ngAfterViewInit (): void {
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,
@@ -277,7 +277,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     this.initialized.emit();
   }
 
-  getAssetUrl(path: string): string {
+  getAssetUrl (path: string): string {
     return this.urlInterpolationService.getFullStaticAssetUrl(path);
   }
 }

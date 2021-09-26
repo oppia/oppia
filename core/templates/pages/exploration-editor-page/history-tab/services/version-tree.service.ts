@@ -47,7 +47,7 @@ export class VersionTreeService {
   private _snapshots!: ExplorationSnapshots;
   private _treeParents!: Record<number, number>;
 
-  init(snapshotsData: ExplorationSnapshot[]): void {
+  init (snapshotsData: ExplorationSnapshot[]): void {
     this._treeParents = {};
     this._snapshots = {};
     var numberOfVersions = snapshotsData.length;
@@ -82,7 +82,7 @@ export class VersionTreeService {
    * in general or reverted version if commit is a reversion.
    * The parent of the root (version 1) is -1.
    */
-  getVersionTree(): {} {
+  getVersionTree (): {} {
     if (this._treeParents === undefined) {
       throw new Error('version tree not initialized.');
     }
@@ -90,7 +90,7 @@ export class VersionTreeService {
   }
 
   // Finds lowest common ancestor of v1 and v2 in the version tree.
-  findLCA(v1: number, v2: number): number {
+  findLCA (v1: number, v2: number): number {
     // Find paths from root to v1 and v2.
     var pathToV1 = [];
     var pathToV2 = [];
@@ -148,7 +148,7 @@ export class VersionTreeService {
    * for 'revert':
    *  - 'version_number': version number reverted to
    */
-  getChangeList(version: number): ExplorationChange[] {
+  getChangeList (version: number): ExplorationChange[] {
     if (this._snapshots === undefined) {
       throw new Error('snapshots is not initialized');
     } else if (version === 1) {

@@ -26,7 +26,7 @@ describe('ResponseTextInputComponent', () => {
   let fixture: ComponentFixture<ResponseTextInputComponent>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };

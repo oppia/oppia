@@ -37,7 +37,7 @@ require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -49,13 +49,13 @@ angular.module('oppia').directive('skillEditorMainTab', [
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
-        function(
+        function (
             $scope, $timeout, $uibModal, FocusManagerService,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
-          $scope.createQuestion = function() {
+          $scope.createQuestion = function () {
             // This check is needed because if a skill has unsaved changes to
             // misconceptions, then these will be reflected in the questions
             // created at that time, but if page is refreshed/changes are
@@ -68,7 +68,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
                   'save-pending-changes-modal.directive.html'),
                 backdrop: true,
                 controller: 'ConfirmOrCancelModalController'
-              }).result.then(null, function() {
+              }).result.then(null, function () {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
@@ -79,11 +79,11 @@ angular.module('oppia').directive('skillEditorMainTab', [
             }
           };
 
-          $scope.getSubtopicName = function() {
+          $scope.getSubtopicName = function () {
             return $scope.subtopicName;
           };
 
-          $scope.getAssignedSkillTopicData = function() {
+          $scope.getAssignedSkillTopicData = function () {
             if (!$scope.topicName && $scope.assignedSkillTopicData) {
               $scope.topicName = Object.keys($scope.assignedSkillTopicData)[0];
               $scope.changeSelectedTopic($scope.topicName);
@@ -94,23 +94,23 @@ angular.module('oppia').directive('skillEditorMainTab', [
             return $scope.assignedSkillTopicData;
           };
 
-          $scope.isTopicDropdownEnabled = function() {
+          $scope.isTopicDropdownEnabled = function () {
             return Boolean(
               $scope.assignedSkillTopicData &&
                 Object.keys($scope.assignedSkillTopicData).length);
           };
 
-          $scope.changeSelectedTopic = function(topicName) {
+          $scope.changeSelectedTopic = function (topicName) {
             $scope.subtopicName = (
               $scope.assignedSkillTopicData[topicName]);
           };
 
-          $scope.hasLoadedSkill = function() {
+          $scope.hasLoadedSkill = function () {
             $scope.skill = SkillEditorStateService.getSkill();
             return SkillEditorStateService.hasLoadedSkill();
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.selectedTopic = null;
             $scope.assignedSkillTopicData = null;
             $scope.topicName = null;
@@ -119,7 +119,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             // To ensure that the focus event function executes only after
             // all the functions in the main thread have executed,
             // $timeout is required.
-            $timeout(function() {
+            $timeout(function () {
               FocusManagerService.setFocus('newQuestionBtn');
             }, 0);
           };

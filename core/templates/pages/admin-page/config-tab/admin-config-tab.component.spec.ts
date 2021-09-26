@@ -28,7 +28,7 @@ import { AdminConfigTabComponent } from './admin-config-tab.component';
 
 class MockWindowRef {
   nativeWindow = {
-    confirm() {
+    confirm () {
       return true;
     },
     location: {
@@ -38,7 +38,7 @@ class MockWindowRef {
       search: 'search',
       hash: 'hash'
     },
-    open() {
+    open () {
       return;
     }
   };

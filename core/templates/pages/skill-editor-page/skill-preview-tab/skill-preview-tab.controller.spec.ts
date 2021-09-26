@@ -26,7 +26,7 @@ import { ExplorationPlayerStateService } from 'pages/exploration-player-page/ser
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Skill preview tab', function() {
+describe('Skill preview tab', function () {
   var $scope = null;
   var ctrl = null;
   var UrlService = null;
@@ -143,7 +143,7 @@ describe('Skill preview tab', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     UrlService = $injector.get('UrlService');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
@@ -153,7 +153,7 @@ describe('Skill preview tab', function() {
     var skillId = 'df432fe';
     $scope = $rootScope.$new();
     var MockQuestionBackendApiService = {
-      fetchQuestionsAsync: async() => Promise.resolve([questionDict])
+      fetchQuestionsAsync: async () => Promise.resolve([questionDict])
     };
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue(skillId);
 
@@ -166,7 +166,7 @@ describe('Skill preview tab', function() {
     ctrl.$onInit();
   }));
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', function () {
     expect(ctrl.questionTextFilter).toEqual('');
     expect(ctrl.displayCardIsInitialized).toEqual(false);
     expect(ctrl.questionsFetched).toEqual(false);
@@ -186,13 +186,13 @@ describe('Skill preview tab', function() {
     expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 
-  it('should initialize the question card', function() {
+  it('should initialize the question card', function () {
     expect(ctrl.displayCardIsInitialized).toEqual(false);
     ctrl.initializeQuestionCard(null);
     expect(ctrl.displayCardIsInitialized).toEqual(true);
   });
 
-  it('should filter the questions', function() {
+  it('should filter the questions', function () {
     ctrl.questionDicts = [questionDict1, questionDict2,
       questionDict3, questionDict4];
 
@@ -222,7 +222,7 @@ describe('Skill preview tab', function() {
     expect(ctrl.displayedQuestions).toEqual([questionDict1]);
   });
 
-  it('should trigger feedback when an answer is submitted', function() {
+  it('should trigger feedback when an answer is submitted', function () {
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
 
     ctrl.$onInit();

@@ -16,18 +16,18 @@
  * @fileoverview Directive for the PencilCodeEditor short response.
  */
 
-describe('oppiaShortResponsePencilCodeEditor', function() {
+describe('oppiaShortResponsePencilCodeEditor', function () {
   let ctrl = null;
   let directive = null;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return answer;
     }
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
 
     $provide.value('$attrs', {
@@ -36,12 +36,12 @@ describe('oppiaShortResponsePencilCodeEditor', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     directive = $injector.get('oppiaShortResponsePencilCodeEditorDirective')[0];
     ctrl = $injector.instantiate(directive.controller);
   }));
 
-  it('should initialise the component when submits answer', function() {
+  it('should initialise the component when submits answer', function () {
     ctrl.$onInit();
     expect(ctrl.answerCode).toEqual('# Add the initial code snippet here.');
   });

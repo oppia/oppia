@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Translation Suggestion Review Modal Controller', function() {
+describe('Translation Suggestion Review Modal Controller', function () {
   let $scope = null;
   let $uibModalInstance = null;
   let SiteAnalyticsService = null;
@@ -33,7 +33,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     contributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
     languageUtilService = $injector.get('LanguageUtilService');
@@ -48,7 +48,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       .and.returnValue('audio_language_description');
   }));
 
-  describe('when reviewing suggestion', function() {
+  describe('when reviewing suggestion', function () {
     const reviewable = true;
     const subheading = 'subheading_title';
     const suggestion1 = {
@@ -91,7 +91,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_1: contribution1,
       suggestion_2: contribution2
     };
-    beforeEach(angular.mock.inject(function($injector, $controller, $q) {
+    beforeEach(angular.mock.inject(function ($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
       userService = $injector.get('UserService');
       $uibModalInstance = jasmine.createSpyObj(
@@ -123,14 +123,14 @@ describe('Translation Suggestion Review Modal Controller', function() {
     }));
 
     it('should user service at initialization.',
-      function() {
+      function () {
         $scope.$apply();
         expect(userInfoSpy).toHaveBeenCalled();
         expect(contributionRightsDataSpy).toHaveBeenCalled();
       });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.activeSuggestionId).toBe('suggestion_1');
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.subheading).toBe('subheading_title');
@@ -139,14 +139,14 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
 
     it('should register Contributor Dashboard view suggestion for review ' +
-      'event after controller is initialized', function() {
+      'event after controller is initialized', function () {
       expect(
         SiteAnalyticsService
           .registerContributorDashboardViewSuggestionForReview)
         .toHaveBeenCalledWith('Translation');
     });
 
-    it('should notify user on failed suggestion activities', function() {
+    it('should notify user on failed suggestion activities', function () {
       const error = {
         data: {
           error: 'Error'
@@ -164,7 +164,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     });
 
     it('should accept suggestion in suggestion modal service when clicking' +
-      ' on accept and review next suggestion button', function() {
+      ' on accept and review next suggestion button', function () {
       expect($scope.activeSuggestionId).toBe('suggestion_1');
       expect($scope.activeSuggestion).toEqual(suggestion1);
       expect($scope.reviewable).toBe(reviewable);
@@ -217,7 +217,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     it(
       'should reject suggestion in suggestion modal service when clicking ' +
-      'on reject and review next suggestion button', function() {
+      'on reject and review next suggestion button', function () {
         expect($scope.activeSuggestionId).toBe('suggestion_1');
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);
@@ -263,7 +263,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
 
     it('should reject a suggestion if the backend pre accept validation ' +
-    'failed', function() {
+    'failed', function () {
       expect($scope.activeSuggestionId).toBe('suggestion_1');
       expect($scope.activeSuggestion).toEqual(suggestion1);
       expect($scope.reviewable).toBe(reviewable);
@@ -301,28 +301,28 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     it(
       'should cancel suggestion in suggestion modal service when clicking ' +
-      'on cancel suggestion button', function() {
+      'on cancel suggestion button', function () {
         $scope.cancel();
         expect($uibModalInstance.close).toHaveBeenCalledWith([]);
       });
 
     it(
       'should open the translation editor when the edit button is clicked',
-      function() {
+      function () {
         $scope.editSuggestion();
         expect($scope.startedEditing).toBe(true);
       });
 
     it(
       'should close the translation editor when the cancel button is clicked',
-      function() {
+      function () {
         $scope.cancelEdit();
         expect($scope.startedEditing).toBe(false);
       });
 
     it(
       'should update translation when the update button is clicked',
-      function() {
+      function () {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
         $scope.editedContent = '<p>In Hindi</p>';
         $scope.activeSuggestion.change = {
@@ -350,7 +350,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
   });
 
-  describe('when viewing suggestion', function() {
+  describe('when viewing suggestion', function () {
     const reviewable = false;
     let $httpBackend = null;
     const subheading = 'subheading_title';
@@ -397,7 +397,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_2: contribution2
     };
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -416,7 +416,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     it(
       'should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.activeSuggestionId).toBe('suggestion_1');
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);

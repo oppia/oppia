@@ -191,7 +191,7 @@ describe('MathEquationInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('should warn if there are missing custom variables', function() {
+  it('should warn if there are missing custom variables', function () {
     answerGroups[0].rules = [
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
@@ -217,7 +217,7 @@ describe('MathEquationInputValidationService', () => {
     }]);
   });
 
-  it('should warn if there are too many custom variables', function() {
+  it('should warn if there are too many custom variables', function () {
     answerGroups[0].rules = [
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',

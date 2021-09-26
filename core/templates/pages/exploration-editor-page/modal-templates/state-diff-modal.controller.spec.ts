@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('State Diff Modal Controller', function() {
+describe('State Diff Modal Controller', function () {
   var $flushPendingTasks = null;
   var $httpBackend = null;
   var $q = null;
@@ -38,9 +38,9 @@ describe('State Diff Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  describe('when new state and old state are truthy', function() {
+  describe('when new state and old state are truthy', function () {
     importAllAngularServices();
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
@@ -79,23 +79,23 @@ describe('State Diff Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.headers).toBe(headers);
         expect($scope.newStateName).toBe(newStateName);
         expect($scope.oldStateName).toBe(oldStateName);
         expect($scope.yamlStrs).toEqual({});
       });
 
-    it('should evaluate yaml strings object', function() {
+    it('should evaluate yaml strings object', function () {
       $httpBackend.flush();
       expect($scope.yamlStrs.leftPane).toBe('Yaml data');
       expect($scope.yamlStrs.rightPane).toBe('Yaml data');
     });
   });
 
-  describe('when new state and old state are falsy', function() {
+  describe('when new state and old state are falsy', function () {
     importAllAngularServices();
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
@@ -119,14 +119,14 @@ describe('State Diff Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.headers).toBe(headers);
         expect($scope.newStateName).toBe(newStateName);
         expect($scope.oldStateName).toBe(oldStateName);
       });
 
     it('should evaluate yaml strings object when timeout tasks are flushed',
-      function() {
+      function () {
         $flushPendingTasks();
         $verifyNoPendingTasks('$timeout');
 

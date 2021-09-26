@@ -46,7 +46,7 @@ import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tes
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
-describe('Param Changes Editor Component', function() {
+describe('Param Changes Editor Component', function () {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
@@ -70,7 +70,7 @@ describe('Param Changes Editor Component', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -83,14 +83,14 @@ describe('Param Changes Editor Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function() {
+  beforeEach(function () {
     alertsService = TestBed.get(AlertsService);
     paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
     paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
     stateParamChangesService = TestBed.get(StateParamChangesService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'TextInputRulesService',
@@ -111,7 +111,7 @@ describe('Param Changes Editor Component', function() {
     $provide.value(
       'StateSolutionService', TestBed.get(StateSolutionService));
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     editabilityService = $injector.get('EditabilityService');
     explorationParamSpecsService = $injector.get(
@@ -149,14 +149,14 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.isParamChangesEditorOpen).toBe(false);
       expect($scope.warningText).toBe('');
       expect($scope.paramNameChoices).toEqual([]);
     });
 
   it('should reset customization args from param change when changing' +
-    ' generator type', function() {
+    ' generator type', function () {
     var paramChange = paramChangeObjectFactory.createFromBackendDict({
       customization_args: {
         list_of_values: ['first value', 'second value']
@@ -173,12 +173,12 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should get complete image path corresponding to a given relative path',
-    function() {
+    function () {
       expect($scope.getStaticImageUrl('/path/to/image.png')).toBe(
         '/assets/images/path/to/image.png');
     });
 
-  it('should save param changes when externalSave is broadcasted', function() {
+  it('should save param changes when externalSave is broadcasted', function () {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     var saveParamChangesSpy = spyOn(
       explorationStatesService, 'saveStateParamChanges').and.callFake(() => {});
@@ -192,7 +192,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should add a new param change when there are no param changes displayed',
-    function() {
+    function () {
       expect(ctrl.paramChangesService.displayed.length).toBe(0);
       $scope.addParamChange();
 
@@ -210,7 +210,7 @@ describe('Param Changes Editor Component', function() {
     });
 
   it('should not open param changes editor when it is not editable',
-    function() {
+    function () {
       spyOn(editabilityService, 'isEditable').and.returnValue(false);
 
       expect(ctrl.paramChangesService.displayed.length).toBe(0);
@@ -220,7 +220,7 @@ describe('Param Changes Editor Component', function() {
       expect(ctrl.paramChangesService.displayed.length).toBe(0);
     });
 
-  it('should open param changes editor and cancel edit', function() {
+  it('should open param changes editor and cancel edit', function () {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     expect(ctrl.paramChangesService.displayed.length).toBe(0);
 
@@ -235,7 +235,7 @@ describe('Param Changes Editor Component', function() {
     expect(ctrl.paramChangesService.displayed.length).toBe(0);
   });
 
-  it('should open param changes editor and add a param change', function() {
+  it('should open param changes editor and add a param change', function () {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
     expect(ctrl.paramChangesService.displayed.length).toBe(0);
@@ -252,7 +252,7 @@ describe('Param Changes Editor Component', function() {
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
   });
 
-  it('should check whenever param changes are valid', function() {
+  it('should check whenever param changes are valid', function () {
     $scope.addParamChange();
 
     expect($scope.areDisplayedParamChangesValid()).toBe(true);
@@ -260,7 +260,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should check param changes as invalid when it has an empty parameter' +
-    ' name', function() {
+    ' name', function () {
     ctrl.paramChangesService.displayed = [
       paramChangeObjectFactory.createDefault('')];
 
@@ -269,7 +269,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should check param changes as invalid when it has a reserved parameter' +
-    ' name', function() {
+    ' name', function () {
     ctrl.paramChangesService.displayed = [
       paramChangeObjectFactory.createDefault('answer')];
 
@@ -279,7 +279,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should check param changes as invalid when it has non alphabetic' +
-    ' characters in parameter name', function() {
+    ' characters in parameter name', function () {
     ctrl.paramChangesService.displayed = [
       paramChangeObjectFactory.createDefault('123')];
 
@@ -289,7 +289,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should check param changes as invalid when it has no default' +
-    ' generator id', function() {
+    ' generator id', function () {
     ctrl.paramChangesService.displayed = [
       paramChangeObjectFactory.createFromBackendDict({
         customization_args: {},
@@ -304,7 +304,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should check param changes as invalid when it has no values and its' +
-    ' generator id is RandomSelector', function() {
+    ' generator id is RandomSelector', function () {
     ctrl.paramChangesService.displayed = [
       paramChangeObjectFactory.createFromBackendDict({
         customization_args: {
@@ -320,7 +320,7 @@ describe('Param Changes Editor Component', function() {
       'Each parameter should have at least one possible value.');
   });
 
-  it('should not save param changes when it is invalid', function() {
+  it('should not save param changes when it is invalid', function () {
     spyOn(alertsService, 'addWarning');
     ctrl.paramChangesService.displayed = [
       paramChangeObjectFactory.createDefault('123')];
@@ -330,7 +330,7 @@ describe('Param Changes Editor Component', function() {
       'Invalid parameter changes.');
   });
 
-  it('should save param changes when it is valid', function() {
+  it('should save param changes when it is valid', function () {
     var saveParamChangesSpy = spyOn(
       explorationStatesService, 'saveStateParamChanges').and.callFake(() => {});
     $scope.addParamChange();
@@ -340,7 +340,7 @@ describe('Param Changes Editor Component', function() {
     expect(postSaveHookSpy).toHaveBeenCalled();
   });
 
-  it('should not delete a param change when index is less than 0', function() {
+  it('should not delete a param change when index is less than 0', function () {
     $scope.addParamChange();
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
 
@@ -351,7 +351,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should not delete a param change when index is greather than param' +
-    ' changes length', function() {
+    ' changes length', function () {
     $scope.addParamChange();
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
 
@@ -361,7 +361,7 @@ describe('Param Changes Editor Component', function() {
       'Cannot delete parameter change at position 5: index out of range');
   });
 
-  it('should delete a param change', function() {
+  it('should delete a param change', function () {
     $scope.addParamChange();
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
 
@@ -370,7 +370,7 @@ describe('Param Changes Editor Component', function() {
   });
 
   it('should change customization args values to be human readable',
-    function() {
+    function () {
       expect($scope.HUMAN_READABLE_ARGS_RENDERERS.Copier({
         value: 'Copier value'
       })).toBe('to Copier value');
@@ -380,7 +380,7 @@ describe('Param Changes Editor Component', function() {
       })).toBe('to one of [first value, second value] at random');
     });
 
-  it('should start param change list to be sortable', function() {
+  it('should start param change list to be sortable', function () {
     var pladeholderHeightSpy = jasmine.createSpy('placeholderHeight', () => {});
     var itemHeightSpy = jasmine.createSpy('itemHeight', () => {});
     var ui = {
@@ -397,7 +397,7 @@ describe('Param Changes Editor Component', function() {
     expect(itemHeightSpy).toHaveBeenCalled();
   });
 
-  it('should stop param change list to be sortable', function() {
+  it('should stop param change list to be sortable', function () {
     $scope.addParamChange();
 
     $scope.PARAM_CHANGE_LIST_SORTABLE_OPTIONS.stop();
@@ -423,7 +423,7 @@ describe('Upgraded component', () => {
       'paramChangesEditor',
       [ParamChangesEditorDirective]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
+      async (textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

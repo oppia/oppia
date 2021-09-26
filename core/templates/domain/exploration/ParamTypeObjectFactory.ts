@@ -53,7 +53,7 @@ export class ParamType {
    * take.
    */
 
-  constructor(typeDefinitionObject: TypeDefinitionObject) {
+  constructor (typeDefinitionObject: TypeDefinitionObject) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function');
@@ -68,12 +68,12 @@ export class ParamType {
   }
 
   /** @returns {Object} - A valid default value for this particular type. */
-  createDefaultValue(): Object {
+  createDefaultValue (): Object {
     return cloneDeep(this.defaultValue);
   }
 
   /** @returns {String} - The display-name of this type. */
-  getName(): string {
+  getName (): string {
     return this._name;
   }
 }
@@ -82,7 +82,7 @@ export class ParamType {
   providedIn: 'root'
 })
 export class ParamTypeObjectFactory {
-  constructor() {
+  constructor () {
     // To finalize type registration, we encode the name of each type into their
     // definition, then freeze them from modifications.
     Object.keys(this.registry).forEach((paramTypeName: string) => {
@@ -110,7 +110,7 @@ export class ParamTypeObjectFactory {
   };
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
-  getDefaultType(): ParamType {
+  getDefaultType (): ParamType {
     return this.registry.UnicodeString;
   }
 
@@ -119,7 +119,7 @@ export class ParamTypeObjectFactory {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  getTypeFromBackendName(backendName: string): ParamType {
+  getTypeFromBackendName (backendName: string): ParamType {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }

@@ -32,14 +32,14 @@ import { UserService } from 'services/user.service';
 import { LoginPageComponent } from './login-page.component';
 
 class MockWindowRef {
-  constructor(
+  constructor (
     public location: string | null = null, public searchParams: string = '') {}
 
-  get nativeWindow() {
+  get nativeWindow () {
     const that = this;
     return {
       location: {
-        get search() {
+        get search () {
           return that.searchParams;
         },
         assign: (url: string) => {
@@ -55,7 +55,7 @@ class PendingPromise<T = void> {
   public readonly resolve: (_: T | PromiseLike<T>) => void;
   public readonly reject: (_?: Object) => void;
 
-  constructor() {
+  constructor () {
     let resolve: (_: T | PromiseLike<T>) => void = () => {};
     let reject: (_?: Object) => void = () => {};
     this.promise = new Promise((res, rej) => {
@@ -164,7 +164,7 @@ describe('Login Page', () => {
     expect(windowRef.location).toEqual('/');
   }));
 
-  describe('Emulator mode', function() {
+  describe('Emulator mode', function () {
     beforeEach(() => {
       email = 'a@a.com';
       spyOnProperty(loginPageComponent, 'emulatorModeIsEnabled', 'get')

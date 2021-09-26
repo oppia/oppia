@@ -84,7 +84,7 @@ describe('NoninteractiveMath', () => {
     '9zdmc+';
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
+    escapedJsonToObj (answer: string): string {
       return answer;
     }
   }

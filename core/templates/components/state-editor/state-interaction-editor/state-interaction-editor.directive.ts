@@ -64,13 +64,13 @@ require('services/context.service');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateInteractionEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
-      link: function(scope, element) {
+      link: function (scope, element) {
         // This allows the scope to be retrievable during Karma unit testing.
         // See http://stackoverflow.com/a/29833832 for more details.
-        element[0].getControllerScope = function() {
+        element[0].getControllerScope = function () {
           return scope;
         };
       },
@@ -94,7 +94,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
-        'WindowDimensionsService', 'INTERACTION_SPECS', function(
+        'WindowDimensionsService', 'INTERACTION_SPECS', function (
             $scope, $uibModal, AlertsService, ContextService,
             EditabilityService, ExplorationHtmlFormatterService,
             InteractionDetailsCacheService,
@@ -110,17 +110,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
           // Declare dummy submitAnswer() and adjustPageHeight() methods for the
           // interaction preview.
-          $scope.submitAnswer = function() {};
-          $scope.adjustPageHeight = function() {};
+          $scope.submitAnswer = function () {};
+          $scope.adjustPageHeight = function () {};
           $scope.interactionIsDisabled = false;
 
-          $scope.getCurrentInteractionName = function() {
+          $scope.getCurrentInteractionName = function () {
             return (
               StateInteractionIdService.savedMemento ?
                 INTERACTION_SPECS[StateInteractionIdService.savedMemento].name :
                 '');
           };
-          $scope.doesCurrentInteractionHaveCustomizations = function() {
+          $scope.doesCurrentInteractionHaveCustomizations = function () {
             var interactionSpec = INTERACTION_SPECS[
               StateInteractionIdService.savedMemento];
             return (
@@ -128,7 +128,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               interactionSpec.customization_arg_specs.length > 0);
           };
 
-          var _getInteractionPreviewTag = function(
+          var _getInteractionPreviewTag = function (
               interactionCustomizationArgs) {
             if (!StateInteractionIdService.savedMemento) {
               return '';
@@ -138,7 +138,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               interactionCustomizationArgs, false, null);
           };
 
-          var _updateInteractionPreview = function() {
+          var _updateInteractionPreview = function () {
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
@@ -150,7 +150,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               ContextService.isExplorationLinkedToStory());
           };
 
-          var _updateAnswerChoices = function() {
+          var _updateAnswerChoices = function () {
             StateEditorService.onUpdateAnswerChoices.emit(
               StateEditorService.getAnswerChoices(
                 $scope.interactionId,
@@ -161,7 +161,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           // this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
           // NOTE TO DEVELOPERS: Callers of this function must ensure that the
           // current active state is a terminal one.
-          var updateDefaultTerminalStateContentIfEmpty = function() {
+          var updateDefaultTerminalStateContentIfEmpty = function () {
             // Check if the content is currently empty, as expected.
             var previousContent = StateContentService.savedMemento;
             if (!previousContent.isEmpty()) {
@@ -173,7 +173,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.onSaveStateContent(StateContentService.displayed);
           };
 
-          $scope.onCustomizationModalSavePostHook = function() {
+          $scope.onCustomizationModalSavePostHook = function () {
             let nextContentIdIndexHasChanged = (
               StateNextContentIdIndexService.displayed !==
               StateNextContentIdIndexService.savedMemento);
@@ -221,7 +221,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             );
           };
 
-          $scope.openInteractionCustomizerModal = function() {
+          $scope.openInteractionCustomizerModal = function () {
             if ($scope.interactionIsDisabled) {
               return;
             }
@@ -241,7 +241,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 windowClass: 'customize-interaction-modal',
                 controller: 'CustomizeInteractionModalController'
               }).result.then(
-                $scope.onCustomizationModalSavePostHook, function() {
+                $scope.onCustomizationModalSavePostHook, function () {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
                   StateNextContentIdIndexService.restoreFromMemento();
@@ -249,7 +249,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
           };
 
-          $scope.deleteInteraction = function() {
+          $scope.deleteInteraction = function () {
             AlertsService.clearWarnings();
             $uibModal.open({
               template: require(
@@ -257,7 +257,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
-            }).result.then(function() {
+            }).result.then(function () {
               StateInteractionIdService.displayed = null;
               StateCustomizationArgsService.displayed = {};
               StateSolutionService.displayed = null;
@@ -280,16 +280,16 @@ angular.module('oppia').directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
-            }, function() {
+            }, function () {
               AlertsService.clearWarnings();
             });
           };
 
-          $scope.toggleInteractionEditor = function() {
+          $scope.toggleInteractionEditor = function () {
             $scope.interactionEditorIsShown = !$scope.interactionEditorIsShown;
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.EditabilityService = EditabilityService;
             $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.interactionEditorIsShown = (
@@ -322,14 +322,14 @@ angular.module('oppia').directive('stateInteractionEditor', [
               )
             );
 
-            $scope.getStaticImageUrl = function(imagePath) {
+            $scope.getStaticImageUrl = function (imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
             StateEditorService.onInteractionEditorInitialized.emit();
             StateEditorService.updateStateInteractionEditorInitialised();
           };
 
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

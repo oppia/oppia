@@ -53,7 +53,7 @@ export class ReadOnlyStoryNode {
   thumbnailBgColor: string;
   thumbnailFilename: string;
 
-  constructor(
+  constructor (
       id: string, title: string, description: string,
       destinationNodeIds: string[], prerequisiteSkillIds: string[],
       acquiredSkillIds: string[], outline: string,
@@ -75,7 +75,7 @@ export class ReadOnlyStoryNode {
     this.thumbnailFilename = thumbnailFilename;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       storyNodeBackendDict: StoryNodeBackendDict): ReadOnlyStoryNode {
     let explorationSummary = LearnerExplorationSummary.createFromBackendDict(
       storyNodeBackendDict.exp_summary_dict);
@@ -96,43 +96,43 @@ export class ReadOnlyStoryNode {
       storyNodeBackendDict.thumbnail_filename);
   }
 
-  getId(): string {
+  getId (): string {
     return this.id;
   }
 
-  getTitle(): string {
+  getTitle (): string {
     return this.title;
   }
 
-  getDescription(): string {
+  getDescription (): string {
     return this.description;
   }
 
-  getExplorationId(): string {
+  getExplorationId (): string {
     return this.explorationId;
   }
 
-  isCompleted(): boolean {
+  isCompleted (): boolean {
     return this.completed;
   }
 
-  getExplorationSummaryObject(): LearnerExplorationSummary {
+  getExplorationSummaryObject (): LearnerExplorationSummary {
     return this.explorationSummary;
   }
 
-  getOutline(): string {
+  getOutline (): string {
     return this.outline;
   }
 
-  getOutlineStatus(): boolean {
+  getOutlineStatus (): boolean {
     return this.outlineIsFinalized;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename (): string {
     return this.thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor (): string {
     return this.thumbnailBgColor;
   }
 }

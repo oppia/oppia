@@ -45,7 +45,7 @@ angular.module('oppia').component('statisticsTab', {
     'ReadOnlyExplorationBackendApiService', 'RouterService',
     'StateInteractionStatsService', 'StatesObjectFactory',
     'UrlInterpolationService',
-    function(
+    function (
         $q, $rootScope, $scope, $uibModal,
         AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
@@ -140,7 +140,7 @@ angular.module('oppia').component('statisticsTab', {
         );
       };
 
-      this.$onDestroy = function() {
+      this.$onDestroy = function () {
         this.directiveSubscriptions.unsubscribe();
       };
     },

@@ -29,7 +29,7 @@ describe('InteractiveSetInputComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         buttonText: {
           value: {

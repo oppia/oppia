@@ -62,7 +62,7 @@ export class ReadOnlyTopic {
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
 
-  constructor(
+  constructor (
       topicName: string, topicId: string, topicDescription: string,
       canonicalStorySummaries: StorySummary[],
       additionalStorySummaries: StorySummary[],
@@ -86,51 +86,51 @@ export class ReadOnlyTopic {
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
-  getTopicName(): string {
+  getTopicName (): string {
     return this._topicName;
   }
 
-  getTopicDescription(): string {
+  getTopicDescription (): string {
     return this._topicDescription;
   }
 
-  getTopicId(): string {
+  getTopicId (): string {
     return this._topicId;
   }
 
-  getCanonicalStorySummaries(): StorySummary[] {
+  getCanonicalStorySummaries (): StorySummary[] {
     return this._canonicalStorySummaries.slice();
   }
 
-  getAdditionalStorySummaries(): StorySummary[] {
+  getAdditionalStorySummaries (): StorySummary[] {
     return this._additionalStorySummaries.slice();
   }
 
-  getUncategorizedSkillsSummaries(): ShortSkillSummary[] {
+  getUncategorizedSkillsSummaries (): ShortSkillSummary[] {
     return this._uncategorizedSkillSummaries.slice();
   }
 
-  getSubtopics(): Subtopic[] {
+  getSubtopics (): Subtopic[] {
     return this._subtopics.slice();
   }
 
-  getDegreesOfMastery(): DegreesOfMastery {
+  getDegreesOfMastery (): DegreesOfMastery {
     return this._degreesOfMastery;
   }
 
-  getSkillDescriptions(): SkillIdToDescriptionMap {
+  getSkillDescriptions (): SkillIdToDescriptionMap {
     return this._skillDescriptions;
   }
 
-  getPracticeTabIsDisplayed(): boolean {
+  getPracticeTabIsDisplayed (): boolean {
     return this._practiceTabIsDisplayed;
   }
 
-  getMetaTagContent(): string {
+  getMetaTagContent (): string {
     return this._metaTagContent;
   }
 
-  getPageTitleFragmentForWeb(): string {
+  getPageTitleFragmentForWeb (): string {
     return this._pageTitleFragmentForWeb;
   }
 }
@@ -139,9 +139,9 @@ export class ReadOnlyTopic {
   providedIn: 'root'
 })
 export class ReadOnlyTopicObjectFactory {
-  constructor() {}
+  constructor () {}
 
-  createFromBackendDict(
+  createFromBackendDict (
       topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map(subtopic => {
       return Subtopic.create(

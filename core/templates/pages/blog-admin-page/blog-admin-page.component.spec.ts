@@ -27,7 +27,7 @@ import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-ma
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
 class MockWindowRef {
   nativeWindow = {
-    confirm() {
+    confirm () {
       return true;
     },
     location: {
@@ -37,7 +37,7 @@ class MockWindowRef {
       search: 'search',
       hash: 'hash'
     },
-    open() {
+    open () {
       return;
     }
   };

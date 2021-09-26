@@ -55,12 +55,12 @@ interface HumanReadableContributorSummaryBackendDict {
   providedIn: 'root'
 })
 export class ExplorationSummaryBackendApiService {
-  constructor(
+  constructor (
     private httpClient: HttpClient,
     private alertsService: AlertsService,
     private validatorsService: ValidatorsService) {}
 
-  private _fetchExpSummaries(
+  private _fetchExpSummaries (
       explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (value: ExplorationSummaryBackendDict) => void,
@@ -98,14 +98,14 @@ export class ExplorationSummaryBackendApiService {
     });
   }
 
-  async loadPublicAndPrivateExplorationSummariesAsync(
+  async loadPublicAndPrivateExplorationSummariesAsync (
       explorationIds: string[]): Promise<ExplorationSummaryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, true, resolve, reject);
     });
   }
 
-  async loadPublicExplorationSummariesAsync(
+  async loadPublicExplorationSummariesAsync (
       explorationIds: string[]): Promise<ExplorationSummaryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, false, resolve, reject);

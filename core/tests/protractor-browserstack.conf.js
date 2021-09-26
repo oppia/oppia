@@ -133,8 +133,8 @@ exports.config = {
   },
 
   // Code to start browserstack local before start of test.
-  beforeLaunch: function() {
-    var checkSuites = function() {
+  beforeLaunch: function () {
+    var checkSuites = function () {
       // eslint-disable-next-line no-console
       console.log(
         'Checking whether the suites in "full" match the actual suites...');
@@ -159,12 +159,12 @@ exports.config = {
     checkSuites();
     // eslint-disable-next-line no-console
     console.log('Connecting browserstack local');
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exports.bs_local = new browserstack.Local();
       exports.bs_local.start({
         key: exports.config.capabilities['browserstack.key'],
         forceLocal: true
-      }, function(error) {
+      }, function (error) {
         if (error) {
           return reject(error);
         }
@@ -177,8 +177,8 @@ exports.config = {
   },
 
   // Code to stop browserstack local after end of test.
-  afterLaunch: function() {
-    return new Promise(function(resolve, reject) {
+  afterLaunch: function () {
+    return new Promise(function (resolve, reject) {
       exports.bs_local.stop(resolve);
     });
   },
@@ -198,7 +198,7 @@ exports.config = {
   // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
-  onPrepare: function() {
+  onPrepare: function () {
     browser.isMobile = true;
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;

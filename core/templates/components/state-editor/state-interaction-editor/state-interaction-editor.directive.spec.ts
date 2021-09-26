@@ -46,8 +46,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 
-describe('State Interaction controller', function() {
-  describe('StateInteraction', function() {
+describe('State Interaction controller', function () {
+  describe('StateInteraction', function () {
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
@@ -56,7 +56,7 @@ describe('State Interaction controller', function() {
             provide: ExplorationDataService,
             useValue: {
               explorationId: 0,
-              autosaveChangeListAsync() {
+              autosaveChangeListAsync () {
                 return;
               }
             }
@@ -67,11 +67,11 @@ describe('State Interaction controller', function() {
       cls = TestBed.inject(ChangeListService);
     });
 
-    beforeEach(function() {
+    beforeEach(function () {
       angular.mock.module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
-      angular.mock.module(function($provide) {
+      angular.mock.module(function ($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TextInput: {
             display_mode: 'inline',
@@ -84,7 +84,7 @@ describe('State Interaction controller', function() {
         });
       });
     });
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
@@ -98,7 +98,7 @@ describe('State Interaction controller', function() {
 
     beforeEach(angular.mock.module('directiveTemplates'));
 
-    beforeEach(angular.mock.inject(function(
+    beforeEach(angular.mock.inject(function (
         _$componentController_, $compile, $controller, $injector, $rootScope,
         $templateCache) {
       $componentController = _$componentController_;
@@ -220,7 +220,7 @@ describe('State Interaction controller', function() {
         ChangeListService: cls,
         ExplorationStatesService: ess,
         EditabilityService: {
-          isEditable: function() {
+          isEditable: function () {
             return true;
           }
         },
@@ -252,7 +252,7 @@ describe('State Interaction controller', function() {
     }));
 
     it('should keep non-empty content when setting a terminal interaction',
-      function() {
+      function () {
         ecs.setActiveStateName('First State');
         stateEditorCtrl.initStateEditor();
 
@@ -274,7 +274,7 @@ describe('State Interaction controller', function() {
     );
 
     it('should change to default text when adding a terminal interaction',
-      function() {
+      function () {
         ecs.setActiveStateName('End State');
         stateEditorCtrl.initStateEditor();
 
@@ -296,7 +296,7 @@ describe('State Interaction controller', function() {
     );
 
     it('should not default text when adding a non-terminal interaction',
-      function() {
+      function () {
         ecs.setActiveStateName('End State');
         stateEditorCtrl.initStateEditor();
 

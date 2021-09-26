@@ -29,7 +29,7 @@ angular.module('oppia').controller(
     'countOfSkillsToPrioritize', 'currentMode', 'linkedSkillsWithDifficulty',
     'skillIdToRubricsObject', 'DEFAULT_SKILL_DIFFICULTY',
     'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
-    function(
+    function (
         $controller, $scope, $uibModalInstance, allSkillSummaries,
         countOfSkillsToPrioritize, currentMode, linkedSkillsWithDifficulty,
         skillIdToRubricsObject, DEFAULT_SKILL_DIFFICULTY,
@@ -62,11 +62,11 @@ angular.module('oppia').controller(
       }
       $scope.skillIdToRubricsObject = skillIdToRubricsObject;
 
-      $scope.isSkillSelected = function(skillId) {
+      $scope.isSkillSelected = function (skillId) {
         return selectedSkills.includes(skillId);
       };
 
-      $scope.selectOrDeselectSkill = function(summary) {
+      $scope.selectOrDeselectSkill = function (summary) {
         if (!$scope.isSkillSelected(summary.id)) {
           $scope.linkedSkillsWithDifficulty.push(
             SkillDifficulty.create(
@@ -75,7 +75,7 @@ angular.module('oppia').controller(
           selectedSkills.push(summary.id);
         } else {
           var idIndex = $scope.linkedSkillsWithDifficulty.map(
-            function(linkedSkillWithDifficulty) {
+            function (linkedSkillWithDifficulty) {
               return linkedSkillWithDifficulty.getId();
             }).indexOf(summary.id);
           $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
@@ -84,15 +84,15 @@ angular.module('oppia').controller(
         }
       };
 
-      $scope.goToSelectSkillView = function() {
+      $scope.goToSelectSkillView = function () {
         $scope.currentMode = MODE_SELECT_SKILL;
       };
 
-      $scope.goToNextStep = function() {
+      $scope.goToNextStep = function () {
         $scope.currentMode = MODE_SELECT_DIFFICULTY;
       };
 
-      $scope.startQuestionCreation = function() {
+      $scope.startQuestionCreation = function () {
         $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
       };
     }

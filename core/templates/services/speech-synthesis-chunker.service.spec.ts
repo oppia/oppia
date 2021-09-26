@@ -148,7 +148,7 @@ describe('Speech Synthesis Chunker Service', () => {
     });
   });
 
-  describe('speak', function() {
+  describe('speak', function () {
     const MockSpeechSynthesisUtteranceConstructor = (
       SpeechSynthesisUtterance);
     const mockSpeechSynthesisUtteran = {
@@ -169,7 +169,7 @@ describe('Speech Synthesis Chunker Service', () => {
 
     it('should not speak when chunk is too short', () => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(function() {
+        .callFake(function () {
           mockSpeechSynthesisUtteran.onend();
         });
       const speechSynthesisUtterance = (
@@ -184,7 +184,7 @@ describe('Speech Synthesis Chunker Service', () => {
 
     it('should not speak when chunk is a falsy value', () => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(function() {
+        .callFake(function () {
           mockSpeechSynthesisUtteran.onend();
         });
       const speechSynthesisUtterance = (
@@ -199,7 +199,7 @@ describe('Speech Synthesis Chunker Service', () => {
 
     it('should speak two phrases at a time', fakeAsync(() => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(function() {
+        .callFake(function () {
           mockSpeechSynthesisUtteran.onend();
         });
       const speechSynthesisUtterance = (

@@ -23,7 +23,7 @@ require(
 angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
   'sortedSkillSummaries',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, skillsInSameTopicCount,
       sortedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {
@@ -34,7 +34,7 @@ angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
     $scope.selectedSkillId = null;
     $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
 
-    $scope.save = function() {
+    $scope.save = function () {
       for (var idx in sortedSkillSummaries) {
         if ($scope.selectedSkillId === sortedSkillSummaries[idx].id) {
           $uibModalInstance.close(sortedSkillSummaries[idx]);

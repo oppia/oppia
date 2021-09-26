@@ -36,7 +36,7 @@ export class SelectTopicsComponent {
   topicFilterText: string = '';
   filteredTopics: { id: string, name: string, isSelected: boolean }[] = [];
 
-  selectOrDeselectTopic(topicId: string): void {
+  selectOrDeselectTopic (topicId: string): void {
     let topic = this.topicSummaries.find(
       topic => topic.id === topicId);
     if (topic === undefined) {
@@ -58,7 +58,7 @@ export class SelectTopicsComponent {
     this.selectedTopicIdsChange.emit(this.selectedTopicIds);
   }
 
-  searchInTopics(searchText: string):
+  searchInTopics (searchText: string):
   { id: string, name: string, isSelected: boolean }[] {
     this.filteredTopics = this.topicSummaries.filter(
       topic => topic.name.toLowerCase().indexOf(

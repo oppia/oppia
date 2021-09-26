@@ -34,7 +34,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
-describe('Skill Misconception Editor Directive', function() {
+describe('Skill Misconception Editor Directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -62,7 +62,7 @@ describe('Skill Misconception Editor Directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     directive = $injector.get('skillMisconceptionsEditorDirective')[0];
@@ -103,7 +103,7 @@ describe('Skill Misconception Editor Directive', function() {
     testSubscriptions.unsubscribe();
   });
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     // Misconception list is shown only when window is not narrow.
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     spyOnProperty(skillEditorStateService, 'onSkillChange').and.returnValue(
@@ -122,7 +122,7 @@ describe('Skill Misconception Editor Directive', function() {
   });
 
   it('should toggle misconceptionList when toggle ' +
-    'button is clicked', function() {
+    'button is clicked', function () {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     $scope.misconceptionsListIsShown = false;
 
@@ -134,7 +134,7 @@ describe('Skill Misconception Editor Directive', function() {
   });
 
   it('should open add misconception modal when clicking on add ' +
-    'button', fakeAsync(function() {
+    'button', fakeAsync(function () {
     $scope.skill = sampleSkill;
     let deferred = $q.defer();
     deferred.resolve({
@@ -155,7 +155,7 @@ describe('Skill Misconception Editor Directive', function() {
   }));
 
   it('should close add misconception modal when clicking on close ' +
-    'button', function() {
+    'button', function () {
     let deferred = $q.defer();
     deferred.reject();
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
@@ -171,7 +171,7 @@ describe('Skill Misconception Editor Directive', function() {
   });
 
   it('should open delete misconception modal when clicking on delete ' +
-    'button', fakeAsync(function() {
+    'button', fakeAsync(function () {
     let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return <NgbModalRef>({
         componentInstance: {
@@ -196,7 +196,7 @@ describe('Skill Misconception Editor Directive', function() {
   }));
 
   it('should close delete misconception modal when clicking on ' +
-    'close button', fakeAsync(function() {
+    'close button', fakeAsync(function () {
     let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return <NgbModalRef>({
         componentInstance: {

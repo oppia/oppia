@@ -28,12 +28,12 @@ export class PreventPageUnloadEventService {
   validationCallback: undefined | (() => boolean);
   _preventPageUnloadEventHandlerBind?: (
     this: Window, ev: BeforeUnloadEvent) => void;
-  constructor(private windowRef: WindowRef) {
+  constructor (private windowRef: WindowRef) {
     this.listenerActive = false;
     this.validationCallback = undefined;
   }
 
-  addListener(callback?: () => boolean): void {
+  addListener (callback?: () => boolean): void {
     if (this.listenerActive) {
       return;
     }
@@ -47,7 +47,7 @@ export class PreventPageUnloadEventService {
     this.listenerActive = true;
   }
 
-  removeListener(): void {
+  removeListener (): void {
     if (this._preventPageUnloadEventHandlerBind === undefined) {
       return;
     }
@@ -56,7 +56,7 @@ export class PreventPageUnloadEventService {
     this.listenerActive = false;
   }
 
-  private _preventPageUnloadEventHandler(
+  private _preventPageUnloadEventHandler (
       validationCallback: () => boolean, e: BeforeUnloadEvent): void {
     if (validationCallback()) {
       // The preventDefault call is used to trigger a confirmation
@@ -71,11 +71,11 @@ export class PreventPageUnloadEventService {
     }
   }
 
-  isListenerActive(): boolean {
+  isListenerActive (): boolean {
     return this.listenerActive;
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.removeListener();
   }
 }

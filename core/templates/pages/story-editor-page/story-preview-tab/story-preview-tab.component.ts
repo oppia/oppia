@@ -41,14 +41,14 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   storyContents: StoryContents;
   nodes: StoryNode[];
   pathIconParameters: IconsArray[];
-  constructor(
+  constructor (
     private storyEditorStateService: StoryEditorStateService,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlService: UrlService,
   ) {}
 
   directiveSubscriptions = new Subscription();
-  initEditor(): void {
+  initEditor (): void {
     this.story = this.storyEditorStateService.getStory();
     this.storyId = this.story.getId();
     this.storyContents = this.story.getStoryContents();
@@ -59,7 +59,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  generatePathIconParameters(): IconsArray[] {
+  generatePathIconParameters (): IconsArray[] {
     var storyNodes = this.nodes;
     var iconParametersArray = [];
     let thumbnailIconUrl = storyNodes[0].getThumbnailFilename() ? (
@@ -85,7 +85,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     return iconParametersArray;
   }
 
-  getExplorationUrl(node: {
+  getExplorationUrl (node: {
      getExplorationId: () => string;
      getId: () => string; }): string {
     var result = '/explore/' + node.getExplorationId();
@@ -96,7 +96,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.storyEditorStateService.onStoryInitialized.subscribe(
         () => this.initEditor()
@@ -110,7 +110,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     this.initEditor();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

@@ -71,7 +71,7 @@ describe('QuestionsListComponent', () => {
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $q = $injector.get('$q');

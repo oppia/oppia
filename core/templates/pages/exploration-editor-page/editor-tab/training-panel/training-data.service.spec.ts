@@ -36,7 +36,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 
-describe('TrainingDataService', function() {
+describe('TrainingDataService', function () {
   var siis, ecs, rs, tds, ess, oof;
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('TrainingDataService', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -57,7 +57,7 @@ describe('TrainingDataService', function() {
 
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -65,11 +65,11 @@ describe('TrainingDataService', function() {
   }));
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     angular.mock.module('oppia');
   });
 
-  beforeEach(angular.mock.inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function ($injector, $rootScope) {
     siis = $injector.get('StateInteractionIdService');
     ecs = $injector.get('StateEditorService');
     ess = $injector.get('ExplorationStatesService');
@@ -164,7 +164,7 @@ describe('TrainingDataService', function() {
   }));
 
   it('should be able to train answer groups and the default response',
-    function() {
+    function () {
       // Training the first answer of a group should add a new classifier.
       tds.associateWithAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
@@ -193,7 +193,7 @@ describe('TrainingDataService', function() {
   );
 
   it('should be able to retrain answers between answer groups and the ' +
-      'default outcome', function() {
+      'default outcome', function () {
     // Retraining an answer from the answer group to the default outcome
     // should remove it from the first, then add it to the second.
     tds.associateWithAnswerGroup(0, 'text answer');
@@ -236,7 +236,7 @@ describe('TrainingDataService', function() {
       ['text answer', 'third answer']);
   });
 
-  it('should not be able to train duplicated answers', function() {
+  it('should not be able to train duplicated answers', function () {
     tds.associateWithAnswerGroup(0, 'text answer');
     tds.associateWithDefaultResponse('second answer');
 
@@ -269,7 +269,7 @@ describe('TrainingDataService', function() {
       ['text answer']);
   });
 
-  it('should get all potential outcomes of an interaction', function() {
+  it('should get all potential outcomes of an interaction', function () {
     // First the answer group's outcome is listed, then the default.
     expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([
       oof.createNew('State', 'feedback_1', 'Feedback', []),
@@ -277,7 +277,7 @@ describe('TrainingDataService', function() {
   });
 
   it('should remove answer from training data associated with given answer ' +
-      'group', function() {
+      'group', function () {
     tds.associateWithAnswerGroup(0, 'text answer');
     tds.associateWithAnswerGroup(0, 'second answer');
     tds.associateWithAnswerGroup(0, 'another answer');
@@ -298,7 +298,7 @@ describe('TrainingDataService', function() {
   });
 
   it('should correctly check whether answer is in confirmed unclassified ' +
-      'answers', function() {
+      'answers', function () {
     tds.associateWithAnswerGroup(0, 'text answer');
     tds.associateWithAnswerGroup(0, 'another answer');
     tds.associateWithDefaultResponse('second answer');
@@ -317,7 +317,7 @@ describe('TrainingDataService', function() {
       ['text answer', 'another answer']);
   });
 
-  it('should get all the training data answers', function() {
+  it('should get all the training data answers', function () {
     tds.associateWithAnswerGroup(0, 'text answer');
     tds.associateWithAnswerGroup(0, 'another answer');
     tds.associateWithDefaultResponse('second answer');

@@ -27,7 +27,7 @@ angular.module('oppia').controller('PostPublishModalController', [
   '$controller', '$scope', '$uibModalInstance', '$window',
   'ContextService', 'UrlInterpolationService',
   'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, $window,
       ContextService, UrlInterpolationService,
       DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
@@ -45,7 +45,7 @@ angular.module('oppia').controller('PostPublishModalController', [
     $scope.explorationLink = (
       $window.location.protocol + '//' +
       $window.location.host + '/explore/' + $scope.explorationId);
-    $scope.selectText = function(evt) {
+    $scope.selectText = function (evt) {
       var codeDiv = evt.currentTarget;
       var range = document.createRange();
       range.setStartBefore(codeDiv.firstChild);

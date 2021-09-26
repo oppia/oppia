@@ -34,7 +34,7 @@ export class Fraction {
   wholeNumber: number;
   numerator: number;
   denominator: number;
-  constructor(
+  constructor (
       isNegative: boolean, wholeNumber: number, numerator: number,
       denominator: number) {
     this.isNegative = isNegative;
@@ -43,7 +43,7 @@ export class Fraction {
     this.denominator = denominator;
   }
 
-  toString(): string {
+  toString (): string {
     var fractionString = '';
     if (this.numerator !== 0) {
       fractionString += this.numerator + '/' + this.denominator;
@@ -60,7 +60,7 @@ export class Fraction {
     return fractionString === '' ? '0' : fractionString;
   }
 
-  toDict(): FractionAnswer {
+  toDict (): FractionAnswer {
     return {
       isNegative: this.isNegative,
       wholeNumber: this.wholeNumber,
@@ -69,17 +69,17 @@ export class Fraction {
     };
   }
 
-  toFloat(): number {
+  toFloat (): number {
     var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
     var floatVal = (totalParts / this.denominator);
     return this.isNegative ? -floatVal : floatVal;
   }
 
-  getIntegerPart(): number {
+  getIntegerPart (): number {
     return this.isNegative ? -this.wholeNumber : this.wholeNumber;
   }
 
-  convertToSimplestForm(): Fraction {
+  convertToSimplestForm (): Fraction {
     const gcd = (x: number, y: number): number => {
       return y === 0 ? x : gcd(y, x % y);
     };
@@ -90,15 +90,15 @@ export class Fraction {
       this.isNegative, this.wholeNumber, numerator, denominator);
   }
 
-  hasNonzeroIntegerPart(): boolean {
+  hasNonzeroIntegerPart (): boolean {
     return this.wholeNumber !== 0;
   }
 
-  isImproperFraction(): boolean {
+  isImproperFraction (): boolean {
     return this.denominator <= this.numerator;
   }
 
-  isEqualTo(fractionToCompare: Fraction): boolean {
+  isEqualTo (fractionToCompare: Fraction): boolean {
     const fraction = this.convertToSimplestForm();
     fractionToCompare = fractionToCompare.convertToSimplestForm();
     return (
@@ -109,7 +109,7 @@ export class Fraction {
     );
   }
 
-  static fromRawInputString(rawInput: string): Fraction {
+  static fromRawInputString (rawInput: string): Fraction {
     var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
@@ -154,7 +154,7 @@ export class Fraction {
     return new Fraction(isNegative, wholeNumber, numerator, denominator);
   }
 
-  static fromDict(fractionDict: FractionAnswer): Fraction {
+  static fromDict (fractionDict: FractionAnswer): Fraction {
     return new Fraction(
       fractionDict.isNegative,
       fractionDict.wholeNumber,

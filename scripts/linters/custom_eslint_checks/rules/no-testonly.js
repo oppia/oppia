@@ -36,9 +36,9 @@ module.exports = {
         'non-test file.'
     }
   },
-  create: function(context) {
+  create: function (context) {
     return {
-      CallExpression(node) {
+      CallExpression (node) {
         if (node.callee.type === 'Identifier' &&
           node.callee.name.toLowerCase().includes('testonly')) {
           context.report({

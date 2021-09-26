@@ -84,13 +84,13 @@ describe('SubtopicPreviewTab', () => {
     subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic.setThumbnailFilename('thumbnailFilename.svg');
     subtopic.setThumbnailBgColor('#FFFFFF');
-    topic.getSubtopics = function() {
+    topic.getSubtopics = function () {
       return [subtopic];
     };
     topic.getId = () => {
       return '1';
     };
-    topic.getSubtopicById = function(id) {
+    topic.getSubtopicById = function (id) {
       return id === 99 ? null : subtopic;
     };
 

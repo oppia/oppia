@@ -23,22 +23,22 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   var filterName = 'truncateAtFirstEllipsis';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  it('should have all expected filters', angular.mock.inject(function($filter) {
+  it('should have all expected filters', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should truncate a string when it first sees a \'...\'',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       var filter = $filter('truncateAtFirstEllipsis');
 
       expect(filter('')).toEqual('');

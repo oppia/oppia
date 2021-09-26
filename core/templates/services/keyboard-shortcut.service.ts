@@ -28,19 +28,19 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private appRef: ApplicationRef) {}
 
-  openQuickReference(): void {
+  openQuickReference (): void {
     this.ngbModal.dismissAll();
     this.ngbModal.open(
       KeyboardShortcutHelpModalComponent, {backdrop: true});
     this.appRef.tick();
   }
 
-  bindExplorationPlayerShortcuts(): void {
+  bindExplorationPlayerShortcuts (): void {
     Mousetrap.bind('s', () => {
       var skipButton = <HTMLElement>document.querySelector(
         '.oppia-skip-to-content');
@@ -75,7 +75,7 @@ export class KeyboardShortcutService {
     });
   }
 
-  bindLibraryPageShortcuts(): void {
+  bindLibraryPageShortcuts (): void {
     Mousetrap.bind('/', () => {
       var searchBar = <HTMLElement>document.querySelector(
         '.oppia-search-bar-text-input');
@@ -103,7 +103,7 @@ export class KeyboardShortcutService {
   }
 
 
-  bindNavigationShortcuts(): void {
+  bindNavigationShortcuts (): void {
     Mousetrap.bind('ctrl+0', () => {
       this.windowRef.nativeWindow.location.href = '/get-started';
     });

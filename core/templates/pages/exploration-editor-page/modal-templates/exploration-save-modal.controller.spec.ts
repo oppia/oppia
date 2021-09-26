@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ExplorationSaveModalController.
  */
 
-describe('Exploration Save Modal Controller', function() {
+describe('Exploration Save Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var SiteAnalyticsService = null;
@@ -25,7 +25,7 @@ describe('Exploration Save Modal Controller', function() {
   var isExplorationPrivate = true;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -43,7 +43,7 @@ describe('Exploration Save Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.showDiff).toBe(false);
       expect($scope.diffData).toBe(diffData);
       expect($scope.isExplorationPrivate).toBe(isExplorationPrivate);
@@ -52,7 +52,7 @@ describe('Exploration Save Modal Controller', function() {
     });
 
   it('should toggle exploration diff visibility when clicking on toggle diff' +
-    ' button', function() {
+    ' button', function () {
     expect($scope.showDiff).toBe(false);
     $scope.onClickToggleDiffButton();
     expect($scope.showDiff).toBe(true);

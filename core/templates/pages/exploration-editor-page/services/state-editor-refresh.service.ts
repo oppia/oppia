@@ -26,7 +26,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class StateEditorRefreshService {
   private _refreshStateEditorEventEmitter = new EventEmitter<void>();
 
-  get onRefreshStateEditor(): EventEmitter<void> {
+  get onRefreshStateEditor (): EventEmitter<void> {
     return this._refreshStateEditorEventEmitter;
   }
 }

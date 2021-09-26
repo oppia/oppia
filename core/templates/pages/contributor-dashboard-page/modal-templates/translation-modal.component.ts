@@ -64,18 +64,18 @@ export interface ImageDetails {
   descriptions: string[];
 }
 export class TranslationError {
-  constructor(
+  constructor (
     private _hasDuplicateAltTexts: boolean,
     private _hasDuplicateDescriptions: boolean,
     private _hasUntranslatedElements: boolean) {}
 
-  get hasDuplicateDescriptions(): boolean {
+  get hasDuplicateDescriptions (): boolean {
     return this._hasDuplicateDescriptions;
   }
-  get hasDuplicateAltTexts(): boolean {
+  get hasDuplicateAltTexts (): boolean {
     return this._hasDuplicateAltTexts;
   }
-  get hasUntranslatedElements(): boolean {
+  get hasUntranslatedElements (): boolean {
     return this._hasUntranslatedElements;
   }
 }
@@ -123,7 +123,7 @@ export class TranslationModalComponent {
     'oppia-noninteractive-skillreview'
   ];
 
-  constructor(
+  constructor (
     private readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
@@ -138,7 +138,7 @@ export class TranslationModalComponent {
     this.contextService = OppiaAngularRootComponent.contextService;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.activeLanguageCode =
     this.translationLanguageService.getActiveLanguageCode();
     // We need to set the context here so that the rte fetches
@@ -185,29 +185,29 @@ export class TranslationModalComponent {
   // TODO(#13221): Remove this method completely after the change detection
   // issues in schema-based-editor have been resolved. The current workaround
   // used is to destroy and re-render the component in the view.
-  resetEditor(): void {
+  resetEditor (): void {
     this.editorIsShown = false;
     this.changeDetectorRef.detectChanges();
     this.editorIsShown = true;
   }
 
-  close(): void {
+  close (): void {
     this.activeModal.close();
   }
 
-  getHtmlSchema(): HTMLSchema {
+  getHtmlSchema (): HTMLSchema {
     return this.HTML_SCHEMA;
   }
 
-  getUnicodeSchema(): UnicodeSchema {
+  getUnicodeSchema (): UnicodeSchema {
     return this.UNICODE_SCHEMA;
   }
 
-  getSetOfStringsSchema(): ListSchema {
+  getSetOfStringsSchema (): ListSchema {
     return this.SET_OF_STRINGS_SCHEMA;
   }
 
-  updateActiveState(translatableItem: TranslatableItem): void {
+  updateActiveState (translatableItem: TranslatableItem): void {
     (
       {
         text: this.textToTranslate,
@@ -230,7 +230,7 @@ export class TranslationModalComponent {
     );
   }
 
-  onContentClick(event: MouseEvent): boolean | void {
+  onContentClick (event: MouseEvent): boolean | void {
     if (this.triedToCopyParagraph(event)) {
       return this.hadCopyParagraphError = true;
     }
@@ -241,7 +241,7 @@ export class TranslationModalComponent {
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
 
-  triedToCopyParagraph($event: MouseEvent): boolean {
+  triedToCopyParagraph ($event: MouseEvent): boolean {
     // Mathematical equations are also wrapped by <p> elements.
     // Hence, math elements should be allowed to be copied.
     // See issue #11683.
@@ -254,22 +254,22 @@ export class TranslationModalComponent {
     return target.localName === 'p' && !mathElementsIncluded;
   }
 
-  isCopyModeActive(): boolean {
+  isCopyModeActive (): boolean {
     return this.ckEditorCopyContentService.copyModeActive;
   }
 
-  updateHtml($event: string): void {
+  updateHtml ($event: string): void {
     if ($event !== this.activeWrittenTranslation) {
       this.activeWrittenTranslation = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  hasPreviousTranslations(): boolean {
+  hasPreviousTranslations (): boolean {
     return this.translateTextService.getActiveIndex() > 0;
   }
 
-  skipActiveTranslation(): void {
+  skipActiveTranslation (): void {
     const translatableItem = (
       this.translateTextService.getTextToTranslate());
     this.updateActiveState(translatableItem);
@@ -277,11 +277,11 @@ export class TranslationModalComponent {
     this.resetEditor();
   }
 
-  isSubmitted(): boolean {
+  isSubmitted (): boolean {
     return this.activeStatus === 'submitted';
   }
 
-  returnToPreviousTranslation(): void {
+  returnToPreviousTranslation (): void {
     const translatableItem = (
       this.translateTextService.getPreviousTextToTranslate());
     this.updateActiveState(translatableItem);
@@ -289,7 +289,7 @@ export class TranslationModalComponent {
     this.resetEditor();
   }
 
-  isSetOfStringDataFormat(): boolean {
+  isSetOfStringDataFormat (): boolean {
     return (
       this.activeDataFormat ===
         TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
@@ -297,7 +297,7 @@ export class TranslationModalComponent {
     );
   }
 
-  getFormattedContentType(
+  getFormattedContentType (
       contentType: string, interactionId: string): string {
     if (contentType === 'interaction') {
       return interactionId + ' interaction';
@@ -307,7 +307,7 @@ export class TranslationModalComponent {
     return contentType;
   }
 
-  getRuleDescription(ruleType: string, interactionId: string): string {
+  getRuleDescription (ruleType: string, interactionId: string): string {
     if (!ruleType || !interactionId) {
       return '';
     }
@@ -319,10 +319,10 @@ export class TranslationModalComponent {
       descriptionPattern, 'the following choices:');
   }
 
-  getElementAttributeTexts(
+  getElementAttributeTexts (
       elements: HTMLCollectionOf<Element>, type: string): string[] {
     const textWrapperLength = 6;
-    const attributes = Array.from(elements, function(element: Element) {
+    const attributes = Array.from(elements, function (element: Element) {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
       // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
@@ -337,7 +337,7 @@ export class TranslationModalComponent {
     return attributes.filter(attribute => attribute);
   }
 
-  getImageAttributeTexts(
+  getImageAttributeTexts (
       htmlElements: HTMLCollectionOf<Element>): ImageDetails {
     return {
       filePaths: this.getElementAttributeTexts(
@@ -349,7 +349,7 @@ export class TranslationModalComponent {
     };
   }
 
-  hasSomeDuplicateElements(
+  hasSomeDuplicateElements (
       originalElements: string[],
       translatedElements: string[]): boolean {
     // This regular expression matches a number, optionally negative, with an
@@ -367,7 +367,7 @@ export class TranslationModalComponent {
     return originalElements.some(hasMatchingTranslatedElement);
   }
 
-  isTranslationCompleted(
+  isTranslationCompleted (
       originalElements: HTMLCollectionOf<Element>,
       translatedElements: HTMLCollectionOf<Element>): boolean {
     // Checks if there are custom tags present in the original content but not
@@ -383,7 +383,7 @@ export class TranslationModalComponent {
     return isEqual(filteredOriginalElements, filteredTranslatedElements);
   }
 
-  validateTranslation(
+  validateTranslation (
       textToTranslate: HTMLCollectionOf<Element>,
       translatedText: HTMLCollectionOf<Element>): TranslationError {
     const translatedElements: ImageDetails = this.getImageAttributeTexts(
@@ -405,7 +405,7 @@ export class TranslationModalComponent {
       hasDuplicateDescriptions, hasUntranslatedElements);
   }
 
-  suggestTranslatedText(): void {
+  suggestTranslatedText (): void {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
       const originalElements = domParser.parseFromString(

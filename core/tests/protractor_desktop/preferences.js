@@ -20,14 +20,14 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('Preferences', function() {
+describe('Preferences', function () {
   var preferencesPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
-  it('should let a user upload a profile photo', async function() {
+  it('should let a user upload a profile photo', async function () {
     await users.createUser('eve@preferences.com', 'evePreferences');
     await users.login('eve@preferences.com');
     await preferencesPage.get();
@@ -38,7 +38,7 @@ describe('Preferences', function() {
     expect(defaultProfilePhotoSource).not.toEqual(newProfilePhotoSource);
   });
 
-  it('should show an error if uploaded photo is too large', async function() {
+  it('should show an error if uploaded photo is too large', async function () {
     await users.createUser('lou@preferences.com', 'louPreferences');
     await users.login('lou@preferences.com');
     await preferencesPage.get();
@@ -48,7 +48,7 @@ describe('Preferences', function() {
     await preferencesPage.expectUploadError();
   });
 
-  it('should change editor role email checkbox value', async function() {
+  it('should change editor role email checkbox value', async function () {
     await users.createUser('alice@preferences.com', 'alicePreferences');
     await users.login('alice@preferences.com');
     await preferencesPage.get();
@@ -64,7 +64,7 @@ describe('Preferences', function() {
       false);
   });
 
-  it('should change feedback message email checkbox value', async function() {
+  it('should change feedback message email checkbox value', async function () {
     await users.createUser('bob@preferences.com', 'bobPreferences');
     await users.login('bob@preferences.com');
     await preferencesPage.get();
@@ -79,7 +79,7 @@ describe('Preferences', function() {
       false);
   });
 
-  it('should set and edit bio in user profile', async function() {
+  it('should set and edit bio in user profile', async function () {
     await users.createUser('lisa@preferences.com', 'lisaPreferences');
     await users.login('lisa@preferences.com');
     await preferencesPage.get();
@@ -101,7 +101,7 @@ describe('Preferences', function() {
       'Junior student from USA studying CS!');
   });
 
-  it('should change prefered audio language of the learner', async function() {
+  it('should change prefered audio language of the learner', async function () {
     await users.createUser('paul@preferences.com', 'paulPreferences');
     await users.login('paul@preferences.com');
     await preferencesPage.get();
@@ -120,7 +120,7 @@ describe('Preferences', function() {
     await preferencesPage.expectPreferredAudioLanguageToBe('Hungarian');
   });
 
-  it('should change prefered site language of the learner', async function() {
+  it('should change prefered site language of the learner', async function () {
     await users.createUser('john@preferences.com', 'johnPreferences');
     await users.login('john@preferences.com');
     await preferencesPage.get();
@@ -140,7 +140,7 @@ describe('Preferences', function() {
   });
 
   it('should load the correct dashboard according to selection',
-    async function() {
+    async function () {
       await users.createUser('lorem@preferences.com', 'loremPreferences');
       await users.login('lorem@preferences.com');
       await preferencesPage.get();
@@ -156,7 +156,7 @@ describe('Preferences', function() {
     });
 
   it('should navigate to account deletion page',
-    async function() {
+    async function () {
       await users.createUser('delete@page.com', 'deletePage');
       await users.login('delete@page.com');
       await preferencesPage.get();
@@ -166,7 +166,7 @@ describe('Preferences', function() {
     });
 
   it('should export account data',
-    async function() {
+    async function () {
       await users.createUser('export@preferences.com', 'exportPreferences');
       await users.login('export@preferences.com');
       await preferencesPage.get();
@@ -175,7 +175,7 @@ describe('Preferences', function() {
     }
   );
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });

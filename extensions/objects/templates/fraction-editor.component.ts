@@ -41,18 +41,18 @@ export class FractionEditorComponent implements OnInit {
   currentFractionValueIsValid = false;
   eventBus: EventBusGroup;
 
-  constructor(
+  constructor (
     private eventBusService: EventBusService) {
     this.eventBus = new EventBusGroup(this.eventBusService);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.value !== null) {
       this.fractionString = Fraction.fromDict(this.value).toString();
     }
   }
 
-  validateFraction(newFraction: string): void {
+  validateFraction (newFraction: string): void {
     if (newFraction.length === 0) {
       this.errorMessage = 'Please enter a non-empty fraction value.';
       this.currentFractionValueIsValid = false;

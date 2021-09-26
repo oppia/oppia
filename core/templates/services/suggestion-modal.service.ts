@@ -44,18 +44,18 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
-  acceptSuggestion(
+  acceptSuggestion (
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
       paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
-  rejectSuggestion(
+  rejectSuggestion (
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
       paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
-  cancelSuggestion(
+  cancelSuggestion (
       $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
     $uibModalInstance.dismiss('cancel');
   }

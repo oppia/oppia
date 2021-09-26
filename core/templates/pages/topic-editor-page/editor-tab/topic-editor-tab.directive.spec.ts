@@ -26,7 +26,7 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Topic editor tab directive', function() {
+describe('Topic editor tab directive', function () {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
@@ -58,12 +58,12 @@ describe('Topic editor tab directive', function() {
     isWindowNarrow: () => false
   };
   var MockTopicsAndSkillsDashboardBackendApiService = {
-    get onTopicsAndSkillsDashboardReinitialized() {
+    get onTopicsAndSkillsDashboardReinitialized () {
       return mockTasdReinitializedEventEmitter;
     }
   };
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModalInstance = $injector.get('$uibModal');
@@ -93,12 +93,12 @@ describe('Topic editor tab directive', function() {
     topicReinitializedEventEmitter = new EventEmitter();
 
     spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-      function() {
+      function () {
         return topicInitializedEventEmitter;
       });
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-      function() {
+      function () {
         return topicReinitializedEventEmitter;
       });
 
@@ -142,7 +142,7 @@ describe('Topic editor tab directive', function() {
     ctrl.$onDestroy();
   });
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', function () {
     expect($scope.topic).toEqual(topic);
     expect($scope.allowedBgColors).toEqual(['#C6DCDA']);
     expect($scope.topicDescriptionChanged).toEqual(false);
@@ -153,13 +153,13 @@ describe('Topic editor tab directive', function() {
     expect($scope.STORY_LIST).toEqual('story');
   });
 
-  it('should call EntityCreationService to create skill', function() {
+  it('should call EntityCreationService to create skill', function () {
     var skillSpy = spyOn(EntityCreationService, 'createSkill');
     $scope.createSkill();
     expect(skillSpy).toHaveBeenCalled();
   });
 
-  it('should toggle the subtopic card', function() {
+  it('should toggle the subtopic card', function () {
     var index = 1;
     expect($scope.subtopicCardSelectedIndexes[index]).toEqual(undefined);
     $scope.toggleSubtopicCard(index);
@@ -170,7 +170,7 @@ describe('Topic editor tab directive', function() {
     expect($scope.subtopicCardSelectedIndexes[index]).toEqual(true);
   });
 
-  it('should open the reassign modal', function() {
+  it('should open the reassign modal', function () {
     var uibModalSpy = spyOn($uibModalInstance, 'open').and.returnValue({
       result: Promise.resolve()
     });
@@ -179,7 +179,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should call the TopicUpdateService if skill is removed from subtopic',
-    function() {
+    function () {
       var removeSkillSpy = (
         spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
       $scope.removeSkillFromSubtopic(0, null);
@@ -187,28 +187,28 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if skill is removed from topic',
-    function() {
+    function () {
       var removeSkillSpy = (
         spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
       $scope.removeSkillFromTopic(0, skillSummary);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
-  it('should show subtopic edit options', function() {
+  it('should show subtopic edit options', function () {
     $scope.showSubtopicEditOptions(1);
     expect($scope.subtopicEditOptionsAreShown).toEqual(1);
     $scope.showSubtopicEditOptions(2);
     expect($scope.subtopicEditOptionsAreShown).toEqual(2);
   });
 
-  it('should show skill edit options', function() {
+  it('should show skill edit options', function () {
     $scope.showSkillEditOptions(0, 1);
     expect($scope.selectedSkillEditOptionsIndex[0][1]).toEqual(true);
     $scope.showSkillEditOptions(0, 1);
     expect($scope.selectedSkillEditOptionsIndex).toEqual({});
   });
 
-  it('should get the classroom URL fragment', function() {
+  it('should get the classroom URL fragment', function () {
     expect($scope.getClassroomUrlFragment()).toEqual('staging');
     spyOn(
       TopicEditorStateService,
@@ -217,7 +217,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should open save changes warning modal before creating skill',
-    function() {
+    function () {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
       var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
       $scope.createSkill();
@@ -226,26 +226,26 @@ describe('Topic editor tab directive', function() {
 
   it('should call TopicEditorStateService to load topic when ' +
       'topics and skills dashboard is reinitialized',
-  function() {
+  function () {
     var refreshTopicSpy = spyOn(TopicEditorStateService, 'loadTopic');
     MockTopicsAndSkillsDashboardBackendApiService.
       onTopicsAndSkillsDashboardReinitialized.emit();
     expect(refreshTopicSpy).toHaveBeenCalled();
   });
 
-  it('should call EntityCreationService to create subtopic', function() {
+  it('should call EntityCreationService to create subtopic', function () {
     var skillSpy = spyOn(EntityCreationService, 'createSubtopic');
     $scope.createSubtopic();
     expect(skillSpy).toHaveBeenCalled();
   });
 
-  it('should show mark the changes in description', function() {
+  it('should show mark the changes in description', function () {
     expect($scope.topicDescriptionChanged).toEqual(false);
     $scope.updateTopicDescriptionStatus('New description');
     expect($scope.topicDescriptionChanged).toEqual(true);
   });
 
-  it('should call the TopicUpdateService if name is updated', function() {
+  it('should call the TopicUpdateService if name is updated', function () {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
     spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
       (newName, successCallback) => successCallback());
@@ -254,7 +254,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should not call updateExistenceOfTopicName if name is empty',
-    function() {
+    function () {
       var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
       spyOn(TopicEditorStateService, 'updateExistenceOfTopicName');
       $scope.updateTopicName('');
@@ -264,14 +264,14 @@ describe('Topic editor tab directive', function() {
       ).not.toHaveBeenCalled();
     });
 
-  it('should not call the TopicUpdateService if name is same', function() {
+  it('should not call the TopicUpdateService if name is same', function () {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
     $scope.updateTopicName('New Name');
     expect(topicNameSpy).not.toHaveBeenCalled();
   });
 
   it('should not call the TopicUpdateService if url fragment is same',
-    function() {
+    function () {
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
       $scope.updateTopicUrlFragment('topic-url-fragment');
@@ -279,7 +279,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if url fragment is updated',
-    function() {
+    function () {
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
       spyOn(
@@ -291,7 +291,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should not update topic url fragment existence for empty url fragment',
-    function() {
+    function () {
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
       spyOn(TopicEditorStateService, 'updateExistenceOfTopicUrlFragment');
@@ -302,14 +302,14 @@ describe('Topic editor tab directive', function() {
       ).not.toHaveBeenCalled();
     });
 
-  it('should call the TopicUpdateService if thumbnail is updated', function() {
+  it('should call the TopicUpdateService if thumbnail is updated', function () {
     var topicThumbnailSpy = (
       spyOn(TopicUpdateService, 'setTopicThumbnailFilename'));
     $scope.updateTopicThumbnailFilename('img2.svg');
     expect(topicThumbnailSpy).toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if thumbnail is updated', function() {
+  it('should call the TopicUpdateService if thumbnail is updated', function () {
     $scope.updateTopicThumbnailFilename('img2.svg');
     var topicThumbnailSpy = (
       spyOn(TopicUpdateService, 'setTopicThumbnailFilename'));
@@ -318,7 +318,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should call the TopicUpdateService if topic description is updated',
-    function() {
+    function () {
       var topicDescriptionSpy = (
         spyOn(TopicUpdateService, 'setTopicDescription'));
       $scope.updateTopicDescription('New description');
@@ -326,7 +326,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should not call the TopicUpdateService if topic description is same',
-    function() {
+    function () {
       $scope.updateTopicDescription('New description');
       var topicDescriptionSpy = (
         spyOn(TopicUpdateService, 'setTopicDescription'));
@@ -335,7 +335,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if topic meta tag content is updated',
-    function() {
+    function () {
       var topicMetaTagContentSpy = (
         spyOn(TopicUpdateService, 'setMetaTagContent'));
       $scope.updateTopicMetaTagContent('new meta tag content');
@@ -343,7 +343,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should not call the TopicUpdateService if topic description is same',
-    function() {
+    function () {
       $scope.updateTopicMetaTagContent('New meta tag content');
       var topicMetaTagContentSpy = (
         spyOn(TopicUpdateService, 'setMetaTagContent'));
@@ -352,7 +352,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if topic page title is updated',
-    function() {
+    function () {
       var topicPageTitleFragmentForWebSpy = spyOn(
         TopicUpdateService, 'setPageTitleFragmentForWeb');
       $scope.updateTopicPageTitleFragmentForWeb('new page title');
@@ -360,7 +360,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should not call the TopicUpdateService if topic page title is same',
-    function() {
+    function () {
       $scope.updateTopicPageTitleFragmentForWeb('New page title');
       var topicPageTitleFragmentForWebSpy = spyOn(
         TopicUpdateService, 'setPageTitleFragmentForWeb');
@@ -369,7 +369,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if practice tab is displayed ' +
-    'property is updated', function() {
+    'property is updated', function () {
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
     $scope.updatePracticeTabIsDisplayed(true);
@@ -377,7 +377,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should not call the TopicUpdateService if practice tab is displayed ' +
-   'property is same', function() {
+   'property is same', function () {
     $scope.updatePracticeTabIsDisplayed(true);
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
@@ -386,7 +386,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should call the TopicUpdateService if skill is deleted from topic',
-    function() {
+    function () {
       var topicDeleteSpy = (
         spyOn(TopicUpdateService, 'removeUncategorizedSkill'));
       $scope.deleteUncategorizedSkillFromTopic();
@@ -394,28 +394,28 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if thumbnail bg color is updated',
-    function() {
+    function () {
       var topicThumbnailBGSpy = (
         spyOn(TopicUpdateService, 'setTopicThumbnailBgColor'));
       $scope.updateTopicThumbnailBgColor('#FFFFFF');
       expect(topicThumbnailBGSpy).toHaveBeenCalled();
     });
 
-  it('should call TopicEditorRoutingService to navigate to skill', function() {
+  it('should call TopicEditorRoutingService to navigate to skill', function () {
     var topicThumbnailBGSpy = (
       spyOn(TopicEditorRoutingService, 'navigateToSkillEditorWithId'));
     $scope.navigateToSkill('id1');
     expect(topicThumbnailBGSpy).toHaveBeenCalledWith('id1');
   });
 
-  it('should return skill editor URL', function() {
+  it('should return skill editor URL', function () {
     var skillId = 'asd4242a';
     expect($scope.getSkillEditorUrl(skillId)).toEqual(
       '/skill_editor/' + skillId);
   });
 
   it('should not call the TopicUpdateService if thumbnail bg color is same',
-    function() {
+    function () {
       $scope.updateTopicThumbnailBgColor('#FFFFFF');
       var topicThumbnailBGSpy = (
         spyOn(TopicUpdateService, 'setTopicThumbnailBgColor'));
@@ -423,31 +423,31 @@ describe('Topic editor tab directive', function() {
       expect(topicThumbnailBGSpy).not.toHaveBeenCalled();
     });
 
-  it('should toggle topic preview', function() {
+  it('should toggle topic preview', function () {
     expect($scope.topicPreviewCardIsShown).toEqual(false);
     $scope.togglePreview();
     expect($scope.topicPreviewCardIsShown).toEqual(true);
   });
 
-  it('should return image path', function() {
+  it('should return image path', function () {
     var urlString = '/assets/images/img1.svg';
     expect($scope.getStaticImageUrl('/img1.svg')).toEqual(urlString);
   });
 
-  it('should call StoryCreation Service', function() {
+  it('should call StoryCreation Service', function () {
     var storySpy = spyOn(StoryCreationService, 'createNewCanonicalStory');
     $scope.createCanonicalStory();
     expect(storySpy).toHaveBeenCalled();
   });
 
-  it('should open save pending changes modal if changes are made', function() {
+  it('should open save pending changes modal if changes are made', function () {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
     $scope.createCanonicalStory();
     expect(uibModalSpy).toHaveBeenCalled();
   });
 
-  it('should call TopicRoutingService to navigate to subtopic', function() {
+  it('should call TopicRoutingService to navigate to subtopic', function () {
     var topicRoutingSpy = (
       spyOn(TopicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
     $scope.navigateToSubtopic(2);
@@ -455,7 +455,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should call TopicEditorService and TopicUpdateService ' +
-      'on to delete subtopic', function() {
+      'on to delete subtopic', function () {
     var topicEditorSpy = spyOn(TopicEditorStateService, 'deleteSubtopicPage');
     var topicUpdateSpy = (
       spyOn(TopicUpdateService, 'deleteSubtopic'));
@@ -464,7 +464,7 @@ describe('Topic editor tab directive', function() {
     expect(topicUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should return preview footer text for topic preview', function() {
+  it('should return preview footer text for topic preview', function () {
     expect($scope.getPreviewFooter()).toEqual('2 Stories');
     topic._canonicalStoryReferences = [];
     expect($scope.getPreviewFooter()).toEqual('0 Stories');
@@ -472,7 +472,7 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 
-  it('should only toggle preview of entity lists in mobile view', function() {
+  it('should only toggle preview of entity lists in mobile view', function () {
     expect($scope.mainTopicCardIsShown).toEqual(true);
     $scope.togglePreviewListCards('topic');
     expect($scope.mainTopicCardIsShown).toEqual(true);
@@ -496,7 +496,7 @@ describe('Topic editor tab directive', function() {
     MockWindowDimensionsService.isWindowNarrow = () => false;
   });
 
-  it('should toggle uncategorized skill options', function() {
+  it('should toggle uncategorized skill options', function () {
     $scope.toggleUncategorizedSkillOptions(10);
     expect($scope.uncategorizedEditOptionsIndex).toEqual(10);
     $scope.toggleUncategorizedSkillOptions(20);
@@ -504,14 +504,14 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should open ChangeSubtopicAssignment modal when change ' +
-      'subtopic assignment is called', function() {
+      'subtopic assignment is called', function () {
     var modalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
     $scope.changeSubtopicAssignment(1, skillSummary);
     expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should open ChangeSubtopicAssignment modal and call TopicUpdateService',
-    function() {
+    function () {
       var deferred = $q.defer();
       deferred.resolve(1);
       spyOn($uibModalInstance, 'open').and.returnValue(
@@ -524,7 +524,7 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should not call the TopicUpdateService if subtopicIds are same',
-    function() {
+    function () {
       var deferred = $q.defer();
       deferred.resolve(1);
       spyOn($uibModalInstance, 'open').and.returnValue(
@@ -536,14 +536,14 @@ describe('Topic editor tab directive', function() {
       expect(moveSkillSpy).not.toHaveBeenCalled();
     });
 
-  it('should record the index of the subtopic being moved', function() {
+  it('should record the index of the subtopic being moved', function () {
     $scope.onRearrangeSubtopicStart(10);
     expect($scope.fromIndex).toEqual(10);
     $scope.onRearrangeSubtopicStart(6);
     expect($scope.fromIndex).toEqual(6);
   });
 
-  it('should call the TopicUpdateService to rearrange subtopic', function() {
+  it('should call the TopicUpdateService to rearrange subtopic', function () {
     $scope.fromIndex = 0;
     var moveSubtopicSpy = (
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
@@ -552,7 +552,7 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should not call the TopicUpdateService to rearrange subtopic if ' +
-      'subtopic is moved to the same position', function() {
+      'subtopic is moved to the same position', function () {
     $scope.fromIndex = 0;
     var moveSubtopicSpy = (
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
@@ -567,7 +567,7 @@ describe('Topic editor tab directive', function() {
       TopicEditorStateService.getCanonicalStorySummaries).toHaveBeenCalled();
   });
 
-  it('should call initEditor on initialization of topic', function() {
+  it('should call initEditor on initialization of topic', function () {
     spyOn(ctrl, 'initEditor').and.callThrough();
     topicInitializedEventEmitter.emit();
     topicReinitializedEventEmitter.emit();

@@ -56,7 +56,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
     'SkillUpdateService', 'UrlInterpolationService',
     'WindowDimensionsService', 'WorkedExampleObjectFactory',
     'COMPONENT_NAME_WORKED_EXAMPLE',
-    function(
+    function (
         $filter, $scope, $uibModal,
         GenerateContentIdService, PageTitleService, SkillEditorStateService,
         SkillUpdateService, UrlInterpolationService,
@@ -64,12 +64,12 @@ angular.module('oppia').component('skillConceptCardEditor', {
         COMPONENT_NAME_WORKED_EXAMPLE) {
       var ctrl = this;
 
-      $scope.getStaticImageUrl = function(imagePath) {
+      $scope.getStaticImageUrl = function (imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
 
       ctrl.directiveSubscriptions = new Subscription();
-      var initBindableFieldsDict = function() {
+      var initBindableFieldsDict = function () {
         PageTitleService.setNavbarSubtitleForMobileView(
           SkillEditorStateService.getSkill().getDescription());
         $scope.bindableFieldsDict = {
@@ -80,17 +80,17 @@ angular.module('oppia').component('skillConceptCardEditor', {
         };
       };
 
-      $scope.isEditable = function() {
+      $scope.isEditable = function () {
         return true;
       };
 
-      $scope.onSaveExplanation = function(explanationObject) {
+      $scope.onSaveExplanation = function (explanationObject) {
         SkillUpdateService.setConceptCardExplanation(
           $scope.skill, explanationObject);
         initBindableFieldsDict();
       };
 
-      $scope.changeActiveWorkedExampleIndex = function(idx) {
+      $scope.changeActiveWorkedExampleIndex = function (idx) {
         if (idx === $scope.activeWorkedExampleIndex) {
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
@@ -100,37 +100,37 @@ angular.module('oppia').component('skillConceptCardEditor', {
         }
       };
 
-      $scope.deleteWorkedExample = function(index, evt) {
+      $scope.deleteWorkedExample = function (index, evt) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/skill-editor-page/modal-templates/' +
             'delete-worked-example-modal.directive.html'),
           backdrop: 'static',
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           SkillUpdateService.deleteWorkedExample($scope.skill, index);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
           $scope.activeWorkedExampleIndex = null;
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      $scope.getWorkedExampleSummary = function(workedExampleQuestion) {
+      $scope.getWorkedExampleSummary = function (workedExampleQuestion) {
         return $filter('formatRtePreview')(workedExampleQuestion);
       };
 
-      $scope.openAddWorkedExampleModal = function() {
+      $scope.openAddWorkedExampleModal = function () {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/skill-editor-page/modal-templates/' +
             'add-worked-example-modal.directive.html'),
           backdrop: 'static',
           controller: 'AddWorkedExampleModalController'
-        }).result.then(function(result) {
+        }).result.then(function (result) {
           var newExample = WorkedExampleObjectFactory.create(
             SubtitledHtml.createDefault(
               result.workedExampleQuestionHtml,
@@ -149,14 +149,14 @@ angular.module('oppia').component('skillConceptCardEditor', {
             $scope.skill, newExample);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      $scope.showSkillPreview = function() {
+      $scope.showSkillPreview = function () {
         var skillDescription = (
           SkillEditorStateService.getSkill().getDescription());
         var skillExplanation = (
@@ -181,20 +181,20 @@ angular.module('oppia').component('skillConceptCardEditor', {
         });
       };
 
-      $scope.toggleWorkedExampleList = function() {
+      $scope.toggleWorkedExampleList = function () {
         if (WindowDimensionsService.isWindowNarrow()) {
           $scope.workedExamplesListIsShown = (
             !$scope.workedExamplesListIsShown);
         }
       };
 
-      $scope.toggleSkillEditorCard = function() {
+      $scope.toggleSkillEditorCard = function () {
         if (WindowDimensionsService.isWindowNarrow()) {
           $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
         }
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.skill = SkillEditorStateService.getSkill();
         initBindableFieldsDict();
         $scope.skillEditorCardIsShown = true;
@@ -216,11 +216,11 @@ angular.module('oppia').component('skillConceptCardEditor', {
           items: '.oppia-sortable-worked-example',
           revert: 100,
           tolerance: 'pointer',
-          start: function(e, ui) {
+          start: function (e, ui) {
             $scope.activeWorkedExampleIndex = null;
             ui.placeholder.height(ui.item.height());
           },
-          stop: function() {
+          stop: function () {
             var newWorkedExamples =
               $scope.bindableFieldsDict.displayedWorkedExamples;
             SkillUpdateService.updateWorkedExamples(
@@ -229,7 +229,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
         };
       };
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         ctrl.directiveSubscriptions.unsubscribe();
       });
     }

@@ -151,17 +151,17 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   private _data: FilepathData;
 
   // Check the note before imports and after fileoverview.
-  get data(): FilepathData {
+  get data (): FilepathData {
     return this._data;
   }
-  set data(value: FilepathData) {
+  set data (value: FilepathData) {
     this._data = value;
     this.validate(this._data);
   }
   cropAreaXWhenLastDown: number;
   cropAreaYWhenLastDown: number;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -173,7 +173,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.validityChange.emit({empty: false});
     this.CROP_CURSORS[this.MOUSE_TOP_LEFT] = 'nwse-resize';
     this.CROP_CURSORS[this.MOUSE_TOP] = 'ns-resize';
@@ -250,7 +250,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
 
   /** Internal functions (not visible in the view) */
 
-  private resetComponent(newValue) {
+  private resetComponent (newValue) {
     // Reset the component each time the value changes
     // (e.g. if this is part of an editable list).
     if (newValue) {
@@ -274,7 +274,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
    * @return A DOMString containing the output image data URI.
    */
 
-  private getResampledImageData(imageDataURI, width, height) {
+  private getResampledImageData (imageDataURI, width, height) {
     // Create an Image object with the original data.
     const img = new Image();
     img.src = imageDataURI;
@@ -300,7 +300,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   * @return A DOMString containing the output image data URI.
   */
 
-  private getCroppedImageData(imageDataURI, x, y, width, height) {
+  private getCroppedImageData (imageDataURI, x, y, width, height) {
     // Put the original image in a canvas.
     const img = new Image();
     img.src = imageDataURI;
@@ -323,7 +323,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
 
-  private async getCroppedGIFDataAsync(
+  private async getCroppedGIFDataAsync (
       x: number, y: number, width: number, height: number,
       imageDataURI: string): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -357,7 +357,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
 
-  private getEventCoorindatesRelativeToImageContainer(e) {
+  private getEventCoorindatesRelativeToImageContainer (e) {
     // Even though the event listeners are added to the image container,
     // the events seem to be reported with 'target' set to the deepest
     // element where the event occurred. In other words, if the event
@@ -379,11 +379,11 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     return { x: x, y: y };
   }
 
-  private clamp(value, min, max) {
+  private clamp (value, min, max) {
     return Math.min(Math.max(min, value), max);
   }
 
-  private handleMouseMoveWhileDraggingCropArea(x, y) {
+  private handleMouseMoveWhileDraggingCropArea (x, y) {
     const xDown = this.lastMouseDownEventCoordinates.x;
     const yDown = this.lastMouseDownEventCoordinates.y;
     const x1WhenDown = this.cropAreaXWhenLastDown;
@@ -407,7 +407,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.cropArea.y2 = y1 + cropHeight;
   }
 
-  private handleMouseMoveWhileResizingCropArea(x, y) {
+  private handleMouseMoveWhileResizingCropArea (x, y) {
     const dimensions = this.calculateTargetImageDimensions();
     const direction = this.cropAreaResizeDirection;
 
@@ -471,7 +471,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  private updatePositionWithinCropArea(x, y) {
+  private updatePositionWithinCropArea (x, y) {
     const margin = this.CROP_BORDER_MARGIN_PX;
     const cx1 = this.cropArea.x1;
     const cy1 = this.cropArea.y1;
@@ -521,7 +521,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  private getTrustedResourceUrlForImageFileName(imageFileName) {
+  private getTrustedResourceUrlForImageFileName (imageFileName) {
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
@@ -540,7 +540,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       encodedFilepath);
   }
 
-  resetFilePathEditor(): void {
+  resetFilePathEditor (): void {
     if (
       this.data.metadata.savedImageFilename && (
         this.contextService.getImageSaveDestination() ===
@@ -564,21 +564,21 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.validityChange.emit({empty: false});
   }
 
-  validate(data: FilepathData): boolean {
+  validate (data: FilepathData): boolean {
     const isValid = data.mode === this.MODE_SAVED &&
       data.metadata.savedImageFilename &&
       data.metadata.savedImageFilename.length > 0;
     return isValid;
   }
 
-  isUserCropping(): boolean {
+  isUserCropping (): boolean {
     const dimensions = this.calculateTargetImageDimensions();
     const cropWidth = this.cropArea.x2 - this.cropArea.x1;
     const cropHeight = this.cropArea.y2 - this.cropArea.y1;
     return cropWidth < dimensions.width || cropHeight < dimensions.height;
   }
 
-  onMouseMoveOnImageArea(e: MouseEvent): void {
+  onMouseMoveOnImageArea (e: MouseEvent): void {
     e.preventDefault();
 
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
@@ -594,7 +594,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.mouseLastKnownCoordinates = { x: coords.x, y: coords.y };
   }
 
-  onMouseDownOnCropArea(e: MouseEvent): void {
+  onMouseDownOnCropArea (e: MouseEvent): void {
     e.preventDefault();
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
     const position = this.mousePositionWithinCropArea;
@@ -611,18 +611,18 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  onMouseUpOnCropArea(e: MouseEvent): void {
+  onMouseUpOnCropArea (e: MouseEvent): void {
     e.preventDefault();
     this.userIsDraggingCropArea = false;
     this.userIsResizingCropArea = false;
   }
 
-  getMainContainerDynamicStyles(): string {
+  getMainContainerDynamicStyles (): string {
     const width = this.OUTPUT_IMAGE_MAX_WIDTH_PX;
     return 'width: ' + width + 'px';
   }
 
-  getImageContainerDynamicStyles(): string {
+  getImageContainerDynamicStyles (): string {
     if (this.data.mode === this.MODE_EMPTY) {
       return 'border: 1px dotted #888';
     } else {
@@ -630,7 +630,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  getToolbarDynamicStyles(): string {
+  getToolbarDynamicStyles (): string {
     if (this.isUserCropping()) {
       return 'visibility: hidden';
     } else {
@@ -638,12 +638,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  getCropButtonBarDynamicStyles(): string {
+  getCropButtonBarDynamicStyles (): string {
     return 'left: ' + this.cropArea.x2 + 'px;' +
       'top: ' + this.cropArea.y1 + 'px;';
   }
 
-  getCropAreaDynamicStyles(): string {
+  getCropAreaDynamicStyles (): string {
     const cropWidth = this.cropArea.x2 - this.cropArea.x1;
     const cropHeight = this.cropArea.y2 - this.cropArea.y1;
     const position = this.mousePositionWithinCropArea;
@@ -685,14 +685,14 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       }).join('; ');
   }
 
-  getUploadedImageDynamicStyles(): string {
+  getUploadedImageDynamicStyles (): string {
     const dimensions = this.calculateTargetImageDimensions();
     const w = dimensions.width;
     const h = dimensions.height;
     return 'width: ' + w + 'px; height: ' + h + 'px;';
   }
 
-  confirmCropImage(): void {
+  confirmCropImage (): void {
     // Find coordinates of the cropped area within original image scale.
     const dimensions = this.calculateTargetImageDimensions();
     const r = this.data.metadata.originalWidth / dimensions.width;
@@ -743,7 +743,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  updateDimensions(
+  updateDimensions (
       newImageFile: File,
       newImageData: string,
       width: number,
@@ -767,7 +767,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     };
   }
 
-  cancelCropImage(): void {
+  cancelCropImage (): void {
     const dimensions = this.calculateTargetImageDimensions();
     this.cropArea.x1 = 0;
     this.cropArea.y1 = 0;
@@ -775,7 +775,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.cropArea.y2 = dimensions.height;
   }
 
-  getImageSizeHelp(): string | null {
+  getImageSizeHelp (): string | null {
     const imageWidth = this.data.metadata.originalWidth;
     if (this.imageResizeRatio === 1 &&
       imageWidth > this.OUTPUT_IMAGE_MAX_WIDTH_PX) {
@@ -787,41 +787,41 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     return null;
   }
 
-  isCropAllowed(): boolean {
+  isCropAllowed (): boolean {
     return this.data.crop;
   }
 
-  isNoImageUploaded(): boolean {
+  isNoImageUploaded (): boolean {
     return this.data.mode === this.MODE_EMPTY;
   }
 
-  isImageUploaded(): boolean {
+  isImageUploaded (): boolean {
     return this.data.mode === this.MODE_UPLOADED;
   }
 
-  isImageSaved(): boolean {
+  isImageSaved (): boolean {
     return this.data.mode === this.MODE_SAVED;
   }
 
-  getCurrentResizePercent(): number {
+  getCurrentResizePercent (): number {
     return Math.round(100 * this.imageResizeRatio);
   }
 
-  decreaseResizePercent(amount: number): void {
+  decreaseResizePercent (amount: number): void {
     // Do not allow to decrease size below 10%.
     this.imageResizeRatio = Math.max(
       0.1, this.imageResizeRatio - amount / 100);
     this.updateValidationWithLatestDimensions();
   }
 
-  increaseResizePercent(amount: number): void {
+  increaseResizePercent (amount: number): void {
     // Do not allow to increase size above 100% (only downsize allowed).
     this.imageResizeRatio = Math.min(
       1, this.imageResizeRatio + amount / 100);
     this.updateValidationWithLatestDimensions();
   }
 
-  private updateValidationWithLatestDimensions(): void {
+  private updateValidationWithLatestDimensions (): void {
     const dimensions = this.calculateTargetImageDimensions();
     const imageDataURI = (
       this.imgData || <string> this.data.metadata.uploadedImageData);
@@ -841,7 +841,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  calculateTargetImageDimensions(): Dimensions {
+  calculateTargetImageDimensions (): Dimensions {
     let width = this.data.metadata.originalWidth;
     let height = this.data.metadata.originalHeight;
     if (width > this.OUTPUT_IMAGE_MAX_WIDTH_PX) {
@@ -855,7 +855,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     };
   }
 
-  setUploadedFile(file: File): void {
+  setUploadedFile (file: File): void {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -891,7 +891,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     reader.readAsDataURL(file);
   }
 
-  setSavedImageFilename(filename: string, updateParent: boolean): void {
+  setSavedImageFilename (filename: string, updateParent: boolean): void {
     this.data = {
       mode: this.MODE_SAVED,
       metadata: {
@@ -911,16 +911,16 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  onFileChanged(file: File): void {
+  onFileChanged (file: File): void {
     this.setUploadedFile(file);
   }
 
-  discardUploadedFile(): void {
+  discardUploadedFile (): void {
     this.resetFilePathEditor();
     this.processedImageIsTooLarge = false;
   }
 
-  validateProcessedFilesize(resampledImageData: string): void {
+  validateProcessedFilesize (resampledImageData: string): void {
     const mimeType = resampledImageData.split(';')[0];
     const imageSize = atob(
       resampledImageData.replace(`${mimeType};base64,`, '')).length;
@@ -931,7 +931,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
   }
 
-  saveUploadedFile(): void {
+  saveUploadedFile (): void {
     this.alertsService.clearWarnings();
     this.processedImageIsTooLarge = false;
 
@@ -1003,7 +1003,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  private processGIFImage(
+  private processGIFImage (
       imageDataURI: string, width: number, height: number,
       processFrameCallback: (dataUrl: string) => void,
       successCallback: (gifshotCallbackObject: GifshotCallbackObject) => void
@@ -1016,7 +1016,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       url: imageDataURI,
       frames: 'all',
       outputType: 'canvas',
-    }).then(async function(frameData) {
+    }).then(async function (frameData) {
       let frames = [];
       for (let i = 0; i < frameData.length; i += 1) {
         let sourceCanvas = frameData[i].getImage();
@@ -1051,7 +1051,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     });
   }
 
-  saveImageToLocalStorage(
+  saveImageToLocalStorage (
       dimensions: Dimensions,
       resampledFile: Blob,
       imageType: string): void {
@@ -1074,7 +1074,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     reader.readAsDataURL(resampledFile);
   }
 
-  saveImage(
+  saveImage (
       dimensions: Dimensions,
       resampledFile: Blob,
       imageType: string): void {
@@ -1088,7 +1088,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  postImageToServer(
+  postImageToServer (
       dimensions: Dimensions,
       resampledFile: Blob,
       imageType: string = 'png'): void {
@@ -1144,7 +1144,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (
       changes.value &&
       changes.value.currentValue !== changes.value.previousValue

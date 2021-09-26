@@ -46,7 +46,7 @@ export class TopicsListComponent {
     'skill_count', 'topic_status'
   ];
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
     private editableTopicBackendApiService: EditableTopicBackendApiService,
@@ -60,7 +60,7 @@ export class TopicsListComponent {
    * @returns {String} Url of the topic editor with the
    * topic ID provided in the args.
    */
-  getTopicEditorUrl(topicId: string): string {
+  getTopicEditorUrl (topicId: string): string {
     const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       TOPIC_EDITOR_URL_TEMPLATE, {
@@ -73,14 +73,14 @@ export class TopicsListComponent {
    * @returns {Boolean} Returns true for the topic whose
    * edit options should be shown.
    */
-  showEditOptions(topicId: string): boolean {
+  showEditOptions (topicId: string): boolean {
     return this.selectedIndex === topicId;
   }
 
   /**
    * @param {String} topicId - ID of the topic.
    */
-  changeEditOptions(topicId: string): void {
+  changeEditOptions (topicId: string): void {
     this.selectedIndex = this.selectedIndex ? null : topicId;
   }
 
@@ -91,7 +91,7 @@ export class TopicsListComponent {
     * of the topic taking into consideration the current page
     * number and the items being displayed per page.
     */
-  getSerialNumberForTopic(topicIndex: number): number {
+  getSerialNumberForTopic (topicIndex: number): number {
     let topicSerialNumber: number = (
       topicIndex + (this.pageNumber * this.itemsPerPage));
     return (topicSerialNumber + 1);
@@ -101,7 +101,7 @@ export class TopicsListComponent {
    * @param {String} topicId - ID of the topic.
    * @param {String} topicName - Name of the topic.
    */
-  deleteTopic(topicId: string, topicName: string): void {
+  deleteTopic (topicId: string, topicName: string): void {
     this.selectedIndex = null;
     let modalRef: NgbModalRef = this.ngbModal.open(DeleteTopicModalComponent, {
       backdrop: true,
@@ -122,7 +122,7 @@ export class TopicsListComponent {
     }, () => {});
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

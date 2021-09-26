@@ -32,7 +32,7 @@ import {
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputRulesService {
-  MatchesExactlyWith(
+  MatchesExactlyWith (
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
@@ -47,7 +47,7 @@ export class AlgebraicExpressionInputRulesService {
     ).eq(nerdamer(inputs.x).text()) as unknown as boolean;
   }
 
-  IsEquivalentTo(
+  IsEquivalentTo (
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
@@ -70,7 +70,7 @@ export class AlgebraicExpressionInputRulesService {
     ).eq(simplifiedCreatorAnswer) as unknown as boolean;
   }
 
-  ContainsSomeOf(
+  ContainsSomeOf (
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     // At least one term should match between answer and input.
@@ -93,7 +93,7 @@ export class AlgebraicExpressionInputRulesService {
     return false;
   }
 
-  OmitsSomeOf(
+  OmitsSomeOf (
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     // There must be at least one term in the input that is not present in the
@@ -122,7 +122,7 @@ export class AlgebraicExpressionInputRulesService {
     return false;
   }
 
-  MatchesWithGeneralForm(
+  MatchesWithGeneralForm (
       answer: AlgebraicExpressionAnswer,
       inputs: AlgebraicExpressionRuleInputsWithPlaceholder): boolean {
     let mis = new MathInteractionsService();

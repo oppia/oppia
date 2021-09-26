@@ -62,11 +62,11 @@ export class SearchService {
     new EventEmitter<ExplorationSummaryDict[]>();
   public numSearchesInProgress = 0;
 
-  constructor(
+  constructor (
     private _searchBackendApiService: SearchBackendApiService) {
   }
 
-  private _getSuffixForQuery(
+  private _getSuffixForQuery (
       selectedCategories: SelectionList,
       selectedLanguageCodes: SelectionList): string {
     let querySuffix = '';
@@ -100,11 +100,11 @@ export class SearchService {
     return querySuffix;
   }
 
-  hasReachedEndOfPage(): boolean {
+  hasReachedEndOfPage (): boolean {
     return this._searchCursor === null;
   }
 
-  updateSearchFields(
+  updateSearchFields (
       itemsType: string, urlComponent: string,
       selectionDetails: SelectionDetails
   ): void {
@@ -133,11 +133,11 @@ export class SearchService {
     }
   }
 
-  getQueryUrl(searchUrlQueryString: string): string {
+  getQueryUrl (searchUrlQueryString: string): string {
     return '?q=' + searchUrlQueryString;
   }
 
-  getSearchUrlQueryString(
+  getSearchUrlQueryString (
       searchQuery: string,
       selectedCategories: SelectionList,
       selectedLanguageCodes: SelectionList): string {
@@ -147,7 +147,7 @@ export class SearchService {
 
 
   // Note that an empty query results in all activities being shown.
-  executeSearchQuery(
+  executeSearchQuery (
       searchQuery: string,
       selectedCategories: SelectionList,
       selectedLanguageCodes: SelectionList,
@@ -183,7 +183,7 @@ export class SearchService {
     }
   }
 
-  isSearchInProgress(): boolean {
+  isSearchInProgress (): boolean {
     return this.numSearchesInProgress > 0;
   }
 
@@ -193,7 +193,7 @@ export class SearchService {
    * fields that were extracted from the url.
    * @returns the unencoded search query string.
   */
-  updateSearchFieldsBasedOnUrlQuery(
+  updateSearchFieldsBasedOnUrlQuery (
       urlComponent: string, selectionDetails: SelectionDetails): string {
     const urlQuery = urlComponent.substring('?q='.length);
     // The following will split the urlQuery into 3 components:
@@ -224,7 +224,7 @@ export class SearchService {
     return decodeURIComponent(querySegments[0]);
   }
 
-  getCurrentUrlQueryString(): string {
+  getCurrentUrlQueryString (): string {
     return this.getSearchUrlQueryString(
       this._lastQuery,
       this._lastSelectedCategories,
@@ -234,7 +234,7 @@ export class SearchService {
 
   // Here failure callback is optional so that it gets invoked
   // only when the end of page has reached and return void otherwise.
-  loadMoreData(
+  loadMoreData (
       successCallback: (
         SearchResponseData: SearchResponseBackendDict,
         boolean: boolean
@@ -268,11 +268,11 @@ export class SearchService {
       });
   }
 
-  get onSearchBarLoaded(): EventEmitter<string> {
+  get onSearchBarLoaded (): EventEmitter<string> {
     return this._searchBarLoadedEventEmitter;
   }
 
-  get onInitialSearchResultsLoaded():
+  get onInitialSearchResultsLoaded ():
     EventEmitter<ExplorationSummaryDict[]> {
     return this._initialSearchResultsLoadedEventEmitter;
   }

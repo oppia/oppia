@@ -59,7 +59,7 @@ export class TopicViewerPageComponent implements OnInit {
   skillDescriptions: SkillIdToDescriptionMap = {};
   practiceTabIsDisplayed: boolean = false;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
@@ -69,7 +69,7 @@ export class TopicViewerPageComponent implements OnInit {
     private windowDimensionsService: WindowDimensionsService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.urlService.getPathname().endsWith('revision')) {
       this.setActiveTab('subtopics');
     } else if (this.urlService.getPathname().endsWith('practice')) {
@@ -117,15 +117,15 @@ export class TopicViewerPageComponent implements OnInit {
     );
   }
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return this.windowDimensionsService.getWidth() < 500;
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setActiveTab(newActiveTabName: string): void {
+  setActiveTab (newActiveTabName: string): void {
     this.activeTab = newActiveTabName;
   }
 }

@@ -35,14 +35,14 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   topicUrlFragment: string;
   classroomUrlFragment: string;
   storyUrlFragment: string;
-  constructor(
+  constructor (
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
 
   directiveSubscriptions = new Subscription();
-  getTopicUrl(): string {
+  getTopicUrl (): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
         topic_url_fragment: this.topicUrlFragment,
@@ -51,7 +51,7 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment =
@@ -67,7 +67,7 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
         this.storyTitle = storyDataObject.title;
       });
   }
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

@@ -41,30 +41,30 @@ angular.module('oppia').component('reviewMaterialEditor', {
   controllerAs: '$ctrl',
   controller: [
     'COMPONENT_NAME_EXPLANATION',
-    function(
+    function (
         COMPONENT_NAME_EXPLANATION) {
       var ctrl = this;
       var explanationMemento = null;
 
-      ctrl.openConceptCardExplanationEditor = function() {
+      ctrl.openConceptCardExplanationEditor = function () {
         ctrl.editableExplanation =
           ctrl.getBindableDict().displayedConceptCardExplanation;
         explanationMemento = ctrl.editableExplanation;
         ctrl.conceptCardExplanationEditorIsShown = true;
       };
 
-      ctrl.closeConceptCardExplanationEditor = function() {
+      ctrl.closeConceptCardExplanationEditor = function () {
         ctrl.editableExplanation = explanationMemento;
         ctrl.conceptCardExplanationEditorIsShown = false;
       };
 
-      ctrl.saveConceptCardExplanation = function() {
+      ctrl.saveConceptCardExplanation = function () {
         ctrl.conceptCardExplanationEditorIsShown = false;
         var explanationObject = SubtitledHtml.createDefault(
           ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
         ctrl.onSaveExplanation(explanationObject);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.HTML_SCHEMA = {
           type: 'html'
         };

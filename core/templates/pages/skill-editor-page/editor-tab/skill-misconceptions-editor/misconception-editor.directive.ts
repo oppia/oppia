@@ -21,7 +21,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('misconceptionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       retrict: 'E',
       scope: {
@@ -35,7 +35,7 @@ angular.module('oppia').directive('misconceptionEditor', [
       controller: [
         '$scope', 'SkillEditorStateService', 'SkillUpdateService',
         'MAX_CHARS_IN_MISCONCEPTION_NAME',
-        function(
+        function (
             $scope, SkillEditorStateService, SkillUpdateService,
             MAX_CHARS_IN_MISCONCEPTION_NAME) {
           var ctrl = this;
@@ -43,7 +43,7 @@ angular.module('oppia').directive('misconceptionEditor', [
           var notesMemento = null;
           var feedbackMemento = null;
 
-          $scope.openNameEditor = function() {
+          $scope.openNameEditor = function () {
             if ($scope.isEditable()) {
               nameMemento = angular.copy(
                 $scope.container.misconceptionName);
@@ -51,7 +51,7 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
-          $scope.openNotesEditor = function() {
+          $scope.openNotesEditor = function () {
             if ($scope.isEditable()) {
               notesMemento = angular.copy(
                 $scope.container.misconceptionNotes);
@@ -59,7 +59,7 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
-          $scope.openFeedbackEditor = function() {
+          $scope.openFeedbackEditor = function () {
             if ($scope.isEditable()) {
               feedbackMemento = angular.copy(
                 $scope.container.misconceptionFeedback);
@@ -67,7 +67,7 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
-          $scope.saveName = function() {
+          $scope.saveName = function () {
             $scope.nameEditorIsOpen = false;
             var nameHasChanged = (
               nameMemento !==
@@ -83,7 +83,7 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
-          $scope.saveNotes = function() {
+          $scope.saveNotes = function () {
             $scope.notesEditorIsOpen = false;
             var notesHasChanged = (
               notesMemento !==
@@ -99,7 +99,7 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
-          $scope.updateMustBeAddressed = function() {
+          $scope.updateMustBeAddressed = function () {
             SkillUpdateService.updateMisconceptionMustBeAddressed(
               $scope.skill,
               $scope.misconception.getId(),
@@ -107,7 +107,7 @@ angular.module('oppia').directive('misconceptionEditor', [
               $scope.container.misconceptionMustBeAddressed);
           };
 
-          $scope.saveFeedback = function() {
+          $scope.saveFeedback = function () {
             $scope.feedbackEditorIsOpen = false;
             var feedbackHasChanged = (
               feedbackMemento !==
@@ -123,25 +123,25 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
-          $scope.cancelEditName = function() {
+          $scope.cancelEditName = function () {
             $scope.container.misconceptionName = nameMemento;
             nameMemento = null;
             $scope.nameEditorIsOpen = false;
           };
 
-          $scope.cancelEditNotes = function() {
+          $scope.cancelEditNotes = function () {
             $scope.container.misconceptionNotes = notesMemento;
             notesMemento = null;
             $scope.notesEditorIsOpen = false;
           };
 
-          $scope.cancelEditFeedback = function() {
+          $scope.cancelEditFeedback = function () {
             $scope.container.misconceptionFeedback = feedbackMemento;
             feedbackMemento = null;
             $scope.feedbackEditorIsOpen = false;
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.MAX_CHARS_IN_MISCONCEPTION_NAME = (
               MAX_CHARS_IN_MISCONCEPTION_NAME);

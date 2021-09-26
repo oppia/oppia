@@ -21,19 +21,19 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Collection Editor Save Modal Controller', function() {
+describe('Collection Editor Save Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
 
   var isPrivate = true;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -48,7 +48,7 @@ describe('Collection Editor Save Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.isCollectionPrivate).toBe(isPrivate);
     });
 });

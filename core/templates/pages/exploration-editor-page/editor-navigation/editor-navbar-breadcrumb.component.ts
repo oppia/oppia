@@ -32,13 +32,13 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
     '$rootScope', '$scope', 'ExplorationPropertyService',
     'ExplorationTitleService', 'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-    function(
+    function (
         $rootScope, $scope, ExplorationPropertyService,
         ExplorationTitleService, FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.editTitle = function() {
+      $scope.editTitle = function () {
         RouterService.navigateToSettingsTab();
         FocusManagerService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
       };
@@ -54,7 +54,7 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
         feedback: 'Feedback',
       };
 
-      $scope.getCurrentTabName = function() {
+      $scope.getCurrentTabName = function () {
         if (!RouterService.getActiveTabName()) {
           return '';
         } else {
@@ -62,7 +62,7 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
             RouterService.getActiveTabName()];
         }
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.navbarTitle = null;
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
@@ -81,7 +81,7 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
           )
         );
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

@@ -67,7 +67,7 @@ angular.module('oppia').component('questionOpportunities', {
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
     'QuestionUndoRedoService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'MAX_QUESTIONS_PER_SKILL',
-    function(
+    function (
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
         QuestionUndoRedoService, SiteAnalyticsService,
@@ -76,7 +76,7 @@ angular.module('oppia').component('questionOpportunities', {
       let userIsLoggedIn = false;
       let allOpportunities = [];
 
-      var getPresentableOpportunitiesData = function({opportunities, more}) {
+      var getPresentableOpportunitiesData = function ({opportunities, more}) {
         let opportunitiesDicts = [];
         for (let index in opportunities) {
           const opportunity = opportunities[index];
@@ -98,7 +98,7 @@ angular.module('oppia').component('questionOpportunities', {
         return {opportunitiesDicts, more};
       };
 
-      ctrl.createQuestion = function(skill, skillDifficulty) {
+      ctrl.createQuestion = function (skill, skillDifficulty) {
         const skillId = skill.getId();
         const question =
           QuestionObjectFactory.createDefaultQuestion([skillId]);
@@ -121,7 +121,7 @@ angular.module('oppia').component('questionOpportunities', {
             skillDifficulty: () => skillDifficulty
           },
           controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function () {}, function () {
           ContextService.resetImageSaveDestination();
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -130,8 +130,8 @@ angular.module('oppia').component('questionOpportunities', {
         });
       };
 
-      ctrl.$onInit = function() {
-        UserService.getUserInfoAsync().then(function(userInfo) {
+      ctrl.$onInit = function () {
+        UserService.getUserInfoAsync().then(function (userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
@@ -139,17 +139,17 @@ angular.module('oppia').component('questionOpportunities', {
         });
       };
 
-      ctrl.loadMoreOpportunities = function() {
+      ctrl.loadMoreOpportunities = function () {
         return ContributionOpportunitiesService.getMoreSkillOpportunitiesAsync()
           .then(getPresentableOpportunitiesData);
       };
 
-      ctrl.loadOpportunities = function() {
+      ctrl.loadOpportunities = function () {
         return ContributionOpportunitiesService.getSkillOpportunitiesAsync()
           .then(getPresentableOpportunitiesData);
       };
 
-      ctrl.onClickSuggestQuestionButton = function(skillId) {
+      ctrl.onClickSuggestQuestionButton = function (skillId) {
         if (!userIsLoggedIn) {
           ContributionOpportunitiesService.showRequiresLoginModal();
           return;
@@ -168,11 +168,11 @@ angular.module('oppia').component('questionOpportunities', {
           },
           controller: (
             'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-        }).result.then(function(result) {
+        }).result.then(function (result) {
           if (AlertsService.warnings.length === 0) {
             ctrl.createQuestion(result.skill, result.skillDifficulty);
           }
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

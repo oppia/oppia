@@ -20,7 +20,7 @@ export class AudioFile {
   filename: string;
   data: Blob;
 
-  constructor(filename: string, data: Blob) {
+  constructor (filename: string, data: Blob) {
     this.filename = filename;
     this.data = data;
   }

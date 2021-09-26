@@ -27,14 +27,14 @@ import { ContextService } from 'services/context.service';
   styleUrls: []
 })
 export class KeyboardShortcutHelpModalComponent implements OnInit {
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
     private urlService: UrlService,
     private contextService: ContextService) {}
 
   KEYBOARD_SHORTCUTS = {};
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const helpShortcutDescription = 'Show this help dialog';
     const searchShortcutDescription = 'Search';
     const skipShortcutDescription = 'Select skip to main content button';
@@ -59,7 +59,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     }
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 }

@@ -36,7 +36,7 @@ var roleEditorContainer = '.protractor-test-roles-editor-card-container';
 var addNewRoleButton = '.protractor-test-add-new-role-button';
 var roleSelect = '.protractor-test-new-role-selector';
 
-module.exports = async(browser, context) => {
+module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
@@ -56,7 +56,7 @@ module.exports = async(browser, context) => {
 };
 
 // Needed to relogin after lighthouse_setup.js.
-const login = async function(context, page) {
+const login = async function (context, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(LOGIN_URL, {waitUntil: networkIdle});
@@ -84,7 +84,7 @@ const login = async function(context, page) {
   }
 };
 
-const setRole = async function(page, role) {
+const setRole = async function (page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -110,7 +110,7 @@ const setRole = async function(page, role) {
   }
 };
 
-const createCollections = async function(context, page) {
+const createCollections = async function (context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
@@ -129,7 +129,7 @@ const createCollections = async function(context, page) {
   }
 };
 
-const createExplorations = async function(context, page) {
+const createExplorations = async function (context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Exploration...');

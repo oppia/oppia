@@ -39,7 +39,7 @@ describe('About Page', () => {
   let component: AboutPageComponent;
   let siteAnalyticsService: SiteAnalyticsService;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [

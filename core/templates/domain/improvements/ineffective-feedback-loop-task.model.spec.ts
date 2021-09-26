@@ -19,7 +19,7 @@
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/ineffective-feedback-loop-task.model';
 
-describe('Ineffective feedback loop task model', function() {
+describe('Ineffective feedback loop task model', function () {
   it('should return new task if there are playthroughs demonstrating cyclic ' +
     'state transitions', () => {
     const task = IneffectiveFeedbackLoopTask.createNew(

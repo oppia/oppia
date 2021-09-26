@@ -19,7 +19,7 @@
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
-var customizeComponent = async function(modal, heading, contentInstructions) {
+var customizeComponent = async function (modal, heading, contentInstructions) {
   await forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(heading);
@@ -29,7 +29,7 @@ var customizeComponent = async function(modal, heading, contentInstructions) {
   await contentInstructions(richTextEditor);
 };
 
-var expectComponentDetailsToMatch = async function(
+var expectComponentDetailsToMatch = async function (
     elem, heading, contentInstructions) {
   var headerElement = elem.element(by.css(
     '.protractor-test-collapsible-heading'));

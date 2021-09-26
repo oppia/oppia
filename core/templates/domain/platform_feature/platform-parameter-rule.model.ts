@@ -42,14 +42,14 @@ export class PlatformParameterRule {
   filters: PlatformParameterFilter[];
   valueWhenMatched: PlatformParameterValue;
 
-  constructor(
+  constructor (
       filters: PlatformParameterFilter[],
       valueWhenMatched: PlatformParameterValue) {
     this.filters = filters;
     this.valueWhenMatched = valueWhenMatched;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: PlatformParameterRuleBackendDict): PlatformParameterRule {
     return new PlatformParameterRule(
       backendDict.filters.map(
@@ -66,7 +66,7 @@ export class PlatformParameterRule {
    * @returns {PlatformParameterRuleBackendDict} - The dict representation
    * of the instance.
    */
-  toBackendDict(): PlatformParameterRuleBackendDict {
+  toBackendDict (): PlatformParameterRuleBackendDict {
     return {
       filters: this.filters.map(filter => filter.toBackendDict()),
       value_when_matched: this.valueWhenMatched
@@ -78,7 +78,7 @@ export class PlatformParameterRule {
    *
    * @returns {boolean} - True if there's any filter of server_mode type.
    */
-  hasServerModeFilter(): boolean {
+  hasServerModeFilter (): boolean {
     return this.filters.some(
       filter => filter.type === PlatformParameterFilterType.ServerMode);
   }

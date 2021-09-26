@@ -84,7 +84,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
-    function(
+    function (
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
@@ -106,7 +106,7 @@ angular.module('oppia').component('explorationEditorTab', {
       $templateCache.put(
         'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
-      ctrl.getStateContentPlaceholder = function() {
+      ctrl.getStateContentPlaceholder = function () {
         if (
           StateEditorService.getActiveStateName() ===
           ExplorationInitStateNameService.savedMemento) {
@@ -119,19 +119,19 @@ angular.module('oppia').component('explorationEditorTab', {
             'You can speak to the learner here, then ask them a question.');
         }
       };
-      ctrl.getStateContentSaveButtonPlaceholder = function() {
+      ctrl.getStateContentSaveButtonPlaceholder = function () {
         return 'Save Content';
       };
 
-      ctrl.addState = function(newStateName) {
+      ctrl.addState = function (newStateName) {
         ExplorationStatesService.addState(newStateName, null);
       };
 
-      ctrl.refreshWarnings = function() {
+      ctrl.refreshWarnings = function () {
         ExplorationWarningsService.updateWarnings();
       };
 
-      ctrl.initStateEditor = function() {
+      ctrl.initStateEditor = function () {
         ctrl.stateName = StateEditorService.getActiveStateName();
         StateEditorService.setStateNames(
           ExplorationStatesService.getStateNames());
@@ -148,10 +148,10 @@ angular.module('oppia').component('explorationEditorTab', {
           //    components of the state editor.
           // 2. state-interaction-editor directive can initialise the
           //    child components of the interaction editor.
-          $scope.$watch(function() {
+          $scope.$watch(function () {
             return (
               StateEditorService.checkEventListenerRegistrationStatus());
-          }, function() {
+          }, function () {
             if (
               StateEditorService.checkEventListenerRegistrationStatus() &&
             ExplorationStatesService.isInitialized()) {
@@ -177,7 +177,7 @@ angular.module('oppia').component('explorationEditorTab', {
         }
       };
 
-      ctrl.windowOnload = function() {
+      ctrl.windowOnload = function () {
         ctrl.TabName = RouterService.getActiveTabName();
         if (ctrl.TabName === 'main') {
           FocusManagerService.setFocus('oppiaEditableSection');
@@ -190,11 +190,11 @@ angular.module('oppia').component('explorationEditorTab', {
         }
       };
 
-      ctrl.recomputeGraph = function() {
+      ctrl.recomputeGraph = function () {
         GraphDataService.recompute();
       };
 
-      ctrl.saveStateContent = function(displayedValue) {
+      ctrl.saveStateContent = function (displayedValue) {
         ExplorationStatesService.saveStateContent(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
@@ -203,21 +203,21 @@ angular.module('oppia').component('explorationEditorTab', {
         ctrl.interactionIsShown = true;
       };
 
-      ctrl.saveLinkedSkillId = function(displayedValue) {
+      ctrl.saveLinkedSkillId = function (displayedValue) {
         ExplorationStatesService.saveLinkedSkillId(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
         StateEditorService.setLinkedSkillId(angular.copy(displayedValue));
       };
 
-      ctrl.saveInteractionId = function(displayedValue) {
+      ctrl.saveInteractionId = function (displayedValue) {
         ExplorationStatesService.saveInteractionId(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
         StateEditorService.setInteractionId(angular.copy(displayedValue));
       };
 
-      ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
+      ctrl.saveInteractionAnswerGroups = function (newAnswerGroups) {
         ExplorationStatesService.saveInteractionAnswerGroups(
           StateEditorService.getActiveStateName(),
           angular.copy(newAnswerGroups));
@@ -227,7 +227,7 @@ angular.module('oppia').component('explorationEditorTab', {
         ctrl.recomputeGraph();
       };
 
-      ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
+      ctrl.saveInteractionDefaultOutcome = function (newOutcome) {
         ExplorationStatesService.saveInteractionDefaultOutcome(
           StateEditorService.getActiveStateName(),
           angular.copy(newOutcome));
@@ -237,7 +237,7 @@ angular.module('oppia').component('explorationEditorTab', {
         ctrl.recomputeGraph();
       };
 
-      ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
+      ctrl.saveInteractionCustomizationArgs = function (displayedValue) {
         ExplorationStatesService.saveInteractionCustomizationArgs(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
@@ -246,13 +246,13 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
       };
 
-      ctrl.saveNextContentIdIndex = function(displayedValue) {
+      ctrl.saveNextContentIdIndex = function (displayedValue) {
         ExplorationStatesService.saveNextContentIdIndex(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
       };
 
-      ctrl.saveSolution = function(displayedValue) {
+      ctrl.saveSolution = function (displayedValue) {
         ExplorationStatesService.saveSolution(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
@@ -261,7 +261,7 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
       };
 
-      ctrl.saveHints = function(displayedValue) {
+      ctrl.saveHints = function (displayedValue) {
         ExplorationStatesService.saveHints(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
@@ -270,7 +270,7 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
       };
 
-      ctrl.saveSolicitAnswerDetails = function(displayedValue) {
+      ctrl.saveSolicitAnswerDetails = function (displayedValue) {
         ExplorationStatesService.saveSolicitAnswerDetails(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
@@ -279,7 +279,7 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
       };
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function (
           contentIds) {
         var stateName = StateEditorService.getActiveStateName();
         var state = ExplorationStatesService.getState(stateName);
@@ -297,7 +297,7 @@ angular.module('oppia').component('explorationEditorTab', {
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
+          }).result.then(function () {
             contentIds.forEach(contentId => {
               if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
                 recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
@@ -313,21 +313,21 @@ angular.module('oppia').component('explorationEditorTab', {
                   contentId, stateName);
               }
             });
-          }, function() {
+          }, function () {
             // This callback is triggered when the Cancel button is
             // clicked. No further action is needed.
           });
         }
       };
 
-      ctrl.navigateToState = function(stateName) {
+      ctrl.navigateToState = function (stateName) {
         RouterService.navigateToMainTab(stateName);
       };
-      ctrl.areParametersEnabled = function() {
+      ctrl.areParametersEnabled = function () {
         return ExplorationFeaturesService.areParametersEnabled();
       };
 
-      ctrl.onChangeCardIsCheckpoint = function() {
+      ctrl.onChangeCardIsCheckpoint = function () {
         var displayedValue = ctrl.stateCardIsCheckpointService.displayed;
         ExplorationStatesService.saveCardIsCheckpoint(
           StateEditorService.getActiveStateName(),
@@ -337,14 +337,14 @@ angular.module('oppia').component('explorationEditorTab', {
         StateCardIsCheckpointService.saveDisplayedValue();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           StateEditorRefreshService.onRefreshStateEditor.subscribe(() => {
             ctrl.initStateEditor();
           })
         );
 
-        $scope.$watch(ExplorationStatesService.getStates, function() {
+        $scope.$watch(ExplorationStatesService.getStates, function () {
           if (ExplorationStatesService.getStates()) {
             StateEditorService.setStateNames(
               ExplorationStatesService.getStateNames());
@@ -352,7 +352,7 @@ angular.module('oppia').component('explorationEditorTab', {
         }, true);
         ctrl.interactionIsShown = false;
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
 
@@ -380,7 +380,7 @@ angular.module('oppia').component('explorationEditorTab', {
           'student and a tutor.')
       }, {
         type: 'function',
-        fn: function(isGoingForward) {
+        fn: function (isGoingForward) {
           $('html, body').animate({
             scrollTop: (isGoingForward ? 0 : 20)
           }, 1000);
@@ -398,7 +398,7 @@ angular.module('oppia').component('explorationEditorTab', {
         placement: 'bottom'
       }, {
         type: 'function',
-        fn: function(isGoingForward) {
+        fn: function (isGoingForward) {
           var idToScrollTo = (
             isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
             _ID_TUTORIAL_STATE_CONTENT);
@@ -430,7 +430,7 @@ angular.module('oppia').component('explorationEditorTab', {
           'and more.')
       }, {
         type: 'function',
-        fn: function(isGoingForward) {
+        fn: function (isGoingForward) {
           var idToScrollTo = (
             isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
             _ID_TUTORIAL_STATE_INTERACTION);
@@ -448,7 +448,7 @@ angular.module('oppia').component('explorationEditorTab', {
           'have them repeat the same card, depending on how they answer.')
       }, {
         type: 'function',
-        fn: function(isGoingForward) {
+        fn: function (isGoingForward) {
           var idToScrollTo = (
             isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
             _ID_TUTORIAL_STATE_INTERACTION);
@@ -487,35 +487,35 @@ angular.module('oppia').component('explorationEditorTab', {
           '</ul>')
       }];
 
-      ctrl.leaveTutorial = function() {
+      ctrl.leaveTutorial = function () {
         EditabilityService.onEndTutorial();
         $scope.$apply();
         StateTutorialFirstTimeService.markEditorTutorialFinished();
         ctrl.tutorialInProgress = false;
       };
 
-      ctrl.onSkipTutorial = function() {
+      ctrl.onSkipTutorial = function () {
         SiteAnalyticsService.registerSkipTutorialEvent(
           ctrl.explorationId);
         ctrl.leaveTutorial();
       };
 
-      ctrl.onFinishTutorial = function() {
+      ctrl.onFinishTutorial = function () {
         SiteAnalyticsService.registerFinishTutorialEvent(
           ctrl.explorationId);
         ctrl.leaveTutorial();
       };
 
-      ctrl.startTutorial = function() {
+      ctrl.startTutorial = function () {
         ctrl.tutorialInProgress = true;
       };
 
       // Remove save from tutorial if user does not has edit rights for
       // exploration since in that case Save Draft button will not be
       // visible on the create page.
-      ctrl.removeTutorialSaveButtonIfNoPermissions = function() {
+      ctrl.removeTutorialSaveButtonIfNoPermissions = function () {
         UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
+          .then(function (permissions) {
             if (!permissions.canEdit) {
               var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
                 saveButtonTutorialElement);

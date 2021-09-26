@@ -19,7 +19,7 @@
 import { StateStats } from
   'domain/statistics/state-stats-model';
 
-describe('State-stats model', function() {
+describe('State-stats model', function () {
   it('should derive values from the backend dict', () => {
     const stateStats = StateStats.createFromBackendDict({
       total_answers_count: 1,

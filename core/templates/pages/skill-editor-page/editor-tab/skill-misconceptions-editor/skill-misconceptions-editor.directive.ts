@@ -39,7 +39,7 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
-  function(
+  function (
       SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -50,16 +50,16 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'NgbModal',
         'WindowDimensionsService',
-        function(
+        function (
             $rootScope, $scope, $uibModal, NgbModal,
             WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          $scope.isEditable = function() {
+          $scope.isEditable = function () {
             return true;
           };
 
-          $scope.changeActiveMisconceptionIndex = function(idx) {
+          $scope.changeActiveMisconceptionIndex = function (idx) {
             if (idx === $scope.activeMisconceptionIndex) {
               $scope.activeMisconceptionIndex = null;
             } else {
@@ -67,11 +67,11 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
             }
           };
 
-          $scope.getMisconceptionSummary = function(misconception) {
+          $scope.getMisconceptionSummary = function (misconception) {
             return misconception.getName();
           };
 
-          $scope.openDeleteMisconceptionModal = function(index, evt) {
+          $scope.openDeleteMisconceptionModal = function (index, evt) {
             let modalInstance: NgbModalRef = NgbModal.open(
               DeleteMisconceptionModalComponent, {
                 backdrop: 'static',
@@ -82,39 +82,39 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               $scope.misconceptions = $scope.skill.getMisconceptions();
               $scope.activeMisconceptionIndex = null;
               $rootScope.$apply();
-            }, function() {
+            }, function () {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          $scope.openAddMisconceptionModal = function() {
+          $scope.openAddMisconceptionModal = function () {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
                 'add-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: 'AddMisconceptionModalController'
-            }).result.then(function(result) {
+            }).result.then(function (result) {
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
               $scope.misconceptions = $scope.skill.getMisconceptions();
-            }, function() {
+            }, function () {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          $scope.toggleMisconceptionLists = function() {
+          $scope.toggleMisconceptionLists = function () {
             if (WindowDimensionsService.isWindowNarrow()) {
               $scope.misconceptionsListIsShown = (
                 !$scope.misconceptionsListIsShown);
             }
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptionsListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
@@ -125,7 +125,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
             );
           };
 
-          $scope.$on('$destroy', function() {
+          $scope.$on('$destroy', function () {
             ctrl.directiveSubscriptions.unsubscribe();
           });
         }]

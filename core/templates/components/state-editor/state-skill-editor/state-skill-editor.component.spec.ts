@@ -46,7 +46,7 @@ describe('State Skill Editor Component', () => {
   class MockNgbModal {
     modal: string;
     success: boolean = true;
-    open(content, options) {
+    open (content, options) {
       if (this.modal === 'add_skill') {
         return {
           componentInstance: {
@@ -109,7 +109,7 @@ describe('State Skill Editor Component', () => {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
-    fetchDashboardDataAsync() {
+    fetchDashboardDataAsync () {
       return {
         then: (callback: (resp) => void) => {
           callback(topicsAndSkillsDashboardData);

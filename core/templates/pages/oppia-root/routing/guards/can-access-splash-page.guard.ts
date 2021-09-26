@@ -25,12 +25,12 @@ import { UserService } from 'services/user.service';
   providedIn: 'root'
 })
 export class CanAccessSplashPageGuard implements CanLoad {
-  constructor(
+  constructor (
     private userService: UserService,
     private windowRef: WindowRef
   ) {}
 
-  canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
+  canLoad (route: Route, segments: UrlSegment[]): Promise<boolean> {
     return this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.isLoggedIn()) {
         this.userService.getUserPreferredDashboardAsync().then(

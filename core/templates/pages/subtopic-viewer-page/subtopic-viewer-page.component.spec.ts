@@ -31,7 +31,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Subtopic viewer page', function() {
+describe('Subtopic viewer page', function () {
   let component: SubtopicViewerPageComponent;
   let fixture: ComponentFixture<SubtopicViewerPageComponent>;
   let pageTitleService: PageTitleService;
@@ -164,7 +164,7 @@ describe('Subtopic viewer page', function() {
         'Failed to get subtopic data');
     }));
 
-  it('should check if the view is mobile or not', function() {
+  it('should check if the view is mobile or not', function () {
     let widthSpy = spyOn(windowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(400);
     expect(component.checkMobileView()).toBe(true);

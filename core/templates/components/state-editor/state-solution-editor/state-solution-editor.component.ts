@@ -85,7 +85,7 @@ angular.module('oppia').component('stateSolutionEditor', {
     'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
     'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
     'INTERACTION_SPECS',
-    function(
+    function (
         $filter, $scope, $uibModal, AlertsService, EditabilityService,
         ExplorationHtmlFormatterService, ExternalSaveService,
         SolutionValidityService, SolutionVerificationService,
@@ -97,7 +97,7 @@ angular.module('oppia').component('stateSolutionEditor', {
         INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
         INTERACTION_SPECS) {
       var ctrl = this;
-      $scope.getInvalidSolutionTooltip = function() {
+      $scope.getInvalidSolutionTooltip = function () {
         if (StateEditorService.isInQuestionMode()) {
           return 'This solution doesn\'t correspond to an answer ' +
             'marked as correct. Verify the rules specified for the ' +
@@ -107,16 +107,16 @@ angular.module('oppia').component('stateSolutionEditor', {
           'responses specified or change the solution.';
       };
 
-      $scope.isSolutionValid = function() {
+      $scope.isSolutionValid = function () {
         return StateEditorService.isCurrentSolutionValid();
       };
 
-      $scope.toggleInlineSolutionEditorIsActive = function() {
+      $scope.toggleInlineSolutionEditorIsActive = function () {
         $scope.inlineSolutionEditorIsActive = (
           !$scope.inlineSolutionEditorIsActive);
       };
 
-      $scope.getSolutionSummary = function() {
+      $scope.getSolutionSummary = function () {
         var solution = StateSolutionService.savedMemento;
         var solutionAsPlainText =
           solution.getSummary(StateInteractionIdService.savedMemento);
@@ -126,7 +126,7 @@ angular.module('oppia').component('stateSolutionEditor', {
       };
 
       // This returns false if the current interaction ID is null.
-      $scope.isCurrentInteractionLinear = function() {
+      $scope.isCurrentInteractionLinear = function () {
         return (
           StateInteractionIdService.savedMemento &&
           INTERACTION_SPECS[
@@ -134,7 +134,7 @@ angular.module('oppia').component('stateSolutionEditor', {
           ].is_linear);
       };
 
-      $scope.openAddOrUpdateSolutionModal = function() {
+      $scope.openAddOrUpdateSolutionModal = function () {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
         $scope.inlineSolutionEditorIsActive = false;
@@ -144,7 +144,7 @@ angular.module('oppia').component('stateSolutionEditor', {
             'modal-templates/add-or-update-solution-modal.template.html'),
           backdrop: 'static',
           controller: 'AddOrUpdateSolutionModalController'
-        }).result.then(function(result) {
+        }).result.then(function (result) {
           StateSolutionService.displayed = result.solution;
           StateSolutionService.saveDisplayedValue();
           ctrl.onSaveSolution(StateSolutionService.displayed);
@@ -166,12 +166,12 @@ angular.module('oppia').component('stateSolutionEditor', {
                 INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
             }
           }
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      $scope.deleteSolution = function(index, evt) {
+      $scope.deleteSolution = function (index, evt) {
         evt.stopPropagation();
 
         AlertsService.clearWarnings();
@@ -181,22 +181,22 @@ angular.module('oppia').component('stateSolutionEditor', {
             'modal-templates/delete-solution-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           StateSolutionService.displayed = null;
           StateSolutionService.saveDisplayedValue();
           ctrl.onSaveSolution(StateSolutionService.displayed);
           StateEditorService.deleteCurrentSolutionValidity();
           ctrl.refreshWarnings()();
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      $scope.toggleSolutionCard = function() {
+      $scope.toggleSolutionCard = function () {
         $scope.solutionCardIsShown = !$scope.solutionCardIsShown;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.EditabilityService = EditabilityService;
         $scope.solutionCardIsShown = (
           !WindowDimensionsService.isWindowNarrow());

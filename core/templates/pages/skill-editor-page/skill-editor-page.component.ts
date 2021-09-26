@@ -47,7 +47,7 @@ angular.module('oppia').component('skillEditorPage', {
     'SkillEditorRoutingService', 'SkillEditorStateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
-    function(
+    function (
         $rootScope, $uibModal, BottomNavbarStatusService,
         PreventPageUnloadEventService,
         SkillEditorRoutingService, SkillEditorStateService,
@@ -56,16 +56,16 @@ angular.module('oppia').component('skillEditorPage', {
       var ctrl = this;
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.getActiveTabName = function() {
+      ctrl.getActiveTabName = function () {
         return SkillEditorRoutingService.getActiveTabName();
       };
-      ctrl.selectMainTab = function() {
+      ctrl.selectMainTab = function () {
         SkillEditorRoutingService.navigateToMainTab();
       };
-      ctrl.selectPreviewTab = function() {
+      ctrl.selectPreviewTab = function () {
         SkillEditorRoutingService.navigateToPreviewTab();
       };
-      ctrl.selectQuestionsTab = function() {
+      ctrl.selectQuestionsTab = function () {
         // This check is needed because if a skill has unsaved changes to
         // misconceptions, then these will be reflected in the questions
         // created at that time, but if page is refreshed/changes are
@@ -78,7 +78,7 @@ angular.module('oppia').component('skillEditorPage', {
               'save-pending-changes-modal.directive.html'),
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(null, function() {
+          }).result.then(null, function () {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -87,11 +87,11 @@ angular.module('oppia').component('skillEditorPage', {
           SkillEditorRoutingService.navigateToQuestionsTab();
         }
       };
-      ctrl.getWarningsCount = function() {
+      ctrl.getWarningsCount = function () {
         return ctrl.skill ? ctrl.skill.getValidationIssues().length : 0;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         BottomNavbarStatusService.markBottomNavbarStatus(true);
         PreventPageUnloadEventService.addListener(
           UndoRedoService.getChangeCount.bind(UndoRedoService));

@@ -62,7 +62,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
 
-describe('Exploration editor page component', function() {
+describe('Exploration editor page component', function () {
   importAllAngularServices();
 
   var ctrl = null;
@@ -225,11 +225,11 @@ describe('Exploration editor page component', function() {
         {
           provide: ExplorationDataService,
           useValue: {
-            getDataAsync: function(callback) {
+            getDataAsync: function (callback) {
               callback();
               return $q.resolve(explorationData);
             },
-            autosaveChangeListAsync: function() {
+            autosaveChangeListAsync: function () {
               return;
             }
           }
@@ -247,7 +247,7 @@ describe('Exploration editor page component', function() {
     as = TestBed.inject(AlertsService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');

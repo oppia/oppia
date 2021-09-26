@@ -25,7 +25,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // ^^^ This block is to be removed.
 
-describe('Skill editor main tab directive', function() {
+describe('Skill editor main tab directive', function () {
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;
@@ -49,7 +49,7 @@ describe('Skill editor main tab directive', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
@@ -67,13 +67,13 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', function () {
     expect($scope.selectedTopic).toEqual(null);
     expect($scope.subtopicName).toEqual(null);
   });
 
   it('should navigate to questions tab when unsaved changes are not present',
-    function() {
+    function () {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
       var routingSpy = spyOn(
         SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
@@ -86,34 +86,34 @@ describe('Skill editor main tab directive', function() {
       expect(createQuestionEventSpyon).toHaveBeenCalled();
     });
 
-  it('should return if skill has been loaded', function() {
+  it('should return if skill has been loaded', function () {
     expect($scope.hasLoadedSkill()).toBe(false);
     spyOn(SkillEditorStateService, 'hasLoadedSkill').and.returnValue(true);
     expect($scope.hasLoadedSkill()).toBe(true);
   });
 
   it('should open save changes modal with $uibModal when unsaved changes are' +
-  ' present', function() {
+  ' present', function () {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
     $scope.createQuestion(),
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should return assigned Skill Topic Data', function() {
+  it('should return assigned Skill Topic Data', function () {
     expect($scope.assignedSkillTopicData).toEqual(null);
     expect($scope.getAssignedSkillTopicData()).toEqual(null);
     $scope.assignedSkillTopicData = assignedSkillTopicData;
     expect($scope.getAssignedSkillTopicData()).toEqual(assignedSkillTopicData);
   });
 
-  it('should return subtopic name', function() {
+  it('should return subtopic name', function () {
     expect($scope.subtopicName).toEqual(null);
     $scope.subtopicName = 'Subtopic1';
     expect($scope.getSubtopicName()).toEqual('Subtopic1');
   });
 
-  it('should change subtopic when selected topic is changed', function() {
+  it('should change subtopic when selected topic is changed', function () {
     $scope.assignedSkillTopicData = assignedSkillTopicData;
     $scope.changeSelectedTopic('topic1');
     expect($scope.getSubtopicName()).toEqual(assignedSkillTopicData.topic1);
@@ -121,13 +121,13 @@ describe('Skill editor main tab directive', function() {
     expect($scope.getSubtopicName()).toEqual(assignedSkillTopicData.topic2);
   });
 
-  it('should return whether the topic dropdown is enabled', function() {
+  it('should return whether the topic dropdown is enabled', function () {
     expect($scope.isTopicDropdownEnabled()).toEqual(false);
     $scope.assignedSkillTopicData = assignedSkillTopicData;
     expect($scope.isTopicDropdownEnabled()).toEqual(true);
   });
 
-  it('should set focus on create question button', function() {
+  it('should set focus on create question button', function () {
     var focusSpy = spyOn(focusManagerService, 'setFocus');
     ctrl.$onInit();
     $timeout.flush();

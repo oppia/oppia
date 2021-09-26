@@ -25,7 +25,7 @@ import { ClassroomBackendApiService } from
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 
-describe('Classroom backend API service', function() {
+describe('Classroom backend API service', function () {
   let classroomBackendApiService: ClassroomBackendApiService;
   let httpTestingController: HttpTestingController;
   let firstTopicSummaryDict: CreatorTopicSummaryBackendDict = {

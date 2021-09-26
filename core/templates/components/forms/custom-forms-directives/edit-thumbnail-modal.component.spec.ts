@@ -25,17 +25,17 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string): string {
+  transform (value: string): string {
     return value;
   }
 }
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 
-  close(): void {
+  close (): void {
     return;
   }
 }
@@ -50,12 +50,12 @@ describe('Edit Thumbnail Modal Component', () => {
   class MockReaderObject {
     result = null;
     onload: () => string;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file: File) {
+    readAsDataURL (file: File) {
       this.onload();
       return 'The file is loaded';
     }
@@ -64,12 +64,12 @@ describe('Edit Thumbnail Modal Component', () => {
   class MockImageObject {
     source = null;
     onload: () => string;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url: string) {
+    set src (url: string) {
       this.onload();
     }
   }

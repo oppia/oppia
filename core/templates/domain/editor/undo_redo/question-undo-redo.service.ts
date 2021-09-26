@@ -20,7 +20,7 @@
 import { BaseUndoRedo } from './base-undo-redo.service';
 
 angular.module('oppia').factory('QuestionUndoRedoService', [
-  function() {
+  function () {
     var child = new BaseUndoRedo();
     child.init();
     return child;

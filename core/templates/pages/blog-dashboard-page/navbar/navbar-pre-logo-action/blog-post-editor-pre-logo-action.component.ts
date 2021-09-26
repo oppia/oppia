@@ -30,11 +30,11 @@ export class BlogPostEditorNavbarPreLogoActionComponent
 implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   activeTab: string;
-  constructor(
+  constructor (
     private blogDashboardPageService: BlogDashboardPageService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.activeTab = this.blogDashboardPageService.activeTab;
     this.directiveSubscriptions.add(
       this.blogDashboardPageService.updateViewEventEmitter.subscribe(
@@ -45,7 +45,7 @@ implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     return this.directiveSubscriptions.unsubscribe();
   }
 }

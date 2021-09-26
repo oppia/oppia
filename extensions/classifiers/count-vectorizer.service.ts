@@ -34,7 +34,7 @@ interface Vocabulary {
   providedIn: 'root'
 })
 export class CountVectorizerService {
-  vectorize(tokens: string[] | null, vocabulary: Vocabulary): number[] {
+  vectorize (tokens: string[] | null, vocabulary: Vocabulary): number[] {
     var vectorLength = Object.keys(vocabulary).length;
     var vector: number[] = [];
     for (var i = 0; i < vectorLength; i++) {
@@ -45,7 +45,7 @@ export class CountVectorizerService {
       return vector;
     }
 
-    tokens.forEach(function(token) {
+    tokens.forEach(function (token) {
       if (vocabulary.hasOwnProperty(token)) {
         vector[vocabulary[token]] += 1;
       }

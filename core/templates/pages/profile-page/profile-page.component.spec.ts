@@ -116,21 +116,21 @@ describe('Profile page', () => {
   }
 
   class MockProfilePageBackendApiService {
-    fetchProfileDataAsync(): Promise<Object> {
+    fetchProfileDataAsync (): Promise<Object> {
       return Promise.resolve(profileData);
     }
 
-    subscribeAsync(username: string): Promise<void> {
+    subscribeAsync (username: string): Promise<void> {
       return Promise.resolve();
     }
 
-    unsubscribeAsync(username: string): Promise<void> {
+    unsubscribeAsync (username: string): Promise<void> {
       return Promise.resolve();
     }
   }
 
   class MockUrlService {
-    getUserFromProfileUrl(): string {
+    getUserFromProfileUrl (): string {
       return 'username1';
     }
   }

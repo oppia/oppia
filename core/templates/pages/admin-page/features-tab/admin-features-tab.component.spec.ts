@@ -44,10 +44,10 @@ let dummyFeatureStatus = false;
 const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
 
 class MockPlatformFeatureService {
-  get status() {
+  get status () {
     return {
       DummyFeature: {
-        get isEnabled() {
+        get isEnabled () {
           return dummyFeatureStatus;
         }
       }
@@ -55,7 +55,7 @@ class MockPlatformFeatureService {
   }
 }
 
-describe('Admin page feature tab', function() {
+describe('Admin page feature tab', function () {
   let component: AdminFeaturesTabComponent;
   let fixture: ComponentFixture<AdminFeaturesTabComponent>;
   let adminDataService: AdminDataService;

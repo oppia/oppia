@@ -31,24 +31,24 @@ import {
   providedIn: 'root'
 })
 export class RatioExpressionInputRulesService {
-  Equals(
+  Equals (
       answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs): boolean {
     return Ratio.arrayEquals(answer, inputs.x);
   }
 
-  HasNumberOfTermsEqualTo(
+  HasNumberOfTermsEqualTo (
       answer: RatioInputAnswer,
       inputs: RatioInputHasNumberOfTermsEqualToRuleInputs): boolean {
     return answer.length === inputs.y;
   }
 
-  HasSpecificTermEqualTo(
+  HasSpecificTermEqualTo (
       answer: RatioInputAnswer,
       inputs: RatioInputHasSpecificTermEqualToRuleInputs): boolean {
     return answer[inputs.x - 1] === inputs.y;
   }
 
-  IsEquivalent(
+  IsEquivalent (
       answer: RatioInputAnswer,
       inputs: RatioInputEqualRuleInputs): boolean {
     var simplifiedInput = Ratio.fromList(

@@ -22,7 +22,7 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Multiple Incorrect Issue Component', function() {
+describe('Multiple Incorrect Issue Component', function () {
   var ctrl = null;
   var $scope = null;
   var alertsService = null;
@@ -34,12 +34,12 @@ describe('Multiple Incorrect Issue Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(function() {
+  beforeEach(function () {
     alertsService = TestBed.get(AlertsService);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     playthroughIssuesService = $injector.get('PlaythroughIssuesService');
     var $rootScope = $injector.get('$rootScope');
 
@@ -71,7 +71,7 @@ describe('Multiple Incorrect Issue Component', function() {
   }));
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect(true).toBe(true);
       expect($scope.currentIssueIdentifier).toBe(2);
       expect($scope.issueStatement).toBe(
@@ -86,20 +86,20 @@ describe('Multiple Incorrect Issue Component', function() {
       expect($scope.playthroughIds).toEqual(['1', '2', '3']);
     });
 
-  it('should open playthrough modal with specific playthrough id', function() {
+  it('should open playthrough modal with specific playthrough id', function () {
     spyOn(playthroughIssuesService, 'openPlaythroughModal');
     $scope.showPlaythrough('2');
     expect(playthroughIssuesService.openPlaythroughModal)
       .toHaveBeenCalledWith('2', 1);
   });
 
-  it('should create playthorugh nav id based on playthrough id', function() {
+  it('should create playthorugh nav id based on playthrough id', function () {
     expect($scope.createPlaythroughNavId('1')).toBe(1);
     expect($scope.createPlaythroughNavId('2')).toBe(2);
     expect($scope.createPlaythroughNavId('3')).toBe(3);
   });
 
-  it('should resolve issue if it\'s not resolved yet', function() {
+  it('should resolve issue if it\'s not resolved yet', function () {
     spyOn(playthroughIssuesService, 'resolveIssue').and.callFake(() => {});
     spyOn(alertsService, 'addSuccessMessage');
     $scope.resolveIssue();
@@ -109,7 +109,7 @@ describe('Multiple Incorrect Issue Component', function() {
       'Issue resolved. Refresh the page to view changes.');
   });
 
-  it('should not resolve issue if it\'s already resolved', function() {
+  it('should not resolve issue if it\'s already resolved', function () {
     // Resolve issue.
     $scope.resolveIssue();
 

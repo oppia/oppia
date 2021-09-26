@@ -40,7 +40,7 @@ import { ReadOnlyExplorationBackendApiService } from
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('State Translation Editor Component', function() {
+describe('State Translation Editor Component', function () {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -134,7 +134,7 @@ describe('State Translation Editor Component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     stateEditorService = TestBed.get(StateEditorService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
     stateWrittenTranslationsService = TestBed.get(
@@ -143,7 +143,7 @@ describe('State Translation Editor Component', function() {
       WrittenTranslationObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
@@ -159,8 +159,8 @@ describe('State Translation Editor Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  describe('when has written translation', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when has written translation', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -215,7 +215,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
@@ -227,7 +227,7 @@ describe('State Translation Editor Component', function() {
 
     it('should not update state\'s recorded voiceovers after broadcasting' +
       ' externalSave when written translation doesn\'t need udpdate',
-    function() {
+    function () {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       stateWrittenTranslationsService.displayed = {
@@ -252,7 +252,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should update state\'s recorded voiceovers after broadcasting' +
-      ' externalSave event when closing modal', function() {
+      ' externalSave event when closing modal', function () {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       stateWrittenTranslationsService.displayed = {
@@ -286,7 +286,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should update state\'s recorded voiceovers after broadcasting' +
-    ' externalSave event when dismissing modal', function() {
+    ' externalSave event when dismissing modal', function () {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       stateWrittenTranslationsService.displayed = {
@@ -320,7 +320,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should update written translation html when clicking on save' +
-      ' translation button', function() {
+      ' translation button', function () {
       spyOn(
         stateWrittenTranslationsService.displayed,
         'updateWrittenTranslation').and.callThrough();
@@ -331,7 +331,7 @@ describe('State Translation Editor Component', function() {
         .toHaveBeenCalled();
     });
 
-    it('should cancel edit and restore values', function() {
+    it('should cancel edit and restore values', function () {
       stateWrittenTranslationsService.displayed = {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
@@ -351,7 +351,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should init editor when changing active content id language',
-      function() {
+      function () {
         mockActiveContentIdChangedEventEmitter.emit('html');
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
@@ -362,7 +362,7 @@ describe('State Translation Editor Component', function() {
           }));
       });
 
-    it('should init editor when changing active language', function() {
+    it('should init editor when changing active language', function () {
       mockActiveLanguageChangedEventEmitter.emit();
       expect($scope.translationEditorIsOpen).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual(
@@ -374,8 +374,8 @@ describe('State Translation Editor Component', function() {
     });
   });
 
-  describe('when hasn\'t written translation', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when hasn\'t written translation', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -424,12 +424,12 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toBe(null);
       });
 
-    it('should open translation editor when it is editable', function() {
+    it('should open translation editor when it is editable', function () {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
@@ -437,7 +437,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should open translation editor when it is editable and with a ' +
-       'Translatable object as data format', function() {
+       'Translatable object as data format', function () {
       $scope.dataFormat = 'set_of_unicode_string';
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
@@ -445,7 +445,7 @@ describe('State Translation Editor Component', function() {
         writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
     });
 
-    it('should mark translation as needing update', function() {
+    it('should mark translation as needing update', function () {
       spyOn(
         explorationStatesService, 'markWrittenTranslationAsNeedingUpdate');
       $scope.activeWrittenTranslation = (
@@ -461,7 +461,7 @@ describe('State Translation Editor Component', function() {
     });
 
     it('should add written translation html when clicking on save' +
-      ' translation button', function() {
+      ' translation button', function () {
       $scope.openTranslationEditor();
       spyOn(
         stateWrittenTranslationsService.displayed,

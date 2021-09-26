@@ -36,7 +36,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
   providedIn: 'root',
 })
 export class SkillUpdateService {
-  constructor(private undoRedoService: UndoRedoService) {}
+  constructor (private undoRedoService: UndoRedoService) {}
 
   private _applyChange = (
       skill,
@@ -144,7 +144,7 @@ export class SkillUpdateService {
       changeDict: BackendChangeObject
   ) => this._getParameterFromChangeDict(changeDict, 'new_value');
 
-  setSkillDescription(skill: Skill, newDescription: string): void {
+  setSkillDescription (skill: Skill, newDescription: string): void {
     let oldDescription = cloneDeep(skill.getDescription());
     this._applyPropertyChange(
       skill,
@@ -161,7 +161,7 @@ export class SkillUpdateService {
     );
   }
 
-  setConceptCardExplanation(skill: Skill, newExplanation: SubtitledHtml): void {
+  setConceptCardExplanation (skill: Skill, newExplanation: SubtitledHtml): void {
     const oldExplanation = skill.getConceptCard().getExplanation();
     this._applySkillContentsPropertyChange(
       skill,
@@ -177,7 +177,7 @@ export class SkillUpdateService {
     );
   }
 
-  addWorkedExample(skill: Skill, newWorkedExample: WorkedExample): void {
+  addWorkedExample (skill: Skill, newWorkedExample: WorkedExample): void {
     const oldWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
     );
@@ -199,7 +199,7 @@ export class SkillUpdateService {
     );
   }
 
-  deleteWorkedExample(skill: Skill, index: number): void {
+  deleteWorkedExample (skill: Skill, index: number): void {
     const oldWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
     );
@@ -223,7 +223,7 @@ export class SkillUpdateService {
     );
   }
 
-  updateWorkedExamples(skill: Skill, newWorkedExamples: WorkedExample[]): void {
+  updateWorkedExamples (skill: Skill, newWorkedExamples: WorkedExample[]): void {
     const oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
     this._applySkillContentsPropertyChange(
       skill,
@@ -243,7 +243,7 @@ export class SkillUpdateService {
     );
   }
 
-  updateWorkedExample(
+  updateWorkedExample (
       skill: Skill,
       workedExampleIndex: number,
       newWorkedExampleQuestionHtml: string,
@@ -261,7 +261,7 @@ export class SkillUpdateService {
     this.updateWorkedExamples(skill, newWorkedExamples);
   }
 
-  addMisconception(skill: Skill, newMisconception: Misconception): void {
+  addMisconception (skill: Skill, newMisconception: Misconception): void {
     const params = {
       new_misconception_dict: newMisconception.toBackendDict(),
     };
@@ -280,7 +280,7 @@ export class SkillUpdateService {
     );
   }
 
-  deleteMisconception(skill: Skill, misconceptionId: string): void {
+  deleteMisconception (skill: Skill, misconceptionId: string): void {
     const params = {
       misconception_id: misconceptionId,
     };
@@ -298,7 +298,7 @@ export class SkillUpdateService {
     );
   }
 
-  addPrerequisiteSkill(skill: Skill, skillId: string): void {
+  addPrerequisiteSkill (skill: Skill, skillId: string): void {
     const params = {
       skill_id: skillId,
     };
@@ -315,7 +315,7 @@ export class SkillUpdateService {
     );
   }
 
-  deletePrerequisiteSkill(skill: Skill, skillId: string): void {
+  deletePrerequisiteSkill (skill: Skill, skillId: string): void {
     const params = {
       skill_id: skillId,
     };
@@ -332,7 +332,7 @@ export class SkillUpdateService {
     );
   }
 
-  updateMisconceptionName(
+  updateMisconceptionName (
       skill: Skill,
       misconceptionId: string,
       oldName: string,
@@ -356,7 +356,7 @@ export class SkillUpdateService {
     }
   }
 
-  updateMisconceptionMustBeAddressed(
+  updateMisconceptionMustBeAddressed (
       skill: Skill,
       misconceptionId: string,
       oldValue: boolean,
@@ -380,7 +380,7 @@ export class SkillUpdateService {
     }
   }
 
-  updateMisconceptionNotes(
+  updateMisconceptionNotes (
       skill: Skill,
       misconceptionId: string,
       oldNotes: string,
@@ -404,7 +404,7 @@ export class SkillUpdateService {
     }
   }
 
-  updateMisconceptionFeedback(
+  updateMisconceptionFeedback (
       skill: Skill,
       misconceptionId: string,
       oldFeedback: string,
@@ -428,7 +428,7 @@ export class SkillUpdateService {
     }
   }
 
-  updateRubricForDifficulty(
+  updateRubricForDifficulty (
       skill: Skill,
       difficulty: string,
       explanations: string[]

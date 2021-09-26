@@ -59,7 +59,7 @@ import $ from 'jquery';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-describe('Translation tab component', function() {
+describe('Translation tab component', function () {
   var ctrl = null;
   var $q = null;
   var $scope = null;
@@ -80,7 +80,7 @@ describe('Translation tab component', function() {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
@@ -91,7 +91,7 @@ describe('Translation tab component', function() {
       UserExplorationPermissionsService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
@@ -123,7 +123,7 @@ describe('Translation tab component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -234,12 +234,12 @@ describe('Translation tab component', function() {
     });
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     ctrl.$onDestroy();
   });
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -254,7 +254,7 @@ describe('Translation tab component', function() {
     });
 
   it('should load translation tab data when translation tab page is' +
-    ' refreshed', function() {
+    ' refreshed', function () {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -321,7 +321,7 @@ describe('Translation tab component', function() {
   });
 
   it('should finish tutorial on clicking the end tutorial button when' +
-    ' it has already started', function() {
+    ' it has already started', function () {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
@@ -344,7 +344,7 @@ describe('Translation tab component', function() {
   });
 
   it('should skip tutorial when the skip tutorial button is clicked',
-    function() {
+    function () {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -367,7 +367,7 @@ describe('Translation tab component', function() {
     });
 
   it('should start tutorial when welcome translation modal is closed',
-    function() {
+    function () {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -388,7 +388,7 @@ describe('Translation tab component', function() {
     });
 
   it('should finish translation tutorial when welcome translation modal is' +
-    ' dismissed', function() {
+    ' dismissed', function () {
     ctrl.$onInit();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
@@ -402,9 +402,9 @@ describe('Translation tab component', function() {
       .toHaveBeenCalled();
   });
 
-  describe('TRANSLATION_TUTORIAL_OPTIONS', function() {
+  describe('TRANSLATION_TUTORIAL_OPTIONS', function () {
     it('should animate html and body to 0px top when calling function' +
-      ' from option 1', function() {
+      ' from option 1', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -419,7 +419,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 20px top when calling function' +
-      ' from option 1', function() {
+      ' from option 1', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -434,7 +434,7 @@ describe('Translation tab component', function() {
     });
 
     it('should set new top value to element with tutorialTranslationOverview' +
-      ' id when calling function from option 3', function() {
+      ' id when calling function from option 3', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -460,7 +460,7 @@ describe('Translation tab component', function() {
     });
 
     it('should set new top value to element with tutorialTranslationLanguage' +
-    ' id when calling function from option 3', function() {
+    ' id when calling function from option 3', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -486,7 +486,7 @@ describe('Translation tab component', function() {
     });
 
     it('should set new top value to element with tutorialTranslationState' +
-      ' id when calling function from option 5', function() {
+      ' id when calling function from option 5', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -512,7 +512,7 @@ describe('Translation tab component', function() {
     });
 
     it('should set new top value to element with tutorialTranslationOverview' +
-      ' id when calling function from option 5', function() {
+      ' id when calling function from option 5', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -538,7 +538,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 0px top when calling function' +
-      ' from option 7', function() {
+      ' from option 7', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -553,7 +553,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 20px top when calling function' +
-      ' from option 7', function() {
+      ' from option 7', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -568,7 +568,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 0px top when calling function' +
-      ' from option 9', function() {
+      ' from option 9', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -583,7 +583,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 20px top when calling function' +
-      ' from option 9', function() {
+      ' from option 9', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -598,7 +598,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 0px top when calling function' +
-      ' from option 11', function() {
+      ' from option 11', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));
@@ -613,7 +613,7 @@ describe('Translation tab component', function() {
     });
 
     it('should animate html and body to 20px top when calling function' +
-      ' from option 11', function() {
+      ' from option 11', function () {
       ctrl.$onInit();
 
       var elementMock = $(document.createElement('div'));

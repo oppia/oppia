@@ -23,7 +23,7 @@ import { TranslateCacheFactory } from './translate-cache.factory';
 
 describe('Translate Cache Factory', () => {
   class MockTranslateCacheService {
-    constructor(
+    constructor (
       private translateService: TranslateService,
       private translateCacheSettings: TranslateCacheSettings
     ) {}

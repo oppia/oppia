@@ -40,7 +40,7 @@ export class HtmlEditorComponent {
     type: 'html'
   };
 
-  updateValue(value: string): void {
+  updateValue (value: string): void {
     this.value = value;
     this.valueChanged.emit(value);
   }

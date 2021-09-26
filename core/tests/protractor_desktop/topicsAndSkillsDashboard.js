@@ -29,14 +29,14 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 
-describe('Topics and skills dashboard functionality', function() {
+describe('Topics and skills dashboard functionality', function () {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
@@ -48,11 +48,11 @@ describe('Topics and skills dashboard functionality', function() {
       'creatorTopicsAndSkillsDB');
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await topicsAndSkillsDashboardPage.get();
   });
 
-  it('should assign, unassign, create and delete a skill', async function() {
+  it('should assign, unassign, create and delete a skill', async function () {
     let TOPIC_NAME = 'Topic1 TASD';
     let SKILL_NAME = 'skill1 TASD';
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
@@ -106,7 +106,7 @@ describe('Topics and skills dashboard functionality', function() {
     }
   });
 
-  it('should filter the topics', async function() {
+  it('should filter the topics', async function () {
     let TOPIC_ALPHA = 'Alpha TASD';
     let TOPIC_BETA = 'Beta TASD';
     let topicsTableIsPresent = (
@@ -153,7 +153,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
   });
 
-  it('should move skill to a topic', async function() {
+  it('should move skill to a topic', async function () {
     let SKILL_NAME = 'skill2 TASD';
     let TOPIC_NAME = 'Topic2 TASD';
     await topicsAndSkillsDashboardPage.createTopic(
@@ -170,7 +170,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
-  it('should merge an outside skill with one in a topic', async function() {
+  it('should merge an outside skill with one in a topic', async function () {
     let SKILL_NAME = 'skill3 TASD';
     let TOPIC_NAME = 'Topic3 TASD';
     await topicsAndSkillsDashboardPage.createTopic(
@@ -228,11 +228,11 @@ describe('Topics and skills dashboard functionality', function() {
       1, SKILL_NAME);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 });

@@ -24,7 +24,7 @@ import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Subtopic editor tab', function() {
+describe('Subtopic editor tab', function () {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
@@ -44,7 +44,7 @@ describe('Subtopic editor tab', function() {
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
@@ -53,7 +53,7 @@ describe('Subtopic editor tab', function() {
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIdsAsync: async() => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIdsAsync: async () => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
@@ -69,16 +69,16 @@ describe('Subtopic editor tab', function() {
     topicReinitializedEventEmitter = new EventEmitter();
 
     spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-      function() {
+      function () {
         return topicInitializedEventEmitter;
       });
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-      function() {
+      function () {
         return topicReinitializedEventEmitter;
       });
 
-    topic.getSubtopicById = function(id) {
+    topic.getSubtopicById = function (id) {
       return id === 99 ? null : subtopic;
     };
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
@@ -99,18 +99,18 @@ describe('Subtopic editor tab', function() {
     ctrl.$onDestroy();
   });
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', function () {
     expect(ctrl.editableTitle).toEqual('Subtopic1');
   });
 
-  it('should call TopicUpdateService if subtopic title updates', function() {
+  it('should call TopicUpdateService if subtopic title updates', function () {
     var titleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
     ctrl.updateSubtopicTitle('New title');
     expect(titleSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService if subtopic title is not updated',
-    function() {
+    function () {
       ctrl.updateSubtopicTitle('New title');
       var titleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
       ctrl.updateSubtopicTitle('New title');
@@ -118,14 +118,14 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should call TopicUpdateService if subtopic url fragment is updated',
-    function() {
+    function () {
       var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
       ctrl.updateSubtopicUrlFragment('new-url');
       expect(urlFragmentSpy).toHaveBeenCalled();
     });
 
   it('should not call TopicUpdateService when url fragment has not changed',
-    function() {
+    function () {
       ctrl.updateSubtopicUrlFragment('subtopic-url');
       ctrl.initialSubtopicUrlFragment = 'subtopic-url';
       var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
@@ -134,7 +134,7 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should not call TopicUpdateService if subtopic url fragment is invalid',
-    function() {
+    function () {
       var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
       ctrl.updateSubtopicUrlFragment('new url');
       expect(urlFragmentSpy).not.toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should call TopicUpdateService if subtopic thumbnail updates',
-    function() {
+    function () {
       var thubmnailSpy = (
         spyOn(TopicUpdateService, 'setSubtopicThumbnailFilename'));
       ctrl.updateSubtopicThumbnailFilename('img.svg');
@@ -155,7 +155,7 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should call TopicUpdateService if subtopic thumbnail is not updated',
-    function() {
+    function () {
       ctrl.updateSubtopicThumbnailFilename('img.svg');
       var thubmnailSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
       ctrl.updateSubtopicThumbnailFilename('img.svg');
@@ -163,7 +163,7 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should call TopicUpdateService if subtopic thumbnail bg color updates',
-    function() {
+    function () {
       var thubmnailBgSpy = (
         spyOn(TopicUpdateService, 'setSubtopicThumbnailBgColor'));
       ctrl.updateSubtopicThumbnailBgColor('#FFFFFF');
@@ -172,7 +172,7 @@ describe('Subtopic editor tab', function() {
 
   it('should not call TopicUpdateService if subtopic ' +
       'thumbnail bg color is not updated',
-  function() {
+  function () {
     ctrl.updateSubtopicThumbnailBgColor('#FFFFFF');
     var thubmnailBgSpy = spyOn(
       TopicUpdateService, 'setSubtopicThumbnailBgColor');
@@ -180,26 +180,26 @@ describe('Subtopic editor tab', function() {
     expect(thubmnailBgSpy).not.toHaveBeenCalled();
   });
 
-  it('should return skill editor URL', function() {
+  it('should return skill editor URL', function () {
     var skillId = 'asd4242a';
     expect(ctrl.getSkillEditorUrl(skillId)).toEqual(
       '/skill_editor/' + skillId);
   });
 
-  it('should show schema editor', function() {
+  it('should show schema editor', function () {
     expect(ctrl.schemaEditorIsShown).toEqual(false);
     ctrl.showSchemaEditor();
     expect(ctrl.schemaEditorIsShown).toEqual(true);
   });
 
-  it('should return if skill is deleted', function() {
+  it('should return if skill is deleted', function () {
     var skillSummary = ShortSkillSummary.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
 
   it('should call TopicUpdateService when skill is rearranged',
-    function() {
+    function () {
       var removeSkillSpy = spyOn(
         TopicUpdateService, 'rearrangeSkillInSubtopic');
       ctrl.onRearrangeMoveSkillFinish(1);
@@ -207,7 +207,7 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should not call TopicUpdateService if skill is rearranged to the ' +
-      'original place', function() {
+      'original place', function () {
     ctrl.onRearrangeMoveSkillStart(10);
     var removeSkillSpy = spyOn(
       TopicUpdateService, 'rearrangeSkillInSubtopic');
@@ -215,12 +215,12 @@ describe('Subtopic editor tab', function() {
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
 
-  it('should record the index of the skill to move', function() {
+  it('should record the index of the skill to move', function () {
     ctrl.onRearrangeMoveSkillStart(10);
     expect(ctrl.fromIndex).toEqual(10);
   });
 
-  it('should set the error message if subtopic title is invalid', function() {
+  it('should set the error message if subtopic title is invalid', function () {
     expect(ctrl.errorMsg).toEqual(null);
     spyOn(SubtopicValidationService, 'checkValidSubtopicName')
       .and.callFake(() => false);
@@ -229,7 +229,7 @@ describe('Subtopic editor tab', function() {
       'A subtopic with this title already exists');
   });
 
-  it('should reset the error message', function() {
+  it('should reset the error message', function () {
     spyOn(SubtopicValidationService, 'checkValidSubtopicName')
       .and.callFake(() => false);
     ctrl.updateSubtopicTitle('New Subtopic1');
@@ -240,7 +240,7 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should call TopicUpdateService to update the SubtopicPageContent',
-    function() {
+    function () {
       var updateSubtopicSpy = (
         spyOn(TopicUpdateService, 'setSubtopicPageContentsHtml'));
       ctrl.htmlData = 'new html data';
@@ -249,7 +249,7 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should call the TopicUpdateService if skill is removed from subtopic',
-    function() {
+    function () {
       var removeSkillSpy = (
         spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
       ctrl.removeSkillFromSubtopic(0, null);
@@ -257,21 +257,21 @@ describe('Subtopic editor tab', function() {
     });
 
   it('should call the TopicUpdateService if skill is removed from topic',
-    function() {
+    function () {
       var removeSkillSpy = (
         spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
       ctrl.removeSkillFromTopic(skillSummary);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
-  it('should set skill edit options index', function() {
+  it('should set skill edit options index', function () {
     ctrl.showSkillEditOptions(10);
     expect(ctrl.selectedSkillEditOptionsIndex).toEqual(10);
     ctrl.showSkillEditOptions(20);
     expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
   });
 
-  it('should toggle skills list preview only in mobile view', function() {
+  it('should toggle skills list preview only in mobile view', function () {
     MockWindowDimensionsService.isWindowNarrow = () => true;
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
@@ -286,7 +286,7 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.skillsListIsShown).toEqual(true);
   });
 
-  it('should toggle subtopic editor card only in mobile view', function() {
+  it('should toggle subtopic editor card only in mobile view', function () {
     MockWindowDimensionsService.isWindowNarrow = () => true;
     expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
     ctrl.toggleSubtopicEditorCard();
@@ -301,7 +301,7 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
   });
 
-  it('should toggle subtopic preview', function() {
+  it('should toggle subtopic preview', function () {
     expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
     ctrl.toggleSubtopicPreview();
     expect(ctrl.subtopicPreviewCardIsShown).toEqual(true);
@@ -311,13 +311,13 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should call TopicEditorRoutingService to navigate To Topic Editor',
-    function() {
+    function () {
       var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
 
-  it('should call initEditor when topic is initialized', function() {
+  it('should call initEditor when topic is initialized', function () {
     spyOn(ctrl, 'initEditor').and.callThrough();
     topicInitializedEventEmitter.emit();
     expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
@@ -325,13 +325,13 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });
 
-  it('should hide the html data input on canceling', function() {
+  it('should hide the html data input on canceling', function () {
     ctrl.schemaEditorIsShown = true;
     ctrl.cancelHtmlDataChange();
     expect(ctrl.schemaEditorIsShown).toEqual(false);
   });
 
-  it('should redirect to topic editor if subtopic id is invalid', function() {
+  it('should redirect to topic editor if subtopic id is invalid', function () {
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl').and
       .returnValue(99);
     var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');

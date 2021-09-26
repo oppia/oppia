@@ -39,7 +39,7 @@ export class TopicsAndSkillsDashboardPageService {
    * the filter object values
    * @returns {Array} filteredTopics - The filtered Topics array
    */
-  getFilteredTopics(
+  getFilteredTopics (
       topicsArray: CreatorTopicSummary[],
       filterObject: TopicsAndSkillsDashboardFilter): CreatorTopicSummary[] {
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;

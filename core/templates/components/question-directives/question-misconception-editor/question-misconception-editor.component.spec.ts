@@ -38,7 +38,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
-describe('Question misconception editor component', function() {
+describe('Question misconception editor component', function () {
   var $componentController = null;
   var $uibModal = null;
   var $q = null;
@@ -51,7 +51,7 @@ describe('Question misconception editor component', function() {
   var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
@@ -64,7 +64,7 @@ describe('Question misconception editor component', function() {
   }));
 
   beforeEach(angular.mock.inject(
-    function(_$componentController_, _$q_, _$rootScope_, $injector) {
+    function (_$componentController_, _$q_, _$rootScope_, $injector) {
       $componentController = _$componentController_;
       $uibModal = $injector.get('$uibModal');
       $q = _$q_;
@@ -73,7 +73,7 @@ describe('Question misconception editor component', function() {
       ses = $injector.get('StateEditorService');
     }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     var onSaveTaggedMisconceptionSpy = jasmine.createSpy(
       'onSaveTaggedMisconception');
     var onSaveAnswerGroupFeedbackSpy = jasmine.createSpy(
@@ -88,7 +88,7 @@ describe('Question misconception editor component', function() {
           '2', 'misc2', 'notes2', 'feedback1', true)
       ]
     };
-    spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {
+    spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function () {
       return mockMisconceptionObject;
     });
     ctrl = $componentController('questionMisconceptionEditor', null, {
@@ -104,7 +104,7 @@ describe('Question misconception editor component', function() {
 
   it(
     'should initialize correctly when tagged misconception is provided',
-    function() {
+    function () {
       spyOn(ctrl, 'getTaggedSkillMisconceptionId').and.callFake(() => 'abc-1');
       ctrl.$onInit();
       expect(ctrl.misconceptionName).toEqual('misc1');
@@ -113,31 +113,31 @@ describe('Question misconception editor component', function() {
       expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
     });
 
-  it('should use feedback by default', function() {
+  it('should use feedback by default', function () {
     expect(ctrl.feedbackIsUsed).toBeTrue();
     expect(ctrl.misconceptionsBySkill).toEqual(mockMisconceptionObject);
   });
 
-  it('should enable edit mode correctly', function() {
+  it('should enable edit mode correctly', function () {
     expect(ctrl.misconceptionEditorIsOpen).toBeNull();
     ctrl.editMisconception();
     expect(ctrl.misconceptionEditorIsOpen).toBeTrue();
   });
 
-  it('should report containing misconceptions correctly', function() {
+  it('should report containing misconceptions correctly', function () {
     expect(ctrl.containsMisconceptions()).toBeTrue();
     ctrl.misconceptionsBySkill = [];
     expect(ctrl.containsMisconceptions()).toBeFalse();
   });
 
   it(
-    'should throw an error if tagged misconception id is invalid', function() {
+    'should throw an error if tagged misconception id is invalid', function () {
       ctrl.getTaggedSkillMisconceptionId = () => 'invalidId';
       expect(() => ctrl.$onInit()).toThrowError(
         'Expected skillMisconceptionId to be <skillId>-<misconceptionId>.');
     });
 
-  it('should tag a misconception correctly', function() {
+  it('should tag a misconception correctly', function () {
     var mockResultObject = {
       misconception: mockMisconceptionObject.abc[1],
       misconceptionSkillId: 'abc',
@@ -165,7 +165,7 @@ describe('Question misconception editor component', function() {
     expect(ctrl.misconceptionEditorIsOpen).toBeFalse();
   });
 
-  it('should not tag a misconception if the modal was dismissed', function() {
+  it('should not tag a misconception if the modal was dismissed', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -187,7 +187,7 @@ describe('Question misconception editor component', function() {
     expect(ctrl.feedbackIsUsed).toBeTrue();
   });
 
-  it('should update tagged misconception name correctly', function() {
+  it('should update tagged misconception name correctly', function () {
     ctrl.outcome.feedback = {
       setHtml: () => null
     };

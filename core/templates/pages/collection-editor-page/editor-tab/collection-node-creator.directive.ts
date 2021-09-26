@@ -29,7 +29,7 @@ require('services/site-analytics.service.ts');
 require('services/validators.service.ts');
 
 angular.module('oppia').directive('collectionNodeCreator', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -44,7 +44,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'ValidatorsService', 'INVALID_NAME_CHARS',
-        function(
+        function (
             $filter, $http, $rootScope, AlertsService,
             CollectionEditorStateService, CollectionLinearizerService,
             ExplorationSummaryBackendApiService,
@@ -56,20 +56,20 @@ angular.module('oppia').directive('collectionNodeCreator', [
            * a search query. It then extracts the title and id of the
            * exploration to prepare typeahead options.
            */
-          ctrl.fetchTypeaheadResults = function(searchQuery) {
+          ctrl.fetchTypeaheadResults = function (searchQuery) {
             if (isValidSearchQuery(searchQuery)) {
               ctrl.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorationsAsync(
                 searchQuery
-              ).then(function(explorationMetadataList) {
+              ).then(function (explorationMetadataList) {
                 var options = [];
-                explorationMetadataList.map(function(item) {
+                explorationMetadataList.map(function (item) {
                   if (!ctrl.collection.containsCollectionNode(item.id)) {
                     options.push(item.title + ' (' + item.id + ')');
                   }
                 });
                 return options;
-              }, function() {
+              }, function () {
                 AlertsService.addWarning(
                   'There was an error when searching for matching ' +
                   'explorations.');
@@ -79,10 +79,10 @@ angular.module('oppia').directive('collectionNodeCreator', [
             }
           };
 
-          var isValidSearchQuery = function(searchQuery) {
+          var isValidSearchQuery = function (searchQuery) {
             // Allow underscores because they are allowed in exploration IDs.
             var INVALID_SEARCH_CHARS = (
-              INVALID_NAME_CHARS.filter(function(item) {
+              INVALID_NAME_CHARS.filter(function (item) {
                 return item !== '_';
               }));
             for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
@@ -93,7 +93,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             return true;
           };
 
-          var addExplorationToCollection = function(newExplorationId) {
+          var addExplorationToCollection = function (newExplorationId) {
             if (!newExplorationId) {
               AlertsService.addWarning('Cannot add an empty exploration ID.');
               return;
@@ -107,7 +107,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
 
             ExplorationSummaryBackendApiService
               .loadPublicAndPrivateExplorationSummariesAsync([newExplorationId])
-              .then(function(responseObject) {
+              .then(function (responseObject) {
                 var summaries = responseObject.summaries;
                 var summaryBackendObject = null;
                 if (summaries.length !== 0 &&
@@ -123,14 +123,14 @@ angular.module('oppia').directive('collectionNodeCreator', [
                     'access to it.');
                 }
                 $rootScope.$applyAsync();
-              }, function() {
+              }, function () {
                 AlertsService.addWarning(
                   'There was an error while adding an exploration to the ' +
                   'collection.');
               });
           };
 
-          var convertTypeaheadToExplorationId = function(typeaheadOption) {
+          var convertTypeaheadToExplorationId = function (typeaheadOption) {
             var matchResults = typeaheadOption.match(/\((.*?)\)$/);
             if (matchResults === null) {
               return typeaheadOption;
@@ -139,7 +139,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
           };
 
           // Creates a new exploration, then adds it to the collection.
-          ctrl.createNewExploration = function() {
+          ctrl.createNewExploration = function () {
             var title = $filter('normalizeWhitespace')(
               ctrl.newExplorationTitle);
 
@@ -150,7 +150,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             // Create a new exploration with the given title.
             $http.post('/contributehandler/create_new', {
               title: title
-            }).then(function(response) {
+            }).then(function (response) {
               ctrl.newExplorationTitle = '';
               var newExplorationId = response.data.exploration_id;
 
@@ -164,19 +164,19 @@ angular.module('oppia').directive('collectionNodeCreator', [
           // Checks whether the user has left a '#' at the end of their ID
           // by accident (which can happen if it's being copy/pasted from the
           // editor page.
-          ctrl.isMalformedId = function(typedExplorationId) {
+          ctrl.isMalformedId = function (typedExplorationId) {
             return (
               typedExplorationId &&
               typedExplorationId.lastIndexOf('#') ===
               typedExplorationId.length - 1);
           };
 
-          ctrl.addExploration = function() {
+          ctrl.addExploration = function () {
             addExplorationToCollection(convertTypeaheadToExplorationId(
               ctrl.newExplorationId));
             ctrl.newExplorationId = '';
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.newExplorationId = '';
             ctrl.newExplorationTitle = '';

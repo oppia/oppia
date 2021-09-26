@@ -31,7 +31,7 @@ require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {
@@ -53,7 +53,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         'DeviceInfoService', 'FocusManagerService',
         'SchemaFormSubmittedService',
         'StateCustomizationArgsService',
-        function(
+        function (
             $filter, $sce, $scope, $timeout, $translate,
             DeviceInfoService, FocusManagerService,
             SchemaFormSubmittedService,
@@ -61,13 +61,13 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.onKeypress = function(evt) {
+          ctrl.onKeypress = function (evt) {
             if (evt.keyCode === 13) {
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
 
-          ctrl.getPlaceholder = function() {
+          ctrl.getPlaceholder = function () {
             if (!ctrl.uiConfig()) {
               return '';
             } else {
@@ -80,7 +80,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             }
           };
 
-          ctrl.getRows = function() {
+          ctrl.getRows = function () {
             if (!ctrl.uiConfig()) {
               return null;
             } else {
@@ -88,7 +88,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             }
           };
 
-          ctrl.getCodingMode = function() {
+          ctrl.getCodingMode = function () {
             if (!ctrl.uiConfig()) {
               return null;
             } else {
@@ -96,16 +96,16 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             }
           };
 
-          ctrl.getDisplayedValue = function() {
+          ctrl.getDisplayedValue = function () {
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
           };
 
-          ctrl.updateLocalValue = function(val) {
+          ctrl.updateLocalValue = function (val) {
             ctrl.localValue = val;
             $scope.$applyAsync();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
               // Flag that is flipped each time the codemirror view is
               // shown. (The codemirror instance needs to be refreshed
@@ -116,7 +116,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               ctrl.codemirrorOptions = {
                 // Convert tabs to spaces.
                 extraKeys: {
-                  Tab: function(cm) {
+                  Tab: function (cm) {
                     var spaces = Array(
                       cm.getOption('indentUnit') + 1).join(' ');
                     cm.replaceSelection(spaces);
@@ -140,7 +140,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
                 ctrl.codemirrorOptions.mode = ctrl.uiConfig().coding_mode;
               }
 
-              $timeout(function() {
+              $timeout(function () {
                 ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
               }, 200);
 
@@ -150,7 +150,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               ctrl.directiveSubscriptions.add(
                 StateCustomizationArgsService.onSchemaBasedFormsShown.subscribe(
                   () => {
-                    $timeout(function() {
+                    $timeout(function () {
                       ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
                     }, 200);
                   })
@@ -158,11 +158,11 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             }
             // So that focus is applied after all the functions in
             // main thread have executed.
-            $timeout(function() {
+            $timeout(function () {
               FocusManagerService.setFocusWithoutScroll(labelForFocus);
             }, 5);
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

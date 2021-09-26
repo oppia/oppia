@@ -17,8 +17,8 @@
  */
 
 // Note that this filter does not truncate at the middle of a word.
-angular.module('oppia').filter('truncateAndCapitalize', [function() {
-  return function(input, maxNumberOfCharacters) {
+angular.module('oppia').filter('truncateAndCapitalize', [function () {
+  return function (input, maxNumberOfCharacters) {
     if (!input) {
       return input;
     }

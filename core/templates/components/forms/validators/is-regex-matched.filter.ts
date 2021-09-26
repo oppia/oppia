@@ -17,8 +17,8 @@
  * the regular expression provided.
  */
 
-angular.module('oppia').filter('isRegexMatched', [function() {
-  return function(input, args) {
+angular.module('oppia').filter('isRegexMatched', [function () {
+  return function (input, args) {
     let re = new RegExp(args.regexPattern);
     return (
       re.test(input)

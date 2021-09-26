@@ -34,7 +34,7 @@ angular.module('oppia').component('improvementsTab', {
   controller: [
     'ExplorationImprovementsTaskRegistryService', 'RouterService',
     'UrlInterpolationService',
-    function(
+    function (
         ExplorationImprovementsTaskRegistryService, RouterService,
         UrlInterpolationService) {
       this.$onInit = () => {

@@ -61,7 +61,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
-  function(
+  function (
       $controller, $injector, $scope, $uibModal, $uibModalInstance,
       ContextService, EditorFirstTimeEventsService,
       InteractionDetailsCacheService, InteractionObjectFactory,
@@ -85,7 +85,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     // their displayed values can be used in the HTML.
     $scope.StateInteractionIdService = StateInteractionIdService;
     $scope.StateCustomizationArgsService = StateCustomizationArgsService;
-    $scope.getInteractionThumbnailImageUrl = function(interactionId) {
+    $scope.getInteractionThumbnailImageUrl = function (interactionId) {
       return UrlInterpolationService.getInteractionThumbnailImageUrl(
         interactionId);
     };
@@ -134,7 +134,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       );
     }
 
-    $scope.getCustomizationArgsWarningsList = function() {
+    $scope.getCustomizationArgsWarningsList = function () {
       var validationServiceName =
         INTERACTION_SPECS[
           $scope.StateInteractionIdService.displayed].id +
@@ -145,7 +145,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       return warningsList;
     };
 
-    $scope.getCustomizationArgsWarningMessage = function() {
+    $scope.getCustomizationArgsWarningMessage = function () {
       var warningsList = (
         $scope.getCustomizationArgsWarningsList());
       var warningMessage = '';
@@ -155,7 +155,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       return warningMessage;
     };
 
-    $scope.onChangeInteractionId = function(newInteractionId) {
+    $scope.onChangeInteractionId = function (newInteractionId) {
       EditorFirstTimeEventsService
         .registerFirstSelectInteractionTypeEvent();
 
@@ -173,7 +173,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             newInteractionId).customization);
       } else {
         const customizationArgsBackendDict = {};
-        $scope.customizationArgSpecs.forEach(function(caSpec) {
+        $scope.customizationArgSpecs.forEach(function (caSpec) {
           customizationArgsBackendDict[caSpec.name] = {
             value: caSpec.default_value
           };
@@ -199,7 +199,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       $scope.form = {};
     };
 
-    $scope.returnToInteractionSelector = function() {
+    $scope.returnToInteractionSelector = function () {
       InteractionDetailsCacheService.set(
         StateInteractionIdService.displayed,
         StateCustomizationArgsService.displayed);
@@ -208,7 +208,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       StateCustomizationArgsService.displayed = {};
     };
 
-    $scope.isSaveInteractionButtonEnabled = function() {
+    $scope.isSaveInteractionButtonEnabled = function () {
       return !!(
         $scope.hasCustomizationArgs &&
         $scope.StateInteractionIdService.displayed &&
@@ -216,7 +216,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         ($scope.getCustomizationArgsWarningsList().length === 0));
     };
 
-    $scope.getSaveInteractionButtonTooltip = function() {
+    $scope.getSaveInteractionButtonTooltip = function () {
       if (!$scope.hasCustomizationArgs) {
         return 'No customization arguments';
       }
@@ -226,7 +226,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       var warningsList =
         $scope.getCustomizationArgsWarningsList();
-      var warningMessages = warningsList.map(function(warning) {
+      var warningMessages = warningsList.map(function (warning) {
         return warning.message;
       });
 
@@ -241,7 +241,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
-    $scope.cancelWithConfirm = function() {
+    $scope.cancelWithConfirm = function () {
       // Do nothing if the confirmation modal is already open.
       if ($('.modal-title').text().includes('Confirmation Required')) {
         return;
@@ -253,9 +253,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         backdrop: 'static',
         keyboard: false,
         controller: 'ConfirmOrCancelModalController'
-      }).result.then(function() {
+      }).result.then(function () {
         $scope.cancel();
-      }, function() {
+      }, function () {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
@@ -268,7 +268,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
      * these null content_id's with a content_id generated from traversing the
      * schema and with next content id index, ensuring a unique content_id.
      */
-    $scope.populateNullContentIds = function() {
+    $scope.populateNullContentIds = function () {
       const interactionId = $scope.StateInteractionIdService.displayed;
 
       let traverseSchemaAndAssignContentIds = (
@@ -331,7 +331,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
      * in the customization arguments.
      * @returns {Object} A Mapping of content ids (string) to content (string).
      */
-    $scope.getContentIdToContent = function() {
+    $scope.getContentIdToContent = function () {
       const interactionId = $scope.StateInteractionIdService.displayed;
       const contentIdToContent = {};
 
@@ -381,7 +381,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       return contentIdToContent;
     };
 
-    $scope.save = function() {
+    $scope.save = function () {
       const updatedContentIdToContent = $scope.getContentIdToContent(
         StateCustomizationArgsService.displayed);
       const contentIdsWithModifiedContent = [];
@@ -403,11 +403,11 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       $uibModalInstance.close();
     };
 
-    $scope.getHyphenatedLowercaseCategoryName = function(categoryName) {
+    $scope.getHyphenatedLowercaseCategoryName = function (categoryName) {
       return categoryName && categoryName.replace(/\s/g, '-').toLowerCase();
     };
 
-    $scope.init = function() {
+    $scope.init = function () {
       $scope.originalContentIdToContent = {};
       if (StateInteractionIdService.savedMemento) {
         // We track the original html or unicode for each content id so that we

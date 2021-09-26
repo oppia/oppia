@@ -42,7 +42,7 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
 
-describe('Tutor Card directive', function() {
+describe('Tutor Card directive', function () {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -82,7 +82,7 @@ describe('Tutor Card directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
@@ -272,7 +272,7 @@ describe('Tutor Card directive', function() {
       LearnerAnswerInfoService: learnerAnswerInfoService
     });
 
-    $scope.getDisplayedCard = function() {
+    $scope.getDisplayedCard = function () {
       return sampleCard;
     };
     $scope.getDisplayedCard().markAsCompleted();
@@ -290,9 +290,9 @@ describe('Tutor Card directive', function() {
     ctrl.$onDestroy();
   });
 
-  describe('on initialization ', function() {
+  describe('on initialization ', function () {
     it('should set profile picture from data url when ' +
-      'user is not in editor preview mode', fakeAsync(function() {
+      'user is not in editor preview mode', fakeAsync(function () {
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(userService, 'getProfileImageDataUrlAsync')
         .and.resolveTo('imageUrl');
@@ -307,7 +307,7 @@ describe('Tutor Card directive', function() {
     }));
 
     it('should set default profile picture when ' +
-      'user is in editor preview mode', fakeAsync(function() {
+      'user is in editor preview mode', fakeAsync(function () {
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlInterpolationService, 'getStaticImageUrl')
         .and.returnValue('staticImage');
@@ -322,7 +322,7 @@ describe('Tutor Card directive', function() {
     }));
 
     it('should check whether the audio bar is expanded on ' +
-      'mobile device', fakeAsync(function() {
+      'mobile device', fakeAsync(function () {
       spyOn(contextService, 'isInExplorationEditorPage')
         .and.returnValue(false);
       spyOn(userService, 'getProfileImageDataUrlAsync')
@@ -337,21 +337,21 @@ describe('Tutor Card directive', function() {
   });
 
   it('should check whether the display card ' +
-    'is non terminal when calling \'isOnTerminalCard(\'', function() {
+    'is non terminal when calling \'isOnTerminalCard(\'', function () {
     let result = $scope.isOnTerminalCard();
 
     expect(result).toBe(false);
   });
 
   it('should check whether the current card is end of transcript ' +
-    'when calling \'isCurrentCardAtEndOfTranscript\'', function() {
+    'when calling \'isCurrentCardAtEndOfTranscript\'', function () {
     let result = $scope.isCurrentCardAtEndOfTranscript();
 
     expect(result).toBe(false);
   });
 
   it('should check whether the content audio translation ' +
-    'is available when concept card is opened', function() {
+    'is available when concept card is opened', function () {
     $scope.conceptCardIsBeingShown = true;
 
     let result = $scope.isContentAudioTranslationAvailable();
@@ -360,7 +360,7 @@ describe('Tutor Card directive', function() {
   });
 
   it('should check whether the content audio translation ' +
-    'is available when concept card is not opened', function() {
+    'is available when concept card is not opened', function () {
     $scope.conceptCardIsBeingShown = false;
 
     let result = $scope.isContentAudioTranslationAvailable();
@@ -369,7 +369,7 @@ describe('Tutor Card directive', function() {
   });
 
   it('should check whether the interactions are ' +
-    'in line when concept card is opened', function() {
+    'in line when concept card is opened', function () {
     $scope.conceptCardIsBeingShown = true;
 
     let result = $scope.isInteractionInline();
@@ -378,7 +378,7 @@ describe('Tutor Card directive', function() {
   });
 
   it('should check whether the interactions are ' +
-    'in line when concept card is not opened', function() {
+    'in line when concept card is not opened', function () {
     $scope.conceptCardIsBeingShown = false;
 
     let result = $scope.isInteractionInline();
@@ -386,26 +386,26 @@ describe('Tutor Card directive', function() {
     expect(result).toBe(true);
   });
 
-  it('should check whether the audio bar is opened', function() {
+  it('should check whether the audio bar is opened', function () {
     let result = $scope.showAudioBar();
 
     expect(result).toBe(true);
   });
 
-  it('should check whether the window can show two cards', function() {
+  it('should check whether the window can show two cards', function () {
     let result = $scope.canWindowShowTwoCards();
 
     expect(result).toBe(false);
   });
 
-  it('should check whether the window is narrow', function() {
+  it('should check whether the window is narrow', function () {
     let result = $scope.isWindowNarrow();
 
     expect(result).toBe(false);
   });
 
   it('should toggle previous responses when ' +
-    'callin \'toggleShowPreviousResponses\'', function() {
+    'callin \'toggleShowPreviousResponses\'', function () {
     $scope.arePreviousResponsesShown = false;
 
     $scope.toggleShowPreviousResponses();
@@ -416,13 +416,13 @@ describe('Tutor Card directive', function() {
   });
 
   it('should return content focus labe when calling ' +
-    '\'getContentFocusLabel\'', function() {
+    '\'getContentFocusLabel\'', function () {
     let result = $scope.getContentFocusLabel();
     expect(result).toBe('content-focus-label-undefined');
   });
 
   it('should return audio highlight class ' +
-    '\'getContentAudioHighlightClass\'', function() {
+    '\'getContentAudioHighlightClass\'', function () {
     spyOn(audioTranslationManagerService, 'getCurrentComponentName')
       .and.returnValue('content');
     spyOn(autogeneratedAudioPlayerService, 'isPlaying').and.returnValue(true);

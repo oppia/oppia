@@ -41,17 +41,17 @@ export class ProfileLinkImageComponent implements OnInit {
     '/' + this.username
   );
 
-  constructor(
+  constructor (
     private profileLinkImageBackendApiService:
       ProfileLinkImageBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  isUsernameLinkable(username: string): boolean {
+  isUsernameLinkable (username: string): boolean {
     return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.profileImageUrl = (
       '/preferenceshandler/profile_picture_by_username/' +
       this.username);

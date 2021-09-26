@@ -55,26 +55,26 @@ export class OnScreenKeyboardComponent {
     'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
     'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
 
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private guppyInitializationService: GuppyInitializationService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  activateGuppy(): void {
+  activateGuppy (): void {
     this.guppyInstance.activate();
   }
 
-  changeTab(newTab: string): void {
+  changeTab (newTab: string): void {
     this.currentTab = newTab;
     this.guppyInstance.activate();
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  insertString(str: string): void {
+  insertString (str: string): void {
     let index = this.greekSymbols.indexOf(str);
     if (index !== -1) {
       str = this.greekLetters[index];
@@ -83,38 +83,38 @@ export class OnScreenKeyboardComponent {
     this.guppyInstance.activate();
   }
 
-  insertSymbol(symbol: string): void {
+  insertSymbol (symbol: string): void {
     this.engine.insert_symbol(symbol);
     this.guppyInstance.activate();
   }
 
-  backspace(): void {
+  backspace (): void {
     this.engine.backspace();
     this.guppyInstance.activate();
   }
 
-  left(): void {
+  left (): void {
     this.engine.left();
     this.guppyInstance.activate();
   }
 
-  right(): void {
+  right (): void {
     this.engine.right();
     this.guppyInstance.activate();
   }
 
-  exponent(value: string): void {
+  exponent (value: string): void {
     this.engine.insert_string('exp');
     this.engine.insert_string(value);
     this.engine.right();
     this.guppyInstance.activate();
   }
 
-  hideOSK(): void {
+  hideOSK (): void {
     this.guppyInitializationService.setShowOSK(false);
   }
 
-  showOSK(): boolean {
+  showOSK (): boolean {
     if (
       !this.deviceInfoService.isMobileUserAgent() ||
           !this.deviceInfoService.hasTouchEvents()) {

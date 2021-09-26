@@ -44,7 +44,7 @@ export class InteractiveMathEquationInput implements OnInit {
   @Input() useFractionForDivisionWithValue;
   @Input() customOskLettersWithValue;
 
-  constructor(
+  constructor (
     private currentInteractionService: CurrentInteractionService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
@@ -54,7 +54,7 @@ export class InteractiveMathEquationInput implements OnInit {
     private mathInteractionsService: MathInteractionsService
   ) {}
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid (): boolean {
     let activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
     if (this.hasBeenTouched && activeGuppyObject === undefined) {
@@ -71,7 +71,7 @@ export class InteractiveMathEquationInput implements OnInit {
     return true;
   }
 
-  submitAnswer(): void {
+  submitAnswer (): void {
     if (!this.isCurrentAnswerValid()) {
       return;
     }
@@ -80,12 +80,12 @@ export class InteractiveMathEquationInput implements OnInit {
       this.mathEquationInputRulesService as unknown as InteractionRulesService);
   }
 
-  showOSK(): void {
+  showOSK (): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'MathEquationInput';
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(

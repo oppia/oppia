@@ -23,14 +23,14 @@ require('services/nested-directives-recursion-timeout-prevention.service');
 require('services/contextual/logger.service');
 
 describe('Nested Directives Recursion Timeout Prevention Service',
-  function() {
+  function () {
     var ndrtps, ls;
     var $scope;
     var element = {
-      append: function() {},
-      contents: function() {
+      append: function () {},
+      contents: function () {
         return {
-          remove: function() {}
+          remove: function () {}
         };
       }
     };
@@ -38,22 +38,22 @@ describe('Nested Directives Recursion Timeout Prevention Service',
 
     beforeEach(angular.mock.module('oppia'));
     importAllAngularServices();
-    beforeEach(angular.mock.inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function ($injector, $rootScope) {
       ndrtps = $injector.get(
         'NestedDirectivesRecursionTimeoutPreventionService');
       ls = $injector.get('LoggerService');
       $scope = $rootScope.$new();
 
       functions = {
-        pre: function() {
+        pre: function () {
           ls.log('Calling pre function');
         },
-        post: function() {}
+        post: function () {}
       };
     }));
 
     it('should return linking functions when object is passed as' +
-      ' arguments on compile function', function() {
+      ' arguments on compile function', function () {
       var logSpy = spyOn(ls, 'log').and.callThrough();
       var postFunctionSpy = spyOn(functions, 'post').and.callThrough();
       var appendElementSpy = spyOn(element, 'append').and.callThrough();
@@ -69,7 +69,7 @@ describe('Nested Directives Recursion Timeout Prevention Service',
     });
 
     it('should return post linking function when a function is passed' +
-      ' as argument on compile function', function() {
+      ' as argument on compile function', function () {
       var postFunctionSpy = spyOn(functions, 'post').and.callThrough();
       var appendElementSpy = spyOn(element, 'append').and.callThrough();
 

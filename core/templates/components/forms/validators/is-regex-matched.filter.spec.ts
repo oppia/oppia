@@ -18,17 +18,17 @@
  */
 
 
-describe('isRegexMatched Filter', function() {
+describe('isRegexMatched Filter', function () {
   const filterName = 'isRegexMatched';
 
   beforeEach(angular.mock.module('oppia'));
 
-  it('should exist', angular.mock.inject(function($filter) {
+  it('should exist', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should pass if the string matches the given regular expression',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       let filter = $filter(filterName);
       let args = {
         regexPattern: 'a.$'
@@ -54,7 +54,7 @@ describe('isRegexMatched Filter', function() {
     }));
 
   it('should fail if the string does not match the given regular expression',
-    angular.mock.inject(function($filter) {
+    angular.mock.inject(function ($filter) {
       let filter = $filter(filterName);
       let args = {
         regexPattern: 'a.$'

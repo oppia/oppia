@@ -32,7 +32,7 @@ describe('Angular Html Bind Wrapper Directive', () => {
         'angularHtmlBindWrapper',
         [AngularHtmlBindWrapperDirective]
       ).then(
-        async(textContext) => expect(textContext).toBe('Hello Oppia!')
+        async (textContext) => expect(textContext).toBe('Hello Oppia!')
       );
     }));
   });
@@ -48,7 +48,7 @@ describe('Angular Html Bind Wrapper Directive', () => {
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(angular.mock.module('oppia'));
 
-    beforeEach(angular.mock.inject(function(
+    beforeEach(angular.mock.inject(function (
         _$componentController_, $compile, $injector) {
       const $rootScope = $injector.get('$rootScope');
       $componentController = _$componentController_;
@@ -64,17 +64,17 @@ describe('Angular Html Bind Wrapper Directive', () => {
       applySpy = spyOn($rootScope, '$applyAsync').and.stub();
     }));
 
-    it('should compile', function() {
+    it('should compile', function () {
       expect(compiledElement).not.toBeNull();
     });
 
-    it('should call applyAsync on initialization', function() {
+    it('should call applyAsync on initialization', function () {
       const ctrl = $componentController('angularHtmlBindWrapper');
       ctrl.$onInit();
       expect(applySpy).toHaveBeenCalled();
     });
 
-    it('should call applyAsync when a change to html is detected', function() {
+    it('should call applyAsync when a change to html is detected', function () {
       const ctrl = $componentController('angularHtmlBindWrapper');
       ctrl.$onChanges({
         htmlData: {

@@ -23,7 +23,7 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = async function(elem, richTextInstructionsArray) {
+var customizeInteraction = async function (elem, richTextInstructionsArray) {
   await forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
     var richTextEditor = await forms.ListEditor(elem).editItem(i, 'RichText');
@@ -34,7 +34,7 @@ var customizeInteraction = async function(elem, richTextInstructionsArray) {
 
 // These members of richTextInstructionsArray each describe how to check one of
 // the options.
-var expectInteractionDetailsToMatch = async function(
+var expectInteractionDetailsToMatch = async function (
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
     by.css('.protractor-test-multiple-choice-option-container'));
@@ -54,7 +54,7 @@ var expectInteractionDetailsToMatch = async function(
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' {String} is the text on the multiple-choice item to select.
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   await elem.element(by.tagName('oppia-interactive-multiple-choice-input')).
     element(by.buttonText(answer)).click();
 };
@@ -62,13 +62,13 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'NonnegativeInt';
 
 var testSuite = [{
-  interactionArguments: [[async function(editor) {
+  interactionArguments: [[async function (editor) {
     await editor.appendBoldText('right');
-  }, async function(editor) {
+  }, async function (editor) {
     await editor.appendItalicText('wrong1');
-  }, async function(editor) {
+  }, async function (editor) {
     await editor.appendItalicText('wrong2');
-  }, async function(editor) {
+  }, async function (editor) {
     await editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],

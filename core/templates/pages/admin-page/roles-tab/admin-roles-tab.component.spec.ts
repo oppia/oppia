@@ -30,7 +30,7 @@ import { AlertsService } from 'services/alerts.service';
 
 import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
 
-describe('Admin roles tab component ', function() {
+describe('Admin roles tab component ', function () {
   let component: AdminRolesTabComponent;
   let fixture: ComponentFixture<AdminRolesTabComponent>;
 
@@ -148,8 +148,8 @@ describe('Admin roles tab component ', function() {
     expect(component.userIsBanned).toEqual(false);
   });
 
-  describe('on startEditing', function() {
-    beforeEach(function() {
+  describe('on startEditing', function () {
+    beforeEach(function () {
       spyOn(adminBackendApiService, 'viewUsersRoleAsync')
         .and.returnValue(Promise.resolve({
           roles: ['TOPIC_MANAGER'],
@@ -184,7 +184,7 @@ describe('Admin roles tab component ', function() {
     }));
   });
 
-  describe('on calling markUserBanned', function() {
+  describe('on calling markUserBanned', function () {
     it('should enable bannedStatusChangeInProgress until user is banned',
       fakeAsync(() => {
         spyOn(adminBackendApiService, 'markUserBannedAsync')
@@ -224,8 +224,8 @@ describe('Admin roles tab component ', function() {
     }));
   });
 
-  describe('on calling unmarkUserBanned', function() {
-    beforeEach(function() {
+  describe('on calling unmarkUserBanned', function () {
+    beforeEach(function () {
       spyOn(adminBackendApiService, 'unmarkUserBannedAsync')
         .and.returnValue(Promise.resolve());
     });
@@ -252,8 +252,8 @@ describe('Admin roles tab component ', function() {
     }));
   });
 
-  describe('on calling removeRole', function() {
-    beforeEach(function() {
+  describe('on calling removeRole', function () {
+    beforeEach(function () {
       spyOn(adminBackendApiService, 'removeUserRoleAsync')
         .and.returnValue(Promise.resolve());
     });
@@ -281,8 +281,8 @@ describe('Admin roles tab component ', function() {
       }));
   });
 
-  describe('on calling addNewRole', function() {
-    beforeEach(function() {
+  describe('on calling addNewRole', function () {
+    beforeEach(function () {
       spyOn(adminBackendApiService, 'addUserRoleAsync')
         .and.returnValue(Promise.resolve());
     });
@@ -306,7 +306,7 @@ describe('Admin roles tab component ', function() {
     });
   });
 
-  describe('on calling openTopicManagerRoleEditor', function() {
+  describe('on calling openTopicManagerRoleEditor', function () {
     let modalSpy = null;
     let ngbModal: NgbModal;
 
@@ -314,7 +314,7 @@ describe('Admin roles tab component ', function() {
       componentInstance: {};
     }
 
-    beforeEach(function() {
+    beforeEach(function () {
       ngbModal = TestBed.inject(NgbModal);
       component.topicSummaries = [sampleTopicSummary];
       modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
@@ -353,7 +353,7 @@ describe('Admin roles tab component ', function() {
       }));
   });
 
-  describe('on calling showNewRoleSelector', function() {
+  describe('on calling showNewRoleSelector', function () {
     it('should enable roleSelectorIsShown', () => {
       component.roleSelectorIsShown = false;
       component.userRoles = ['FULL_USER', 'MODERATOR'];

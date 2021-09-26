@@ -43,9 +43,9 @@ export class TranslatableSetOfUnicodeStringEditorComponent {
     }]
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor (private changeDetectorRef: ChangeDetectorRef) { }
 
-  updateValue(val: string): void {
+  updateValue (val: string): void {
     if (this.value.unicodeStrSet === val) {
       return;
     }
@@ -54,7 +54,7 @@ export class TranslatableSetOfUnicodeStringEditorComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): {
+  getSchema (): {
     type: string;
     items: { type: string; };
     validators: { id: string; }[];

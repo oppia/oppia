@@ -29,11 +29,11 @@ import { StateNextContentIdIndexService } from
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  constructor(
+  constructor (
       private stateNextContentIdIndexService: StateNextContentIdIndexService
   ) {}
 
-  generateIdForComponent(
+  generateIdForComponent (
       existingComponentIds: string[],
       componentName: string): string {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
@@ -52,7 +52,7 @@ export class GenerateContentIdService {
     return (searchKey + String(count + 1));
   }
 
-  _getNextId(
+  _getNextId (
       existingComponentIds: string[],
       componentName: string): string {
     // Worked example questions and explanations do not live in the State domain
@@ -66,7 +66,7 @@ export class GenerateContentIdService {
     }
   }
 
-  _getNextStateId(prefix: string): string {
+  _getNextStateId (prefix: string): string {
     // This function is used to generate content_ids for content that live in
     // the State domain. This includes hints, feedback, and customization args.
     const contentIdIndex = this.stateNextContentIdIndexService.displayed;
@@ -74,13 +74,13 @@ export class GenerateContentIdService {
     return `${prefix}_${contentIdIndex}`;
   }
 
-  getNextId(
+  getNextId (
       existingComponentIds: string[],
       componentName: string): string {
     return this._getNextId(existingComponentIds, componentName);
   }
 
-  getNextStateId(prefix: string): string {
+  getNextStateId (prefix: string): string {
     return this._getNextStateId(prefix);
   }
 }

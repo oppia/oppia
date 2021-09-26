@@ -29,7 +29,7 @@ export class LearnerAnswerInfo {
   _answerDetails: string;
   _createdOn: number;
 
-  constructor(
+  constructor (
       learnerAnswerInfoId: string, answer: string, answerDetails: string,
       createdOn: number) {
     this._id = learnerAnswerInfoId;
@@ -38,13 +38,13 @@ export class LearnerAnswerInfo {
     this._createdOn = createdOn;
   }
 
-  static createDefaultLearnerAnswerInfo(
+  static createDefaultLearnerAnswerInfo (
       answer: string, answerDetails: string): LearnerAnswerInfo {
     return new LearnerAnswerInfo(
       null, answer, answerDetails, null);
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
     return new LearnerAnswerInfo(
       learnerAnswerInfoDict.id,
@@ -54,19 +54,19 @@ export class LearnerAnswerInfo {
     );
   }
 
-  getId(): string {
+  getId (): string {
     return this._id;
   }
 
-  getAnswer(): string {
+  getAnswer (): string {
     return this._answer;
   }
 
-  getAnswerDetails(): string {
+  getAnswerDetails (): string {
     return this._answerDetails;
   }
 
-  getCreatedOn(): number {
+  getCreatedOn (): number {
     return this._createdOn;
   }
 }

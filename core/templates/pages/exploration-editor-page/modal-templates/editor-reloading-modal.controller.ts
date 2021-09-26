@@ -22,13 +22,13 @@ require(
 
 angular.module('oppia').controller('EditorReloadingModalController', [
   '$controller', '$scope', '$timeout', '$uibModalInstance',
-  function($controller, $scope, $timeout, $uibModalInstance) {
+  function ($controller, $scope, $timeout, $uibModalInstance) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
 
-    $timeout(function() {
+    $timeout(function () {
       $scope.cancel();
     }, 2500);
   }

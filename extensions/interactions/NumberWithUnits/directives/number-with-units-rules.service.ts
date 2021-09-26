@@ -32,7 +32,7 @@ import { NumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class NumberWithUnitsRulesService {
-  constructor(
+  constructor (
     private unitsObjectFactory: NumberWithUnitsObjectFactory,
     private utilsService: UtilsService) {
     try {
@@ -40,7 +40,7 @@ export class NumberWithUnitsRulesService {
     } catch (parsingError) {}
   }
 
-  IsEqualTo(
+  IsEqualTo (
       answer: NumberWithUnitsAnswer,
       inputs: NumberWithUnitsRuleInputs): boolean {
     // Returns true only if input is exactly equal to answer.
@@ -57,7 +57,7 @@ export class NumberWithUnitsRulesService {
     return this.utilsService.isEquivalent(answerList, inputsList);
   }
 
-  IsEquivalentTo(
+  IsEquivalentTo (
       answer: NumberWithUnitsAnswer,
       inputs: NumberWithUnitsRuleInputs): boolean {
     var answerObject = this.unitsObjectFactory.fromDict(answer);

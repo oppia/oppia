@@ -37,13 +37,13 @@ import { RatioInputAnswer } from 'interactions/answer-defs';
   providedIn: 'root'
 })
 export class RatioExpressionInputValidationService {
-  constructor(
+  constructor (
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
-    var isNonNegativeInt = function(number: number) {
+    var isNonNegativeInt = function (number: number) {
       return number % 1 === 0 && number >= 0;
     };
     var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
@@ -80,7 +80,7 @@ export class RatioExpressionInputValidationService {
     }
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: RatioExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[],
@@ -97,7 +97,7 @@ export class RatioExpressionInputValidationService {
         answerGroups, defaultOutcome, stateName));
 
     // Checks whether currentInput has less number of terms than seenInput.
-    let hasLessNumberOfTerms = function(
+    let hasLessNumberOfTerms = function (
         currentRuleType: string,
         seenRuleType: string,
         currentInput: number[],

@@ -30,14 +30,14 @@ export class PreferencesPageRootComponent {
   pageIsShown: boolean = false;
   errorPageIsShown: boolean = false;
 
-  constructor(
+  constructor (
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES);
     this.loaderService.showLoadingScreen('Loading');

@@ -56,12 +56,12 @@ type TranslationType = (
   typeof WRITTEN_TRANSLATIONS_KEY | typeof RECORDED_VOICEOVERS_KEY);
 
 export class States {
-  constructor(
+  constructor (
     private _stateObject: StateObjectFactory,
     private _states: StateObjectsDict
   ) {}
 
-  getState(stateName: string): State {
+  getState (stateName: string): State {
     return this._states[stateName];
   }
 
@@ -69,23 +69,23 @@ export class States {
   // with an object to represent data to be manipulated inside
   // ExplorationDiffService.
 
-  getStateObjects(): StateObjectsDict {
+  getStateObjects (): StateObjectsDict {
     return this._states;
   }
-  addState(newStateName: string): void {
+  addState (newStateName: string): void {
     this._states[newStateName] = this._stateObject.createDefaultState(
       newStateName);
   }
-  setState(stateName: string, stateData: State): void {
+  setState (stateName: string, stateData: State): void {
     // We use the copy method defined in the StateObjectFactory to make
     // sure that this._states[stateName] remains a State object as opposed to
     // Object.assign(..) which returns an object with the content of stateData.
     this._states[stateName].copy(stateData);
   }
-  hasState(stateName: string): boolean {
+  hasState (stateName: string): boolean {
     return this._states.hasOwnProperty(stateName);
   }
-  deleteState(deleteStateName: string): void {
+  deleteState (deleteStateName: string): void {
     delete this._states[deleteStateName];
     for (let otherStateName in this._states) {
       let interaction = this._states[otherStateName].interaction;
@@ -102,7 +102,7 @@ export class States {
       }
     }
   }
-  renameState(oldStateName: string, newStateName: string): void {
+  renameState (oldStateName: string, newStateName: string): void {
     this._states[newStateName] = this._states[oldStateName];
     this._states[newStateName].setName(newStateName);
     delete this._states[oldStateName];
@@ -122,10 +122,10 @@ export class States {
       }
     }
   }
-  getStateNames(): string[] {
+  getStateNames (): string[] {
     return Object.keys(this._states);
   }
-  getFinalStateNames(): string[] {
+  getFinalStateNames (): string[] {
     let finalStateNames = [];
     for (let stateName in this._states) {
       let interaction = this._states[stateName].interaction;
@@ -139,7 +139,7 @@ export class States {
     return finalStateNames;
   }
 
-  _getAllLanguageCodesFor(translationType: TranslationType): string[] {
+  _getAllLanguageCodesFor (translationType: TranslationType): string[] {
     const allLanguageCodes = new Set<string>();
     Object.values(this._states).forEach(state => {
       state[translationType].getAllContentIds().forEach(contentId => {
@@ -153,15 +153,15 @@ export class States {
     return [...allLanguageCodes];
   }
 
-  getAllVoiceoverLanguageCodes(): string[] {
+  getAllVoiceoverLanguageCodes (): string[] {
     return this._getAllLanguageCodesFor(RECORDED_VOICEOVERS_KEY);
   }
 
-  getAllWrittenTranslationLanguageCodes(): string[] {
+  getAllWrittenTranslationLanguageCodes (): string[] {
     return this._getAllLanguageCodesFor(WRITTEN_TRANSLATIONS_KEY);
   }
 
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
+  getAllVoiceovers (languageCode: string): VoiceoverObjectsDict {
     let allAudioTranslations: VoiceoverObjectsDict = {};
     for (let stateName in this._states) {
       let state = this._states[stateName];
@@ -179,7 +179,7 @@ export class States {
     return allAudioTranslations;
   }
 
-  areWrittenTranslationsDisplayable(languageCode: string): boolean {
+  areWrittenTranslationsDisplayable (languageCode: string): boolean {
     // A language's translations are ready to be displayed if there are less
     // than five missing or update-needed translations. In addition, all
     // rule-related translations must be present.
@@ -228,8 +228,8 @@ export class States {
   providedIn: 'root'
 })
 export class StatesObjectFactory {
-  constructor(private stateObject: StateObjectFactory) {}
-  createFromBackendDict(statesBackendDict: StateObjectsBackendDict): States {
+  constructor (private stateObject: StateObjectFactory) {}
+  createFromBackendDict (statesBackendDict: StateObjectsBackendDict): States {
     let stateObjectsDict: StateObjectsDict = {};
     for (let stateName in statesBackendDict) {
       stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(

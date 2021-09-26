@@ -38,16 +38,16 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   currentValue!: string;
   choices: TranslatableHtmlContentIdEditorChoices = [];
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor (private changeDetectorRef: ChangeDetectorRef) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.name = Math.random().toString(36).substring(7);
     this.choices = this.initArgs.choices;
 
     this.currentValue = this.value || this.choices[0].val;
   }
 
-  updateLocalValue(value: string): void {
+  updateLocalValue (value: string): void {
     if (this.value === value) {
       return;
     }

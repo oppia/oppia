@@ -30,7 +30,7 @@ require('pages/exploration-editor-page/services/exploration-property.service');
 require(
   'pages/exploration-editor-page/services/exploration-init-state-name.service');
 
-describe('Exploration Warnings Service', function() {
+describe('Exploration Warnings Service', function () {
   var ExplorationWarningsService = null;
   var ExplorationStatesService = null;
   var StateTopAnswersStatsService = null;
@@ -39,8 +39,8 @@ describe('Exploration Warnings Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-  describe('when exploration param changes has jinja values', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+  describe('when exploration param changes has jinja values', function () {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('ExplorationInitStateNameService', {
         savedMemento: 'Hola',
         displayed: 'Hola'
@@ -69,7 +69,7 @@ describe('Exploration Warnings Service', function() {
         }]
       });
     }));
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       ExplorationWarningsService = $injector.get('ExplorationWarningsService');
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       StateTopAnswersStatsBackendApiService = $injector.get(
@@ -78,7 +78,7 @@ describe('Exploration Warnings Service', function() {
         'StateTopAnswersStatsService');
     }));
 
-    it('should update warnings with TextInput as interaction id', function() {
+    it('should update warnings with TextInput as interaction id', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -161,7 +161,7 @@ describe('Exploration Warnings Service', function() {
       });
     });
 
-    it('should update warnings with Continue as interaction id', function() {
+    it('should update warnings with Continue as interaction id', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -259,7 +259,7 @@ describe('Exploration Warnings Service', function() {
       });
     });
 
-    it('should update warnings when no interaction id is provided', function() {
+    it('should update warnings when no interaction id is provided', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -333,7 +333,7 @@ describe('Exploration Warnings Service', function() {
     });
 
     it('should update warnings when there is a solution in the interaction',
-      function() {
+      function () {
         ExplorationStatesService.init({
           Hola: {
             card_is_checkpoint: true,
@@ -426,7 +426,7 @@ describe('Exploration Warnings Service', function() {
       });
 
     it('should update warnings when state top answers stats is initiated',
-      fakeAsync(async function() {
+      fakeAsync(async function () {
         ExplorationStatesService.init({
           Hola: {
             card_is_checkpoint: true,
@@ -529,7 +529,7 @@ describe('Exploration Warnings Service', function() {
       }));
 
     it('should update warnings when state name is not equal to the default' +
-    ' outcome destination', function() {
+    ' outcome destination', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -618,7 +618,7 @@ describe('Exploration Warnings Service', function() {
     });
 
     it('should update warnings when there are two states but only one saved' +
-    ' memento value', function() {
+    ' memento value', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -768,7 +768,7 @@ describe('Exploration Warnings Service', function() {
       });
     });
 
-    it('should update warning when first card is not a checkpoint', function() {
+    it('should update warning when first card is not a checkpoint', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: false,
@@ -834,7 +834,7 @@ describe('Exploration Warnings Service', function() {
       });
     });
 
-    it('should show warning if terminal card is a checkpoint', function() {
+    it('should show warning if terminal card is a checkpoint', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -941,7 +941,7 @@ describe('Exploration Warnings Service', function() {
     });
 
     it('should show warnings if checkpoint count is more than 8 and' +
-      ' bypassable state is made a checkpoint', function() {
+      ' bypassable state is made a checkpoint', function () {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -1385,8 +1385,8 @@ describe('Exploration Warnings Service', function() {
     });
   });
 
-  describe('when exploration param changes has no jinja values', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+  describe('when exploration param changes has no jinja values', function () {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('ExplorationInitStateNameService', {
         savedMemento: 'Hola'
       });
@@ -1400,12 +1400,12 @@ describe('Exploration Warnings Service', function() {
         }]
       });
     }));
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       ExplorationWarningsService = $injector.get('ExplorationWarningsService');
       ExplorationStatesService = $injector.get('ExplorationStatesService');
     }));
 
-    it('should update warning to an empty array', function() {
+    it('should update warning to an empty array', function () {
       ExplorationStatesService.init(<StateObjectsBackendDict> {
         Hola: {
           content: {

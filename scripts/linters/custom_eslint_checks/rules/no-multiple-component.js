@@ -37,7 +37,7 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var numOfDirective,
       numOfController,
       numOfFilter,
@@ -49,14 +49,14 @@ module.exports = {
       '[object.callee.object.name=angular]');
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         numOfDirective = 0;
         numOfController = 0;
         numOfFilter = 0;
         numOfFactory = 0;
       },
 
-      [selector]: function(node) {
+      [selector]: function (node) {
         switch (node.property.name) {
           case 'controller':
             numOfController++;
@@ -73,7 +73,7 @@ module.exports = {
         }
       },
 
-      'Program:exit': function(node) {
+      'Program:exit': function (node) {
         var totalComponent = (
           numOfDirective + numOfController + numOfFilter + numOfFactory);
         if (totalComponent > 1) {

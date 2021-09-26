@@ -44,40 +44,40 @@ export interface TranslationBackendDict {
 }
 
 export class WrittenTranslation {
-  constructor(
+  constructor (
       public dataFormat: DataFormatToDefaultValuesKey,
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
 
-  markAsNeedingUpdate(): void {
+  markAsNeedingUpdate (): void {
     this.needsUpdate = true;
   }
 
-  toggleNeedsUpdateAttribute(): void {
+  toggleNeedsUpdateAttribute (): void {
     this.needsUpdate = !this.needsUpdate;
   }
 
-  isHtml(): boolean {
+  isHtml (): boolean {
     return this.dataFormat === TRANSLATION_DATA_FORMAT_HTML;
   }
 
-  isUnicode(): boolean {
+  isUnicode (): boolean {
     return this.dataFormat === TRANSLATION_DATA_FORMAT_UNICODE;
   }
 
-  isSetOfStrings(): boolean {
+  isSetOfStrings (): boolean {
     return [
       TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
       TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
     ].indexOf(this.dataFormat) !== -1;
   }
 
-  getTranslation(): string|string[] {
+  getTranslation (): string|string[] {
     return this.translation;
   }
 
-  setTranslation(translation: string|string[]): void {
+  setTranslation (translation: string|string[]): void {
     if (typeof translation !==
         typeof DATA_FORMAT_TO_DEFAULT_VALUES[
           <DataFormatToDefaultValuesKey> this.dataFormat]) {
@@ -88,7 +88,7 @@ export class WrittenTranslation {
     this.translation = translation;
   }
 
-  toBackendDict(): TranslationBackendDict {
+  toBackendDict (): TranslationBackendDict {
     return {
       data_format: this.dataFormat,
       translation: this.translation,
@@ -101,7 +101,7 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(dataFormat: string): WrittenTranslation {
+  createNew (dataFormat: string): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
@@ -117,7 +117,7 @@ export class WrittenTranslationObjectFactory {
     );
   }
 
-  createFromBackendDict(
+  createFromBackendDict (
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
       <DataFormatToDefaultValuesKey> translationBackendDict.data_format,

@@ -84,7 +84,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory',
   'DEFAULT_LANGUAGE_CODE',
-  function(
+  function (
       $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       EditabilityService,
@@ -109,7 +109,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
     var _initExplorationPageEventEmitter = new EventEmitter();
 
-    var isAdditionalMetadataNeeded = function() {
+    var isAdditionalMetadataNeeded = function () {
       return (
         !ExplorationTitleService.savedMemento ||
         !ExplorationObjectiveService.savedMemento ||
@@ -119,21 +119,21 @@ angular.module('oppia').factory('ExplorationSaveService', [
         ExplorationTagsService.savedMemento.length === 0);
     };
 
-    var showCongratulatorySharingModal = function() {
+    var showCongratulatorySharingModal = function () {
       return $uibModal.open({
         template: require(
           'pages/exploration-editor-page/modal-templates/' +
           'post-publish-modal.template.html'),
         backdrop: true,
         controller: 'PostPublishModalController'
-      }).result.then(function() {}, function() {
+      }).result.then(function () {}, function () {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
       });
     };
 
-    var openPublishExplorationModal = function(
+    var openPublishExplorationModal = function (
         onStartSaveCallback, onSaveDoneCallback) {
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
@@ -144,13 +144,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
           'exploration-publish-modal.template.html'),
         backdrop: 'static',
         controller: 'ConfirmOrCancelModalController'
-      }).result.then(function() {
+      }).result.then(function () {
         if (onStartSaveCallback) {
           onStartSaveCallback();
         }
 
         ExplorationRightsService.publish().then(
-          function() {
+          function () {
             if (onSaveDoneCallback) {
               onSaveDoneCallback();
             }
@@ -160,7 +160,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               ExplorationDataService.explorationId);
             whenModalClosed.resolve();
           });
-      }, function() {
+      }, function () {
         AlertsService.clearWarnings();
         whenModalClosed.resolve();
       });
@@ -168,7 +168,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       return whenModalClosed.promise;
     };
 
-    var saveDraftToBackend = function(commitMessage) {
+    var saveDraftToBackend = function (commitMessage) {
       // Resolved when save is done
       // (regardless of success or failure of the operation).
       var whenSavingDone = $q.defer();
@@ -192,7 +192,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
       ExplorationDataService.save(
         changeList, commitMessage,
-        function(isDraftVersionValid, draftChanges) {
+        function (isDraftVersionValid, draftChanges) {
           if (isDraftVersionValid === false &&
               draftChanges !== null &&
               draftChanges.length > 0) {
@@ -216,7 +216,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             whenSavingDone.resolve();
             $rootScope.$applyAsync();
           });
-        }, function() {
+        }, function () {
           saveIsInProgress = false;
           whenSavingDone.resolve();
           $rootScope.$applyAsync();
@@ -226,7 +226,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
     };
 
     return {
-      isExplorationSaveable: function() {
+      isExplorationSaveable: function () {
         return (
           ChangeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
@@ -240,7 +240,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
         );
       },
 
-      discardChanges: function() {
+      discardChanges: function () {
         $uibModal.open({
           template: require(
             'pages/exploration-editor-page/modal-templates/' +
@@ -248,7 +248,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           backdrop: 'static',
           keyboard: false,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           AlertsService.clearWarnings();
           ExternalSaveService.onExternalSave.emit();
 
@@ -275,14 +275,14 @@ angular.module('oppia').factory('ExplorationSaveService', [
             // (since it is already cached in ExplorationDataService).
             $window.location.reload();
           });
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       },
 
-      showPublishExplorationModal: function(
+      showPublishExplorationModal: function (
           onStartLoadingCallback, onEndLoadingCallback) {
         // This is resolved after publishing modals are closed,
         // so we can remove the loading-dots.
@@ -303,14 +303,14 @@ angular.module('oppia').factory('ExplorationSaveService', [
             controller: 'ExplorationMetadataModalController'
           });
 
-          modalInstance.opened.then(function() {
+          modalInstance.opened.then(function () {
             // Toggle loading dots off after modal is opened.
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }
           });
 
-          modalInstance.result.then(function(metadataList) {
+          modalInstance.result.then(function (metadataList) {
             if (metadataList.length > 0) {
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
@@ -319,24 +319,24 @@ angular.module('oppia').factory('ExplorationSaveService', [
                 onStartLoadingCallback();
               }
 
-              saveDraftToBackend(commitMessage).then(function() {
+              saveDraftToBackend(commitMessage).then(function () {
                 if (onEndLoadingCallback) {
                   onEndLoadingCallback();
                 }
                 openPublishExplorationModal(
                   onStartLoadingCallback, onEndLoadingCallback)
-                  .then(function() {
+                  .then(function () {
                     whenModalsClosed.resolve();
                   });
               });
             } else {
               openPublishExplorationModal(
                 onStartLoadingCallback, onEndLoadingCallback)
-                .then(function() {
+                .then(function () {
                   whenModalsClosed.resolve();
                 });
             }
-          }, function() {
+          }, function () {
             whenModalsClosed.resolve();
             ExplorationTitleService.restoreFromMemento();
             ExplorationObjectiveService.restoreFromMemento();
@@ -349,14 +349,14 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // No further metadata is needed. Open the publish modal immediately.
           openPublishExplorationModal(
             onStartLoadingCallback, onEndLoadingCallback)
-            .then(function() {
+            .then(function () {
               whenModalsClosed.resolve();
             });
         }
         return whenModalsClosed.promise;
       },
 
-      saveChanges: function(onStartLoadingCallback, onEndLoadingCallback) {
+      saveChanges: function (onStartLoadingCallback, onEndLoadingCallback) {
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
         var whenModalClosed = $q.defer();
@@ -371,7 +371,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           return;
         }
 
-        ExplorationDataService.getLastSavedDataAsync().then(function(data) {
+        ExplorationDataService.getLastSavedDataAsync().then(function (data) {
           var oldStates = StatesObjectFactory.createFromBackendDict(
             data.states).getStateObjects();
           var newStates = ExplorationStatesService.getStates()
@@ -409,7 +409,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               'exploration-save-modal.template.html'),
             backdrop: 'static',
             resolve: {
-              isExplorationPrivate: function() {
+              isExplorationPrivate: function () {
                 return ExplorationRightsService.isPrivate();
               },
               diffData: diffData
@@ -421,20 +421,20 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // Modal is Opened.
           modalIsOpen = true;
 
-          modalInstance.opened.then(function() {
+          modalInstance.opened.then(function () {
             // Toggle loading dots off after modal is opened.
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }
             // The $timeout seems to be needed
             // in order to give the modal time to render.
-            $timeout(function() {
+            $timeout(function () {
               FocusManagerService.setFocus('saveChangesModalOpened');
             });
             $rootScope.$applyAsync();
           });
 
-          modalInstance.result.then(function(commitMessage) {
+          modalInstance.result.then(function (commitMessage) {
             modalIsOpen = false;
 
             // Toggle loading dots back on for loading from backend.
@@ -442,12 +442,12 @@ angular.module('oppia').factory('ExplorationSaveService', [
               onStartLoadingCallback();
             }
 
-            saveDraftToBackend(commitMessage).then(function() {
+            saveDraftToBackend(commitMessage).then(function () {
               whenModalClosed.resolve();
               $rootScope.$applyAsync();
             });
             $rootScope.$applyAsync();
-          }, function() {
+          }, function () {
             AlertsService.clearWarnings();
             modalIsOpen = false;
             whenModalClosed.resolve();
@@ -458,7 +458,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
         return whenModalClosed.promise;
       },
 
-      get onInitExplorationPage() {
+      get onInitExplorationPage () {
         return _initExplorationPageEventEmitter;
       }
     };

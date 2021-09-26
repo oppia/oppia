@@ -27,7 +27,7 @@ require('services/alerts.service.ts');
 angular.module('oppia').factory('StoryCreationService', [
   '$http', '$uibModal', '$window', 'AlertsService', 'ImageLocalStorageService',
   'LoaderService', 'TopicEditorStateService', 'UrlInterpolationService',
-  function(
+  function (
       $http, $uibModal, $window, AlertsService, ImageLocalStorageService,
       LoaderService, TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
@@ -35,7 +35,7 @@ angular.module('oppia').factory('StoryCreationService', [
     var storyCreationInProgress = false;
 
     return {
-      createNewCanonicalStory: function() {
+      createNewCanonicalStory: function () {
         if (storyCreationInProgress) {
           return;
         }
@@ -45,7 +45,7 @@ angular.module('oppia').factory('StoryCreationService', [
             'create-new-story-modal.template.html'),
           backdrop: 'static',
           controller: 'CreateNewStoryModalController'
-        }).result.then(function(newlyCreatedStory) {
+        }).result.then(function (newlyCreatedStory) {
           if (!newlyCreatedStory.isValid()) {
             throw new Error('Story fields cannot be empty');
           }
@@ -87,17 +87,17 @@ angular.module('oppia').factory('StoryCreationService', [
               'Content-Type': undefined
             }
           })
-            .then(function(response) {
+            .then(function (response) {
               $window.location = UrlInterpolationService.interpolateUrl(
                 STORY_EDITOR_URL_TEMPLATE, {
                   story_id: response.data.storyId
                 }
               );
-            }, function() {
+            }, function () {
               LoaderService.hideLoadingScreen();
               ImageLocalStorageService.flushStoredImagesData();
             });
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

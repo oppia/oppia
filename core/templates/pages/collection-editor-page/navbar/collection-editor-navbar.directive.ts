@@ -42,7 +42,7 @@ require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('collectionEditorNavbar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -56,14 +56,14 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'CollectionEditorStateService', 'CollectionRightsBackendApiService',
         'CollectionValidationService', 'RouterService',
         'UndoRedoService', 'UrlService',
-        function(
+        function (
             $rootScope, $uibModal, AlertsService,
             CollectionEditorStateService, CollectionRightsBackendApiService,
             CollectionValidationService, RouterService,
             UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var _validateCollection = function() {
+          var _validateCollection = function () {
             if (ctrl.collectionRights.isPrivate()) {
               ctrl.validationIssues = (
                 CollectionValidationService
@@ -77,12 +77,12 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             }
           };
 
-          var _publishCollection = function() {
+          var _publishCollection = function () {
             // TODO(bhenning): This also needs a confirmation of destructive
             // action since it is not reversible.
             CollectionRightsBackendApiService.setCollectionPublicAsync(
               ctrl.collectionId, ctrl.collection.getVersion()).then(
-              function() {
+              function () {
                 ctrl.collectionRights.setPublic();
                 CollectionEditorStateService.setCollectionRights(
                   ctrl.collectionRights);
@@ -93,28 +93,28 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               });
           };
 
-          ctrl.getWarningsCount = function() {
+          ctrl.getWarningsCount = function () {
             return ctrl.validationIssues.length;
           };
 
-          ctrl.getChangeListCount = function() {
+          ctrl.getChangeListCount = function () {
             return UndoRedoService.getChangeCount();
           };
 
-          ctrl.isCollectionSaveable = function() {
+          ctrl.isCollectionSaveable = function () {
             return (
               ctrl.getChangeListCount() > 0 &&
               ctrl.validationIssues.length === 0);
           };
 
-          ctrl.isCollectionPublishable = function() {
+          ctrl.isCollectionPublishable = function () {
             return (
               ctrl.collectionRights.isPrivate() &&
               ctrl.getChangeListCount() === 0 &&
               ctrl.validationIssues.length === 0);
           };
 
-          ctrl.saveChanges = function() {
+          ctrl.saveChanges = function () {
             var isPrivate = ctrl.collectionRights.isPrivate();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -125,18 +125,18 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 isPrivate: () => isPrivate
               },
               controller: 'CollectionEditorSaveModalController'
-            }).result.then(function(commitMessage) {
+            }).result.then(function (commitMessage) {
               CollectionEditorStateService.saveCollection(commitMessage, () => {
                 $rootScope.$applyAsync();
               });
-            }, function() {
+            }, function () {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          ctrl.publishCollection = function() {
+          ctrl.publishCollection = function () {
             var additionalMetadataNeeded = (
               !ctrl.collection.getTitle() ||
               !ctrl.collection.getObjective() ||
@@ -150,12 +150,12 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 backdrop: 'static',
                 controllerAs: '$ctrl',
                 controller: 'CollectionEditorPrePublishModalController'
-              }).result.then(function(metadataList) {
+              }).result.then(function (metadataList) {
                 var commitMessage = (
                   'Add metadata: ' + metadataList.join(', ') + '.');
                 CollectionEditorStateService.saveCollection(
                   commitMessage, _publishCollection);
-              }, function() {
+              }, function () {
                 // This callback is triggered when the Cancel button is
                 // clicked. No further action is needed.
               });
@@ -166,10 +166,10 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
           // Unpublish the collection. Will only show up if the collection is
           // public and the user has access to the collection.
-          ctrl.unpublishCollection = function() {
+          ctrl.unpublishCollection = function () {
             CollectionRightsBackendApiService.setCollectionPrivateAsync(
               ctrl.collectionId, ctrl.collection.getVersion()).then(
-              function() {
+              function () {
                 ctrl.collectionRights.setPrivate();
                 CollectionEditorStateService.setCollectionRights(
                   ctrl.collectionRights);
@@ -177,36 +177,36 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();
-              }, function() {
+              }, function () {
                 AlertsService.addWarning(
                   'There was an error when unpublishing the collection.');
               });
           };
-          ctrl.isLoadingCollection = function() {
+          ctrl.isLoadingCollection = function () {
             return CollectionEditorStateService.isLoadingCollection();
           };
-          ctrl.isSaveInProgress = function() {
+          ctrl.isSaveInProgress = function () {
             return CollectionEditorStateService.isSavingCollection();
           };
-          ctrl.getActiveTabName = function() {
+          ctrl.getActiveTabName = function () {
             return RouterService.getActiveTabName();
           };
-          ctrl.selectMainTab = function() {
+          ctrl.selectMainTab = function () {
             RouterService.navigateToMainTab();
           };
-          ctrl.selectPreviewTab = function() {
+          ctrl.selectPreviewTab = function () {
             RouterService.navigateToPreviewTab();
           };
-          ctrl.selectSettingsTab = function() {
+          ctrl.selectSettingsTab = function () {
             RouterService.navigateToSettingsTab();
           };
-          ctrl.selectStatsTab = function() {
+          ctrl.selectStatsTab = function () {
             RouterService.navigateToStatsTab();
           };
-          ctrl.selectHistoryTab = function() {
+          ctrl.selectHistoryTab = function () {
             RouterService.navigateToHistoryTab();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
                 () => _validateCollection()
@@ -224,7 +224,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
             ctrl.validationIssues = [];
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

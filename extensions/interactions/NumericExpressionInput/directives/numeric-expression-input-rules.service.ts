@@ -29,7 +29,7 @@ import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class NumericExpressionInputRulesService {
-  MatchesExactlyWith(
+  MatchesExactlyWith (
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
     let mis = new MathInteractionsService();
@@ -59,7 +59,7 @@ export class NumericExpressionInputRulesService {
     return answerTerms.length === 0 && inputTerms.length === 0;
   }
 
-  IsEquivalentTo(
+  IsEquivalentTo (
       answer: NumericExpressionAnswer, inputs: NumericExpressionRuleInputs
   ): boolean {
     // TODO(#13083): Remove the 'as unknown as boolean' part after the library
@@ -69,7 +69,7 @@ export class NumericExpressionInputRulesService {
     ) as unknown as boolean;
   }
 
-  ContainsSomeOf(
+  ContainsSomeOf (
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
     // At least one term should match between answer and input.
@@ -89,7 +89,7 @@ export class NumericExpressionInputRulesService {
     return false;
   }
 
-  OmitsSomeOf(
+  OmitsSomeOf (
       answer: NumericExpressionAnswer,
       inputs: NumericExpressionRuleInputs): boolean {
     // There must be at least one term in the input that is not present in the

@@ -37,7 +37,7 @@ export class CreateActivityButtonComponent implements OnInit {
   allowYamlFileUpload: boolean = false;
   userIsLoggedIn: boolean = false;
 
-  constructor(
+  constructor (
     private userService: UserService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlService: UrlService,
@@ -46,7 +46,7 @@ export class CreateActivityButtonComponent implements OnInit {
     private windowRef: WindowRef
   ) {}
 
-  onRedirectToLogin(destinationUrl: string): boolean {
+  onRedirectToLogin (destinationUrl: string): boolean {
     this.siteAnalyticsService.registerStartLoginEvent(
       'createActivityButton');
     setTimeout(() => {
@@ -55,7 +55,7 @@ export class CreateActivityButtonComponent implements OnInit {
     return false;
   }
 
-  initCreationProcess(): void {
+  initCreationProcess (): void {
     // Without this, the modal keeps reopening when the window is
     // resized.
     if (this.creationInProgress) {
@@ -79,11 +79,11 @@ export class CreateActivityButtonComponent implements OnInit {
     }
   }
 
-  showUploadExplorationModal(): void {
+  showUploadExplorationModal (): void {
     this.explorationCreationService.showUploadExplorationModal();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.creationInProgress = false;
     this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
 

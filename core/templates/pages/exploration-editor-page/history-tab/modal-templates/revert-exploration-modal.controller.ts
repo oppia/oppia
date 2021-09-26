@@ -25,7 +25,7 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 angular.module('oppia').controller('RevertExplorationModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'ExplorationDataService', 'version',
-  function(
+  function (
       $controller, $scope, $uibModalInstance,
       ExplorationDataService, version) {
     $controller('ConfirmOrCancelModalController', {
@@ -34,7 +34,7 @@ angular.module('oppia').controller('RevertExplorationModalController', [
     });
 
     $scope.version = version;
-    $scope.getExplorationUrl = function(version) {
+    $scope.getExplorationUrl = function (version) {
       return (
         '/explore/' + ExplorationDataService.explorationId +
         '?v=' + version);

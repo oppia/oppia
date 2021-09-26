@@ -21,7 +21,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('workedExampleEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -34,10 +34,10 @@ angular.module('oppia').directive('workedExampleEditor', [
         'worked-example-editor.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService', 'SkillUpdateService',
-        function($scope, SkillEditorStateService, SkillUpdateService) {
+        function ($scope, SkillEditorStateService, SkillUpdateService) {
           var ctrl = this;
 
-          $scope.openQuestionEditor = function() {
+          $scope.openQuestionEditor = function () {
             if ($scope.isEditable()) {
               $scope.workedExampleQuestionMemento =
                 angular.copy($scope.container.workedExampleQuestionHtml);
@@ -45,7 +45,7 @@ angular.module('oppia').directive('workedExampleEditor', [
             }
           };
 
-          $scope.openExplanationEditor = function() {
+          $scope.openExplanationEditor = function () {
             if ($scope.isEditable()) {
               $scope.workedExampleExplanationMemento =
                 angular.copy($scope.container.workedExampleExplanationHtml);
@@ -53,7 +53,7 @@ angular.module('oppia').directive('workedExampleEditor', [
             }
           };
 
-          $scope.saveWorkedExample = function(inQuestionEditor) {
+          $scope.saveWorkedExample = function (inQuestionEditor) {
             if (inQuestionEditor) {
               $scope.questionEditorIsOpen = false;
             } else {
@@ -77,21 +77,21 @@ angular.module('oppia').directive('workedExampleEditor', [
             }
           };
 
-          $scope.cancelEditQuestion = function() {
+          $scope.cancelEditQuestion = function () {
             $scope.container.workedExampleQuestionHtml = angular.copy(
               $scope.workedExampleQuestionMemento);
             $scope.workedExampleQuestionMemento = null;
             $scope.questionEditorIsOpen = false;
           };
 
-          $scope.cancelEditExplanation = function() {
+          $scope.cancelEditExplanation = function () {
             $scope.container.workedExampleExplanationHtml = angular.copy(
               $scope.workedExampleExplanationMemento);
             $scope.workedExampleExplanationMemento = null;
             $scope.explanationEditorIsOpen = false;
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.questionEditorIsOpen = false;
             $scope.explanationEditorIsOpen = false;
             $scope.container = {

@@ -29,7 +29,7 @@ import { UtilsService } from 'services/utils.service';
 })
 export class StateNextContentIdIndexService
   extends StatePropertyService<number> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveNextContentIdIndex';
   }

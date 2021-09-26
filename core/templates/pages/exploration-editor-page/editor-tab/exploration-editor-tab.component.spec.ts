@@ -59,7 +59,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
 
-describe('Exploration editor tab component', function() {
+describe('Exploration editor tab component', function () {
   var ctrl;
   var $q = null;
   var $scope = null;
@@ -93,7 +93,7 @@ describe('Exploration editor tab component', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -109,7 +109,7 @@ describe('Exploration editor tab component', function() {
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
@@ -144,7 +144,7 @@ describe('Exploration editor tab component', function() {
       TestBed.get(WrittenTranslationsObjectFactory));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -349,12 +349,12 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect(ctrl.interactionIsShown).toBe(false);
     });
 
   it('should get state content placeholder text when init state name is equal' +
-    ' to active state name', function() {
+    ' to active state name', function () {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('First State');
 
@@ -365,7 +365,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should get state content placeholder text when init state name is' +
-    ' different from active state name', function() {
+    ' different from active state name', function () {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('Second State');
 
@@ -373,11 +373,11 @@ describe('Exploration editor tab component', function() {
       'You can speak to the learner here, then ask them a question.');
   });
 
-  it('should get state content save button placeholder', function() {
+  it('should get state content save button placeholder', function () {
     expect(ctrl.getStateContentSaveButtonPlaceholder()).toBe('Save Content');
   });
 
-  it('should add state in exploration states', function() {
+  it('should add state in exploration states', function () {
     spyOn(explorationStatesService, 'addState');
 
     ctrl.addState('Fourth State');
@@ -386,7 +386,7 @@ describe('Exploration editor tab component', function() {
       'Fourth State', null);
   });
 
-  it('should refresh warnings', function() {
+  it('should refresh warnings', function () {
     spyOn(explorationWarningsService, 'updateWarnings');
 
     ctrl.refreshWarnings();
@@ -394,7 +394,7 @@ describe('Exploration editor tab component', function() {
     expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
   });
 
-  it('should save state content', function() {
+  it('should save state content', function () {
     stateEditorService.setActiveStateName('First State');
     expect(explorationStatesService.getState('First State').content).toEqual(
       SubtitledHtml.createFromBackendDict({
@@ -413,7 +413,7 @@ describe('Exploration editor tab component', function() {
     expect(ctrl.interactionIsShown).toBe(true);
   });
 
-  it('should save state interaction id', function() {
+  it('should save state interaction id', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -426,7 +426,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
-  it('should save state next content id index', function() {
+  it('should save state next content id index', function () {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').nextContentIdIndex
@@ -438,7 +438,7 @@ describe('Exploration editor tab component', function() {
     ).toBe(2);
   });
 
-  it('should save linked skill id', function() {
+  it('should save linked skill id', function () {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').linkedSkillId
@@ -450,7 +450,7 @@ describe('Exploration editor tab component', function() {
     ).toBe('skill_id1');
   });
 
-  it('should save interaction answer groups', function() {
+  it('should save interaction answer groups', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -490,7 +490,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.answerGroups).toEqual(displayedValue);
   });
 
-  it('should save interaction default outcome', function() {
+  it('should save interaction default outcome', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -523,7 +523,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction customization args', function() {
+  it('should save interaction customization args', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -547,7 +547,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction solution', function() {
+  it('should save interaction solution', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -576,7 +576,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction hints', function() {
+  it('should save interaction hints', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -595,7 +595,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save solicit answer details', function() {
+  it('should save solicit answer details', function () {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setSolicitAnswerDetails(
       explorationStatesService.getState('First State').solicitAnswerDetails);
@@ -607,7 +607,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.solicitAnswerDetails).toBe(true);
   });
 
-  it('should save card is checkpoint on change', function() {
+  it('should save card is checkpoint on change', function () {
     stateEditorService.setActiveStateName('Second State');
     stateEditorService.setCardIsCheckpoint(
       explorationStatesService.getState('Second State').cardIsCheckpoint);
@@ -620,7 +620,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.cardIsCheckpoint).toBe(true);
   });
 
-  it('should mark all audio as needing update when closing modal', function() {
+  it('should mark all audio as needing update when closing modal', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -649,7 +649,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should not mark all audio as needing update when dismissing modal',
-    function() {
+    function () {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -677,7 +677,7 @@ describe('Exploration editor tab component', function() {
         .toBe(false);
     });
 
-  it('should navigate to main tab in specific state name', function() {
+  it('should navigate to main tab in specific state name', function () {
     spyOn(routerService, 'navigateToMainTab');
 
     var stateName = 'Second State';
@@ -686,7 +686,7 @@ describe('Exploration editor tab component', function() {
     expect(routerService.navigateToMainTab).toHaveBeenCalledWith(stateName);
   });
 
-  it('should evaluate if parameters are enabled', function() {
+  it('should evaluate if parameters are enabled', function () {
     var areParametersEnabledSpy = spyOn(
       explorationFeaturesService, 'areParametersEnabled');
 
@@ -698,7 +698,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should correctly broadcast the stateEditorInitialized flag with ' +
-      'the state data', function() {
+      'the state data', function () {
     stateEditorService.setActiveStateName('Second State');
     stateEditorService.updateStateInteractionEditorInitialised();
     stateEditorService.updateStateResponsesInitialised();

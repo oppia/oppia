@@ -110,17 +110,17 @@ describe('Url Service', () => {
       urlService.getTopicIdFromUrl()
     ).toBe('abcdefgijklm');
     mockLocation.pathname = '/topic_editor/abcdefgij';
-    expect(function() {
+    expect(function () {
       urlService.getTopicIdFromUrl();
     }).toThrowError('Invalid topic id url');
 
     mockLocation.pathname = '/topiceditor/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getTopicIdFromUrl();
     }).toThrowError('Invalid topic id url');
 
     mockLocation.pathname = '/topic_editor';
-    expect(function() {
+    expect(function () {
       urlService.getTopicIdFromUrl();
     }).toThrowError('Invalid topic id url');
   });
@@ -134,7 +134,7 @@ describe('Url Service', () => {
 
     mockLocation.pathname = '/blog-dashboard';
     mockLocation.hash = '/blog_post_editor/abcdefgij';
-    expect(function() {
+    expect(function () {
       urlService.getBlogPostIdFromUrl();
     }).toThrowError('Invalid Blog Post Id.');
   });
@@ -176,7 +176,7 @@ describe('Url Service', () => {
       urlService.getSubtopicUrlFragmentFromLearnerUrl()
     ).toBe('negative-numbers');
     mockLocation.pathname = '/sub/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getSubtopicUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for subtopic');
   });
@@ -201,7 +201,7 @@ describe('Url Service', () => {
       urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('topic');
     mockLocation.pathname = '/topc/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getTopicUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for topic');
   });
@@ -218,7 +218,7 @@ describe('Url Service', () => {
       urlService.getClassroomUrlFragmentFromLearnerUrl()
     ).toBe('math');
     mockLocation.pathname = '/english/topic-name';
-    expect(function() {
+    expect(function () {
       urlService.getClassroomUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for classroom');
   });
@@ -230,12 +230,12 @@ describe('Url Service', () => {
       urlService.getSelectedSubtopicsFromUrl()
     ).toBe('abcdefgijklm');
     mockLocation.pathname = '/topic/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getSelectedSubtopicsFromUrl();
     }).toThrowError('Invalid URL for practice session');
     mockLocation.pathname = '/practice_session/topicName';
     mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getSelectedSubtopicsFromUrl();
     }).toThrowError('Invalid URL for practice session');
   });
@@ -250,7 +250,7 @@ describe('Url Service', () => {
       urlService.getClassroomUrlFragmentFromUrl()
     ).toBe('class name');
     mockLocation.pathname = '/invalid/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getClassroomUrlFragmentFromUrl();
     }).toThrowError('Invalid URL for classroom');
   });
@@ -265,11 +265,11 @@ describe('Url Service', () => {
       urlService.getSubtopicIdFromUrl()
     ).toBe('20');
     mockLocation.pathname = '/subtopic/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getSubtopicIdFromUrl();
     }).toThrowError('Invalid URL for subtopic');
     mockLocation.pathname = '/topic/abcdefgijklm/1';
-    expect(function() {
+    expect(function () {
       urlService.getSubtopicIdFromUrl();
     }).toThrowError('Invalid URL for subtopic');
   });
@@ -280,29 +280,29 @@ describe('Url Service', () => {
       urlService.getStoryIdFromUrl()
     ).toBe('abcdefgijklm');
     mockLocation.pathname = '/story_editor/abcdefgij';
-    expect(function() {
+    expect(function () {
       urlService.getStoryIdFromUrl();
     }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/storyeditor/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getStoryIdFromUrl();
     }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/story_editor';
-    expect(function() {
+    expect(function () {
       urlService.getStoryIdFromUrl();
     }).toThrowError('Invalid story id url');
   });
 
   it('should correctly retrieve story id from story viewer url', () => {
     mockLocation.pathname = '/story_viewer/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getStoryIdFromViewerUrl();
     }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/learn/math/abcdefgijklm/story/abcdefg';
-    expect(function() {
+    expect(function () {
       urlService.getStoryIdFromViewerUrl();
     }).toThrowError('Invalid story id url');
 
@@ -318,13 +318,13 @@ describe('Url Service', () => {
       urlService.getSkillIdFromUrl()
     ).toBe('abcdefghijkl');
     mockLocation.pathname = '/skill_editor/abcdefghijk';
-    expect(function() {
+    expect(function () {
       urlService.getSkillIdFromUrl();
     }).toThrowError('Invalid Skill Id');
   });
 
   it('should correctly retrieve collection id from url in exploration player',
-    function() {
+    function () {
       mockLocation.search = '?collection_id=abcdefghijkl';
       expect(
         urlService.getCollectionIdFromExplorationUrl()
@@ -361,7 +361,7 @@ describe('Url Service', () => {
     expect(urlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
 
     mockLocation.pathname = '/wrong_url/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getUsernameFromProfileUrl();
     }).toThrowError('Invalid profile URL');
   });
@@ -371,7 +371,7 @@ describe('Url Service', () => {
     expect(urlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
 
     mockLocation.pathname = '/wrong_url/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getCollectionIdFromUrl();
     }).toThrowError('Invalid collection URL');
   });
@@ -381,12 +381,12 @@ describe('Url Service', () => {
     expect(urlService.getCollectionIdFromEditorUrl()).toBe('abcdefgijklm');
 
     mockLocation.pathname = '/collection_editor/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getCollectionIdFromEditorUrl();
     }).toThrowError('Invalid collection editor URL');
 
     mockLocation.pathname = '/collection_editor/wrong/abcdefgijklm';
-    expect(function() {
+    expect(function () {
       urlService.getCollectionIdFromEditorUrl();
     }).toThrowError('Invalid collection editor URL');
   });

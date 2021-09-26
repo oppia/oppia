@@ -24,7 +24,7 @@ describe('ResponseImageClickInput', () => {
   let component: ResponseImageClickInput;
   let fixture: ComponentFixture<ResponseImageClickInput>;
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return JSON.parse(answer);
     }
   };

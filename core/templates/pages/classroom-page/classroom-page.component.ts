@@ -44,7 +44,7 @@ export class ClassroomPageComponent {
   bannerImageFileUrl!: string;
   classroomData!: ClassroomData;
 
-  constructor(
+  constructor (
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private alertsService: AlertsService,
@@ -58,7 +58,7 @@ export class ClassroomPageComponent {
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.classroomUrlFragment = (
       this.urlService.getClassroomUrlFragmentFromUrl());
     this.bannerImageFileUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -92,7 +92,7 @@ export class ClassroomPageComponent {
     });
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }

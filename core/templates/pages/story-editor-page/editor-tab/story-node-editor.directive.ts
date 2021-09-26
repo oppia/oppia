@@ -47,7 +47,7 @@ import { Subscription } from 'rxjs';
 import storyNodeConstants from 'assets/constants';
 
 angular.module('oppia').directive('storyNodeEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -72,7 +72,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
-        'MAX_CHARS_IN_EXPLORATION_TITLE', function(
+        'MAX_CHARS_IN_EXPLORATION_TITLE', function (
             $rootScope, $scope, $timeout,
             AlertsService,
             ExplorationIdValidationService, FocusManagerService, NgbModal,
@@ -87,12 +87,12 @@ angular.module('oppia').directive('storyNodeEditor', [
             MAX_CHARS_IN_EXPLORATION_TITLE);
           $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
             MAX_CHARS_IN_CHAPTER_DESCRIPTION);
-          var _recalculateAvailableNodes = function() {
+          var _recalculateAvailableNodes = function () {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
             var linearNodesList =
               $scope.story.getStoryContents().getLinearNodesList();
-            var linearNodeIds = linearNodesList.map(function(node) {
+            var linearNodeIds = linearNodesList.map(function (node) {
               return node.getId();
             });
             for (var i = 0; i < $scope.storyNodeIds.length; i++) {
@@ -114,7 +114,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
           var categorizedSkills = null;
           var untriagedSkillSummaries = null;
-          var _init = function() {
+          var _init = function () {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
             $scope.nodeIdToTitleMap =
@@ -126,7 +126,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-              .then(function(response) {
+              .then(function (response) {
                 categorizedSkills = response.categorizedSkillsDict;
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $scope.skillInfoHasLoaded = true;
@@ -161,16 +161,16 @@ angular.module('oppia').directive('storyNodeEditor', [
             };
           };
 
-          $scope.getSkillEditorUrl = function(skillId) {
+          $scope.getSkillEditorUrl = function (skillId) {
             return '/skill_editor/' + skillId;
           };
 
-          $scope.checkCanSaveExpId = function() {
+          $scope.checkCanSaveExpId = function () {
             $scope.expIdCanBeSaved = $scope.explorationIdPattern.test(
               $scope.explorationId) || !$scope.explorationId;
             $scope.invalidExpErrorIsShown = false;
           };
-          $scope.updateTitle = function(newTitle) {
+          $scope.updateTitle = function (newTitle) {
             if (newTitle !== $scope.currentTitle) {
               var titleIsValid = true;
               for (var idx in $scope.story.getStoryContents().getNodes()) {
@@ -189,7 +189,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
 
-          $scope.updateDescription = function(newDescription) {
+          $scope.updateDescription = function (newDescription) {
             if (newDescription !== $scope.currentDescription) {
               StoryUpdateService.setStoryNodeDescription(
                 $scope.story, $scope.getId(), newDescription);
@@ -197,7 +197,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
 
-          $scope.updateThumbnailFilename = function(newThumbnailFilename) {
+          $scope.updateThumbnailFilename = function (newThumbnailFilename) {
             if (newThumbnailFilename !== $scope.editableThumbnailFilename) {
               StoryUpdateService.setStoryNodeThumbnailFilename(
                 $scope.story, $scope.getId(), newThumbnailFilename);
@@ -206,7 +206,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.$applyAsync();
           };
 
-          $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
+          $scope.updateThumbnailBgColor = function (newThumbnailBgColor) {
             if (newThumbnailBgColor !== $scope.editableThumbnailBgColor) {
               StoryUpdateService.setStoryNodeThumbnailBgColor(
                 $scope.story, $scope.getId(), newThumbnailBgColor);
@@ -214,16 +214,16 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
 
-          $scope.viewNodeEditor = function(nodeId) {
+          $scope.viewNodeEditor = function (nodeId) {
             StoryEditorStateService.onViewStoryNodeEditor.emit(nodeId);
           };
 
-          $scope.finalizeOutline = function() {
+          $scope.finalizeOutline = function () {
             StoryUpdateService.finalizeStoryNodeOutline(
               $scope.story, $scope.getId());
           };
 
-          $scope.updateExplorationId = function(explorationId) {
+          $scope.updateExplorationId = function (explorationId) {
             $scope.toggleExplorationInputButtons();
             if (StoryEditorStateService.isStoryPublished()) {
               if (explorationId === '' || explorationId === null) {
@@ -233,7 +233,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 return;
               }
               ExplorationIdValidationService.isExpPublishedAsync(
-                explorationId).then(function(expIdIsValid) {
+                explorationId).then(function (expIdIsValid) {
                 $scope.expIdIsValid = expIdIsValid;
                 if ($scope.expIdIsValid) {
                   StoryUpdateService.setStoryNodeExplorationId(
@@ -259,13 +259,13 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
 
-          $scope.removePrerequisiteSkillId = function(skillId) {
+          $scope.removePrerequisiteSkillId = function (skillId) {
             StoryUpdateService.removePrerequisiteSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
             $scope.$applyAsync();
           };
 
-          $scope.addPrerequisiteSkillId = function() {
+          $scope.addPrerequisiteSkillId = function () {
             var sortedSkillSummaries = (
               StoryEditorStateService.getSkillSummaries());
             var allowSkillsFromOtherTopics = true;
@@ -284,7 +284,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               allowSkillsFromOtherTopics);
             modalRef.componentInstance.untriagedSkillSummaries = (
               untriagedSkillSummaries);
-            modalRef.result.then(function(summary) {
+            modalRef.result.then(function (summary) {
               try {
                 $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
@@ -296,14 +296,14 @@ angular.module('oppia').directive('storyNodeEditor', [
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
               $rootScope.$applyAsync();
-            }, function() {
+            }, function () {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          $scope.addAcquiredSkillId = function() {
+          $scope.addAcquiredSkillId = function () {
             var sortedSkillSummaries = (
               StoryEditorStateService.getSkillSummaries());
             var allowSkillsFromOtherTopics = false;
@@ -325,7 +325,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               allowSkillsFromOtherTopics);
             modalRef.componentInstance.untriagedSkillSummaries = (
               untriagedSkillSummaries);
-            modalRef.result.then(function(summary) {
+            modalRef.result.then(function (summary) {
               try {
                 StoryUpdateService.addAcquiredSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);
@@ -336,37 +336,37 @@ angular.module('oppia').directive('storyNodeEditor', [
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
               $rootScope.$applyAsync();
-            }, function() {
+            }, function () {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          $scope.removeAcquiredSkillId = function(skillId) {
+          $scope.removeAcquiredSkillId = function (skillId) {
             StoryUpdateService.removeAcquiredSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
             $scope.$applyAsync();
           };
 
-          $scope.unfinalizeOutline = function() {
+          $scope.unfinalizeOutline = function () {
             StoryUpdateService.unfinalizeStoryNodeOutline(
               $scope.story, $scope.getId());
           };
 
-          $scope.openNodeTitleEditor = function() {
+          $scope.openNodeTitleEditor = function () {
             $scope.nodeTitleEditorIsShown = true;
           };
 
-          $scope.closeNodeTitleEditor = function() {
+          $scope.closeNodeTitleEditor = function () {
             $scope.nodeTitleEditorIsShown = false;
           };
 
-          $scope.isOutlineModified = function(outline) {
+          $scope.isOutlineModified = function (outline) {
             return ($scope.oldOutline !== outline);
           };
 
-          $scope.updateOutline = function(newOutline) {
+          $scope.updateOutline = function (newOutline) {
             if ($scope.isOutlineModified(newOutline)) {
               StoryUpdateService.setStoryNodeOutline(
                 $scope.story, $scope.getId(), newOutline);
@@ -374,46 +374,46 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
 
-          $scope.togglePreview = function() {
+          $scope.togglePreview = function () {
             $scope.chapterPreviewCardIsShown = (
               !$scope.chapterPreviewCardIsShown);
           };
 
-          $scope.togglePrerequisiteSkillsList = function() {
+          $scope.togglePrerequisiteSkillsList = function () {
             if (WindowDimensionsService.isWindowNarrow()) {
               $scope.prerequisiteSkillIsShown =
                   !$scope.prerequisiteSkillIsShown;
             }
           };
-          $scope.toggleChapterOutline = function() {
+          $scope.toggleChapterOutline = function () {
             if (WindowDimensionsService.isWindowNarrow()) {
               $scope.chapterOutlineIsShown = !$scope.chapterOutlineIsShown;
             }
           };
-          $scope.toggleAcquiredSkillsList = function() {
+          $scope.toggleAcquiredSkillsList = function () {
             if (WindowDimensionsService.isWindowNarrow()) {
               $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
             }
           };
-          $scope.toggleChapterCard = function() {
+          $scope.toggleChapterCard = function () {
             if (WindowDimensionsService.isWindowNarrow()) {
               $scope.mainChapterCardIsShown = !$scope.mainChapterCardIsShown;
             }
           };
-          $scope.toggleChapterTodoCard = function() {
+          $scope.toggleChapterTodoCard = function () {
             if (WindowDimensionsService.isWindowNarrow()) {
               $scope.chapterTodoCardIsShown = !$scope.chapterTodoCardIsShown;
             }
           };
-          $scope.toggleExplorationInputButtons = function() {
+          $scope.toggleExplorationInputButtons = function () {
             $scope.explorationInputButtonsAreShown = (
               !$scope.explorationInputButtonsAreShown);
           };
-          $scope.toggleChapterOutlineButtons = function() {
+          $scope.toggleChapterOutlineButtons = function () {
             $scope.chapterOutlineButtonsAreShown = (
               !$scope.chapterOutlineButtonsAreShown);
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
             // is not being used here, as the chapter of the story can be saved
@@ -456,7 +456,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }, 0);
           };
 
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

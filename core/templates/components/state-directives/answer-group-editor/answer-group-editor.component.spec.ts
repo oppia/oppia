@@ -54,7 +54,7 @@ describe('AnswerGroupEditorComponent', () => {
     ctrl.$onDestroy();
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.constant('INTERACTION_SPECS', {
       TextInput: {
         is_linear: false,
@@ -82,7 +82,7 @@ describe('AnswerGroupEditorComponent', () => {
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 

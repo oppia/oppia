@@ -46,18 +46,18 @@ class MockWindowRef {
 }
 
 class MockWindowDimensionsService {
-  getResizeEvent() {
+  getResizeEvent () {
     return {
       subscribe: (callb) => {
         callb();
         return {
-          unsubscribe() {}
+          unsubscribe () {}
         };
       }
     };
   }
 
-  getWidth(): number {
+  getWidth (): number {
     return 700;
   }
 }

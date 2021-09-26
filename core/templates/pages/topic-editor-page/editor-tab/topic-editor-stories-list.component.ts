@@ -35,12 +35,12 @@ angular.module('oppia').component('topicEditorStoriesList', {
   controller: [
     '$scope', '$uibModal', '$window', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService',
-    function(
+    function (
         $scope, $uibModal, $window, TopicUpdateService,
         UndoRedoService, UrlInterpolationService) {
       var ctrl = this;
       var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
-      $scope.openStoryEditor = function(storyId) {
+      $scope.openStoryEditor = function (storyId) {
         if (UndoRedoService.getChangeCount() > 0) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -48,7 +48,7 @@ angular.module('oppia').component('topicEditorStoriesList', {
                   'topic-save-pending-changes-modal.template.html'),
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {}, function() {
+          }).result.then(function () {}, function () {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -62,14 +62,14 @@ angular.module('oppia').component('topicEditorStoriesList', {
         }
       };
 
-      $scope.deleteCanonicalStory = function(storyId) {
+      $scope.deleteCanonicalStory = function (storyId) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
                 'delete-story-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           TopicUpdateService.removeCanonicalStory(
             ctrl.getTopic(), storyId);
           for (var i = 0; i < ctrl.storySummaries.length; i++) {
@@ -77,14 +77,14 @@ angular.module('oppia').component('topicEditorStoriesList', {
               ctrl.storySummaries.splice(i, 1);
             }
           }
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      $scope.onMoveStoryFinish = function(toIndex) {
+      $scope.onMoveStoryFinish = function (toIndex) {
         $scope.toIndex = toIndex;
         if ($scope.fromIndex === $scope.toIndex) {
           return;
@@ -97,11 +97,11 @@ angular.module('oppia').component('topicEditorStoriesList', {
         ctrl.storySummaries.splice($scope.toIndex, 0, storySummary);
       };
 
-      $scope.onMoveStoryStart = function(fromIndex) {
+      $scope.onMoveStoryStart = function (fromIndex) {
         $scope.fromIndex = fromIndex;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.STORY_TABLE_COLUMN_HEADINGS = [
           'title', 'node_count', 'publication_status'];
       };

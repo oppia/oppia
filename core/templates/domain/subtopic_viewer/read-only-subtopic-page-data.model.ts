@@ -39,7 +39,7 @@ export class ReadOnlySubtopicPageData {
   pageContents: SubtopicPageContents;
   nextSubtopic: Subtopic | null;
 
-  constructor(
+  constructor (
       parentTopicId: string,
       parentTopicName: string,
       subtopicTitle: string,
@@ -53,27 +53,27 @@ export class ReadOnlySubtopicPageData {
     this.nextSubtopic = nextSubtopic;
   }
 
-  getParentTopicId(): string {
+  getParentTopicId (): string {
     return this.parentTopicId;
   }
 
-  getParentTopicName(): string {
+  getParentTopicName (): string {
     return this.parentTopicName;
   }
 
-  getSubtopicTitle(): string {
+  getSubtopicTitle (): string {
     return this.subtopicTitle;
   }
 
-  getPageContents(): SubtopicPageContents {
+  getPageContents (): SubtopicPageContents {
     return this.pageContents;
   }
 
-  getNextSubtopic(): Subtopic | null {
+  getNextSubtopic (): Subtopic | null {
     return this.nextSubtopic;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       subtopicDataBackendDict: SubtopicDataBackendDict):
   ReadOnlySubtopicPageData {
     let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (

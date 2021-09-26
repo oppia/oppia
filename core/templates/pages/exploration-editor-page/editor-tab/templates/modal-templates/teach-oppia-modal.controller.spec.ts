@@ -41,7 +41,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Teach Oppia Modal Controller', function() {
+describe('Teach Oppia Modal Controller', function () {
   importAllAngularServices();
 
   var $httpBackend = null;
@@ -132,14 +132,14 @@ describe('Teach Oppia Modal Controller', function() {
     });
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     angularNameService = TestBed.get(AngularNameService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', angularNameService);
     $provide.value(
       'TextInputRulesService',
@@ -161,8 +161,8 @@ describe('Teach Oppia Modal Controller', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  describe('when successfully fetching top unresolved answers', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+  describe('when successfully fetching top unresolved answers', function () {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       alertsService = $injector.get('AlertsService');
       $httpBackend = $injector.get('$httpBackend');
       var $rootScope = $injector.get('$rootScope');
@@ -218,7 +218,7 @@ describe('Teach Oppia Modal Controller', function() {
     }));
 
     it('should initialize unresolved answer properties after controller is' +
-      ' initialized', function() {
+      ' initialized', function () {
       var unresolvedAnswers = $scope.unresolvedAnswers[0];
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
@@ -227,7 +227,7 @@ describe('Teach Oppia Modal Controller', function() {
     });
 
     it('should confirm answer assignment when its type is default_outcome',
-      function() {
+      function () {
         spyOn(alertsService, 'addSuccessMessage');
         spyOn(trainingDataService, 'associateWithDefaultResponse').and
           .callFake(() => {});
@@ -238,7 +238,7 @@ describe('Teach Oppia Modal Controller', function() {
       });
 
     it('should confirm answer assignment when its type is not default_outcome',
-      function() {
+      function () {
         spyOn(alertsService, 'addSuccessMessage');
         spyOn(trainingDataService, 'associateWithAnswerGroup').and
           .callFake(() => {});
@@ -262,9 +262,9 @@ describe('Teach Oppia Modal Controller', function() {
           'The answer Correct a... has been successfully trained.', 2000);
       });
 
-    it('should open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function () {
       spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
+        .callFake(function (answer, callback) {
           callback();
         });
       spyOn(alertsService, 'addSuccessMessage');
@@ -276,10 +276,10 @@ describe('Teach Oppia Modal Controller', function() {
     });
   });
 
-  describe('when fetching top unresolved answers fails', function() {
+  describe('when fetching top unresolved answers fails', function () {
     var $logSpy = null;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       alertsService = $injector.get('AlertsService');
       $httpBackend = $injector.get('$httpBackend');
       $log = $injector.get('$log');
@@ -333,7 +333,7 @@ describe('Teach Oppia Modal Controller', function() {
     }));
 
     it('should initialize controller properties after its initialization',
-      function() {
+      function () {
         expect($logSpy.calls.allArgs()).toContain(
           ['Error occurred while fetching unresolved answers ' +
           'for exploration exp1 state Introduction: Server error.']);

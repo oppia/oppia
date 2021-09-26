@@ -29,7 +29,7 @@ export class BooleanEditorComponent {
   @Input() value: boolean = false;
   @Output() valueChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  setValue(e: boolean): void {
+  setValue (e: boolean): void {
     this.value = e;
     this.valueChanged.emit(e);
   }

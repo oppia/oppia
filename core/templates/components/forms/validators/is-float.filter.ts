@@ -16,8 +16,8 @@
  * @fileoverview Validator to check if input is float.
  */
 
-angular.module('oppia').filter('isFloat', [function() {
-  return function(input) {
+angular.module('oppia').filter('isFloat', [function () {
+  return function (input) {
     var FLOAT_REGEXP = /(?=.*\d)^\-?\d*(\.|\,)?\d*\%?$/;
     // This regex accepts floats in the following formats:
     // 0.

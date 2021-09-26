@@ -43,7 +43,7 @@ export class BaseContentComponent {
   ONE_YEAR_IN_MSECS = 31536000000;
   directiveSubscriptions = new Subscription();
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private backgroundMaskService: BackgroundMaskService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
@@ -56,7 +56,7 @@ export class BaseContentComponent {
     private cookieService: CookieService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     /**
      * Redirect any developers using the old appspot URL to the
      * test server (see issue #7867 for details).
@@ -84,44 +84,44 @@ export class BaseContentComponent {
     });
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  getHeaderText(): string {
+  getHeaderText (): string {
     return this.pageTitleService.getNavbarTitleForMobileView();
   }
 
-  getSubheaderText(): string {
+  getSubheaderText (): string {
     return this.pageTitleService.getNavbarSubtitleForMobileView();
   }
 
-  isMainProdServer(): boolean {
+  isMainProdServer (): boolean {
     return this.windowRef.nativeWindow.location.hostname ===
       'oppiaserver.appspot.com';
   }
 
-  isSidebarShown(): boolean {
+  isSidebarShown (): boolean {
     return this.sidebarStatusService.isSidebarShown();
   }
 
-  isBottomNavbarShown(): boolean {
+  isBottomNavbarShown (): boolean {
     return this.bottomNavbarStatusService.isBottomNavbarEnabled();
   }
 
-  closeSidebarOnSwipe(): void {
+  closeSidebarOnSwipe (): void {
     this.sidebarStatusService.closeSidebar();
   }
 
-  toggleMobileNavOptions(): void {
+  toggleMobileNavOptions (): void {
     this.mobileNavOptionsAreShown = !this.mobileNavOptionsAreShown;
   }
 
-  isBackgroundMaskActive(): boolean {
+  isBackgroundMaskActive (): boolean {
     return this.backgroundMaskService.isMaskActive();
   }
 
-  skipToMainContent(): void {
+  skipToMainContent (): void {
     // 'getElementById' can return null if the element provided as
     // an argument is invalid.
     let mainContentElement: HTMLElement | null = document.getElementById(
@@ -135,7 +135,7 @@ export class BaseContentComponent {
     mainContentElement.focus();
   }
 
-  hasAcknowledgedCookies(): boolean {
+  hasAcknowledgedCookies (): boolean {
     let cookieSetDateMsecs = this.cookieService.get(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
     return (
@@ -144,7 +144,7 @@ export class BaseContentComponent {
     );
   }
 
-  acknowledgeCookies(): void {
+  acknowledgeCookies (): void {
     let currentDateInUnixTimeMsecs = new Date().valueOf();
     // This cookie should support cross-site context so secure=true and
     // sameSite='none' is set explicitly. Not setting this can cause

@@ -73,7 +73,7 @@ export class TopicEditorStateService {
   private _topicReinitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private editableTopicBackendApiService: EditableTopicBackendApiService,
@@ -86,14 +86,14 @@ export class TopicEditorStateService {
     this._subtopicPage = SubtopicPage.createInterstitialSubtopicPage();
   }
 
-  private _getSubtopicPageId(topicId: string, subtopicId: number): string {
+  private _getSubtopicPageId (topicId: string, subtopicId: number): string {
     if (topicId !== null && subtopicId !== null) {
       return topicId.toString() + '-' + subtopicId.toString();
     }
     return '';
   }
 
-  private _updateGroupedSkillSummaries(
+  private _updateGroupedSkillSummaries (
       groupedSkillSummaries: { [topicName: string]:
         SkillSummaryBackendDict[] }): void {
     this._groupedSkillSummaries.current = [];
@@ -114,13 +114,13 @@ export class TopicEditorStateService {
     }
   }
 
-  private _getSubtopicIdFromSubtopicPageId(subtopicPageId: string): number {
+  private _getSubtopicIdFromSubtopicPageId (subtopicPageId: string): number {
     // The subtopic page id consists of the topic id of length 12, a hyphen
     // and a subtopic id (which is a number).
     return parseInt(subtopicPageId.slice(13));
   }
 
-  private _setTopic(topic: Topic): void {
+  private _setTopic (topic: Topic): void {
     this._topic.copyFromTopic(topic);
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
@@ -133,7 +133,7 @@ export class TopicEditorStateService {
     }
   }
 
-  private _getSubtopicPageIndex(subtopicPageId: string): number | null {
+  private _getSubtopicPageIndex (subtopicPageId: string): number | null {
     for (let i = 0; i < this._cachedSubtopicPages.length; i++) {
       if (this._cachedSubtopicPages[i].getId() === subtopicPageId) {
         return i;
@@ -142,11 +142,11 @@ export class TopicEditorStateService {
     return null;
   }
 
-  private _updateClassroomUrlFragment(classroomUrlFragment: string): void {
+  private _updateClassroomUrlFragment (classroomUrlFragment: string): void {
     this._classroomUrlFragment = classroomUrlFragment;
   }
 
-  private _updateTopic(
+  private _updateTopic (
       newBackendTopicDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): void {
     this._setTopic(
@@ -154,7 +154,7 @@ export class TopicEditorStateService {
         newBackendTopicDict, skillIdToDescriptionDict));
   }
 
-  private _updateSkillIdToRubricsObject(skillIdToRubricsObject: object): void {
+  private _updateSkillIdToRubricsObject (skillIdToRubricsObject: object): void {
     for (let skillId in skillIdToRubricsObject) {
       // Skips deleted skills.
       if (!skillIdToRubricsObject[skillId]) {
@@ -168,29 +168,29 @@ export class TopicEditorStateService {
     }
   }
 
-  private _setSubtopicPage(subtopicPage: SubtopicPage): void {
+  private _setSubtopicPage (subtopicPage: SubtopicPage): void {
     this._subtopicPage.copyFromSubtopicPage(subtopicPage);
     this._cachedSubtopicPages.push(cloneDeep(subtopicPage));
     this._subtopicPageLoadedEventEmitter.emit();
   }
 
-  private _updateSubtopicPage(
+  private _updateSubtopicPage (
       newBackendSubtopicPageObject: SubtopicPageBackendDict): void {
     this._setSubtopicPage(SubtopicPage.createFromBackendDict(
       newBackendSubtopicPageObject));
   }
 
-  private _setTopicRights(topicRights: TopicRights): void {
+  private _setTopicRights (topicRights: TopicRights): void {
     this._topicRights.copyFromTopicRights(topicRights);
   }
 
-  private _updateTopicRights(
+  private _updateTopicRights (
       newBackendTopicRightsObject: TopicRightsBackendDict): void {
     this._setTopicRights(TopicRights.createFromBackendDict(
       newBackendTopicRightsObject));
   }
 
-  private _setCanonicalStorySummaries(
+  private _setCanonicalStorySummaries (
       canonicalStorySummaries: StorySummaryBackendDict[]): void {
     this._canonicalStorySummaries = canonicalStorySummaries.map(
       (storySummaryDict) => {
@@ -200,11 +200,11 @@ export class TopicEditorStateService {
     this._storySummariesInitializedEventEmitter.emit();
   }
 
-  private _setTopicWithNameExists(topicWithNameExists: boolean): void {
+  private _setTopicWithNameExists (topicWithNameExists: boolean): void {
     this._topicWithNameExists = topicWithNameExists;
   }
 
-  private _setTopicWithUrlFragmentExists(
+  private _setTopicWithUrlFragmentExists (
       topicWithUrlFragmentExists: boolean): void {
     this._topicWithUrlFragmentExists = topicWithUrlFragmentExists;
   }
@@ -214,7 +214,7 @@ export class TopicEditorStateService {
    * specified topic ID. See setTopic() for more information on
    * additional behavior of this function.
    */
-  loadTopic(topicId: string): void {
+  loadTopic (topicId: string): void {
     this._topicIsLoading = true;
     let topicDataPromise = this.editableTopicBackendApiService
       .fetchTopicAsync(topicId);
@@ -257,25 +257,25 @@ export class TopicEditorStateService {
     });
   }
 
-  getGroupedSkillSummaries(): object {
+  getGroupedSkillSummaries (): object {
     return cloneDeep(this._groupedSkillSummaries);
   }
 
-  getSkillQuestionCountDict(): object {
+  getSkillQuestionCountDict (): object {
     return this._skillQuestionCountDict;
   }
 
   /**
    * Returns whether the topic name already exists on the server.
    */
-  getTopicWithNameExists(): boolean {
+  getTopicWithNameExists (): boolean {
     return this._topicWithNameExists;
   }
 
   /**
    * Returns whether the topic URL fragment already exists on the server.
    */
-  getTopicWithUrlFragmentExists(): boolean {
+  getTopicWithUrlFragmentExists (): boolean {
     return this._topicWithUrlFragmentExists;
   }
 
@@ -283,7 +283,7 @@ export class TopicEditorStateService {
    * Loads, or reloads, the subtopic page stored by this service given a
    * specified topic ID and subtopic ID.
    */
-  loadSubtopicPage(topicId: string, subtopicId: number): void {
+  loadSubtopicPage (topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
       this._subtopicPage = cloneDeep(
@@ -306,7 +306,7 @@ export class TopicEditorStateService {
    * Returns whether this service is currently attempting to load the
    * topic maintained by this service.
    */
-  isLoadingTopic(): boolean {
+  isLoadingTopic (): boolean {
     return this._topicIsLoading;
   }
 
@@ -314,11 +314,11 @@ export class TopicEditorStateService {
    * Returns whether a topic has yet been loaded using either
    * loadTopic() or setTopic().
    */
-  hasLoadedTopic(): boolean {
+  hasLoadedTopic (): boolean {
     return this._topicIsInitialized;
   }
 
-  getSkillIdToRubricsObject(): object {
+  getSkillIdToRubricsObject (): object {
     return this._skillIdToRubricsObject;
   }
 
@@ -330,18 +330,18 @@ export class TopicEditorStateService {
    * return an empty topic object if the topic has not yet been
    * loaded for this editor instance.
    */
-  getTopic(): Topic {
+  getTopic (): Topic {
     return this._topic;
   }
 
   /**
    * Returns whether the user can create a skill via the topic editor.
    */
-  isSkillCreationAllowed(): boolean {
+  isSkillCreationAllowed (): boolean {
     return this._skillCreationIsAllowed;
   }
 
-  getCanonicalStorySummaries(): StorySummary[] {
+  getCanonicalStorySummaries (): StorySummary[] {
     return this._canonicalStorySummaries;
   }
 
@@ -353,11 +353,11 @@ export class TopicEditorStateService {
    * null, though it may return an empty subtopic page object if the topic
    * has not yet been loaded for this editor instance.
    */
-  getSubtopicPage(): SubtopicPage {
+  getSubtopicPage (): SubtopicPage {
     return this._subtopicPage;
   }
 
-  getCachedSubtopicPages(): SubtopicPage[] {
+  getCachedSubtopicPages (): SubtopicPage[] {
     return this._cachedSubtopicPages;
   }
 
@@ -369,7 +369,7 @@ export class TopicEditorStateService {
    * null, though it may return an empty topic rights object if the
    * topic rights has not yet been loaded for this editor instance.
    */
-  getTopicRights(): TopicRights {
+  getTopicRights (): TopicRights {
     return this._topicRights;
   }
 
@@ -380,7 +380,7 @@ export class TopicEditorStateService {
    * onTopicInitialized. All subsequent
    * calls will similarly fire a onTopicReinitialized event.
    */
-  setTopic(topic: Topic): void {
+  setTopic (topic: Topic): void {
     this._setTopic(topic);
   }
 
@@ -388,7 +388,7 @@ export class TopicEditorStateService {
    * Sets the updated subtopic page object in the correct position in the
    * _cachedSubtopicPages list.
    */
-  setSubtopicPage(subtopicPage: SubtopicPage): void {
+  setSubtopicPage (subtopicPage: SubtopicPage): void {
     if (this._getSubtopicPageIndex(subtopicPage.getId()) !== null) {
       this._cachedSubtopicPages[
         this._getSubtopicPageIndex(subtopicPage.getId())] =
@@ -400,7 +400,7 @@ export class TopicEditorStateService {
     }
   }
 
-  deleteSubtopicPage(topicId: string, subtopicId: number): void {
+  deleteSubtopicPage (topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let index = this._getSubtopicPageIndex(subtopicPageId);
     let newIndex = this._newSubtopicPageIds.indexOf(subtopicPageId);
@@ -448,7 +448,7 @@ export class TopicEditorStateService {
    * changes to all bindings to the topic returned by
    * getTopicRights().
    */
-  setTopicRights(topicRights: TopicRights): void {
+  setTopicRights (topicRights: TopicRights): void {
     this._setTopicRights(topicRights);
   }
 
@@ -460,7 +460,7 @@ export class TopicEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setTopic(), when it succeeds.
    */
-  saveTopic(commitMessage: string, successCallback: () => void): boolean {
+  saveTopic (commitMessage: string, successCallback: () => void): boolean {
     if (!this._topicIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a topic before one is loaded.');
@@ -507,21 +507,21 @@ export class TopicEditorStateService {
    * Returns whether this service is currently attempting to save the
    * topic maintained by this service.
    */
-  isSavingTopic(): boolean {
+  isSavingTopic (): boolean {
     return this._topicIsBeingSaved;
   }
 
-  get onTopicInitialized(): EventEmitter<void> {
+  get onTopicInitialized (): EventEmitter<void> {
     return this._topicInitializedEventEmitter;
   }
 
-  get onTopicReinitialized(): EventEmitter<void> {
+  get onTopicReinitialized (): EventEmitter<void> {
     return this._topicReinitializedEventEmitter;
   }
   /**
    * Returns the classroom name for the topic.
    */
-  getClassroomUrlFragment(): string {
+  getClassroomUrlFragment (): string {
     return this._classroomUrlFragment;
   }
 
@@ -533,7 +533,7 @@ export class TopicEditorStateService {
    * async backend call was successful and that _topicWithNameExists
    * has been successfully updated.
    */
-  updateExistenceOfTopicName(
+  updateExistenceOfTopicName (
       topicName: string, successCallback: () => void): void {
     this.editableTopicBackendApiService.doesTopicWithNameExistAsync(
       topicName).then((topicNameExists) => {
@@ -557,7 +557,7 @@ export class TopicEditorStateService {
    * async backend call was successful and that _topicWithUrlFragmentExists
    * has been successfully updated.
    */
-  updateExistenceOfTopicUrlFragment(
+  updateExistenceOfTopicUrlFragment (
       topicUrlFragment: string, successCallback: () => void): void {
     this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
       topicUrlFragment).then((topicUrlFragmentExists) => {
@@ -573,11 +573,11 @@ export class TopicEditorStateService {
     });
   }
 
-  get onStorySummariesInitialized(): EventEmitter<void> {
+  get onStorySummariesInitialized (): EventEmitter<void> {
     return this._storySummariesInitializedEventEmitter;
   }
 
-  get onSubtopicPageLoaded(): EventEmitter<void> {
+  get onSubtopicPageLoaded (): EventEmitter<void> {
     return this._subtopicPageLoadedEventEmitter;
   }
 }

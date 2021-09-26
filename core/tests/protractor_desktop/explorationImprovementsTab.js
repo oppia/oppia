@@ -25,28 +25,28 @@ var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationEditorPage = (
   require('../protractor_utils/ExplorationEditorPage.js'));
 
-describe('Improvements tab', function() {
+describe('Improvements tab', function () {
   let adminPage = new AdminPage.AdminPage();
   let explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
 
   let explorationEditorImprovementsTab = (
     explorationEditorPage.getImprovementsTab());
 
-  beforeAll(async() => {
+  beforeAll(async () => {
     await users.createAndLoginCurriculumAdminUser(
       'superUser@improvementsTab.com', 'superUser');
     await adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean',
-      async(elem) => await elem.setValue(true));
+      async (elem) => await elem.setValue(true));
     await users.logout();
   });
 
-  afterEach(async() => {
+  afterEach(async () => {
     await general.checkForConsoleErrors([]);
   });
 
-  it('should not be present in an unpublished exploration', async() => {
+  it('should not be present in an unpublished exploration', async () => {
     await users.createUser(
       'drafter@improvementsTab.com', 'improvementsTabDrafter');
     await users.login('drafter@improvementsTab.com');

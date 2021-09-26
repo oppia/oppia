@@ -59,7 +59,7 @@ export class ResponsesService {
   private _answerGroupsChangedEventEmitter = new EventEmitter();
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private loggerService: LoggerService,
     private outcomeObjectFactory: OutcomeObjectFactory,
@@ -209,7 +209,7 @@ export class ResponsesService {
 
   // The 'data' arg is a list of interaction handlers for the
   // currently-active state.
-  init(data: Interaction): void {
+  init (data: Interaction): void {
     this._answerGroups = cloneDeep(data.answerGroups);
     this._defaultOutcome = cloneDeep(data.defaultOutcome);
     this._confirmedUnclassifiedAnswers = cloneDeep(
@@ -224,32 +224,32 @@ export class ResponsesService {
     this._activeAnswerGroupIndex = -1;
     this._activeRuleIndex = 0;
   }
-  getAnswerGroups(): AnswerGroup[] {
+  getAnswerGroups (): AnswerGroup[] {
     return cloneDeep(this._answerGroups);
   }
 
-  getAnswerGroup(index: number): AnswerGroup {
+  getAnswerGroup (index: number): AnswerGroup {
     return cloneDeep(this._answerGroups[index]);
   }
-  getAnswerGroupCount(): number {
+  getAnswerGroupCount (): number {
     return this._answerGroups.length;
   }
-  getDefaultOutcome(): Outcome {
+  getDefaultOutcome (): Outcome {
     return cloneDeep(this._defaultOutcome);
   }
-  getConfirmedUnclassifiedAnswers(): readonly InteractionAnswer[] {
+  getConfirmedUnclassifiedAnswers (): readonly InteractionAnswer[] {
     return cloneDeep(this._confirmedUnclassifiedAnswers);
   }
-  getAnswerChoices(): AnswerChoice[] {
+  getAnswerChoices (): AnswerChoice[] {
     return cloneDeep(this._answerChoices);
   }
-  getActiveRuleIndex(): number {
+  getActiveRuleIndex (): number {
     return this._activeRuleIndex;
   }
-  getActiveAnswerGroupIndex(): number {
+  getActiveAnswerGroupIndex (): number {
     return this._activeAnswerGroupIndex;
   }
-  onInteractionIdChanged(
+  onInteractionIdChanged (
       newInteractionId: string,
       callback: (value: AnswerGroup[], value2: Outcome) => void
   ): void {
@@ -289,7 +289,7 @@ export class ResponsesService {
       callback(this._answerGroupsMemento, this._defaultOutcomeMemento);
     }
   }
-  changeActiveAnswerGroupIndex(newIndex: number): void {
+  changeActiveAnswerGroupIndex (newIndex: number): void {
     // If the current group is being clicked on again, close it.
     if (newIndex === this._activeAnswerGroupIndex) {
       this._activeAnswerGroupIndex = -1;
@@ -299,17 +299,17 @@ export class ResponsesService {
 
     this._activeRuleIndex = -1;
   }
-  changeActiveRuleIndex(newIndex: number): void {
+  changeActiveRuleIndex (newIndex: number): void {
     this._activeRuleIndex = newIndex;
   }
-  updateAnswerGroup(
+  updateAnswerGroup (
       index: number,
       updates: AnswerGroup,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(index, updates, callback);
   }
-  deleteAnswerGroup(
+  deleteAnswerGroup (
       index: number,
       callback: (value: AnswerGroup[]) => void
   ): void {
@@ -319,13 +319,13 @@ export class ResponsesService {
     this._saveAnswerGroups(this._answerGroups);
     callback(this._answerGroupsMemento);
   }
-  updateActiveAnswerGroup(
+  updateActiveAnswerGroup (
       updates: AnswerGroup,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
   }
-  updateDefaultOutcome(
+  updateDefaultOutcome (
       updates: Outcome,
       callback: (value: Outcome) => void
   ): void {
@@ -348,7 +348,7 @@ export class ResponsesService {
     this._saveDefaultOutcome(outcome);
     callback(this._defaultOutcomeMemento);
   }
-  updateConfirmedUnclassifiedAnswers(
+  updateConfirmedUnclassifiedAnswers (
       confirmedUnclassifiedAnswers: InteractionAnswer[]
   ): void {
     this._saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
@@ -356,12 +356,12 @@ export class ResponsesService {
   // Updates answer choices when the interaction is initialized or deleted.
   // For example, the rules for multiple choice need to refer to the
   // multiple choice interaction's customization arguments.
-  updateAnswerChoices(newAnswerChoices: AnswerChoice[]): void {
+  updateAnswerChoices (newAnswerChoices: AnswerChoice[]): void {
     this._updateAnswerChoices(newAnswerChoices);
   }
   // Handles changes to custom args by updating the answer choices
   // accordingly.
-  handleCustomArgsUpdate(
+  handleCustomArgsUpdate (
       newAnswerChoices: AnswerChoice[],
       callback: (value: AnswerGroup) => void
   ): void {
@@ -501,7 +501,7 @@ export class ResponsesService {
     }
   }
   // This registers the change to the handlers in the list of changes.
-  save(
+  save (
       newAnswerGroups: AnswerGroup[],
       defaultOutcome: Outcome,
       callback: (value: AnswerGroup[], value2: Outcome) => void
@@ -511,11 +511,11 @@ export class ResponsesService {
     callback(this._answerGroupsMemento, this._defaultOutcomeMemento);
   }
 
-  get onAnswerGroupsChanged(): EventEmitter<unknown> {
+  get onAnswerGroupsChanged (): EventEmitter<unknown> {
     return this._answerGroupsChangedEventEmitter;
   }
 
-  get onInitializeAnswerGroups(): EventEmitter<unknown> {
+  get onInitializeAnswerGroups (): EventEmitter<unknown> {
     return this._initializeAnswerGroupsEventEmitter;
   }
 }

@@ -24,10 +24,10 @@ interface RandomSelectorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('randomSelector', [
-  '$compile', function($compile) {
+  '$compile', function ($compile) {
     return {
-      link: function(scope: RandomSelectorCustomScope, element) {
-        scope.getTemplateUrl = function() {
+      link: function (scope: RandomSelectorCustomScope, element) {
+        scope.getTemplateUrl = function () {
           return '/value_generator_handler/' + scope.$ctrl.generatorId;
         };
         $compile(element.contents())(scope);
@@ -40,9 +40,9 @@ angular.module('oppia').directive('randomSelector', [
       },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controllerAs: '$ctrl',
-      controller: function() {
+      controller: function () {
         var ctrl = this;
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           ctrl.SCHEMA = {
             type: 'list',
             items: {

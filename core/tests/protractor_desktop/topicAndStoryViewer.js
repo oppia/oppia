@@ -37,7 +37,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
-describe('Topic and Story viewer functionality', function() {
+describe('Topic and Story viewer functionality', function () {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
@@ -50,7 +50,7 @@ describe('Topic and Story viewer functionality', function() {
   var skillId = null;
   var skillEditorPage = null;
 
-  var createDummyExplorations = async function() {
+  var createDummyExplorations = async function () {
     var EXPLORATION = {
       category: 'Learning',
       objective: 'The goal is to check story viewer functionality.',
@@ -70,7 +70,7 @@ describe('Topic and Story viewer functionality', function() {
     }
   };
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     adminPage = new AdminPage.AdminPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     topicAndStoryViewerPage = (
@@ -100,7 +100,7 @@ describe('Topic and Story viewer functionality', function() {
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
       'List',
-      async function(elem) {
+      async function (elem) {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
@@ -152,7 +152,7 @@ describe('Topic and Story viewer functionality', function() {
     await users.logout();
   });
 
-  it('should play through story and save progress on login.', async function() {
+  it('should play through story and save progress on login.', async function () {
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
@@ -177,7 +177,7 @@ describe('Topic and Story viewer functionality', function() {
 
   it(
     'should check for topic description, stories and revision cards',
-    async function() {
+    async function () {
       await users.createAndLoginCurriculumAdminUser(
         'creator1@storyViewer.com', 'creatorStoryViewer1');
       await topicViewerPage.get('math', 'Topic TASV1');
@@ -198,13 +198,13 @@ describe('Topic and Story viewer functionality', function() {
       await topicViewerPage.moveToPracticeTab();
       await topicViewerPage.selectSkillForPractice('Subtopic TASV1');
 
-      await waitFor.clientSideRedirection(async() => {
+      await waitFor.clientSideRedirection(async () => {
         // Start practice to trigger redirection to practice session page.
         await topicViewerPage.startPractice();
       }, (url) => {
         // Wait until the URL has changed to /practice.
         return (/practice/.test(url));
-      }, async() => {
+      }, async () => {
         await topicAndStoryViewerPage.waitForPracticeSessionContainer();
       });
 
@@ -216,7 +216,7 @@ describe('Topic and Story viewer functionality', function() {
       await users.logout();
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

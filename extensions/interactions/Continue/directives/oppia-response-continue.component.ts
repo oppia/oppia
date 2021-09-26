@@ -35,9 +35,9 @@ export class OppiaResponseContinueComponent implements OnInit {
   @Input() answer!: string;
   escapedAnswer: string = '';
 
-  constructor(private readonly htmlEscaperService: HtmlEscaperService) {}
+  constructor (private readonly htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.escapedAnswer = (
       this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
   }

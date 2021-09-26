@@ -31,7 +31,7 @@ import { AnswerClassificationService, InteractionRulesService } from
 })
 
 export class LearnerAnswerInfoService {
-  constructor(
+  constructor (
     private answerClassificationService: AnswerClassificationService,
     private learnerAnswerDetailsBackendApiService:
       LearnerAnswerDetailsBackendApiService) {}
@@ -59,13 +59,13 @@ export class LearnerAnswerInfoService {
     typeC: 0.05
   };
 
-  getRandomProbabilityIndex(): number {
+  getRandomProbabilityIndex (): number {
     const min = 0;
     const max = 100;
     return (Math.floor(Math.random() * (max - min + 1)) + min) / 100;
   }
 
-  initLearnerAnswerInfoService(
+  initLearnerAnswerInfoService (
       entityId: string, state: State, answer: string,
       interactionRulesService: InteractionRulesService,
       alwaysAskLearnerForAnswerInfo: boolean): void {
@@ -118,11 +118,11 @@ export class LearnerAnswerInfoService {
       randomProbabilityIndex <= thresholdProbabilityIndex);
   }
 
-  resetSubmittedAnswerInfoCount(): void {
+  resetSubmittedAnswerInfoCount (): void {
     this.submittedAnswerInfoCount = 0;
   }
 
-  recordLearnerAnswerInfo(answerDetails: string): void {
+  recordLearnerAnswerInfo (answerDetails: string): void {
     this.learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
       this.currentEntityId, this.stateName, this.interactionId,
       this.currentAnswer, answerDetails);
@@ -131,25 +131,25 @@ export class LearnerAnswerInfoService {
     this.canAskLearnerForAnswerInfo = false;
   }
 
-  getCanAskLearnerForAnswerInfo(): boolean {
+  getCanAskLearnerForAnswerInfo (): boolean {
     return this.canAskLearnerForAnswerInfo;
   }
 
-  getCurrentAnswer(): string {
+  getCurrentAnswer (): string {
     return this.currentAnswer;
   }
 
-  getCurrentInteractionRulesService(): InteractionRulesService {
+  getCurrentInteractionRulesService (): InteractionRulesService {
     return this.currentInteractionRulesService;
   }
 
-  getSolicitAnswerDetailsQuestion(): string {
+  getSolicitAnswerDetailsQuestion (): string {
     var el = $('<p>');
     el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
     return ($('<span>').append(el)).html();
   }
 
-  getSolicitAnswerDetailsFeedback(): string {
+  getSolicitAnswerDetailsFeedback (): string {
     var el = $('<p>');
     el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
     return ($('<span>').append(el)).html();

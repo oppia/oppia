@@ -35,20 +35,20 @@ export class MergeSkillModalComponent extends ConfirmOrCancelModal {
   allowSkillsFromOtherTopics: boolean = true;
   selectedSkillId: string;
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
 
-  confirm(): void {
+  confirm (): void {
     this.ngbActiveModal.close({
       skill: this.skill,
       supersedingSkillId: this.selectedSkillId
     });
   }
 
-  setSelectedSkillId(skillId: string): void {
+  setSelectedSkillId (skillId: string): void {
     this.selectedSkillId = skillId;
   }
 }

@@ -46,9 +46,9 @@ export class NormalizedStringEditorComponent implements
   componentSubscriptions = new Subscription();
   active: boolean = false;
   largeInput = false;
-  constructor(private externalSaveService: ExternalSaveService) { }
+  constructor (private externalSaveService: ExternalSaveService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.alwaysEditable) {
       this.componentSubscriptions.add(
         this.externalSaveService.onExternalSave.subscribe(() => {
@@ -61,24 +61,24 @@ export class NormalizedStringEditorComponent implements
     }
   }
 
-  updateLocalValue(newValue: string): void {
+  updateLocalValue (newValue: string): void {
     this.value = newValue;
   }
 
-  openEditor(): void {
+  openEditor (): void {
     this.active = true;
   }
 
-  closeEditor(): void {
+  closeEditor (): void {
     this.active = false;
   }
 
-  replaceValue(newValue: string): void {
+  replaceValue (newValue: string): void {
     this.value = newValue;
     this.closeEditor();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (
       changes.initArgs &&
       changes.initArgs.currentValue &&
@@ -91,7 +91,7 @@ export class NormalizedStringEditorComponent implements
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.componentSubscriptions.unsubscribe();
   }
 }

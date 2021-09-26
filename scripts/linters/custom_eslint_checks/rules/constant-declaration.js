@@ -41,7 +41,7 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var constantsDeclarations = [];
     var args;
     var filename = context.getFilename();
@@ -52,7 +52,7 @@ module.exports = {
 
     if (filename.endsWith('constants.ts')) {
       return {
-        VariableDeclarator: function(node) {
+        VariableDeclarator: function (node) {
           if ((node.init.type !== 'TSAsExpression') ||
            (node.init.typeAnnotation.typeName.name !== 'const')) {
             context.report ({
@@ -65,7 +65,7 @@ module.exports = {
     }
 
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         if (!filename.endsWith('.constants.ajs.ts')) {
           context.report ({
             node: node,

@@ -23,12 +23,12 @@ require('components/forms/validators/is-float.filter.ts');
 
 /* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('requireIsFloat', [
-  '$filter', function($filter) {
+  '$filter', function ($filter) {
     return {
       require: 'ngModel',
       restrict: 'A',
-      link: function(scope, elm, attrs, ctrl) {
-        var floatValidator = function(viewValue) {
+      link: function (scope, elm, attrs, ctrl) {
+        var floatValidator = function (viewValue) {
           var filteredValue = $filter('isFloat')(viewValue);
           ctrl.$setValidity('isFloat', filteredValue !== undefined);
           return filteredValue;

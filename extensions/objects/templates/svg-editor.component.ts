@@ -39,7 +39,7 @@ export interface Dimensions {
 }
 
 export class PolyPoint {
-  constructor(
+  constructor (
     public x: number,
     public y: number
   ) {}
@@ -177,7 +177,7 @@ export class SvgEditorComponent implements OnInit {
   loadingIndicatorIsShown: boolean;
   x: number;
   y: number;
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -189,7 +189,7 @@ export class SvgEditorComponent implements OnInit {
     private svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService,
     private svgSanitizerService: SvgSanitizerService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.imageSaveDestination = this.contextService.getImageSaveDestination();
     this.entityId = this.contextService.getEntityId();
     this.entityType = this.contextService.getEntityType();
@@ -218,7 +218,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onWidthInputBlur(): void {
+  onWidthInputBlur (): void {
     if (this.diagramWidth > SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH) {
       this.diagramWidth = SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH;
     } else if (
@@ -228,7 +228,7 @@ export class SvgEditorComponent implements OnInit {
     this.currentDiagramWidth = this.diagramWidth;
   }
 
-  onHeightInputBlur(): void {
+  onHeightInputBlur (): void {
     if (
       this.diagramHeight > SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT) {
       this.diagramHeight = SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT;
@@ -239,7 +239,7 @@ export class SvgEditorComponent implements OnInit {
     this.currentDiagramHeight = this.diagramHeight;
   }
 
-  isDiagramCreated(): boolean {
+  isDiagramCreated (): boolean {
     // This function checks if any shape has been created or not.
     return Boolean(
       !this.isUserDrawing() &&
@@ -247,11 +247,11 @@ export class SvgEditorComponent implements OnInit {
       this.canvas && this.canvas.getObjects().length > 0);
   }
 
-  isUserDrawing(): boolean {
+  isUserDrawing (): boolean {
     return Boolean(this.canvas && this.drawMode !== this.DRAW_MODE_NONE);
   }
 
-  private getTrustedResourceUrlForSvgFileName(
+  private getTrustedResourceUrlForSvgFileName (
       svgFileName: string): {
         safeUrl: SafeResourceUrl | string, unsafeUrl: string} {
     if (
@@ -274,7 +274,7 @@ export class SvgEditorComponent implements OnInit {
     };
   }
 
-  setSavedSvgFilename(filename: string, setData: boolean): void {
+  setSavedSvgFilename (filename: string, setData: boolean): void {
     this.diagramStatus = this.STATUS_SAVED;
     // Reset fabric js parameters.
     this.onClear();
@@ -303,7 +303,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  postSvgToServer(
+  postSvgToServer (
       dimensions: Dimensions,
       resampledFile: Blob
   ): Promise<{filename: string}> {
@@ -311,7 +311,7 @@ export class SvgEditorComponent implements OnInit {
       resampledFile, dimensions, this.entityType, this.entityId).toPromise();
   }
 
-  saveImageToLocalStorage(
+  saveImageToLocalStorage (
       dimensions: Dimensions,
       resampledFile: Blob
   ): void {
@@ -336,7 +336,7 @@ export class SvgEditorComponent implements OnInit {
     reader.readAsDataURL(resampledFile);
   }
 
-  getSvgString(): string {
+  getSvgString (): string {
     const svgString = this.canvas.toSVG().replace('\t\t', '');
     const domParser = new DOMParser();
     const doc = domParser.parseFromString(svgString, 'text/xml');
@@ -362,7 +362,7 @@ export class SvgEditorComponent implements OnInit {
     return svg.outerHTML;
   }
 
-  isSvgTagValid(svgString: string): true {
+  isSvgTagValid (svgString: string): true {
     const dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
@@ -380,7 +380,7 @@ export class SvgEditorComponent implements OnInit {
     return true;
   }
 
-  saveSvgFile(): void {
+  saveSvgFile (): void {
     this.alertsService.clearWarnings();
 
     if (!this.isDiagramCreated()) {
@@ -437,11 +437,11 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isDiagramSaved(): boolean {
+  isDiagramSaved (): boolean {
     return this.diagramStatus === this.STATUS_SAVED;
   }
 
-  createCustomToSVG(
+  createCustomToSVG (
       toSVG: () => string, selector: string, id: string, ctx: unknown
   ): () => string {
     return (): string => {
@@ -454,7 +454,7 @@ export class SvgEditorComponent implements OnInit {
     };
   }
 
-  loadGroupedObject(
+  loadGroupedObject (
       objId: string,
       obj: fabric.Object,
       groupedObjects: fabric.Object[][]
@@ -477,7 +477,7 @@ export class SvgEditorComponent implements OnInit {
     return groupedObjects;
   }
 
-  loadTextObject(
+  loadTextObject (
       element: Element,
       obj: fabric.Object
   ): void {
@@ -542,13 +542,13 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.add(text);
   }
 
-  isFullRectangle(element: SVGRectElement): boolean {
+  isFullRectangle (element: SVGRectElement): boolean {
     return (
       element.width.baseVal.valueAsString === '100%' &&
       element.height.baseVal.valueAsString === '100%');
   }
 
-  continueDiagramEditing(): void {
+  continueDiagramEditing (): void {
     if (
       this.data.savedSvgFileName &&
       this.imageSaveDestination === (
@@ -603,20 +603,20 @@ export class SvgEditorComponent implements OnInit {
     });
   }
 
-  validate(): boolean {
+  validate (): boolean {
     return (
       this.isDiagramSaved() && this.data.savedSvgFileName &&
       this.data.savedSvgFileName.length > 0);
   }
 
-  getSize(): number {
+  getSize (): number {
     const size = this.fabricjsOptions.size;
     // Removes the word "px" from the end of the string and converts
     // into an int.
     return parseInt(size);
   }
 
-  createRect(): void {
+  createRect (): void {
     this.canvas.discardActiveObject();
     const defaultWidth = 60;
     const defaultHeight = 70;
@@ -633,7 +633,7 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.add(rect);
   }
 
-  createLine(): void {
+  createLine (): void {
     this.canvas.discardActiveObject();
     const defaultBottomCoordinate = 100;
     const defaultRightCoordinate = 100;
@@ -651,7 +651,7 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.add(line);
   }
 
-  createCircle(): void {
+  createCircle (): void {
     this.canvas.discardActiveObject();
     const circle = new fabric.Circle({
       top: this.defaultTopCoordinate,
@@ -665,7 +665,7 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.add(circle);
   }
 
-  createText(): void {
+  createText (): void {
     this.canvas.discardActiveObject();
     // The defaultTextSize is necessary to prevent the text
     // from being too small. This can be changed later in the editor.
@@ -686,19 +686,19 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.add(text);
   }
 
-  areAllToolsEnabled(): boolean {
+  areAllToolsEnabled (): boolean {
     return this.drawMode === this.DRAW_MODE_NONE;
   }
 
-  isDrawModePencil(): boolean {
+  isDrawModePencil (): boolean {
     return this.drawMode === this.DRAW_MODE_PENCIL;
   }
 
-  isPencilEnabled(): boolean {
+  isPencilEnabled (): boolean {
     return this.areAllToolsEnabled() || this.isDrawModePencil();
   }
 
-  togglePencilDrawing(): void {
+  togglePencilDrawing (): void {
     this.canvas.discardActiveObject();
     this.canvas.isDrawingMode = !this.canvas.isDrawingMode;
     this.canvas.freeDrawingBrush.color = this.fabricjsOptions.stroke;
@@ -709,7 +709,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  private makePolygon(): fabric.Polyline {
+  private makePolygon (): fabric.Polyline {
     // The startPt is the initial point in the polygon and it is also the
     // last point if the polygon is closed.
     const startPt = this.polyOptions.bboxPoints[0];
@@ -727,7 +727,7 @@ export class SvgEditorComponent implements OnInit {
     return shape;
   }
 
-  private createPolyShape(): void {
+  private createPolyShape (): void {
     // This function removes the individual lines and draws the polygon.
     this.polyOptions.lines.forEach((value) => {
       this.canvas.remove(value);
@@ -749,13 +749,13 @@ export class SvgEditorComponent implements OnInit {
     this.polyOptions.lineCounter = 0;
   }
 
-  private setPolyStartingPoint(options): void {
+  private setPolyStartingPoint (options): void {
     var mouse = this.canvas.getPointer(options.e);
     this.polyOptions.x = mouse.x;
     this.polyOptions.y = mouse.y;
   }
 
-  private createPolygon() {
+  private createPolygon () {
     if (this.drawMode === this.DRAW_MODE_POLY) {
       this.drawMode = this.DRAW_MODE_NONE;
       this.createPolyShape();
@@ -769,35 +769,35 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isDrawModePolygon(): boolean {
+  isDrawModePolygon (): boolean {
     return this.drawMode === this.DRAW_MODE_POLY;
   }
 
-  isOpenPolygonEnabled(): boolean {
+  isOpenPolygonEnabled (): boolean {
     return (
       this.areAllToolsEnabled() || (
         this.isDrawModePolygon() &&
         this.polygonMode === this.OPEN_POLYGON_MODE));
   }
 
-  createOpenPolygon(): void {
+  createOpenPolygon (): void {
     this.polygonMode = this.OPEN_POLYGON_MODE;
     this.createPolygon();
   }
 
-  isClosedPolygonEnabled(): boolean {
+  isClosedPolygonEnabled (): boolean {
     return (
       this.areAllToolsEnabled() || (
         this.isDrawModePolygon() &&
         this.polygonMode === this.CLOSED_POLYGON_MODE));
   }
 
-  createClosedPolygon(): void {
+  createClosedPolygon (): void {
     this.polygonMode = this.CLOSED_POLYGON_MODE;
     this.createPolygon();
   }
 
-  private createBezierControlPoints(left: number, top: number): fabric.Circle {
+  private createBezierControlPoints (left: number, top: number): fabric.Circle {
     // This function is used to add the control points for the quadratic
     // bezier curve which is used to control the position of the curve.
     // A size 2 is added so that the control circles is not rendered
@@ -814,7 +814,7 @@ export class SvgEditorComponent implements OnInit {
     return circle;
   }
 
-  private drawQuadraticCurve(): void {
+  private drawQuadraticCurve (): void {
     const defaultCurve = 'M 40 40 Q 95, 100, 150, 40';
     const defaultP1TopCoordinate = 95;
     const defaultP1LeftCoordinate = 100;
@@ -852,7 +852,7 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.add(p2);
   }
 
-  private getQuadraticBezierCurve() {
+  private getQuadraticBezierCurve () {
     if (this.drawMode === this.DRAW_MODE_BEZIER) {
       // The order of objects being added are the path followed by
       // three control points. Therefore the 4th from the last is the
@@ -861,7 +861,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  createQuadraticBezier(): void {
+  createQuadraticBezier (): void {
     if (this.drawMode === this.DRAW_MODE_NONE) {
       this.canvas.discardActiveObject();
       this.drawMode = this.DRAW_MODE_BEZIER;
@@ -901,11 +901,11 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isDrawModeBezier(): boolean {
+  isDrawModeBezier (): boolean {
     return this.drawMode === this.DRAW_MODE_BEZIER;
   }
 
-  onAddItem(): void {
+  onAddItem (): void {
     if (this.pieChartDataInput.length < this.pieChartDataLimit) {
       var defaultData = 10;
       var dataInput = {
@@ -918,7 +918,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  getPieSlice(
+  getPieSlice (
       center: {x: number, y: number},
       radius: number,
       startAngle: number,
@@ -971,7 +971,7 @@ export class SvgEditorComponent implements OnInit {
     return slice;
   }
 
-  getTextIndex(text: string, lineNum: number, charIndex: number): number {
+  getTextIndex (text: string, lineNum: number, charIndex: number): number {
     return (
       text.split('\n').slice(0, lineNum).reduce((sum, textLine) => {
         return sum + textLine.length + 1;
@@ -979,7 +979,7 @@ export class SvgEditorComponent implements OnInit {
     );
   }
 
-  createChart(): void {
+  createChart (): void {
     let total = 0;
     let currentAngle = 0;
     let pieSlices = [];
@@ -1042,7 +1042,7 @@ export class SvgEditorComponent implements OnInit {
     this.groupCount += 1;
   }
 
-  createPieChart(): void {
+  createPieChart (): void {
     if (this.drawMode === this.DRAW_MODE_NONE) {
       this.canvas.discardActiveObject();
       this.drawMode = this.DRAW_MODE_PIECHART;
@@ -1064,17 +1064,17 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isPieChartEnabled(): boolean {
+  isPieChartEnabled (): boolean {
     return Boolean(
       this.areAllToolsEnabled() ||
       this.drawMode === this.DRAW_MODE_PIECHART);
   }
 
-  isDrawModePieChart(): boolean {
+  isDrawModePieChart (): boolean {
     return Boolean(this.drawMode === this.DRAW_MODE_PIECHART);
   }
 
-  private loadSvgFile(objects): void {
+  private loadSvgFile (objects): void {
     if (this.loadType === 'group') {
       objects.forEach((obj) => {
         obj.set({
@@ -1092,7 +1092,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  uploadSvgFile(): void {
+  uploadSvgFile (): void {
     if (this.drawMode === this.DRAW_MODE_NONE) {
       this.canvas.discardActiveObject();
       this.drawMode = this.DRAW_MODE_SVG_UPLOAD;
@@ -1107,7 +1107,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  setUploadedFile(file: File): void {
+  setUploadedFile (file: File): void {
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
@@ -1124,46 +1124,46 @@ export class SvgEditorComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  onFileChanged(file: File, filename: string): void {
+  onFileChanged (file: File, filename: string): void {
     this.setUploadedFile(file);
   }
 
-  isFileUploaded(): boolean {
+  isFileUploaded (): boolean {
     return Boolean(this.uploadedSvgDataUrl !== null);
   }
 
-  isDrawModeSvgUpload(): boolean {
+  isDrawModeSvgUpload (): boolean {
     return Boolean(this.drawMode === this.DRAW_MODE_SVG_UPLOAD);
   }
 
-  isSvgUploadEnabled(): boolean {
+  isSvgUploadEnabled (): boolean {
     return Boolean(
       this.areAllToolsEnabled() ||
       this.drawMode === this.DRAW_MODE_SVG_UPLOAD);
   }
 
-  bringObjectForward(): void {
+  bringObjectForward (): void {
     this.canvas.bringForward(this.canvas.getActiveObject());
     if (this.layerNum < this.canvas._objects.length) {
       this.layerNum += 1;
     }
   }
 
-  sendObjectBackward(): void {
+  sendObjectBackward (): void {
     this.canvas.sendBackwards(this.canvas.getActiveObject());
     if (this.layerNum > 1) {
       this.layerNum -= 1;
     }
   }
 
-  private undoStackPush(object): void {
+  private undoStackPush (object): void {
     if (this.objectUndoStack.length === this.undoLimit) {
       this.objectUndoStack.shift();
     }
     this.objectUndoStack.push(object);
   }
 
-  onUndo(): void {
+  onUndo (): void {
     this.canvas.discardActiveObject();
     if (this.objectUndoStack.length > 0) {
       var undoObj = this.objectUndoStack.pop();
@@ -1191,12 +1191,12 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isUndoEnabled(): boolean {
+  isUndoEnabled (): boolean {
     return (
       this.drawMode === this.DRAW_MODE_NONE && this.objectUndoStack.length > 0);
   }
 
-  onRedo(): void {
+  onRedo (): void {
     this.canvas.discardActiveObject();
     if (this.objectRedoStack.length > 0) {
       var redoObj = this.objectRedoStack.pop();
@@ -1217,12 +1217,12 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.renderAll();
   }
 
-  isRedoEnabled(): boolean {
+  isRedoEnabled (): boolean {
     return (
       this.drawMode === this.DRAW_MODE_NONE && this.objectRedoStack.length > 0);
   }
 
-  removeShape(): void {
+  removeShape (): void {
     var shape = this.canvas.getActiveObject();
     var index = this.canvasObjects.indexOf(shape);
     if (shape) {
@@ -1237,7 +1237,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onClear(): void {
+  onClear (): void {
     this.groupCount = 0;
     this.objectUndoStack = [];
     this.objectRedoStack = [];
@@ -1248,12 +1248,12 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isClearEnabled(): boolean {
+  isClearEnabled (): boolean {
     return (
       this.canvasObjects.length > 0 && this.drawMode === this.DRAW_MODE_NONE);
   }
 
-  onStrokeChange(): void {
+  onStrokeChange (): void {
     if (this.drawMode === this.DRAW_MODE_BEZIER) {
       this.getQuadraticBezierCurve().set({
         stroke: this.fabricjsOptions.stroke
@@ -1272,7 +1272,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onFillChange(): void {
+  onFillChange (): void {
     // Fetches the bezier curve and then the fill color.
     if (this.drawMode === this.DRAW_MODE_BEZIER) {
       this.getQuadraticBezierCurve().set({
@@ -1291,7 +1291,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onBgChange(): void {
+  onBgChange (): void {
     this.canvas.setBackgroundColor(
       this.fabricjsOptions.bg, () => {
         // This is a call back that runs when background is set.
@@ -1300,7 +1300,7 @@ export class SvgEditorComponent implements OnInit {
     this.canvas.renderAll();
   }
 
-  onItalicToggle(): void {
+  onItalicToggle (): void {
     var shape = this.canvas.getActiveObject();
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
@@ -1310,7 +1310,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onBoldToggle(): void {
+  onBoldToggle (): void {
     var shape = this.canvas.getActiveObject();
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
@@ -1320,7 +1320,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onFontChange(): void {
+  onFontChange (): void {
     var shape = this.canvas.getActiveObject();
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
@@ -1330,7 +1330,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  onSizeChange(): void {
+  onSizeChange (): void {
     // Ensures that the size change is applied only to the curve and
     // not to all the control points.
     if (this.drawMode === this.DRAW_MODE_BEZIER) {
@@ -1367,12 +1367,12 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  isSizeVisible(): boolean {
+  isSizeVisible (): boolean {
     return Boolean(
       this.objectIsSelected || this.drawMode !== this.DRAW_MODE_NONE);
   }
 
-  createColorPicker(value: string): void {
+  createColorPicker (value: string): void {
     var parent = document.getElementById(value + '-color');
 
     var onChangeFunc = {
@@ -1419,7 +1419,7 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  initializeMouseEvents(): void {
+  initializeMouseEvents (): void {
     // Adding event listener for polygon tool.
     this.canvas.on('mouse:dblclick', () => {
       if (this.drawMode === this.DRAW_MODE_POLY) {
@@ -1594,13 +1594,13 @@ export class SvgEditorComponent implements OnInit {
     });
   }
 
-  setCanvasDimensions(): void {
+  setCanvasDimensions (): void {
     this.canvas.setHeight(this.CANVAS_HEIGHT);
     this.canvas.setWidth(this.CANVAS_WIDTH);
     this.canvas.renderAll();
   }
 
-  initializeFabricJs(): void {
+  initializeFabricJs (): void {
     this.canvas = new fabric.Canvas(this.canvasID);
     this.setCanvasDimensions();
     this.canvas.selection = false;

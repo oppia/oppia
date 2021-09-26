@@ -75,7 +75,7 @@ export class StateGraphLayoutService {
   // order in which to specify states in rules.
   lastComputedArrangement: NodeDataDict = null;
 
-  getGraphAsAdjacencyLists(
+  getGraphAsAdjacencyLists (
       nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
     var adjacencyLists = {};
 
@@ -92,7 +92,7 @@ export class StateGraphLayoutService {
     return adjacencyLists;
   }
 
-  getIndentationLevels(
+  getIndentationLevels (
       adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
     var indentationLevels = [];
 
@@ -169,7 +169,7 @@ export class StateGraphLayoutService {
   //       END node.
   //   - id: a unique id for the node.
   //   - label: the full label of the node.
-  computeLayout(
+  computeLayout (
       nodes: GraphNodes, links: GraphLink[], initNodeId: string,
       finalNodeIds: string[]): NodeDataDict {
     var adjacencyLists = this.getGraphAsAdjacencyLists(nodes, links);
@@ -485,11 +485,11 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  getLastComputedArrangement(): NodeDataDict {
+  getLastComputedArrangement (): NodeDataDict {
     return cloneDeep(this.lastComputedArrangement);
   }
 
-  getGraphBoundaries(nodeData: NodeDataDict): GraphBoundaries {
+  getGraphBoundaries (nodeData: NodeDataDict): GraphBoundaries {
     var INFINITY = 1e30;
     var BORDER_PADDING = 5;
 
@@ -519,7 +519,7 @@ export class StateGraphLayoutService {
     };
   }
 
-  getAugmentedLinks(
+  getAugmentedLinks (
       nodeData: NodeDataDict, nodeLinks: GraphLink[]): AugmentedLink[] {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
@@ -585,7 +585,7 @@ export class StateGraphLayoutService {
     return augmentedLinks;
   }
 
-  modifyPositionValues(
+  modifyPositionValues (
       nodeData: NodeDataDict, graphWidth: number,
       graphHeight: number): NodeDataDict {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
@@ -605,7 +605,7 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  getGraphWidth(maxNodesPerRow: number, maxNodeLabelLength: number): number {
+  getGraphWidth (maxNodesPerRow: number, maxNodeLabelLength: number): number {
     // A rough upper bound for the width of a single letter, in pixels,
     // to use as a scaling factor to determine the width of graph nodes.
     // This is not an entirely accurate description because it also takes
@@ -614,7 +614,7 @@ export class StateGraphLayoutService {
     return maxNodesPerRow * maxNodeLabelLength * letterWidthInPixels;
   }
 
-  getGraphHeight(nodeData: NodeDataDict): number {
+  getGraphHeight (nodeData: NodeDataDict): number {
     var maxDepth = 0;
     for (var nodeId in nodeData) {
       maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);

@@ -48,46 +48,46 @@ angular.module('oppia').component('responseHeader', {
   controller: [
     'EditabilityService', 'StateEditorService', 'StateInteractionIdService',
     'INTERACTION_SPECS', 'PLACEHOLDER_OUTCOME_DEST',
-    function(
+    function (
         EditabilityService, StateEditorService, StateInteractionIdService,
         INTERACTION_SPECS, PLACEHOLDER_OUTCOME_DEST) {
       var ctrl = this;
-      ctrl.isInQuestionMode = function() {
+      ctrl.isInQuestionMode = function () {
         return StateEditorService.isInQuestionMode();
       };
 
-      ctrl.getCurrentInteractionId = function() {
+      ctrl.getCurrentInteractionId = function () {
         return StateInteractionIdService.savedMemento;
       };
 
-      ctrl.isCorrectnessFeedbackEnabled = function() {
+      ctrl.isCorrectnessFeedbackEnabled = function () {
         return StateEditorService.getCorrectnessFeedbackEnabled();
       };
       // This returns false if the current interaction ID is null.
-      ctrl.isCurrentInteractionLinear = function() {
+      ctrl.isCurrentInteractionLinear = function () {
         var interactionId = ctrl.getCurrentInteractionId();
         return interactionId && INTERACTION_SPECS[interactionId].is_linear;
       };
 
-      ctrl.isCorrect = function() {
+      ctrl.isCorrect = function () {
         return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
       };
 
-      ctrl.isOutcomeLooping = function() {
+      ctrl.isOutcomeLooping = function () {
         var outcome = ctrl.getOutcome();
         var activeStateName = StateEditorService.getActiveStateName();
         return outcome && (outcome.dest === activeStateName);
       };
 
-      ctrl.isCreatingNewState = function() {
+      ctrl.isCreatingNewState = function () {
         var outcome = ctrl.getOutcome();
         return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
       };
 
-      ctrl.deleteResponse = function(evt) {
+      ctrl.deleteResponse = function (evt) {
         ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.EditabilityService = EditabilityService;
       };
     }

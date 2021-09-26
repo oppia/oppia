@@ -24,7 +24,7 @@ var waitFor = require(
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
 //   'content': a function that gives rich text editing instructions.
-var customizeComponent = async function(modal, tabArray) {
+var customizeComponent = async function (modal, tabArray) {
   var listEditor = await forms.ListEditor(modal);
 
   await listEditor.setLength(tabArray.length);
@@ -38,7 +38,7 @@ var customizeComponent = async function(modal, tabArray) {
   }
 };
 
-var expectComponentDetailsToMatch = async function(elem, tabArray) {
+var expectComponentDetailsToMatch = async function (elem, tabArray) {
   var titleElems = elem.all(
     by.css('.protractor-test-non-interactive-tabs-headers'));
   expect(await titleElems.count()).toEqual(tabArray.length);

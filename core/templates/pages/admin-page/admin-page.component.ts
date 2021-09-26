@@ -32,14 +32,14 @@ export class AdminPageComponent {
   inDevMode = AppConstants.DEV_MODE;
   adminPageTabChange: EventEmitter<string> = new EventEmitter();
 
-  constructor(
+  constructor (
     private adminRouterService: AdminRouterService,
     private changeDetectorRef: ChangeDetectorRef,
     private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.adminRouterService.showTab(
       this.windowRef.nativeWindow.location.hash);
     this.windowRef.nativeWindow.onhashchange = () => {
@@ -48,32 +48,32 @@ export class AdminPageComponent {
     };
   }
 
-  isActivitiesTabOpen(): boolean {
+  isActivitiesTabOpen (): boolean {
     return this.adminRouterService.isActivitiesTabOpen();
   }
 
-  isConfigTabOpen(): boolean {
+  isConfigTabOpen (): boolean {
     return this.adminRouterService.isConfigTabOpen();
   }
 
-  isFeaturesTabOpen(): boolean {
+  isFeaturesTabOpen (): boolean {
     return this.adminRouterService.isFeaturesTabOpen();
   }
 
-  isRolesTabOpen(): boolean {
+  isRolesTabOpen (): boolean {
     return this.adminRouterService.isRolesTabOpen();
   }
 
-  isMiscTabOpen(): boolean {
+  isMiscTabOpen (): boolean {
     return this.adminRouterService.isMiscTabOpen();
   }
 
-  setStatusMessage(statusMessage: string): void {
+  setStatusMessage (statusMessage: string): void {
     this.statusMessage = statusMessage;
     this.changeDetectorRef.detectChanges();
   }
 
-  isDummyFeatureEnabled(): boolean {
+  isDummyFeatureEnabled (): boolean {
     return this.platformFeatureService.status.DummyFeature.isEnabled;
   }
 }

@@ -31,13 +31,13 @@ require('services/services.constants.ajs.ts');
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal', 'HtmlEscaperService',
   'INLINE_RTE_COMPONENTS',
-  'RTE_COMPONENT_SPECS', function(
+  'RTE_COMPONENT_SPECS', function (
       $document, $log, $uibModal, HtmlEscaperService,
       INLINE_RTE_COMPONENTS,
       RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
-    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
+    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function (componentId) {
       _RICH_TEXT_COMPONENTS.push({
         backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
         customizationArgSpecs: angular.copy(
@@ -52,7 +52,7 @@ angular.module('oppia').factory('RteHelperService', [
       });
     });
 
-    var _createCustomizationArgDictFromAttrs = function(attrs) {
+    var _createCustomizationArgDictFromAttrs = function (attrs) {
       var customizationArgsDict = {};
       for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i];
@@ -73,19 +73,19 @@ angular.module('oppia').factory('RteHelperService', [
     };
 
     return {
-      createCustomizationArgDictFromAttrs: function(attrs) {
+      createCustomizationArgDictFromAttrs: function (attrs) {
         return _createCustomizationArgDictFromAttrs(attrs);
       },
-      getRichTextComponents: function() {
+      getRichTextComponents: function () {
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
-      isInlineComponent: function(richTextComponent) {
+      isInlineComponent: function (richTextComponent) {
         return INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
       },
       // The refocusFn arg is a function that restores focus to the text editor
       // after exiting the modal, and moves the cursor back to where it was
       // before the modal was opened.
-      openCustomizationModal: function(
+      openCustomizationModal: function (
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
@@ -95,10 +95,10 @@ angular.module('oppia').factory('RteHelperService', [
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
           resolve: {
-            customizationArgSpecs: function() {
+            customizationArgSpecs: function () {
               return customizationArgSpecs;
             },
-            attrsCustomizationArgsDict: function() {
+            attrsCustomizationArgsDict: function () {
               return attrsCustomizationArgsDict;
             }
           },

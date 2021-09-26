@@ -30,16 +30,16 @@ export class PageTitleService {
   pageTitleForMobile!: string;
   pageSubtitleForMobile!: string;
 
-  constructor(
+  constructor (
     private metaTagService: Meta,
     private titleService: Title
   ) {}
 
-  setDocumentTitle(title: string): void {
+  setDocumentTitle (title: string): void {
     this.titleService.setTitle(title);
   }
 
-  getDocumentTitle(): string {
+  getDocumentTitle (): string {
     return this.titleService.getTitle();
   }
 
@@ -47,7 +47,7 @@ export class PageTitleService {
    * Updates the description meta tag in the current HTML page
    * with the provided content.
    */
-  updateMetaTag(content: string): void {
+  updateMetaTag (content: string): void {
     this.metaTagService.updateTag({
       name: 'description',
       content: content
@@ -62,19 +62,19 @@ export class PageTitleService {
     });
   }
 
-  setNavbarTitleForMobileView(title: string): void {
+  setNavbarTitleForMobileView (title: string): void {
     this.pageTitleForMobile = title;
   }
 
-  setNavbarSubtitleForMobileView(subtitle: string): void {
+  setNavbarSubtitleForMobileView (subtitle: string): void {
     this.pageSubtitleForMobile = subtitle;
   }
 
-  getNavbarTitleForMobileView(): string {
+  getNavbarTitleForMobileView (): string {
     return this.pageTitleForMobile;
   }
 
-  getNavbarSubtitleForMobileView(): string {
+  getNavbarSubtitleForMobileView (): string {
     return this.pageSubtitleForMobile;
   }
 }

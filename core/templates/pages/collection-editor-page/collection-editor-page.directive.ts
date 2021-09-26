@@ -30,7 +30,7 @@ require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('collectionEditorPage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,12 +41,12 @@ angular.module('oppia').directive('collectionEditorPage', [
       controller: [
         '$rootScope', 'CollectionEditorStateService', 'PageTitleService',
         'RouterService', 'UrlService',
-        function(
+        function (
             $rootScope, CollectionEditorStateService, PageTitleService,
             RouterService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var setTitle = function() {
+          var setTitle = function () {
             var title = (
               CollectionEditorStateService.getCollection().getTitle());
             if (title) {
@@ -57,10 +57,10 @@ angular.module('oppia').directive('collectionEditorPage', [
             }
           };
 
-          ctrl.getActiveTabName = function() {
+          ctrl.getActiveTabName = function () {
             return RouterService.getActiveTabName();
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
                 () => setTitle()
@@ -72,7 +72,7 @@ angular.module('oppia').directive('collectionEditorPage', [
                 $rootScope.$applyAsync();
               });
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

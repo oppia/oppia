@@ -29,15 +29,15 @@ import { ReadOnlySubtopicPageData } from
   'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
 class MockUrlService {
-  getTopicUrlFragmentFromLearnerUrl() {
+  getTopicUrlFragmentFromLearnerUrl () {
     return 'topic_1';
   }
 
-  getClassroomUrlFragmentFromLearnerUrl() {
+  getClassroomUrlFragmentFromLearnerUrl () {
     return 'classroom_1';
   }
 
-  getSubtopicUrlFragmentFromLearnerUrl() {
+  getSubtopicUrlFragmentFromLearnerUrl () {
     return 'subtopic_1';
   }
 }
@@ -45,7 +45,7 @@ class MockUrlService {
 let component: SubtopicViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<SubtopicViewerNavbarBreadcrumbComponent>;
 
-describe('Subtopic viewer navbar breadcrumb component', function() {
+describe('Subtopic viewer navbar breadcrumb component', function () {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SubtopicViewerNavbarBreadcrumbComponent],
@@ -54,7 +54,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
         {
           provide: SubtopicViewerBackendApiService,
           useValue: {
-            fetchSubtopicDataAsync: async() => (
+            fetchSubtopicDataAsync: async () => (
               new Promise((resolve) => {
                 resolve(
                   ReadOnlySubtopicPageData.createFromBackendDict({

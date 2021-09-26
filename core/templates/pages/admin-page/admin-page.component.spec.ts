@@ -27,7 +27,7 @@ import { AdminRouterService } from './services/admin-router.service';
 
 class MockWindowRef {
   nativeWindow = {
-    confirm() {
+    confirm () {
       return true;
     },
     location: {
@@ -37,17 +37,17 @@ class MockWindowRef {
       search: 'search',
       hash: 'hash'
     },
-    open() {
+    open () {
       return;
     },
-    onhashchange() {
+    onhashchange () {
       return;
     }
   };
 }
 
 class MockPlatformFeatureService {
-  get status() {
+  get status () {
     return {
       DummyFeature: {
         isEnabled: true

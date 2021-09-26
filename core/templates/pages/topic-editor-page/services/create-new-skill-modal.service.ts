@@ -34,7 +34,7 @@ export class CreateNewSkillModalService {
   skillCreationInProgress: boolean = false;
   CREATE_NEW_SKILL_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
     private windowRef: WindowRef,
@@ -45,7 +45,7 @@ export class CreateNewSkillModalService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  createNewSkill(topicsIds: string[] = []): void {
+  createNewSkill (topicsIds: string[] = []): void {
     const modalRef = this.ngbModal.open(
       CreateNewSkillModalComponent, {
         windowClass: 'create-new-skill-modal',

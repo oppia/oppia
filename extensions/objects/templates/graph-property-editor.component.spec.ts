@@ -24,7 +24,7 @@ describe('graphPropertyEditor', () => {
   let $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     ctrl = $componentController('graphPropertyEditor');

@@ -28,7 +28,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Exploration history', function() {
+describe('Exploration history', function () {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
@@ -41,14 +41,14 @@ describe('Exploration history', function() {
   var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
   var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should correctly display the dates of the commits', async function() {
+  it('should correctly display the dates of the commits', async function () {
     await users.createUser('userTestDate@historyTab.com', 'testDateUsername');
     await users.login('userTestDate@historyTab.com');
 
@@ -64,7 +64,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should display the history', async function() {
+  it('should display the history', async function () {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration(true);
@@ -601,7 +601,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should revert to old exploration commit', async function() {
+  it('should revert to old exploration commit', async function () {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
     await workflow.createExploration(true);
@@ -689,7 +689,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

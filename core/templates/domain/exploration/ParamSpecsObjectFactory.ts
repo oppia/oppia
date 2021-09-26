@@ -41,7 +41,7 @@ export class ParamSpecs {
    * @param {Object.<String, ParamSpec>} paramDict - params and their specs
    *    for this object will hold.
    */
-  constructor(
+  constructor (
       paramDict: ParamDict, paramSpecObjectFactory: ParamSpecObjectFactory) {
     /** @member {Object.<String, ParamSpec>} */
     this._paramDict = paramDict;
@@ -52,19 +52,19 @@ export class ParamSpecs {
    * @param {String} paramName - The parameter to fetch.
    * @returns {ParamSpec} - associated to given parameter name.
    */
-  getParamSpec(paramName: string): ParamSpec {
+  getParamSpec (paramName: string): ParamSpec {
     return this._paramDict[paramName];
   }
 
   /**
    * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
    */
-  getParamDict(): ParamDict {
+  getParamDict (): ParamDict {
     return this._paramDict;
   }
 
   /** @returns {Array.<String>} - The names of the current parameter specs. */
-  getParamNames(): string[] {
+  getParamNames (): string[] {
     return Object.keys(this._paramDict);
   }
 
@@ -76,7 +76,7 @@ export class ParamSpecs {
    * @param {ParamSpec=} paramSpec - The specification of the parameter.
    * @returns {Boolean} - True when the parameter was newly added.
    */
-  addParamIfNew(paramName: string, paramSpec: ParamSpec): boolean {
+  addParamIfNew (paramName: string, paramSpec: ParamSpec): boolean {
     if (!this._paramDict.hasOwnProperty(paramName)) {
       this._paramDict[paramName] =
         paramSpec || this._paramSpecObjectFactory.createDefault();
@@ -89,7 +89,7 @@ export class ParamSpecs {
    * @callback callback - Is passed the name and corresponding ParamSpec of
    *    each parameter in the specs.
    */
-  forEach(callback: Function): void {
+  forEach (callback: Function): void {
     var that = this;
     this.getParamNames().forEach((paramName) => {
       callback(paramName, that.getParamSpec(paramName));
@@ -100,7 +100,7 @@ export class ParamSpecs {
    * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
    *    consumption.
    */
-  toBackendDict(): ParamSpecsBackendDict {
+  toBackendDict (): ParamSpecsBackendDict {
     var paramSpecsBackendDict: ParamSpecsBackendDict = {};
     this.forEach(
       (paramName: string, paramSpec: ParamSpec) => {
@@ -114,7 +114,7 @@ export class ParamSpecs {
   providedIn: 'root'
 })
 export class ParamSpecsObjectFactory {
-  constructor(private paramSpecObjectFactory: ParamSpecObjectFactory) {}
+  constructor (private paramSpecObjectFactory: ParamSpecObjectFactory) {}
 
   /**
    * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
@@ -122,7 +122,7 @@ export class ParamSpecsObjectFactory {
    * @returns {ParamSpecs} - An instance with properties from the backend
    *    dict.
    */
-  createFromBackendDict(
+  createFromBackendDict (
       paramSpecsBackendDict: ParamSpecsBackendDict): ParamSpecs {
     var paramDict: ParamDict = {};
     Object.keys(paramSpecsBackendDict).forEach((paramName) => {

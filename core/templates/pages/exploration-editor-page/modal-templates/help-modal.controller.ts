@@ -21,28 +21,28 @@ require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('HelpModalController', [
   '$scope', '$uibModalInstance', 'ContextService', 'SiteAnalyticsService',
-  function(
+  function (
       $scope, $uibModalInstance, ContextService, SiteAnalyticsService) {
     var EDITOR_TUTORIAL_MODE = 'editor';
     var TRANSLATION_TUTORIAL_MODE = 'translation';
     var explorationId = (
       ContextService.getExplorationId());
 
-    $scope.beginEditorTutorial = function() {
+    $scope.beginEditorTutorial = function () {
       SiteAnalyticsService
         .registerOpenTutorialFromHelpCenterEvent(
           explorationId);
       $uibModalInstance.close(EDITOR_TUTORIAL_MODE);
     };
 
-    $scope.beginTranslationTutorial = function() {
+    $scope.beginTranslationTutorial = function () {
       SiteAnalyticsService
         .registerOpenTutorialFromHelpCenterEvent(
           explorationId);
       $uibModalInstance.close(TRANSLATION_TUTORIAL_MODE);
     };
 
-    $scope.goToHelpCenter = function() {
+    $scope.goToHelpCenter = function () {
       SiteAnalyticsService.registerVisitHelpCenterEvent(
         explorationId);
       $uibModalInstance.dismiss('cancel');

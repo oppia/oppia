@@ -21,13 +21,13 @@ require(
   'exploration-title-editor.component.ts');
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Exploration Objective Editor directive', function() {
+describe('Exploration Objective Editor directive', function () {
   var $scope = null;
   var ExplorationObjectiveService = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
 
@@ -39,7 +39,7 @@ describe('Exploration Objective Editor directive', function() {
   }));
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect($scope.explorationObjectiveService).toEqual(
         ExplorationObjectiveService);
     });

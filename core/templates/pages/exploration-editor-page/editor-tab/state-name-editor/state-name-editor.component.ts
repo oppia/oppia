@@ -42,7 +42,7 @@ angular.module('oppia').component('stateNameEditor', {
     'ExplorationStatesService',
     'ExternalSaveService', 'FocusManagerService', 'RouterService',
     'StateEditorService', 'StateNameService', 'MAX_STATE_NAME_LENGTH',
-    function(
+    function (
         $filter, EditabilityService,
         ExplorationStatesService,
         ExternalSaveService, FocusManagerService, RouterService,
@@ -50,11 +50,11 @@ angular.module('oppia').component('stateNameEditor', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
 
-      ctrl.initStateNameEditor = function() {
+      ctrl.initStateNameEditor = function () {
         StateNameService.init();
       };
 
-      ctrl.openStateNameEditor = function() {
+      ctrl.openStateNameEditor = function () {
         var stateName = StateEditorService.getActiveStateName();
         StateNameService.setStateNameEditorVisibility(true);
         StateNameService.setStateNameSavedMemento(stateName);
@@ -63,7 +63,7 @@ angular.module('oppia').component('stateNameEditor', {
         FocusManagerService.setFocus('stateNameEditorOpened');
       };
 
-      ctrl.saveStateName = function(newStateName) {
+      ctrl.saveStateName = function (newStateName) {
         var normalizedNewName =
           _getNormalizedStateName(newStateName);
         var savedMemento = StateNameService.getStateNameSavedMemento();
@@ -84,11 +84,11 @@ angular.module('oppia').component('stateNameEditor', {
         }
       };
 
-      var _getNormalizedStateName = function(newStateName) {
+      var _getNormalizedStateName = function (newStateName) {
         return $filter('normalizeWhitespace')(newStateName);
       };
 
-      var _isNewStateNameValid = function(stateName) {
+      var _isNewStateNameValid = function (stateName) {
         if (stateName === StateEditorService.getActiveStateName()) {
           return true;
         }
@@ -96,7 +96,7 @@ angular.module('oppia').component('stateNameEditor', {
           stateName, true);
       };
 
-      ctrl.saveStateNameAndRefresh = function(newStateName) {
+      ctrl.saveStateNameAndRefresh = function (newStateName) {
         var normalizedStateName =
           _getNormalizedStateName(newStateName);
         var valid = ctrl.saveStateName(normalizedStateName);
@@ -104,7 +104,7 @@ angular.module('oppia').component('stateNameEditor', {
           RouterService.navigateToMainTab(normalizedStateName);
         }
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(
             () => {
@@ -120,7 +120,7 @@ angular.module('oppia').component('stateNameEditor', {
         ctrl.StateNameService = StateNameService;
         ctrl.stateNameEditorIsShown = false;
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

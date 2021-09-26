@@ -32,16 +32,16 @@ class MockWindowRef {
   _window = {
     location: {
       _href: '',
-      get href(): string {
+      get href (): string {
         return this._href;
       },
-      set href(val) {
+      set href (val) {
         this._href = val;
       }
     },
     gtag: () => {}
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }

@@ -118,10 +118,10 @@ interface MessageSummaryList {
   providedIn: 'root'
 })
 export class LearnerDashboardBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient) {}
 
-  async _fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
+  async _fetchLearnerDashboardDataAsync (): Promise<LearnerDashboardData> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardDataBackendDict>(
         '/learnerdashboardhandler/data').toPromise().then(dashboardData => {
@@ -197,7 +197,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  getUntrackedTopics(
+  getUntrackedTopics (
       untrackedTopics: Record<string,
       LearnerTopicSummaryBackendDict[]>): Record<string,
       LearnerTopicSummary[]> {
@@ -210,11 +210,11 @@ export class LearnerDashboardBackendApiService {
     return topics;
   }
 
-  async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
+  async fetchLearnerDashboardDataAsync (): Promise<LearnerDashboardData> {
     return this._fetchLearnerDashboardDataAsync();
   }
 
-  async addNewMessageAsync(
+  async addNewMessageAsync (
       url: string, payload: AddMessagePayload): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(url, payload).toPromise()
@@ -226,7 +226,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async onClickThreadAsync(
+  async onClickThreadAsync (
       threadDataUrl: string): Promise<FeedbackMessageSummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this.http.get<MessageSummaryList>(
@@ -238,7 +238,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async _fetchSubtopicMastery(
+  async _fetchSubtopicMastery (
       topicIds: string): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
@@ -253,7 +253,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
+  async fetchSubtopicMastery (topicIds: string): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return this._fetchSubtopicMastery(topicIds);
   }

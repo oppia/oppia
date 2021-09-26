@@ -38,11 +38,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: AlgebraicExpressionInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
@@ -59,7 +59,7 @@ export class AlgebraicExpressionInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: AlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {

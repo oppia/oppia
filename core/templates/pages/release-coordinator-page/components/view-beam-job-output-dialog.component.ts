@@ -37,13 +37,13 @@ export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
   output: BeamJobRunResult = null;
   subscription: Subscription = null;
 
-  constructor(
+  constructor (
       @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
       public matDialogRef: MatDialogRef<ViewBeamJobOutputDialogComponent>,
       private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.subscription = (
       this.backendApiService.getBeamJobRunOutput(this.beamJobRun).pipe(
         first(),
@@ -55,11 +55,11 @@ export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
     ).subscribe(output => this.output = output);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.subscription?.unsubscribe();
   }
 
-  getOutput(): string {
+  getOutput (): string {
     if (!this.output) {
       return '';
     }

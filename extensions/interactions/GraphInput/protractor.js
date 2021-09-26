@@ -20,7 +20,7 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = async function(interactionEditor, graphDict) {
+var customizeInteraction = async function (interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
     '.protractor-test-graph-input-viz-container'));
   if (graphDict) {
@@ -29,7 +29,7 @@ var customizeInteraction = async function(interactionEditor, graphDict) {
   }
 };
 
-var expectInteractionDetailsToMatch = async function(
+var expectInteractionDetailsToMatch = async function (
     interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
     '.protractor-test-graph-input-viz-container'));
@@ -39,7 +39,7 @@ var expectInteractionDetailsToMatch = async function(
   }
 };
 
-var submitAnswer = async function(conversationInput, graphDict) {
+var submitAnswer = async function (conversationInput, graphDict) {
   // Assuming graph container is empty or already has the necessary nodes to
   // draw edges on. Otherwise, should allow user to add nodes before creating
   // new nodes.

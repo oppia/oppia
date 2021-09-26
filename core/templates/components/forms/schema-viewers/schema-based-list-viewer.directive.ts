@@ -23,7 +23,7 @@ require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedListViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  function(
+  function (
       NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {

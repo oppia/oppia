@@ -93,14 +93,14 @@ interface CreatorDashboardData {
   providedIn: 'root'
 })
 export class CreatorDashboardBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
     private loggerService: LoggerService) {}
 
-  _getSuggestionThreads(
+  _getSuggestionThreads (
       feedbackDicts: FeedbackThreadBackendDict[],
       suggestionDicts: SuggestionBackendDict[]): SuggestionThread[] {
     var numberOfSuggestions = feedbackDicts.length;
@@ -128,7 +128,7 @@ export class CreatorDashboardBackendApiService {
     return suggestionThreads;
   }
 
-  async _fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
+  async _fetchDashboardDataAsync (): Promise<CreatorDashboardData> {
     return this.http.get<CreatorDashboardDataBackendDict>(
       '/creatordashboardhandler/data').toPromise().then(dashboardData => {
       return {
@@ -181,11 +181,11 @@ export class CreatorDashboardBackendApiService {
     });
   }
 
-  async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
+  async fetchDashboardDataAsync (): Promise<CreatorDashboardData> {
     return this._fetchDashboardDataAsync();
   }
 
-  async postExplorationViewAsync(newViewType: string): Promise<void> {
+  async postExplorationViewAsync (newViewType: string): Promise<void> {
     return this.http.post<void>('/creatordashboardhandler/data', {
       display_preference: newViewType
     }).toPromise();

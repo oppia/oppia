@@ -83,7 +83,7 @@ describe('StateResponsesComponent', () => {
   });
 
   beforeEach(angular.mock.inject(
-    function($injector, $componentController) {
+    function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $uibModal = $injector.get('$uibModal');

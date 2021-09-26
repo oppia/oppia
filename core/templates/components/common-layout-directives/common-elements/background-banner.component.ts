@@ -26,9 +26,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './background-banner.component.html'
 })
 export class BackgroundBannerComponent implements OnInit {
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor (private urlInterpolationService: UrlInterpolationService) {}
   bannerImageFileUrl: string = '';
-  ngOnInit(): void {
+  ngOnInit (): void {
     const possibleBannerFilenames: string[] = [
       'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
     const bannerImageFilename: string = possibleBannerFilenames[

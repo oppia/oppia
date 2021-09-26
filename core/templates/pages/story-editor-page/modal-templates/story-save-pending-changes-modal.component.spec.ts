@@ -21,10 +21,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StorySavePendingChangesModalComponent } from './story-save-pending-changes-modal.component';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
-  close(): void {
+  close (): void {
     return;
   }
 }

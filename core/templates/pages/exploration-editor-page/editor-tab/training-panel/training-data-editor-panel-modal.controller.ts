@@ -33,7 +33,7 @@ angular.module('oppia').controller(
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'TrainingDataService', 'TrainingModalService',
     'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
-    function(
+    function (
         $filter, $injector, $scope, $uibModalInstance,
         AlertsService, AngularNameService, AnswerClassificationService,
         CurrentInteractionService, ExplorationHtmlFormatterService,
@@ -59,10 +59,10 @@ angular.module('oppia').controller(
           StateCustomizationArgsService.savedMemento,
           false, FOCUS_LABEL_TEST_INTERACTION_INPUT, null));
 
-      var _rebuildTrainingData = function() {
+      var _rebuildTrainingData = function () {
         $scope.trainingData = [];
         TrainingDataService.getTrainingDataOfAnswerGroup(
-          answerGroupIndex).forEach(function(answer) {
+          answerGroupIndex).forEach(function (answer) {
           var answerTemplate = (
             ExplorationHtmlFormatterService.getAnswerHtml(
               answer, StateInteractionIdService.savedMemento,
@@ -74,7 +74,7 @@ angular.module('oppia').controller(
         });
       };
 
-      $scope.init = function() {
+      $scope.init = function () {
         _rebuildTrainingData();
         $scope.newAnswerIsAlreadyResolved = false;
         $scope.answerSuccessfullyAdded = false;
@@ -82,18 +82,18 @@ angular.module('oppia').controller(
           FOCUS_LABEL_TEST_INTERACTION_INPUT);
       };
 
-      $scope.removeAnswerFromTrainingData = function(answerIndex) {
+      $scope.removeAnswerFromTrainingData = function (answerIndex) {
         var answer = $scope.trainingData[answerIndex].answer;
         TrainingDataService.removeAnswerFromAnswerGroupTrainingData(
           answer, answerGroupIndex);
         $scope.trainingData.splice(answerIndex, 1);
       };
 
-      $scope.exit = function() {
+      $scope.exit = function () {
         $uibModalInstance.close();
       };
 
-      $scope.submitAnswer = function(newAnswer) {
+      $scope.submitAnswer = function (newAnswer) {
         $scope.newAnswerIsAlreadyResolved = false;
 
         var interactionId = StateInteractionIdService.savedMemento;
@@ -148,7 +148,7 @@ angular.module('oppia').controller(
 
       CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
 
-      $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
+      $scope.openTrainUnresolvedAnswerModal = function (answerIndex) {
         // An answer group must have either a rule or at least one
         // answer in training data. Don't allow modification of training
         // data answers if there are no rules and only one training data
@@ -159,7 +159,7 @@ angular.module('oppia').controller(
           var answer = $scope.trainingData[answerIndex].answer;
           var interactionId = StateInteractionIdService.savedMemento;
           return TrainingModalService.openTrainUnresolvedAnswerModal(
-            answer, function() {
+            answer, function () {
               var truncatedAnswer = $filter(
                 'truncateInputBasedOnInteractionAnswerType')(
                 answer, interactionId, 12);

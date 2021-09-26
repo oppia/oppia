@@ -26,17 +26,17 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class UploadBlogPostThumbnailModalComponent
   extends ConfirmOrCancelModal {
-  constructor(
+  constructor (
       ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }
 
-  cancel(): void {
+  cancel (): void {
     super.cancel();
   }
 
-  save(imageDataUrl: string): void {
+  save (imageDataUrl: string): void {
     super.confirm(imageDataUrl);
   }
 }

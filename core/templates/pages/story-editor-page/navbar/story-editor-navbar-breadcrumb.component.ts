@@ -32,7 +32,7 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
    templateUrl: './story-editor-navbar-breadcrumb.component.html'
  })
 export class StoryEditorNavbarBreadcrumbComponent {
-  constructor(
+  constructor (
      private undoRedoService: UndoRedoService,
      private ngbModal: NgbModal,
      private storyEditorStateService: StoryEditorStateService,
@@ -44,7 +44,7 @@ export class StoryEditorNavbarBreadcrumbComponent {
    directiveSubscriptions = new Subscription();
    TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 
-   returnToTopicEditorPage(): void {
+   returnToTopicEditorPage (): void {
      if (this.undoRedoService.getChangeCount() > 0) {
        this.ngbModal.open(
          StorySavePendingChangesModalComponent,
@@ -64,7 +64,7 @@ export class StoryEditorNavbarBreadcrumbComponent {
      }
    }
 
-   ngOnInit(): void {
+   ngOnInit (): void {
      this.directiveSubscriptions.add(
        this.storyEditorStateService.onStoryInitialized.subscribe(
          () => {
@@ -74,7 +74,7 @@ export class StoryEditorNavbarBreadcrumbComponent {
        ));
    }
 
-   ngOnDestroy(): void {
+   ngOnDestroy (): void {
      this.directiveSubscriptions.unsubscribe();
    }
 }

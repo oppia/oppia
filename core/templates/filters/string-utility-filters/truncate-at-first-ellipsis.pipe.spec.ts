@@ -19,7 +19,7 @@
 import { TruncateAtFirstEllipsisPipe } from
   'filters/string-utility-filters/truncate-at-first-ellipsis.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let truncateAtFirstEllipsisPipe: TruncateAtFirstEllipsisPipe = null;
   beforeEach(() => {
     truncateAtFirstEllipsisPipe = new TruncateAtFirstEllipsisPipe();

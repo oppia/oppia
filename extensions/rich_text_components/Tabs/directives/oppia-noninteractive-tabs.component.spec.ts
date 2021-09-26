@@ -28,7 +28,7 @@ describe('NoninteractiveTabs', () => {
   let fixture: ComponentFixture<NoninteractiveTabs>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: string) {
+    escapedJsonToObj: function (answer: string) {
       return JSON.parse(answer);
     }
   };

@@ -129,7 +129,7 @@ describe('Admin Data Service', () => {
   });
 
   it('should return the correct admin data', fakeAsync(() => {
-    adminDataService.getDataAsync().then(function(response) {
+    adminDataService.getDataAsync().then(function (response) {
       expect(response).toEqual(adminDataResponse);
     });
 
@@ -152,7 +152,7 @@ describe('Admin Data Service', () => {
 
       flushMicrotasks();
 
-      adminDataService.getDataAsync().then(function(response) {
+      adminDataService.getDataAsync().then(function (response) {
         expect(response).toEqual(adminDataResponse);
       });
 

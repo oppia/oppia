@@ -47,7 +47,7 @@ export class UnassignSkillFromTopicsModalComponent
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService
@@ -55,7 +55,7 @@ export class UnassignSkillFromTopicsModalComponent
     super(ngbActiveModal);
   }
 
-  fetchTopicAssignmentsForSkill(): void {
+  fetchTopicAssignmentsForSkill (): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
         this.skillId).then((response: AssignedSkill[]) => {
@@ -71,11 +71,11 @@ export class UnassignSkillFromTopicsModalComponent
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.fetchTopicAssignmentsForSkill();
   }
 
-  selectedTopicToUnassign(topicId: string): void {
+  selectedTopicToUnassign (topicId: string): void {
     let index: number = this.selectedTopicNames.indexOf(topicId);
     if (index !== -1) {
       this.selectedTopicNames.splice(index, 1);
@@ -83,7 +83,7 @@ export class UnassignSkillFromTopicsModalComponent
       this.selectedTopicNames.push(topicId);
     }
   }
-  close(): void {
+  close (): void {
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(
         this.topicsAssignments[this.selectedTopicNames[index]]);

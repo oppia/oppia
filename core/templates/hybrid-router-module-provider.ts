@@ -44,7 +44,7 @@ export class MockRouterLink {
 export class MockRouterModule {}
 
 export class HybridRouterModuleProvider {
-  static provide(): ModuleWithProviders<MockRouterModule | RouterModule> {
+  static provide (): ModuleWithProviders<MockRouterModule | RouterModule> {
     let bodyContent = window.document.querySelector('body');
 
     // Checks whether the page is using angular router.

@@ -23,7 +23,7 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var StoryEditorPage = function() {
+var StoryEditorPage = function () {
   var EDITOR_URL_PREFIX = '/story_editor/';
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
@@ -127,34 +127,34 @@ var StoryEditorPage = function() {
   var discardChangesButton = element(
     by.css('.protractor-test-discard-story-changes'));
 
-  this.get = async function(storyId) {
+  this.get = async function (storyId) {
     await browser.get(EDITOR_URL_PREFIX + storyId);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getStoryThumbnailSource = async function() {
+  this.getStoryThumbnailSource = async function () {
     return await workflow.getImageSource(storyThumbnailImageElement);
   };
 
-  this.getChapterThumbnailSource = async function() {
+  this.getChapterThumbnailSource = async function () {
     return await workflow.getImageSource(chapterThumbnailImageElement);
   };
 
-  this.submitStoryThumbnail = async function(imgPath, resetExistingImage) {
+  this.submitStoryThumbnail = async function (imgPath, resetExistingImage) {
     return await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
-  this.submitChapterThumbnail = async function(imgPath, resetExistingImage) {
+  this.submitChapterThumbnail = async function (imgPath, resetExistingImage) {
     return await workflow.submitImage(
       chapterThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
-  this.publishStory = async function() {
+  this.publishStory = async function () {
     await action.click('Publish Story Button', publishStoryButton);
   };
 
-  this.unpublishStory = async function() {
+  this.unpublishStory = async function () {
     await unpublishStoryButton.click();
     await action.click('Close Save Modal button', closeSaveModalButton);
     await waitFor.invisibilityOf(
@@ -162,7 +162,7 @@ var StoryEditorPage = function() {
       'Unpublish message modal takes too long to disappear.');
   };
 
-  this.deleteChapterWithIndex = async function(index) {
+  this.deleteChapterWithIndex = async function (index) {
     await waitFor.visibilityOf(
       chapterEditOptions.first(),
       'Chapter list taking too long to appear.');
@@ -171,7 +171,7 @@ var StoryEditorPage = function() {
     await confirmDeleteChapterButton.click();
   };
 
-  this.createNewChapter = async function(title, explorationId, imgPath) {
+  this.createNewChapter = async function (title, explorationId, imgPath) {
     await general.scrollToTop();
     await action.click(
       'Create chapter button takes too long to be clickable.',
@@ -187,17 +187,17 @@ var StoryEditorPage = function() {
     await general.scrollToTop();
   };
 
-  this.cancelChapterCreation = async function() {
+  this.cancelChapterCreation = async function () {
     await action.click(
       'Cancel chapter creation button', cancelChapterCreationButton);
   };
 
-  this.discardStoryChanges = async function() {
+  this.discardStoryChanges = async function () {
     await action.click('Show discard option button', discardOption);
     await action.click('Discard changes button', discardChangesButton);
   };
 
-  this.navigateToChapterWithName = async function(chapterName) {
+  this.navigateToChapterWithName = async function (chapterName) {
     await waitFor.visibilityOf(
       chapterTitles.first(), 'Chapter list taking too long to appear');
     var chapterIndex = -1;
@@ -219,7 +219,7 @@ var StoryEditorPage = function() {
     await general.scrollToTop();
   };
 
-  this.navigateToStoryEditorTab = async function() {
+  this.navigateToStoryEditorTab = async function () {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       backToStoryEditorButton, 'Back to story button is not visible');
@@ -227,14 +227,14 @@ var StoryEditorPage = function() {
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
 
-  this.expectChaptersListToBe = async function(chapters) {
+  this.expectChaptersListToBe = async function (chapters) {
     await this.expectNumberOfChaptersToBe(chapters.length);
     for (var i = 0; i < chapters.length; i++) {
       expect(await chapterTitles.get(i).getText()).toEqual(chapters[i]);
     }
   };
 
-  this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
+  this.dragChapterToAnotherChapter = (async function (chapter1, chapter2) {
     await waitFor.visibilityOf(
       chapterTitles.first(),
       'Chapter titles taking too long to appear.');
@@ -260,26 +260,26 @@ var StoryEditorPage = function() {
     await general.dragAndDrop(toMove, target);
   });
 
-  this.expectDestinationToBe = async function(chapterName) {
+  this.expectDestinationToBe = async function (chapterName) {
     var pattern = '\s*' + chapterName + '\s*';
     return expect(await nextChapterCard.getText()).toMatch(pattern);
   };
 
-  this.expectNumberOfChaptersToBe = async function(count) {
+  this.expectNumberOfChaptersToBe = async function (count) {
     expect(await chapterTitles.count()).toEqual(count);
   };
 
-  this.expectNotesToBe = async function(richTextInstructions) {
+  this.expectNotesToBe = async function (richTextInstructions) {
     await forms.expectRichText(storyNotes).toMatch(richTextInstructions);
   };
 
-  this.expectTitleToBe = async function(title) {
+  this.expectTitleToBe = async function (title) {
     await waitFor.presenceOf(
       storyTitleField, 'Story Title Field takes too long to appear');
     expect(await storyTitleField.getAttribute('value')).toEqual(title);
   };
 
-  this.expectDescriptionToBe = async function(description) {
+  this.expectDescriptionToBe = async function (description) {
     await waitFor.presenceOf(
       storyDescriptionField,
       'Story Description Field takes too long to appear');
@@ -287,20 +287,20 @@ var StoryEditorPage = function() {
       description);
   };
 
-  this.changeStoryTitle = async function(storyTitle) {
+  this.changeStoryTitle = async function (storyTitle) {
     await waitFor.visibilityOf(
       storyTitleField, 'Story Title Field taking too long to appear.');
     await storyTitleField.clear();
     await storyTitleField.sendKeys(storyTitle);
   };
 
-  this.returnToTopic = async function() {
+  this.returnToTopic = async function () {
     await general.scrollToTop();
     await action.click('Return to topic button', returnToTopicButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.changeStoryDescription = async function(storyDescription) {
+  this.changeStoryDescription = async function (storyDescription) {
     await waitFor.visibilityOf(
       storyDescriptionField,
       'Story Description Field taking too long to appear.');
@@ -308,7 +308,7 @@ var StoryEditorPage = function() {
     await storyDescriptionField.sendKeys(storyDescription);
   };
 
-  this.changeStoryNotes = async function(richTextInstructions) {
+  this.changeStoryNotes = async function (richTextInstructions) {
     await action.click(
       'Open Story Editor Notes Button', openStoryNotesEditorButton);
     var storyNotesEditor = await forms.RichTextEditor(
@@ -319,7 +319,7 @@ var StoryEditorPage = function() {
       'Save Story Notes Editor Button', saveStoryNotesEditorButton);
   };
 
-  this.saveStory = async function(commitMessage) {
+  this.saveStory = async function (commitMessage) {
     await action.click('Save Story Button', saveStoryButton);
     await waitFor.visibilityOf(
       commitMessageField, 'Commit message modal takes too long to appear.');
@@ -337,14 +337,14 @@ var StoryEditorPage = function() {
       saveStoryButton, 'Save Draft', 'Story could not be saved.');
   };
 
-  this.expectSaveStoryDisabled = async function() {
+  this.expectSaveStoryDisabled = async function () {
     await waitFor.visibilityOf(
       saveStoryButton, 'Save story button taking too long to appear');
     return expect(
       await saveStoryButton.getAttribute('disabled')).toEqual('true');
   };
 
-  this.setChapterExplorationId = async function(explorationId) {
+  this.setChapterExplorationId = async function (explorationId) {
     await waitFor.visibilityOf(
       explorationIdInput,
       'ExplorationIdInput takes too long to be visible'
@@ -358,7 +358,7 @@ var StoryEditorPage = function() {
     await explorationIdSaveButton.click();
   };
 
-  this.changeNodeDescription = async function(nodeDescription) {
+  this.changeNodeDescription = async function (nodeDescription) {
     // Function scrollToTop is added to prevent nodeDescriptionInputField from
     // being hidden by the navbar.
     await general.scrollToTop();
@@ -369,7 +369,7 @@ var StoryEditorPage = function() {
     await nodeDescriptionInputField.sendKeys(nodeDescription);
   };
 
-  this.expectNodeDescription = async function(nodeDescription) {
+  this.expectNodeDescription = async function (nodeDescription) {
     await waitFor.visibilityOf(
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible'
@@ -381,7 +381,7 @@ var StoryEditorPage = function() {
     await expect(desc).toMatch(nodeDescription);
   };
 
-  this.expectChapterExplorationIdToBe = async function(id) {
+  this.expectChapterExplorationIdToBe = async function (id) {
     await waitFor.visibilityOf(
       explorationIdInput,
       'explorationIdInput takes too long to be visible'
@@ -393,7 +393,7 @@ var StoryEditorPage = function() {
     await expect(explorationId).toEqual(id);
   };
 
-  this.changeNodeOutline = async function(richTextInstructions) {
+  this.changeNodeOutline = async function (richTextInstructions) {
     await waitFor.visibilityOf(
       nodeOutlineEditor, 'Node outline editor taking too long to appear.');
     var editor = await forms.RichTextEditor(
@@ -405,7 +405,7 @@ var StoryEditorPage = function() {
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
 
-  this.navigateToChapterByIndex = async function(index) {
+  this.navigateToChapterByIndex = async function (index) {
     // Function scrollToTop is added to prevent chapterTitles from being hidden
     // by the navbar.
     await general.scrollToTop();
@@ -413,24 +413,24 @@ var StoryEditorPage = function() {
     await chapterTitleButton.click();
   };
 
-  this.expectNodeOutlineToMatch = function(nodeOutline) {
+  this.expectNodeOutlineToMatch = function (nodeOutline) {
     expect(
       nodeOutlineEditorRteContent.first().getText()).toEqual(nodeOutline);
   };
 
-  this.expectExplorationIdAlreadyExistWarning = async function() {
+  this.expectExplorationIdAlreadyExistWarning = async function () {
     var warningText = await action.getText(
       'Exploration Already Present Message', explorationAlreadyPresentMsg);
     expect(warningText).toEqual(
       'The given exploration already exists in the story.');
   };
 
-  this.getSelectSkillModal = async function() {
+  this.getSelectSkillModal = async function () {
     await waitFor.visibilityOf(
       selectSkillModalHeader,
       'selectSkillModalHeader takes too long to be visible.');
     return {
-      _searchSkillByName: async function(name) {
+      _searchSkillByName: async function (name) {
         await waitFor.visibilityOf(
           skillNameInputField,
           'skillNameInputField takes too long to be visible');
@@ -438,7 +438,7 @@ var StoryEditorPage = function() {
         await action.click('Skill Name Input field', skillNameInputField);
       },
 
-      _selectSkillBasedOnIndex: async function(index) {
+      _selectSkillBasedOnIndex: async function (index) {
         await waitFor.visibilityOf(skillListItems.get(0));
         var selectedSkill = skillListItems.get(index);
         await waitFor.elementToBeClickable(
@@ -446,7 +446,7 @@ var StoryEditorPage = function() {
         await selectedSkill.click();
       },
 
-      selectSkill: async function(name) {
+      selectSkill: async function (name) {
         await this._searchSkillByName(name);
         await this._selectSkillBasedOnIndex(0);
         await waitFor.pageToFullyLoad();
@@ -455,37 +455,37 @@ var StoryEditorPage = function() {
     };
   };
 
-  this.addAcquiredSkill = async function(skillName) {
+  this.addAcquiredSkill = async function (skillName) {
     await action.click(
       'addAcquiredSkillButton', addAcquiredSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
 
-  this.addPrerequisiteSkill = async function(skillName) {
+  this.addPrerequisiteSkill = async function (skillName) {
     await action.click(
       'addPrerequisiteSkillButton', addPrerequisiteSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
 
-  this.deleteAcquiredSkillByIndex = async function(index) {
+  this.deleteAcquiredSkillByIndex = async function (index) {
     var deleteButton = deleteAcquiredSkillButton.get(index);
     await action.click('Delete Acquired Skill Button', deleteButton);
   };
 
-  this.deletePrerequisiteSkillByIndex = async function(index) {
+  this.deletePrerequisiteSkillByIndex = async function (index) {
     var deleteButton = deletePrerequisiteSkillButton.get(index);
     await action.click('Delete Prerequisite Skill Button', deleteButton);
   };
 
-  this.updateMetaTagContent = async function(newMetaTagContent) {
+  this.updateMetaTagContent = async function (newMetaTagContent) {
     await action.sendKeys(
       'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', storyMetaTagContentLabel);
   };
 
-  this.expectAcquiredSkillDescriptionCardCount = async function(number) {
+  this.expectAcquiredSkillDescriptionCardCount = async function (number) {
     let count = await browser.executeScript(() => {
       return document.getElementsByClassName(
         'protractor-test-acquired-skill-description-card').length;
@@ -493,7 +493,7 @@ var StoryEditorPage = function() {
     await expect(count).toEqual(number);
   };
 
-  this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
+  this.expectPrerequisiteSkillDescriptionCardCount = async function (number) {
     let count = await browser.executeScript(() => {
       return document.getElementsByClassName(
         'protractor-test-prerequisite-skill-description-card').length;
@@ -501,7 +501,7 @@ var StoryEditorPage = function() {
     await expect(count).toEqual(number);
   };
 
-  this.expectWarningInIndicator = async function(warning) {
+  this.expectWarningInIndicator = async function (warning) {
     await waitFor.visibilityOf(
       warningIndicator, 'Warning Indicator taking too long to appear.');
     await browser.actions().mouseMove(warningIndicator).perform();

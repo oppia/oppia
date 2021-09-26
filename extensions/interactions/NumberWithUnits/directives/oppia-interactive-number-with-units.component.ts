@@ -38,18 +38,18 @@ angular.module('oppia').component('oppiaInteractiveNumberWithUnits', {
   controller: [
     '$attrs', '$scope', '$uibModal', 'CurrentInteractionService',
     'NumberWithUnitsObjectFactory', 'NumberWithUnitsRulesService',
-    function(
+    function (
         $attrs, $scope, $uibModal, CurrentInteractionService,
         NumberWithUnitsObjectFactory, NumberWithUnitsRulesService) {
       var ctrl = this;
       var errorMessage = '';
       // Label for errors caused whilst parsing number with units.
       var FORM_ERROR_TYPE = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-      ctrl.getWarningText = function() {
+      ctrl.getWarningText = function () {
         return errorMessage;
       };
 
-      ctrl.submitAnswer = function(answer) {
+      ctrl.submitAnswer = function (answer) {
         try {
           var numberWithUnits = (
             NumberWithUnitsObjectFactory.fromRawInputString(answer));
@@ -62,7 +62,7 @@ angular.module('oppia').component('oppiaInteractiveNumberWithUnits', {
         }
       };
 
-      ctrl.isAnswerValid = function() {
+      ctrl.isAnswerValid = function () {
         if (ctrl.NumberWithUnitsForm === undefined) {
           return true;
         }
@@ -70,23 +70,23 @@ angular.module('oppia').component('oppiaInteractiveNumberWithUnits', {
           !ctrl.NumberWithUnitsForm.$invalid && ctrl.answer !== '');
       };
 
-      var submitAnswerFn = function() {
+      var submitAnswerFn = function () {
         ctrl.submitAnswer(ctrl.answer);
       };
-      ctrl.showHelp = function() {
+      ctrl.showHelp = function () {
         $uibModal.open({
           template: require(
             './number-with-units-help-modal.directive.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function () {}, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
-      ctrl.$onInit = function() {
-        $scope.$watch('$ctrl.answer', function(newValue) {
+      ctrl.$onInit = function () {
+        $scope.$watch('$ctrl.answer', function (newValue) {
           try {
             NumberWithUnitsObjectFactory.fromRawInputString(newValue);
             errorMessage = '';

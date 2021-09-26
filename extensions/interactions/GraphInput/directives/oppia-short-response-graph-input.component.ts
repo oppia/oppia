@@ -37,9 +37,9 @@ export class ShortResponseGraphInput {
   @Input() answer!: string;
   graph!: GraphAnswer;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor (private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     // TODO(#12104): Improve this short response by using a small
     // version of the graph image instead of an arbitrary label of
     // vertices and edges.

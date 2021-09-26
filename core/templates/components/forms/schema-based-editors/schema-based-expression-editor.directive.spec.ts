@@ -29,7 +29,7 @@ describe('Schema Based Expression Editor Directive', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     FocusManagerService = $injector.get('FocusManagerService');

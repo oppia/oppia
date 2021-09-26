@@ -39,10 +39,10 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var filename = context.getFilename();
 
-    var checkAndReportHttpClient = function(node) {
+    var checkAndReportHttpClient = function (node) {
       if (!filename.endsWith('backend-api.service.ts')) {
         context.report({
           node: node,
@@ -52,7 +52,7 @@ module.exports = {
     };
 
     return {
-      'ImportSpecifier[imported.name=HttpClient]': function(node) {
+      'ImportSpecifier[imported.name=HttpClient]': function (node) {
         checkAndReportHttpClient(node);
       }
     };

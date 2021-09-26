@@ -25,11 +25,11 @@ import { PageHeadService } from 'services/page-head.service';
   templateUrl: './volunteer-page-root.component.html'
 })
 export class VolunteerPageRootComponent {
-  constructor(
+  constructor (
     private pageHeadService: PageHeadService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER);
   }

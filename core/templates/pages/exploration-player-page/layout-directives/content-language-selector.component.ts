@@ -42,7 +42,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   styleUrls: []
 })
 export class ContentLanguageSelectorComponent implements OnInit {
-  constructor(
+  constructor (
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
     private contextService: ContextService,
@@ -57,7 +57,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   languageOptions: ExplorationLanguageInfo[];
   currentGlobalLanguageCode: string;
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.currentGlobalLanguageCode = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.selectedLanguageCode = (
@@ -76,7 +76,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
   }
 
-  onSelectLanguage(newLanguageCode: string): string {
+  onSelectLanguage (newLanguageCode: string): string {
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(
         SwitchContentLanguageRefreshRequiredModalComponent);
@@ -96,13 +96,13 @@ export class ContentLanguageSelectorComponent implements OnInit {
     return this.selectedLanguageCode;
   }
 
-  shouldDisplaySelector(): boolean {
+  shouldDisplaySelector (): boolean {
     return (
       this.languageOptions.length > 1 &&
       this.playerPositionService.displayedCardIndex === 0);
   }
 
-  private shouldPromptForRefresh(): boolean {
+  private shouldPromptForRefresh (): boolean {
     const firstCard = this.playerTranscriptService.getCard(0);
     return firstCard.getInputResponsePairs().length > 0;
   }

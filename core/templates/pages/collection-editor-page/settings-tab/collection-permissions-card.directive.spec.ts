@@ -30,7 +30,7 @@ describe('Collection Permissions Card component', () => {
   let getCollectionRights: jasmine.Spy;
   let hasLoadedCollection: jasmine.Spy;
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     getCollectionRights = jasmine.createSpy('getCollectionRightsSpy');
     hasLoadedCollection = jasmine.createSpy('hasLoadedCollectionSpy');
     const mockCollectionEditorStateService = {
@@ -39,7 +39,7 @@ describe('Collection Permissions Card component', () => {
     $provide.value(
       'CollectionEditorStateService', mockCollectionEditorStateService);
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     ctrl = $componentController('collectionPermissionsCard', {
@@ -66,7 +66,7 @@ describe('Upgraded component', () => {
       'collectionPermissionsCard',
       [CollectionPermissionsCard]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
+      async (textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

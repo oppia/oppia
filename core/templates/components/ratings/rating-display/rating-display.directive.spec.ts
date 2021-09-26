@@ -24,12 +24,12 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 require('components/ratings/rating-display/rating-display.directive.ts');
 
-describe('Rating display directive', function() {
+describe('Rating display directive', function () {
   var outerScope, ctrlScope;
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -37,7 +37,7 @@ describe('Rating display directive', function() {
   }));
 
   beforeEach(
-    angular.mock.inject(function($compile, $rootScope, $templateCache) {
+    angular.mock.inject(function ($compile, $rootScope, $templateCache) {
       var templateHtml = $templateCache.get(
         '/components/ratings/rating-display/rating-display.directive.html');
       $compile(templateHtml)($rootScope);
@@ -51,7 +51,7 @@ describe('Rating display directive', function() {
       ctrlScope = compiledElem[0].getControllerScope();
     }));
 
-  it('should display the correct number of stars', function() {
+  it('should display the correct number of stars', function () {
     // Pre checks -- here ratingValue is 5 as given in the template.
     expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star');

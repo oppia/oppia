@@ -27,21 +27,21 @@ require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'answer-submit-action.component.ts');
 
-describe('Answer Submit Action directive', function() {
+describe('Answer Submit Action directive', function () {
   var ctrl = null;
   var $scope = null;
   var explorationHtmlFormatterService = null;
   var htmlEscaperService = null;
   var interactionObjectFactory = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService);
     htmlEscaperService = TestBed.get(HtmlEscaperService);
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$attrs', {
       actionIndex: 2,
       answer: '"This is an answer string."',
@@ -63,7 +63,7 @@ describe('Answer Submit Action directive', function() {
   }));
 
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
@@ -77,14 +77,14 @@ describe('Answer Submit Action directive', function() {
   }));
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect(ctrl.currentStateName).toBe('State name');
       expect(ctrl.destStateName).toBe('Introduction');
       expect(ctrl.actionIndex).toBe(2);
       expect(ctrl.timeSpentInStateSecs).toBe(2000);
     });
 
-  it('should get short answer html', function() {
+  it('should get short answer html', function () {
     expect(ctrl.getShortAnswerHtml()).toBe(
       '<oppia-short-response-multiple-choice-input answer="&amp;quot;This is' +
       ' an answer string.&amp;quot;" choices="[&amp;quot;Value&amp;quot;]"' +

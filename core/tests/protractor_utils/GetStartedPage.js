@@ -18,15 +18,15 @@
  */
 var waitFor = require('./waitFor.js');
 
-var GetStartedPage = function() {
+var GetStartedPage = function () {
   var GET_STARTED_PAGE_URL = '/get-started';
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(GET_STARTED_PAGE_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getMetaTagContent = async function(name, type) {
+  this.getMetaTagContent = async function (name, type) {
     if (type === 'itemprop') {
       var tag = element(by.css('meta[itemprop="' + name + '"]'));
     } else if (type === 'og') {

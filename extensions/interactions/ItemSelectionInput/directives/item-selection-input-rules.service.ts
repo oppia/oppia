@@ -30,7 +30,7 @@ export class ItemSelectionInputRulesService {
   private removeDuplicatesInArrayPipe: RemoveDuplicatesInArrayPipe = (
     new RemoveDuplicatesInArrayPipe());
 
-  Equals(
+  Equals (
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
@@ -39,7 +39,7 @@ export class ItemSelectionInputRulesService {
     return normalizedAnswer.length === normalizedInput.length &&
     normalizedAnswer.every(val => normalizedInput.includes(val));
   }
-  ContainsAtLeastOneOf(
+  ContainsAtLeastOneOf (
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
@@ -49,7 +49,7 @@ export class ItemSelectionInputRulesService {
   }
   // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
   // in sync with the backend migration of the same rule.
-  DoesNotContainAtLeastOneOf(
+  DoesNotContainAtLeastOneOf (
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
@@ -59,7 +59,7 @@ export class ItemSelectionInputRulesService {
   }
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
-  IsProperSubsetOf(
+  IsProperSubsetOf (
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);

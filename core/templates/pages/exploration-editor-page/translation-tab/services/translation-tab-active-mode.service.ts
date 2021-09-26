@@ -29,19 +29,19 @@ import { ExplorationEditorPageConstants } from
 export class TranslationTabActiveModeService {
   private activeMode!: string;
 
-  activateVoiceoverMode(): void {
+  activateVoiceoverMode (): void {
     this.activeMode = ExplorationEditorPageConstants.VOICEOVER_MODE;
   }
 
-  activateTranslationMode(): void {
+  activateTranslationMode (): void {
     this.activeMode = ExplorationEditorPageConstants.TRANSLATION_MODE;
   }
 
-  isTranslationModeActive(): boolean {
+  isTranslationModeActive (): boolean {
     return this.activeMode === ExplorationEditorPageConstants.TRANSLATION_MODE;
   }
 
-  isVoiceoverModeActive(): boolean {
+  isVoiceoverModeActive (): boolean {
     return this.activeMode === ExplorationEditorPageConstants.VOICEOVER_MODE;
   }
 }

@@ -34,7 +34,7 @@ export class SaveVersionMismatchModalComponent
   hasLostChanges: boolean;
   @Input() lostChanges: LostChange[];
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private elRef: ElementRef,
     private loggerService: LoggerService,
@@ -45,7 +45,7 @@ export class SaveVersionMismatchModalComponent
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     if (this.hasLostChanges) {
       this.lostChanges = this.lostChanges.map(
@@ -53,19 +53,19 @@ export class SaveVersionMismatchModalComponent
     }
   }
 
-  private _refreshPage(delay: number): void {
+  private _refreshPage (delay: number): void {
     setTimeout(() => {
       this.windowRef.nativeWindow.location.reload();
     }, delay);
   }
 
-  discardChanges(): void {
+  discardChanges (): void {
     this.explorationDataService.discardDraftAsync().then(() => {
       this._refreshPage(this.MSECS_TO_REFRESH);
     });
   }
 
-  exportAndDiscardChanges(): void {
+  exportAndDiscardChanges (): void {
     let lostChangesData: HTMLElement = (
       this.elRef.nativeElement.getElementsByClassName(
         'oppia-lost-changes'));

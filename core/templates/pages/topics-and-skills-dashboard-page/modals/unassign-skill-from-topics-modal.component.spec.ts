@@ -37,7 +37,7 @@ describe('Unassing SKill Modal', () => {
 
 
   class MockTopicsAndSkillsDashboardBackendApiService {
-    fetchTopicAssignmentsForSkillAsync(skillId: string) {
+    fetchTopicAssignmentsForSkillAsync (skillId: string) {
       return {
         then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);

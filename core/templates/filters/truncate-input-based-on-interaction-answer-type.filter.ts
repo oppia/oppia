@@ -25,8 +25,8 @@ require('filters/string-utility-filters/truncate.filter.ts');
  * @param {integer} length - Truncated length of answer.
  */
 angular.module('oppia').filter('truncateInputBasedOnInteractionAnswerType', [
-  '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {
-    return function(input, interactionId, length) {
+  '$filter', 'INTERACTION_SPECS', function ($filter, INTERACTION_SPECS) {
+    return function (input, interactionId, length) {
       var answerType = INTERACTION_SPECS[interactionId].answer_type;
       var actualInputToTruncate = '';
       if (answerType === 'NormalizedString') {

@@ -41,11 +41,11 @@ module.exports = {
     },
   },
 
-  create: function(context) {
-    var getDependenciesLiteralLines = function(controllerArg, nameIn) {
+  create: function (context) {
+    var getDependenciesLiteralLines = function (controllerArg, nameIn) {
       var dependencyToLineIndex = {};
       var startLine = 1000000;
-      controllerArg.forEach(function(Literal) {
+      controllerArg.forEach(function (Literal) {
         var lineNo = Literal.loc.start.line;
         if (startLine > lineNo) {
           startLine = lineNo;
@@ -56,7 +56,7 @@ module.exports = {
     };
 
     return {
-      'CallExpression[callee.property.name=directive]': function(node) {
+      'CallExpression[callee.property.name=directive]': function (node) {
         var arg = node.arguments;
         // In angular, components function take 2 arguments and type of last
         // arguments is an ArrayExpression, if arguments doesn't follow this
@@ -71,7 +71,7 @@ module.exports = {
           return;
         }
         var returnDictProp = functionNode.body.body[0].argument.properties;
-        returnDictProp.forEach(function(property) {
+        returnDictProp.forEach(function (property) {
           if (property.key.name === 'controller' && (
             property.value.type === 'ArrayExpression')) {
             var lenPropElements = property.value.elements.length;

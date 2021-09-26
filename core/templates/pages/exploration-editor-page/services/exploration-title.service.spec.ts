@@ -24,17 +24,17 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require(
   'pages/exploration-editor-page/services/exploration-title.service.ts');
 
-describe('Exploration Title Service', function() {
+describe('Exploration Title Service', function () {
   let ets = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     ets = $injector.get('ExplorationTitleService');
   }));
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(ets.propertyName).toBe('title');
     let NotNormalize = '   Exploration         Title Service     ';
     let Normalize = 'Exploration Title Service';

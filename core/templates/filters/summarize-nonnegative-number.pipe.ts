@@ -23,7 +23,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 // Users of this filter should ensure that the input is a non-negative number.
 @Pipe({name: 'summarizeNonnegativeNumber'})
 export class SummarizeNonnegativeNumberPipe implements PipeTransform {
-  transform(input: number): number | string {
+  transform (input: number): number | string {
     // Nine zeros for billions (e.g. 146008788788 --> 146.0B).
     // Six zeros for millions (e.g. 146008788 --> 146.0M).
     // Three zeros for thousands (e.g. 146008 --> 146.0K).

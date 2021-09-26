@@ -24,15 +24,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class AuthBackendApiService {
-  constructor(private httpClient: HttpClient) {}
+  constructor (private httpClient: HttpClient) {}
 
-  async beginSessionAsync(idToken: string): Promise<void> {
+  async beginSessionAsync (idToken: string): Promise<void> {
     await this.httpClient.get('/session_begin', {
       headers: {Authorization: `Bearer ${idToken}`}
     }).toPromise();
   }
 
-  async endSessionAsync(): Promise<void> {
+  async endSessionAsync (): Promise<void> {
     await this.httpClient.get('/session_end').toPromise();
   }
 }

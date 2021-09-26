@@ -38,7 +38,7 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   flag: boolean;
   flagMessage: string;
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal,
     private focusManagerService: FocusManagerService,
     private playerPositionService: PlayerPositionService
@@ -47,14 +47,14 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
     this.stateName = this.playerPositionService.getCurrentStateName();
   }
 
-  showFlagMessageTextarea(value: boolean): void {
+  showFlagMessageTextarea (value: boolean): void {
     if (value) {
       this.flagMessageTextareaIsShown = true;
       this.focusManagerService.setFocus('flagMessageTextarea');
     }
   }
 
-  submitReport(): void {
+  submitReport (): void {
     if (this.flagMessageTextareaIsShown) {
       this.ngbActiveModal.close({
         report_type: this.flag,

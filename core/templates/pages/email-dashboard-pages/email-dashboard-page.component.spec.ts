@@ -36,7 +36,7 @@ describe('Email Dashboard Page Component', () => {
   let emailDashboardDataService: EmailDashboardDataService;
 
   class MockChangeDetectorRef {
-    detectChanges(): void {}
+    detectChanges (): void {}
   }
 
   beforeEach(waitForAsync(() => {

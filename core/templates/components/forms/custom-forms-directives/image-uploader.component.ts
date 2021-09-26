@@ -49,20 +49,20 @@ export class ImageUploaderComponent {
   backgroundWhileUploading: boolean = false;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
-  constructor(
+  constructor (
     private blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
     private windowRef: WindowRef,
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     // We generate a random class name to distinguish this input from
     // others in the DOM.
     this.fileInputClassName = (
       'image-uploader-file-input' + this.idGenerationService.generateNewId());
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit (): void {
     this.dropAreaRef.nativeElement.addEventListener(
       'drop', (event: DragEvent) => {
         this.onDragEnd(event);
@@ -97,12 +97,12 @@ export class ImageUploaderComponent {
     });
   }
 
-  onDragEnd(e: Event): void {
+  onDragEnd (e: Event): void {
     e.preventDefault();
     this.backgroundWhileUploading = false;
   }
 
-  handleFile(): void {
+  handleFile (): void {
     let file: File = this.imageInputRef.nativeElement.files[0];
     let filename: string = this.imageInputRef.nativeElement.value.split(
       /(\\|\/)/g).pop();
@@ -117,7 +117,7 @@ export class ImageUploaderComponent {
     this.imageInputRef.nativeElement.value = '';
   }
 
-  validateUploadedFile(file: File, filename: string): string | null {
+  validateUploadedFile (file: File, filename: string): string | null {
     if (!file || !file.size || !file.type.match('image.*')) {
       return 'This file is not recognized as an image';
     }

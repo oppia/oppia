@@ -40,7 +40,7 @@ export interface StateTopAnswersStatsBackendDict {
 }
 
 export class StateTopAnswersStats {
-  constructor(
+  constructor (
     public answers: StateTopAnswers,
     public interactionIds: StateInteractionIds
   ) {}
@@ -50,7 +50,7 @@ export class StateTopAnswersStats {
   providedIn: 'root'
 })
 export class StateTopAnswersStatsObjectFactory {
-  createFromBackendDict(
+  createFromBackendDict (
       backendDict: StateTopAnswersStatsBackendDict): StateTopAnswersStats {
     let stateTopAnswers: StateTopAnswers = {};
 

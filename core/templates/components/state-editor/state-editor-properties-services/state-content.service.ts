@@ -30,7 +30,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 })
 // TODO(sll): Add validation.
 export class StateContentService extends StatePropertyService<SubtitledHtml> {
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+  constructor (alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveStateContent';
   }

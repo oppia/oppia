@@ -293,7 +293,7 @@ describe('retrieving threads service', () => {
   }));
 
   it('should throw error if trying to fetch messages of' +
-    'null thread', async() => {
+    'null thread', async () => {
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'SuggestionAndFeedbackThread'". We need to suppress this
     // error because we are testing validations here.
@@ -436,7 +436,7 @@ describe('retrieving threads service', () => {
     flushMicrotasks();
   }));
 
-  it('should throw error if trying to mark null thread as seen', async() => {
+  it('should throw error if trying to mark null thread as seen', async () => {
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'SuggestionAndFeedbackThread'". We need to suppress this
     // error because we are testing validations here.
@@ -467,7 +467,7 @@ describe('retrieving threads service', () => {
       flushMicrotasks();
     }));
 
-  it('should use reject handler when passing a null thread', async() => {
+  it('should use reject handler when passing a null thread', async () => {
     await expectAsync(threadDataBackendApiService.addNewMessageAsync(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'SuggestionAndFeedbackThread'". We need to suppress this
@@ -621,7 +621,7 @@ describe('retrieving threads service', () => {
     flushMicrotasks();
   }));
 
-  it('should throw an error if trying to resolve a null thread', async() => {
+  it('should throw an error if trying to resolve a null thread', async () => {
     await expectAsync(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'SuggestionAndFeedbackThread'". We need to suppress this

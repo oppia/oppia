@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for CreateFeedbackThreadModalController.
  */
 
-describe('Create Feedback Thread Modal Controller', function() {
+describe('Create Feedback Thread Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var AlertsService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     AlertsService = $injector.get('AlertsService');
 
@@ -37,12 +37,12 @@ describe('Create Feedback Thread Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.newThreadSubject).toEqual('');
       expect($scope.newThreadText).toEqual('');
     });
 
-  it('should not close modal when new thread subject is emoty', function() {
+  it('should not close modal when new thread subject is emoty', function () {
     spyOn(AlertsService, 'addWarning').and.callThrough();
     var newThreadSubject = '';
     var newThreadText = 'text';
@@ -52,7 +52,7 @@ describe('Create Feedback Thread Modal Controller', function() {
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
-  it('should not close modal when new thread text is empty', function() {
+  it('should not close modal when new thread text is empty', function () {
     spyOn(AlertsService, 'addWarning').and.callThrough();
     var newThreadSubject = 'subject';
     var newThreadText = '';
@@ -63,7 +63,7 @@ describe('Create Feedback Thread Modal Controller', function() {
   });
 
   it('should close modal when both new thread subject and new thread text are' +
-    ' valid', function() {
+    ' valid', function () {
     var newThreadSubject = 'subject';
     var newThreadText = 'text';
     $scope.create(newThreadSubject, newThreadText);

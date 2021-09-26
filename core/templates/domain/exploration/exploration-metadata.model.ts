@@ -24,12 +24,12 @@ export interface ExplorationMetaDataBackendDict {
 }
 
 export class ExplorationMetadata {
-  constructor(
+  constructor (
     public id: string,
     public objective: string,
     public title: string) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       explorationMetadataBackendDict: ExplorationMetaDataBackendDict):
         ExplorationMetadata {
     return new ExplorationMetadata(

@@ -44,7 +44,7 @@ angular.module('oppia').component('historyTab', {
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'LoaderService', 'RouterService',
     'VersionTreeService', 'WindowRef',
-    function(
+    function (
         $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         LoaderService, RouterService,
@@ -58,7 +58,7 @@ angular.module('oppia').component('historyTab', {
 
       // Compares the two selected versions and displays the comparison
       // results.
-      ctrl.compareSelectedVersions = function() {
+      ctrl.compareSelectedVersions = function () {
         if (ctrl.selectedVersionsArray.length === 2) {
           ctrl.changeCompareVersion();
           ctrl.hideHistoryGraph = false;
@@ -66,7 +66,7 @@ angular.module('oppia').component('historyTab', {
       };
       // Changes the checkbox selection and provides an appropriate user
       // prompt.
-      ctrl.changeSelectedVersions = function(snapshot, item) {
+      ctrl.changeSelectedVersions = function (snapshot, item) {
         if (item === 1 && snapshot && !ctrl.selectedVersionsArray.includes(
           snapshot.versionNumber)) {
           ctrl.selectedVersionsArray[0] = snapshot.versionNumber;
@@ -84,9 +84,9 @@ angular.module('oppia').component('historyTab', {
       };
 
       // Refreshes the displayed version history log.
-      ctrl.refreshVersionHistory = function() {
+      ctrl.refreshVersionHistory = function () {
         LoaderService.showLoadingScreen('Loading');
-        ExplorationDataService.getDataAsync().then(function(data) {
+        ExplorationDataService.getDataAsync().then(function (data) {
           var currentVersion = data.version;
           ctrl.currentVersion = currentVersion;
           // The ctrl.compareVersionMetadata is an object with keys
@@ -109,7 +109,7 @@ angular.module('oppia').component('historyTab', {
           ctrl.compareVersionsButtonIsHidden = ctrl.comparisonsAreDisabled;
 
           $http.get(ctrl.explorationAllSnapshotsUrl).then(
-            function(response) {
+            function (response) {
               explorationSnapshots = response.data.snapshots;
               VersionTreeService.init(explorationSnapshots);
 
@@ -148,7 +148,7 @@ angular.module('oppia').component('historyTab', {
         });
       };
 
-      var getVersionHeader = function(versionMetadata) {
+      var getVersionHeader = function (versionMetadata) {
         return (
           'Revision #' + versionMetadata.versionNumber +
           ' by ' + versionMetadata.committerId +
@@ -158,7 +158,7 @@ angular.module('oppia').component('historyTab', {
               ': ' + versionMetadata.commitMessage : ''));
       };
 
-      ctrl.filterByUsername = function() {
+      ctrl.filterByUsername = function () {
         if (!ctrl.username) {
           ctrl.explorationVersionMetadata = cloneDeep(
             ctrl.totalExplorationVersionMetadata);
@@ -177,7 +177,7 @@ angular.module('oppia').component('historyTab', {
 
       // Function to set compared version metadata, download YAML and
       // generate diff graph and legend when selection is changed.
-      ctrl.changeCompareVersion = function() {
+      ctrl.changeCompareVersion = function () {
         ctrl.diffData = null;
 
         var earlierComparedVersion = Math.min(
@@ -204,7 +204,7 @@ angular.module('oppia').component('historyTab', {
 
         CompareVersionsService.getDiffGraphData(
           earlierComparedVersion, laterComparedVersion).then(
-          function(response) {
+          function (response) {
             $log.info('Retrieved version comparison data');
             $log.info(response);
 
@@ -218,7 +218,7 @@ angular.module('oppia').component('historyTab', {
       };
 
       // Downloads the zip file for an exploration.
-      ctrl.downloadExplorationWithVersion = function(versionNumber) {
+      ctrl.downloadExplorationWithVersion = function (versionNumber) {
         // Note that this opens (and then immediately closes) a new tab. If
         // we do this in the same tab, the beforeunload handler is
         // triggered.
@@ -227,7 +227,7 @@ angular.module('oppia').component('historyTab', {
           '&output_format=zip');
       };
 
-      ctrl.showRevertExplorationModal = function(version) {
+      ctrl.showRevertExplorationModal = function (version) {
         $uibModal.open({
           template: require(
             'pages/exploration-editor-page/history-tab/modal-templates/' +
@@ -237,21 +237,21 @@ angular.module('oppia').component('historyTab', {
             version: () => version
           },
           controller: 'RevertExplorationModalController'
-        }).result.then(function(version) {
+        }).result.then(function (version) {
           $http.post(ctrl.revertExplorationUrl, {
             current_version: ExplorationDataService.data.version,
             revert_to_version: version
-          }).then(function() {
+          }).then(function () {
             WindowRef.nativeWindow.location.reload();
           });
-        }, function(error) {
+        }, function (error) {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      ctrl.changeItemsPerPage = function() {
+      ctrl.changeItemsPerPage = function () {
         ctrl.explorationVersionMetadata =
             ctrl.totalExplorationVersionMetadata.slice(
               (ctrl.displayedCurrentPageNumber - 1) * ctrl.VERSIONS_PER_PAGE,
@@ -264,22 +264,22 @@ angular.module('oppia').component('historyTab', {
         ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
       };
 
-      ctrl.isEditable = function() {
+      ctrl.isEditable = function () {
         return ctrl.EditabilityService.isEditable();
       };
 
-      ctrl.resetGraph = function() {
+      ctrl.resetGraph = function () {
         ctrl.firstVersion = null;
         ctrl.secondVersion = null;
         ctrl.hideHistoryGraph = true;
         ctrl.selectedVersionsArray = [];
       };
 
-      ctrl.reverseDateOrder = function() {
+      ctrl.reverseDateOrder = function () {
         ctrl.explorationVersionMetadata.reverse();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
             if (
@@ -325,7 +325,7 @@ angular.module('oppia').component('historyTab', {
 
         ctrl.versionChoices = [10, 15, 20];
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

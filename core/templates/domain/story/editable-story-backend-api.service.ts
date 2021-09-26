@@ -61,11 +61,11 @@ interface ValidationExplorationBackendResponse {
   providedIn: 'root'
 })
 export class EditableStoryBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchStory(
+  private _fetchStory (
       storyId: string,
       successCallback: (value: FetchStoryResponse) => void,
       errorCallback: (reason: string) => void): void {
@@ -93,7 +93,7 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  private _updateStory(
+  private _updateStory (
       storyId: string, storyVersion: number,
       commitMessage: string,
       changeList: StoryChange[],
@@ -117,7 +117,7 @@ export class EditableStoryBackendApiService {
     );
   }
 
-  private _changeStoryPublicationStatus(
+  private _changeStoryPublicationStatus (
       storyId: string,
       newStoryStatusIsPublic: boolean,
       successCallback: (value: void) => void,
@@ -134,7 +134,7 @@ export class EditableStoryBackendApiService {
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
-  private _validateExplorations(
+  private _validateExplorations (
       storyId: string,
       expIds: string[],
       successCallback: (value: string[]) => void,
@@ -156,7 +156,7 @@ export class EditableStoryBackendApiService {
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
-  private _deleteStory(
+  private _deleteStory (
       storyId: string,
       successCallback: (value: number) => void,
       errorCallback: (reason: string) => void): void {
@@ -178,7 +178,7 @@ export class EditableStoryBackendApiService {
       });
   }
 
-  private _doesStoryWithUrlFragmentExist(
+  private _doesStoryWithUrlFragmentExist (
       storyUrlFragment: string,
       successCallback: (value: boolean) => void,
       errorCallback: (reason: string) => void): void {
@@ -199,7 +199,7 @@ export class EditableStoryBackendApiService {
       });
   }
 
-  async fetchStoryAsync(storyId: string): Promise<FetchStoryResponse> {
+  async fetchStoryAsync (storyId: string): Promise<FetchStoryResponse> {
     return new Promise((resolve, reject) => {
       this._fetchStory(storyId, resolve, reject);
     });
@@ -215,7 +215,7 @@ export class EditableStoryBackendApiService {
      * the success callback, if one is provided to the returned promise
      * object. Errors are passed to the error callback, if one is provided.
      */
-  async updateStoryAsync(
+  async updateStoryAsync (
       storyId: string, storyVersion: number,
       commitMessage: string,
       changeList: StoryChange[]):
@@ -227,7 +227,7 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  async changeStoryPublicationStatusAsync(
+  async changeStoryPublicationStatusAsync (
       storyId: string,
       newStoryStatusIsPublic: boolean):
   Promise<void> {
@@ -237,7 +237,7 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  async validateExplorationsAsync(
+  async validateExplorationsAsync (
       storyId: string,
       expIds: string[]): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -246,13 +246,13 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  async deleteStoryAsync(storyId: string): Promise<number> {
+  async deleteStoryAsync (storyId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteStory(storyId, resolve, reject);
     });
   }
 
-  async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
+  async doesStoryWithUrlFragmentExistAsync (storyUrlFragment: string):
   Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesStoryWithUrlFragmentExist(

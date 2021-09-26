@@ -33,11 +33,11 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class SubtopicViewerBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
-  private _fetchSubtopicData(
+  private _fetchSubtopicData (
       topicUrlFragment: string,
       classroomUrlFragment: string,
       subtopicUrlFragment: string,
@@ -65,7 +65,7 @@ export class SubtopicViewerBackendApiService {
       });
   }
 
-  async fetchSubtopicDataAsync(
+  async fetchSubtopicDataAsync (
       topicUrlFragment: string,
       classroomUrlFragment: string,
       subtopicUrlFragment: string): Promise<ReadOnlySubtopicPageData> {

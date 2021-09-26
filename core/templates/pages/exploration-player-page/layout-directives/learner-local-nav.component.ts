@@ -42,7 +42,7 @@ export class LearnerLocalNavComponent implements OnInit {
   feedbackOptionIsShown: boolean = true;
   @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
     private attributionService: AttributionService,
@@ -54,7 +54,7 @@ export class LearnerLocalNavComponent implements OnInit {
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
   ) {}
 
-  showFlagExplorationModal(): void {
+  showFlagExplorationModal (): void {
     this.ngbModal.open(FlagExplorationModalComponent, {
       backdrop: 'static'
     }).result.then((result: FlagExplorationModalResult) => {
@@ -79,7 +79,7 @@ export class LearnerLocalNavComponent implements OnInit {
     });
   }
 
-  toggleAttributionModal(): void {
+  toggleAttributionModal (): void {
     if (this.attributionService.isAttributionModalShown()) {
       this.attributionService.hideAttributionModal();
     } else {
@@ -87,7 +87,7 @@ export class LearnerLocalNavComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.explorationId = this.explorationEngineService.getExplorationId();
     this.version = this.explorationEngineService.getExplorationVersion();
     this.readOnlyExplorationBackendApiService
@@ -107,11 +107,11 @@ export class LearnerLocalNavComponent implements OnInit {
     });
   }
 
-  togglePopover(): void {
+  togglePopover (): void {
     this.feedbackPopOver.toggle();
   }
 
-  closePopover(): void {
+  closePopover (): void {
     this.feedbackPopOver.close();
   }
 }

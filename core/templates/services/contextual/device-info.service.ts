@@ -25,9 +25,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 // See: https://stackoverflow.com/a/11381730
 export class DeviceInfoService {
-  constructor(private window: WindowRef) {}
+  constructor (private window: WindowRef) {}
 
-  isMobileDevice(): boolean {
+  isMobileDevice (): boolean {
     return Boolean(
       navigator.userAgent.match(/Android/i) ||
       navigator.userAgent.match(/webOS/i) ||
@@ -38,11 +38,11 @@ export class DeviceInfoService {
       navigator.userAgent.match(/Windows Phone/i));
   }
 
-  isMobileUserAgent(): boolean {
+  isMobileUserAgent (): boolean {
     return /Mobi/.test(navigator.userAgent);
   }
 
-  hasTouchEvents(): boolean {
+  hasTouchEvents (): boolean {
     return 'ontouchstart' in this.window.nativeWindow;
   }
 }

@@ -37,7 +37,7 @@ export class TopicsAndSkillsDashboardFilter {
    * @param {ETopicPublishedOptions} status - One of the values
    *   in ETopicPublishedOptions.
    */
-  constructor(
+  constructor (
       classroom: string, keywords: string[],
       sort: ETopicSortOptions, status: ETopicPublishedOptions) {
     this.classroom = classroom;
@@ -48,7 +48,7 @@ export class TopicsAndSkillsDashboardFilter {
   /**
    * Resets the filter object values
    */
-  reset(): void {
+  reset (): void {
     this.classroom =
         TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL;
     this.keywords = [];
@@ -60,7 +60,7 @@ export class TopicsAndSkillsDashboardFilter {
    * @returns {TopicsAndSkillsDashboardFilter} - A new
    *   TopicsAndSkillsDashboardFilter instance.
    */
-  static createDefault(): TopicsAndSkillsDashboardFilter {
+  static createDefault (): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
       TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL,
       [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);

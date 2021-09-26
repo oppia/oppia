@@ -41,17 +41,17 @@ angular.module('oppia').factory('LearnerActionRenderService', [
   'ExplorationStatesService', 'HtmlEscaperService',
   'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
   'ACTION_TYPE_EXPLORATION_START',
-  function(
+  function (
       ExplorationStatesService, HtmlEscaperService,
       ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
       ACTION_TYPE_EXPLORATION_START) {
-    var renderExplorationStartActionHTML = function(stateName, actionIndex) {
+    var renderExplorationStartActionHTML = function (stateName, actionIndex) {
       var statement =
         actionIndex + '. Started exploration at card "' + stateName + '".';
       return ($('<span>').text(statement)).html();
     };
 
-    var renderExplorationQuitActionHTML = function(
+    var renderExplorationQuitActionHTML = function (
         stateName, timeSpentInStateMsecs, actionIndex) {
       var statement = (
         actionIndex + '. Left the exploration after spending a total of ' +
@@ -60,7 +60,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       return ($('<span>').text(statement)).html();
     };
 
-    var renderContinueButtonSubmitActionHTML = function(
+    var renderContinueButtonSubmitActionHTML = function (
         stateName, timeSpentInStateMsecs, actionIndex) {
       var statement =
         actionIndex + '. Pressed "Continue" to move to card "' + stateName +
@@ -79,7 +79,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
      * @param {Interaction} interaction.
      * @returns {string}
      */
-    var renderAnswerSubmitActionHTML = function(
+    var renderAnswerSubmitActionHTML = function (
         answer, destStateName, timeSpentInStateMsecs, currentStateName,
         actionIndex, interaction) {
       var el = $('<answer-submit-action>');
@@ -105,7 +105,7 @@ angular.module('oppia').factory('LearnerActionRenderService', [
      * @param {int} actionIndex.
      * @returns {string}
      */
-    var renderLearnerActionHTML = function(learnerAction, actionIndex) {
+    var renderLearnerActionHTML = function (learnerAction, actionIndex) {
       var actionType = learnerAction.actionType;
       var custArgs = learnerAction.actionCustomizationArgs;
       var interaction = ExplorationStatesService.getState(
@@ -140,14 +140,14 @@ angular.module('oppia').factory('LearnerActionRenderService', [
        * @param {int} actionStartIndex.
        * @returns {string}
        */
-      renderFinalDisplayBlockForMISIssueHTML: function(
+      renderFinalDisplayBlockForMISIssueHTML: function (
           block, actionStartIndex) {
         var el = $('<multiple-incorrect-submissions-issue>');
         el.attr('final-block', HtmlEscaperService.objToEscapedJson(block));
         el.attr('action-start-index', actionStartIndex);
         return ($('<span>').append(el)).html();
       },
-      renderLearnerAction: function(learnerAction, actionIndex) {
+      renderLearnerAction: function (learnerAction, actionIndex) {
         return renderLearnerActionHTML(learnerAction, actionIndex);
       },
     };

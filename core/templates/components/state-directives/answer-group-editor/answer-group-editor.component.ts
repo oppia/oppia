@@ -76,7 +76,7 @@ angular.module('oppia').component('answerGroupEditor', {
     'StateNextContentIdIndexService',
     'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
     'INTERACTION_SPECS',
-    function(
+    function (
         AlertsService, ExternalSaveService, ResponsesService,
         RuleObjectFactory, StateEditorService, StateInteractionIdService,
         StateNextContentIdIndexService,
@@ -85,19 +85,19 @@ angular.module('oppia').component('answerGroupEditor', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
 
-      ctrl.isInQuestionMode = function() {
+      ctrl.isInQuestionMode = function () {
         return StateEditorService.isInQuestionMode();
       };
 
-      ctrl.getAnswerChoices = function() {
+      ctrl.getAnswerChoices = function () {
         return ResponsesService.getAnswerChoices();
       };
 
-      ctrl.getCurrentInteractionId = function() {
+      ctrl.getCurrentInteractionId = function () {
         return StateInteractionIdService.savedMemento;
       };
 
-      ctrl.getDefaultInputValue = function(varType) {
+      ctrl.getDefaultInputValue = function (varType) {
         // TODO(bhenning): Typed objects in the backend should be required
         // to provide a default value specific for their type.
         switch (varType) {
@@ -195,7 +195,7 @@ angular.module('oppia').component('answerGroupEditor', {
         }
       };
 
-      ctrl.addNewRule = function() {
+      ctrl.addNewRule = function () {
         // Build an initial blank set of inputs for the initial rule.
         var interactionId = ctrl.getCurrentInteractionId();
         var ruleDescriptions = (
@@ -238,7 +238,7 @@ angular.module('oppia').component('answerGroupEditor', {
         ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
       };
 
-      ctrl.deleteRule = function(index) {
+      ctrl.deleteRule = function (index) {
         ctrl.rules.splice(index, 1);
         ctrl.saveRules();
 
@@ -248,7 +248,7 @@ angular.module('oppia').component('answerGroupEditor', {
         }
       };
 
-      ctrl.cancelActiveRuleEdit = function() {
+      ctrl.cancelActiveRuleEdit = function () {
         ctrl.rules.splice(0, ctrl.rules.length);
         for (var i = 0; i < ctrl.rulesMemento.length; i++) {
           ctrl.rules.push(ctrl.rulesMemento[i]);
@@ -256,7 +256,7 @@ angular.module('oppia').component('answerGroupEditor', {
         ctrl.saveRules();
       };
 
-      ctrl.saveRules = function() {
+      ctrl.saveRules = function () {
         if (ctrl.originalContentIdToContent !== undefined) {
           const updatedContentIdToContent = getContentIdToContent();
           const contentIdsWithModifiedContent = [];
@@ -286,12 +286,12 @@ angular.module('oppia').component('answerGroupEditor', {
           StateNextContentIdIndexService.displayed);
       };
 
-      ctrl.changeActiveRuleIndex = function(newIndex) {
+      ctrl.changeActiveRuleIndex = function (newIndex) {
         ResponsesService.changeActiveRuleIndex(newIndex);
         ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
       };
 
-      ctrl.openRuleEditor = function(index) {
+      ctrl.openRuleEditor = function (index) {
         if (!ctrl.isEditable) {
           // The rule editor may not be opened in a read-only editor view.
           return;
@@ -301,11 +301,11 @@ angular.module('oppia').component('answerGroupEditor', {
         ctrl.changeActiveRuleIndex(index);
       };
 
-      ctrl.isRuleEditorOpen = function() {
+      ctrl.isRuleEditorOpen = function () {
         return ctrl.activeRuleIndex !== -1;
       };
 
-      ctrl.isCurrentInteractionTrainable = function() {
+      ctrl.isCurrentInteractionTrainable = function () {
         var interactionId = ctrl.getCurrentInteractionId();
         if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
           throw new Error('Invalid interaction id');
@@ -313,11 +313,11 @@ angular.module('oppia').component('answerGroupEditor', {
         return INTERACTION_SPECS[interactionId].is_trainable;
       };
 
-      ctrl.openTrainingDataEditor = function() {
+      ctrl.openTrainingDataEditor = function () {
         TrainingDataEditorPanelService.openTrainingDataEditor();
       };
 
-      ctrl.isMLEnabled = function() {
+      ctrl.isMLEnabled = function () {
         return ENABLE_ML_CLASSIFIERS;
       };
 
@@ -327,7 +327,7 @@ angular.module('oppia').component('answerGroupEditor', {
       * @returns {Object} A Mapping of content ids (string) to content
       *   (string).
       */
-      const getContentIdToContent = function() {
+      const getContentIdToContent = function () {
         const contentIdToContent = {};
         ctrl.rules.forEach(rule => {
           Object.keys(rule.inputs).forEach(ruleName => {
@@ -341,7 +341,7 @@ angular.module('oppia').component('answerGroupEditor', {
         return contentIdToContent;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         // Updates answer choices when the interaction requires it -- e.g.,
         // the rules for multiple choice need to refer to the multiple
         // choice interaction's customization arguments.
@@ -384,7 +384,7 @@ angular.module('oppia').component('answerGroupEditor', {
         ctrl.editAnswerGroupForm = {};
         ctrl.answerChoices = ctrl.getAnswerChoices();
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

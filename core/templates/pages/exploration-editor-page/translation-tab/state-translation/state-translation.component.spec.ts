@@ -78,7 +78,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
 
-describe('State translation component', function() {
+describe('State translation component', function () {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
@@ -401,7 +401,7 @@ describe('State translation component', function() {
     });
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'ContinueValidationService', TestBed.get(ContinueValidationService));
@@ -439,7 +439,7 @@ describe('State translation component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.get(CkEditorCopyContentService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
@@ -451,14 +451,14 @@ describe('State translation component', function() {
     subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
 
-  afterEach(function() {
+  afterEach(function () {
     ctrl.$onDestroy();
   });
 
 
   describe('when translation tab is not busy and voiceover mode is' +
-    ' active', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    ' active', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       var $filter = $injector.get('$filter');
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -495,7 +495,7 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should init state translation when refreshing page', function() {
+    it('should init state translation when refreshing page', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       refreshStateTranslationEmitter.emit();
 
@@ -506,7 +506,7 @@ describe('State translation component', function() {
         .toHaveBeenCalledWith('content_1', 'html');
     });
 
-    it('should navigate to a given state', function() {
+    it('should navigate to a given state', function () {
       spyOn(routerService, 'navigateToMainTab');
       $scope.navigateToState('Introduction');
 
@@ -533,7 +533,7 @@ describe('State translation component', function() {
     });
 
     it('should broadcast copy to ck editor when clicking on content',
-      function() {
+      function () {
         spyOn(ckEditorCopyContentService, 'broadcastCopy').and
           .callFake(() => {});
 
@@ -548,7 +548,7 @@ describe('State translation component', function() {
           mockEvent.target);
       });
 
-    it('should activate content tab when clicking on tab', function() {
+    it('should activate content tab when clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('content');
 
@@ -567,7 +567,7 @@ describe('State translation component', function() {
     });
 
     it('should activate interaction custimization arguments tab when ' +
-       'clicking on tab', function() {
+       'clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('ca');
 
@@ -585,7 +585,7 @@ describe('State translation component', function() {
       });
     });
 
-    it('should activate feedback tab when clicking on tab', function() {
+    it('should activate feedback tab when clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
@@ -603,7 +603,7 @@ describe('State translation component', function() {
       });
     });
 
-    it('should activate hint tab when clicking on tab', function() {
+    it('should activate hint tab when clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('hint');
 
@@ -621,7 +621,7 @@ describe('State translation component', function() {
       });
     });
 
-    it('should activate solution tab when clicking on tab', function() {
+    it('should activate solution tab when clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
 
@@ -639,7 +639,7 @@ describe('State translation component', function() {
       });
     });
 
-    it('should activate rule inputs tab when clicking on tab', function() {
+    it('should activate rule inputs tab when clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('rule_input');
 
@@ -649,7 +649,7 @@ describe('State translation component', function() {
         .toHaveBeenCalledWith('rule_input_4', 'set_of_normalized_string');
     });
 
-    it('should change active rule content index', function() {
+    it('should change active rule content index', function () {
       $scope.onTabClick('rule_input');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -660,7 +660,7 @@ describe('State translation component', function() {
     });
 
     it('should not change active rule content index if it is equal to the ' +
-       'current one', function() {
+       'current one', function () {
       $scope.onTabClick('rule_input');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -670,7 +670,7 @@ describe('State translation component', function() {
         .toHaveBeenCalled();
     });
 
-    it('should change active hint index', function() {
+    it('should change active hint index', function () {
       $scope.onTabClick('hint');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -681,7 +681,7 @@ describe('State translation component', function() {
     });
 
     it('should not change active hint index if it is equal to the current one',
-      function() {
+      function () {
         $scope.onTabClick('hint');
 
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -691,7 +691,7 @@ describe('State translation component', function() {
           .toHaveBeenCalled();
       });
 
-    it('should change active answer group index', function() {
+    it('should change active answer group index', function () {
       $scope.onTabClick('feedback');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -703,7 +703,7 @@ describe('State translation component', function() {
 
     it('should not change active customization argument index if it is equal' +
       ' to the current one',
-    function() {
+    function () {
       $scope.onTabClick('ca');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -714,7 +714,7 @@ describe('State translation component', function() {
     });
 
     it('should change active answer group index to default outcome when' +
-      ' index provided is equal to answer groups length', function() {
+      ' index provided is equal to answer groups length', function () {
       $scope.onTabClick('feedback');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -725,7 +725,7 @@ describe('State translation component', function() {
     });
 
     it('should not change active hint index if it is equal to the current one',
-      function() {
+      function () {
         $scope.onTabClick('feedback');
 
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -735,7 +735,7 @@ describe('State translation component', function() {
           .toHaveBeenCalled();
       });
 
-    it('should get subtitled html data translation', function() {
+    it('should get subtitled html data translation', function () {
       var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html'
@@ -746,14 +746,14 @@ describe('State translation component', function() {
     });
 
     it('should get empty content message when text translations haven\'t' +
-      ' been added yet', function() {
+      ' been added yet', function () {
       expect($scope.getEmptyContentMessage()).toBe(
         'The translation for this section has not been created yet.' +
         ' Switch to translation mode to add a text translation.');
     });
 
     it('should get summary default outcome when outcome is linear',
-      function() {
+      function () {
         expect($scope.summarizeDefaultOutcome(
           outcomeObjectFactory.createNew(
             'unused', '1', 'Feedback Text', []), 'Continue', 0, true))
@@ -761,7 +761,7 @@ describe('State translation component', function() {
       });
 
     it('should get summary default outcome when answer group count' +
-      ' is greater than 0', function() {
+      ' is greater than 0', function () {
       expect($scope.summarizeDefaultOutcome(
         outcomeObjectFactory.createNew(
           'unused', '1', 'Feedback Text', []), 'TextInput', 1, true))
@@ -769,7 +769,7 @@ describe('State translation component', function() {
     });
 
     it('should get summary default outcome when answer group count' +
-      ' is equal to 0', function() {
+      ' is equal to 0', function () {
       expect($scope.summarizeDefaultOutcome(
         outcomeObjectFactory.createNew(
           'unused', '1', 'Feedback Text', []), 'TextInput', 0, true))
@@ -777,12 +777,12 @@ describe('State translation component', function() {
     });
 
     it('should get an empty summary when default outcome is a falsy value',
-      function() {
+      function () {
         expect($scope.summarizeDefaultOutcome(null, 'Continue', 0, true))
           .toBe('');
       });
 
-    it('should get summary answer group', function() {
+    it('should get summary answer group', function () {
       expect($scope.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
           [],
@@ -793,8 +793,8 @@ describe('State translation component', function() {
   });
 
   describe('when translation tab is busy and voiceover mode is not' +
-    ' activate', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    ' activate', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       translationLanguageService = $injector.get('TranslationLanguageService');
@@ -829,7 +829,7 @@ describe('State translation component', function() {
     }));
 
     it('should open translation tab busy modal when clicking on content' +
-      ' tab', function() {
+      ' tab', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('content');
@@ -841,7 +841,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when clicking on interaction' +
-      'customization arguments tab', function() {
+      'customization arguments tab', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('ca');
@@ -852,7 +852,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when clicking on feedback' +
-      ' tab', function() {
+      ' tab', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
@@ -863,7 +863,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when clicking on hint' +
-      ' tab', function() {
+      ' tab', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('hint');
@@ -874,7 +874,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when clicking on solution' +
-      ' tab', function() {
+      ' tab', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
@@ -885,7 +885,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active rule content index', function() {
+      ' active rule content index', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveRuleContentIndex(1);
@@ -896,7 +896,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active hint index', function() {
+      ' active hint index', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
@@ -907,7 +907,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active answer group index', function() {
+      ' active answer group index', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
@@ -918,7 +918,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' interaction customization argument index', function() {
+      ' interaction customization argument index', function () {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveCustomizationArgContentIndex(0);
@@ -928,7 +928,7 @@ describe('State translation component', function() {
         .toHaveBeenCalled();
     });
 
-    it('should get subtitled data', function() {
+    it('should get subtitled data', function () {
       var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html'
@@ -947,14 +947,14 @@ describe('State translation component', function() {
     });
 
     it('should get content message warning that there is not text available' +
-      ' to translate', function() {
+      ' to translate', function () {
       expect($scope.getEmptyContentMessage()).toBe(
         'There is no text available to translate.');
     });
   });
 
-  describe('when rules input tab is accessed but with no rules', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when rules input tab is accessed but with no rules', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       var $filter = $injector.get('$filter');
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -1064,7 +1064,7 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should throw an error when there are no rules', function() {
+    it('should throw an error when there are no rules', function () {
       expect(() => {
         $scope.onTabClick('rule_input');
       }).toThrowError(
@@ -1072,8 +1072,8 @@ describe('State translation component', function() {
     });
   });
 
-  describe('when state has default outcome and no answer groups', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when state has default outcome and no answer groups', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       var $filter = $injector.get('$filter');
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -1105,7 +1105,7 @@ describe('State translation component', function() {
     }));
 
     it('should activate feedback tab with default outcome when' +
-      ' clicking on tab', function() {
+      ' clicking on tab', function () {
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
@@ -1116,8 +1116,8 @@ describe('State translation component', function() {
     });
   });
 
-  describe('when state\'s property is_linear is true', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when state\'s property is_linear is true', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       routerService = $injector.get('RouterService');
@@ -1146,26 +1146,26 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate content tab as enabled', function() {
+    it('should evaluate content tab as enabled', function () {
       expect($scope.isDisabled('content')).toBe(false);
     });
 
-    it('should evaluate feedback tab as disabled', function() {
+    it('should evaluate feedback tab as disabled', function () {
       expect($scope.isDisabled('feedback')).toBe(true);
     });
 
-    it('should evaluate hint tab as disabled', function() {
+    it('should evaluate hint tab as disabled', function () {
       expect($scope.isDisabled('hint')).toBe(true);
     });
 
-    it('should evaluate solution tab as disabled', function() {
+    it('should evaluate solution tab as disabled', function () {
       expect($scope.isDisabled('solution')).toBe(true);
     });
   });
 
   describe('when state has a multiple choice interaction with no hints, ' +
-           'solution or outcome', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+           'solution or outcome', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       routerService = $injector.get('RouterService');
@@ -1228,19 +1228,19 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate feedback tab as disabled', function() {
+    it('should evaluate feedback tab as disabled', function () {
       expect($scope.isDisabled('feedback')).toBe(true);
     });
 
-    it('should evaluate hint tab as disabled', function() {
+    it('should evaluate hint tab as disabled', function () {
       expect($scope.isDisabled('hint')).toBe(true);
     });
 
-    it('should evaluate solution tab as disabled', function() {
+    it('should evaluate solution tab as disabled', function () {
       expect($scope.isDisabled('solution')).toBe(true);
     });
 
-    it('should change active customization argument index', function() {
+    it('should change active customization argument index', function () {
       $scope.onTabClick('ca');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
 
@@ -1254,8 +1254,8 @@ describe('State translation component', function() {
     });
   });
 
-  describe('getHumanReadableRuleInputValues', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('getHumanReadableRuleInputValues', function () {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       var $filter = $injector.get('$filter');
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -1286,7 +1286,7 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should cover all translatable objects', function() {
+    it('should cover all translatable objects', function () {
       Object.keys(DEFAULT_OBJECT_VALUES).forEach(objName => {
         if (objName.indexOf('Translatable') !== 0 ||
             objName.indexOf('ContentId') !== -1) {
@@ -1300,21 +1300,21 @@ describe('State translation component', function() {
       });
     });
 
-    it('should format TranslatableSetOfNormalizedString values', function() {
+    it('should format TranslatableSetOfNormalizedString values', function () {
       expect($scope.getHumanReadableRuleInputValues(
         {normalizedStrSet: ['input1', 'input2']},
         'TranslatableSetOfNormalizedString'
       )).toEqual('[input1, input2]');
     });
 
-    it('should format TranslatableSetOfUnicodeString values', function() {
+    it('should format TranslatableSetOfUnicodeString values', function () {
       expect($scope.getHumanReadableRuleInputValues(
         {unicodeStrSet: ['input1', 'input2']},
         'TranslatableSetOfUnicodeString'
       )).toEqual('[input1, input2]');
     });
 
-    it('should throw an error on invalid type', function() {
+    it('should throw an error on invalid type', function () {
       expect(() => {
         $scope.getHumanReadableRuleInputValues(
           ['input1', 'input2'],

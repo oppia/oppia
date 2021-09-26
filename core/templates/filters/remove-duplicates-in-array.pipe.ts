@@ -20,7 +20,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'removeDuplicatesInArray'})
 export class RemoveDuplicatesInArrayPipe implements PipeTransform {
-  transform(input: string[]): string[] {
+  transform (input: string[]): string[] {
     if (!input.filter) {
       throw new Error(
         'Bad input for removeDuplicatesInArray: ' + JSON.stringify(input));

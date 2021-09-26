@@ -38,7 +38,7 @@ interface ConceptCardBackendDicts {
   providedIn: 'root'
 })
 export class ConceptCardBackendApiService {
-  constructor(
+  constructor (
     private conceptCardObjectFactory: ConceptCardObjectFactory,
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
@@ -46,7 +46,7 @@ export class ConceptCardBackendApiService {
   // Maps previously loaded concept cards to their IDs.
   private _conceptCardCache: Record<string, ConceptCard> = {};
 
-  private _fetchConceptCards(
+  private _fetchConceptCards (
       skillIds: string[],
       successCallback: (value: ConceptCard[]) => void,
       errorCallback: (reason: string) => void): void {
@@ -75,11 +75,11 @@ export class ConceptCardBackendApiService {
       });
   }
 
-  private _isCached(skillId: string): boolean {
+  private _isCached (skillId: string): boolean {
     return this._conceptCardCache.hasOwnProperty(skillId);
   }
 
-  private _getUncachedSkillIds(skillIds: string[]): string[] {
+  private _getUncachedSkillIds (skillIds: string[]): string[] {
     const uncachedSkillIds: string[] = [];
     skillIds.forEach(skillId => {
       if (!this._isCached(skillId)) {
@@ -89,7 +89,7 @@ export class ConceptCardBackendApiService {
     return uncachedSkillIds;
   }
 
-  async loadConceptCardsAsync(skillIds: string[]): Promise<ConceptCard[]> {
+  async loadConceptCardsAsync (skillIds: string[]): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
       var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
       const conceptCards: ConceptCard[] = [];

@@ -109,7 +109,7 @@ describe('Exploration Recommendations Service', () => {
 
     class MockExplorationSummary {
       id?: string;
-      constructor(id?: string) {
+      constructor (id?: string) {
         this.id = id;
       }
     }
@@ -135,7 +135,7 @@ describe('Exploration Recommendations Service', () => {
       spyOn(
         expRecsBackendApiService,
         'getRecommendedSummaryDictsAsync').and.callFake(
-        async(_, includeSystemRecommendations: string) => {
+        async (_, includeSystemRecommendations: string) => {
           return Promise.resolve(
             includeSystemRecommendations === 'true' ?
             systemRecommendations.concat(authorRecommendations) :

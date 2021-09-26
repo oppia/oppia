@@ -39,21 +39,21 @@ export class VolunteerPageComponent implements OnInit {
   learnerFeedback = {};
   lessonCreation = {};
 
-  constructor(
+  constructor (
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
     private ngbCarouselConfig: NgbCarouselConfig
   ) {}
 
-  getWebpExtendedName(fileName: string): string {
+  getWebpExtendedName (fileName: string): string {
     return fileName.replace(/\.\w+$/g, '.webp');
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageTitleService.setDocumentTitle('Volunteer | Oppia');
     this.mapImgPath = '/volunteer/map.png';
 

@@ -85,7 +85,7 @@ var roleSelect = '.protractor-test-new-role-selector';
 var cookieBannerAcceptButton = (
   '.protractor-test-oppia-cookie-banner-accept-button');
 
-const login = async function(browser, page) {
+const login = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -118,7 +118,7 @@ const login = async function(browser, page) {
   }
 };
 
-const setRole = async function(browser, page, role) {
+const setRole = async function (browser, page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -143,7 +143,7 @@ const setRole = async function(browser, page, role) {
   }
 };
 
-const getExplorationEditorUrl = async function(browser, page) {
+const getExplorationEditorUrl = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -161,7 +161,7 @@ const getExplorationEditorUrl = async function(browser, page) {
   }
 };
 
-const getCollectionEditorUrl = async function(browser, page) {
+const getCollectionEditorUrl = async function (browser, page) {
   try {
     // Load in Collection
     // eslint-disable-next-line dot-notation
@@ -182,7 +182,7 @@ const getCollectionEditorUrl = async function(browser, page) {
   }
 };
 
-const getTopicEditorUrl = async function(browser, page) {
+const getTopicEditorUrl = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -226,7 +226,7 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
-const getStoryEditorUrl = async function(browser, page) {
+const getStoryEditorUrl = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, { waitUntil: networkIdle });
@@ -258,7 +258,7 @@ const getStoryEditorUrl = async function(browser, page) {
   }
 };
 
-const getSkillEditorUrl = async function(browser, page) {
+const getSkillEditorUrl = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, { waitUntil: networkIdle });
@@ -290,7 +290,7 @@ const getSkillEditorUrl = async function(browser, page) {
   }
 };
 
-const main = async function() {
+const main = async function () {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.

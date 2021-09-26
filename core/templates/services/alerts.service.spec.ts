@@ -19,7 +19,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AlertsService } from 'services/alerts.service';
 
-describe('Alerts Service', function() {
+describe('Alerts Service', function () {
   let alertsService: AlertsService;
 
   beforeEach(() => {

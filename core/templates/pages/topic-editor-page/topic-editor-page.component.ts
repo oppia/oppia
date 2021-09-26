@@ -47,7 +47,7 @@ require('services/prevent-page-unload-event.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('topicEditorPage', [
-  'UrlInterpolationService', function(
+  'UrlInterpolationService', function (
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -61,21 +61,21 @@ angular.module('oppia').directive('topicEditorPage', [
         'LoaderService', 'PageTitleService', 'PreventPageUnloadEventService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService',
-        function(
+        function (
             $rootScope, BottomNavbarStatusService, ContextService,
             LoaderService, PageTitleService, PreventPageUnloadEventService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          ctrl.getActiveTabName = function() {
+          ctrl.getActiveTabName = function () {
             return TopicEditorRoutingService.getActiveTabName();
           };
-          ctrl.getEntityType = function() {
+          ctrl.getEntityType = function () {
             return ContextService.getEntityType();
           };
 
-          var setDocumentTitle = function() {
+          var setDocumentTitle = function () {
             let topicName = TopicEditorStateService.getTopic().getName();
             PageTitleService.setDocumentTitle(
               topicName + ' - Oppia');
@@ -84,14 +84,14 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl._validateTopic();
           };
 
-          ctrl.getChangeListLength = function() {
+          ctrl.getChangeListLength = function () {
             return UndoRedoService.getChangeCount();
           };
-          ctrl.isInTopicEditorTabs = function() {
+          ctrl.isInTopicEditorTabs = function () {
             var activeTab = TopicEditorRoutingService.getActiveTabName();
             return !activeTab.startsWith('subtopic');
           };
-          ctrl.openTopicViewer = function() {
+          ctrl.openTopicViewer = function () {
             var activeTab = TopicEditorRoutingService.getActiveTabName();
             var lastSubtopicIdVisited = (
               TopicEditorRoutingService.getLastSubtopicIdVisited());
@@ -103,13 +103,13 @@ angular.module('oppia').directive('topicEditorPage', [
                 subtopicId);
             }
           };
-          ctrl.isInPreviewTab = function() {
+          ctrl.isInPreviewTab = function () {
             var activeTab = TopicEditorRoutingService.getActiveTabName();
             return (
               activeTab === 'subtopic_preview' ||
                 activeTab === 'topic_preview');
           };
-          ctrl.selectMainTab = function() {
+          ctrl.selectMainTab = function () {
             const activeTab = ctrl.getActiveTabName();
             const subtopicId = (
               TopicEditorRoutingService.getSubtopicIdFromUrl() ||
@@ -124,14 +124,14 @@ angular.module('oppia').directive('topicEditorPage', [
             }
             TopicEditorRoutingService.navigateToMainTab();
           };
-          ctrl.isMainEditorTabSelected = function() {
+          ctrl.isMainEditorTabSelected = function () {
             const activeTab = ctrl.getActiveTabName();
             return activeTab === 'main' || activeTab === 'subtopic_editor';
           };
-          ctrl.selectQuestionsTab = function() {
+          ctrl.selectQuestionsTab = function () {
             TopicEditorRoutingService.navigateToQuestionsTab();
           };
-          ctrl.getNavbarText = function() {
+          ctrl.getNavbarText = function () {
             if (TopicEditorStateService.hasLoadedTopic()) {
               const activeTab = ctrl.getActiveTabName();
               if (activeTab === 'main') {
@@ -147,7 +147,7 @@ angular.module('oppia').directive('topicEditorPage', [
               }
             }
           };
-          ctrl._validateTopic = function() {
+          ctrl._validateTopic = function () {
             ctrl.validationIssues = ctrl.topic.validate();
             if (TopicEditorStateService.getTopicWithNameExists()) {
               ctrl.validationIssues.push(
@@ -167,18 +167,18 @@ angular.module('oppia').directive('topicEditorPage', [
                 subtopicPrepublishValidationIssues));
           };
 
-          ctrl.getWarningsCount = function() {
+          ctrl.getWarningsCount = function () {
             return ctrl.validationIssues.length;
           };
 
-          ctrl.getTotalWarningsCount = function() {
+          ctrl.getTotalWarningsCount = function () {
             var validationIssuesCount = ctrl.validationIssues.length;
             var prepublishValidationIssuesCount = (
               ctrl.prepublishValidationIssues.length);
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
@@ -218,7 +218,7 @@ angular.module('oppia').directive('topicEditorPage', [
             );
           };
 
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

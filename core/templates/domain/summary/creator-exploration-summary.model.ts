@@ -52,7 +52,7 @@ export interface CreatorExplorationSummaryBackendDict {
 }
 
 export class CreatorExplorationSummary {
-  constructor(
+  constructor (
       public category: string,
       public communityOwned: boolean,
       public id: string,
@@ -73,7 +73,7 @@ export class CreatorExplorationSummary {
       public numTotalThreads: number,
       public numOpenThreads: number) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       expSummaryBacknedDict: CreatorExplorationSummaryBackendDict):
       CreatorExplorationSummary {
     return new CreatorExplorationSummary(

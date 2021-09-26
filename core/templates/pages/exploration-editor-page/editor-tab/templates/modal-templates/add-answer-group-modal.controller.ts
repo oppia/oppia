@@ -40,7 +40,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
   'PopulateRuleContentIdsService', 'RuleObjectFactory', 'StateEditorService',
   'addState', 'currentInteractionId', 'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
-  function(
+  function (
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
       EventBusService, GenerateContentIdService, OutcomeObjectFactory,
       PopulateRuleContentIdsService, RuleObjectFactory, StateEditorService,
@@ -65,23 +65,23 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.addState = addState;
     $scope.questionModeEnabled = (
       StateEditorService.isInQuestionMode());
-    $scope.updateAnswerGroupFeedback = function(outcome) {
+    $scope.updateAnswerGroupFeedback = function (outcome) {
       $scope.openFeedbackEditor();
       $scope.tmpOutcome.feedback = outcome.feedback;
     };
-    $scope.updateTaggedMisconception = function(
+    $scope.updateTaggedMisconception = function (
         misconceptionId, skillId) {
       $scope.tmpTaggedSkillMisconceptionId = (
         `${skillId}-${misconceptionId}`);
     };
-    $scope.openFeedbackEditor = function() {
+    $scope.openFeedbackEditor = function () {
       $scope.feedbackEditorIsOpen = true;
     };
-    $scope.isCorrectnessFeedbackEnabled = function() {
+    $scope.isCorrectnessFeedbackEnabled = function () {
       return StateEditorService.getCorrectnessFeedbackEnabled();
     };
     // This returns false if the current interaction ID is null.
-    $scope.isCurrentInteractionLinear = function() {
+    $scope.isCurrentInteractionLinear = function () {
       return (
         currentInteractionId &&
         INTERACTION_SPECS[currentInteractionId].is_linear);
@@ -94,7 +94,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       feedbackContentId, '', []);
     $scope.tmpTaggedSkillMisconceptionId = null;
 
-    $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
+    $scope.isSelfLoopWithNoFeedback = function (tmpOutcome) {
       return (
         tmpOutcome.dest ===
         stateName && !tmpOutcome.hasNonemptyFeedback());
@@ -102,7 +102,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
 
     $scope.addAnswerGroupForm = {};
 
-    $scope.saveResponse = function(reopen) {
+    $scope.saveResponse = function (reopen) {
       PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
@@ -117,7 +117,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         reopen: reopen
       });
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         eventBusGroup.unsubscribe();
       });
     };

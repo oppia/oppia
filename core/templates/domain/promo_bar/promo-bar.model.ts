@@ -25,31 +25,31 @@ export class PromoBar {
   _promoBarEnabled: boolean;
   _promoBarMessage: string;
 
-  constructor(promoBarEnabled: boolean, promoBarMessage: string) {
+  constructor (promoBarEnabled: boolean, promoBarMessage: string) {
     this._promoBarEnabled = promoBarEnabled;
     this._promoBarMessage = promoBarMessage;
   }
 
-  static createFromBackendDict(data: PromoBarBackendDict): PromoBar {
+  static createFromBackendDict (data: PromoBarBackendDict): PromoBar {
     return new PromoBar(data.promo_bar_enabled, data.promo_bar_message);
   }
-  static createEmpty(): PromoBar {
+  static createEmpty (): PromoBar {
     return new PromoBar(false, '');
   }
 
-  get promoBarEnabled(): boolean {
+  get promoBarEnabled (): boolean {
     return this._promoBarEnabled;
   }
 
-  set promoBarEnabled(status: boolean) {
+  set promoBarEnabled (status: boolean) {
     this._promoBarEnabled = status;
   }
 
-  get promoBarMessage(): string {
+  get promoBarMessage (): string {
     return this._promoBarMessage;
   }
 
-  set promoBarMessage(message: string) {
+  set promoBarMessage (message: string) {
     this._promoBarMessage = message;
   }
 }

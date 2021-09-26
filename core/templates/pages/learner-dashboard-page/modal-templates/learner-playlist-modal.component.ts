@@ -37,12 +37,12 @@ export class LearnerPlaylistModalComponent implements OnInit {
   sectionNameI18nId!: string;
   removeFromLearnerPlaylistUrl!: string;
 
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
     this.removeFromLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
@@ -53,11 +53,11 @@ export class LearnerPlaylistModalComponent implements OnInit {
         }));
   }
 
-  remove(): void {
+  remove (): void {
     this.activeModal.close(this.removeFromLearnerPlaylistUrl);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 }

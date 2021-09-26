@@ -34,7 +34,7 @@ export class AngularNameService {
    * @param interactionId - The interaction id.
    * @returns - The angular name after mapping with ID is done.
    */
-  getNameOfInteractionRulesService(interactionId: string): string {
+  getNameOfInteractionRulesService (interactionId: string): string {
     AngularNameService.angularName = interactionId.charAt(0) +
     interactionId.slice(1) + 'RulesService';
     return AngularNameService.angularName;

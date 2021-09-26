@@ -38,12 +38,12 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var selector = (
       'CallExpression[callee.property.name=/(controller|directive|factory)/]'
     );
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         var args = node.arguments;
         // In angular JS, components function take 2 arguments and type of last
         // arguments is an ArrayExpression, if arguments doesn't follow this
@@ -58,7 +58,7 @@ module.exports = {
           localInjections = [],
           constantInjections = [];
 
-        dependenciesLiteralNodes.forEach(function(node) {
+        dependenciesLiteralNodes.forEach(function (node) {
           var literalNodeValue = node.value;
           dependenciesLiterals.push(literalNodeValue);
 

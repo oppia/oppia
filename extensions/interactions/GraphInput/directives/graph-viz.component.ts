@@ -41,12 +41,12 @@ import { EdgeCentre, GraphDetailService } from './graph-detail.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 const debounce = (delay: number = 5): MethodDecorator => {
-  return function(
+  return function (
       target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     const key = `__timeout__${propertyKey}`;
 
-    descriptor.value = function(...args) {
+    descriptor.value = function (...args) {
       clearTimeout(this[key]);
       this[key] = setTimeout(() => original.apply(this, args), delay);
     };
@@ -131,7 +131,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   vizWidth: SVGAnimatedLength;
   graphOptions: GraphOption[];
   svgViewBox: string;
-  constructor(
+  constructor (
     private deviceInfoService: DeviceInfoService,
     private element: ElementRef,
     private focusManagerService: FocusManagerService,
@@ -140,7 +140,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     private utilsService: UtilsService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => this.state.currentMode = null
@@ -157,7 +157,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit (): void {
     this.vizContainer = this.element.nativeElement.querySelectorAll(
       '.oppia-graph-viz-svg');
     this.vizWidth = this.vizContainer[0].width;
@@ -191,7 +191,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getEdgeColor(index: number): string {
+  getEdgeColor (index: number): string {
     if (!this.interactionIsActive) {
       return this.DEFAULT_COLOR;
     }
@@ -208,7 +208,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getVertexColor(index: number): string {
+  getVertexColor (index: number): string {
     if (!this.interactionIsActive) {
       return this.DEFAULT_COLOR;
     }
@@ -227,16 +227,16 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getDirectedEdgeArrowPoints(index: number): string {
+  getDirectedEdgeArrowPoints (index: number): string {
     return this.graphDetailService.getDirectedEdgeArrowPoints(
       this.graph, index);
   }
 
-  getEdgeCentre(index: number): EdgeCentre {
+  getEdgeCentre (index: number): EdgeCentre {
     return this.graphDetailService.getEdgeCentre(this.graph, index);
   }
 
-  mousemoveGraphSVG(event: MouseEvent): void {
+  mousemoveGraphSVG (event: MouseEvent): void {
     if (!this.interactionIsActive) {
       return;
     }
@@ -267,7 +267,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onClickGraphSVG(): void {
+  onClickGraphSVG (): void {
     if (!this.interactionIsActive) {
       return;
     }
@@ -288,7 +288,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  initButtons(): void {
+  initButtons (): void {
     this.buttons = [];
     if (this.canMoveVertex) {
       this.buttons.push({
@@ -320,7 +320,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  init(): void {
+  init (): void {
     this.initButtons();
     this.state.currentMode = this.buttons[0].mode;
     if (this.isMobile) {
@@ -338,7 +338,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  toggleGraphOption(option: string): void {
+  toggleGraphOption (option: string): void {
     // Handle the case when we have two edges s -> d and d -> s.
     if (option === 'isDirected' && this.graph[option]) {
       this._deleteRepeatedUndirectedEdges();
@@ -347,7 +347,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.graphChange.emit(this.graph);
   }
 
-  setMode(mode: number): void {
+  setMode (mode: number): void {
     this.state.currentMode = mode;
     if (this.isMobile) {
       if (this.state.currentMode === this._MODES.ADD_EDGE) {
@@ -369,7 +369,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.hoveredVertex = null;
   }
 
-  onClickModeButton(mode: number, event: Event): void {
+  onClickModeButton (mode: number, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     if (this.interactionIsActive) {
@@ -382,7 +382,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
   // ---- Vertex events ----
-  onClickVertex(index: number): void {
+  onClickVertex (index: number): void {
     if (this.state.currentMode === this._MODES.DELETE) {
       if (this.canDeleteVertex) {
         this.deleteVertex(index);
@@ -411,7 +411,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onTouchInitialVertex(index: number): void {
+  onTouchInitialVertex (index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
         this.beginAddEdge(index);
@@ -425,7 +425,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onTouchFinalVertex(index: number): void {
+  onTouchFinalVertex (index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       this.tryAddEdge(
         this.state.addEdgeVertex, index);
@@ -442,7 +442,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onMousedownVertex(index: number): void {
+  onMousedownVertex (index: number): void {
     if (this.isMobile) {
       return;
     }
@@ -457,7 +457,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onMouseleaveVertex(index: number): void {
+  onMouseleaveVertex (index: number): void {
     if (this.isMobile) {
       return;
     }
@@ -466,14 +466,14 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       null : this.state.hoveredVertex;
   }
 
-  onClickVertexLabel(index: number): void {
+  onClickVertexLabel (index: number): void {
     if (this.graph.isLabeled && this.canEditVertexLabel) {
       this.beginEditVertexLabel(index);
     }
   }
 
   // ---- Edge events ----
-  onClickEdge(index: number): void {
+  onClickEdge (index: number): void {
     if (this.state.currentMode === this._MODES.DELETE) {
       if (this.canDeleteEdge) {
         this.deleteEdge(index);
@@ -485,7 +485,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.beginEditEdgeWeight(index);
     }
   }
-  onClickEdgeWeight(index: number): void {
+  onClickEdgeWeight (index: number): void {
     if (this.graph.isWeighted && this.canEditEdgeWeight) {
       this.beginEditEdgeWeight(index);
     }
@@ -494,7 +494,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   // ---- Document event ----
   @HostListener('document:mouseup', ['$event'])
   @debounce()
-  onMouseupDocument(): void {
+  onMouseupDocument (): void {
     if (this.isMobile) {
       return;
     }
@@ -512,15 +512,15 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   // ---- Actions ----
-  beginAddEdge(startIndex: number): void {
+  beginAddEdge (startIndex: number): void {
     this.state.addEdgeVertex = startIndex;
   }
 
-  endAddEdge(): void {
+  endAddEdge (): void {
     this.state.addEdgeVertex = null;
   }
 
-  tryAddEdge(startIndex: number, endIndex: number): void {
+  tryAddEdge (startIndex: number, endIndex: number): void {
     if (
       startIndex === null ||
       endIndex === null ||
@@ -552,7 +552,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     return;
   }
 
-  beginDragVertex(index: number): void {
+  beginDragVertex (index: number): void {
     this.state.currentlyDraggedVertex = index;
     this.state.vertexDragStartX = this.graph.vertices[index].x;
     this.state.vertexDragStartY = this.graph.vertices[index].y;
@@ -560,7 +560,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.mouseDragStartY = this.state.mouseY;
   }
 
-  endDragVertex(): void {
+  endDragVertex (): void {
     this.state.currentlyDraggedVertex = null;
     this.state.vertexDragStartX = 0;
     this.state.vertexDragStartY = 0;
@@ -568,12 +568,12 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.mouseDragStartY = 0;
   }
 
-  beginEditVertexLabel(index: number): void {
+  beginEditVertexLabel (index: number): void {
     this.state.selectedVertex = index;
     this.focusManagerService.setFocus('vertexLabelEditBegun');
   }
 
-  beginEditEdgeWeight(index: number): void {
+  beginEditEdgeWeight (index: number): void {
     this.state.selectedEdge = index;
     this.selectedEdgeWeightValue = (
       this.graph.edges[this.state.selectedEdge].weight);
@@ -581,13 +581,13 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.focusManagerService.setFocus('edgeWeightEditBegun');
   }
 
-  deleteEdge(index: number): void {
+  deleteEdge (index: number): void {
     this.graph.edges.splice(index, 1);
     this.graphChange.emit(this.graph);
     this.state.hoveredEdge = null;
   }
 
-  private _deleteRepeatedUndirectedEdges(): void {
+  private _deleteRepeatedUndirectedEdges (): void {
     for (let i = 0; i < this.graph.edges.length; i++) {
       const edge1 = this.graph.edges[i];
       for (let j = i + 1; j < this.graph.edges.length; j++) {
@@ -601,7 +601,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  deleteVertex(index: number): void {
+  deleteVertex (index: number): void {
     this.graph.edges = this.graph.edges.map((edge) => {
       if (edge.src === index || edge.dst === index) {
         return null;
@@ -620,27 +620,27 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.hoveredVertex = null;
   }
 
-  get selectedVertexLabel(): string {
+  get selectedVertexLabel (): string {
     if (this.state.selectedVertex === null) {
       return '';
     }
     return this.graph.vertices[this.state.selectedVertex].label;
   }
 
-  set selectedVertexLabel(label: string) {
+  set selectedVertexLabel (label: string) {
     if (this.utilsService.isDefined(label)) {
       this.graph.vertices[this.state.selectedVertex].label = label;
     }
   }
 
-  get selectedEdgeWeight(): string | number {
+  get selectedEdgeWeight (): string | number {
     if (this.state.selectedEdge === null) {
       return '';
     }
     return this.selectedEdgeWeightValue;
   }
 
-  set selectedEdgeWeight(weight: number | string | null) {
+  set selectedEdgeWeight (weight: number | string | null) {
     if (weight === null) {
       this.selectedEdgeWeightValue = '';
     }
@@ -649,11 +649,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  isValidEdgeWeight(): boolean {
+  isValidEdgeWeight (): boolean {
     return (typeof this.selectedEdgeWeightValue === 'number');
   }
 
-  onUpdateEdgeWeight(): void {
+  onUpdateEdgeWeight (): void {
     if (angular.isNumber(this.selectedEdgeWeightValue)) {
       this.graph.edges[this.state.selectedEdge].weight = (
         this.selectedEdgeWeightValue);

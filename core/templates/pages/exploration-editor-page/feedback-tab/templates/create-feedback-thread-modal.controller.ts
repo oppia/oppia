@@ -24,7 +24,7 @@ require('services/alerts.service.ts');
 
 angular.module('oppia').controller('CreateFeedbackThreadModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  function($controller, $scope, $uibModalInstance, AlertsService) {
+  function ($controller, $scope, $uibModalInstance, AlertsService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

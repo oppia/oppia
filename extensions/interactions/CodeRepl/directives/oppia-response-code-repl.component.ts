@@ -33,12 +33,12 @@ export class ResponseCodeReplComponent implements OnInit {
   @Input('answer') answerWithValue: string;
   answer;
   errorFocusLabel: string;
-  constructor(
+  constructor (
     private htmlEscaperService: HtmlEscaperService,
     private focusManagerService: FocusManagerService
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.answer = this.htmlEscaperService.escapedJsonToObj(
       this.answerWithValue);
     if (this.answer.error) {

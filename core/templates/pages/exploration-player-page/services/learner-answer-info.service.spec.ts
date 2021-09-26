@@ -192,7 +192,7 @@ describe('Learner answer info service', () =>{
   });
 
   describe('.initLearnerAnswerInfo', () => {
-    beforeEach(function() {
+    beforeEach(function () {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, tirs, false);
     });
@@ -215,7 +215,7 @@ describe('Learner answer info service', () =>{
   });
 
   describe('learner answer info service', () => {
-    beforeEach(function() {
+    beforeEach(function () {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, tirs, false);
     });
@@ -236,7 +236,7 @@ describe('Learner answer info service', () =>{
   describe(
     'should not ask for answer details for trivial interaction ids',
     () => {
-      beforeEach(function() {
+      beforeEach(function () {
         firstState.interaction.id = 'EndExploration';
         learnerAnswerInfoService.initLearnerAnswerInfoService(
           '10', firstState, mockAnswer, tirs, false);
@@ -251,7 +251,7 @@ describe('Learner answer info service', () =>{
 
   describe('init learner answer info service with solicit answer details false',
     () => {
-      beforeEach(function() {
+      beforeEach(function () {
         firstState.solicitAnswerDetails = false;
         learnerAnswerInfoService.initLearnerAnswerInfoService(
           '10', firstState, mockAnswer, tirs, false);
@@ -265,7 +265,7 @@ describe('Learner answer info service', () =>{
 
 
   describe('.recordLearnerAnswerInfo', () => {
-    beforeEach(function() {
+    beforeEach(function () {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, tirs, false);
     });
@@ -280,7 +280,7 @@ describe('Learner answer info service', () =>{
   });
 
   describe('learner answer info service', () => {
-    beforeEach(function() {
+    beforeEach(function () {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, tirs, false);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');

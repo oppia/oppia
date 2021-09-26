@@ -30,15 +30,15 @@ import { ReadOnlyExplorationBackendApiService } from
 
 class MockRouterService {
   private refreshStatisticsTabEventEmitter: EventEmitter<void>;
-  get onRefreshStatisticsTab() {
+  get onRefreshStatisticsTab () {
     return this.refreshStatisticsTabEventEmitter;
   }
-  set refreshStatisticsTabEmitter(val) {
+  set refreshStatisticsTabEmitter (val) {
     this.refreshStatisticsTabEventEmitter = val;
   }
 }
 
-describe('Statistics Tab Component', function() {
+describe('Statistics Tab Component', function () {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -121,7 +121,7 @@ describe('Statistics Tab Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
@@ -133,7 +133,7 @@ describe('Statistics Tab Component', function() {
     routerService = new MockRouterService();
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('ExplorationDataService', {
       explorationId: explorationId
     });
@@ -142,7 +142,7 @@ describe('Statistics Tab Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -189,13 +189,13 @@ describe('Statistics Tab Component', function() {
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
+    function () {
       expect(ctrl.stateStatsModalIsOpen).toBe(false);
       expect($scope.explorationHasBeenVisited).toBe(false);
     });
 
   it('should refresh exploration statistics when broadcasting' +
-    ' refreshStatisticsTab', function() {
+    ' refreshStatisticsTab', function () {
     routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
@@ -224,7 +224,7 @@ describe('Statistics Tab Component', function() {
     expect($scope.explorationHasBeenVisited).toBe(true);
   });
 
-  it('should open state stats modal', function() {
+  it('should open state stats modal', function () {
     routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
@@ -240,7 +240,7 @@ describe('Statistics Tab Component', function() {
   });
 
   it('should open state stats modal and close it when clicking in stats' +
-    ' graph', function() {
+    ' graph', function () {
     routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
@@ -257,7 +257,7 @@ describe('Statistics Tab Component', function() {
   });
 
   it('should open state stats modal and dismiss it when clicking in' +
-    ' stats graph', function() {
+    ' stats graph', function () {
     routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.

@@ -36,19 +36,19 @@ export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
   formGroup = new FormGroup({email: this.email});
 
-  constructor(
+  constructor (
       private alertsService: AlertsService, private authService: AuthService,
       private loaderService: LoaderService, private userService: UserService,
       private windowRef: WindowRef) {}
 
-  get emulatorModeIsEnabled(): boolean {
+  get emulatorModeIsEnabled (): boolean {
     return AppConstants.EMULATOR_MODE;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
 
-    this.userService.getUserInfoAsync().then(async(userInfo) => {
+    this.userService.getUserInfoAsync().then(async (userInfo) => {
       if (userInfo.isLoggedIn()) {
         this.redirectToPath('/');
         return;
@@ -83,7 +83,7 @@ export class LoginPageComponent implements OnInit {
     });
   }
 
-  async onClickSignInButtonAsync(email: string): Promise<void> {
+  async onClickSignInButtonAsync (email: string): Promise<void> {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
 
     try {
@@ -96,7 +96,7 @@ export class LoginPageComponent implements OnInit {
     this.redirectToSignUp();
   }
 
-  private onSignInError(error: firebase.auth.Error): void {
+  private onSignInError (error: firebase.auth.Error): void {
     if (error.code === 'auth/user-disabled') {
       this.redirectToPath('/pending-account-deletion');
       return;
@@ -112,13 +112,13 @@ export class LoginPageComponent implements OnInit {
     }
   }
 
-  private redirectToSignUp(): void {
+  private redirectToSignUp (): void {
     const queryParams = this.windowRef.nativeWindow.location.search;
     const returnUrl = new URLSearchParams(queryParams).get('return_url') ?? '/';
     this.redirectToPath(`/signup?return_url=${returnUrl}`);
   }
 
-  private redirectToPath(destination: string): void {
+  private redirectToPath (destination: string): void {
     this.windowRef.nativeWindow.location.assign(destination);
   }
 }

@@ -34,7 +34,7 @@ export class CreateActivityModalComponent implements OnInit {
   explorationImageUrl!: string;
   collectionImageUrl!: string;
   canCreateCollections: boolean = false;
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private explorationCreationService: ExplorationCreationService,
@@ -42,23 +42,23 @@ export class CreateActivityModalComponent implements OnInit {
     private activeModal: NgbActiveModal
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.canCreateCollections = (
         userInfo.canCreateCollections());
     });
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  chooseExploration(): void {
+  chooseExploration (): void {
     this.explorationCreationService.createNewExploration();
     this.activeModal.dismiss();
   }
 
-  chooseCollection(): void {
+  chooseCollection (): void {
     this.collectionCreationService.createNewCollection();
     this.activeModal.dismiss();
   }

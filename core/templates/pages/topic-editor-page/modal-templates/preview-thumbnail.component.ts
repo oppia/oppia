@@ -39,12 +39,12 @@ export class PreviewThumbnailComponent {
   @Input() previewTitle!: string;
   editableThumbnailDataUrl!: string;
 
-  constructor(
+  constructor (
     private contextService: ContextService,
     private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let entityType = this.contextService.getEntityType();
     if (entityType === undefined) {
       throw new Error('No image present for preview');

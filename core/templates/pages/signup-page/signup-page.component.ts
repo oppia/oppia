@@ -51,7 +51,7 @@ export class SignupPageComponent {
   canReceiveEmailUpdates: boolean;
   emailPreferencesWarningText: string;
 
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
@@ -63,7 +63,7 @@ export class SignupPageComponent {
     private utilsService: UtilsService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('I18N_SIGNUP_LOADING');
 
     this.signupPageBackendApiService.fetchSignupPageDataAsync()
@@ -78,14 +78,14 @@ export class SignupPageComponent {
       });
   }
 
-  isFormValid(): boolean {
+  isFormValid (): boolean {
     return (
       this.hasAgreedToLatestTerms &&
       (this.hasUsername || !this.warningI18nCode)
     );
   }
 
-  showLicenseExplanationModal(evt: { target: {innerText: string} }): void {
+  showLicenseExplanationModal (evt: { target: {innerText: string} }): void {
     if (evt.target.innerText !== 'here') {
       return;
     }
@@ -104,7 +104,7 @@ export class SignupPageComponent {
     });
   }
 
-  onUsernameInputFormBlur(username: string): void {
+  onUsernameInputFormBlur (username: string): void {
     if (this.hasUsername) {
       return;
     }
@@ -125,7 +125,7 @@ export class SignupPageComponent {
 
   // Returns the warning text corresponding to the validation error for
   // the given username, or an empty string if the username is valid.
-  updateWarningText(username: string): void {
+  updateWarningText (username: string): void {
     let alphanumericRegex = /^[A-Za-z0-9]+$/;
     let adminRegex = /admin/i;
     let oppiaRegex = /oppia/i;
@@ -147,11 +147,11 @@ export class SignupPageComponent {
     }
   }
 
-  onSelectEmailPreference(): void {
+  onSelectEmailPreference (): void {
     this.emailPreferencesWarningText = '';
   }
 
-  submitPrerequisitesForm(
+  submitPrerequisitesForm (
       agreedToTerms: boolean,
       username: string,
       canReceiveEmailUpdates: string): void {
@@ -223,7 +223,7 @@ export class SignupPageComponent {
       });
   }
 
-  showRegistrationSessionExpiredModal(): void {
+  showRegistrationSessionExpiredModal (): void {
     let modalRef = this.ngbModal.open(
       RegistrationSessionExpiredModalComponent, {
         backdrop: 'static',

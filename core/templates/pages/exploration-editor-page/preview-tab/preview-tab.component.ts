@@ -69,7 +69,7 @@ angular.module('oppia').component('previewTab', {
     'ParamChangesObjectFactory', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
     'StateEditorService',
-    function(
+    function (
         $q, $rootScope, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
@@ -82,7 +82,7 @@ angular.module('oppia').component('previewTab', {
         StateEditorService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.getManualParamChanges = function(initStateNameForPreview) {
+      ctrl.getManualParamChanges = function (initStateNameForPreview) {
         var deferred = $q.defer();
 
         var unsetParametersInfo = ParameterMetadataService
@@ -98,7 +98,7 @@ angular.module('oppia').component('previewTab', {
 
         // Use modal to populate parameter change values.
         if (manualParamChanges.length > 0) {
-          ctrl.showSetParamsModal(manualParamChanges, function() {
+          ctrl.showSetParamsModal(manualParamChanges, function () {
             deferred.resolve(manualParamChanges);
           });
         } else {
@@ -108,13 +108,13 @@ angular.module('oppia').component('previewTab', {
         return deferred.promise;
       };
 
-      ctrl.showParameterSummary = function() {
+      ctrl.showParameterSummary = function () {
         return (
           ExplorationFeaturesService.areParametersEnabled() &&
           !angular.equals({}, ctrl.allParams));
       };
 
-      ctrl.showSetParamsModal = function(manualParamChanges, callback) {
+      ctrl.showSetParamsModal = function (manualParamChanges, callback) {
         $uibModal.open({
           template: require(
             'pages/exploration-editor-page/preview-tab/templates/' +
@@ -125,33 +125,33 @@ angular.module('oppia').component('previewTab', {
             manualParamChanges: () => manualParamChanges
           },
           controller: 'PreviewSetParametersModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           if (callback) {
             callback();
           }
-        }, function() {
+        }, function () {
           RouterService.navigateToMainTab();
         });
       };
 
-      ctrl.loadPreviewState = function(stateName, manualParamChanges) {
+      ctrl.loadPreviewState = function (stateName, manualParamChanges) {
         ExplorationEngineService.initSettingsFromEditor(
           stateName, manualParamChanges);
         ctrl.isExplorationPopulated = true;
       };
 
-      ctrl.resetPreview = function() {
+      ctrl.resetPreview = function () {
         ctrl.previewWarning = '';
         ctrl.isExplorationPopulated = false;
         var initStateNameForPreview = (
           ExplorationInitStateNameService.savedMemento);
-        $timeout(function() {
+        $timeout(function () {
           var explorationId = ContextService.getExplorationId();
           EditableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
-            explorationId).then(function(returnDict) {
+            explorationId).then(function (returnDict) {
             ExplorationEngineService.init(
               returnDict, null, null, null, null,
-              function() {
+              function () {
                 ctrl.loadPreviewState(initStateNameForPreview, []);
               });
             PlayerCorrectnessFeedbackEnabledService.init(
@@ -162,7 +162,7 @@ angular.module('oppia').component('previewTab', {
         }, 200);
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         // This allows the active state to be kept up-to-date whilst
         // navigating in preview mode, ensuring that the state does not
         // change when toggling between editor and preview.
@@ -178,7 +178,7 @@ angular.module('oppia').component('previewTab', {
           })
         );
         ctrl.isExplorationPopulated = false;
-        ExplorationDataService.getDataAsync().then(async(explorationData) => {
+        ExplorationDataService.getDataAsync().then(async (explorationData) => {
           // TODO(#13564): Remove this part of code and make sure that this
           // function is executed only after the Promise in initExplorationPage
           // is fully finished.
@@ -215,7 +215,7 @@ angular.module('oppia').component('previewTab', {
           // Prompt user to enter any unset parameters, then populate
           // exploration.
           ctrl.getManualParamChanges(initStateNameForPreview).then(
-            function(manualParamChanges) {
+            function (manualParamChanges) {
               ctrl.loadPreviewState(
                 initStateNameForPreview, manualParamChanges);
             });
@@ -224,7 +224,7 @@ angular.module('oppia').component('previewTab', {
         $rootScope.$applyAsync();
         ctrl.allParams = {};
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

@@ -21,9 +21,9 @@ export interface BeamJobBackendDict {
 }
 
 export class BeamJob {
-  constructor(public readonly name: string) {}
+  constructor (public readonly name: string) {}
 
-  static createFromBackendDict(backendDict: BeamJobBackendDict): BeamJob {
+  static createFromBackendDict (backendDict: BeamJobBackendDict): BeamJob {
     return new BeamJob(backendDict.name);
   }
 }

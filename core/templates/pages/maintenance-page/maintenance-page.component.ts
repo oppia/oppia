@@ -32,18 +32,18 @@ import { DocumentAttributeCustomizationService } from
 export class MaintenancePageComponent implements OnInit {
   currentLang: string = 'en';
 
-  constructor(
+  constructor (
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.currentLang = 'en';
     this.documentAttributeCustomizationService.addAttribute(
       'lang', this.currentLang);
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }

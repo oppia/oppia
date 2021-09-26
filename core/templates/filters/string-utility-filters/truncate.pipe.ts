@@ -25,9 +25,9 @@ import { ConvertToPlainTextPipe } from './convert-to-plain-text.pipe';
   providedIn: 'root'
 })
 export class TruncatePipe implements PipeTransform {
-  constructor(private convertToPlainTextPipe: ConvertToPlainTextPipe) {}
+  constructor (private convertToPlainTextPipe: ConvertToPlainTextPipe) {}
 
-  transform(input: string, length: number, suffix?: string): string {
+  transform (input: string, length: number, suffix?: string): string {
     if (!input) {
       return '';
     }

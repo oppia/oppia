@@ -34,7 +34,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
 
-  constructor(
+  constructor (
     private ngbActiveModal: NgbActiveModal,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService,
@@ -42,7 +42,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  fetchTopicAssignmentsForSkill(): void {
+  fetchTopicAssignmentsForSkill (): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
         this.skillId).then((response: AssignedSkill[]) => {
@@ -51,11 +51,11 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.fetchTopicAssignmentsForSkill();
   }
 
-  showTopicsAssignments(): boolean {
+  showTopicsAssignments (): boolean {
     return Boolean(
       this.topicsAssignmentsAreFetched &&
         this.topicsAssignments.length);

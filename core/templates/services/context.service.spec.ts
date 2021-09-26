@@ -31,21 +31,21 @@ class MockWindowRef {
     location: {
       _pathname: '/explore/123',
       _href: '',
-      get pathname(): string {
+      get pathname (): string {
         return this._pathname;
       },
-      set pathname(val: string) {
+      set pathname (val: string) {
         this._pathname = val;
       },
-      get href(): string {
+      get href (): string {
         return this._href;
       },
-      set href(val) {
+      set href (val) {
         this._href = val;
       }
     }
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }

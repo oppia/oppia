@@ -35,7 +35,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-describe('Enable correctness feedback and set correctness', function() {
+describe('Enable correctness feedback and set correctness', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
@@ -50,12 +50,12 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-  var enableCorrectnessFeedbackSetting = async function() {
+  var enableCorrectnessFeedbackSetting = async function () {
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.enableCorrectnessFeedback();
   };
 
-  var testEnableCorrectnessInPlayerPage = async function() {
+  var testEnableCorrectnessInPlayerPage = async function () {
     await libraryPage.get();
     await libraryPage.findExploration(explorationTitle);
     await libraryPage.playExploration(explorationTitle);
@@ -66,15 +66,15 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectExplorationToBeOver();
   };
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     await users.createAndLoginUser('user@markCorrect.com', 'userMarkCorrect');
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     explorationTitle = EXPLORATION_TITLE + String(currentExplorationIndex);
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -85,7 +85,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'after the interaction is created', async function() {
+     'after the interaction is created', async function () {
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -126,7 +126,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'during set the interaction', async function() {
+     'during set the interaction', async function () {
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -168,7 +168,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the default response editor',
-    async function() {
+    async function () {
       await workflow.createExploration(false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -201,7 +201,7 @@ describe('Enable correctness feedback and set correctness', function() {
       await testEnableCorrectnessInPlayerPage();
     });
 
-  it('should show Learn Again button correctly', async function() {
+  it('should show Learn Again button correctly', async function () {
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -284,7 +284,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectExplorationToBeOver();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await libraryPage.get();
     currentExplorationIndex += 1;
     await general.checkForConsoleErrors([]);
@@ -292,14 +292,14 @@ describe('Enable correctness feedback and set correctness', function() {
 });
 
 
-describe('Core exploration functionality', function() {
+describe('Core exploration functionality', function () {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var userNumber = 1;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -312,7 +312,7 @@ describe('Core exploration functionality', function() {
     userNumber++;
   });
 
-  it('should display plain text content', async function() {
+  it('should display plain text content', async function () {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('plain text'));
     await explorationEditorMainTab.setInteraction('Continue', 'click here');
@@ -336,8 +336,8 @@ describe('Core exploration functionality', function() {
   });
 
   it('should create content and multiple choice interactions',
-    async function() {
-      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+    async function () {
+      await explorationEditorMainTab.setContent(async function (richTextEditor) {
         await richTextEditor.appendBoldText('bold text');
         await richTextEditor.appendPlainText(' ');
         await richTextEditor.appendItalicText('italic text');
@@ -368,12 +368,12 @@ describe('Core exploration functionality', function() {
     });
 
   it('should obey numeric interaction rules and display feedback',
-    async function() {
+    async function () {
       await explorationEditorMainTab.setContent(
         await forms.toRichText('some content'));
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
-        'NumericInput', async function(richTextEditor) {
+        'NumericInput', async function (richTextEditor) {
           await richTextEditor.appendBoldText('correct');
         }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
@@ -408,7 +408,7 @@ describe('Core exploration functionality', function() {
       // still get submitted even though it is a falsy value in JavaScript.
       await explorationPlayerPage.submitAnswer('NumericInput', 0);
       await explorationPlayerPage.expectLatestFeedbackToMatch(
-        async function(richTextChecker) {
+        async function (richTextChecker) {
           await richTextChecker.readBoldText('correct');
         });
       await explorationPlayerPage.clickThroughToNextCard();
@@ -416,7 +416,7 @@ describe('Core exploration functionality', function() {
     });
 
   it('should skip the customization modal for interactions having no ' +
-      'customization options', async function() {
+      'customization options', async function () {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
@@ -431,7 +431,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
-     'customize it', async function() {
+     'customize it', async function () {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
@@ -459,7 +459,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should correctly display contents, rule parameters, feedback' +
-    ' instructions and newly created state', async function() {
+    ' instructions and newly created state', async function () {
     // Verify exploration's text content.
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Happiness Checker'));
@@ -493,7 +493,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorPage.saveChanges();
   });
 
-  it('should be able to edit title', async function() {
+  it('should be able to edit title', async function () {
     await explorationEditorPage.navigateToSettingsTab();
 
     await explorationEditorSettingsTab.expectTitleToBe('');
@@ -505,7 +505,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.expectTitleToBe('title1');
   });
 
-  it('should be able to edit goal', async function() {
+  it('should be able to edit goal', async function () {
     await explorationEditorPage.navigateToSettingsTab();
 
     await explorationEditorSettingsTab.expectObjectiveToBe('');
@@ -518,7 +518,7 @@ describe('Core exploration functionality', function() {
       'It is just a test.');
   });
 
-  it('should show warnings when the length of goal < 15', async function() {
+  it('should show warnings when the length of goal < 15', async function () {
     await explorationEditorPage.navigateToSettingsTab();
 
     // Color grey when there is no warning, red when there is a warning.
@@ -530,7 +530,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to select category from the dropdown menu',
-    async function() {
+    async function () {
       await explorationEditorPage.navigateToSettingsTab();
 
       await explorationEditorSettingsTab.expectCategoryToBe('');
@@ -543,7 +543,7 @@ describe('Core exploration functionality', function() {
     });
 
   it('should be able to create new category which is not' +
-  ' in the dropdown menu', async function() {
+  ' in the dropdown menu', async function () {
     await explorationEditorPage.navigateToSettingsTab();
 
     await explorationEditorSettingsTab.expectCategoryToBe('');
@@ -557,7 +557,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to select language from the dropdown menu',
-    async function() {
+    async function () {
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.expectLanguageToBe('English');
       await explorationEditorSettingsTab.setLanguage('italiano (Italian)');
@@ -569,7 +569,7 @@ describe('Core exploration functionality', function() {
         'italiano (Italian)');
     });
 
-  it('should change the first card of the exploration', async function() {
+  it('should change the first card of the exploration', async function () {
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 1'));
@@ -588,7 +588,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.expectFirstStateToBe('card 2');
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });

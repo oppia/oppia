@@ -31,21 +31,21 @@ angular.module('oppia').component('questionMisconceptionSelector', {
   template: require(
     './question-misconception-selector.component.html'),
   controller: ['StateEditorService',
-    function(StateEditorService) {
+    function (StateEditorService) {
       var ctrl = this;
 
-      ctrl.selectMisconception = function(
+      ctrl.selectMisconception = function (
           misconception, skillId) {
         ctrl.selectedMisconception = angular.copy(misconception);
         ctrl.selectedMisconceptionSkillId = skillId;
       };
 
-      ctrl.toggleMisconceptionFeedbackUsage = function() {
+      ctrl.toggleMisconceptionFeedbackUsage = function () {
         ctrl.misconceptionFeedbackIsUsed = (
           !ctrl.misconceptionFeedbackIsUsed);
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.misconceptionsBySkill = (
           StateEditorService.getMisconceptionsBySkill());
       };

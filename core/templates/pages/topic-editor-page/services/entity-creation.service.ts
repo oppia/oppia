@@ -43,10 +43,10 @@ require('pages/topic-editor-page/services/create-new-skill-modal.service');
 angular.module('oppia').factory('EntityCreationService', [
   '$uibModal', 'CreateNewSkillModalService',
   'TopicEditorRoutingService', 'TopicEditorStateService',
-  function(
+  function (
       $uibModal, CreateNewSkillModalService,
       TopicEditorRoutingService, TopicEditorStateService) {
-    var createSubtopic = function(topic) {
+    var createSubtopic = function (topic) {
       $uibModal.open({
         template: require(
           'pages/topic-editor-page/modal-templates/' +
@@ -58,16 +58,16 @@ angular.module('oppia').factory('EntityCreationService', [
         controllerAs: '$ctrl',
         windowClass: 'create-new-subtopic',
         controller: 'CreateNewSubtopicModalController'
-      }).result.then(function(subtopicId) {
+      }).result.then(function (subtopicId) {
         TopicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
-      }, function() {
+      }, function () {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
       });
     };
 
-    var createSkill = function() {
+    var createSkill = function () {
       var topicId = TopicEditorStateService.getTopic().getId();
       CreateNewSkillModalService.createNewSkill([topicId]);
     };

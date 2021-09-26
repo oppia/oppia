@@ -51,19 +51,19 @@ export class PositiveIntEditorComponent implements OnInit {
       id: 'is_integer'
     }]
   };
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor (private changeDetectorRef: ChangeDetectorRef) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.value = 1;
     }
   }
 
-  getSchema(): PositiveIntSchema {
+  getSchema (): PositiveIntSchema {
     return this.SCHEMA;
   }
 
-  updateValue(newValue: number): void {
+  updateValue (newValue: number): void {
     if (this.value === newValue) {
       return;
     }

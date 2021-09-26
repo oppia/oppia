@@ -56,7 +56,7 @@ export class PlatformParameter {
   readonly featureStage: FeatureStage | null;
   rules: PlatformParameterRule[];
 
-  constructor(
+  constructor (
       name: string, description: string, dataType: string,
       rules: PlatformParameterRule[], ruleSchemaVersion: number,
       defaultValue: PlatformParameterValue, isFeature: boolean,
@@ -71,7 +71,7 @@ export class PlatformParameter {
     this.featureStage = featureStage;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: PlatformParameterBackendDict): PlatformParameter {
     return new PlatformParameter(
       backendDict.name,
@@ -95,7 +95,7 @@ export class PlatformParameter {
    * @returns {PlatformParameterRuleBackendDict[]} - Array of dict
    * representations of the rules.
    */
-  createBackendDictsForRules(): PlatformParameterRuleBackendDict[] {
+  createBackendDictsForRules (): PlatformParameterRuleBackendDict[] {
     return this.rules.map(rule => rule.toBackendDict());
   }
 }

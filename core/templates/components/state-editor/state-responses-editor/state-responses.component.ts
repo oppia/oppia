@@ -118,7 +118,7 @@ angular.module('oppia').component('stateResponses', {
     'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
     'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
-    function(
+    function (
         $filter, $scope, $uibModal, AlertsService,
         AnswerGroupObjectFactory,
         EditabilityService, ExternalSaveService, ResponsesService,
@@ -133,17 +133,17 @@ angular.module('oppia').component('stateResponses', {
       var ctrl = this;
 
       ctrl.directiveSubscriptions = new Subscription();
-      var _initializeTrainingData = function() {
+      var _initializeTrainingData = function () {
         if (StateEditorService.isInQuestionMode()) {
           return;
         }
       };
 
-      $scope.isInQuestionMode = function() {
+      $scope.isInQuestionMode = function () {
         return StateEditorService.isInQuestionMode();
       };
 
-      $scope.suppressDefaultAnswerGroupWarnings = function() {
+      $scope.suppressDefaultAnswerGroupWarnings = function () {
         var interactionId = $scope.getCurrentInteractionId();
         var answerGroups = ResponsesService.getAnswerGroups();
         // This array contains the text of each of the possible answers
@@ -168,7 +168,7 @@ angular.module('oppia').component('stateResponses', {
           }
           // We only suppress the default warning if each choice index has
           // been handled by at least one answer group.
-          return choiceIndices.every(function(choiceIndex) {
+          return choiceIndices.every(function (choiceIndex) {
             return handledAnswersArray.indexOf(choiceIndex) !== -1;
           });
         } else if (interactionId === 'ItemSelectionInput') {
@@ -186,15 +186,15 @@ angular.module('oppia').component('stateResponses', {
             }
 
             var answerChoiceToIndex = {};
-            answerChoices.forEach(function(answerChoice, choiceIndex) {
+            answerChoices.forEach(function (answerChoice, choiceIndex) {
               answerChoiceToIndex[answerChoice] = choiceIndex;
             });
 
-            answerGroups.forEach(function(answerGroup) {
+            answerGroups.forEach(function (answerGroup) {
               var rules = answerGroup.rules;
-              rules.forEach(function(rule) {
+              rules.forEach(function (rule) {
                 var ruleInputs = rule.inputs.x;
-                ruleInputs.forEach(function(ruleInput) {
+                ruleInputs.forEach(function (ruleInput) {
                   var choiceIndex = answerChoiceToIndex[ruleInput];
                   if (rule.type === 'Equals' ||
                       rule.type === 'ContainsAtLeastOneOf') {
@@ -211,7 +211,7 @@ angular.module('oppia').component('stateResponses', {
             });
 
             var areAllChoicesCovered = handledAnswersArray.every(
-              function(handledAnswer) {
+              function (handledAnswer) {
                 return handledAnswer;
               });
             // We only suppress the default warning if each choice text has
@@ -223,13 +223,13 @@ angular.module('oppia').component('stateResponses', {
         return false;
       };
 
-      $scope.onChangeSolicitAnswerDetails = function() {
+      $scope.onChangeSolicitAnswerDetails = function () {
         ctrl.onSaveSolicitAnswerDetails(
           $scope.stateSolicitAnswerDetailsService.displayed);
         StateSolicitAnswerDetailsService.saveDisplayedValue();
       };
 
-      $scope.isSelfLoopWithNoFeedback = function(outcome) {
+      $scope.isSelfLoopWithNoFeedback = function (outcome) {
         if (outcome && typeof outcome === 'object' &&
           outcome.constructor.name === 'Outcome') {
           return outcome.isConfusing($scope.stateName);
@@ -237,7 +237,7 @@ angular.module('oppia').component('stateResponses', {
         return false;
       };
 
-      $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
+      $scope.isSelfLoopThatIsMarkedCorrect = function (outcome) {
         if (!outcome ||
             !StateEditorService.getCorrectnessFeedbackEnabled()) {
           return false;
@@ -248,34 +248,34 @@ angular.module('oppia').component('stateResponses', {
           outcome.labelledAsCorrect);
       };
 
-      $scope.changeActiveAnswerGroupIndex = function(newIndex) {
+      $scope.changeActiveAnswerGroupIndex = function (newIndex) {
         ExternalSaveService.onExternalSave.emit();
         ResponsesService.changeActiveAnswerGroupIndex(newIndex);
         $scope.activeAnswerGroupIndex = (
           ResponsesService.getActiveAnswerGroupIndex());
       };
 
-      $scope.getCurrentInteractionId = function() {
+      $scope.getCurrentInteractionId = function () {
         return StateInteractionIdService.savedMemento;
       };
 
-      $scope.isCreatingNewState = function(outcome) {
+      $scope.isCreatingNewState = function (outcome) {
         return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
       };
 
       // This returns false if the current interaction ID is null.
-      $scope.isCurrentInteractionLinear = function() {
+      $scope.isCurrentInteractionLinear = function () {
         var interactionId = $scope.getCurrentInteractionId();
         return interactionId && INTERACTION_SPECS[interactionId].is_linear;
       };
 
-      $scope.isCurrentInteractionTrivial = function() {
+      $scope.isCurrentInteractionTrivial = function () {
         var interactionId = $scope.getCurrentInteractionId();
         return INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1;
       };
 
-      $scope.isLinearWithNoFeedback = function(outcome) {
+      $scope.isLinearWithNoFeedback = function (outcome) {
         // Returns false if current interaction is linear and has no
         // feedback.
         if (outcome && typeof outcome === 'object' &&
@@ -286,7 +286,7 @@ angular.module('oppia').component('stateResponses', {
         return false;
       };
 
-      $scope.getOutcomeTooltip = function(outcome) {
+      $scope.getOutcomeTooltip = function (outcome) {
         if ($scope.isSelfLoopThatIsMarkedCorrect(outcome)) {
           return 'Self-loops should not be labelled as correct.';
         }
@@ -300,7 +300,7 @@ angular.module('oppia').component('stateResponses', {
         }
       };
 
-      $scope.openAddAnswerGroupModal = function() {
+      $scope.openAddAnswerGroupModal = function () {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
         var stateName = StateEditorService.getActiveStateName();
@@ -319,7 +319,7 @@ angular.module('oppia').component('stateResponses', {
           },
           windowClass: 'add-answer-group-modal',
           controller: 'AddAnswerGroupModalController'
-        }).result.then(function(result) {
+        }).result.then(function (result) {
           StateNextContentIdIndexService.saveDisplayedValue();
           ctrl.onSaveNextContentIdIndex(
             StateNextContentIdIndexService.displayed);
@@ -330,7 +330,7 @@ angular.module('oppia').component('stateResponses', {
             result.tmpTaggedSkillMisconceptionId));
           ResponsesService.save(
             $scope.answerGroups, $scope.defaultOutcome,
-            function(newAnswerGroups, newDefaultOutcome) {
+            function (newAnswerGroups, newDefaultOutcome) {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
               ctrl.refreshWarnings()();
@@ -343,12 +343,12 @@ angular.module('oppia').component('stateResponses', {
           if (result.reopen) {
             $scope.openAddAnswerGroupModal();
           }
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      $scope.deleteAnswerGroup = function(index, evt) {
+      $scope.deleteAnswerGroup = function (index, evt) {
         // Prevent clicking on the delete button from also toggling the
         // display state of the answer group.
         evt.stopPropagation();
@@ -360,18 +360,18 @@ angular.module('oppia').component('stateResponses', {
             'modal-templates/delete-answer-group-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           ResponsesService.deleteAnswerGroup(
-            index, function(newAnswerGroups) {
+            index, function (newAnswerGroups) {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.refreshWarnings()();
             });
-        }, function() {
+        }, function () {
           AlertsService.clearWarnings();
         });
       };
 
-      var verifyAndUpdateInapplicableSkillMisconceptionIds = function() {
+      var verifyAndUpdateInapplicableSkillMisconceptionIds = function () {
         var answerGroups = ResponsesService.getAnswerGroups();
         var taggedSkillMisconceptionIds = [];
         for (var i = 0; i < answerGroups.length; i++) {
@@ -397,89 +397,89 @@ angular.module('oppia').component('stateResponses', {
         }
       };
 
-      $scope.saveTaggedMisconception = function(misconceptionId, skillId) {
+      $scope.saveTaggedMisconception = function (misconceptionId, skillId) {
         ResponsesService.updateActiveAnswerGroup({
           taggedSkillMisconceptionId: skillId + '-' + misconceptionId
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
           ctrl.refreshWarnings()();
         });
       };
 
-      $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
+      $scope.saveActiveAnswerGroupFeedback = function (updatedOutcome) {
         ResponsesService.updateActiveAnswerGroup({
           feedback: updatedOutcome.feedback
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
           ctrl.refreshWarnings()();
         });
       };
 
-      $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
+      $scope.saveActiveAnswerGroupDest = function (updatedOutcome) {
         ResponsesService.updateActiveAnswerGroup({
           dest: updatedOutcome.dest,
           refresherExplorationId: updatedOutcome.refresherExplorationId,
           missingPrerequisiteSkillId:
             updatedOutcome.missingPrerequisiteSkillId
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
           ctrl.refreshWarnings()();
         });
       };
 
-      $scope.saveActiveAnswerGroupCorrectnessLabel = function(
+      $scope.saveActiveAnswerGroupCorrectnessLabel = function (
           updatedOutcome) {
         ResponsesService.updateActiveAnswerGroup({
           labelledAsCorrect: updatedOutcome.labelledAsCorrect
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
           ctrl.refreshWarnings()();
         });
       };
 
-      $scope.saveActiveAnswerGroupRules = function(updatedRules) {
+      $scope.saveActiveAnswerGroupRules = function (updatedRules) {
         ResponsesService.updateActiveAnswerGroup({
           rules: updatedRules
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
           ctrl.refreshWarnings()();
         });
       };
 
-      $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
+      $scope.saveDefaultOutcomeFeedback = function (updatedOutcome) {
         ResponsesService.updateDefaultOutcome({
           feedback: updatedOutcome.feedback,
           dest: updatedOutcome.dest
-        }, function(newDefaultOutcome) {
+        }, function (newDefaultOutcome) {
           ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
         });
       };
 
-      $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
+      $scope.saveDefaultOutcomeDest = function (updatedOutcome) {
         ResponsesService.updateDefaultOutcome({
           dest: updatedOutcome.dest,
           refresherExplorationId: updatedOutcome.refresherExplorationId,
           missingPrerequisiteSkillId:
             updatedOutcome.missingPrerequisiteSkillId
-        }, function(newDefaultOutcome) {
+        }, function (newDefaultOutcome) {
           ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
         });
       };
 
-      $scope.saveDefaultOutcomeCorrectnessLabel = function(
+      $scope.saveDefaultOutcomeCorrectnessLabel = function (
           updatedOutcome) {
         ResponsesService.updateDefaultOutcome({
           labelledAsCorrect: updatedOutcome.labelledAsCorrect
-        }, function(newDefaultOutcome) {
+        }, function (newDefaultOutcome) {
           ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
         });
       };
 
-      $scope.getAnswerChoices = function() {
+      $scope.getAnswerChoices = function () {
         return ResponsesService.getAnswerChoices();
       };
 
-      $scope.summarizeAnswerGroup = function(
+      $scope.summarizeAnswerGroup = function (
           answerGroup, interactionId, answerChoices, shortenRule) {
         var summary = '';
         var outcome = answerGroup.outcome;
@@ -507,7 +507,7 @@ angular.module('oppia').component('stateResponses', {
         return summary;
       };
 
-      $scope.summarizeDefaultOutcome = function(
+      $scope.summarizeDefaultOutcome = function (
           defaultOutcome, interactionId, answerGroupCount, shortenRule) {
         if (!defaultOutcome) {
           return '';
@@ -540,16 +540,16 @@ angular.module('oppia').component('stateResponses', {
         return summary;
       };
 
-      $scope.isOutcomeLooping = function(outcome) {
+      $scope.isOutcomeLooping = function (outcome) {
         var activeStateName = $scope.stateName;
         return outcome && (outcome.dest === activeStateName);
       };
 
-      $scope.toggleResponseCard = function() {
+      $scope.toggleResponseCard = function () {
         $scope.responseCardIsShown = !$scope.responseCardIsShown;
       };
 
-      $scope.getUnaddressedMisconceptionNames = function() {
+      $scope.getUnaddressedMisconceptionNames = function () {
         var answerGroups = ResponsesService.getAnswerGroups();
         var taggedSkillMisconceptionIds = {};
         for (var i = 0; i < answerGroups.length; i++) {
@@ -561,7 +561,7 @@ angular.module('oppia').component('stateResponses', {
         }
         var unaddressedMisconceptionNames = [];
         Object.keys($scope.misconceptionsBySkill).forEach(
-          function(skillId) {
+          function (skillId) {
             var misconceptions = $scope.misconceptionsBySkill[skillId];
             for (var i = 0; i < misconceptions.length; i++) {
               if (!misconceptions[i].isMandatory()) {
@@ -579,7 +579,7 @@ angular.module('oppia').component('stateResponses', {
         return unaddressedMisconceptionNames;
       };
 
-      $scope.getOptionalSkillMisconceptionStatus = function(
+      $scope.getOptionalSkillMisconceptionStatus = function (
           optionalSkillMisconceptionId) {
         var answerGroups = ResponsesService.getAnswerGroups();
         var taggedSkillMisconceptionIds = [];
@@ -600,7 +600,7 @@ angular.module('oppia').component('stateResponses', {
           optionalSkillMisconceptionId) ? 'Not Applicable' : '';
       };
 
-      $scope.updateOptionalMisconceptionIdStatus = function(
+      $scope.updateOptionalMisconceptionIdStatus = function (
           skillMisconceptionId, isApplicable) {
         if (isApplicable) {
           $scope.inapplicableSkillMisconceptionIds = (
@@ -615,17 +615,17 @@ angular.module('oppia').component('stateResponses', {
         $scope.setActiveEditOption(null);
       };
 
-      $scope.setActiveEditOption = function(activeEditOption) {
+      $scope.setActiveEditOption = function (activeEditOption) {
         $scope.activeEditOption = activeEditOption;
       };
 
-      $scope.isNoActionExpected = function(skillMisconceptionId) {
+      $scope.isNoActionExpected = function (skillMisconceptionId) {
         return ['Assigned', 'Not Applicable'].includes(
           $scope.getOptionalSkillMisconceptionStatus(
             skillMisconceptionId));
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
           SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
         $scope.EditabilityService = EditabilityService;
@@ -660,7 +660,7 @@ angular.module('oppia').component('stateResponses', {
           })
         );
 
-        $scope.getStaticImageUrl = function(imagePath) {
+        $scope.getStaticImageUrl = function (imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
 
@@ -670,7 +670,7 @@ angular.module('oppia').component('stateResponses', {
               ExternalSaveService.onExternalSave.emit();
               ResponsesService.onInteractionIdChanged(
                 newInteractionId,
-                function(newAnswerGroups, newDefaultOutcome) {
+                function (newAnswerGroups, newDefaultOutcome) {
                   ctrl.onSaveInteractionDefaultOutcome(
                     newDefaultOutcome);
                   ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
@@ -720,7 +720,7 @@ angular.module('oppia').component('stateResponses', {
           StateEditorService.onHandleCustomArgsUpdate.subscribe(
             (newAnswerChoices) => {
               ResponsesService.handleCustomArgsUpdate(
-                newAnswerChoices, function(newAnswerGroups) {
+                newAnswerChoices, function (newAnswerGroups) {
                   ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
                   ctrl.refreshWarnings()();
                 });
@@ -751,15 +751,15 @@ angular.module('oppia').component('stateResponses', {
           items: '.oppia-sortable-rule-block',
           revert: 100,
           tolerance: 'pointer',
-          start: function(e, ui) {
+          start: function (e, ui) {
             ExternalSaveService.onExternalSave.emit();
             $scope.changeActiveAnswerGroupIndex(-1);
             ui.placeholder.height(ui.item.height());
           },
-          stop: function() {
+          stop: function () {
             ResponsesService.save(
               $scope.answerGroups, $scope.defaultOutcome,
-              function(newAnswerGroups, newDefaultOutcome) {
+              function (newAnswerGroups, newDefaultOutcome) {
                 ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
                 ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
                 ctrl.refreshWarnings()();
@@ -774,7 +774,7 @@ angular.module('oppia').component('stateResponses', {
           StateEditorService.getInapplicableSkillMisconceptionIds());
         $scope.activeEditOption = null;
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

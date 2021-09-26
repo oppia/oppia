@@ -32,14 +32,14 @@ import { of } from 'rxjs';
 export class CancelBeamJobDialogComponent {
   isRunning = false;
 
-  constructor(
+  constructor (
       @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
       private matDialogRef:
         MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun>,
       private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 
-  onActionClick(): void {
+  onActionClick (): void {
     this.isRunning = true;
     this.matDialogRef.disableClose = true;
 

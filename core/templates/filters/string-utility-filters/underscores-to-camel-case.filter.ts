@@ -16,9 +16,9 @@
  * @fileoverview UnderscoresToCamelCase filter for Oppia.
  */
 
-angular.module('oppia').filter('underscoresToCamelCase', [function() {
-  return function(input) {
-    return input.replace(/_+(.)/g, function(match, group1) {
+angular.module('oppia').filter('underscoresToCamelCase', [function () {
+  return function (input) {
+    return input.replace(/_+(.)/g, function (match, group1) {
       return group1.toUpperCase();
     });
   };

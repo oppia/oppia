@@ -44,7 +44,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   parentTopicId: string;
   nextSubtopic: Subtopic;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private contextService: ContextService,
     private loaderService: LoaderService,
@@ -54,11 +54,11 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment = (
@@ -97,7 +97,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.contextService.removeCustomEntityContext();
   }
 }

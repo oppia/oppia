@@ -22,7 +22,7 @@ var waitFor = require('./waitFor.js');
 var pendingAccountDeletionHeading =
   element(by.css('.protractor-test-pending-account-deletion'));
 
-var DeleteAccountPage = function() {
+var DeleteAccountPage = function () {
   var DELETE_ACCOUNT_PAGE_URL = '/delete-account';
   var deleteMyAccountButton = element(
     by.css('.protractor-test-delete-my-account-button'));
@@ -31,21 +31,21 @@ var DeleteAccountPage = function() {
   var confirmDeletionButton = element(
     by.css('.protractor-test-confirm-deletion-button'));
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(DELETE_ACCOUNT_PAGE_URL);
     await waitFor.elementToBeClickable(deleteMyAccountButton);
   };
 
-  this.requestAccountDeletion = async function(username) {
+  this.requestAccountDeletion = async function (username) {
     await action.click('Delete Account button', deleteMyAccountButton);
     await waitFor.modalPopupToAppear();
     await action.sendKeys(
       'Fill username', confirmDeletionUsernameField, username);
-    await waitFor.clientSideRedirection(async() => {
+    await waitFor.clientSideRedirection(async () => {
       await action.click('Confirm deletion button', confirmDeletionButton);
     }, (url) => {
       return url === 'http://localhost:9001/pending-account-deletion';
-    }, async() => {
+    }, async () => {
       await waitFor.visibilityOf(
         pendingAccountDeletionHeading,
         'Pending Account Deletion Page takes too long to appear');

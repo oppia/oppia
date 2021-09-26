@@ -24,13 +24,13 @@ export interface CreatorDashboardStatsBackendDict {
 }
 
 export class CreatorDashboardStats {
-  constructor(
+  constructor (
     public averageRatings: number,
     public numRatings: number,
     public totalOpenFeedback: number,
     public totalPlays: number) { }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       dashboardStatsBackendDict: CreatorDashboardStatsBackendDict):
       CreatorDashboardStats {
     return new CreatorDashboardStats(

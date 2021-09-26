@@ -57,7 +57,7 @@ describe('Subtopic data object factory', () => {
         createFromBackendDict(sampleSubtopicDataBackendDict);
     });
 
-    it('should be able to get all the values', function() {
+    it('should be able to get all the values', function () {
       expect(_sampleSubtopicData.getParentTopicId()).toEqual('topic_id');
       expect(_sampleSubtopicData.getParentTopicName()).toEqual('topic');
       expect(_sampleSubtopicData.getNextSubtopic()).toEqual(null);

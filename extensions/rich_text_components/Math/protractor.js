@@ -22,7 +22,7 @@ var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var request = require('request');
 
-var customizeComponent = async function(modal, rawLatex) {
+var customizeComponent = async function (modal, rawLatex) {
   await (objects.MathExpressionContentEditor(
     modal.element(by.tagName('math-expression-content-editor'))
   ).setValue(rawLatex));
@@ -32,7 +32,7 @@ var customizeComponent = async function(modal, rawLatex) {
 // This is required because the customizationArg value which we get initially
 // from the Math rich text component is in escaped format and we need to
 // convert it to unescaped format.
-var escapedJsonToObj = function(json) {
+var escapedJsonToObj = function (json) {
   return (JSON.parse((
     json.toString())
     .replace(/&quot;/g, '"')
@@ -89,7 +89,7 @@ const SVGTAGS = {
     '></g></g></svg>')
 };
 
-var expectComponentDetailsToMatch = async function(elem, rawLatex) {
+var expectComponentDetailsToMatch = async function (elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
   var mathComponent = await elem.getAttribute('math_content-with-value');
   expect(escapedJsonToObj(mathComponent).raw_latex).toBe(rawLatex);
@@ -98,7 +98,7 @@ var expectComponentDetailsToMatch = async function(elem, rawLatex) {
     mathSvgImage,
     'Math SVG takes too long to load.');
   var src = await mathSvgImage.getAttribute('src');
-  await request(src, function(error, response, body) {
+  await request(src, function (error, response, body) {
     expect(body).toBe(SVGTAGS[rawLatex]);
   });
 };

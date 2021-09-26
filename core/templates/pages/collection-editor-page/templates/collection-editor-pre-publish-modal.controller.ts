@@ -30,7 +30,7 @@ angular.module('oppia').controller(
     '$controller', '$scope', '$uibModalInstance', 'AlertsService',
     'CollectionEditorStateService', 'CollectionUpdateService',
     'ALL_CATEGORIES',
-    function(
+    function (
         $controller, $scope, $uibModalInstance, AlertsService,
         CollectionEditorStateService, CollectionUpdateService,
         ALL_CATEGORIES) {
@@ -59,13 +59,13 @@ angular.module('oppia').controller(
         });
       }
 
-      ctrl.isSavingAllowed = function() {
+      ctrl.isSavingAllowed = function () {
         return Boolean(
           ctrl.newTitle && ctrl.newObjective &&
           ctrl.newCategory);
       };
 
-      ctrl.save = function() {
+      ctrl.save = function () {
         if (!ctrl.newTitle) {
           AlertsService.addWarning('Please specify a title');
           return;

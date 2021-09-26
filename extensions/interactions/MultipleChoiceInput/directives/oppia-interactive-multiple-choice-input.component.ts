@@ -39,7 +39,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   choices;
   answer;
 
-  constructor(
+  constructor (
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
@@ -47,7 +47,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService
   ) { }
 
-  private getAttrs() {
+  private getAttrs () {
     return {
       choicesWithValue: this.choicesWithValue,
       showChoicesInShuffledOrderWithValue: (
@@ -55,11 +55,11 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     };
   }
 
-  private validityCheckFn(): boolean {
+  private validityCheckFn (): boolean {
     return this.answer !== null;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     const {
       showChoicesInShuffledOrder,
       choices
@@ -69,7 +69,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     ) as MultipleChoiceInputCustomizationArgs;
 
     var choicesWithIndex = choices.value.map(
-      function(value, originalIndex) {
+      function (value, originalIndex) {
         return {originalIndex: originalIndex, value: value.html};
       }
     );
@@ -99,7 +99,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       () => this.submitAnswer(), () => this.validityCheckFn());
   }
 
-  selectAnswer(event: MouseEvent, answer: string): void {
+  selectAnswer (event: MouseEvent, answer: string): void {
     event.preventDefault();
     if (answer === null) {
       return;
@@ -119,7 +119,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     }
   }
 
-  submitAnswer(): void {
+  submitAnswer (): void {
     if (this.answer === null) {
       return;
     }

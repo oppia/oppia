@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Preview Summary Tile Modal Controller', function() {
+describe('Preview Summary Tile Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ExplorationCategoryService = null;
@@ -27,7 +27,7 @@ describe('Preview Summary Tile Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ExplorationCategoryService = $injector.get('ExplorationCategoryService');
     ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
@@ -43,30 +43,30 @@ describe('Preview Summary Tile Modal Controller', function() {
     });
   }));
 
-  it('should get exploration title', function() {
+  it('should get exploration title', function () {
     ExplorationTitleService.init('Exploration Title');
     expect($scope.getExplorationTitle()).toBe('Exploration Title');
   });
-  it('should get exploration objective', function() {
+  it('should get exploration objective', function () {
     ExplorationObjectiveService.init('Exploration Objective');
     expect($scope.getExplorationObjective()).toBe('Exploration Objective');
   });
-  it('should get exploration category', function() {
+  it('should get exploration category', function () {
     ExplorationCategoryService.init('Exploration Category');
     expect($scope.getExplorationCategory()).toBe('Exploration Category');
   });
 
-  it('should get thumbnail icon url', function() {
+  it('should get thumbnail icon url', function () {
     ExplorationCategoryService.init('Astrology');
     expect($scope.getThumbnailIconUrl()).toBe('/subjects/Lightbulb.svg');
   });
 
-  it('should get thumbnail bg color if category is listed', function() {
+  it('should get thumbnail bg color if category is listed', function () {
     ExplorationCategoryService.init('Algebra');
     expect($scope.getThumbnailBgColor()).toBe('#cd672b');
   });
 
-  it('should get thumbnail bg color if category is not listed', function() {
+  it('should get thumbnail bg color if category is not listed', function () {
     ExplorationCategoryService.init('Astrology');
     expect($scope.getThumbnailBgColor()).toBe('#a33f40');
   });

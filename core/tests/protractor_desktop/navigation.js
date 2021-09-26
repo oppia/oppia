@@ -21,8 +21,8 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
-describe('Oppia landing pages tour', function() {
-  it('should visit the Fractions landing page', async function() {
+describe('Oppia landing pages tour', function () {
+  it('should visit the Fractions landing page', async function () {
     await browser.get('/fractions');
     await waitFor.pageToFullyLoad();
 
@@ -33,41 +33,41 @@ describe('Oppia landing pages tour', function() {
     await waitFor.pageToFullyLoad();
   });
 
-  it('should visit the Partners landing page', async function() {
+  it('should visit the Partners landing page', async function () {
     await browser.get('/partners');
     await waitFor.pageToFullyLoad();
   });
 
-  it('should visit the Nonprofits landing page', async function() {
+  it('should visit the Nonprofits landing page', async function () {
     await browser.get('/nonprofits');
     await waitFor.pageToFullyLoad();
   });
 
-  it('should visit the Parents landing page', async function() {
+  it('should visit the Parents landing page', async function () {
     await browser.get('/parents');
     await waitFor.pageToFullyLoad();
   });
 
-  it('should visit the Teachers landing page', async function() {
+  it('should visit the Teachers landing page', async function () {
     await browser.get('/teachers');
     await waitFor.pageToFullyLoad();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
-describe('Meta Tags', function() {
+describe('Meta Tags', function () {
   var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
   var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
   var getStartedPage = new GetStartedPage.GetStartedPage();
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await getStartedPage.get();
   });
 
-  it('should set the correct itemprop meta tags', async function() {
+  it('should set the correct itemprop meta tags', async function () {
     expect(await getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
       EXPECTED_META_NAME);
     expect(
@@ -75,7 +75,7 @@ describe('Meta Tags', function() {
         'description', 'itemprop')).toEqual(EXPECTED_META_DESCRIPTION);
   });
 
-  it('should set the correct og meta tags', async function() {
+  it('should set the correct og meta tags', async function () {
     expect(await getStartedPage.getMetaTagContent('title', 'og')).toEqual(
       EXPECTED_META_NAME);
     expect(await getStartedPage.getMetaTagContent('description', 'og')).toEqual(
@@ -84,14 +84,14 @@ describe('Meta Tags', function() {
       'http://localhost:9001/get-started');
   });
 
-  it('should set the correct application name', async function() {
+  it('should set the correct application name', async function () {
     expect(await getStartedPage.getMetaTagContent(
       'application-name', 'name')).toEqual('Oppia.org');
   });
 });
 
-describe('DEV MODE Test', function() {
-  it('should not show Dev Mode label in prod', async function() {
+describe('DEV MODE Test', function () {
+  it('should not show Dev Mode label in prod', async function () {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
     expect(await element(
@@ -100,33 +100,33 @@ describe('DEV MODE Test', function() {
   });
 });
 
-describe('Donation flow', function() {
+describe('Donation flow', function () {
   var payPalButton = element(by.css('.protractor-test-paypal-donate-button'));
   var creditCardButton = element(
     by.css('.protractor-test-credit-card-donate-button'));
-  it('should be able to donate via PayPal', async function() {
+  it('should be able to donate via PayPal', async function () {
     await browser.get('/donate');
     await action.click('PayPal button', payPalButton);
     expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
   });
 
-  it('should be able to donate via credit card', async function() {
+  it('should be able to donate via credit card', async function () {
     await browser.get('/donate');
     await action.click('Credit Card button', creditCardButton);
     expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
   });
 });
 
-describe('Static Pages Tour', function() {
+describe('Static Pages Tour', function () {
   var getStartedPage = new GetStartedPage.GetStartedPage();
-  it('should visit the Get started page', async function() {
+  it('should visit the Get started page', async function () {
     await getStartedPage.get();
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Login page', async function() {
+  it('should visit the Login page', async function () {
     await browser.get('/login');
     await waitFor.pageToFullyLoad();
     var loginPage = element(by.css('.protractor-test-login-page'));
@@ -134,19 +134,19 @@ describe('Static Pages Tour', function() {
   });
 
   it('should redirect away from the Login page when visited by logged-in user',
-    async function() {
+    async function () {
       var loginPage = element(by.css('.protractor-test-login-page'));
       var learnerDashboardPage = (
         element(by.css('.protractor-test-learner-dashboard-page')));
 
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
 
-      await waitFor.clientSideRedirection(async() => {
+      await waitFor.clientSideRedirection(async () => {
         // Login page will redirect user away if logged in.
         await browser.get('/login');
 
         // Wait for first redirection (login page to splash page).
-        await browser.driver.wait(async() => {
+        await browser.driver.wait(async () => {
           var url = await browser.driver.getCurrentUrl();
           // Wait until the URL has changed to something that is not /login.
           return !(/login/.test(url));
@@ -157,7 +157,7 @@ describe('Static Pages Tour', function() {
         // page).
         return url !== 'http://localhost:9001/';
       },
-      async() => {
+      async () => {
         await waitFor.presenceOf(
           learnerDashboardPage, 'Learner dashboard page did not load');
       });
@@ -170,77 +170,77 @@ describe('Static Pages Tour', function() {
       await waitFor.presenceOf(loginPage, 'Login page did not load');
     });
 
-  it('should visit the Teach page', async function() {
+  it('should visit the Teach page', async function () {
     await browser.get('/teach');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Home page', async function() {
+  it('should visit the Home page', async function () {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the About page', async function() {
+  it('should visit the About page', async function () {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-about-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Contact page', async function() {
+  it('should visit the Contact page', async function () {
     await browser.get('/contact');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-contact-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Donate page', async function() {
+  it('should visit the Donate page', async function () {
     await browser.get('/donate');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Partnerships page', async function() {
+  it('should visit the Partnerships page', async function () {
     await browser.get('/partnerships');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-partnerships-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the About foundation page', async function() {
+  it('should visit the About foundation page', async function () {
     await browser.get('/about-foundation');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-about-foundation-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Privacy page', async function() {
+  it('should visit the Privacy page', async function () {
     await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Terms page', async function() {
+  it('should visit the Terms page', async function () {
     await browser.get('/terms');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-terms-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Thanks page', async function() {
+  it('should visit the Thanks page', async function () {
     await browser.get('/thanks');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the Volunteer page', async function() {
+  it('should visit the Volunteer page', async function () {
     await browser.get('/volunteer');
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
@@ -249,7 +249,7 @@ describe('Static Pages Tour', function() {
   });
 
   it('should show the error page when an incorrect url is given',
-    async function() {
+    async function () {
       await browser.get('/splashes');
       await waitFor.pageToFullyLoad();
       await general.expectErrorPage(404);

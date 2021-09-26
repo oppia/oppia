@@ -35,9 +35,9 @@ export class ResponseTextInputComponent implements OnInit {
   @Input('answer') answerWithValue!: string;
   answer!: string;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor (private htmlEscaperService: HtmlEscaperService) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.answer = this.htmlEscaperService.escapedJsonToObj(
       this.answerWithValue) as string;
   }

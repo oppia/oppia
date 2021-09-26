@@ -35,23 +35,23 @@ export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
   modalHeader = 'Concept Card';
   isInTestMode = false;
 
-  constructor(protected modalInstance: NgbActiveModal) {
+  constructor (protected modalInstance: NgbActiveModal) {
     super(modalInstance);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.skillIds = [this.skillId];
   }
 
-  isLastConceptCard(): true {
+  isLastConceptCard (): true {
     return true;
   }
 
-  goToNextConceptCard(): void {
+  goToNextConceptCard (): void {
     return;
   }
 
-  retryTest(): void {
+  retryTest (): void {
     return;
   }
 }

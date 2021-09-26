@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
 
-describe('Pretest question backend API service', function() {
+describe('Pretest question backend API service', function () {
   let pretestQuestionBackendApiService:
     PretestQuestionBackendApiService = null;
   let httpTestingController: HttpTestingController;

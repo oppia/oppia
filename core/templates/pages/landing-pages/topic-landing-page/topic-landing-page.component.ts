@@ -60,14 +60,14 @@ export class TopicLandingPageComponent implements OnInit {
   topicData: TopicData = null;
   topicTitle: string = null;
 
-  constructor(
+  constructor (
     private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private urlService: UrlService) {}
 
-  getLessonQualities(): LessonsQuality[] {
+  getLessonQualities (): LessonsQuality[] {
     return [{
       title: 'Fun storytelling',
       description: (
@@ -100,7 +100,7 @@ export class TopicLandingPageComponent implements OnInit {
   }
 
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     let pathArray = this.windowRef.nativeWindow.location.pathname.split('/');
     let subjectName = pathArray[1];
     let topicName = pathArray[2];
@@ -135,13 +135,13 @@ export class TopicLandingPageComponent implements OnInit {
       [this.topicTitle, this.topicData.topicTagline, 'Oppia'].join(' | '));
   }
 
-  getLessonQualityImageSrc(filename: string): string {
+  getLessonQualityImageSrc (filename: string): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.urlInterpolationService.interpolateUrl(
         '/landing/<filename>', {filename: filename}));
   }
 
-  onClickGetStartedButton(): void {
+  onClickGetStartedButton (): void {
     let collectionId = this.topicData.collectionId;
     this.siteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
       collectionId);
@@ -151,7 +151,7 @@ export class TopicLandingPageComponent implements OnInit {
     }, 150);
   }
 
-  goToClassroom(): void {
+  goToClassroom (): void {
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = (
         `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);

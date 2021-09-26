@@ -24,7 +24,7 @@ angular.module('oppia').component('answerSubmitAction', {
   template: require('./answer-submit-action.component.html'),
   controller: ['$attrs', 'ExplorationHtmlFormatterService',
     'HtmlEscaperService', 'InteractionObjectFactory',
-    function(
+    function (
         $attrs, ExplorationHtmlFormatterService,
         HtmlEscaperService, InteractionObjectFactory) {
       var ctrl = this;
@@ -36,11 +36,11 @@ angular.module('oppia').component('answerSubmitAction', {
         )
       );
       var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      ctrl.getShortAnswerHtml = function() {
+      ctrl.getShortAnswerHtml = function () {
         return ExplorationHtmlFormatterService.getShortAnswerHtml(
           _answer, $attrs.interactionId, _customizationArgs);
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.currentStateName = $attrs.currentStateName;
         ctrl.destStateName = $attrs.destStateName;
         ctrl.actionIndex = $attrs.actionIndex;

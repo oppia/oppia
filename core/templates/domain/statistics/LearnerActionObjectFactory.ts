@@ -77,12 +77,12 @@ export type LearnerActionBackendDict = (
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the ActionType parameter.
 class LearnerActionBase<ActionType> {
-  constructor(
+  constructor (
       public readonly actionType: ActionType,
       public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
       public schemaVersion: number) {}
 
-  toBackendDict(): LearnerActionBackendDictBase<ActionType> {
+  toBackendDict (): LearnerActionBackendDictBase<ActionType> {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -109,7 +109,7 @@ export type LearnerAction = (
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
-  createNewExplorationStartAction(
+  createNewExplorationStartAction (
       actionCustomizationArgs: ExplorationStartCustomizationArgs
   ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
@@ -117,7 +117,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewAnswerSubmitAction(
+  createNewAnswerSubmitAction (
       actionCustomizationArgs: AnswerSubmitCustomizationArgs
   ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
@@ -125,7 +125,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewExplorationQuitAction(
+  createNewExplorationQuitAction (
       actionCustomizationArgs: ExplorationQuitCustomizationArgs
   ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
@@ -146,7 +146,7 @@ export class LearnerActionObjectFactory {
    * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
-  createFromBackendDict(
+  createFromBackendDict (
       learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
       case 'ExplorationStart':

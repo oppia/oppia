@@ -28,11 +28,11 @@ export class SubtopicValidationService {
   private _VALID_URL_FRAGMENT_REGEX = new RegExp(
     subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
 
-  constructor(
+  constructor (
     private topicEditorStateService: TopicEditorStateService
   ) {}
 
-  checkValidSubtopicName(title: string): boolean {
+  checkValidSubtopicName (title: string): boolean {
     let subtopicTitles = [];
     let topic = this.topicEditorStateService.getTopic();
     topic.getSubtopics().forEach((subtopic) => {
@@ -41,13 +41,13 @@ export class SubtopicValidationService {
     return subtopicTitles.indexOf(title) === -1;
   }
 
-  doesSubtopicWithUrlFragmentExist(urlFragment: string): boolean {
+  doesSubtopicWithUrlFragmentExist (urlFragment: string): boolean {
     let topic = this.topicEditorStateService.getTopic();
     return topic.getSubtopics().some(
       subtopic => subtopic.getUrlFragment() === urlFragment);
   }
 
-  isUrlFragmentValid(urlFragment: string): boolean {
+  isUrlFragmentValid (urlFragment: string): boolean {
     return this._VALID_URL_FRAGMENT_REGEX.test(urlFragment);
   }
 }

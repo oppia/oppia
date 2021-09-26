@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for ModeratorUnpublishExplorationModalController.
  */
 
-describe('Moderator Unpublish Exploration Modal Controller', function() {
+describe('Moderator Unpublish Exploration Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var draftEmailBody = 'This is a draft email body';
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -37,7 +37,7 @@ describe('Moderator Unpublish Exploration Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.willEmailBeSent).toBe(true);
       expect($scope.emailBody).toBe(draftEmailBody);
       expect($scope.EMAIL_BODY_SCHEMA).toEqual({

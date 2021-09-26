@@ -33,9 +33,9 @@ export class ResponseAlgebraicExpressionInputComponent implements OnInit {
   @Input() answer: string = '';
   escapedAnswer: string = '';
 
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor (private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.escapedAnswer = (
       this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
   }

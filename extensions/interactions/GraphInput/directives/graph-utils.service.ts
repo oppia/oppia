@@ -49,7 +49,7 @@ export class GraphUtilsService {
    *   or all edges in both directions, as though the graph were undirected
    *   (undirected)
    */
-  constructAdjacencyLists(
+  constructAdjacencyLists (
       graph: GraphAnswer, adjacencyListMode: string): number[][] {
     var adjacencyLists: number[][] = [];
     for (var i = 0; i < graph.vertices.length; i++) {
@@ -83,7 +83,7 @@ export class GraphUtilsService {
    * This function modifies the isVisited array and changes the values at
    * the indices of the vertices reachable from the starting vertex to true.
    */
-  markAccessible(
+  markAccessible (
       startVertex: number, adjacencyLists: number[][],
       isVisited: boolean[]): void {
     isVisited[startVertex] = true;
@@ -95,7 +95,7 @@ export class GraphUtilsService {
     }
   }
 
-  findCycle(
+  findCycle (
       currentVertex: number, previousVertex: number,
       adjacencyLists: number[][], nodeStatus: string[],
       isDirected: boolean): boolean {
@@ -120,7 +120,7 @@ export class GraphUtilsService {
     return false;
   }
 
-  constructAdjacencyMatrix(graph: GraphAnswer): AdjacencyMatrix {
+  constructAdjacencyMatrix (graph: GraphAnswer): AdjacencyMatrix {
     var adjMatrix: AdjacencyMatrix = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       var adjMatrixRow = [];
@@ -140,7 +140,7 @@ export class GraphUtilsService {
     return adjMatrix;
   }
 
-  nextPermutation(permutation: number[]): number[] | null {
+  nextPermutation (permutation: number[]): number[] | null {
     // Generates (in place) the next lexicographical permutation.
     // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1].
 
@@ -170,7 +170,7 @@ export class GraphUtilsService {
     return permutation;
   }
 
-  areAdjacencyMatricesEqualWithPermutation(
+  areAdjacencyMatricesEqualWithPermutation (
       adj1: AdjacencyMatrix,
       adj2: AdjacencyMatrix,
       permutation: number[]): boolean {

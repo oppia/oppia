@@ -56,14 +56,14 @@ class FeatureStatusCheckerItem {
    * @param {() => boolean} getterFn - Function that returns the status of
    *     the feature.
    */
-  constructor(private getterFn: () => boolean) {}
+  constructor (private getterFn: () => boolean) {}
 
   /**
    * Checks if the feature is enabled.
    *
    * @returns {boolean} - True if the feature is enabled.
    */
-  get isEnabled(): boolean {
+  get isEnabled (): boolean {
     return this.getterFn();
   }
 }
@@ -75,11 +75,11 @@ class FeatureStatusCheckerItem {
 export class FeatureStatusSummary {
   featureNameToFlag: Map<string, boolean>;
 
-  constructor(backendDict: FeatureStatusSummaryBackendDict) {
+  constructor (backendDict: FeatureStatusSummaryBackendDict) {
     this.featureNameToFlag = new Map(Object.entries(backendDict));
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: FeatureStatusSummaryBackendDict): FeatureStatusSummary {
     return new FeatureStatusSummary(backendDict);
   }
@@ -91,7 +91,7 @@ export class FeatureStatusSummary {
    * @returns {FeatureStatusSummary} - The FeatureStatusSummary object instance
    *     with all feature disabled.
    */
-  static createDefault(): FeatureStatusSummary {
+  static createDefault (): FeatureStatusSummary {
     const defaultDict: FeatureStatusSummaryBackendDict = {};
     const featureNamesKeys = <FeatureNamesKeys> Object.keys(FeatureNames);
     featureNamesKeys.forEach(
@@ -105,7 +105,7 @@ export class FeatureStatusSummary {
    * @returns {FeatureStatusSummaryBackendDict} - The dict representation
    * of the instance.
    */
-  toBackendDict(): FeatureStatusSummaryBackendDict {
+  toBackendDict (): FeatureStatusSummaryBackendDict {
     const backendDict: Record<string, boolean> = {};
     for (const [key, value] of this.featureNameToFlag.entries()) {
       backendDict[key] = value;
@@ -118,7 +118,7 @@ export class FeatureStatusSummary {
    *
    * @returns {FeatureStatusChecker} - The feature status checker.
    */
-  toStatusChecker(): FeatureStatusChecker {
+  toStatusChecker (): FeatureStatusChecker {
     const checker = <FeatureStatusChecker>{};
     const featureNamesKeys = <FeatureNamesKeys> Object.keys(FeatureNames);
     featureNamesKeys.forEach(name => {
@@ -139,7 +139,7 @@ export class FeatureStatusSummary {
    * @returns {boolean} - The value of the feature flag, true if enabled.
    * @throws {Error} - If the feature with the specified name doesn't exist.
    */
-  private isFeatureEnabled(featureName: string): boolean {
+  private isFeatureEnabled (featureName: string): boolean {
     const isEnabled = this.featureNameToFlag.get(featureName);
     if (isEnabled === undefined) {
       throw new Error(`Feature '${featureName}' does not exist.`);

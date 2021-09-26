@@ -36,7 +36,7 @@ var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
@@ -48,12 +48,12 @@ describe('Learner dashboard functionality', function() {
   var learnerDashboardPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  var clickContinueButton = async function() {
+  var clickContinueButton = async function () {
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktop = async function(welcomeModalIsShown) {
+  var createDummyExplorationOnDesktop = async function (welcomeModalIsShown) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await waitFor.pageToFullyLoad();
@@ -95,7 +95,7 @@ describe('Learner dashboard functionality', function() {
     await workflow.publishExploration();
   };
 
-  beforeAll(function() {
+  beforeAll(function () {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
@@ -111,7 +111,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should visit the exploration player and play the correct exploration',
-    async function() {
+    async function () {
       await users.createAndLoginSuperAdminUser(
         'expCreator@learnerDashboard.com', 'expCreator');
       // Create or load an exploration named 'Exploration Player Test'.
@@ -136,7 +136,7 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('should visit the collection player and play the correct collection',
-    async function() {
+    async function () {
       await users.createAndLoginSuperAdminUser(
         'expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
@@ -178,7 +178,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playCollection('Introduction to Collections in Oppia');
     });
 
-  it('should display incomplete and completed explorations', async function() {
+  it('should display incomplete and completed explorations', async function () {
     await users.createAndLoginSuperAdminUser(
       'originalCreator@learnerDashboard.com', 'originalCreator');
     // Create or load explorations.
@@ -294,7 +294,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should display incomplete and completed collections', async function() {
+  it('should display incomplete and completed collections', async function () {
     await users.createAndLoginSuperAdminUser(
       'explorationCreator@learnerDashboard.com', 'explorationCreator');
     // Create or load a collection.
@@ -443,7 +443,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });

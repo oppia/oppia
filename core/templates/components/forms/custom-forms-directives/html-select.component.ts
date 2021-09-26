@@ -31,13 +31,13 @@ angular.module('oppia').component('htmlSelect', {
   },
   template: require(
     'components/forms/custom-forms-directives/html-select.component.html'),
-  controller: ['$scope', function($scope) {
+  controller: ['$scope', function ($scope) {
     let ctrl = this;
-    $scope.select = function(id) {
+    $scope.select = function (id) {
       ctrl.selection = id;
     };
 
-    $scope.getSelectionIndex = function() {
+    $scope.getSelectionIndex = function () {
       for (var index = 0; index < ctrl.options.length; index++) {
         if (ctrl.options[index].id === ctrl.selection) {
           return index;

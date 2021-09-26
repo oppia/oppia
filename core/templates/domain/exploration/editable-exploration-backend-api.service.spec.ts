@@ -28,7 +28,7 @@ import { HttpTestingController, HttpClientTestingModule } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 
-describe('Editable exploration backend API service', function() {
+describe('Editable exploration backend API service', function () {
   let editableExplorationBackendApiService:
   EditableExplorationBackendApiService = null;
   let readOnlyExplorationBackendApiService:
@@ -51,7 +51,7 @@ describe('Editable exploration backend API service', function() {
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
 
@@ -164,7 +164,7 @@ describe('Editable exploration backend API service', function() {
 
     // Loading a exploration the first time should fetch it from the backend.
     editableExplorationBackendApiService.fetchExplorationAsync('0').then(
-      function(data) {
+      function (data) {
         exploration = data;
       });
 

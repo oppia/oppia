@@ -38,7 +38,7 @@ export class StoryPlaythrough {
   topicName: string;
   metaTagContent: string;
 
-  constructor(
+  constructor (
       id: string,
       nodes: ReadOnlyStoryNode[],
       title: string,
@@ -53,7 +53,7 @@ export class StoryPlaythrough {
     this.metaTagContent = metaTagContent;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       storyPlaythroughBackendDict:
       StoryPlaythroughBackendDict): StoryPlaythrough {
     var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
@@ -68,23 +68,23 @@ export class StoryPlaythrough {
       storyPlaythroughBackendDict.meta_tag_content);
   }
 
-  getInitialNode(): ReadOnlyStoryNode {
+  getInitialNode (): ReadOnlyStoryNode {
     return this.nodes[0];
   }
 
-  getStoryNodeCount(): number {
+  getStoryNodeCount (): number {
     return this.nodes.length;
   }
 
-  getStoryNodes(): ReadOnlyStoryNode[] {
+  getStoryNodes (): ReadOnlyStoryNode[] {
     return this.nodes;
   }
 
-  hasFinishedStory(): boolean {
+  hasFinishedStory (): boolean {
     return this.nodes.slice(-1)[0].isCompleted();
   }
 
-  getNextPendingNodeId(): string {
+  getNextPendingNodeId (): string {
     for (var i = 0; i < this.nodes.length; i++) {
       if (!this.nodes[i].isCompleted()) {
         return this.nodes[i].getId();
@@ -93,15 +93,15 @@ export class StoryPlaythrough {
     throw new Error('No story nodes found!');
   }
 
-  hasStartedStory(): boolean {
+  hasStartedStory (): boolean {
     return this.nodes[0].isCompleted();
   }
 
-  getStoryId(): string {
+  getStoryId (): string {
     return this.id;
   }
 
-  getMetaTagContent(): string {
+  getMetaTagContent (): string {
     return this.metaTagContent;
   }
 }

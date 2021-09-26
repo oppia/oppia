@@ -39,7 +39,7 @@ describe('InteractiveImageClickInput', () => {
   'img_20210616_110856_oxqveyuhr3_height_778_width_441.svg';
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes (interactionId, attributes) {
       return {
         imageAndRegions: {
           value: JSON.parse(attributes.imageAndRegionsWithValue)

@@ -46,7 +46,7 @@ export class LearnerDashboardActivityIds {
   explorationPlaylistIds: string[];
   collectionPlaylistIds: string[];
 
-  constructor(
+  constructor (
       incompleteExplorationIds: string[], incompleteCollectionIds: string[],
       partiallyLearntTopicIds: string[],
       completedExplorationIds: string[], completedCollectionIds: string[],
@@ -68,7 +68,7 @@ export class LearnerDashboardActivityIds {
     this.collectionPlaylistIds = collectionPlaylistIds;
   }
 
-  includesActivity(activityId: string): boolean {
+  includesActivity (activityId: string): boolean {
     if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
         this.completedCollectionIds.indexOf(activityId) !== -1 ||
         this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
@@ -86,106 +86,106 @@ export class LearnerDashboardActivityIds {
     return false;
   }
 
-  belongsToExplorationPlaylist(explorationId: string): boolean {
+  belongsToExplorationPlaylist (explorationId: string): boolean {
     if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToCollectionPlaylist(collectionId: string): boolean {
+  belongsToCollectionPlaylist (collectionId: string): boolean {
     if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToTopicsToLearn(topicId: string): boolean {
+  belongsToTopicsToLearn (topicId: string): boolean {
     if (this.topicIdsToLearn.indexOf(topicId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToCompletedExplorations(explorationId: string): boolean {
+  belongsToCompletedExplorations (explorationId: string): boolean {
     if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToCompletedCollections(collectionId: string): boolean {
+  belongsToCompletedCollections (collectionId: string): boolean {
     if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToCompletedStories(storyId: string): boolean {
+  belongsToCompletedStories (storyId: string): boolean {
     if (this.completedStoryIds.indexOf(storyId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToLearntTopics(topicId: string): boolean {
+  belongsToLearntTopics (topicId: string): boolean {
     if (this.learntTopicIds.indexOf(topicId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToIncompleteExplorations(explorationId: string): boolean {
+  belongsToIncompleteExplorations (explorationId: string): boolean {
     if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToIncompleteCollections(collectionId: string): boolean {
+  belongsToIncompleteCollections (collectionId: string): boolean {
     if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
       return true;
     }
     return false;
   }
 
-  belongsToPartiallyLearntTopics(topicId: string): boolean {
+  belongsToPartiallyLearntTopics (topicId: string): boolean {
     if (this.partiallyLearntTopicIds.indexOf(topicId) !== -1) {
       return true;
     }
     return false;
   }
 
-  addToExplorationLearnerPlaylist(explorationId: string): void {
+  addToExplorationLearnerPlaylist (explorationId: string): void {
     this.explorationPlaylistIds.push(explorationId);
   }
 
-  removeFromExplorationLearnerPlaylist(explorationId: string): void {
+  removeFromExplorationLearnerPlaylist (explorationId: string): void {
     var index = this.explorationPlaylistIds.indexOf(explorationId);
     if (index !== -1) {
       this.explorationPlaylistIds.splice(index, 1);
     }
   }
 
-  addToCollectionLearnerPlaylist(collectionId: string): void {
+  addToCollectionLearnerPlaylist (collectionId: string): void {
     this.collectionPlaylistIds.push(collectionId);
   }
 
-  removeFromCollectionLearnerPlaylist(collectionId: string): void {
+  removeFromCollectionLearnerPlaylist (collectionId: string): void {
     var index = this.collectionPlaylistIds.indexOf(collectionId);
     if (index !== -1) {
       this.collectionPlaylistIds.splice(index, 1);
     }
   }
 
-  removeTopicFromLearn(topicId: string): void {
+  removeTopicFromLearn (topicId: string): void {
     var index = this.topicIdsToLearn.indexOf(topicId);
     if (index !== -1) {
       this.topicIdsToLearn.splice(index, 1);
     }
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       learnerDashboardActivityIdsDict: LearnerDashboardActivityIdsDict):
       LearnerDashboardActivityIds {
     return new LearnerDashboardActivityIds(

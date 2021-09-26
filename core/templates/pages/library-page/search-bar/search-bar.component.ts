@@ -67,7 +67,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   activeMenuName: string = '';
   @Input() enableDropup: boolean = false;
 
-  constructor(
+  constructor (
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
     private searchService: SearchService,
@@ -82,11 +82,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.urlService.getPathname().startsWith('/learn'));
   }
 
-  isSearchInProgress(): boolean {
+  isSearchInProgress (): boolean {
     return this.searchService.isSearchInProgress();
   }
 
-  searchToBeExec(e: {target: {value: string}}): void {
+  searchToBeExec (e: {target: {value: string}}): void {
     if (!this.classroomPageIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
@@ -98,7 +98,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu (evt: KeyboardEvent, menuName: string): void {
     this.navigationService.openSubmenu(evt, menuName);
   }
 
@@ -113,7 +113,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
    * @example
    *  onMenuKeypress($event, 'category', {enter: 'open'})
    */
-  onMenuKeypress(
+  onMenuKeypress (
       evt: KeyboardEvent,
       menuName: string,
       eventsTobeHandled: EventToCodes): void {
@@ -123,7 +123,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   // Update the description, numSelections and summary fields of the
   // relevant entry of selectionDetails.
-  updateSelectionDetails(itemsType: string): void {
+  updateSelectionDetails (itemsType: string): void {
     let itemsName = this.selectionDetails[itemsType].itemsName;
     let masterList = this.selectionDetails[itemsType].masterList;
 
@@ -159,7 +159,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleSelection(itemsType: string, optionName: string): void {
+  toggleSelection (itemsType: string, optionName: string): void {
     let selections = this.selectionDetails[itemsType].selections;
     if (!selections.hasOwnProperty(optionName)) {
       selections[optionName] = true;
@@ -171,13 +171,13 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.onSearchQueryChangeExec();
   }
 
-  deselectAll(itemsType: string): void {
+  deselectAll (itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
   }
 
-  onSearchQueryChangeExec(): void {
+  onSearchQueryChangeExec (): void {
     this.searchService.executeSearchQuery(
       this.searchQuery, this.selectionDetails.categories.selections,
       this.selectionDetails.languageCodes.selections, () => {
@@ -199,7 +199,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       });
   }
 
-  updateSearchFieldsBasedOnUrlQuery(): void {
+  updateSearchFieldsBasedOnUrlQuery (): void {
     this.selectionDetails.categories.selections = {};
     this.selectionDetails.languageCodes.selections = {};
 
@@ -216,7 +216,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  refreshSearchBarLabels(): void {
+  refreshSearchBarLabels (): void {
     // If you translate these strings in the html, then you must use a
     // filter because only the first 14 characters are displayed. That
     // would generate FOUC for languages other than English. As an
@@ -234,7 +234,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       {...this.translationData, messageFormat: true});
   }
 
-  searchDropdownCategories(): SearchDropDownCategories[] {
+  searchDropdownCategories (): SearchDropDownCategories[] {
     return constants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
       return {
         id: categoryName,
@@ -244,7 +244,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
     this.KEYBOARD_EVENT_TO_KEY_CODES = (
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES);
@@ -332,7 +332,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         .subscribe(() => this.refreshSearchBarLabels()));
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

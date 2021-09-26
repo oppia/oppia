@@ -36,11 +36,11 @@ export class CollectionRightsBackendApiService {
   // Maps previously loaded collection rights to their IDs.
   collectionRightsCache: Record<string, CollectionRights> = {};
 
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) { }
 
-  private _fetchCollectionRights(
+  private _fetchCollectionRights (
       collectionId: string,
       successCallback: (value: CollectionRights) => void,
       errorCallback: (reason: string) => void): void {
@@ -65,7 +65,7 @@ export class CollectionRightsBackendApiService {
       });
   }
 
-  private _setCollectionStatus(
+  private _setCollectionStatus (
       collectionId: string,
       collectionVersion: number,
       isPublic: boolean,
@@ -103,14 +103,14 @@ export class CollectionRightsBackendApiService {
       });
   }
 
-  private _isCached(collectionId: string): boolean {
+  private _isCached (collectionId: string): boolean {
     return this.collectionRightsCache.hasOwnProperty(collectionId);
   }
 
   /**
    * Gets a collection's rights, given its ID.
    */
-  async fetchCollectionRightsAsync(collectionId: string):
+  async fetchCollectionRightsAsync (collectionId: string):
    Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._fetchCollectionRights(collectionId, resolve, reject);
@@ -126,7 +126,7 @@ export class CollectionRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  async loadCollectionRightsAsync(collectionId: string):
+  async loadCollectionRightsAsync (collectionId: string):
    Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
@@ -151,7 +151,7 @@ export class CollectionRightsBackendApiService {
    * local data cache or if it needs to be retrieved from the backend
    * upon a laod.
    */
-  isCached(collectionId: string): boolean {
+  isCached (collectionId: string): boolean {
     return this._isCached(collectionId);
   }
 
@@ -159,7 +159,7 @@ export class CollectionRightsBackendApiService {
    * Replaces the current collection rights in the cache given by the
    * specified collection ID with a new collection rights object.
    */
-  cacheCollectionRights(
+  cacheCollectionRights (
       collectionId: string,
       collectionRights: CollectionRights): void {
     this.collectionRightsCache[collectionId] = collectionRights;
@@ -168,7 +168,7 @@ export class CollectionRightsBackendApiService {
    * Updates a collection's rights to be have public learner access, given
    * its ID and version.
    */
-  async setCollectionPublicAsync(
+  async setCollectionPublicAsync (
       collectionId: string,
       collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
@@ -181,7 +181,7 @@ export class CollectionRightsBackendApiService {
    * Updates a collection's rights to be have private learner access,
    * given its ID and version.
    */
-  async setCollectionPrivateAsync(
+  async setCollectionPrivateAsync (
       collectionId: string,
       collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {

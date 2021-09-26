@@ -34,7 +34,7 @@ import { CollectionRightsBackendApiService } from 'domain/collection/collection-
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 
-describe('Collection Editor Navbar directive', function() {
+describe('Collection Editor Navbar directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -69,7 +69,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
@@ -178,7 +178,7 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.$onDestroy();
   });
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     spyOn(urlService, 'getCollectionIdFromEditorUrl')
       .and.returnValue('collectionId');
     spyOn(collectionEditorStateService, 'getCollection')
@@ -198,7 +198,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should validate issues when undo redo change ' +
-    'event is emitted', function() {
+    'event is emitted', function () {
     spyOn(urlService, 'getCollectionIdFromEditorUrl')
       .and.returnValue('collectionId');
     spyOn(collectionEditorStateService, 'getCollection')
@@ -220,7 +220,7 @@ describe('Collection Editor Navbar directive', function() {
 
 
   it('should validate issues when collection initialize ' +
-    'event is emitted', function() {
+    'event is emitted', function () {
     spyOn(urlService, 'getCollectionIdFromEditorUrl')
       .and.returnValue('collectionId');
     spyOn(collectionEditorStateService, 'getCollection')
@@ -247,7 +247,7 @@ describe('Collection Editor Navbar directive', function() {
     expect(validationSpy).toHaveBeenCalled();
   });
 
-  it('should fetch collection when initialized', function() {
+  it('should fetch collection when initialized', function () {
     spyOn(urlService, 'getCollectionIdFromEditorUrl')
       .and.returnValue('collectionId');
     spyOn(collectionEditorStateService, 'getCollection')
@@ -269,7 +269,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should unpublish collection successfully ' +
-    'when unpublish button is clicked', fakeAsync(function() {
+    'when unpublish button is clicked', fakeAsync(function () {
     ctrl.collection = sampleCollection;
     ctrl.collectionRights = new CollectionRights({
       owner_names: [],
@@ -291,7 +291,7 @@ describe('Collection Editor Navbar directive', function() {
   }));
 
   it('should not unpublish collection in case of ' +
-    'backend error', fakeAsync(function() {
+    'backend error', fakeAsync(function () {
     ctrl.collection = sampleCollection;
     ctrl.collectionRights = sampleCollectionRights;
     spyOn(collectionRightsBackendApiService, 'setCollectionPrivateAsync')
@@ -307,7 +307,7 @@ describe('Collection Editor Navbar directive', function() {
   }));
 
   it('should open a modal to save changes if ' +
-    'additional meta data needed', fakeAsync(function() {
+    'additional meta data needed', fakeAsync(function () {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject2);
     ctrl.collection = sampleCollection;
@@ -336,7 +336,7 @@ describe('Collection Editor Navbar directive', function() {
   }));
 
   it('should publish collection successfully if no ' +
-    'additional meta data needed', fakeAsync(function() {
+    'additional meta data needed', fakeAsync(function () {
     ctrl.collection = sampleCollection;
     ctrl.collectionRights = new CollectionRights({
       owner_names: [],
@@ -363,7 +363,7 @@ describe('Collection Editor Navbar directive', function() {
   }));
 
   it('should open a modal to save changes when clicking ' +
-    'on save button', fakeAsync(function() {
+    'on save button', fakeAsync(function () {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject2);
     ctrl.collection = sampleCollection;
@@ -395,7 +395,7 @@ describe('Collection Editor Navbar directive', function() {
   }));
 
   it('should not save changes if cancel button was ' +
-    'clicked', fakeAsync(function() {
+    'clicked', fakeAsync(function () {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject2);
     ctrl.collection = sampleCollection;
@@ -425,14 +425,14 @@ describe('Collection Editor Navbar directive', function() {
   }));
 
   it('should return change list count ' +
-    'when calling \'getChangeListCount\'', function() {
+    'when calling \'getChangeListCount\'', function () {
     spyOn(undoRedoService, 'getChangeCount')
       .and.returnValue(2);
     expect(ctrl.getChangeListCount()).toBe(2);
   });
 
   it('should return count of validation issues ' +
-    'when calling \'getWarningsCount\'', function() {
+    'when calling \'getWarningsCount\'', function () {
     ctrl.validationIssues = [];
     expect(ctrl.getWarningsCount()).toBe(0);
 
@@ -441,14 +441,14 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should check whether a collection is saveable ' +
-    'when calling \'isCollectionSaveable\'', function() {
+    'when calling \'isCollectionSaveable\'', function () {
     let result = ctrl.isCollectionSaveable();
 
     expect(result).toBe(false);
   });
 
   it('should check whether a collection is publishable ' +
-    'when calling \'isCollectionPublishable\'', function() {
+    'when calling \'isCollectionPublishable\'', function () {
     ctrl.collectionRights = new CollectionRights({
       owner_names: [],
       collection_id: 1,
@@ -463,7 +463,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should check whether a collection is loading ' +
-    'when calling \'isLoadingCollection\'', function() {
+    'when calling \'isLoadingCollection\'', function () {
     spyOn(collectionEditorStateService, 'isLoadingCollection')
       .and.returnValue(true);
 
@@ -473,7 +473,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should check whether a collection is saving ' +
-    'when calling \'isSaveInProgress\'', function() {
+    'when calling \'isSaveInProgress\'', function () {
     spyOn(collectionEditorStateService, 'isSavingCollection')
       .and.returnValue(true);
 
@@ -483,7 +483,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should return active tab name ' +
-    'when calling \'getActiveTabName\'', function() {
+    'when calling \'getActiveTabName\'', function () {
     spyOn(RouterService, 'getActiveTabName')
       .and.returnValue('activeTab');
 
@@ -493,7 +493,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should open the main tab ' +
-    'when calling \'selectMainTab\'', function() {
+    'when calling \'selectMainTab\'', function () {
     let navigationSpy = spyOn(RouterService, 'navigateToMainTab')
       .and.returnValue(null);
 
@@ -503,7 +503,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should open the preview tab ' +
-    'when calling \'selectPreviewTab\'', function() {
+    'when calling \'selectPreviewTab\'', function () {
     let navigationSpy = spyOn(RouterService, 'navigateToPreviewTab')
       .and.returnValue(null);
 
@@ -513,7 +513,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should open the settings tab ' +
-    'when calling \'selectSettingsTab\'', function() {
+    'when calling \'selectSettingsTab\'', function () {
     let navigationSpy = spyOn(RouterService, 'navigateToSettingsTab')
       .and.returnValue(null);
 
@@ -523,7 +523,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should open the stats tab ' +
-    'when calling \'selectStatsTab\'', function() {
+    'when calling \'selectStatsTab\'', function () {
     let navigationSpy = spyOn(RouterService, 'navigateToStatsTab')
       .and.returnValue(null);
 
@@ -533,7 +533,7 @@ describe('Collection Editor Navbar directive', function() {
   });
 
   it('should open the history tab ' +
-    'when calling \'selectHistoryTab\'', function() {
+    'when calling \'selectHistoryTab\'', function () {
     let navigationSpy = spyOn(RouterService, 'navigateToHistoryTab')
       .and.returnValue(null);
 

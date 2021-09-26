@@ -50,11 +50,11 @@ interface EditableCollectionBackendResponse {
   providedIn: 'root'
 })
 export class EditableCollectionBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private readOnlyCollectionService: ReadOnlyCollectionBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
-  private _fetchCollection(
+  private _fetchCollection (
       collectionId: string,
       successCallback: (value: Collection) => void,
       errorCallback: (reason: string) => void): void {
@@ -77,7 +77,7 @@ export class EditableCollectionBackendApiService {
     });
   }
 
-  private _updateCollection(
+  private _updateCollection (
       collectionId: string, collectionVersion: number,
       commitMessage: string, changeList: BackendChangeObject[],
       successCallback: (value: Collection) => void,
@@ -113,7 +113,7 @@ export class EditableCollectionBackendApiService {
     });
   }
 
-  async fetchCollectionAsync(collectionId: string): Promise<Collection> {
+  async fetchCollectionAsync (collectionId: string): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this._fetchCollection(collectionId, resolve, reject);
     });
@@ -132,7 +132,7 @@ export class EditableCollectionBackendApiService {
    * cached within the CollectionBackendApiService to ensure the cache is
    * not out-of-date with any updates made by this backend API service.
    */
-  async updateCollectionAsync(
+  async updateCollectionAsync (
       collectionId: string, collectionVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<Collection> {

@@ -70,7 +70,7 @@ describe('Learner playlist Backend Api service ', () => {
     csrfService = TestBed.inject(CsrfTokenService);
     alertsService = TestBed.inject(AlertsService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });

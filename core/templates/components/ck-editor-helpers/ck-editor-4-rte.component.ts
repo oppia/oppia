@@ -59,7 +59,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
-  constructor(
+  constructor (
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private elementRef: ElementRef,
@@ -69,7 +69,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     this.subscriptions = new Subscription();
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.subscriptions.add(
       this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
@@ -82,7 +82,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           }
         }));
   }
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
     // lifecycle hook. This cannot be avoided so we check if the currentValue
@@ -115,7 +115,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
    * @param sharedSpaces IDs of the page elements that will store the editor
    * UI elements
    */
-  private _createCKEditorConfig(
+  private _createCKEditorConfig (
       uiConfig: UiConfig,
       pluginNames: string,
       buttonNames: string[],
@@ -197,7 +197,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
    * component in a span (inline) or div (block).
    * For block elements, we add an overlay div as well.
    */
-  wrapComponents(html: string): string {
+  wrapComponents (html: string): string {
     if (html === undefined) {
       return html;
     }
@@ -213,7 +213,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     });
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit (): void {
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
@@ -446,7 +446,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     this.ckEditorCopyContentService.bindPasteHandler(ck);
   }
 
-  disableRTEicons(): void {
+  disableRTEicons (): void {
     // Add disabled cursor pointer to the icons.
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(
@@ -457,7 +457,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
     });
   }
-  enableRTEicons(): void {
+  enableRTEicons (): void {
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(
         'cke_button__oppia' + name);
@@ -468,7 +468,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     });
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.ck.destroy();
     this.subscriptions.unsubscribe();
   }

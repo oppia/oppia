@@ -21,7 +21,7 @@ import {
   ExplorationImprovementsConfigBackendDict,
 } from 'domain/improvements/exploration-improvements-config.model';
 
-describe('ExplorationImprovementsConfigModel', function() {
+describe('ExplorationImprovementsConfigModel', function () {
   it('should return an instance with specified backend values', () => {
     let backendDict: ExplorationImprovementsConfigBackendDict = {
       exploration_id: 'eid',

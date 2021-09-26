@@ -24,7 +24,7 @@ import { StatePropertyService } from './state-property.service';
 
 class MockStatePropertyService extends
   StatePropertyService<string> {
-  restoreFromMomento() {
+  restoreFromMomento () {
     return;
   }
 }

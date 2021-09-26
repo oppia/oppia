@@ -27,7 +27,7 @@ import { StoryEditorNavigationService } from
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Chapter Editor tab', function() {
+describe('Chapter Editor tab', function () {
   var $scope = null;
   var ctrl = null;
   var MockStoryEditorNavigationService = null;
@@ -42,7 +42,7 @@ describe('Chapter Editor tab', function() {
         EditableStoryBackendApiService]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
@@ -52,7 +52,7 @@ describe('Chapter Editor tab', function() {
       TestBed.get(StoryEditorNavigationService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     var storyObjectFactory = $injector.get('StoryObjectFactory');
     var StoryEditorStateService = $injector.get('StoryEditorStateService');
@@ -95,11 +95,11 @@ describe('Chapter Editor tab', function() {
     storyReinitializedEventEmitter = new EventEmitter();
 
     spyOnProperty(StoryEditorStateService, 'onStoryInitialized').and.callFake(
-      function() {
+      function () {
         return storyInitializedEventEmitter;
       });
     spyOnProperty(StoryEditorStateService, 'onStoryReinitialized').and.callFake(
-      function() {
+      function () {
         return storyReinitializedEventEmitter;
       });
 
@@ -115,21 +115,21 @@ describe('Chapter Editor tab', function() {
     ctrl.$onDestroy();
   });
 
-  it('should set initialize chapter index from the story', function() {
+  it('should set initialize chapter index from the story', function () {
     ctrl.$onInit();
     expect(ctrl.chapterId).toEqual('node_1');
     expect(ctrl.chapterIndex).toEqual(0);
   });
 
   it('should call StoryEditorNavigationService to navigate to story editor',
-    function() {
+    function () {
       ctrl.$onInit();
       ctrl.navigateToStoryEditor();
       expect(MockStoryEditorNavigationService.getActiveTab()).toEqual('story');
     });
 
   it('should called initEditor on calls from story being initialized',
-    function() {
+    function () {
       spyOn(ctrl, 'initEditor').and.callThrough();
       ctrl.$onInit();
       storyInitializedEventEmitter.emit();

@@ -49,8 +49,8 @@ describe('Exploration Property Service', () => {
       changeListService, 'editExplorationProperty').and.returnValue(null);
   });
 
-  it('should create a new exploration properties object', function() {
-    expect(function() {
+  it('should create a new exploration properties object', function () {
+    expect(function () {
       explorationPropertyService.init('initial value');
     }).toThrowError('Exploration property name cannot be null.');
 
@@ -60,14 +60,14 @@ describe('Exploration Property Service', () => {
     expect(explorationPropertyService.hasChanged()).toBe(false);
   });
 
-  it('should overrides _normalize and _isValid methods', function() {
+  it('should overrides _normalize and _isValid methods', function () {
     let childToOverride = Object.create(explorationPropertyService);
 
-    childToOverride._isValid = function(value) {
+    childToOverride._isValid = function (value) {
       return !!value;
     };
 
-    childToOverride._normalize = function(value) {
+    childToOverride._normalize = function (value) {
       return value;
     };
 
@@ -94,11 +94,11 @@ describe('Exploration Property Service', () => {
     explorationPropertyService.hasChanged();
   });
 
-  it('should not save the displayed value when it\'s empty', function() {
+  it('should not save the displayed value when it\'s empty', function () {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'property_1';
 
-    child._isValid = function(value) {
+    child._isValid = function (value) {
       if (!value) {
         throw new Error('this.displayed should have a valid value.');
       }
@@ -106,7 +106,7 @@ describe('Exploration Property Service', () => {
     };
 
     child.init();
-    expect(function() {
+    expect(function () {
       child.saveDisplayedValue();
     }).toThrowError('this.displayed should have a valid value.');
 
@@ -116,12 +116,12 @@ describe('Exploration Property Service', () => {
     expect(child.hasChanged()).toBe(false);
   });
 
-  it('should save displayed value when is ParamChanges object', function() {
+  it('should save displayed value when is ParamChanges object', function () {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
-    child._normalize = function(paramChanges) {
+    child._normalize = function (paramChanges) {
       // Changing paramChanges so hasChanged() turns to be true on line 87.
-      paramChanges.forEach(function(paramChange) {
+      paramChanges.forEach(function (paramChange) {
         paramChange.resetCustomizationArgs();
       });
       return paramChanges;
@@ -152,10 +152,10 @@ describe('Exploration Property Service', () => {
     expect(child.hasChanged()).toBe(false);
   });
 
-  it('should save displayed value when is ParamSpecs object', function() {
+  it('should save displayed value when is ParamSpecs object', function () {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'param_specs';
-    child._normalize = function(paramSpecs) {
+    child._normalize = function (paramSpecs) {
       // Changing paramSpecs so hasChanged() turns to be true on line 87.
       let paramSpec = paramSpecObjectFactory.createDefault();
       paramSpecs.addParamIfNew('z', paramSpec);

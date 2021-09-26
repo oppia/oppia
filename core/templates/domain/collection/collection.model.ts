@@ -60,7 +60,7 @@ export class Collection {
   nodes: CollectionNode[];
   explorationIdToNodeIndexMap: ExplorationIdToNodeIndexMap = {};
 
-  constructor(
+  constructor (
       id: string | null, title: string | null, objective: string | null,
       languageCode: string | null, tags: string[] | null,
       playthrough: CollectionPlaythrough, category: string | null,
@@ -87,7 +87,7 @@ export class Collection {
     }
   }
 
-  static create(collectionBackendObject: CollectionBackendDict): Collection {
+  static create (collectionBackendObject: CollectionBackendDict): Collection {
     let collectionNodes = collectionBackendObject.nodes.map(
       node => CollectionNode.create(node));
     let collectionPlaythrough = (
@@ -109,66 +109,66 @@ export class Collection {
 
   // Create a new, empty collection. This is not guaranteed to pass validation
   // tests.
-  static createEmptyCollection(): Collection {
+  static createEmptyCollection (): Collection {
     let emptyCollectionPlaythrough = CollectionPlaythrough.create(null, []);
     return new Collection(
       null, null, null, null, null, emptyCollectionPlaythrough,
       null, null, null, []);
   }
 
-  getId(): string | null {
+  getId (): string | null {
     return this.id;
   }
 
-  getTitle(): string | null {
+  getTitle (): string | null {
     return this.title;
   }
 
-  setTitle(title: string | null): void {
+  setTitle (title: string | null): void {
     this.title = title;
   }
 
-  getCategory(): string | null {
+  getCategory (): string | null {
     return this.category;
   }
 
-  getSchemaVersion(): number | null {
+  getSchemaVersion (): number | null {
     return this.schemaVersion;
   }
 
-  getPlaythrough(): CollectionPlaythrough {
+  getPlaythrough (): CollectionPlaythrough {
     return this.playthrough;
   }
 
-  setCategory(category: string | null): void {
+  setCategory (category: string | null): void {
     this.category = category;
   }
 
-  getObjective(): string | null {
+  getObjective (): string | null {
     return this.objective;
   }
 
-  setObjective(objective: string | null): void {
+  setObjective (objective: string | null): void {
     this.objective = objective;
   }
 
-  getLanguageCode(): string | null {
+  getLanguageCode (): string | null {
     return this.languageCode;
   }
 
-  setLanguageCode(languageCode: string | null): void {
+  setLanguageCode (languageCode: string | null): void {
     this.languageCode = languageCode;
   }
 
-  getTags(): string[] | null {
+  getTags (): string[] | null {
     return this.tags;
   }
 
-  setTags(tags: string[] | null): void {
+  setTags (tags: string[] | null): void {
     this.tags = tags;
   }
 
-  getVersion(): number | null {
+  getVersion (): number | null {
     return this.version;
   }
 
@@ -177,7 +177,7 @@ export class Collection {
   // given collection node references an exploration ID already referenced by
   // another node within this collection. Changes to the provided object will
   // be reflected in this collection.
-  addCollectionNode(collectionNodeObject: CollectionNode): boolean {
+  addCollectionNode (collectionNodeObject: CollectionNode): boolean {
     var explorationId = collectionNodeObject.getExplorationId();
     if (!this.explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
       this.explorationIdToNodeIndexMap[explorationId] = this.nodes.length;
@@ -189,7 +189,7 @@ export class Collection {
 
   // This will swap 2 nodes of the collection and update the exploration id
   // to node index map accordingly.
-  swapCollectionNodes(firstIndex: number, secondIndex: number): boolean {
+  swapCollectionNodes (firstIndex: number, secondIndex: number): boolean {
     if (firstIndex >= this.nodes.length ||
         secondIndex >= this.nodes.length ||
         firstIndex < 0 ||
@@ -212,7 +212,7 @@ export class Collection {
   // specified exploration ID. Returns whether the collection node was
   // removed, which depends on whether any collection nodes reference the
   // given exploration ID.
-  deleteCollectionNode(explorationId: string): boolean {
+  deleteCollectionNode (explorationId: string): boolean {
     // TODO(bhenning): Consider whether the removed collection node should be
     // invalidated, leading to errors if its mutated in the future. This might
     // help prevent bugs where collection nodes are stored and changed after
@@ -234,7 +234,7 @@ export class Collection {
   }
 
   // Deletes all collection nodes within this collection.
-  clearCollectionNodes(): void {
+  clearCollectionNodes (): void {
     // Clears the existing array in-place, since there may be Angular bindings
     // to this array and they can't be reset to empty arrays.See for context:
     // http://stackoverflow.com/a/1232046
@@ -244,25 +244,25 @@ export class Collection {
 
   // Returns whether any collection nodes in this collection reference the
   // provided exploration ID.
-  containsCollectionNode(explorationId: string): boolean {
+  containsCollectionNode (explorationId: string): boolean {
     return this.explorationIdToNodeIndexMap.hasOwnProperty(explorationId);
   }
 
   // Returns a collection node given an exploration ID, or undefined if no
   // collection node within this collection references the provided
   // exploration ID.
-  getCollectionNodeByExplorationId(expId: string): CollectionNode {
+  getCollectionNodeByExplorationId (expId: string): CollectionNode {
     return this.nodes[this.explorationIdToNodeIndexMap[expId]];
   }
 
   // Returns a list of collection node objects for this collection. Changes to
   // nodes returned by this function will be reflected in the collection.
   // Changes to the list itself will not be reflected in this collection.
-  getCollectionNodes(): CollectionNode[] {
+  getCollectionNodes (): CollectionNode[] {
     return this.nodes.slice();
   }
 
-  getCollectionNodeCount(): number {
+  getCollectionNodeCount (): number {
     return this.nodes.length;
   }
 
@@ -272,13 +272,13 @@ export class Collection {
   // also be aware this exposes internal state of the collection domain
   // object, so changes to the array itself may internally break the domain
   // object.
-  getBindableCollectionNodes(): CollectionNode[] {
+  getBindableCollectionNodes (): CollectionNode[] {
     return this.nodes;
   }
 
   // Returns the collection node which is initially available to play
   // by the player.
-  getStartingCollectionNode(): CollectionNode | null {
+  getStartingCollectionNode (): CollectionNode | null {
     if (this.nodes.length === 0) {
       return null;
     } else {
@@ -288,7 +288,7 @@ export class Collection {
 
   // Returns a list of all exploration IDs referenced by this collection.
   // Changes to the list itself will not be reflected in this collection.
-  getExplorationIds(): string[] {
+  getExplorationIds (): string[] {
     return cloneDeep(Object.keys(this.explorationIdToNodeIndexMap));
   }
 
@@ -297,7 +297,7 @@ export class Collection {
   // internal, bindable objects are changed within this collection. Note that
   // the collection nodes within this collection will be completely redefined
   // as copies from the specified collection.
-  copyFromCollection(otherCollection: Collection): void {
+  copyFromCollection (otherCollection: Collection): void {
     this.id = otherCollection.getId();
     this.setTitle(otherCollection.getTitle());
     this.setCategory(otherCollection.getCategory());

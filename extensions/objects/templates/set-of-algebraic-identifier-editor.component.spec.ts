@@ -22,7 +22,7 @@ import { SetOfAlgebraicIdentifierEditorComponent } from './set-of-algebraic-iden
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('SetOfAlgebraicIdentifier', function() {
+describe('SetOfAlgebraicIdentifier', function () {
   let component: SetOfAlgebraicIdentifierEditorComponent;
 
   beforeEach(waitForAsync(() => {

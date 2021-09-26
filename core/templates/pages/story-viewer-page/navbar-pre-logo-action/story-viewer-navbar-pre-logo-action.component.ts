@@ -35,14 +35,14 @@ implements OnInit, OnDestroy {
   topicUrlFragment: string;
   classroomUrlFragment: string;
   storyUrlFragment: string;
-  constructor(
+  constructor (
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
 
   directiveSubscriptions = new Subscription();
-  getTopicUrl(): string {
+  getTopicUrl (): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
         topic_url_fragment: this.topicUrlFragment,
@@ -51,7 +51,7 @@ implements OnInit, OnDestroy {
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
@@ -65,7 +65,7 @@ implements OnInit, OnDestroy {
         this.topicName = storyDataObject.topicName;
       });
   }
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     return this.directiveSubscriptions.unsubscribe();
   }
 }

@@ -88,9 +88,9 @@ const DIVISION_SYMBOL_DICT = {
 export class GuppyConfigurationService {
   static serviceIsInitialized = false;
 
-  constructor() {}
+  constructor () {}
 
-  init(): void {
+  init (): void {
     if (GuppyConfigurationService.serviceIsInitialized) {
       return;
     }
@@ -109,7 +109,7 @@ export class GuppyConfigurationService {
     GuppyConfigurationService.serviceIsInitialized = true;
   }
 
-  changeDivSymbol(useFraction: boolean = false): void {
+  changeDivSymbol (useFraction: boolean = false): void {
     Guppy.add_global_symbol(
       '/', useFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
     );

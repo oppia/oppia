@@ -53,7 +53,7 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
     'StateInteractionIdService', 'StateTopAnswersStatsService',
     'INTERACTION_SPECS',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
-    function(
+    function (
         $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         ImprovementsService, StateEditorService,
@@ -62,39 +62,39 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
         SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
       var ctrl = this;
 
-      var isStateRequiredToBeResolved = function(stateName) {
+      var isStateRequiredToBeResolved = function (stateName) {
         return ImprovementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(
             ExplorationStatesService.getState(stateName));
       };
 
-      $scope.isUnresolvedAnswersOverviewShown = function() {
+      $scope.isUnresolvedAnswersOverviewShown = function () {
         var activeStateName = StateEditorService.getActiveStateName();
         return StateTopAnswersStatsService.hasStateStats(activeStateName) &&
           isStateRequiredToBeResolved(activeStateName);
       };
 
-      $scope.getCurrentInteractionId = function() {
+      $scope.getCurrentInteractionId = function () {
         return StateInteractionIdService.savedMemento;
       };
 
-      $scope.isCurrentInteractionLinear = function() {
+      $scope.isCurrentInteractionLinear = function () {
         var interactionId = $scope.getCurrentInteractionId();
         return interactionId && INTERACTION_SPECS[interactionId].is_linear;
       };
 
-      $scope.isCurrentInteractionTrainable = function() {
+      $scope.isCurrentInteractionTrainable = function () {
         var interactionId = $scope.getCurrentInteractionId();
         return (
           interactionId &&
           INTERACTION_SPECS[interactionId].is_trainable);
       };
 
-      $scope.isEditableOutsideTutorialMode = function() {
+      $scope.isEditableOutsideTutorialMode = function () {
         return EditabilityService.isEditableOutsideTutorialMode();
       };
 
-      $scope.openTeachOppiaModal = function() {
+      $scope.openTeachOppiaModal = function () {
         ExternalSaveService.onExternalSave.emit();
 
         $uibModal.open({
@@ -103,18 +103,18 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
             'modal-templates/teach-oppia-modal.template.html'),
           backdrop: 'static',
           controller: 'TeachOppiaModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function () {}, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      $scope.getUnresolvedStateStats = function() {
+      $scope.getUnresolvedStateStats = function () {
         return StateTopAnswersStatsService.getUnresolvedStateStats(
           StateEditorService.getActiveStateName());
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.unresolvedAnswersOverviewIsShown = false;
         $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
           SHOW_TRAINABLE_UNRESOLVED_ANSWERS);

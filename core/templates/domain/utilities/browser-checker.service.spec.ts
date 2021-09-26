@@ -21,7 +21,7 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-describe('Browser Checker Service', function() {
+describe('Browser Checker Service', function () {
   let bcs: BrowserCheckerService, wrs: WindowRef;
 
   let mockUserAgent: (ua: string) => void;

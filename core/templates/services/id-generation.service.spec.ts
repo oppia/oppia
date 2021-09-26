@@ -36,7 +36,7 @@ describe('IdGenerationService', () => {
   });
 
   it('should generate id with 10 digits when random string has length' +
-    ' greater than or equal to 10', function() {
+    ' greater than or equal to 10', function () {
     // It returns a number that represents 10 digits string.
     spyOn(Math, 'random').and.returnValue(0.5023019837490587);
     var generatedId = idGenerationService.generateNewId();
@@ -44,7 +44,7 @@ describe('IdGenerationService', () => {
   });
 
   it('should generate id with 10 digits when random string has length' +
-    ' less than 10', function() {
+    ' less than 10', function () {
     // It returns a number that represents 9 digits string.
     spyOn(Math, 'random').and.returnValue(0.25275092369714336);
     var generatedId = idGenerationService.generateNewId();

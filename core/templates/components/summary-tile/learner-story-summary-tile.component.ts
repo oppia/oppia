@@ -45,13 +45,13 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   thumbnailBgColor: string;
   starImageUrl: string = '';
 
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlService: UrlService,
   ) {}
 
-  getStoryLink(): string {
+  getStoryLink (): string {
     if (!this.storySummary.getClassroomUrlFragment() ||
       !this.storySummary.getTopicUrlFragment()) {
       return '#';
@@ -86,7 +86,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.nodeCount = this.storySummary.getNodeTitles().length;
     this.completedNodeCount = this.storySummary.getCompletedNodeTitles().length;
     this.storyProgress = Math.floor(
@@ -116,14 +116,14 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
-  isDisplayAreaHome(): boolean {
+  isDisplayAreaHome (): boolean {
     if (this.displayArea === 'homeTab') {
       return true;
     }
     return false;
   }
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }

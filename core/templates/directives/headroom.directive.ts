@@ -36,7 +36,7 @@ export class HeadroomDirective implements OnDestroy {
   @Input() scroller?: ElementRef;
   headroom: Headroom;
 
-  constructor(
+  constructor (
     private el: ElementRef
   ) {
     let headroomOptions: Headroom.HeadroomOptions = {
@@ -51,7 +51,7 @@ export class HeadroomDirective implements OnDestroy {
     this.headroom.init();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.headroom.destroy();
   }
 }

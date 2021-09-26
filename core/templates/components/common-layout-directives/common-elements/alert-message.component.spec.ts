@@ -27,7 +27,7 @@ describe('Alert Message Component', () => {
   let numOfCalls: number = 0;
 
   class MockToastrService {
-    info(content: string, title: string, conf: object): object {
+    info (content: string, title: string, conf: object): object {
       return {
         onHidden: {
           toPromise: () => {
@@ -41,7 +41,7 @@ describe('Alert Message Component', () => {
       };
     }
 
-    success(content: string, title: string, conf: object): object {
+    success (content: string, title: string, conf: object): object {
       return {
         onHidden: {
           toPromise: () => {
@@ -57,7 +57,7 @@ describe('Alert Message Component', () => {
   }
 
   class MockAlertsService {
-    deleteMessage(messageObject: object): void {
+    deleteMessage (messageObject: object): void {
       numOfCalls++;
     }
   }

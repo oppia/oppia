@@ -26,7 +26,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-describe('Embedding', function() {
+describe('Embedding', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
@@ -36,7 +36,7 @@ describe('Embedding', function() {
   explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
-  var createCountingExploration = async function() {
+  var createCountingExploration = async function () {
     // Intro.
     await explorationEditorMainTab.setStateName('Intro');
     await explorationEditorMainTab.setContent(await forms.toRichText(
@@ -115,11 +115,11 @@ describe('Embedding', function() {
     'responded with a status of 400 ()',
   ];
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display and play embedded explorations', async function() {
+  it('should display and play embedded explorations', async function () {
     var TEST_PAGES = [{
       filename: 'embedding_tests_dev_0.0.1.min.html',
       isVersion1: true
@@ -128,7 +128,7 @@ describe('Embedding', function() {
       isVersion1: false
     }];
 
-    var playCountingExploration = async function(version) {
+    var playCountingExploration = async function (version) {
       // Protractor's waitForAngularEnabled does not work well inside
       // iframes. see: https://github.com/angular/protractor/issues/4678
       // Current, work-around is to use browser.sleep() before executing
@@ -254,11 +254,11 @@ describe('Embedding', function() {
   });
 
   it('should use the exploration language as site language.',
-    async function() {
+    async function () {
       // Opens the test file and checks the placeholder in the exploration is
       // correct.
       var explorationId = null;
-      var checkPlaceholder = async function(expectedPlaceholder) {
+      var checkPlaceholder = async function (expectedPlaceholder) {
         var driver = browser.driver;
         await driver.get(
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +

@@ -32,13 +32,13 @@ import {
   providedIn: 'root'
 })
 export class GraphInputRulesService {
-  constructor(
+  constructor (
     private gus: GraphUtilsService, private utilsService: UtilsService) {}
   /**
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is strongly connected.
    */
-  private isStronglyConnected(graph: GraphAnswer): boolean {
+  private isStronglyConnected (graph: GraphAnswer): boolean {
     // Uses depth first search on each vertex to try and visit every other
     // vertex in both the normal and inverted adjacency lists.
     if (graph.vertices.length === 0) {
@@ -50,21 +50,21 @@ export class GraphInputRulesService {
     var invertedAdjacencyLists = this.gus.constructAdjacencyLists(
       graph, this.gus.GRAPH_ADJACENCY_MODE.INVERTED);
 
-    var isVisited = graph.vertices.map(function() {
+    var isVisited = graph.vertices.map(function () {
       return false;
     });
     this.gus.markAccessible(0, adjacencyLists, isVisited);
-    var isAnyVertexUnreachable = isVisited.some(function(visited) {
+    var isAnyVertexUnreachable = isVisited.some(function (visited) {
       return visited === false;
     });
 
-    var isVisitedInReverse = graph.vertices.map(function() {
+    var isVisitedInReverse = graph.vertices.map(function () {
       return false;
     });
     this.gus.markAccessible(
       0, invertedAdjacencyLists, isVisitedInReverse);
     var isAnyVertexUnreachableInReverse =
-      isVisitedInReverse.some(function(visited) {
+      isVisitedInReverse.some(function (visited) {
         return visited === false;
       });
 
@@ -75,7 +75,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is weakly connected.
    */
-  private isWeaklyConnected(graph: GraphAnswer): boolean {
+  private isWeaklyConnected (graph: GraphAnswer): boolean {
     // Generates adjacency lists assuming graph is undirected, then uses depth
     // first search on node 0 to try to reach every other vertex.
     if (graph.vertices.length === 0) {
@@ -84,11 +84,11 @@ export class GraphInputRulesService {
 
     var adjacencyLists = this.gus.constructAdjacencyLists(
       graph, this.gus.GRAPH_ADJACENCY_MODE.UNDIRECTED);
-    var isVisited = graph.vertices.map(function() {
+    var isVisited = graph.vertices.map(function () {
       return false;
     });
     this.gus.markAccessible(0, adjacencyLists, isVisited);
-    return isVisited.every(function(visited) {
+    return isVisited.every(function (visited) {
       return visited === true;
     });
   }
@@ -97,7 +97,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
-  private isAcyclic(graph: GraphAnswer): boolean {
+  private isAcyclic (graph: GraphAnswer): boolean {
     // Uses depth first search to ensure that we never have an edge to an
     // ancestor in the search tree.
     var nodeStatus = graph.vertices.map(() => {
@@ -122,7 +122,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
-  private isRegular(graph: GraphAnswer): boolean {
+  private isRegular (graph: GraphAnswer): boolean {
     // Checks that every vertex has outdegree and indegree equal to the first.
     if (graph.vertices.length === 0) {
       return true;
@@ -130,28 +130,28 @@ export class GraphInputRulesService {
 
     var adjacencyLists = this.gus.constructAdjacencyLists(
       graph, this.gus.GRAPH_ADJACENCY_MODE.DIRECTED);
-    var outdegreeCounts = adjacencyLists.map(function(list) {
+    var outdegreeCounts = adjacencyLists.map(function (list) {
       return list.length;
     });
-    var indegreeCounts = adjacencyLists.map(function() {
+    var indegreeCounts = adjacencyLists.map(function () {
       return 0;
     });
-    adjacencyLists.forEach(function(list) {
-      list.forEach(function(destination) {
+    adjacencyLists.forEach(function (list) {
+      list.forEach(function (destination) {
         indegreeCounts[destination]++;
       });
     });
 
-    var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
+    var areIndegreeCountsEqual = indegreeCounts.every(function (indegree) {
       return indegree === indegreeCounts[0];
     });
-    var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
+    var areOutdegreeCountsEqual = outdegreeCounts.every(function (outdegree) {
       return outdegree === outdegreeCounts[0];
     });
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
 
-  private _getDegreesOfMatrix(adj: AdjacencyMatrix): number[] {
+  private _getDegreesOfMatrix (adj: AdjacencyMatrix): number[] {
     return <number[]> adj.map((value) => {
       return value.reduce((prev, cur) => {
         prev = (prev === null) ? 0 : prev;
@@ -161,7 +161,7 @@ export class GraphInputRulesService {
     }).sort();
   }
 
-  private isIsomorphic(graph1: GraphAnswer, graph2: GraphAnswer): boolean {
+  private isIsomorphic (graph1: GraphAnswer, graph2: GraphAnswer): boolean {
     if (graph1.vertices.length !== graph2.vertices.length) {
       return false;
     }
@@ -202,7 +202,7 @@ export class GraphInputRulesService {
     return false;
   }
 
-  HasGraphProperty(
+  HasGraphProperty (
       answer: GraphAnswer,
       inputs: GraphPropertyRuleInputs): boolean {
     if (inputs.p === 'strongly_connected') {
@@ -218,7 +218,7 @@ export class GraphInputRulesService {
     }
   }
 
-  IsIsomorphicTo(
+  IsIsomorphicTo (
       answer: GraphAnswer,
       inputs: GraphIsomorphicRuleInputs): boolean {
     return this.isIsomorphic(answer, inputs.g);

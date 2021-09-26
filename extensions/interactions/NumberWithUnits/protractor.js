@@ -17,18 +17,18 @@
  * Interaction.
  */
 
-var customizeInteraction = function() {
+var customizeInteraction = function () {
   // There are no customizations.
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
+var expectInteractionDetailsToMatch = async function (elem) {
   expect(
     await elem.element(by.tagName(
       'oppia-interactive-number-with-units')).isPresent()
   ).toBe(true);
 };
 
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   await elem.element(by.tagName('oppia-interactive-number-with-units')).
     element(by.tagName('input')).sendKeys(answer + '\n');
 };

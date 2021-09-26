@@ -311,11 +311,11 @@ describe('ImageEditor', () => {
   };
 
   class MockImageUploadHelperService {
-    convertImageDataToImageFile(dataURI) {
+    convertImageDataToImageFile (dataURI) {
       return dataURI;
     }
 
-    generateImageFilename(
+    generateImageFilename (
         height: number, width: number, extension: string): string {
       return 'img_' + '12345' + '_height_' + height + '_width_' + width +
       '.' + extension;
@@ -325,12 +325,12 @@ describe('ImageEditor', () => {
   class MockReaderObject {
     onload = null;
     result = null;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL (file) {
       this.onload();
       return 'The file is loaded';
     }
@@ -339,15 +339,15 @@ describe('ImageEditor', () => {
   class MockImageObject {
     source = null;
     onload = null;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url) {
+    set src (url) {
       this.onload();
     }
-    addEventListener(txt, func, bool) {
+    addEventListener (txt, func, bool) {
       func();
     }
   }
@@ -2123,7 +2123,7 @@ describe('ImageEditor', () => {
     });
     spyOn(component, 'saveImage').and.callThrough();
     spyOn(component, 'validateProcessedFilesize').and.stub();
-    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
@@ -2223,7 +2223,7 @@ describe('ImageEditor', () => {
     spyOn(component, 'validateProcessedFilesize').and.stub();
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
     // This throws an error "Type '{ lastModified: number; name:

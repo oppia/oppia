@@ -19,28 +19,28 @@ import { BrowserCheckerService } from 'domain/utilities/browser-checker.service'
  * @fileoverview Unit tests for the ItemSelectionInput interaction.
  */
 
-describe('oppiaInteractiveItemSelectionInput', function() {
+describe('oppiaInteractiveItemSelectionInput', function () {
   let ctrl = null;
   let browserCheckerService: BrowserCheckerService = null;
   let currentInteractionService = null;
 
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    onSubmit: function (answer, rulesService) {},
+    registerCurrentInteraction: function (submitAnswerFn, isAnswerValid) {
       submitAnswerFn();
       isAnswerValid();
     }
   };
   let mockItemSelectionInputRulesService = {};
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function (interactionId, attrs) {
       return attrs;
     }
   };
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'CurrentInteractionService', mockCurrentInteractionService);
     $provide.value(
@@ -52,7 +52,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   }));
 
   describe('when only one choice is allowed to be selected', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('$attrs', {
         choices: [
           {
@@ -72,7 +72,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         minAllowableSelectionCount: 1
       });
     }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       browserCheckerService = $injector.get('BrowserCheckerService');
       currentInteractionService = $injector.get('CurrentInteractionService');
       ctrl = $componentController('oppiaInteractiveItemSelectionInput');
@@ -158,7 +158,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   });
 
   describe('when multiple choices are allowed to be selected', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       $provide.value('$attrs', {
         choices: [
           {
@@ -178,7 +178,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         minAllowableSelectionCount: 1
       });
     }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(function ($injector, $componentController) {
       ctrl = $componentController('oppiaInteractiveItemSelectionInput');
       ctrl.$onInit();
     }));

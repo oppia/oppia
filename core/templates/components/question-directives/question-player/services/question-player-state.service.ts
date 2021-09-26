@@ -20,14 +20,14 @@
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('QuestionPlayerStateService', [
-  function() {
+  function () {
     var questionPlayerState = {};
     var _quesionSessionCompletedEventEmitter = new EventEmitter();
-    var getCurrentTime = function() {
+    var getCurrentTime = function () {
       return new Date().getTime();
     };
 
-    var createNewQuestionPlayerState = function(
+    var createNewQuestionPlayerState = function (
         questionId, linkedSkillIds) {
       questionPlayerState[questionId] = {
         linkedSkillIds: linkedSkillIds,
@@ -36,7 +36,7 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
       };
     };
 
-    var _hintUsed = function(question) {
+    var _hintUsed = function (question) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
         createNewQuestionPlayerState(
@@ -47,7 +47,7 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
         {timestamp: getCurrentTime()});
     };
 
-    var _solutionViewed = function(question) {
+    var _solutionViewed = function (question) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
         createNewQuestionPlayerState(
@@ -58,7 +58,7 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
         timestamp: getCurrentTime()};
     };
 
-    var _answerSubmitted = function(
+    var _answerSubmitted = function (
         question, isCorrect, taggedSkillMisconceptionId) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
@@ -80,20 +80,20 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
 
 
     return {
-      hintUsed: function(question) {
+      hintUsed: function (question) {
         _hintUsed(question);
       },
-      solutionViewed: function(question) {
+      solutionViewed: function (question) {
         _solutionViewed(question);
       },
-      answerSubmitted: function(
+      answerSubmitted: function (
           question, isCorrect, taggedSkillMisconceptionId) {
         _answerSubmitted(question, isCorrect, taggedSkillMisconceptionId);
       },
-      getQuestionPlayerStateData: function() {
+      getQuestionPlayerStateData: function () {
         return questionPlayerState;
       },
-      get onQuestionSessionCompleted() {
+      get onQuestionSessionCompleted () {
         return _quesionSessionCompletedEventEmitter;
       }
     };

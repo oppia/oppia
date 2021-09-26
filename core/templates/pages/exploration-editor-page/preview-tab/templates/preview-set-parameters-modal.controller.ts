@@ -22,7 +22,7 @@ require(
 
 angular.module('oppia').controller('PreviewSetParametersModalController', [
   '$controller', '$scope', '$uibModalInstance', 'manualParamChanges',
-  function($controller, $scope, $uibModalInstance, manualParamChanges) {
+  function ($controller, $scope, $uibModalInstance, manualParamChanges) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

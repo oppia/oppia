@@ -32,10 +32,10 @@ describe('MusicPhrasePlayerService', () => {
       // functions given below for testing.
       // @ts-expect-error
       Player: {
-        stop: function() {}
+        stop: function () {}
       },
-      chordOn: function() {},
-      chordOff: function() {}
+      chordOn: function () {},
+      chordOff: function () {}
     };
   });
 

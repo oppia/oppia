@@ -31,11 +31,11 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() outcome!: Outcome;
   OUTCOME_FEEDBACK_SCHEMA!: object;
-  constructor(
+  constructor (
     private readonly changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.OUTCOME_FEEDBACK_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -45,14 +45,14 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     };
   }
 
-  updateHtml(newHtmlString: string): void {
+  updateHtml (newHtmlString: string): void {
     if (newHtmlString !== this.outcome.feedback.html) {
       this.outcome.feedback.html = newHtmlString;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  getSchema(): object {
+  getSchema (): object {
     return this.OUTCOME_FEEDBACK_SCHEMA;
   }
 }

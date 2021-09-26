@@ -51,7 +51,7 @@ angular.module('oppia').component('feedbackTab', {
     'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UserService',
-    function(
+    function (
         $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
         FocusManagerService, LoaderService,
@@ -60,19 +60,19 @@ angular.module('oppia').component('feedbackTab', {
         UserService) {
       var ctrl = this;
 
-      var _resetTmpMessageFields = function() {
+      var _resetTmpMessageFields = function () {
         ctrl.tmpMessage.status =
           ctrl.activeThread && ctrl.activeThread.status;
         ctrl.tmpMessage.text = '';
       };
 
-      ctrl.clearActiveThread = function() {
+      ctrl.clearActiveThread = function () {
         ctrl.activeThread = null;
         _resetTmpMessageFields();
       };
 
       // Fetches the threads again if any thread is updated.
-      ctrl.fetchUpdatedThreads = function() {
+      ctrl.fetchUpdatedThreads = function () {
         let activeThreadId =
           ctrl.activeThread && ctrl.activeThread.threadId;
         return ThreadDataBackendApiService.getThreadsAsync().then(data => {
@@ -87,14 +87,14 @@ angular.module('oppia').component('feedbackTab', {
         });
       };
 
-      ctrl.onBackButtonClicked = function() {
+      ctrl.onBackButtonClicked = function () {
         ctrl.clearActiveThread();
         if (ctrl.threadIsStale) {
           ctrl.fetchUpdatedThreads();
         }
       };
 
-      ctrl.showCreateThreadModal = function() {
+      ctrl.showCreateThreadModal = function () {
         return $uibModal.open({
           template: require(
             'pages/exploration-editor-page/feedback-tab/templates/' +
@@ -157,7 +157,7 @@ angular.module('oppia').component('feedbackTab', {
         );
       };
 
-      ctrl.addNewMessage = function(threadId, tmpText, tmpStatus) {
+      ctrl.addNewMessage = function (threadId, tmpText, tmpStatus) {
         if (threadId === null) {
           AlertsService.addWarning(
             'Cannot add message to thread with ID: null.');
@@ -187,7 +187,7 @@ angular.module('oppia').component('feedbackTab', {
         });
       };
 
-      ctrl.setActiveThread = function(threadId) {
+      ctrl.setActiveThread = function (threadId) {
         let thread = ThreadDataBackendApiService.getThread(threadId);
         if (thread === null) {
           throw new Error('Trying to display a non-existent thread');
@@ -201,24 +201,24 @@ angular.module('oppia').component('feedbackTab', {
         });
       };
 
-      ctrl.getLabelClass = function(status) {
+      ctrl.getLabelClass = function (status) {
         return ThreadStatusDisplayService.getLabelClass(status);
       };
 
-      ctrl.getHumanReadableStatus = function(status) {
+      ctrl.getHumanReadableStatus = function (status) {
         return ThreadStatusDisplayService.getHumanReadableStatus(status);
       };
 
-      ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+      ctrl.getLocaleAbbreviatedDatetimeString = function (millisSinceEpoch) {
         return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
           millisSinceEpoch);
       };
 
-      ctrl.isExplorationEditable = function() {
+      ctrl.isExplorationEditable = function () {
         return EditabilityService.isEditable();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
         ctrl.activeThread = null;
         ctrl.userIsLoggedIn = null;

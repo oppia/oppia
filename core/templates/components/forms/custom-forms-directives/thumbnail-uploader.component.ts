@@ -66,7 +66,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   parsedResponse;
   encodedImageURI: string;
 
-  constructor(
+  constructor (
     private imageUploadHelperService: ImageUploadHelperService,
     private alertsService: AlertsService,
     private contextService: ContextService,
@@ -80,7 +80,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       '/icons/story-image-icon.png'));
   thumbnailIsLoading = true;
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.filename !== null &&
         this.filename !== undefined &&
         this.filename !== '') {
@@ -103,7 +103,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   // 1. Initial render of the page containing this directive.
   // 2. When a thumbnail is uploaded.
   // 3. When a saved draft is discarded.
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges (changes: SimpleChanges): void {
     if (
       changes.filename &&
       changes.filename.currentValue !== changes.filename.previousValue) {
@@ -113,7 +113,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     }
   }
 
-  filenameChanges(newFilename: string, prevFilename: string): void {
+  filenameChanges (newFilename: string, prevFilename: string): void {
     if (newFilename) {
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
@@ -127,13 +127,13 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     this.hidePlaceholder = false;
   }
 
-  saveThumbnailBgColor(newBgColor: string): void {
+  saveThumbnailBgColor (newBgColor: string): void {
     if (newBgColor !== this.bgColor) {
       this.updateBgColor.emit(newBgColor);
     }
   }
 
-  saveThumbnailImageData(imageURI: string, callback: () => void): void {
+  saveThumbnailImageData (imageURI: string, callback: () => void): void {
     this.resampledFile = null;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
@@ -146,7 +146,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     this.postImageToServer(this.resampledFile, callback);
   }
 
-  postImageToServer(resampledFile: Blob, callback: () => void): void {
+  postImageToServer (resampledFile: Blob, callback: () => void): void {
     let entityType = this.contextService.getEntityType();
     let entityId = this.contextService.getEntityId();
     const result = this.assetsBackendApiService.postThumbnailFile(
@@ -161,7 +161,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     });
   }
 
-  showEditThumbnailModal(): void {
+  showEditThumbnailModal (): void {
     if (this.disabled) {
       return;
     }

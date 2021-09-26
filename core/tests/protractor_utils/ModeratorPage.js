@@ -20,15 +20,15 @@
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var ModeratorPage = function() {
+var ModeratorPage = function () {
   var moderatorPage = element(by.css('.protractor-test-moderator-page'));
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(general.MODERATOR_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectModeratorPageToBeVisible = async function() {
+  this.expectModeratorPageToBeVisible = async function () {
     await waitFor.visibilityOf(
       moderatorPage, 'Moderator page taking too long to appear.');
   };

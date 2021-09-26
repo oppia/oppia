@@ -27,7 +27,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 
-describe('Feedback popup directive', function() {
+describe('Feedback popup directive', function () {
   let $scope = null;
   let ctrl = null;
   let $element: JQLite = null;
@@ -77,7 +77,7 @@ describe('Feedback popup directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function ($injector, $q) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
@@ -100,7 +100,7 @@ describe('Feedback popup directive', function() {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'stateName');
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function () {
       var deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
@@ -114,7 +114,7 @@ describe('Feedback popup directive', function() {
     });
   }));
 
-  it('should set properties when initialized', fakeAsync(function() {
+  it('should set properties when initialized', fakeAsync(function () {
     expect($scope.feedbackText).toBe(undefined);
     expect($scope.isSubmitterAnonymized).toBe(undefined);
     expect($scope.feedbackTitle).toBe(undefined);
@@ -128,7 +128,7 @@ describe('Feedback popup directive', function() {
       'Feedback when the user was at card "stateName"');
   }));
 
-  it('should deactivate mask when popover is closed', function() {
+  it('should deactivate mask when popover is closed', function () {
     $element.wrap('<div uib-popover-template></div>');
     $element.wrap(
       '<div uib-popover-template uib-popover-template-popup></div>');
@@ -143,7 +143,7 @@ describe('Feedback popup directive', function() {
   });
 
   it('should save feedback successfully when ' +
-    'clicking on save button', fakeAsync(function() {
+    'clicking on save button', fakeAsync(function () {
     expect($scope.feedbackSubmitted).toBe(undefined);
 
     $scope.feedbackText = 'feedback';
@@ -168,7 +168,7 @@ describe('Feedback popup directive', function() {
   }));
 
   it('should show error message when there ' +
-    'is no popover child element', function() {
+    'is no popover child element', function () {
     spyOn(backgroundMaskService, 'deactivateMask')
       .and.returnValue(null);
     let loggerSpy = spyOn($log, 'error')

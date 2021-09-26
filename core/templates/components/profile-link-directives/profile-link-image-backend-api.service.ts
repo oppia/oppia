@@ -30,14 +30,14 @@ interface ProfileDict {
   providedIn: 'root'
 })
 export class ProfileLinkImageBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient
   ) {}
   // This function will return a 'null' Promise in the following cases:
   // 1. The user is not logged in
   // 2. The user didn't upload a profile picture
   // 3. The user uses preview mode inside the exploration editor.
-  async fetchProfilePictureDataAsync(profileImageUrl: string):
+  async fetchProfilePictureDataAsync (profileImageUrl: string):
       Promise<string | null> {
     return this.http.get<ProfileDict>(profileImageUrl).pipe(
       // A URL encoded base64 image is treated as unsafe by Angular. This is

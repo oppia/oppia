@@ -36,13 +36,13 @@ require('services/external-save.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateContentEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
-      link: function(scope, element) {
+      link: function (scope, element) {
         // This allows the scope to be retrievable during Karma unit testing.
         // See http://stackoverflow.com/a/29833832 for more details.
-        element[0].getControllerScope = function() {
+        element[0].getControllerScope = function () {
           return scope;
         };
       },
@@ -60,13 +60,13 @@ angular.module('oppia').directive('stateContentEditor', [
         '$scope', 'ContextService', 'EditabilityService',
         'EditorFirstTimeEventsService', 'ExternalSaveService',
         'StateContentService', 'StateEditorService',
-        function(
+        function (
             $scope, ContextService, EditabilityService,
             EditorFirstTimeEventsService, ExternalSaveService,
             StateContentService, StateEditorService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          $scope.isCardHeightLimitReached = function() {
+          $scope.isCardHeightLimitReached = function () {
             var shadowPreviewCard = $(
               '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
             );
@@ -74,24 +74,24 @@ angular.module('oppia').directive('stateContentEditor', [
             return (height > 630);
           };
 
-          $scope.hideCardHeightLimitWarning = function() {
+          $scope.hideCardHeightLimitWarning = function () {
             $scope.cardHeightLimitWarningIsShown = false;
           };
 
-          var saveContent = function() {
+          var saveContent = function () {
             StateContentService.saveDisplayedValue();
             $scope.onSaveStateContent(StateContentService.displayed);
             $scope.contentEditorIsOpen = false;
           };
 
-          $scope.openStateContentEditor = function() {
+          $scope.openStateContentEditor = function () {
             if ($scope.isEditable()) {
               EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
               $scope.contentEditorIsOpen = true;
             }
           };
 
-          $scope.onSaveContentButtonClicked = function() {
+          $scope.onSaveContentButtonClicked = function () {
             EditorFirstTimeEventsService.registerFirstSaveContentEvent();
             var savedContent = StateContentService.savedMemento;
             var contentHasChanged = (
@@ -105,11 +105,11 @@ angular.module('oppia').directive('stateContentEditor', [
             saveContent();
           };
 
-          $scope.cancelEdit = function() {
+          $scope.cancelEdit = function () {
             StateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
           };
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.HTML_SCHEMA = {
               type: 'html',
               ui_config: {
@@ -137,7 +137,7 @@ angular.module('oppia').directive('stateContentEditor', [
             );
             StateEditorService.updateStateContentEditorInitialised();
           };
-          ctrl.$onDestroy = function() {
+          ctrl.$onDestroy = function () {
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

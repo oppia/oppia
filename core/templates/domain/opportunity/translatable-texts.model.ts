@@ -39,12 +39,12 @@ export interface TranslatableTextsBackendDict {
 }
 
 export class TranslatableTexts {
-  constructor(
+  constructor (
       private readonly stateNamesToContentIdMapping:
       StateNamesToContentIdMapping,
       private readonly version: string) {}
 
-  static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
+  static createFromBackendDict (backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {
     const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
     for (let stateName in backendDict.state_names_to_content_id_mapping) {
@@ -64,11 +64,11 @@ export class TranslatableTexts {
     );
   }
 
-  get stateWiseContents(): StateNamesToContentIdMapping {
+  get stateWiseContents (): StateNamesToContentIdMapping {
     return this.stateNamesToContentIdMapping;
   }
 
-  get explorationVersion(): string {
+  get explorationVersion (): string {
     return this.version;
   }
 }

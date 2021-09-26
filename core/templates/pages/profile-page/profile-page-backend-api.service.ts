@@ -32,13 +32,13 @@ import { UserProfile, UserProfileBackendDict } from
   providedIn: 'root'
 })
 export class ProfilePageBackendApiService {
-  constructor(
+  constructor (
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
     private urlService: UrlService
   ) {}
 
-  async _postSubscribeAsync(creatorUsername: string): Promise<void> {
+  async _postSubscribeAsync (creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_SUBSCRIBE_URL,
       { creator_username: creatorUsername }
@@ -48,7 +48,7 @@ export class ProfilePageBackendApiService {
     });
   }
 
-  async _postUnsubscribeAsync(creatorUsername: string): Promise<void> {
+  async _postUnsubscribeAsync (creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_UNSUBSCRIBE_URL,
       { creator_username: creatorUsername }
@@ -57,7 +57,7 @@ export class ProfilePageBackendApiService {
     });
   }
 
-  async _fetchProfileDataAsync(): Promise<UserProfile> {
+  async _fetchProfileDataAsync (): Promise<UserProfile> {
     return this.http.get<UserProfileBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ProfilePageDomainConstants.PROFILE_DATA_URL,
@@ -74,7 +74,7 @@ export class ProfilePageBackendApiService {
    * Subscribes to a profile for the given username.
    * @param {String} creatorUsername - username of profile to be subscribed.
    */
-  async subscribeAsync(creatorUsername: string): Promise<void> {
+  async subscribeAsync (creatorUsername: string): Promise<void> {
     return this._postSubscribeAsync(creatorUsername);
   }
 
@@ -82,14 +82,14 @@ export class ProfilePageBackendApiService {
    * Unsubscribes from a profile for the given username.
    * @param {String} creatorUsername - username of profile to be unsubscribed.
    */
-  async unsubscribeAsync(creatorUsername: string): Promise<void> {
+  async unsubscribeAsync (creatorUsername: string): Promise<void> {
     return this._postUnsubscribeAsync(creatorUsername);
   }
 
   /**
    * Fetches the profile for username in URL.
    */
-  async fetchProfileDataAsync(): Promise<UserProfile> {
+  async fetchProfileDataAsync (): Promise<UserProfile> {
     return this._fetchProfileDataAsync();
   }
 }

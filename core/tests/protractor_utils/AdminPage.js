@@ -23,7 +23,7 @@ var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = function() {
+var AdminPage = function () {
   var ADMIN_URL_SUFFIX = '/admin';
 
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
@@ -80,15 +80,15 @@ var AdminPage = function() {
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
   if (general.isInDevMode()) {
-    var getExplorationTitleElement = function(explorationElement) {
+    var getExplorationTitleElement = function (explorationElement) {
       return explorationElement.element(explorationTitleLocator);
     };
 
-    var getExplorationElementReloadButton = function(explorationElement) {
+    var getExplorationElementReloadButton = function (explorationElement) {
       return explorationElement.element(explorationButtonLocator);
     };
 
-    this.reloadCollection = async function(collectionId) {
+    this.reloadCollection = async function (collectionId) {
       await this.get();
       var reloadCollectionButton = reloadCollectionButtons.get(collectionId);
       await action.click('Reload Collection Buttons', reloadCollectionButton);
@@ -102,9 +102,9 @@ var AdminPage = function() {
 
     // The name should be as given in the admin page (including '.yaml' if
     // necessary).
-    this.reloadExploration = async function(name) {
+    this.reloadExploration = async function (name) {
       await this.get();
-      explorationElements.map(async function(explorationElement) {
+      explorationElements.map(async function (explorationElement) {
         await waitFor.visibilityOf(
           getExplorationTitleElement(
             explorationElement,
@@ -130,7 +130,7 @@ var AdminPage = function() {
     };
   }
 
-  var _switchToRolesTab = async function() {
+  var _switchToRolesTab = async function () {
     await action.click('Admin roles tab button', adminRolesTab);
 
     expect(await adminRolesTab.getAttribute('class')).toMatch('active');
@@ -138,7 +138,7 @@ var AdminPage = function() {
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
-  var saveConfigProperty = async function(
+  var saveConfigProperty = async function (
       configProperty, propertyName, objectType, editingInstructions) {
     await waitFor.visibilityOf(
       configProperty.element(configTitleLocator),
@@ -157,24 +157,24 @@ var AdminPage = function() {
     }
   };
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(ADMIN_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getJobsTab = async function() {
+  this.getJobsTab = async function () {
     await browser.get(ADMIN_URL_SUFFIX + '#/jobs');
     await waitFor.pageToFullyLoad();
   };
 
-  this.getFeaturesTab = async function() {
+  this.getFeaturesTab = async function () {
     await this.get();
     await action.click('Admin features tab', featuresTab);
     await waitFor.visibilityOf(
       featureFlagElements.first(), 'Feature flags not showing up');
   };
 
-  this.getDummyFeatureElement = async function() {
+  this.getDummyFeatureElement = async function () {
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements.get(i);
@@ -187,7 +187,7 @@ var AdminPage = function() {
     return null;
   };
 
-  this.removeAllRulesOfFeature = async function(featureElement) {
+  this.removeAllRulesOfFeature = async function (featureElement) {
     while (!await featureElement.isElementPresent(noRuleIndicatorLocator)) {
       await action.click(
         'Remove feature rule button',
@@ -197,7 +197,7 @@ var AdminPage = function() {
     }
   };
 
-  this.saveChangeOfFeature = async function(featureElement) {
+  this.saveChangeOfFeature = async function (featureElement) {
     await action.click(
       'Save feature button',
       featureElement
@@ -208,7 +208,7 @@ var AdminPage = function() {
     await waitFor.visibilityOf(statusMessage);
   };
 
-  this.enableFeatureForDev = async function(featureElement) {
+  this.enableFeatureForDev = async function (featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 
     await action.click(
@@ -232,7 +232,7 @@ var AdminPage = function() {
     await this.saveChangeOfFeature(featureElement);
   };
 
-  this.editConfigProperty = async function(
+  this.editConfigProperty = async function (
       propertyName, objectType, editingInstructions) {
     await this.get();
     await action.click('Config Tab', configTab);
@@ -254,7 +254,7 @@ var AdminPage = function() {
     }
   };
 
-  this._editUserRole = async function(username) {
+  this._editUserRole = async function (username) {
     await this.get();
     await _switchToRolesTab();
     await action.sendKeys(
@@ -264,7 +264,7 @@ var AdminPage = function() {
       roleEditorContainer, 'Role editor card takes too long to appear.');
   };
 
-  this.addRole = async function(name, newRole) {
+  this.addRole = async function (name, newRole) {
     await this._editUserRole(name);
 
     await action.click('Add new role', addNewRoleButton);
@@ -279,15 +279,15 @@ var AdminPage = function() {
       removeButtonElement, 'Role removal button takes too long to appear.');
   };
 
-  this.getUsersAsssignedToRole = async function(role) {
+  this.getUsersAsssignedToRole = async function (role) {
     await action.select('Role Drop Down', roleDropdown, 'By Role');
     await action.select('Role Value Option', roleValueOption, role);
     await action.click('View Role Button', viewRoleButton);
   };
 
-  this.expectUserRolesToMatch = async function(name, expectedRoles) {
+  this.expectUserRolesToMatch = async function (name, expectedRoles) {
     await this._editUserRole(name);
-    var userRoles = await userRoleItems.map(async function(userRoleContainer) {
+    var userRoles = await userRoleItems.map(async function (userRoleContainer) {
       return (
         await action.getText('Role container', userRoleContainer)
       ).toLowerCase();
@@ -301,12 +301,12 @@ var AdminPage = function() {
     }
   };
 
-  this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
+  this.expectUsernamesToMatch = async function (expectedUsernamesArray) {
     var foundUsersArray = [];
     if (expectedUsernamesArray.length !== 0) {
       await waitFor.visibilityOf(rolesResultRowsElements.first());
     }
-    var usernames = await rolesResultRowsElements.map(async function(elm) {
+    var usernames = await rolesResultRowsElements.map(async function (elm) {
       var text = await action.getText(
         'Username in roles list on admin page', elm);
       return text;

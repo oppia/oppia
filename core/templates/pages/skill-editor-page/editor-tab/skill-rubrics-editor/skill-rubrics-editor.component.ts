@@ -30,21 +30,21 @@ angular.module('oppia').component('skillRubricsEditor', {
   controller: [
     '$scope', 'SkillEditorStateService',
     'SkillUpdateService', 'WindowDimensionsService',
-    function(
+    function (
         $scope, SkillEditorStateService,
         SkillUpdateService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.onSaveRubric = function(difficulty, explanations) {
+      $scope.onSaveRubric = function (difficulty, explanations) {
         SkillUpdateService.updateRubricForDifficulty(
           $scope.skill, difficulty, explanations);
       };
-      $scope.toggleRubricsList = function() {
+      $scope.toggleRubricsList = function () {
         if (WindowDimensionsService.isWindowNarrow()) {
           $scope.rubricsListIsShown = !$scope.rubricsListIsShown;
         }
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         $scope.skill = SkillEditorStateService.getSkill();
         $scope.rubricsListIsShown = (
           !WindowDimensionsService.isWindowNarrow());
@@ -54,7 +54,7 @@ angular.module('oppia').component('skillRubricsEditor', {
         );
       };
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         ctrl.directiveSubscriptions.unsubscribe();
       });
     }]

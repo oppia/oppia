@@ -39,25 +39,25 @@ export class I18nLanguageCodeService {
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
-  constructor() {}
+  constructor () {}
 
-  getCurrentI18nLanguageCode(): string {
+  getCurrentI18nLanguageCode (): string {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     return I18nLanguageCodeService.languageCode;
   }
 
-  get onI18nLanguageCodeChange(): EventEmitter<string> {
+  get onI18nLanguageCodeChange (): EventEmitter<string> {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     return I18nLanguageCodeService.languageCodeChangeEventEmitter;
   }
 
-  setI18nLanguageCode(code: string): void {
+  setI18nLanguageCode (code: string): void {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     I18nLanguageCodeService.languageCode = code;
     I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
   }
 
-  get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {
+  get onPreferredLanguageCodesLoaded (): EventEmitter<string[]> {
     return this._preferredLanguageCodesLoadedEventEmitter;
   }
 }

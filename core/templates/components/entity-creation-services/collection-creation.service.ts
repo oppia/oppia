@@ -35,7 +35,7 @@ export class CollectionCreationService {
   // TODO(#9154): Remove static when migration is complete.
   static collectionCreationInProgress: boolean = false;
 
-  constructor(
+  constructor (
     private collectionCreationBackendService: CollectionCreationBackendService,
     private alertsService: AlertsService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -47,7 +47,7 @@ export class CollectionCreationService {
   CREATE_NEW_COLLECTION_URL_TEMPLATE = (
       '/collection_editor/create/<collection_id>');
 
-  createNewCollection(): void {
+  createNewCollection (): void {
     if (CollectionCreationService.collectionCreationInProgress) {
       return;
     }

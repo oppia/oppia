@@ -43,7 +43,7 @@ export class SuggestionThread {
   lastNonemptyMessageSummary: ThreadMessageSummary;
   messages: ThreadMessage[] = [];
 
-  constructor(
+  constructor (
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdatedMsecs: number,
       messageCount: number, threadId: string,
@@ -60,7 +60,7 @@ export class SuggestionThread {
     this.suggestion = suggestion;
   }
 
-  setMessages(messages: ThreadMessage[]): void {
+  setMessages (messages: ThreadMessage[]): void {
     this.messages = messages;
     // Since messages have been updated, we need to update all of our other
     // message-related fields to maintain consistency between them.
@@ -72,44 +72,44 @@ export class SuggestionThread {
     }
   }
 
-  getMessages(): ThreadMessage[] {
+  getMessages (): ThreadMessage[] {
     return this.messages;
   }
 
-  isSuggestionHandled(): boolean | null {
+  isSuggestionHandled (): boolean | null {
     return this.suggestion ? this.suggestion.status !== 'review' : null;
   }
 
-  getSuggestionStateName(): string | null {
+  getSuggestionStateName (): string | null {
     return this.suggestion ? this.suggestion.stateName : null;
   }
 
-  setSuggestionStatus(status: string): void {
+  setSuggestionStatus (status: string): void {
     if (this.suggestion) {
       this.suggestion.status = status;
     }
   }
 
-  getSuggestionStatus(): string | null {
+  getSuggestionStatus (): string | null {
     return this.suggestion ? this.suggestion.status : null;
   }
 
-  getReplacementHtmlFromSuggestion(): string | null {
+  getReplacementHtmlFromSuggestion (): string | null {
     return this.suggestion ? this.suggestion.newValue.html : null;
   }
 
-  isSuggestionThread(): boolean {
+  isSuggestionThread (): boolean {
     return true;
   }
 
-  getSuggestion(): Suggestion | null {
+  getSuggestion (): Suggestion | null {
     return this.suggestion;
   }
 }
 
 @Injectable({providedIn: 'root'})
 export class SuggestionThreadObjectFactory {
-  private createEditExplorationStateContentSuggestionFromBackendDict(
+  private createEditExplorationStateContentSuggestionFromBackendDict (
       suggestionBackendDict: SuggestionBackendDict): Suggestion | null {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
@@ -118,7 +118,7 @@ export class SuggestionThreadObjectFactory {
     return Suggestion.createFromBackendDict(suggestionBackendDict);
   }
 
-  createFromBackendDicts(
+  createFromBackendDicts (
       feedbackThreadBackendDict: FeedbackThreadBackendDict,
       suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
     return new SuggestionThread(

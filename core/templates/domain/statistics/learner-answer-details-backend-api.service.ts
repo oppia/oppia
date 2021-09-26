@@ -29,11 +29,11 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class LearnerAnswerDetailsBackendApiService {
-  constructor(
+  constructor (
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async recordLearnerAnswerDetailsAsync(
+  async recordLearnerAnswerDetailsAsync (
       explorationId: string, stateName: string, interactionId: string,
       answer: string, answerDetails: string): Promise<void> {
     let recordLearnerAnswerDetailsUrl = (

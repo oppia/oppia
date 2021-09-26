@@ -39,7 +39,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
   'StateTopAnswersStatsService', 'CHECKPOINT_ERROR_MESSAGES',
   'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
-  function(
+  function (
       $injector, ExplorationInitStateNameService, ExplorationStatesService,
       GraphDataService, ImprovementsService,
       ParameterMetadataService, SolutionValidityService,
@@ -51,12 +51,12 @@ angular.module('oppia').factory('ExplorationWarningsService', [
     var checkpointCountWarning = '';
     var hasCriticalStateWarning = false;
 
-    var _getStatesWithoutInteractionIds = function() {
+    var _getStatesWithoutInteractionIds = function () {
       var statesWithoutInteractionIds = [];
 
       var states = ExplorationStatesService.getStates();
 
-      states.getStateNames().forEach(function(stateName) {
+      states.getStateNames().forEach(function (stateName) {
         if (!states.getState(stateName).interaction.id) {
           statesWithoutInteractionIds.push(stateName);
         }
@@ -65,11 +65,11 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       return statesWithoutInteractionIds;
     };
 
-    var _getStatesWithIncorrectSolution = function() {
+    var _getStatesWithIncorrectSolution = function () {
       var statesWithIncorrectSolution = [];
 
       var states = ExplorationStatesService.getStates();
-      states.getStateNames().forEach(function(stateName) {
+      states.getStateNames().forEach(function (stateName) {
         if (states.getState(stateName).interaction.solution &&
             !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
@@ -87,7 +87,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
     //     names
     // - edges: a list of edges, each of which is an object with keys 'source',
     //     and 'target'.
-    var _getUnreachableNodeNames = function(initNodeIds, nodes, edges) {
+    var _getUnreachableNodeNames = function (initNodeIds, nodes, edges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
@@ -95,7 +95,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       }
       while (queue.length > 0) {
         var currNodeId = queue.shift();
-        edges.forEach(function(edge) {
+        edges.forEach(function (edge) {
           if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
             seen[edge.target] = true;
             queue.push(edge.target);
@@ -116,8 +116,8 @@ angular.module('oppia').factory('ExplorationWarningsService', [
     // an array with the same objects but with the values of 'source' and
     // 'target' switched. (The objects represent edges in a graph, and this
     // operation amounts to reversing all the edges.)
-    var _getReversedLinks = function(links) {
-      return links.map(function(link) {
+    var _getReversedLinks = function (links) {
+      return links.map(function (link) {
         return {
           source: link.target,
           target: link.source,
@@ -127,12 +127,12 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
     // Verify that all parameters referred to in a state are guaranteed to
     // have been set beforehand.
-    var _verifyParameters = function(initNodeIds) {
+    var _verifyParameters = function (initNodeIds) {
       var unsetParametersInfo = (
         ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
       var paramWarningsList = [];
-      unsetParametersInfo.forEach(function(unsetParameterData) {
+      unsetParametersInfo.forEach(function (unsetParameterData) {
         if (!unsetParameterData.stateName) {
           // The parameter value is required in the initial list of parameter
           // changes.
@@ -160,7 +160,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       return paramWarningsList;
     };
 
-    var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
+    var _getAnswerGroupIndexesWithEmptyClassifiers = function (state) {
       var indexes = [];
       var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
@@ -173,12 +173,12 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       return indexes;
     };
 
-    var _getStatesAndAnswerGroupsWithEmptyClassifiers = function() {
+    var _getStatesAndAnswerGroupsWithEmptyClassifiers = function () {
       var results = [];
 
       var states = ExplorationStatesService.getStates();
 
-      states.getStateNames().forEach(function(stateName) {
+      states.getStateNames().forEach(function (stateName) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
           states.getState(stateName));
         if (groupIndexes.length > 0) {
@@ -192,28 +192,28 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       return results;
     };
 
-    var _getStatesWithAnswersThatMustBeResolved = function() {
+    var _getStatesWithAnswersThatMustBeResolved = function () {
       var stass = StateTopAnswersStatsService;
       var states = ExplorationStatesService.getStates();
-      return stass.getStateNamesWithStats().filter(function(stateName) {
+      return stass.getStateNamesWithStats().filter(function (stateName) {
         var mustResolveState =
           ImprovementsService
             .isStateForcedToResolveOutstandingUnaddressedAnswers(
               states.getState(stateName));
         return mustResolveState &&
-          stass.getUnresolvedStateStats(stateName).some(function(answer) {
+          stass.getUnresolvedStateStats(stateName).some(function (answer) {
             return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
           });
       });
     };
 
-    var _updateWarningsList = function() {
+    var _updateWarningsList = function () {
       _warningsList = [];
       stateWarnings = {};
       checkpointCountWarning = '';
       hasCriticalStateWarning = false;
 
-      var _extendStateWarnings = function(stateName, newWarning) {
+      var _extendStateWarnings = function (stateName, newWarning) {
         if (stateWarnings.hasOwnProperty(stateName)) {
           stateWarnings[stateName].push(newWarning);
         } else {
@@ -225,7 +225,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       var _graphData = GraphDataService.getGraphData();
 
       var _states = ExplorationStatesService.getStates();
-      _states.getStateNames().forEach(function(stateName) {
+      _states.getStateNames().forEach(function (stateName) {
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
           var validatorServiceName =
@@ -247,19 +247,19 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(
-        statesWithoutInteractionIds, function(stateWithoutInteractionIds) {
+        statesWithoutInteractionIds, function (stateWithoutInteractionIds) {
           _extendStateWarnings(
             stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
         });
 
       var statesWithAnswersThatMustBeResolved =
         _getStatesWithAnswersThatMustBeResolved();
-      angular.forEach(statesWithAnswersThatMustBeResolved, function(stateName) {
+      angular.forEach(statesWithAnswersThatMustBeResolved, function (stateName) {
         _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
       });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
-      angular.forEach(statesWithIncorrectSolution, function(state) {
+      angular.forEach(statesWithIncorrectSolution, function (state) {
         _extendStateWarnings(state, STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
       });
 
@@ -269,7 +269,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
         if (unreachableStateNames.length) {
           angular.forEach(
-            unreachableStateNames, function(unreachableStateName) {
+            unreachableStateNames, function (unreachableStateName) {
               _extendStateWarnings(
                 unreachableStateName, STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
             });
@@ -279,7 +279,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
             _graphData.finalStateIds, _graphData.nodes,
             _getReversedLinks(_graphData.links));
           if (deadEndStates.length) {
-            angular.forEach(deadEndStates, function(deadEndState) {
+            angular.forEach(deadEndStates, function (deadEndState) {
               _extendStateWarnings(
                 deadEndState, STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
             });
@@ -366,7 +366,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
       var statesWithAnswerGroupsWithEmptyClassifiers = (
         _getStatesAndAnswerGroupsWithEmptyClassifiers());
-      statesWithAnswerGroupsWithEmptyClassifiers.forEach(function(result) {
+      statesWithAnswerGroupsWithEmptyClassifiers.forEach(function (result) {
         var warningMessage = 'In \'' + result.stateName + '\'';
         if (result.groupIndexes.length !== 1) {
           warningMessage += ', the following answer groups have classifiers ';
@@ -385,24 +385,24 @@ angular.module('oppia').factory('ExplorationWarningsService', [
     };
 
     return {
-      countWarnings: function() {
+      countWarnings: function () {
         return _warningsList.length;
       },
-      getAllStateRelatedWarnings: function() {
+      getAllStateRelatedWarnings: function () {
         return stateWarnings;
       },
-      getWarnings: function() {
+      getWarnings: function () {
         return _warningsList;
       },
-      getCheckpointCountWarning: function() {
+      getCheckpointCountWarning: function () {
         return checkpointCountWarning;
       },
-      hasCriticalWarnings: function() {
-        return hasCriticalStateWarning || _warningsList.some(function(warning) {
+      hasCriticalWarnings: function () {
+        return hasCriticalStateWarning || _warningsList.some(function (warning) {
           return warning.type === WARNING_TYPES.CRITICAL;
         });
       },
-      updateWarnings: function() {
+      updateWarnings: function () {
         _updateWarningsList();
       }
     };

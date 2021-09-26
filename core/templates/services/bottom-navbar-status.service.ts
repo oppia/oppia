@@ -29,13 +29,13 @@ import { WindowDimensionsService } from
 })
 export class BottomNavbarStatusService {
   bottomNavbarIsEnabled: boolean = false;
-  constructor(private windowDimensionsService: WindowDimensionsService) {}
+  constructor (private windowDimensionsService: WindowDimensionsService) {}
 
-  markBottomNavbarStatus(status: boolean): void {
+  markBottomNavbarStatus (status: boolean): void {
     this.bottomNavbarIsEnabled = status;
   }
 
-  isBottomNavbarEnabled(): boolean {
+  isBottomNavbarEnabled (): boolean {
     return (
       this.bottomNavbarIsEnabled &&
           this.windowDimensionsService.getWidth() < 1000);

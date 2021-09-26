@@ -652,7 +652,7 @@ export class Change {
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;
 
-  constructor(
+  constructor (
       backendChangeObject: BackendChangeObject,
       applyChangeToObject: (
         backendChangeObject: BackendChangeObject,
@@ -667,25 +667,25 @@ export class Change {
 
   // Returns the JSON object which represents a backend python dict of this
   // change. Changes to this object are not reflected in this domain object.
-  getBackendChangeObject(): BackendChangeObject {
+  getBackendChangeObject (): BackendChangeObject {
     return cloneDeep(this._backendChangeObject);
   }
 
-  setBackendChangeObject(
+  setBackendChangeObject (
       backendChangeObject: BackendChangeObject): BackendChangeObject {
     return this._backendChangeObject = cloneDeep(backendChangeObject);
   }
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
-  applyChange(domainObject: DomainObject): void {
+  applyChange (domainObject: DomainObject): void {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
   }
 
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
-  reverseChange(domainObject: DomainObject): void {
+  reverseChange (domainObject: DomainObject): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
 }

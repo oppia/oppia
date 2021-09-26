@@ -28,32 +28,32 @@ export class StateNameService {
   /**
    * @return {boolean} Whether the state name editor is shown.
    */
-  isStateNameEditorShown(): boolean {
+  isStateNameEditorShown (): boolean {
     return this.stateNameEditorIsShown;
   }
 
   /**
    * @param {boolean} value - Visibility of the state name editor to be set to.
    */
-  setStateNameEditorVisibility(value: boolean): void {
+  setStateNameEditorVisibility (value: boolean): void {
     this.stateNameEditorIsShown = value;
   }
 
   /**
    * @param {string} value - Memento of the state name to be set to.
    */
-  setStateNameSavedMemento(stateName: string | null): void {
+  setStateNameSavedMemento (stateName: string | null): void {
     this.savedMemento = stateName;
   }
 
   /**
    * @return {string} The state name's saved memento.
    */
-  getStateNameSavedMemento(): string | null {
+  getStateNameSavedMemento (): string | null {
     return this.savedMemento;
   }
 
-  init(): void {
+  init (): void {
     this.setStateNameSavedMemento(null);
     this.setStateNameEditorVisibility(false);
   }

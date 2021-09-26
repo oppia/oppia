@@ -50,7 +50,7 @@ export interface LearnerExplorationSummaryBackendDict {
 }
 
 export class LearnerExplorationSummary {
-  constructor(
+  constructor (
       public category: string,
       public communityOwned: boolean,
       public id: string,
@@ -69,7 +69,7 @@ export class LearnerExplorationSummary {
       public humanReadableContributorsSummary:
       HumanReadableContributorsSummary) {}
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       expSummaryBacknedDict: LearnerExplorationSummaryBackendDict):
       LearnerExplorationSummary {
     return new LearnerExplorationSummary(

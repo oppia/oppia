@@ -47,9 +47,9 @@ export class AudioSliderComponent {
   @Input() max!: number;
   @Input() thumbLabel = false;
   @Output() valueChange = new EventEmitter<{ value: number }>();
-  constructor() { }
+  constructor () { }
 
-  setDuration(event: {value: number}): void {
+  setDuration (event: {value: number}): void {
     this.valueChange.emit(event);
   }
 }

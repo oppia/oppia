@@ -43,58 +43,58 @@ export class AdminNavbarComponent implements OnInit {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-  constructor(
+  constructor (
     private adminRouterService: AdminRouterService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  isActivitiesTabOpen(): boolean {
+  isActivitiesTabOpen (): boolean {
     return this.adminRouterService.isActivitiesTabOpen();
   }
 
-  isConfigTabOpen(): boolean {
+  isConfigTabOpen (): boolean {
     return this.adminRouterService.isConfigTabOpen();
   }
 
-  isFeaturesTabOpen(): boolean {
+  isFeaturesTabOpen (): boolean {
     return this.adminRouterService.isFeaturesTabOpen();
   }
 
-  isRolesTabOpen(): boolean {
+  isRolesTabOpen (): boolean {
     return this.adminRouterService.isRolesTabOpen();
   }
 
-  isMiscTabOpen(): boolean {
+  isMiscTabOpen (): boolean {
     return this.adminRouterService.isMiscTabOpen();
   }
 
-  activateProfileDropdown(): boolean {
+  activateProfileDropdown (): boolean {
     return this.profileDropdownIsActive = true;
   }
 
-  deactivateProfileDropdown(): boolean {
+  deactivateProfileDropdown (): boolean {
     return this.profileDropdownIsActive = false;
   }
 
-  activateDropdownMenu(): boolean {
+  activateDropdownMenu (): boolean {
     return this.dropdownMenuIsActive = true;
   }
 
-  deactivateDropdownMenu(): boolean {
+  deactivateDropdownMenu (): boolean {
     return this.dropdownMenuIsActive = false;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
+  async getProfileImageDataAsync (): Promise<void> {
     let dataUrl = await this.userService.getProfileImageDataUrlAsync();
     this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
 
-  async getUserInfoAsync(): Promise<void> {
+  async getUserInfoAsync (): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
@@ -109,7 +109,7 @@ export class AdminNavbarComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
   }

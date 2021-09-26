@@ -31,14 +31,14 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   providedIn: 'root'
 })
 export class ExpressionInterpolationService {
-  constructor(
+  constructor (
     private expressionEvaluatorService: ExpressionEvaluatorService,
     private expressionParserService: ExpressionParserService,
     private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  processHtml(sourceHtml: string, envs: Record<string, string>[]): string {
+  processHtml (sourceHtml: string, envs: Record<string, string>[]): string {
     return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1)=> {
       try {
         // TODO(sll): Remove the call to $filter once we have a
@@ -60,7 +60,7 @@ export class ExpressionInterpolationService {
   }
 
   // Function returns null if there is some error in the expression or syntax.
-  processUnicode(
+  processUnicode (
       sourceUnicode: string, envs: Record<string, string>[]): string | null {
     try {
       return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1)=> {
@@ -79,7 +79,7 @@ export class ExpressionInterpolationService {
     }
   }
 
-  getParamsFromString(sourceString: string): string[] {
+  getParamsFromString (sourceString: string): string[] {
     let matches = sourceString.match(/{{([^}]*)}}/g) || [];
 
     let allParams = [];

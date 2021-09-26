@@ -18,11 +18,11 @@
 
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 
-describe('Oppia click hexbins visualization', function() {
+describe('Oppia click hexbins visualization', function () {
   let $compile, $rootScope;
   let el: JQLite;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AssetsBackendApiService', {
       getImageUrlForPreview: (url: string) => url,
     });
@@ -35,7 +35,7 @@ describe('Oppia click hexbins visualization', function() {
     });
   }));
 
-  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
+  beforeEach(angular.mock.inject(function (_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
   }));

@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for PreviewSetParametersModalController.
  */
 
-describe('Preview Set Parameters Modal Controller', function() {
+describe('Preview Set Parameters Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var manualParamChanges = [];
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -37,7 +37,7 @@ describe('Preview Set Parameters Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.manualParamChanges).toEqual(manualParamChanges);
     });
 });

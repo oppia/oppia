@@ -19,7 +19,7 @@
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { ResponseMathEquationInput } from './oppia-response-math-equation-input.component';
 
-describe('ResponseNumericExpressionInput', function() {
+describe('ResponseNumericExpressionInput', function () {
   let component: ResponseMathEquationInput;
   let fixture: ComponentFixture<ResponseMathEquationInput>;
 
@@ -37,7 +37,7 @@ describe('ResponseNumericExpressionInput', function() {
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.displayAnswer).toBe('answer');
   });

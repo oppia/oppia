@@ -23,7 +23,7 @@ import { StateHintsService } from
   'components/state-editor/state-editor-properties-services/state-hints.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 
-describe('Add Hint Modal Controller', function() {
+describe('Add Hint Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
@@ -35,13 +35,13 @@ describe('Add Hint Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function() {
+  beforeEach(function () {
     generateContentIdService = TestBed.get(GenerateContentIdService);
     hintObjectFactory = TestBed.get(HintObjectFactory);
     stateHintsService = TestBed.get(StateHintsService);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getEntityType').and.returnValue('question');
@@ -63,13 +63,13 @@ describe('Add Hint Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.tmpHint).toBe('');
       expect($scope.addHintForm).toEqual({});
       expect($scope.hintIndex).toBe(5);
     });
 
-  it('should save hint when closing the modal', function() {
+  it('should save hint when closing the modal', function () {
     var contentId = 'cont_1';
     var hintExpected = hintObjectFactory.createNew(contentId, '');
 

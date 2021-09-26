@@ -23,22 +23,22 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   var filterName = 'getAbbreviatedText';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  it('should have all expected filters', angular.mock.inject(function($filter) {
+  it('should have all expected filters', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should not shorten the length of text', angular.mock.inject(
-    function($filter) {
+    function ($filter) {
       expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
         .toBe('It will remain unchanged.');
       expect($filter('getAbbreviatedText')(
@@ -48,7 +48,7 @@ describe('Testing filters', function() {
   ));
 
   it('should shorten the length of text', angular.mock.inject(
-    function($filter) {
+    function ($filter) {
       expect($filter('getAbbreviatedText')(
         'It has to convert to a substring as it exceeds the character limit.',
         50)).toBe('It has to convert to a substring as it exceeds...');

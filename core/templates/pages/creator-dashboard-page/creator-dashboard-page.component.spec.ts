@@ -112,33 +112,33 @@ describe('Creator dashboard controller', () => {
   }));
 
   it('should get the correct exploration editor page URL corresponding to a' +
-    ' given exploration ID', function() {
+    ' given exploration ID', function () {
     var explorationId = '1';
     expect(ctrl.getExplorationUrl(explorationId)).toBe(
       '/create/' + explorationId);
   });
 
   it('should get the correct collection editor page URL corresponding to a' +
-    ' given collection ID', function() {
+    ' given collection ID', function () {
     var collectionId = '1';
     expect(ctrl.getCollectionUrl(collectionId)).toBe(
       '/collection_editor/create/' + collectionId);
   });
 
   it('should get username popover event type according to username length',
-    function() {
+    function () {
       expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(ctrl.showUsernamePopover('abc')).toBe('none');
     });
 
   it('should get complete thumbail icon path corresponding to a given' +
-    ' relative path', function() {
+    ' relative path', function () {
     expect(ctrl.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
       '/assets/images/path/to/icon.png');
   });
 
   it('should create new exploration when clicked on CREATE' +
-   ' EXPLORATION button', function() {
+   ' EXPLORATION button', function () {
     spyOn(
       explorationCreationService, 'createNewExploration');
     ctrl.createNewExploration();
@@ -147,7 +147,7 @@ describe('Creator dashboard controller', () => {
   });
 
   describe('when fetching dashboard successfully and on explorations tab',
-    function() {
+    function () {
       var dashboardData = {
         explorations_list: [
           {
@@ -274,7 +274,7 @@ describe('Creator dashboard controller', () => {
         }]
       };
 
-      beforeEach(function() {
+      beforeEach(function () {
         spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
           .and.returnValue($q.resolve({
             dashboardStats: CreatorDashboardStats
@@ -329,7 +329,7 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should evaluate dashboard data retrieved from backend', function() {
+      it('should evaluate dashboard data retrieved from backend', function () {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],
@@ -347,14 +347,14 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should change active tab name when creator clicks on a new tab',
-        function() {
+        function () {
           expect(ctrl.activeTab).toBe('myExplorations');
           ctrl.setActiveTab('suggestions');
           expect(ctrl.activeTab).toBe('suggestions');
         });
 
       it('should save the exploration format view in the backend when creator' +
-        ' changes the format view', function() {
+        ' changes the format view', function () {
         var spyObj = spyOn(
           CreatorDashboardBackendApiService, 'postExplorationViewAsync')
           .and.returnValue($q.resolve());
@@ -367,7 +367,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should reverse the sort order of explorations when the creator' +
-        ' re-selects the current sorting type', function() {
+        ' re-selects the current sorting type', function () {
         expect(ctrl.isCurrentSortDescending).toBe(true);
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('numOpenThreads');
@@ -375,13 +375,13 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should update the exploration sort order based on the' +
-        ' option chosen by the creator', function() {
+        ' option chosen by the creator', function () {
         ctrl.setExplorationsSortingOptions('new_open');
         expect(ctrl.currentSortType).toBe('new_open');
       });
 
       it('should reverse the sort order of subscriptions when the creator' +
-        ' re-selects the current sorting type', function() {
+        ' re-selects the current sorting type', function () {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
         expect(ctrl.currentSubscribersSortType).toBe('username');
         ctrl.setSubscriptionSortingOptions('username');
@@ -389,12 +389,12 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should update the subscription sort order based on the' +
-        ' option chosen by the creator', function() {
+        ' option chosen by the creator', function () {
         ctrl.setSubscriptionSortingOptions('new_subscriber');
         expect(ctrl.currentSubscribersSortType).toBe('new_subscriber');
       });
 
-      it('should sort subscription list by username', function() {
+      it('should sort subscription list by username', function () {
         var entity = {
           username: 'username'
         };
@@ -404,14 +404,14 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should not sort subscription list by impact given empty object',
-        function() {
+        function () {
           ctrl.setSubscriptionSortingOptions('impact');
           expect(ctrl.currentSubscribersSortType).toBe('impact');
           expect(ctrl.sortSubscriptionFunction({})).toBe(0);
         });
 
       it('should sort exploration list by untitled explorations when title' +
-        ' is not provided and exploration is private', function() {
+        ' is not provided and exploration is private', function () {
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('title');
         expect(ctrl.currentSortType).toBe('title');
@@ -423,7 +423,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should not sort exploration list by rating when providing' +
-        ' a empty object', function() {
+        ' a empty object', function () {
         ctrl.setExplorationsSortingOptions('ratings');
         expect(ctrl.currentSortType).toBe('ratings');
 
@@ -431,7 +431,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should sort exploration list by last updated when last updated' +
-        ' value is provided', function() {
+        ' value is provided', function () {
         ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
         expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
 
@@ -441,7 +441,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should not sort exploration list by options that is not last update' +
-        ' when trying to sort by number of views', function() {
+        ' when trying to sort by number of views', function () {
         ctrl.setExplorationsSortingOptions('numViews');
         expect(ctrl.currentSortType).toBe('numViews');
 
@@ -452,7 +452,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should update exploration view and publish text on resizing page',
-        function() {
+        function () {
           var innerWidthSpy = spyOnProperty($window, 'innerWidth');
           var spyObj = spyOn(
             CreatorDashboardBackendApiService, 'postExplorationViewAsync')
@@ -482,7 +482,7 @@ describe('Creator dashboard controller', () => {
         });
 
       it('should set active thread from my suggestions list when changing' +
-        ' active thread', function() {
+        ' active thread', function () {
         var threadId = 'exp1';
         var messages = [{
           author_username: '',
@@ -515,7 +515,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should set active thread from suggestions to review list' +
-        ' when cleaning active thread', function() {
+        ' when cleaning active thread', function () {
         var threadId = 'exp2';
         var suggestionToReviewObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
@@ -535,7 +535,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should open suggestion modal when clicking on show suggestion modal',
-        function() {
+        function () {
           var threadId = 'exp1';
 
           var spyObj = spyOn(
@@ -559,7 +559,7 @@ describe('Creator dashboard controller', () => {
         });
     });
 
-  describe('when on collections tab', function() {
+  describe('when on collections tab', function () {
     var dashboardData = {
       explorations_list: [],
       collections_list: [{
@@ -591,7 +591,7 @@ describe('Creator dashboard controller', () => {
       suggestions_to_review_list: []
     };
 
-    beforeEach(function() {
+    beforeEach(function () {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
           dashboardStats: CreatorDashboardStats
@@ -645,12 +645,12 @@ describe('Creator dashboard controller', () => {
       $rootScope.$apply();
     });
 
-    it('should evaluate active tab', function() {
+    it('should evaluate active tab', function () {
       expect(ctrl.activeTab).toBe('myCollections');
     });
   });
 
-  describe('when on suggestions tab', function() {
+  describe('when on suggestions tab', function () {
     var dashboardData = {
       explorations_list: [],
       collections_list: [],
@@ -692,7 +692,7 @@ describe('Creator dashboard controller', () => {
       suggestions_to_review_list: []
     };
 
-    beforeEach(function() {
+    beforeEach(function () {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
           dashboardStats: CreatorDashboardStats
@@ -745,13 +745,13 @@ describe('Creator dashboard controller', () => {
       $rootScope.$apply();
     });
 
-    it('should evaluate active tab', function() {
+    it('should evaluate active tab', function () {
       expect(ctrl.activeTab).toBe('suggestions');
     });
   });
 
-  describe('when fetching dashboard fails', function() {
-    it('should use reject handler', function() {
+  describe('when fetching dashboard fails', function () {
+    it('should use reject handler', function () {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404

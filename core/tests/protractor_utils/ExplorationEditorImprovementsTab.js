@@ -18,31 +18,31 @@
  */
 
 var waitFor = require('../protractor_utils/waitFor.js');
-var ExplorationEditorImprovementsTab = function() {
+var ExplorationEditorImprovementsTab = function () {
   /*
    * Interactive elements
    */
   var explorationHealth = $('.protractor-test-improvements-tab-health');
 
-  this.expectToBeHidden = async function() {
+  this.expectToBeHidden = async function () {
     expect(await $$('.protractor-test-improvements-tab').count()).toEqual(0);
   };
 
-  this.expectHealthyExploration = async function() {
+  this.expectHealthyExploration = async function () {
     await waitFor.visibilityOf(
       explorationHealth,
       'Exploration health is taking too long to appear'
     );
     expect(await explorationHealth.getText()).toEqual('HEALTHY');
   };
-  this.expectWarningExploration = async function() {
+  this.expectWarningExploration = async function () {
     await waitFor.visibilityOf(
       explorationHealth,
       'Exploration health is taking too long to appear'
     );
     expect(await explorationHealth.getText()).toEqual('WARNING');
   };
-  this.expectCriticalExploration = async function() {
+  this.expectCriticalExploration = async function () {
     await waitFor.visibilityOf(
       explorationHealth,
       'Exploration health is taking too long to appear'

@@ -35,7 +35,7 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 
-describe('Progress nav directive', function() {
+describe('Progress nav directive', function () {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -64,11 +64,11 @@ describe('Progress nav directive', function() {
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     ctrl.$onDestroy();
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
@@ -241,12 +241,12 @@ describe('Progress nav directive', function() {
       $scope: $scope
     });
 
-    $scope.getDisplayedCard = function() {
+    $scope.getDisplayedCard = function () {
       return sampleCard1;
     };
   }));
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', function () {
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockEventEmitter);
@@ -270,7 +270,7 @@ describe('Progress nav directive', function() {
   });
 
   it('should check if continue button is shown in the user interface ' +
-    'when concept card is being shown', function() {
+    'when concept card is being shown', function () {
     $scope.conceptCardIsBeingShown = true;
     $scope.displayedCard = $scope.getDisplayedCard();
 
@@ -280,7 +280,7 @@ describe('Progress nav directive', function() {
   });
 
   it('should check if continue button is shown in the user interface ' +
-    'when concept card is not being shown', function() {
+    'when concept card is not being shown', function () {
     $scope.displayedCard = $scope.getDisplayedCard();
     $scope.conceptCardIsBeingShown = false;
 
@@ -290,9 +290,9 @@ describe('Progress nav directive', function() {
   });
 
   it('should check if generic button is shown in the user interface ' +
-    'when interactions has special case for mobile', function() {
+    'when interactions has special case for mobile', function () {
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
-    $scope.getDisplayedCard = function() {
+    $scope.getDisplayedCard = function () {
       return sampleCard2;
     };
     ctrl.$onInit();
@@ -305,21 +305,21 @@ describe('Progress nav directive', function() {
   });
 
   it('should check if generic button is shown in the user interface ' +
-    'when interactions have nav submit button', function() {
+    'when interactions have nav submit button', function () {
     let result = $scope.shouldGenericSubmitButtonBeShown();
 
     expect(result).toBe(false);
   });
 
   it('should throw an error if generic button is submitted ' +
-    'with invalid interaction id', function() {
+    'with invalid interaction id', function () {
     $scope.interactionId = -1;
     expect(() => {
       $scope.shouldGenericSubmitButtonBeShown();
     }).toThrowError('');
   });
 
-  it('should check whether the window can show two cards', function() {
+  it('should check whether the window can show two cards', function () {
     // Note that threshold width value for two cards to be shown is 960px.
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(961);
 
@@ -329,7 +329,7 @@ describe('Progress nav directive', function() {
   });
 
   it('should change card when calling \'changeCard\' if current ' +
-    'state has been completed sucessfully', function() {
+    'state has been completed sucessfully', function () {
     spyOn(playerPositionService, 'recordNavigationButtonClick')
       .and.returnValue(null);
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.returnValue(null);
@@ -347,7 +347,7 @@ describe('Progress nav directive', function() {
   });
 
   it('should not change card when calling \'changeCard\' if given ' +
-    'index is out of bound', function() {
+    'index is out of bound', function () {
     let changeCardSpy = spyOn(
       playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
 

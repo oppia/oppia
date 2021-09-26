@@ -35,12 +35,12 @@ angular.module('oppia').component('voiceoverOpportunities', {
     'translation-opportunities.component.html'),
   controller: [
     '$rootScope', 'ContributionOpportunitiesService',
-    'TranslationLanguageService', function(
+    'TranslationLanguageService', function (
         $rootScope, ContributionOpportunitiesService,
         TranslationLanguageService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var updateWithNewOpportunities = function(opportunities, more) {
+      var updateWithNewOpportunities = function (opportunities, more) {
         for (var index in opportunities) {
           var opportunity = opportunities[index];
           var subheading = opportunity.getOpportunitySubheading();
@@ -58,7 +58,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
         $rootScope.$apply();
       };
 
-      ctrl.onLoadMoreOpportunities = function() {
+      ctrl.onLoadMoreOpportunities = function () {
         if (
           !ctrl.opportunitiesAreLoading &&
           ctrl.moreOpportunitiesAvailable) {
@@ -68,7 +68,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
             updateWithNewOpportunities);
         }
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           TranslationLanguageService.onActiveLanguageChanged.subscribe(
             () => {
@@ -88,7 +88,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
           TranslationLanguageService.getActiveLanguageCode(),
           updateWithNewOpportunities);
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

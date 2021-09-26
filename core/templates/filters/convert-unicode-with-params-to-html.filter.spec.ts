@@ -24,9 +24,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
   'filters/convert-unicode-with-params-to-html.filter.ts');
 
-describe('HTML to text', function() {
+describe('HTML to text', function () {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -42,9 +42,9 @@ describe('HTML to text', function() {
   ];
 
   it('should detect invalid unicode strings', angular.mock.inject(
-    function($filter) {
-      invalidUnicodeStrings.forEach(function(s) {
-        var fn = function() {
+    function ($filter) {
+      invalidUnicodeStrings.forEach(function (s) {
+        var fn = function () {
           return $filter('convertUnicodeWithParamsToHtml')(s);
         };
         expect(fn).toThrowError(
@@ -60,15 +60,15 @@ describe('HTML to text', function() {
   ];
 
   it('should detect valid unicode strings', angular.mock.inject(
-    function($filter) {
+    function ($filter) {
       var results = [
         '<oppia-parameter></oppia-parameter>',
         '<oppia-parameter>abc</oppia-parameter>',
         '\\<oppia-parameter>abc</oppia-parameter>',
         '{<oppia-parameter>abc</oppia-parameter>',
       ];
-      validUnicodeStrings.forEach(function(s, i) {
-        var fn = (function() {
+      validUnicodeStrings.forEach(function (s, i) {
+        var fn = (function () {
           return $filter('convertUnicodeWithParamsToHtml')(s);
         })();
         expect(fn).toEqual(results[i]);

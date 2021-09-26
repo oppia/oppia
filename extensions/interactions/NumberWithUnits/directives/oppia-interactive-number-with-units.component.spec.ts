@@ -22,29 +22,29 @@ require(
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('oppiaInteractiveNumberWithUnits', function() {
+describe('oppiaInteractiveNumberWithUnits', function () {
   let ctrl = null, $scope = null, $rootScope = null;
   let $q = null;
   let $uibModal = null;
   let numberWithUnitsObjectFactory = null;
   let currentInteractionService = null;
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    onSubmit: function (answer, rulesService) {},
+    registerCurrentInteraction: function (submitAnswerFn, isAnswerValid) {
       submitAnswerFn();
       isAnswerValid();
     }
   };
   let mockNumberWithUnitsRulesService = {};
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function (interactionId, attrs) {
       return attrs;
     }
   };
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'CurrentInteractionService', mockCurrentInteractionService);
     $provide.value(
@@ -57,7 +57,7 @@ describe('oppiaInteractiveNumberWithUnits', function() {
       labelForFocusTarget: 'label'
     });
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $q = $injector.get('$q');
@@ -69,7 +69,7 @@ describe('oppiaInteractiveNumberWithUnits', function() {
     ctrl.NumberWithUnitsForm = {
       answer: {
         $invalid: false,
-        $setValidity: function(errorType, valid) {
+        $setValidity: function (errorType, valid) {
           this.$invalid = !valid;
         }
       }

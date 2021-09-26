@@ -20,7 +20,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('third-party-imports/select2.import.ts');
 
 angular.module('oppia').directive('select2Dropdown', [
-  function() {
+  function () {
     // Directive for incorporating select2 dropdowns.
     return {
       restrict: 'E',
@@ -48,9 +48,9 @@ angular.module('oppia').directive('select2Dropdown', [
       template: require(
         'components/forms/custom-forms-directives/' +
         'select2-dropdown.directive.html'),
-      controller: ['$element', '$scope', function($element, $scope) {
+      controller: ['$element', '$scope', function ($element, $scope) {
         var ctrl = this;
-        ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
           $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 
           var select2Options = {
@@ -61,14 +61,14 @@ angular.module('oppia').directive('select2Dropdown', [
             placeholder: $scope.placeholder,
             width: $scope.width || '250px',
             dropdownCssClass: null,
-            createTag: function(params) {
+            createTag: function (params) {
               return params.term.match($scope.newChoiceValidator) ? {
                 id: params.term,
                 text: params.term
               } : null;
             },
-            templateResult: function(queryResult) {
-              var doesChoiceMatchText = function(choice) {
+            templateResult: function (queryResult) {
+              var doesChoiceMatchText = function (choice) {
                 return choice.id === queryResult.text;
               };
 
@@ -83,7 +83,7 @@ angular.module('oppia').directive('select2Dropdown', [
               }
             },
             language: {
-              noResults: function() {
+              noResults: function () {
                 if ($scope.invalidSearchTermMessage) {
                   return $scope.invalidSearchTermMessage;
                 } else {
@@ -104,14 +104,14 @@ angular.module('oppia').directive('select2Dropdown', [
           $(select2Node).val($scope.item).trigger('change');
 
           // Update $scope.item when the selection changes.
-          $(select2Node).on('change', function() {
+          $(select2Node).on('change', function () {
             $scope.item = $(select2Node).val();
             $scope.$apply();
             $scope.onSelectionChange();
           });
 
           // Respond to external changes in $scope.item.
-          $scope.$watch('item', function(newValue) {
+          $scope.$watch('item', function (newValue) {
             $(select2Node).val(newValue);
           });
         };

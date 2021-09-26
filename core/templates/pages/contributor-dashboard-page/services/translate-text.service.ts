@@ -42,7 +42,7 @@ export interface TranslatableItem {
 export type Status = 'pending' | 'submitted';
 
 export class StateAndContent {
-  constructor(
+  constructor (
     public stateName: string,
     public contentID: string,
     public contentText: string | string[],
@@ -74,12 +74,12 @@ export class TranslateTextService {
   activeContentText: string;
   activeContentStatus: Status;
 
-  constructor(
+  constructor (
     private translateTextBackedApiService:
       TranslateTextBackendApiService
   ) { }
 
-  private _getNextText(): string | string[] {
+  private _getNextText (): string | string[] {
     if (this.stateAndContent.length === 0) {
       return null;
     }
@@ -91,7 +91,7 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] {
+  private _getPreviousText (): string | string[] {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
       return null;
     }
@@ -102,25 +102,25 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _isPreviousTextAvailableForTranslation(): boolean {
+  private _isPreviousTextAvailableForTranslation (): boolean {
     return this.activeIndex > 0;
   }
 
-  private _isMoreTextAvailableForTranslation(): boolean {
+  private _isMoreTextAvailableForTranslation (): boolean {
     if (this.stateAndContent.length === 0) {
       return false;
     }
     return (this.activeIndex + 1 < this.stateAndContent.length);
   }
 
-  private _isSetDataFormat(dataFormat: string): boolean {
+  private _isSetDataFormat (dataFormat: string): boolean {
     return (
       dataFormat === TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
       dataFormat === TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
     );
   }
 
-  private _getUpdatedTextToTranslate(
+  private _getUpdatedTextToTranslate (
       text: string | string[],
       more: boolean,
       status: Status,
@@ -149,7 +149,7 @@ export class TranslateTextService {
     };
   }
 
-  init(expId: string, languageCode: string, successCallback: () => void): void {
+  init (expId: string, languageCode: string, successCallback: () => void): void {
     this.stateWiseContentIds = {};
     this.stateNamesList = [];
     this.stateAndContent = [];
@@ -197,11 +197,11 @@ export class TranslateTextService {
     });
   }
 
-  getActiveIndex(): number {
+  getActiveIndex (): number {
     return this.activeIndex;
   }
 
-  getTextToTranslate(): TranslatableItem {
+  getTextToTranslate (): TranslatableItem {
     const {
       status = this.PENDING,
       translation = ''
@@ -211,7 +211,7 @@ export class TranslateTextService {
       text, this._isMoreTextAvailableForTranslation(), status, translation);
   }
 
-  getPreviousTextToTranslate(): TranslatableItem {
+  getPreviousTextToTranslate (): TranslatableItem {
     const {
       status = this.PENDING,
       translation = ''
@@ -221,7 +221,7 @@ export class TranslateTextService {
       text, this._isPreviousTextAvailableForTranslation(), status, translation);
   }
 
-  suggestTranslatedText(
+  suggestTranslatedText (
       translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: () => void): void {

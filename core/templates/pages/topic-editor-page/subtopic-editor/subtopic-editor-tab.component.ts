@@ -44,7 +44,7 @@ angular.module('oppia').component('subtopicEditorTab', {
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
-    function(
+    function (
         $rootScope, $scope, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorRoutingService,
         TopicEditorStateService, TopicUpdateService,
@@ -57,7 +57,7 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
-      ctrl.initEditor = function() {
+      ctrl.initEditor = function () {
         ctrl.hostname = WindowRef.nativeWindow.location.hostname;
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.classroomUrlFragment = (
@@ -107,7 +107,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         }
       };
 
-      ctrl.updateSubtopicTitle = function(title) {
+      ctrl.updateSubtopicTitle = function (title) {
         if (title === ctrl.subtopic.getTitle()) {
           return;
         }
@@ -122,7 +122,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.editableTitle = title;
       };
 
-      ctrl.updateSubtopicUrlFragment = function(urlFragment) {
+      ctrl.updateSubtopicUrlFragment = function (urlFragment) {
         ctrl.subtopicUrlFragmentIsValid = (
           SubtopicValidationService.isUrlFragmentValid(urlFragment));
         if (urlFragment === ctrl.initialSubtopicUrlFragment) {
@@ -144,7 +144,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.editableUrlFragment = urlFragment;
       };
 
-      ctrl.updateSubtopicThumbnailFilename = function(
+      ctrl.updateSubtopicThumbnailFilename = function (
           newThumbnailFilename) {
         var oldThumbnailFilename = ctrl.subtopic.getThumbnailFilename();
         if (newThumbnailFilename === oldThumbnailFilename) {
@@ -155,7 +155,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.editableThumbnailFilename = newThumbnailFilename;
       };
 
-      ctrl.updateSubtopicThumbnailBgColor = function(
+      ctrl.updateSubtopicThumbnailBgColor = function (
           newThumbnailBgColor) {
         var oldThumbnailBgColor = ctrl.subtopic.getThumbnailBgColor();
         if (newThumbnailBgColor === oldThumbnailBgColor) {
@@ -166,15 +166,15 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.editableThumbnailBgColor = newThumbnailBgColor;
       };
 
-      ctrl.resetErrorMsg = function() {
+      ctrl.resetErrorMsg = function () {
         ctrl.errorMsg = null;
       };
 
-      ctrl.isSkillDeleted = function(skillSummary) {
+      ctrl.isSkillDeleted = function (skillSummary) {
         return skillSummary.getDescription() === null;
       };
 
-      ctrl.getSkillEditorUrl = function(skillId) {
+      ctrl.getSkillEditorUrl = function (skillId) {
         return UrlInterpolationService.interpolateUrl(
           SKILL_EDITOR_URL_TEMPLATE, {
             skillId: skillId
@@ -182,7 +182,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         );
       };
 
-      ctrl.updateHtmlData = function() {
+      ctrl.updateHtmlData = function () {
         if (ctrl.htmlData !==
                 ctrl.subtopicPage.getPageContents().getHtml()) {
           var subtitledHtml = angular.copy(
@@ -195,17 +195,17 @@ angular.module('oppia').component('subtopicEditorTab', {
         }
       };
 
-      ctrl.cancelHtmlDataChange = function() {
+      ctrl.cancelHtmlDataChange = function () {
         ctrl.htmlData = ctrl.htmlDataBeforeUpdate;
         ctrl.updateHtmlData();
         ctrl.schemaEditorIsShown = false;
       };
-      ctrl.showSchemaEditor = function() {
+      ctrl.showSchemaEditor = function () {
         ctrl.schemaEditorIsShown = true;
         ctrl.htmlDataBeforeUpdate = angular.copy(ctrl.htmlData);
       };
 
-      ctrl.onRearrangeMoveSkillFinish = function(toIndex) {
+      ctrl.onRearrangeMoveSkillFinish = function (toIndex) {
         ctrl.toIndex = toIndex;
         if (ctrl.fromIndex === ctrl.toIndex) {
           return;
@@ -214,41 +214,41 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.topic, ctrl.subtopic.getId(), ctrl.fromIndex, ctrl.toIndex);
       };
 
-      ctrl.onRearrangeMoveSkillStart = function(fromIndex) {
+      ctrl.onRearrangeMoveSkillStart = function (fromIndex) {
         ctrl.fromIndex = fromIndex;
       };
 
-      ctrl.toggleSubtopicPreview = function() {
+      ctrl.toggleSubtopicPreview = function () {
         ctrl.subtopicPreviewCardIsShown = !ctrl.subtopicPreviewCardIsShown;
       };
 
-      ctrl.togglePreviewSkillCard = function() {
+      ctrl.togglePreviewSkillCard = function () {
         if (!WindowDimensionsService.isWindowNarrow()) {
           return;
         }
         ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
       };
 
-      ctrl.toggleSubtopicEditorCard = function() {
+      ctrl.toggleSubtopicEditorCard = function () {
         if (!WindowDimensionsService.isWindowNarrow()) {
           return;
         }
         ctrl.subtopicEditorCardIsShown = !ctrl.subtopicEditorCardIsShown;
       };
 
-      ctrl.showSkillEditOptions = function(index) {
+      ctrl.showSkillEditOptions = function (index) {
         ctrl.selectedSkillEditOptionsIndex = (
             (ctrl.selectedSkillEditOptionsIndex === index) ? -1 : index);
       };
 
-      ctrl.removeSkillFromSubtopic = function(skillSummary) {
+      ctrl.removeSkillFromSubtopic = function (skillSummary) {
         ctrl.selectedSkillEditOptionsIndex = -1;
         TopicUpdateService.removeSkillFromSubtopic(
           ctrl.topic, ctrl.subtopicId, skillSummary);
         ctrl.initEditor();
       };
 
-      ctrl.removeSkillFromTopic = function(skillSummary) {
+      ctrl.removeSkillFromTopic = function (skillSummary) {
         ctrl.selectedSkillEditOptionsIndex = -1;
         TopicUpdateService.removeSkillFromSubtopic(
           ctrl.topic, ctrl.subtopicId, skillSummary);
@@ -257,11 +257,11 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.initEditor();
       };
 
-      ctrl.navigateToTopicEditor = function() {
+      ctrl.navigateToTopicEditor = function () {
         TopicEditorRoutingService.navigateToMainTab();
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.SUBTOPIC_PAGE_SCHEMA = {
           type: 'html',
           ui_config: {
@@ -303,7 +303,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.initEditor();
         }
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

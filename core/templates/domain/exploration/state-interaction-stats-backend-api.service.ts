@@ -38,11 +38,11 @@ export class StateInteractionStatsBackendApiService {
   STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
     '/createhandler/state_interaction_stats/<exploration_id>/<state_name>');
 
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async getStatsAsync(
+  async getStatsAsync (
       explorationId: string,
       name: string
   ): Promise<VisualizationInfo[]> {

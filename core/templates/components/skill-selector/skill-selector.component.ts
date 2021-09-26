@@ -51,11 +51,11 @@ export class SkillSelectorComponent implements OnInit {
   subTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
 
-  constructor(
+  constructor (
     private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.currCategorizedSkills = this.categorizedSkills;
     for (let topicName in this.currCategorizedSkills) {
       let topicNameDict = {
@@ -76,11 +76,11 @@ export class SkillSelectorComponent implements OnInit {
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
   }
 
-  checkIfEmpty(skills: Object[]): boolean {
+  checkIfEmpty (skills: Object[]): boolean {
     return skills.length === 0;
   }
 
-  checkTopicIsNotEmpty(topicName: string): boolean {
+  checkTopicIsNotEmpty (topicName: string): boolean {
     for (let key in this.currCategorizedSkills[topicName]) {
       if (Object.keys(this.currCategorizedSkills[topicName][key]).length) {
         return true;
@@ -89,13 +89,13 @@ export class SkillSelectorComponent implements OnInit {
     return false;
   }
 
-  setSelectedSkillId(): void {
+  setSelectedSkillId (): void {
     this.selectedSkillIdChange.emit(this.selectedSkill);
   }
 
   // The following function is called when the subtopic filter changes.
   // This updates the list of Skills displayed in the selector.
-  updateSkillsListOnSubtopicFilterChange(): void {
+  updateSkillsListOnSubtopicFilterChange (): void {
     let updatedSkillsDict: CategorizedSkills = {};
     let isAnySubTopicChecked: boolean = false;
     for (let topicName in this.subTopicFilterDict) {
@@ -140,7 +140,7 @@ export class SkillSelectorComponent implements OnInit {
   // The following function is called when the topic filter changes.
   // First, the subtopic filter is updated according to the changed
   // topic filter list. Then the main Skills list is updated.
-  updateSkillsListOnTopicFilterChange(): void {
+  updateSkillsListOnTopicFilterChange (): void {
     let updatedSubTopicFilterList: SubTopicFilterDict = {};
     let isAnyTopicChecked: boolean = false;
     for (var i = 0; i < this.topicFilterList.length; i++) {
@@ -169,7 +169,7 @@ export class SkillSelectorComponent implements OnInit {
     this.updateSkillsListOnSubtopicFilterChange();
   }
 
-  searchInSubtopicSkills(input: ShortSkillSummary[], searchText: string):
+  searchInSubtopicSkills (input: ShortSkillSummary[], searchText: string):
   ShortSkillSummary[] {
     let skills: string[] = input.map(val => {
       return val.getDescription();
@@ -181,7 +181,7 @@ export class SkillSelectorComponent implements OnInit {
     });
   }
 
-  searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
+  searchInUntriagedSkillSummaries (searchText: string): SkillSummary[] {
     let skills: string[] = this.untriagedSkillSummaries.map(val => {
       return val.description;
     });
@@ -192,7 +192,7 @@ export class SkillSelectorComponent implements OnInit {
     });
   }
 
-  clearAllFilters(): void {
+  clearAllFilters (): void {
     for (let i = 0; i < this.topicFilterList.length; i++) {
       this.topicFilterList[i].checked = false;
     }

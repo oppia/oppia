@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Exploration Editor Suggestion Modal Controller', function() {
+describe('Exploration Editor Suggestion Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var EditabilityService = null;
@@ -31,20 +31,20 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
   var newContent = 'New Content';
   var suggestionStatus = 'rejected';
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('when suggestion is already rejected', function() {
+  describe('when suggestion is already rejected', function () {
     var suggestionIsHandled = true;
     var suggestionIsValid = true;
     var threadUibModalInstance = null;
     var unsavedChangesExist = true;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       EditabilityService = $injector.get('EditabilityService');
       SuggestionModalService = $injector.get('SuggestionModalService');
@@ -69,7 +69,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.isNotHandled).toEqual(false);
         expect($scope.canEdit).toBe(true);
         expect($scope.commitMessage).toBe('');
@@ -82,7 +82,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
           'This suggestion has already been rejected.');
       });
 
-    it('should close modal when accepting suggestion', function() {
+    it('should close modal when accepting suggestion', function () {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
       $scope.acceptSuggestion();
 
@@ -90,7 +90,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should close modal when rejecting suggestion', function() {
+    it('should close modal when rejecting suggestion', function () {
       spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
       $scope.rejectSuggestion();
 
@@ -98,7 +98,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should dismiss modal when canceling suggestion', function() {
+    it('should dismiss modal when canceling suggestion', function () {
       spyOn(SuggestionModalService, 'cancelSuggestion').and.callThrough();
       $scope.cancelReview();
 
@@ -109,13 +109,13 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
   });
 
   describe('when suggestion is from a state that doesn\'t exist anymore',
-    function() {
+    function () {
       var suggestionIsHandled = false;
       var suggestionIsValid = false;
       var threadUibModalInstance = null;
       var unsavedChangesExist = true;
 
-      beforeEach(angular.mock.inject(function($injector, $controller) {
+      beforeEach(angular.mock.inject(function ($injector, $controller) {
         var $rootScope = $injector.get('$rootScope');
         EditabilityService = $injector.get('EditabilityService');
         SuggestionModalService = $injector.get('SuggestionModalService');
@@ -140,7 +140,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       }));
 
       it('should initialize $scope properties after controller is initialized',
-        function() {
+        function () {
           expect($scope.isNotHandled).toEqual(true);
           expect($scope.canEdit).toBe(true);
           expect($scope.commitMessage).toBe('');
@@ -155,13 +155,13 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
         });
     });
 
-  describe('when exploration has unsaved changes', function() {
+  describe('when exploration has unsaved changes', function () {
     var suggestionIsHandled = false;
     var suggestionIsValid = true;
     var threadUibModalInstance = null;
     var unsavedChangesExist = true;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       EditabilityService = $injector.get('EditabilityService');
 
@@ -185,7 +185,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.isNotHandled).toEqual(true);
         expect($scope.canEdit).toBe(true);
         expect($scope.commitMessage).toBe('');
@@ -201,13 +201,13 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
   });
 
   describe('when suggestion is valid but not handled and no exist changes' +
-    ' exist', function() {
+    ' exist', function () {
     var suggestionIsHandled = false;
     var suggestionIsValid = true;
     var threadUibModalInstance = null;
     var unsavedChangesExist = false;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
       SuggestionModalService = $injector.get('SuggestionModalService');
       EditabilityService = $injector.get('EditabilityService');
@@ -235,7 +235,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
     }));
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
+      function () {
         expect($scope.isNotHandled).toEqual(true);
         expect($scope.canEdit).toBe(true);
         expect($scope.commitMessage).toBe('');
@@ -248,7 +248,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
 
     it('should accept suggestion and close the modal on clicking the accept' +
-      ' suggestion button', function() {
+      ' suggestion button', function () {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
       $scope.acceptSuggestion();
 
@@ -257,7 +257,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
     });
 
     it('should reject suggestion and close the modal on clicking the reject' +
-      ' suggestion button', function() {
+      ' suggestion button', function () {
       spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
       $scope.rejectSuggestion();
 

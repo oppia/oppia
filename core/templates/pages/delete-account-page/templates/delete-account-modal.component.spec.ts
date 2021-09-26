@@ -27,11 +27,11 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 
-  close(): void {
+  close (): void {
     return;
   }
 }

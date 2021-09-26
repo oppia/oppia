@@ -30,11 +30,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockUrlService {
-  getTopicUrlFragmentFromLearnerUrl() {
+  getTopicUrlFragmentFromLearnerUrl () {
     return 'topic_1';
   }
 
-  getClassroomUrlFragmentFromLearnerUrl() {
+  getClassroomUrlFragmentFromLearnerUrl () {
     return 'classroom_1';
   }
 }
@@ -46,18 +46,18 @@ class MockWindowRef {
       reload: (val) => val
     },
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
 class MockQuestionBackendApiService {
-  async fetchTotalQuestionCountForSkillIdsAsync() {
+  async fetchTotalQuestionCountForSkillIdsAsync () {
     return Promise.resolve(1);
   }
 }
 
-describe('Practice tab component', function() {
+describe('Practice tab component', function () {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
@@ -119,7 +119,7 @@ describe('Practice tab component', function() {
   });
 
   it('should initialize controller properties after its initilization',
-    function() {
+    function () {
       component.ngOnInit();
       expect(component.selectedSubtopics).toEqual([]);
       expect(component.availableSubtopics.length).toBe(1);
@@ -127,26 +127,26 @@ describe('Practice tab component', function() {
     });
 
   it('should have start button enabled when a subtopic is selected',
-    function() {
+    function () {
       component.selectedSubtopicIndices[0] = true;
       component.questionsAreAvailable = true;
       expect(component.isStartButtonDisabled()).toBe(false);
     });
 
   it('should have start button disabled when there is no subtopic selected',
-    function() {
+    function () {
       component.selectedSubtopicIndices[0] = false;
       expect(component.isStartButtonDisabled()).toBe(true);
     });
 
   it('should have start button disabled when the disable boolean is set',
-    function() {
+    function () {
       component.startButtonIsDisabled = true;
       expect(component.isStartButtonDisabled()).toBe(true);
     });
 
   it('should open a new practice session containing the selected subtopic' +
-    ' when start button is clicked for topicViewer display area', function() {
+    ' when start button is clicked for topicViewer display area', function () {
     component.selectedSubtopicIndices[0] = true;
     component.openNewPracticeSession();
 
@@ -167,7 +167,7 @@ describe('Practice tab component', function() {
     }));
 
   it('should open a new practice session containing the selected subtopic' +
-    ' when start button is clicked for progressTab display area', function() {
+    ' when start button is clicked for progressTab display area', function () {
     component.displayArea = 'progressTab';
     component.topicUrlFragment = 'topic_1';
     component.classroomUrlFragment = 'classroom_1';

@@ -29,11 +29,11 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   styleUrls: []
 })
 export class AboutFoundationPageComponent implements OnInit {
-  constructor(
+  constructor (
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.pageTitleService.setDocumentTitle('About foundation | Oppia');
   }
 }

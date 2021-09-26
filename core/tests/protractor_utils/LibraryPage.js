@@ -21,7 +21,7 @@ var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
-var LibraryPage = function() {
+var LibraryPage = function () {
   var LIBRARY_URL_SUFFIX = '/community-library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
@@ -29,11 +29,11 @@ var LibraryPage = function() {
     by.css('.protractor-test-exp-summary-tile'));
   var expSummaryTileTitleLocator = by.css(
     '.protractor-test-exp-summary-tile-title');
-  var allCollectionsTitled = function(collectionName) {
+  var allCollectionsTitled = function (collectionName) {
     return element.all(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', collectionName));
   };
-  var allExplorationsTitled = function(explorationName) {
+  var allExplorationsTitled = function (explorationName) {
     return element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', explorationName));
   };
@@ -60,9 +60,9 @@ var LibraryPage = function() {
     '.protractor-test-exp-summary-tile-rating');
 
   // Returns a promise of all explorations with the given name.
-  var _getExplorationElements = async function(name) {
+  var _getExplorationElements = async function (name) {
     return await allExplorationSummaryTile.filter(
-      async function(tile) {
+      async function (tile) {
         var tileTitle = await tile.element(
           expSummaryTileTitleLocator).getText();
         return (tileTitle === name);
@@ -70,7 +70,7 @@ var LibraryPage = function() {
     );
   };
 
-  var _submitSearchQuery = async function(searchQuery) {
+  var _submitSearchQuery = async function (searchQuery) {
     // The library page has two search bar input elements.
     // The first search bar input element is visible only in a desktop
     // browser and is invisible in case of a mobile browser.
@@ -90,12 +90,12 @@ var LibraryPage = function() {
     }
   };
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
 
-  this.addSelectedExplorationToPlaylist = async function() {
+  this.addSelectedExplorationToPlaylist = async function () {
     await browser.actions().mouseMove(expHoverElement).perform();
 
     await waitFor.elementToBeClickable(
@@ -105,46 +105,46 @@ var LibraryPage = function() {
       'Add to play later list button', addToPlayLaterListButton);
   };
 
-  this.selectLanguages = async function(languages) {
+  this.selectLanguages = async function (languages) {
     await languageSelector.selectValues(languages);
   };
 
-  this.deselectLanguages = async function(languages) {
+  this.deselectLanguages = async function (languages) {
     await languageSelector.deselectValues(languages);
   };
 
-  this.expectCurrentLanguageSelectionToBe = async function(expectedLanguages) {
+  this.expectCurrentLanguageSelectionToBe = async function (expectedLanguages) {
     await languageSelector.expectCurrentSelectionToBe(expectedLanguages);
   };
 
-  this.selectCategories = async function(categories) {
+  this.selectCategories = async function (categories) {
     await categorySelector.selectValues(categories);
   };
 
-  this.deselectCategories = async function(categories) {
+  this.deselectCategories = async function (categories) {
     await categorySelector.deselectValues(categories);
   };
 
-  this.expectCurrentCategorySelectionToBe = async function(
+  this.expectCurrentCategorySelectionToBe = async function (
       expectedCategories) {
     await categorySelector.expectCurrentSelectionToBe(expectedCategories);
   };
 
-  this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+  this.expectMainHeaderTextToBe = async function (expectedHeaderText) {
     expect(await mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
-  this.expectExplorationToBeVisible = async function(name) {
+  this.expectExplorationToBeVisible = async function (name) {
     var elems = await _getExplorationElements(name);
     expect(elems.length).not.toBe(0);
   };
 
-  this.expectExplorationToBeHidden = async function(name) {
+  this.expectExplorationToBeHidden = async function (name) {
     var elems = await _getExplorationElements(name);
     expect(elems.length).toBe(0);
   };
 
-  this.playCollection = async function(collectionName) {
+  this.playCollection = async function (collectionName) {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       allCollectionSummaryTile.first(),
@@ -159,7 +159,7 @@ var LibraryPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.playExploration = async function(explorationName) {
+  this.playExploration = async function (explorationName) {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       allExplorationSummaryTile.first(),
@@ -174,12 +174,12 @@ var LibraryPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getExplorationObjective = async function(name) {
+  this.getExplorationObjective = async function (name) {
     var elems = await _getExplorationElements(name);
     return await elems[0].element(expSummaryTileObjectiveLocator).getText();
   };
 
-  this.expectExplorationRatingToEqual = async function(name, ratingValue) {
+  this.expectExplorationRatingToEqual = async function (name, ratingValue) {
     var elems = await _getExplorationElements(name);
     await waitFor.visibilityOf(
       elems[0], 'Rating card takes too long to appear');
@@ -187,21 +187,21 @@ var LibraryPage = function() {
     expect(value).toBe(ratingValue);
   };
 
-  this.clickCreateActivity = async function() {
+  this.clickCreateActivity = async function () {
     await action.click('create Activity Button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickExplorationObjective = async function() {
+  this.clickExplorationObjective = async function () {
     await action.click('Exploration objective', explorationObjective);
   };
 
-  this.findExploration = async function(explorationTitle) {
+  this.findExploration = async function (explorationTitle) {
     await waitFor.pageToFullyLoad();
     await _submitSearchQuery(explorationTitle);
   };
 
-  this.findCollection = async function(collectionTitle) {
+  this.findCollection = async function (collectionTitle) {
     await waitFor.pageToFullyLoad();
     await _submitSearchQuery(collectionTitle);
   };

@@ -66,7 +66,7 @@ angular.module('oppia').component('translationTab', {
     'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
     'TranslationTabActiveModeService',
     'UserExplorationPermissionsService',
-    function(
+    function (
         $scope, $templateCache, $uibModal,
         ContextService, EditabilityService, ExplorationStatesService,
         LoaderService, RouterService, SiteAnalyticsService,
@@ -88,7 +88,7 @@ angular.module('oppia').component('translationTab', {
       ngJoyrideTemplate = ngJoyrideTemplate.replace(
         /\{\{/g, '<[').replace(/\}\}/g, ']>');
 
-      $scope.initTranslationTab = function() {
+      $scope.initTranslationTab = function () {
         StateTutorialFirstTimeService.initTranslation(
           ContextService.getExplorationId());
         var stateName = StateEditorService.getActiveStateName();
@@ -107,23 +107,23 @@ angular.module('oppia').component('translationTab', {
         }
       };
 
-      $scope.leaveTutorial = function() {
+      $scope.leaveTutorial = function () {
         EditabilityService.onEndTutorial();
         $scope.$apply();
         StateTutorialFirstTimeService.markTranslationTutorialFinished();
         $scope.tutorialInProgress = false;
       };
 
-      $scope.onFinishTutorial = function() {
+      $scope.onFinishTutorial = function () {
         $scope.leaveTutorial();
       };
 
-      $scope.onSkipTutorial = function() {
+      $scope.onSkipTutorial = function () {
         $scope.leaveTutorial();
       };
 
       var permissions = null;
-      $scope.startTutorial = function() {
+      $scope.startTutorial = function () {
         if (permissions === null) {
           return;
         }
@@ -132,7 +132,7 @@ angular.module('oppia').component('translationTab', {
         }
       };
 
-      $scope.showWelcomeTranslationModal = function() {
+      $scope.showWelcomeTranslationModal = function () {
         $uibModal.open({
           template: require(
             'pages/exploration-editor-page/translation-tab/' +
@@ -140,18 +140,18 @@ angular.module('oppia').component('translationTab', {
           backdrop: true,
           controller: 'WelcomeTranslationModalController',
           windowClass: 'oppia-welcome-modal'
-        }).result.then(function(explorationId) {
+        }).result.then(function (explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
           $scope.startTutorial();
-        }, function(explorationId) {
+        }, function (explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
             explorationId);
           StateTutorialFirstTimeService.markTranslationTutorialFinished();
         });
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         LoaderService.showLoadingScreen('Loading');
         $scope.isTranslationTabBusy = false;
         $scope.showTranslationTabSubDirectives = false;
@@ -173,7 +173,7 @@ angular.module('oppia').component('translationTab', {
             'Hit the "Next" button to begin.')
         }, {
           type: 'function',
-          fn: function(isGoingForward) {
+          fn: function (isGoingForward) {
             $('html, body').animate({
               scrollTop: (isGoingForward ? 0 : 20)
             }, 1000);
@@ -188,7 +188,7 @@ angular.module('oppia').component('translationTab', {
           placement: 'bottom'
         }, {
           type: 'function',
-          fn: function(isGoingForward) {
+          fn: function (isGoingForward) {
             var idToScrollTo = (
               isGoingForward ? _ID_TUTORIAL_TRANSLATION_OVERVIEW :
               _ID_TUTORIAL_TRANSLATION_LANGUAGE);
@@ -208,7 +208,7 @@ angular.module('oppia').component('translationTab', {
           placement: 'left'
         }, {
           type: 'function',
-          fn: function(isGoingForward) {
+          fn: function (isGoingForward) {
             var idToScrollTo = (
               isGoingForward ? _ID_TUTORIAL_TRANSLATION_STATE :
               _ID_TUTORIAL_TRANSLATION_OVERVIEW);
@@ -228,7 +228,7 @@ angular.module('oppia').component('translationTab', {
           placement: 'bottom'
         }, {
           type: 'function',
-          fn: function(isGoingForward) {
+          fn: function (isGoingForward) {
             $('html, body').animate({
               scrollTop: (isGoingForward ? 0 : 20)
             }, 1000);
@@ -266,7 +266,7 @@ angular.module('oppia').component('translationTab', {
             '</ol>')
         }, {
           type: 'function',
-          fn: function(isGoingForward) {
+          fn: function (isGoingForward) {
             $('html, body').animate({
               scrollTop: (isGoingForward ? 0 : 20)
             }, 1000);
@@ -302,7 +302,7 @@ angular.module('oppia').component('translationTab', {
             '</ul>')
         }, {
           type: 'function',
-          fn: function(isGoingForward) {
+          fn: function (isGoingForward) {
             $('html, body').animate({
               scrollTop: (isGoingForward ? 0 : 20)
             }, 1000);
@@ -326,7 +326,7 @@ angular.module('oppia').component('translationTab', {
         $templateCache.put(
           'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
         UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(explorationPermissions) {
+          .then(function (explorationPermissions) {
             permissions = explorationPermissions;
           });
         ctrl.directiveSubscriptions.add(
@@ -336,7 +336,7 @@ angular.module('oppia').component('translationTab', {
           )
         );
       };
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }]

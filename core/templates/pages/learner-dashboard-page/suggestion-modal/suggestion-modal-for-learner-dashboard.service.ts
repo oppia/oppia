@@ -31,11 +31,11 @@ interface ExtraParams {
   providedIn: 'root'
 })
 export class SuggestionModalForLearnerDashboardService {
-  constructor(
+  constructor (
     private ngbModal: NgbModal,
   ) {}
 
-  private _showEditStateContentSuggestionModal(
+  private _showEditStateContentSuggestionModal (
       newContent: string, oldContent: string, description: string): void {
     const modelRef = this.ngbModal.open(
       LearnerDashboardSuggestionModalComponent, {backdrop: true});
@@ -49,7 +49,7 @@ export class SuggestionModalForLearnerDashboardService {
     });
   }
 
-  showSuggestionModal(suggestionType: string, extraParams: ExtraParams): void {
+  showSuggestionModal (suggestionType: string, extraParams: ExtraParams): void {
     if (suggestionType === 'edit_exploration_state_content') {
       this._showEditStateContentSuggestionModal(
         extraParams.newContent,

@@ -27,7 +27,7 @@ require(
 
 angular.module('oppia').factory('ContributionAndReviewService', [
   '$http', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
-  function(
+  function (
       $http, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
     var _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
       '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
@@ -44,11 +44,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       '/updatequestionsuggestionhandler/<suggestion_id>'
     );
 
-    var _fetchSuggestionsAsync = async function(url) {
-      return $http.get(url).then(function(res) {
+    var _fetchSuggestionsAsync = async function (url) {
+      return $http.get(url).then(function (res) {
         var suggestionIdToSuggestions = {};
         var targetIdToDetails = res.data.target_id_to_opportunity_dict;
-        res.data.suggestions.forEach(function(suggestion) {
+        res.data.suggestions.forEach(function (suggestion) {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details: targetIdToDetails[suggestion.target_id]
@@ -59,7 +59,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     };
 
     return {
-      getUserCreatedQuestionSuggestionsAsync: async function() {
+      getUserCreatedQuestionSuggestionsAsync: async function () {
         var url = UrlInterpolationService.interpolateUrl(
           _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
             target_type: 'skill',
@@ -67,7 +67,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestionsAsync(url);
       },
-      getReviewableQuestionSuggestionsAsync: async function() {
+      getReviewableQuestionSuggestionsAsync: async function () {
         var url = UrlInterpolationService.interpolateUrl(
           _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
             target_type: 'skill',
@@ -75,7 +75,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestionsAsync(url);
       },
-      getUserCreatedTranslationSuggestionsAsync: async function(onSuccess) {
+      getUserCreatedTranslationSuggestionsAsync: async function (onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
             target_type: 'exploration',
@@ -83,7 +83,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestionsAsync(url);
       },
-      getReviewableTranslationSuggestionsAsync: async function(onSuccess) {
+      getReviewableTranslationSuggestionsAsync: async function (onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
           _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
             target_type: 'exploration',
@@ -91,7 +91,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestionsAsync(url);
       },
-      resolveSuggestionToExploration: function(
+      resolveSuggestionToExploration: function (
           targetId, suggestionId, action, reviewMessage, commitMessage,
           onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
@@ -106,11 +106,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
             action === ACTION_ACCEPT_SUGGESTION ?
             commitMessage : null
           )
-        }).then(function() {
+        }).then(function () {
           onSuccess(suggestionId);
         }, (error) => onFailure && onFailure(error));
       },
-      resolveSuggestiontoSkill: function(
+      resolveSuggestiontoSkill: function (
           targetId, suggestionId, action, reviewMessage, skillDifficulty,
           onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
@@ -122,11 +122,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           action: action,
           review_message: reviewMessage,
           skill_difficulty: skillDifficulty
-        }).then(function() {
+        }).then(function () {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
       },
-      updateTranslationSuggestionAsync: async function(
+      updateTranslationSuggestionAsync: async function (
           suggestionId, translationHtml,
           onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
@@ -135,11 +135,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return $http.put(url, {
           translation_html: translationHtml
-        }).then(function() {
+        }).then(function () {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
       },
-      updateQuestionSuggestionAsync: async function(
+      updateQuestionSuggestionAsync: async function (
           suggestionId, skillDifficulty, questionStateData, imagesData,
           onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
@@ -164,7 +164,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           headers: {
             'Content-Type': undefined
           },
-        }).then(function() {
+        }).then(function () {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
       }

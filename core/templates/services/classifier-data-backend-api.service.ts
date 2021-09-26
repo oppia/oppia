@@ -46,7 +46,7 @@ export interface ClassifierMetaData {
 export class ClassifierDataBackendApiService {
   private readonly classifierDataDownloadUrlTemplate: string;
 
-  constructor(
+  constructor (
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
     if (
@@ -62,15 +62,15 @@ export class ClassifierDataBackendApiService {
       '/<entity_type>/<entity_id>/assets/<filename>');
   }
 
-  static get DEV_MODE(): boolean {
+  static get DEV_MODE (): boolean {
     return AppConstants.DEV_MODE;
   }
 
-  static get GCS_RESOURCE_BUCKET_NAME(): string {
+  static get GCS_RESOURCE_BUCKET_NAME (): string {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
-  private _getDownloadUrl(
+  private _getDownloadUrl (
       entityType: string, entityId: string, filename: string): string {
     return this.urlInterpolationService.interpolateUrl(
       this.classifierDataDownloadUrlTemplate, {
@@ -80,7 +80,7 @@ export class ClassifierDataBackendApiService {
       });
   }
 
-  private async getClassifierMetadataAsync(
+  private async getClassifierMetadataAsync (
       explorationId: string, explorationVersion: number,
       stateName: string): Promise<ClassifierMetaData> {
     return new Promise((resolve, reject) => {
@@ -104,7 +104,7 @@ export class ClassifierDataBackendApiService {
     });
   }
 
-  async getClassifierDataAsync(
+  async getClassifierDataAsync (
       explorationId: string, explorationVersion: number,
       stateName: string): Promise<Classifier> {
     return new Promise((resolve, reject) => {

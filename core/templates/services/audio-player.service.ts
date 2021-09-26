@@ -45,14 +45,14 @@ export class AudioPlayerService {
   private _autoplayAudioEventEmitter = (
     new EventEmitter<void | AutoPlayAudioEvent>());
   private _stopIntervalSubject = new Subject<void>();
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private audioTranslationManagerService: AudioTranslationManagerService,
     private contextService: ContextService,
     private ngZone: NgZone
   ) {}
 
-  private async _loadAsync(
+  private async _loadAsync (
       filename: string,
       successCallback: () => void,
       errorCallback: (reason?: string[]) => void
@@ -85,13 +85,13 @@ export class AudioPlayerService {
     );
   }
 
-  async loadAsync(filename: string): Promise<void> {
+  async loadAsync (filename: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._loadAsync(filename, resolve, reject);
     });
   }
 
-  play(): void {
+  play (): void {
     if (this.isPlaying()) {
       return;
     }
@@ -114,7 +114,7 @@ export class AudioPlayerService {
     });
   }
 
-  pause(): void {
+  pause (): void {
     if (!this.isPlaying()) {
       return;
     }
@@ -125,7 +125,7 @@ export class AudioPlayerService {
     this._stopIntervalSubject.next();
   }
 
-  stop(): void {
+  stop (): void {
     if (!this._currentTrack) {
       return;
     }
@@ -135,7 +135,7 @@ export class AudioPlayerService {
     this._stopIntervalSubject.next();
   }
 
-  rewind(seconds: number): void {
+  rewind (seconds: number): void {
     if (!this._currentTrack) {
       return;
     }
@@ -148,7 +148,7 @@ export class AudioPlayerService {
     this._currentTrack.seek(rewindTo > 0 ? rewindTo : 0);
   }
 
-  forward(seconds: number): void {
+  forward (seconds: number): void {
     if (!this._currentTrack) {
       return;
     }
@@ -161,7 +161,7 @@ export class AudioPlayerService {
     }
   }
 
-  getCurrentTime(): number {
+  getCurrentTime (): number {
     if (!this._currentTrack) {
       return 0;
     }
@@ -172,7 +172,7 @@ export class AudioPlayerService {
     return Math.floor(currentTime);
   }
 
-  setCurrentTime(val: number): void {
+  setCurrentTime (val: number): void {
     if (!this._currentTrack) {
       return;
     }
@@ -188,7 +188,7 @@ export class AudioPlayerService {
     this._currentTrack.seek(Math.floor(val));
   }
 
-  getAudioDuration(): number {
+  getAudioDuration (): number {
     if (this._currentTrack) {
       return this._currentTrack.duration();
     } else {
@@ -196,15 +196,15 @@ export class AudioPlayerService {
     }
   }
 
-  isPlaying(): boolean {
+  isPlaying (): boolean {
     return this._currentTrack !== null && this._currentTrack.playing();
   }
 
-  isTrackLoaded(): boolean {
+  isTrackLoaded (): boolean {
     return this._currentTrack !== null;
   }
 
-  clear(): void {
+  clear (): void {
     if (this.isPlaying()) {
       this.stop();
     }
@@ -212,15 +212,15 @@ export class AudioPlayerService {
     this._currentTrack = null;
   }
 
-  get viewUpdate(): EventEmitter<void> {
+  get viewUpdate (): EventEmitter<void> {
     return this._updateViewEventEmitter;
   }
 
-  get onAutoplayAudio(): EventEmitter<void | AutoPlayAudioEvent> {
+  get onAutoplayAudio (): EventEmitter<void | AutoPlayAudioEvent> {
     return this._autoplayAudioEventEmitter;
   }
 
-  get onAudioStop(): Subject<void> {
+  get onAudioStop (): Subject<void> {
     return this._stopIntervalSubject;
   }
 }

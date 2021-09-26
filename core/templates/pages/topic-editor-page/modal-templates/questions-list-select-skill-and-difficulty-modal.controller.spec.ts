@@ -23,7 +23,7 @@ import { SkillDifficulty } from
   'domain/skill/skill-difficulty.model';
 
 describe('Questions List Select Skill And Difficulty Modal Controller',
-  function() {
+  function () {
     var $scope = null;
     var $uibModalInstance = null;
 
@@ -44,7 +44,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
 
     beforeEach(angular.mock.module('oppia'));
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -66,7 +66,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     }));
 
     it('should initialize $scope properties after controller' +
-      ' is initialized', function() {
+      ' is initialized', function () {
       expect($scope.countOfSkillsToPrioritize).toBe(countOfSkillsToPrioritize);
       expect($scope.instructionMessage).toBe(
         'Select the skill(s) to link the question to:');
@@ -79,7 +79,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       expect($scope.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
     });
 
-    it('should toggle skill selection when clicking on it', function() {
+    it('should toggle skill selection when clicking on it', function () {
       expect($scope.linkedSkillsWithDifficulty.length).toBe(0);
       var summary = allSkillSummaries[0];
       $scope.selectOrDeselectSkill(summary);
@@ -93,7 +93,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     });
 
     it('should change view mode to select skill when changing view',
-      function() {
+      function () {
         expect($scope.currentMode).toBe(currentMode);
 
         $scope.goToSelectSkillView();
@@ -101,7 +101,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       });
 
     it('should change view mode to select difficulty after selecting a skill',
-      function() {
+      function () {
         expect($scope.currentMode).toBe(currentMode);
 
         $scope.goToNextStep();
@@ -109,7 +109,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       });
 
     it('should select skill and its difficulty proerly when closing the modal',
-      function() {
+      function () {
         var summary = allSkillSummaries[1];
         $scope.selectOrDeselectSkill(summary);
 

@@ -35,14 +35,14 @@ describe('ImageWithRegionsEditorComponent', () => {
     onload!: () => string;
     width = 0;
     height = 0;
-    constructor(_width: 0, _height: 0) {
+    constructor (_width: 0, _height: 0) {
       this.width = _width;
       this.height = _height;
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url: string) {
+    set src (url: string) {
       this.onload();
     }
   }

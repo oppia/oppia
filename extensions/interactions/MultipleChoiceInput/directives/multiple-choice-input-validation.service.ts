@@ -34,11 +34,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class MultipleChoiceInputValidationService {
-  constructor(
+  constructor (
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: MultipleChoiceInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
@@ -74,7 +74,7 @@ export class MultipleChoiceInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string,
       customizationArgs: MultipleChoiceInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {

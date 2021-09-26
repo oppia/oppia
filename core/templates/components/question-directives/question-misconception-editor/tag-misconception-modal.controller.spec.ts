@@ -34,7 +34,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
-describe('Tag misconception modal controller', function() {
+describe('Tag misconception modal controller', function () {
   var $controller = null;
   var $uibModalInstance = null;
   var $rootScope = null;
@@ -44,7 +44,7 @@ describe('Tag misconception modal controller', function() {
   var ses = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
@@ -53,7 +53,7 @@ describe('Tag misconception modal controller', function() {
   }));
 
   beforeEach(angular.mock.inject(
-    function(_$controller_, _$q_, _$rootScope_, $injector) {
+    function (_$controller_, _$q_, _$rootScope_, $injector) {
       $rootScope = _$rootScope_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');
@@ -67,7 +67,7 @@ describe('Tag misconception modal controller', function() {
             '1', 'misc1', 'notes1', 'feedback1', true)
         ]
       };
-      spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {
+      spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function () {
         return mockMisconceptionObject;
       });
       $controller('TagMisconceptionModalController', {
@@ -78,7 +78,7 @@ describe('Tag misconception modal controller', function() {
       });
     }));
 
-  it('should close modal correctly', function() {
+  it('should close modal correctly', function () {
     $scope.tempSelectedMisconception = mockMisconceptionObject.abc[0];
     $scope.tempSelectedMisconceptionSkillId = 'abc';
     $scope.done();
@@ -89,7 +89,7 @@ describe('Tag misconception modal controller', function() {
     });
   });
 
-  it('should dismiss modal correctly', function() {
+  it('should dismiss modal correctly', function () {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalled();
   });

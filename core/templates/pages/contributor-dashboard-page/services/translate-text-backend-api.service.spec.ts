@@ -264,7 +264,7 @@ describe('TranslateTextBackendApiService', () => {
     }));
 
     it('should throw error if Image Data is not present in' +
-       ' local Storage', async() => {
+       ' local Storage', async () => {
       imagesData = [{
         filename: 'imageFilename1',
         imageBlob: null

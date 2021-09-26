@@ -32,7 +32,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
   'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService',
   'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
-  function(
+  function (
       ExplorationParamChangesService, ExplorationStatesService,
       ExpressionInterpolationService, GraphDataService,
       PARAM_ACTION_GET, PARAM_ACTION_SET) {
@@ -41,7 +41,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
     var PARAM_SOURCE_FEEDBACK = 'feedback';
     var PARAM_SOURCE_PARAM_CHANGES = 'param_changes';
 
-    var getMetadataFromParamChanges = function(paramChanges) {
+    var getMetadataFromParamChanges = function (paramChanges) {
       var result = [];
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
@@ -76,7 +76,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
     // the order that they occur.
     // TODO(sll): Add trace data (so that it's easy to figure out in which rule
     // an issue occurred, say).
-    var getStateParamMetadata = function(state) {
+    var getStateParamMetadata = function (state) {
       // First, the state param changes are applied: we get their values
       // and set the params.
       var result = getMetadataFromParamChanges(state.paramChanges);
@@ -84,7 +84,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
       // Next, the content is evaluated.
       ExpressionInterpolationService.getParamsFromString(
         state.content.html).forEach(
-        function(paramName) {
+        function (paramName) {
           result.push(ParamMetadata.createWithGetAction(
             paramName, PARAM_SOURCE_CONTENT, null));
         }
@@ -95,9 +95,9 @@ angular.module('oppia').factory('ParameterMetadataService', [
         'answer', PARAM_SOURCE_ANSWER, null));
 
       // Finally, the rule feedback strings are evaluated.
-      state.interaction.answerGroups.forEach(function(group) {
+      state.interaction.answerGroups.forEach(function (group) {
         ExpressionInterpolationService.getParamsFromString(
-          group.outcome.feedback.html).forEach(function(paramName, index) {
+          group.outcome.feedback.html).forEach(function (paramName, index) {
           result.push(ParamMetadata.createWithGetAction(
             paramName, PARAM_SOURCE_FEEDBACK, index));
         });
@@ -109,7 +109,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
     // Returns one of null, PARAM_ACTION_SET, PARAM_ACTION_GET depending on
     // whether this parameter is not used at all in this state, or
     // whether its first occurrence is a 'set' or 'get'.
-    var getParamStatus = function(stateParamMetadata, paramName) {
+    var getParamStatus = function (stateParamMetadata, paramName) {
       for (var i = 0; i < stateParamMetadata.length; i++) {
         if (stateParamMetadata[i].paramName === paramName) {
           return stateParamMetadata[i].action;
@@ -128,7 +128,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
       //     parameter is required is in the initial list of parameter changes
       //     (e.g. one parameter may be set based on the value assigned to
       //     another parameter).
-      getUnsetParametersInfo: function(initNodeIds) {
+      getUnsetParametersInfo: function (initNodeIds) {
         var graphData = GraphDataService.getGraphData();
 
         var states = ExplorationStatesService.getStates();
@@ -139,13 +139,13 @@ angular.module('oppia').factory('ParameterMetadataService', [
           ExplorationParamChangesService.savedMemento);
         var stateParamMetadatas = {};
 
-        expParamChangesMetadata.forEach(function(expParamMetadataItem) {
+        expParamChangesMetadata.forEach(function (expParamMetadataItem) {
           if (allParamNames.indexOf(expParamMetadataItem.paramName) === -1) {
             allParamNames.push(expParamMetadataItem.paramName);
           }
         });
 
-        states.getStateNames().forEach(function(stateName) {
+        states.getStateNames().forEach(function (stateName) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
             states.getState(stateName));
           for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {

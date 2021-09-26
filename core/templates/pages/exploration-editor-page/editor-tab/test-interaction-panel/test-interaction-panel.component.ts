@@ -36,19 +36,19 @@ angular.module('oppia').component('testInteractionPanel', {
     '$rootScope', '$scope', 'CurrentInteractionService',
     'ExplorationStatesService', 'INTERACTION_DISPLAY_MODE_INLINE',
     'INTERACTION_SPECS',
-    function(
+    function (
         $rootScope, $scope, CurrentInteractionService,
         ExplorationStatesService, INTERACTION_DISPLAY_MODE_INLINE,
         INTERACTION_SPECS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.onSubmitAnswerFromButton = function() {
+      $scope.onSubmitAnswerFromButton = function () {
         CurrentInteractionService.submitAnswer();
       };
 
       $scope.isSubmitButtonDisabled = (
         CurrentInteractionService.isSubmitButtonDisabled);
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.directiveSubscriptions.add(
           // TODO(#11996): Remove when migrating to Angular2+.
           CurrentInteractionService.onAnswerChanged$.subscribe(() => {
@@ -62,7 +62,7 @@ angular.module('oppia').component('testInteractionPanel', {
           INTERACTION_DISPLAY_MODE_INLINE);
       };
 
-      ctrl.$onDestroy = function() {
+      ctrl.$onDestroy = function () {
         ctrl.directiveSubscriptions.unsubscribe();
       };
     }

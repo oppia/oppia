@@ -36,10 +36,10 @@ module.exports = {
     }
   },
 
-  create: function(context) {
+  create: function (context) {
     const sourceCode = context.getSourceCode();
 
-    var _checkNotMultilineDisableComment = function(comment) {
+    var _checkNotMultilineDisableComment = function (comment) {
       if (comment.value.includes('eslint-disable ')) {
         context.report({
           comment,
@@ -50,7 +50,7 @@ module.exports = {
     };
 
     return {
-      Program() {
+      Program () {
         const comments = sourceCode.getAllComments();
         comments.filter(
           token => token.type !== 'Shebang').forEach(

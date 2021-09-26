@@ -28,10 +28,10 @@ describe('parameterNameEditor', () => {
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(function() {
+  beforeEach(function () {
     paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
   });
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     explorationParamSpecsService =
       $injector.get('ExplorationParamSpecsService');
     $rootScope = $injector.get('$rootScope');

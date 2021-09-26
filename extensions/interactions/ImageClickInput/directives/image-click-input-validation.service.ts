@@ -34,11 +34,11 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class ImageClickInputValidationService {
-  constructor(
+  constructor (
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings (
       customizationArgs: ImageClickInputCustomizationArgs): Warning[] {
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['imageAndRegions']);
@@ -105,7 +105,7 @@ export class ImageClickInputValidationService {
     return warningsList;
   }
 
-  getAllWarnings(
+  getAllWarnings (
       stateName: string, customizationArgs: ImageClickInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
     var warningsList: Warning[] = [];
@@ -119,7 +119,7 @@ export class ImageClickInputValidationService {
 
     var imgAndRegionArgValue = customizationArgs.imageAndRegions.value;
     var seenRegionStrings = imgAndRegionArgValue.labeledRegions.map(
-      function(region) {
+      function (region) {
         return region.label;
       });
 

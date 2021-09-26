@@ -37,7 +37,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 
-describe('Full exploration editor', function() {
+describe('Full exploration editor', function () {
   var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
@@ -48,7 +48,7 @@ describe('Full exploration editor', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -61,7 +61,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
-    async function() {
+    async function () {
       await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
@@ -75,7 +75,7 @@ describe('Full exploration editor', function() {
   );
 
   it('should reflect skills and goal in exploration editor settings',
-    async function() {
+    async function () {
       await users.createUser('user@editorAndPlayer.com', 'userEditorAndPlayer');
       await users.login('user@editorAndPlayer.com');
       const EXPLORATION_OBJECTIVE =
@@ -104,7 +104,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should report an exploration to moderators', async function() {
+  it('should report an exploration to moderators', async function () {
     var EXPLORATION_OBJECTIVE = 'Let us learn how to add fractions';
     await users.createUser(
       'creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
@@ -126,7 +126,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should prevent going back when help card is shown', async function() {
+  it('should prevent going back when help card is shown', async function () {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
 
@@ -172,7 +172,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should redirect back to parent exploration correctly when parent id is' +
-      ' given as query parameter', async function() {
+      ' given as query parameter', async function () {
     await users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     await users.login('user1@editorAndPlayer.com');
 
@@ -222,7 +222,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should give option for redirection when author has specified ' +
-      'a refresher exploration ID', async function() {
+      'a refresher exploration ID', async function () {
     await users.createCollectionEditor('testadm@collections.com', 'testadm');
     await users.login('testadm@collections.com');
     await adminPage.addRole('testadm', 'curriculum admin');
@@ -366,7 +366,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should navigate multiple states correctly, with parameters',
-    async function() {
+    async function () {
       await users.createUser(
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
       await users.login('user4@editorAndPlayer.com');
@@ -424,7 +424,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should use hints and solutions in an exploration', async function() {
+  it('should use hints and solutions in an exploration', async function () {
     var explorationPlayerPage = (
       new ExplorationPlayerPage.ExplorationPlayerPage());
     await users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
@@ -466,7 +466,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should play the recommended exploration successfully', async function() {
+  it('should play the recommended exploration successfully', async function () {
     await users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
     await users.createUser(
       'user10@editorAndPlayer.com', 'user10editorAndPlayer');
@@ -525,7 +525,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

@@ -36,12 +36,12 @@ interface PageMetadata {
   providedIn: 'root'
 })
 export class PageHeadService {
-  constructor(
+  constructor (
     private pageTitleService: PageTitleService,
     private metaTagCustomizationService: MetaTagCustomizationService
   ) {}
 
-  updateTitleAndMetaTags(pageMetadata: PageMetadata): void {
+  updateTitleAndMetaTags (pageMetadata: PageMetadata): void {
     // Update default title.
     this.pageTitleService.setDocumentTitle(pageMetadata.TITLE);
 

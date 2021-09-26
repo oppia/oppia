@@ -50,7 +50,7 @@ require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
   '$uibModal', 'AlertsService', 'ExternalSaveService',
-  function(
+  function (
       $uibModal, AlertsService, ExternalSaveService) {
     return {
       /**
@@ -59,7 +59,7 @@ angular.module('oppia').factory('TrainingModalService', [
       * @param {requestCallback} finishTrainingCallback - Function to call when
           answer has been trained.
       */
-      openTrainUnresolvedAnswerModal: function(
+      openTrainUnresolvedAnswerModal: function (
           unhandledAnswer, finishTrainingCallback) {
         AlertsService.clearWarnings();
         $uibModal.open({
@@ -68,10 +68,10 @@ angular.module('oppia').factory('TrainingModalService', [
             'modal-templates/training-unresolved-answer-modal.template.html'),
           backdrop: 'static',
           resolve: {
-            unhandledAnswer: function() {
+            unhandledAnswer: function () {
               return unhandledAnswer;
             },
-            finishTrainingCallback: function() {
+            finishTrainingCallback: function () {
               return finishTrainingCallback;
             }
           },

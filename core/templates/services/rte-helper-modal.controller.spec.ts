@@ -20,7 +20,7 @@ import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Rte Helper Modal Controller', function() {
+describe('Rte Helper Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
@@ -29,7 +29,7 @@ describe('Rte Helper Modal Controller', function() {
 
   importAllAngularServices();
 
-  describe('when customization args has a valid youtube video', function() {
+  describe('when customization args has a valid youtube video', function () {
     var customizationArgSpecs = [{
       name: 'heading',
       default_value: 'default value'
@@ -40,14 +40,14 @@ describe('Rte Helper Modal Controller', function() {
 
     beforeEach(angular.mock.module('oppia'));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       mockExternalRteSaveEventEmitter = new EventEmitter();
       $provide.value('ExternalRteSaveService', {
         onExternalRteSave: mockExternalRteSaveEventEmitter
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
 
@@ -66,19 +66,19 @@ describe('Rte Helper Modal Controller', function() {
         });
     }));
 
-    it('should load modal correctly', function() {
+    it('should load modal correctly', function () {
       expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
       expect($scope.modalIsLoading).toBe(true);
       $timeout.flush();
       expect($scope.modalIsLoading).toBe(false);
     });
 
-    it('should close modal when clicking on cancel button', function() {
+    it('should close modal when clicking on cancel button', function () {
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith(false);
     });
 
-    it('should save modal customization args when closing it', function() {
+    it('should save modal customization args when closing it', function () {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       expect($scope.disableSaveButtonForMathRte()).toBe(false);
       $scope.save();
@@ -90,7 +90,7 @@ describe('Rte Helper Modal Controller', function() {
     });
   });
 
-  describe('when the editor is Math expression editor', function() {
+  describe('when the editor is Math expression editor', function () {
     var customizationArgSpecs = [{
       name: 'math_content',
       default_value: {
@@ -104,14 +104,14 @@ describe('Rte Helper Modal Controller', function() {
     var ContextService = null;
     beforeEach(angular.mock.module('oppia'));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       mockExternalRteSaveEventEmitter = new EventEmitter();
       $provide.value('ExternalRteSaveService', {
         onExternalRteSave: mockExternalRteSaveEventEmitter
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
@@ -137,17 +137,17 @@ describe('Rte Helper Modal Controller', function() {
         });
     }));
 
-    it('should load modal correctly', function() {
+    it('should load modal correctly', function () {
       expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
       expect($scope.currentRteIsMathExpressionEditor).toBe(true);
     });
 
-    it('should close modal when clicking on cancel button', function() {
+    it('should close modal when clicking on cancel button', function () {
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith(false);
     });
 
-    it('should save modal customization args when closing it', function() {
+    it('should save modal customization args when closing it', function () {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
@@ -185,7 +185,7 @@ describe('Rte Helper Modal Controller', function() {
       });
     });
 
-    it('should cancel the modal when saving of math SVG fails', function() {
+    it('should cancel the modal when saving of math SVG fails', function () {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
@@ -210,7 +210,7 @@ describe('Rte Helper Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should cancel the modal when math SVG exceeds 100 KB', function() {
+    it('should cancel the modal when math SVG exceeds 100 KB', function () {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
@@ -233,7 +233,7 @@ describe('Rte Helper Modal Controller', function() {
     });
 
     it('should cancel the modal when if the rawLatex or filename field is' +
-       'empty for a math expression', function() {
+       'empty for a math expression', function () {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
@@ -250,7 +250,7 @@ describe('Rte Helper Modal Controller', function() {
     });
 
     it('should save modal customization args while in local storage',
-      function() {
+      function () {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
         $scope.tmpCustomizationArgs = [{
           name: 'math_content',
@@ -280,7 +280,7 @@ describe('Rte Helper Modal Controller', function() {
   });
 
   describe('when customization args doesn\'t have a valid youtube video',
-    function() {
+    function () {
       var customizationArgSpecs = [{
         name: 'heading',
         default_value: ''
@@ -291,14 +291,14 @@ describe('Rte Helper Modal Controller', function() {
 
       beforeEach(angular.mock.module('oppia'));
 
-      beforeEach(angular.mock.module('oppia', function($provide) {
+      beforeEach(angular.mock.module('oppia', function ($provide) {
         mockExternalRteSaveEventEmitter = new EventEmitter();
         $provide.value('ExternalRteSaveService', {
           onExternalRteSave: mockExternalRteSaveEventEmitter
         });
       }));
 
-      beforeEach(angular.mock.inject(function($injector, $controller) {
+      beforeEach(angular.mock.inject(function ($injector, $controller) {
         $timeout = $injector.get('$timeout');
         var $rootScope = $injector.get('$rootScope');
 
@@ -317,19 +317,19 @@ describe('Rte Helper Modal Controller', function() {
           });
       }));
 
-      it('should load modal correctly', function() {
+      it('should load modal correctly', function () {
         expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
         expect($scope.modalIsLoading).toBe(true);
         $timeout.flush();
         expect($scope.modalIsLoading).toBe(false);
       });
 
-      it('should close modal when clicking on cancel button', function() {
+      it('should close modal when clicking on cancel button', function () {
         $scope.cancel();
         expect($uibModalInstance.dismiss).toHaveBeenCalledWith(false);
       });
 
-      it('should save modal customization args when closing it', function() {
+      it('should save modal customization args when closing it', function () {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
         $scope.save();
         expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
@@ -354,14 +354,14 @@ describe('Rte Helper Modal Controller', function() {
 
     beforeEach(angular.mock.module('oppia'));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', function ($provide) {
       mockExternalRteSaveEventEmitter = new EventEmitter();
       $provide.value('ExternalRteSaveService', {
         onExternalRteSave: mockExternalRteSaveEventEmitter
       });
     }));
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function ($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
 
@@ -382,7 +382,7 @@ describe('Rte Helper Modal Controller', function() {
         });
     }));
 
-    it('should close modal and remove the tag', function() {
+    it('should close modal and remove the tag', function () {
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith(true);
     });

@@ -39,12 +39,12 @@ export class AlertMessageComponent {
   @Input() messageObject!: MessageObject;
   @Input() messageIndex!: number;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private toastrService: ToastrService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (this.messageObject.type === 'info') {
       this.toastrService.info(this.messageObject.content, '', {
         timeOut: this.messageObject.timeout,

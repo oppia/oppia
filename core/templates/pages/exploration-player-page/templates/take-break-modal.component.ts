@@ -27,18 +27,18 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: []
 })
 export class TakeBreakModalComponent {
-  constructor(
+  constructor (
     private activeModal: NgbActiveModal
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
   }
 
-  cancel(): void {
+  cancel (): void {
     this.activeModal.dismiss();
   }
 
-  confirm(): void {
+  confirm (): void {
     this.activeModal.close();
   }
 }

@@ -41,13 +41,13 @@ export class SubtopicSummaryTileComponent implements OnInit {
   thumbnailBgColor!: string;
   subtopicTitle !: string;
 
-  constructor(
+  constructor (
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef
   ) {}
 
-  openSubtopicPage(): void {
+  openSubtopicPage (): void {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
@@ -64,7 +64,7 @@ export class SubtopicSummaryTileComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.thumbnailBgColor = this.subtopic.getThumbnailBgColor();
     this.subtopicTitle = this.subtopic.getTitle();
     if (this.subtopic.getThumbnailFilename()) {

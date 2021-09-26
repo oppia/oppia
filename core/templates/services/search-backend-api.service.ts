@@ -32,9 +32,9 @@ export class SearchResponseBackendDict {
   providedIn: 'root'
 })
 export class SearchBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  async fetchExplorationSearchResultAsync(
+  async fetchExplorationSearchResultAsync (
       searchQuery: string): Promise<SearchResponseBackendDict> {
     return this.http.get<SearchResponseBackendDict>(
       ServicesConstants.SEARCH_DATA_URL + searchQuery).toPromise();

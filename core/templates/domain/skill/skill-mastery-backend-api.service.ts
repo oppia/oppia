@@ -34,10 +34,10 @@ export interface SkillMasteryBackendResponse {
   providedIn: 'root'
 })
 export class SkillMasteryBackendApiService {
-  constructor(
+  constructor (
     private httpClient: HttpClient) {}
 
-  _fetchSkillMasteryDegrees(
+  _fetchSkillMasteryDegrees (
       skillIds: string[],
       successCallback: (value: SkillMastery) => void,
       errorCallback: (reason: string) => void): void {
@@ -60,7 +60,7 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  _updateSkillMasteryDegrees(
+  _updateSkillMasteryDegrees (
       masteryPerSkillMapping: {[key: string]: number},
       successCallback: () => void,
       errorCallback: (reason: string) => void): void {
@@ -81,14 +81,14 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  async fetchSkillMasteryDegreesAsync(skillIds: string[]):
+  async fetchSkillMasteryDegreesAsync (skillIds: string[]):
    Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
   }
 
-  async updateSkillMasteryDegreesAsync(
+  async updateSkillMasteryDegreesAsync (
       masteryPerSkillMapping: {[key: string]: number}): Promise<void> {
     return new Promise((resolve, reject) => {
       this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);

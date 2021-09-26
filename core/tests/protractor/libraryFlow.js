@@ -26,7 +26,7 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-describe('Library pages tour', function() {
+describe('Library pages tour', function () {
   var EXPLORATION_TITLE = 'Test Exploration';
   var EXPLORATION_OBJECTIVE = 'To learn testing';
   var EXPLORATION_CATEGORY = 'Algorithms';
@@ -36,17 +36,17 @@ describe('Library pages tour', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  var visitRecentlyPublishedPage = async function() {
+  var visitRecentlyPublishedPage = async function () {
     await browser.get('community-library/recently-published');
     await waitFor.pageToFullyLoad();
   };
 
-  var rateExploration = async function() {
+  var rateExploration = async function () {
     var adminPage = new AdminPage.AdminPage();
     await users.createAndLoginSuperAdminUser('random@gmail.com', 'random');
     // We need an exploration to rate here.
@@ -69,17 +69,17 @@ describe('Library pages tour', function() {
     await users.logout();
   };
 
-  it('should visit the search page', async function() {
+  it('should visit the search page', async function () {
     await libraryPage.get();
     await libraryPage.findExploration(SEARCH_TERM);
     expect(await browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
-  it('should visit the library index page', async function() {
+  it('should visit the library index page', async function () {
     await libraryPage.get();
   });
 
-  it('should visit the top rated page', async function() {
+  it('should visit the top rated page', async function () {
     // To visit the top rated page, at least one
     // exploration has to be rated by the user.
     await rateExploration();
@@ -91,18 +91,18 @@ describe('Library pages tour', function() {
       'community-library/top-rated');
   });
 
-  it('should visit the recent explorations page', async function() {
+  it('should visit the recent explorations page', async function () {
     await visitRecentlyPublishedPage();
     expect(await browser.getCurrentUrl()).toContain(
       'community-library/recently-published');
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });
 
-describe('Rating', function() {
+describe('Rating', function () {
   var EXPLORATION_RATINGTEST = 'RatingTest';
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
@@ -111,13 +111,13 @@ describe('Rating', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  var addRating = async function(
+  var addRating = async function (
       userEmail, userName, explorationName, ratingValue) {
     await users.createAndLoginUser(userEmail, userName);
     await libraryPage.get();
@@ -133,7 +133,7 @@ describe('Rating', function() {
   };
 
   it('should display ratings on exploration when minimum ratings have been ' +
-     'submitted', async function() {
+     'submitted', async function () {
     await users.createAndLoginSuperAdminUser(
       'user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
@@ -184,7 +184,7 @@ describe('Rating', function() {
     }
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

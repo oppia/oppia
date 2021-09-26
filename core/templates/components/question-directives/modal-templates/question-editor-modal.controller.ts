@@ -41,7 +41,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubric', 'skillName', 'untriagedSkillSummaries', 'MAX_COMMIT_MESSAGE_LENGTH',
-  function(
+  function (
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
       ImageLocalStorageService, NgbModal, QuestionUndoRedoService,
       QuestionValidationService,
@@ -65,10 +65,10 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.rubric = rubric;
     $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
 
-    $scope.getSkillEditorUrl = function(skillId) {
+    $scope.getSkillEditorUrl = function (skillId) {
       return '/skill_editor/' + skillId;
     };
-    $scope.removeSkill = function(skillId) {
+    $scope.removeSkill = function (skillId) {
       if ($scope.associatedSkillSummaries.length === 1) {
         AlertsService.addInfoMessage(
           'A question should be linked to at least one skill.');
@@ -79,20 +79,20 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         task: 'remove'
       });
       $scope.associatedSkillSummaries =
-        $scope.associatedSkillSummaries.filter(function(summary) {
+        $scope.associatedSkillSummaries.filter(function (summary) {
           return summary.getId() !== skillId;
         });
     };
 
-    $scope.getSkillLinkageModificationsArray = function() {
+    $scope.getSkillLinkageModificationsArray = function () {
       return returnModalObject.skillLinkageModificationsArray;
     };
 
-    $scope.undo = function() {
+    $scope.undo = function () {
       $scope.associatedSkillSummaries = associatedSkillSummaries;
       returnModalObject.skillLinkageModificationsArray = [];
     };
-    $scope.addSkill = function() {
+    $scope.addSkill = function () {
       var skillsInSameTopicCount =
         groupedSkillSummaries.current.length;
       var sortedSkillSummaries =
@@ -112,7 +112,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         allowSkillsFromOtherTopics);
       modalRef.componentInstance.untriagedSkillSummaries = (
         untriagedSkillSummaries);
-      modalRef.result.then(function(summary) {
+      modalRef.result.then(function (summary) {
         for (var idx in $scope.associatedSkillSummaries) {
           if (
             $scope.associatedSkillSummaries[idx].getId() ===
@@ -143,7 +143,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     // modified then no commit message is required from the user
     // as there is already a default commit message present in the
     // backend for modification of skill linkages.
-    $scope.saveAndCommit = function() {
+    $scope.saveAndCommit = function () {
       if (!$scope.isQuestionValid()) {
         return;
       }
@@ -157,10 +157,10 @@ angular.module('oppia').controller('QuestionEditorModalController', [
                    'question-editor-save-modal.template.html'),
           backdrop: 'static',
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function(commitMessage) {
+        }).result.then(function (commitMessage) {
           returnModalObject.commitMessage = commitMessage;
           $uibModalInstance.close(returnModalObject);
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is
           // clicked. No further action is needed.
@@ -169,14 +169,14 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         $uibModalInstance.close(returnModalObject);
       }
     };
-    $scope.isSaveAndCommitButtonDisabled = function() {
+    $scope.isSaveAndCommitButtonDisabled = function () {
       return !(
         QuestionUndoRedoService.hasChanges() || (
           returnModalObject.skillLinkageModificationsArray.length) > 0) ||
           !$scope.isQuestionValid();
     };
 
-    $scope.done = function() {
+    $scope.done = function () {
       if (!$scope.isQuestionValid()) {
         return;
       }
@@ -185,12 +185,12 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     };
     // Checking if Question contains all requirement to enable
     // Save and Publish Question.
-    $scope.isQuestionValid = function() {
+    $scope.isQuestionValid = function () {
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
     };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       if (QuestionUndoRedoService.hasChanges()) {
         $uibModal.open({
           templateUrl:
@@ -199,11 +199,11 @@ angular.module('oppia').controller('QuestionEditorModalController', [
               'confirm-question-modal-exit-modal.directive.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
-        }).result.then(function() {
+        }).result.then(function () {
           ContextService.resetImageSaveDestination();
           ImageLocalStorageService.flushStoredImagesData();
           $uibModalInstance.dismiss('cancel');
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is
           // clicked. No further action is needed.

@@ -20,7 +20,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorFeedbackTab = function() {
+var ExplorationEditorFeedbackTab = function () {
   /*
    * Interactive elements
    */
@@ -60,7 +60,7 @@ var ExplorationEditorFeedbackTab = function() {
   /*
    * Workflows
    */
-  this.acceptSuggestion = async function(suggestionDescription) {
+  this.acceptSuggestion = async function (suggestionDescription) {
     await waitFor.visibilityOf(
       element(by.css(suggestionRowClassName)),
       'Suggestion row takes too long to appear');
@@ -78,12 +78,12 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectToHaveFeedbackThread = async function() {
+  this.expectToHaveFeedbackThread = async function () {
     await waitFor.presenceOf(
       feedbackTabRow, 'Feedback Tab Row takes too long to appear');
   };
 
-  this.getSuggestionThreads = async function() {
+  this.getSuggestionThreads = async function () {
     var threads = [];
     await waitFor.visibilityOf(
       element.all(by.css(suggestionRowClassName)).first(),
@@ -99,11 +99,11 @@ var ExplorationEditorFeedbackTab = function() {
     return threads;
   };
 
-  this.goBackToAllFeedbacks = async function() {
+  this.goBackToAllFeedbacks = async function () {
     await action.click('Feedback Back Button', feedbackBackButton);
   };
 
-  this.readFeedbackMessages = async function() {
+  this.readFeedbackMessages = async function () {
     var messages = [];
     await waitFor.visibilityOf(
       element.all(by.css(suggestionRowClassName)).first(),
@@ -122,7 +122,7 @@ var ExplorationEditorFeedbackTab = function() {
     return messages;
   };
 
-  this.rejectSuggestion = async function(suggestionDescription) {
+  this.rejectSuggestion = async function (suggestionDescription) {
     await waitFor.visibilityOf(
       element(by.css(suggestionRowClassName)),
       'Suggestion row takes too long to appear');
@@ -141,14 +141,14 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.selectLatestFeedbackThread = async function() {
+  this.selectLatestFeedbackThread = async function () {
     var suggestionRowFirst = (
       element.all(by.css(suggestionRowClassName)).first());
     await action.click(
       'Suggestion Row First', suggestionRowFirst);
   };
 
-  this.sendResponseToLatestFeedback = async function(feedbackResponse) {
+  this.sendResponseToLatestFeedback = async function (feedbackResponse) {
     await this.selectLatestFeedbackThread();
     await action.sendKeys(
       'Feedback Response Text Area',
@@ -157,7 +157,7 @@ var ExplorationEditorFeedbackTab = function() {
       'Feedback Send Response Button', feedbackSendResponseButton);
   };
 
-  this.changeFeedbackStatus = async function(
+  this.changeFeedbackStatus = async function (
       feedbackStatus, feedbackResponse) {
     await action.sendKeys(
       'Feedback Response Text Area',
@@ -171,13 +171,13 @@ var ExplorationEditorFeedbackTab = function() {
       'Feedback Send Response Button', feedbackSendResponseButton);
   };
 
-  this.readFeedbackMessagesFromThread = async function() {
+  this.readFeedbackMessagesFromThread = async function () {
     await waitFor.visibilityOf(
       feedbackMessages.first(), 'Feedback message text is not visible');
     return feedbackMessages;
   };
 
-  this.expectFeedbackStatusNameToBe = async function(feedbackStatus) {
+  this.expectFeedbackStatusNameToBe = async function (feedbackStatus) {
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
     await waitFor.textToBePresentInElement(

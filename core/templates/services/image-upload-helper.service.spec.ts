@@ -38,14 +38,14 @@ describe('imageUploadHelperService', () => {
     expect(imageFile instanceof Blob).toBe(true);
   });
 
-  it('should return null for non-image data', function() {
+  it('should return null for non-image data', function () {
     const imageFile = (
       imageUploadHelperService.convertImageDataToImageFile(
         'data:text/plain;base64,xyz'));
     expect(imageFile).toEqual(null);
   });
 
-  it('should generate a filename for a math SVG', function() {
+  it('should generate a filename for a math SVG', function () {
     const height = '1d345';
     const width = '2d455';
     const verticalPadding = '0d123';
@@ -56,7 +56,7 @@ describe('imageUploadHelperService', () => {
       '_height_1d345_width_2d455_vertical_0d123.svg')).toBe(true);
   });
 
-  it('should throw error for an invalid filename', function() {
+  it('should throw error for an invalid filename', function () {
     const height = 'height';
     const width = '2d455';
     const verticalPadding = '0d123';
@@ -65,7 +65,7 @@ describe('imageUploadHelperService', () => {
       .toThrowError('The Math SVG filename format is invalid.');
   });
 
-  it('should generate a filename for a normal image', function() {
+  it('should generate a filename for a normal image', function () {
     const height = 720;
     const width = 180;
     const format = 'png';
@@ -74,7 +74,7 @@ describe('imageUploadHelperService', () => {
     expect(generatedFilename.endsWith('_height_720_width_180.png')).toBe(true);
   });
 
-  it('should get trusted resource Url for thumbnail filename', function() {
+  it('should get trusted resource Url for thumbnail filename', function () {
     const imageFileName = 'image.svg';
     const entityType = 'logo';
     const entityId = 'id';

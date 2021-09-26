@@ -18,10 +18,10 @@
  */
 var waitFor = require('./waitFor.js');
 
-var ThanksPage = function() {
+var ThanksPage = function () {
   var THANKS_PAGE_URL = '/thanks';
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.get(THANKS_PAGE_URL);
     await waitFor.pageToFullyLoad();
   };

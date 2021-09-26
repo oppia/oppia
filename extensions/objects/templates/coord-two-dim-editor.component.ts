@@ -43,9 +43,9 @@ export class CoordTwoDimEditorComponent implements OnInit {
   };
   options!: MapOptions;
 
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor (private urlInterpolationService: UrlInterpolationService) {}
 
-  leafletClick(e: LeafletMouseEvent): void {
+  leafletClick (e: LeafletMouseEvent): void {
     const newLat = e.latlng.lat;
     const newLng = e.latlng.lng;
     this.value = [newLat, newLng];
@@ -53,12 +53,12 @@ export class CoordTwoDimEditorComponent implements OnInit {
     this.valueChanged.emit([newLat, newLng]);
   }
 
-  leafletMove(e: LeafletEvent): void {
+  leafletMove (e: LeafletEvent): void {
     this.value = [e.target._latlng.lat, e.target._latlng.lng];
     this.valueChanged.emit([e.target._latlng.lat, e.target._latlng.lng]);
   }
 
-  private updateMarker(lat: number, lng: number) {
+  private updateMarker (lat: number, lng: number) {
     const newMarker = marker(
       [lat, lng],
       {
@@ -90,7 +90,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
     this.mapMarkers = newMarker;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.options = {
       layers: [tileLayer(
         this.optionsSpec.layers[0].url,

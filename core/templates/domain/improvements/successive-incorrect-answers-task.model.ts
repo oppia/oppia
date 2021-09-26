@@ -24,7 +24,7 @@ import { ImprovementsConstants } from
 
 export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     'successive_incorrect_answers'> {
-  constructor(
+  constructor (
       backendDict: TaskEntryBackendDict<'successive_incorrect_answers'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
@@ -47,7 +47,7 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     super(backendDict);
   }
 
-  private static createNewObsoleteTask(
+  private static createNewObsoleteTask (
       expId: string, expVersion: number, stateName: string
   ): SuccessiveIncorrectAnswersTask {
     return new SuccessiveIncorrectAnswersTask({
@@ -65,7 +65,7 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     });
   }
 
-  static createNew(
+  static createNew (
       expId: string, expVersion: number, stateName: string,
       numMultipleIncorrectSubmissionsPlaythroughs: number
   ): SuccessiveIncorrectAnswersTask {
@@ -75,17 +75,17 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     return task;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: TaskEntryBackendDict<'successive_incorrect_answers'>
   ): SuccessiveIncorrectAnswersTask {
     return new SuccessiveIncorrectAnswersTask(backendDict);
   }
 
-  public resolve(): void {
+  public resolve (): void {
     this.markAsResolved();
   }
 
-  public refreshStatus(
+  public refreshStatus (
       numMultipleIncorrectSubmissionsPlaythroughs: number): void {
     if (this.isObsolete() && numMultipleIncorrectSubmissionsPlaythroughs > 0) {
       this.generateIssueDescription(
@@ -94,7 +94,7 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     }
   }
 
-  private generateIssueDescription(
+  private generateIssueDescription (
       numMultipleIncorrectSubmissionsPlaythroughs: number): void {
     this.issueDescription = (
       `At least ${numMultipleIncorrectSubmissionsPlaythroughs} learners had ` +

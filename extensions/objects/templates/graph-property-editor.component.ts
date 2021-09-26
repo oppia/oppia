@@ -22,7 +22,7 @@
 // in via initArgs.
 
 angular.module('oppia').directive('graphPropertyEditor', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -31,10 +31,10 @@ angular.module('oppia').directive('graphPropertyEditor', [
       },
       template: require('./graph-property-editor.component.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
+      controller: ['$scope', function ($scope) {
         var ctrl = this;
-        ctrl.$onInit = function() {
-          $scope.$watch('$ctrl.localValue.property', function() {
+        ctrl.$onInit = function () {
+          $scope.$watch('$ctrl.localValue.property', function () {
             ctrl.value = ctrl.localValue.property.name;
           });
           ctrl.alwaysEditable = true;

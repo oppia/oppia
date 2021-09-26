@@ -41,12 +41,12 @@ export class QuestionsListService {
   private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter<void>());
 
-  constructor(
+  constructor (
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private questionBackendApiService: QuestionBackendApiService,
     private truncatePipe: TruncatePipe) {}
 
-  private _setQuestionSummariesForOneSkill(
+  private _setQuestionSummariesForOneSkill (
       newQuestionSummaries: QuestionSummaryForOneSkill[],
       resetHistory: boolean): void {
     if (resetHistory) {
@@ -59,25 +59,25 @@ export class QuestionsListService {
     this._questionSummartiesInitializedEventEmitter.emit();
   }
 
-  private _changeNextQuestionsOffset(resetHistory: boolean): void {
+  private _changeNextQuestionsOffset (resetHistory: boolean): void {
     if (resetHistory) {
       this._nextOffsetForQuestions = 0;
     }
     this._nextOffsetForQuestions += AppConstants.NUM_QUESTIONS_PER_PAGE;
   }
 
-  private _setMoreQuestionsAvailable(moreQuestionsAvailable: boolean): void {
+  private _setMoreQuestionsAvailable (moreQuestionsAvailable: boolean): void {
     this._moreQuestionsAvailable = moreQuestionsAvailable;
   }
 
-  isLastQuestionBatch(): boolean {
+  isLastQuestionBatch (): boolean {
     return (
       this._moreQuestionsAvailable === false &&
       (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
         this._questionSummariesForOneSkill.length);
   }
 
-  getQuestionSummariesAsync(
+  getQuestionSummariesAsync (
       skillId: string, fetchMore: boolean, resetHistory: boolean): void {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
@@ -111,7 +111,7 @@ export class QuestionsListService {
     }
   }
 
-  getCachedQuestionSummaries(): QuestionSummaryForOneSkill[] {
+  getCachedQuestionSummaries (): QuestionSummaryForOneSkill[] {
     const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
 
     return this._questionSummariesForOneSkill.slice(
@@ -126,23 +126,23 @@ export class QuestionsListService {
     });
   }
 
-  incrementPageNumber(): void {
+  incrementPageNumber (): void {
     this._currentPage++;
   }
 
-  decrementPageNumber(): void {
+  decrementPageNumber (): void {
     this._currentPage--;
   }
 
-  resetPageNumber(): void {
+  resetPageNumber (): void {
     this._currentPage = 0;
   }
 
-  getCurrentPageNumber(): number {
+  getCurrentPageNumber (): number {
     return this._currentPage;
   }
 
-  get onQuestionSummariesInitialized(): EventEmitter<void> {
+  get onQuestionSummariesInitialized (): EventEmitter<void> {
     return this._questionSummartiesInitializedEventEmitter;
   }
 }

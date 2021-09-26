@@ -121,7 +121,7 @@ export class AdminFeaturesTabComponent implements OnInit {
 
   isDummyApiEnabled: boolean = false;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
@@ -130,7 +130,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
 
-  async reloadFeatureFlagsAsync(): Promise<void> {
+  async reloadFeatureFlagsAsync (): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
 
     this.featureFlags = data.featureFlags;
@@ -139,19 +139,19 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
   }
 
-  addNewRuleToTop(feature: PlatformParameter): void {
+  addNewRuleToTop (feature: PlatformParameter): void {
     feature.rules.unshift(cloneDeep(this.defaultNewRule));
   }
 
-  addNewRuleToBottom(feature: PlatformParameter): void {
+  addNewRuleToBottom (feature: PlatformParameter): void {
     feature.rules.push(cloneDeep(this.defaultNewRule));
   }
 
-  addNewFilter(rule: PlatformParameterRule): void {
+  addNewFilter (rule: PlatformParameterRule): void {
     rule.filters.push(cloneDeep(this.defaultNewFilter));
   }
 
-  addNewCondition(filter: PlatformParameterFilter): void {
+  addNewCondition (filter: PlatformParameterFilter): void {
     const context = this.filterTypeToContext[filter.type];
     filter.conditions.push([
       context.operators[0],
@@ -159,32 +159,32 @@ export class AdminFeaturesTabComponent implements OnInit {
     ]);
   }
 
-  removeRule(feature: PlatformParameter, ruleIndex: number): void {
+  removeRule (feature: PlatformParameter, ruleIndex: number): void {
     feature.rules.splice(ruleIndex, 1);
   }
 
-  removeFilter(rule: PlatformParameterRule, filterIndex: number): void {
+  removeFilter (rule: PlatformParameterRule, filterIndex: number): void {
     rule.filters.splice(filterIndex, 1);
   }
 
-  removeCondition(
+  removeCondition (
       filter: PlatformParameterFilter, conditionIndex: number): void {
     filter.conditions.splice(conditionIndex, 1);
   }
 
-  moveRuleUp(feature: PlatformParameter, ruleIndex: number): void {
+  moveRuleUp (feature: PlatformParameter, ruleIndex: number): void {
     const rule = feature.rules[ruleIndex];
     this.removeRule(feature, ruleIndex);
     feature.rules.splice(ruleIndex - 1, 0, rule);
   }
 
-  moveRuleDown(feature: PlatformParameter, ruleIndex: number): void {
+  moveRuleDown (feature: PlatformParameter, ruleIndex: number): void {
     const rule = feature.rules[ruleIndex];
     this.removeRule(feature, ruleIndex);
     feature.rules.splice(ruleIndex + 1, 0, rule);
   }
 
-  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
+  async updateFeatureRulesAsync (feature: PlatformParameter): Promise<void> {
     const issues = this.validateFeatureFlag(feature);
     if (issues.length > 0) {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
@@ -222,7 +222,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     }
   }
 
-  clearChanges(featureFlag: PlatformParameter): void {
+  clearChanges (featureFlag: PlatformParameter): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This will revert all changes you made. Are you sure?')) {
       return;
@@ -231,11 +231,11 @@ export class AdminFeaturesTabComponent implements OnInit {
     featureFlag.rules = cloneDeep(backup.rules);
   }
 
-  clearFilterConditions(filter: PlatformParameterFilter): void {
+  clearFilterConditions (filter: PlatformParameterFilter): void {
     filter.conditions.splice(0);
   }
 
-  isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
+  isFeatureFlagRulesChanged (feature: PlatformParameter): boolean {
     const original = this.featureFlagNameToBackupMap.get(feature.name);
     return !isEqual(original.rules, feature.rules);
   }
@@ -248,7 +248,7 @@ export class AdminFeaturesTabComponent implements OnInit {
    *
    * @returns {string[]} - Array of issue messages, if any.
    */
-  validateFeatureFlag(feature: PlatformParameter): string[] {
+  validateFeatureFlag (feature: PlatformParameter): string[] {
     const issues = [];
 
     const seenRules: PlatformParameterRule[] = [];
@@ -295,17 +295,17 @@ export class AdminFeaturesTabComponent implements OnInit {
     return issues;
   }
 
-  get isDummyFeatureEnabled(): boolean {
+  get isDummyFeatureEnabled (): boolean {
     return this.featureService.status.DummyFeature.isEnabled;
   }
 
-  async reloadDummyHandlerStatusAsync(): Promise<void> {
+  async reloadDummyHandlerStatusAsync (): Promise<void> {
     if (this.isDummyFeatureEnabled) {
       this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
     }
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
   }

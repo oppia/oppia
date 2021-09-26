@@ -22,7 +22,7 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Rearrange Skills In Subtopic Modal Controller', function() {
+describe('Rearrange Skills In Subtopic Modal Controller', function () {
   var $scope = null;
   var ctrl = null;
   var topic = null;
@@ -35,7 +35,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
@@ -57,16 +57,16 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     ctrl.$onDestroy();
   });
 
-  it('should initialize the variables', function() {
+  it('should initialize the variables', function () {
     ctrl.init();
     expect(ctrl.topic).toEqual(topic);
   });
 
-  it('should get skill editor url', function() {
+  it('should get skill editor url', function () {
     expect(ctrl.getSkillEditorUrl('1')).toBe('/skill_editor/1');
   });
 
-  it('should record skill summary to move and subtopic Id', function() {
+  it('should record skill summary to move and subtopic Id', function () {
     var skillSummary = ShortSkillSummary.create(
       '1', 'Skill description');
     ctrl.onMoveSkillStart(1, skillSummary);
@@ -74,21 +74,21 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     expect(ctrl.oldSubtopicId).toEqual(1);
   });
 
-  it('should call TopicUpdateService when skill is moved', function() {
+  it('should call TopicUpdateService when skill is moved', function () {
     var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
     ctrl.onMoveSkillEnd(1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
-    function() {
+    function () {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
       ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
   it('should not call TopicUpdateService when skill is moved to same subtopic',
-    function() {
+    function () {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
       ctrl.oldSubtopicId = null;
       ctrl.onMoveSkillEnd(null);
@@ -96,20 +96,20 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     });
 
   it('should not call TopicUpdateService if subtopic name validation fails',
-    function() {
+    function () {
       ctrl.editableName = 'subtopic1';
       var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
       ctrl.updateSubtopicTitle(1);
       expect(subtopicTitleSpy).not.toHaveBeenCalled();
     });
 
-  it('should call TopicUpdateService to update subtopic title', function() {
+  it('should call TopicUpdateService to update subtopic title', function () {
     var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
     ctrl.updateSubtopicTitle(1);
     expect(subtopicTitleSpy).toHaveBeenCalled();
   });
 
-  it('should call set and reset the selected subtopic index', function() {
+  it('should call set and reset the selected subtopic index', function () {
     ctrl.editNameOfSubtopicWithId(1);
     expect(ctrl.selectedSubtopicId).toEqual(1);
     ctrl.editNameOfSubtopicWithId(10);
@@ -120,17 +120,17 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   });
 
   it('should call initEditor on calls from topic being initialized',
-    function() {
+    function () {
       topicInitializedEventEmitter = new EventEmitter();
       topicReinitializedEventEmitter = new EventEmitter();
 
       spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-        function() {
+        function () {
           return topicInitializedEventEmitter;
         });
       spyOnProperty(
         TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-        function() {
+        function () {
           return topicReinitializedEventEmitter;
         });
       spyOn(ctrl, 'initEditor').and.callThrough();

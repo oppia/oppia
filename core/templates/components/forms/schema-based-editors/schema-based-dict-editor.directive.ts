@@ -24,7 +24,7 @@ require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
+  function (NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {
         localValue: '=',
@@ -39,13 +39,13 @@ angular.module('oppia').directive('schemaBasedDictEditor', [
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [
         '$scope', 'IdGenerationService',
-        function($scope, IdGenerationService) {
+        function ($scope, IdGenerationService) {
           var ctrl = this;
-          $scope.getHumanReadablePropertyDescription = function(property) {
+          $scope.getHumanReadablePropertyDescription = function (property) {
             return property.description || '[' + property.name + ']';
           };
 
-          ctrl.$onInit = function() {
+          ctrl.$onInit = function () {
             $scope.fieldIds = {};
             for (var i = 0; i < $scope.propertySchemas().length; i++) {
               // Generate random IDs for each field.

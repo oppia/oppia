@@ -19,16 +19,16 @@
 
 var waitFor = require('./waitFor.js');
 
-var ClassroomPage = function() {
+var ClassroomPage = function () {
   var topicSummaryTiles = element.all(
     by.css('.protractor-test-topic-summary-tile'));
 
-  this.get = async function(classroomName) {
+  this.get = async function (classroomName) {
     await browser.get('/learn/' + classroomName);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfTopicsToBe = async function(count) {
+  this.expectNumberOfTopicsToBe = async function (count) {
     if (count > 0) {
       await waitFor.visibilityOf(
         topicSummaryTiles.first(), 'Topic summary tile is not visible');

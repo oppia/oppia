@@ -22,7 +22,7 @@ import { ImprovementsConstants } from 'domain/improvements/improvements.constant
 
 export class IneffectiveFeedbackLoopTask extends TaskEntry<
     'ineffective_feedback_loop'> {
-  constructor(backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>) {
+  constructor (backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -44,7 +44,7 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
     super(backendDict);
   }
 
-  private static createNewObsoleteTask(
+  private static createNewObsoleteTask (
       expId: string, expVersion: number, stateName: string
   ): IneffectiveFeedbackLoopTask {
     return new IneffectiveFeedbackLoopTask({
@@ -62,7 +62,7 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
     });
   }
 
-  static createNew(
+  static createNew (
       expId: string, expVersion: number, stateName: string,
       numCyclicStateTransitionsPlaythroughs: number
   ): IneffectiveFeedbackLoopTask {
@@ -72,24 +72,24 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
     return task;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>
   ): IneffectiveFeedbackLoopTask {
     return new IneffectiveFeedbackLoopTask(backendDict);
   }
 
-  public resolve(): void {
+  public resolve (): void {
     this.markAsResolved();
   }
 
-  public refreshStatus(numCyclicStateTransitionsPlaythroughs: number): void {
+  public refreshStatus (numCyclicStateTransitionsPlaythroughs: number): void {
     if (this.isObsolete() && numCyclicStateTransitionsPlaythroughs > 0) {
       this.generateIssueDescription(numCyclicStateTransitionsPlaythroughs);
       this.markAsOpen();
     }
   }
 
-  private generateIssueDescription(
+  private generateIssueDescription (
       numCyclicStateTransitionsPlaythroughs: number): void {
     this.issueDescription = (
       `At least ${numCyclicStateTransitionsPlaythroughs} learners had quit ` +

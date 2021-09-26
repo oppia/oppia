@@ -23,23 +23,23 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('components/forms/validators/is-integer.filter.ts');
 
-describe('Normalizer tests', function() {
+describe('Normalizer tests', function () {
   var filterName = 'isInteger';
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  it('should have the relevant filters', angular.mock.inject(function($filter) {
+  it('should have the relevant filters', angular.mock.inject(function ($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
-  it('should validate integers', angular.mock.inject(function($filter) {
+  it('should validate integers', angular.mock.inject(function ($filter) {
     var filter = $filter('isInteger');
     expect(filter('3')).toBe(true);
     expect(filter('-3')).toBe(true);

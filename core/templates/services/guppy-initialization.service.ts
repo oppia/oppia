@@ -27,7 +27,7 @@ export class GuppyObject {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   divId!: string;
   guppyInstance!: Guppy;
-  constructor(divId: string, guppyInstance: Guppy) {
+  constructor (divId: string, guppyInstance: Guppy) {
     this.divId = divId;
     this.guppyInstance = guppyInstance;
   }
@@ -42,7 +42,7 @@ export class GuppyInitializationService {
   static interactionType: string;
   private static customOskLetters: string[] = [];
 
-  init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
+  init (guppyDivClassName: string, placeholderText: string, initialValue = ''):
       void {
     this.onScreenKeyboardShown = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
@@ -82,7 +82,7 @@ export class GuppyInitializationService {
     }
   }
 
-  findActiveGuppyObject(): GuppyObject | undefined {
+  findActiveGuppyObject (): GuppyObject | undefined {
     let activeId = $('.guppy_active').attr('id');
     for (let guppyObject of this.guppyInstances) {
       if (guppyObject.divId === activeId) {
@@ -91,19 +91,19 @@ export class GuppyInitializationService {
     }
   }
 
-  getShowOSK(): boolean {
+  getShowOSK (): boolean {
     return this.onScreenKeyboardShown;
   }
 
-  setShowOSK(value: boolean): void {
+  setShowOSK (value: boolean): void {
     this.onScreenKeyboardShown = value;
   }
 
-  getCustomOskLetters(): string[] {
+  getCustomOskLetters (): string[] {
     return GuppyInitializationService.customOskLetters;
   }
 
-  setCustomOskLetters(customOskLetters: string[]): void {
+  setCustomOskLetters (customOskLetters: string[]): void {
     GuppyInitializationService.customOskLetters = customOskLetters;
   }
 }

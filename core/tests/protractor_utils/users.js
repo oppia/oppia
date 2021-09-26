@@ -26,7 +26,7 @@ var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 var splashPage = element(by.css('.protractor-test-splash-page'));
 
-var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
+var _createFirebaseAccount = async function (email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
   // developer email used to sign in is consistent with these accounts, we
   // manually change them to lower case.
@@ -57,7 +57,7 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 // When manual navigation is enabled, the function will explicitly redirect the
 // browser to the login page. If disabled, then the function will assume that
 // the browser is already on the login page.
-var login = async function(email, useManualNavigation = true) {
+var login = async function (email, useManualNavigation = true) {
   if (useManualNavigation) {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
@@ -75,7 +75,7 @@ var login = async function(email, useManualNavigation = true) {
   var returnUrl = currentUrl.split('return_url=')[
     currentUrl.split('return_url=').length - 1];
 
-  await waitFor.clientSideRedirection(async() => {
+  await waitFor.clientSideRedirection(async () => {
     // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
   }, (url) => {
@@ -86,19 +86,19 @@ var login = async function(email, useManualNavigation = true) {
     } else {
       return (new RegExp(returnUrl + '|signup')).test(url);
     }
-  }, async() => {
+  }, async () => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
   });
 };
 
-var logout = async function() {
-  await waitFor.clientSideRedirection(async() => {
+var logout = async function () {
+  await waitFor.clientSideRedirection(async () => {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
   }, (url) => {
     // Wait until the URL has changed to something that is not /logout.
     return !(/logout/.test(url));
-  }, async() => {
+  }, async () => {
     await waitFor.visibilityOf(
       splashPage, 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
@@ -107,7 +107,7 @@ var logout = async function() {
 
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
-var _completeSignup = async function(username) {
+var _completeSignup = async function (username) {
   await waitFor.pageToFullyLoad();
   let cookieBannerAcceptButton = element(
     by.css('.protractor-test-oppia-cookie-banner-accept-button'));
@@ -133,7 +133,7 @@ var _completeSignup = async function(username) {
   var returnUrl = currentUrl.split('return_url=')[
     currentUrl.split('return_url=').length - 1];
 
-  await waitFor.clientSideRedirection(async() => {
+  await waitFor.clientSideRedirection(async () => {
     // Click the "register user" button to trigger redirection.
     await action.click('Register user button', registerUser);
   }, (url) => {
@@ -142,49 +142,49 @@ var _completeSignup = async function(username) {
     } else {
       return (new RegExp(returnUrl)).test(url);
     }
-  }, async() => {
+  }, async () => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
   });
 };
 
-var createAndLoginUser = async function(
+var createAndLoginUser = async function (
     email, username, useManualNavigation = true) {
   await _createFirebaseAccount(email);
   await login(email, useManualNavigation);
   await _completeSignup(username);
 };
 
-var createAndLoginCurriculumAdminUser = async function(email, username) {
+var createAndLoginCurriculumAdminUser = async function (email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
   await adminPage.addRole(username, 'curriculum admin');
 };
 
-var createAndLoginSuperAdminUser = async function(email, username) {
+var createAndLoginSuperAdminUser = async function (email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
 };
 
-var createAndLoginCurriculumAdminUserMobile = async function(email, username) {
+var createAndLoginCurriculumAdminUserMobile = async function (email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
 };
 
-var createAdminMobile = async function(email, username) {
+var createAdminMobile = async function (email, username) {
   await createAndLoginCurriculumAdminUserMobile(email, username);
   await logout();
 };
 
-var createUser = async function(email, username) {
+var createUser = async function (email, username) {
   await createAndLoginUser(email, username);
   await logout();
 };
 
-var createUserWithRole = async function(email, username, role) {
+var createUserWithRole = async function (email, username, role) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
@@ -193,15 +193,15 @@ var createUserWithRole = async function(email, username, role) {
   await logout();
 };
 
-var createModerator = async function(email, username) {
+var createModerator = async function (email, username) {
   await createUserWithRole(email, username, 'moderator');
 };
 
-var createCollectionEditor = async function(email, username) {
+var createCollectionEditor = async function (email, username) {
   await createUserWithRole(email, username, 'collection editor');
 };
 
-var createAdmin = async function(email, username) {
+var createAdmin = async function (email, username) {
   await createAndLoginCurriculumAdminUser(email, username);
   await logout();
 };

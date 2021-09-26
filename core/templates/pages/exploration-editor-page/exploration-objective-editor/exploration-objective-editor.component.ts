@@ -31,7 +31,7 @@ angular.module('oppia').component('explorationObjectiveEditor', {
   template: require('./exploration-objective-editor.component.html'),
   controller: [
     '$scope', 'ExplorationObjectiveService',
-    function($scope, ExplorationObjectiveService) {
+    function ($scope, ExplorationObjectiveService) {
       $scope.explorationObjectiveService = ExplorationObjectiveService;
     }
   ]

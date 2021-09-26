@@ -27,7 +27,7 @@ angular.module('oppia').controller(
     'suggestionStatus', 'threadUibModalInstance', 'unsavedChangesExist',
     'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
     'MAX_COMMIT_MESSAGE_LENGTH',
-    function(
+    function (
         $scope, $uibModalInstance, EditabilityService,
         SuggestionModalService, currentContent,
         newContent, suggestionIsHandled, suggestionIsValid,

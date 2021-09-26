@@ -39,11 +39,11 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
-describe('Translation status service', function() {
+describe('Translation status service', function () {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.constant('INTERACTION_SPECS', {
       MultipleChoiceInput: {
         is_linear: false,
@@ -55,14 +55,14 @@ describe('Translation status service', function() {
       }
     });
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('Translation status service', function() {
+  describe('Translation status service', function () {
     var ess = null;
     var srvs = null;
     var swts = null;
@@ -81,7 +81,7 @@ describe('Translation status service', function() {
             provide: ExplorationDataService,
             useValue: {
               explorationId: 0,
-              autosaveChangeListAsync() {
+              autosaveChangeListAsync () {
                 return;
               }
             }
@@ -90,7 +90,7 @@ describe('Translation status service', function() {
       });
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
       tss = $injector.get('TranslationStatusService');
       ess = $injector.get('ExplorationStatesService');
       ttams = $injector.get('TranslationTabActiveModeService');
@@ -321,7 +321,7 @@ describe('Translation status service', function() {
     }));
 
     it('should return a correct list of state names for which audio needs ' +
-      'update', function() {
+      'update', function () {
       ttams.activateVoiceoverMode();
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
       // To check that initially no state contains audio that needs update.
@@ -342,7 +342,7 @@ describe('Translation status service', function() {
     });
 
     it('should return a correct list of state names for which translation ' +
-      'needs update', function() {
+      'needs update', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       var statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
@@ -363,7 +363,7 @@ describe('Translation status service', function() {
     });
 
     it('should return a correct count of audio and translations required in ' +
-      'an exploration', function() {
+      'an exploration', function () {
       ttams.activateVoiceoverMode();
       var explorationAudioRequiredCount = (
         tss.getExplorationContentRequiredCount());
@@ -395,7 +395,7 @@ describe('Translation status service', function() {
     });
 
     it('should return a correct count of audio not available in an exploration',
-      function() {
+      function () {
         ttams.activateVoiceoverMode();
         var explorationAudioNotAvailableCount = tss
           .getExplorationContentNotAvailableCount();
@@ -412,7 +412,7 @@ describe('Translation status service', function() {
       });
 
     it('should return a correct count of translations not available in an ' +
-      'exploration', function() {
+      'exploration', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       var explorationTranslationNotAvailableCount = (
@@ -430,7 +430,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return an object containing status colors of audio ' +
-      'for all states in the exploration', function() {
+      'for all states in the exploration', function () {
       ttams.activateVoiceoverMode();
       var stateWiseStatusColor = tss.getAllStateStatusColors();
       expect(stateWiseStatusColor.First).toBe(FEW_ASSETS_AVAILABLE_COLOR);
@@ -447,7 +447,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return an object containing status colors of ' +
-      'translations for all states in the exploration', function() {
+      'translations for all states in the exploration', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       tss.refresh();
@@ -466,7 +466,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct status color for audio availability in the ' +
-      'active state components', function() {
+      'active state components', function () {
       ttams.activateVoiceoverMode();
       srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateComponentStatus = tss
@@ -498,7 +498,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct status color for translations availability in ' +
-      'the active state components', function() {
+      'the active state components', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
@@ -521,7 +521,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return whether active state component audio needs ' +
-      'update', function() {
+      'update', function () {
       ttams.activateVoiceoverMode();
       srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateComponentNeedsUpdateStatus = tss
@@ -542,7 +542,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return whether active state component translation ' +
-      'needs update', function() {
+      'needs update', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
@@ -559,7 +559,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct audio availability status color of a contentId ' +
-      'of active state', function() {
+      'of active state', function () {
       ttams.activateVoiceoverMode();
       srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateContentIdStatusColor = tss
@@ -594,7 +594,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct translation availability status color of a ' +
-      'contentId of active state', function() {
+      'contentId of active state', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
@@ -629,7 +629,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct needs update status of voice-over of active ' +
-      'state contentId', function() {
+      'state contentId', function () {
       ttams.activateVoiceoverMode();
       srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateContentIdNeedsUpdateStatus = tss
@@ -649,7 +649,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct needs update status of translation of active ' +
-      'state contentId', function() {
+      'state contentId', function () {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       swts.init('First', ess.getWrittenTranslationsMemento('First'));

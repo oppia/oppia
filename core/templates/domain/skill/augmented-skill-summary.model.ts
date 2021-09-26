@@ -30,7 +30,7 @@ export interface AugmentedSkillSummaryBackendDict {
 }
 
 export class AugmentedSkillSummary {
-  constructor(
+  constructor (
     public id: string,
     public description: string,
     public languageCode: string,
@@ -42,7 +42,7 @@ export class AugmentedSkillSummary {
     public topicNames: string[],
     public classroomNames: string[]) { }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       summaryDict: AugmentedSkillSummaryBackendDict): AugmentedSkillSummary {
     return new AugmentedSkillSummary(
       summaryDict.id,

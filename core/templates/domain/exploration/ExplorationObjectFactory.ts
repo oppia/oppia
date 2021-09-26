@@ -75,7 +75,7 @@ export class Exploration {
   logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
 
-  constructor(
+  constructor (
       initStateName: string, paramChanges: ParamChange[],
       paramSpecs: ParamSpecs, states: States, title: string,
       languageCode: string, loggerService: LoggerService,
@@ -91,13 +91,13 @@ export class Exploration {
   }
 
   // ---- Instance methods ----
-  isStateTerminal(stateName: string): boolean {
+  isStateTerminal (stateName: string): boolean {
     return (
       stateName && this.getInteractionId(stateName) &&
         INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
   }
 
-  getAuthorRecommendedExpIds(stateName: string): string[] {
+  getAuthorRecommendedExpIds (stateName: string): string[] {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
         'Tried to get recommendations for a non-terminal state: ' +
@@ -111,7 +111,7 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  getInteraction(stateName: string): Interaction {
+  getInteraction (stateName: string): Interaction {
     let state = this.states.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -120,7 +120,7 @@ export class Exploration {
     return state.interaction;
   }
 
-  getInteractionId(stateName: string): string {
+  getInteractionId (stateName: string): string {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -128,7 +128,7 @@ export class Exploration {
     return interaction.id;
   }
 
-  getInteractionCustomizationArgs(
+  getInteractionCustomizationArgs (
       stateName: string): InteractionCustomizationArgs {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
@@ -137,12 +137,12 @@ export class Exploration {
     return interaction.customizationArgs;
   }
 
-  getInteractionInstructions(stateName: string): string {
+  getInteractionInstructions (stateName: string): string {
     let interactionId = this.getInteractionId(stateName);
     return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
   }
 
-  getNarrowInstructions(stateName: string): string {
+  getNarrowInstructions (stateName: string): string {
     let interactionId = this.getInteractionId(stateName);
     return (
         interactionId ?
@@ -150,7 +150,7 @@ export class Exploration {
             '');
   }
 
-  getInteractionThumbnailSrc(stateName: string): string {
+  getInteractionThumbnailSrc (stateName: string): string {
     // TODO(sll): Unify this with the 'choose interaction' modal in
     // state_editor_interaction.html.
     let interactionId = this.getInteractionId(stateName);
@@ -159,7 +159,7 @@ export class Exploration {
           .getInteractionThumbnailImageUrl(interactionId)) : '';
   }
 
-  isInteractionInline(stateName: string): boolean {
+  isInteractionInline (stateName: string): boolean {
     let interactionId = this.getInteractionId(stateName);
 
     // Note that we treat a null interaction as an inline one, so that the
@@ -170,27 +170,27 @@ export class Exploration {
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
-  getStates(): States {
+  getStates (): States {
     return cloneDeep(this.states);
   }
 
-  getState(stateName: string): State {
+  getState (stateName: string): State {
     return this.states.getState(stateName);
   }
 
-  getInitialState(): State {
+  getInitialState (): State {
     return this.getState(this.initStateName);
   }
 
-  setInitialStateName(stateName: string): void {
+  setInitialStateName (stateName: string): void {
     this.initStateName = stateName;
   }
 
-  getUninterpolatedContentHtml(stateName: string): string {
+  getUninterpolatedContentHtml (stateName: string): string {
     return this.getState(stateName).content.html;
   }
 
-  getVoiceovers(stateName: string): BindableVoiceovers {
+  getVoiceovers (stateName: string): BindableVoiceovers {
     let state = this.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -202,7 +202,7 @@ export class Exploration {
       contentId);
   }
 
-  getVoiceover(
+  getVoiceover (
       stateName: string, languageCode: string): Voiceover {
     let state = this.getState(stateName);
     if (!state) {
@@ -215,19 +215,19 @@ export class Exploration {
     return voiceovers || null;
   }
 
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
+  getAllVoiceovers (languageCode: string): VoiceoverObjectsDict {
     return this.states.getAllVoiceovers(languageCode);
   }
 
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this.languageCode;
   }
 
-  getAllVoiceoverLanguageCodes(): string[] {
+  getAllVoiceoverLanguageCodes (): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
   }
 
-  getDisplayableWrittenTranslationLanguageCodes(): string[] {
+  getDisplayableWrittenTranslationLanguageCodes (): string[] {
     const allLanguageCodes = (
       this.states.getAllWrittenTranslationLanguageCodes());
 
@@ -243,14 +243,14 @@ export class Exploration {
   providedIn: 'root'
 })
 export class ExplorationObjectFactory {
-  constructor(
+  constructor (
     private logger: LoggerService,
     private paramChangesObjectFactory: ParamChangesObjectFactory,
     private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private statesObjectFactory: StatesObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  createFromBackendDict(
+  createFromBackendDict (
       explorationBackendDict: ExplorationBackendDict): Exploration {
     return new Exploration(
       explorationBackendDict.init_state_name,

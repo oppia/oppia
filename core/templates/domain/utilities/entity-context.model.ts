@@ -21,16 +21,16 @@ export class EntityContext {
   _id: string;
   _type: string;
 
-  constructor(id: string, type: string) {
+  constructor (id: string, type: string) {
     this._id = id;
     this._type = type;
   }
 
-  getId(): string {
+  getId (): string {
     return this._id;
   }
 
-  getType(): string {
+  getType (): string {
     return this._type;
   }
 }

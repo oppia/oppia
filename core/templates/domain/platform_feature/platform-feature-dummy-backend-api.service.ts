@@ -32,7 +32,7 @@ import { PlatformFeatureDomainConstants } from
   providedIn: 'root'
 })
 export class PlatformFeatureDummyBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
   ) {}
 
@@ -42,7 +42,7 @@ export class PlatformFeatureDummyBackendApiService {
    * @returns {Promise<boolean>} - A promise that resolves to true if request
    * to the dummy handler succeeded without 404 error.
    */
-  async isHandlerEnabled(): Promise<boolean> {
+  async isHandlerEnabled (): Promise<boolean> {
     try {
       await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .toPromise();

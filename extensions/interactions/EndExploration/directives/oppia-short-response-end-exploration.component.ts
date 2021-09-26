@@ -22,5 +22,5 @@
 
 angular.module('oppia').component('oppiaShortResponseEndExploration', {
   controllerAs: '$ctrl',
-  controller: [function() {}]
+  controller: [function () {}]
 });

@@ -33,9 +33,9 @@ module.exports = {
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     return {
-      'MemberExpression[property.name=toThrow]': function(node) {
+      'MemberExpression[property.name=toThrow]': function (node) {
         context.report({
           node: node.property,
           messageId: 'noToThrow'

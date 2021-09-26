@@ -30,10 +30,10 @@ require(
 angular.module('oppia').factory('TrainingDataService', [
   'ExplorationStatesService', 'GraphDataService',
   'ResponsesService', 'StateEditorService',
-  function(
+  function (
       ExplorationStatesService, GraphDataService,
       ResponsesService, StateEditorService) {
-    var _getIndexOfTrainingData = function(answer, trainingData) {
+    var _getIndexOfTrainingData = function (answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
         if (angular.equals(trainingData[i], answer)) {
@@ -47,7 +47,7 @@ angular.module('oppia').factory('TrainingDataService', [
     // Attempts to remove a given answer from a list of trained answers. This
     // function returns the index of the answer that was removed if it was
     // successfully removed from the training data, or -1 otherwise.
-    var _removeAnswerFromTrainingData = function(answer, trainingData) {
+    var _removeAnswerFromTrainingData = function (answer, trainingData) {
       var index = _getIndexOfTrainingData(answer, trainingData);
       if (index !== -1) {
         trainingData.splice(index, 1);
@@ -59,7 +59,7 @@ angular.module('oppia').factory('TrainingDataService', [
     // or the confirmed unclassified answer list. It also removes the answer
     // from the training data being presented to the user so that it does not
     // show up again.
-    var _removeAnswer = function(answer) {
+    var _removeAnswer = function (answer) {
       var answerGroups = ResponsesService.getAnswerGroups();
       var confirmedUnclassifiedAnswers = (
         ResponsesService.getConfirmedUnclassifiedAnswers());
@@ -83,7 +83,7 @@ angular.module('oppia').factory('TrainingDataService', [
       if (updatedAnswerGroups) {
         ResponsesService.save(
           answerGroups, ResponsesService.getDefaultOutcome(),
-          function(newAnswerGroups, newDefaultOutcome) {
+          function (newAnswerGroups, newDefaultOutcome) {
             ExplorationStatesService.saveInteractionAnswerGroups(
               StateEditorService.getActiveStateName(),
               angular.copy(newAnswerGroups));
@@ -106,7 +106,7 @@ angular.module('oppia').factory('TrainingDataService', [
     };
 
     return {
-      getTrainingDataAnswers: function() {
+      getTrainingDataAnswers: function () {
         var trainingDataAnswers = [];
         var answerGroups = ResponsesService.getAnswerGroups();
 
@@ -120,11 +120,11 @@ angular.module('oppia').factory('TrainingDataService', [
         return trainingDataAnswers;
       },
 
-      getTrainingDataOfAnswerGroup: function(answerGroupIndex) {
+      getTrainingDataOfAnswerGroup: function (answerGroupIndex) {
         return ResponsesService.getAnswerGroup(answerGroupIndex).trainingData;
       },
 
-      getAllPotentialOutcomes: function(state) {
+      getAllPotentialOutcomes: function (state) {
         var potentialOutcomes = [];
         var interaction = state.interaction;
 
@@ -139,7 +139,7 @@ angular.module('oppia').factory('TrainingDataService', [
         return potentialOutcomes;
       },
 
-      associateWithAnswerGroup: function(answerGroupIndex, answer) {
+      associateWithAnswerGroup: function (answerGroupIndex, answer) {
         // Remove answer from traning data of any answer group or
         // confirmed unclassified answers.
         _removeAnswer(answer);
@@ -151,7 +151,7 @@ angular.module('oppia').factory('TrainingDataService', [
         answerGroup.trainingData.push(answer);
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: answerGroup.trainingData
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ExplorationStatesService.saveInteractionAnswerGroups(
             StateEditorService.getActiveStateName(),
             angular.copy(newAnswerGroups));
@@ -160,7 +160,7 @@ angular.module('oppia').factory('TrainingDataService', [
         });
       },
 
-      associateWithDefaultResponse: function(answer) {
+      associateWithDefaultResponse: function (answer) {
         // Remove answer from traning data of any answer group or
         // confirmed unclassified answers.
         _removeAnswer(answer);
@@ -175,12 +175,12 @@ angular.module('oppia').factory('TrainingDataService', [
           angular.copy(confirmedUnclassifiedAnswers));
       },
 
-      isConfirmedUnclassifiedAnswer: function(answer) {
+      isConfirmedUnclassifiedAnswer: function (answer) {
         return (_getIndexOfTrainingData(
           answer, ResponsesService.getConfirmedUnclassifiedAnswers()) !== -1);
       },
 
-      removeAnswerFromAnswerGroupTrainingData: function(
+      removeAnswerFromAnswerGroupTrainingData: function (
           answer, answerGroupIndex) {
         var trainingData = ResponsesService.getAnswerGroup(
           answerGroupIndex).trainingData;
@@ -191,7 +191,7 @@ angular.module('oppia').factory('TrainingDataService', [
 
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: trainingData
-        }, function(newAnswerGroups) {
+        }, function (newAnswerGroups) {
           ExplorationStatesService.saveInteractionAnswerGroups(
             StateEditorService.getActiveStateName(),
             angular.copy(newAnswerGroups));

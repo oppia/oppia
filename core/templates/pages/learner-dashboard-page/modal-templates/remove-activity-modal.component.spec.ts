@@ -24,22 +24,22 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  close(): void {
+  close (): void {
     return;
   }
 
-  dismiss(): void {
+  dismiss (): void {
     return;
   }
 }
 
 class MockUrlInterpolationService {
-  interpolateUrl(): void {
+  interpolateUrl (): void {
     return;
   }
 }
 
-describe('Remove Activity Modal Component', function() {
+describe('Remove Activity Modal Component', function () {
   let component: RemoveActivityModalComponent;
   let fixture: ComponentFixture<RemoveActivityModalComponent>;
   let ngbActiveModal: NgbActiveModal;

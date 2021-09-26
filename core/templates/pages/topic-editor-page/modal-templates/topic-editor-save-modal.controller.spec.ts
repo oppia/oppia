@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicEditorSaveModalController.
  */
 
-describe('Topic Editor Save Modal Controller', function() {
+describe('Topic Editor Save Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
 
@@ -24,7 +24,7 @@ describe('Topic Editor Save Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -39,7 +39,7 @@ describe('Topic Editor Save Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.isTopicPublished).toBe(topicIsPublished);
     });
 });

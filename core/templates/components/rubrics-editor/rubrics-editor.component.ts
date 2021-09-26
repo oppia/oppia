@@ -70,32 +70,32 @@ export class RubricsEditorComponent {
   rubricsOptions: RubricsOptions[];
   rubric: Rubric;
 
-  constructor(
+  constructor (
     private skillCreationService: SkillCreationService,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
-  isEditable(): boolean {
+  isEditable (): boolean {
     return true;
   }
 
-  getSchema(): ExplanationFormSchema {
+  getSchema (): ExplanationFormSchema {
     return this.EXPLANATION_FORM_SCHEMA;
   }
 
-  isExplanationEmpty(explanation: string): boolean {
+  isExplanationEmpty (explanation: string): boolean {
     return explanation === '<p></p>' || explanation === '';
   }
 
-  openExplanationEditor(difficulty: string, index: number): void {
+  openExplanationEditor (difficulty: string, index: number): void {
     this.explanationEditorIsOpen[difficulty][index] = true;
   }
 
-  isExplanationValid(difficulty: string, index: number): boolean {
+  isExplanationValid (difficulty: string, index: number): boolean {
     return Boolean(this.editableExplanations[difficulty][index]);
   }
 
-  updateExplanation($event: string, idx: number): void {
+  updateExplanation ($event: string, idx: number): void {
     if (this.editableExplanations[this.rubric.getDifficulty()][idx] !==
     $event) {
       this.editableExplanations[this.rubric.getDifficulty()][idx] = $event;
@@ -103,7 +103,7 @@ export class RubricsEditorComponent {
     }
   }
 
-  saveExplanation(difficulty: string, index: number): void {
+  saveExplanation (difficulty: string, index: number): void {
     if (difficulty === this.skillDifficultyMedium && index === 0) {
       this.skillCreationService.disableSkillDescriptionStatusMarker();
     }
@@ -123,7 +123,7 @@ export class RubricsEditorComponent {
     }
   }
 
-  cancelEditExplanation(difficulty: string, index: number): void {
+  cancelEditExplanation (difficulty: string, index: number): void {
     this.editableExplanations[difficulty][index] = (
       this.explanationsMemento[difficulty][index]);
     if (!this.editableExplanations[difficulty][index]) {
@@ -132,7 +132,7 @@ export class RubricsEditorComponent {
     this.explanationEditorIsOpen[difficulty][index] = false;
   }
 
-  addExplanationForDifficulty(difficulty: string): void {
+  addExplanationForDifficulty (difficulty: string): void {
     this.editableExplanations[difficulty].push('');
     const rubricData: RubricData = {
       difficulty: difficulty,
@@ -146,7 +146,7 @@ export class RubricsEditorComponent {
       this.editableExplanations[difficulty].length - 1] = true;
   }
 
-  deleteExplanation(difficulty: string, index: number): void {
+  deleteExplanation (difficulty: string, index: number): void {
     if (difficulty === this.skillDifficultyMedium && index === 0) {
       this.skillCreationService.disableSkillDescriptionStatusMarker();
     }
@@ -162,7 +162,7 @@ export class RubricsEditorComponent {
   }
 
 
-  isAnyExplanationEmptyForDifficulty(difficulty: string): boolean {
+  isAnyExplanationEmptyForDifficulty (difficulty: string): boolean {
     for (let idx in this.explanationsMemento[difficulty]) {
       if (
         this.isExplanationEmpty(
@@ -173,7 +173,7 @@ export class RubricsEditorComponent {
     return false;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     for (let idx in this.rubrics) {
       let explanations = this.rubrics[idx].getExplanations();
       let difficulty = this.rubrics[idx].getDifficulty();
@@ -192,7 +192,7 @@ export class RubricsEditorComponent {
     this.rubric = this.rubrics[1];
   }
 
-  onRubricSelectionChange(): void {
+  onRubricSelectionChange (): void {
     this.rubric = this.rubrics[this.selectedRubricIndex];
   }
 }

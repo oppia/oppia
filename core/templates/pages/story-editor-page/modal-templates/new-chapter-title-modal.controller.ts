@@ -31,7 +31,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
   'ExplorationIdValidationService', 'StoryEditorStateService',
   'StoryUpdateService', 'ValidatorsService', 'nodeTitles',
   'MAX_CHARS_IN_EXPLORATION_TITLE',
-  function(
+  function (
       $controller, $scope, $uibModalInstance,
       ExplorationIdValidationService, StoryEditorStateService,
       StoryUpdateService, ValidatorsService, nodeTitles,
@@ -41,7 +41,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $uibModalInstance: $uibModalInstance
     });
 
-    $scope.init = function() {
+    $scope.init = function () {
       $scope.title = '';
       $scope.explorationId = '';
       $scope.invalidExpId = '';
@@ -60,7 +60,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
 
     $scope.init();
 
-    $scope.updateThumbnailFilename = function(
+    $scope.updateThumbnailFilename = function (
         newThumbnailFilename) {
       StoryUpdateService.setStoryNodeThumbnailFilename(
         $scope.story, $scope.nodeId, newThumbnailFilename);
@@ -68,23 +68,23 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.$applyAsync();
     };
 
-    $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
+    $scope.updateThumbnailBgColor = function (newThumbnailBgColor) {
       StoryUpdateService.setStoryNodeThumbnailBgColor(
         $scope.story, $scope.nodeId, newThumbnailBgColor);
       $scope.editableThumbnailBgColor = newThumbnailBgColor;
     };
 
-    $scope.updateTitle = function() {
+    $scope.updateTitle = function () {
       StoryUpdateService.setStoryNodeTitle(
         $scope.story, $scope.nodeId, $scope.title);
     };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       StoryUpdateService.deleteStoryNode($scope.story, $scope.nodeId);
       $uibModalInstance.dismiss();
     };
 
-    $scope.updateExplorationId = function() {
+    $scope.updateExplorationId = function () {
       var nodes = $scope.story.getStoryContents().getNodes();
       for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].getExplorationId() === $scope.explorationId) {
@@ -96,7 +96,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       }
       if (StoryEditorStateService.isStoryPublished()) {
         ExplorationIdValidationService.isExpPublishedAsync(
-          $scope.explorationId).then(function(expIdIsValid) {
+          $scope.explorationId).then(function (expIdIsValid) {
           $scope.expIdIsValid = expIdIsValid;
           if ($scope.expIdIsValid) {
             StoryUpdateService.setStoryNodeExplorationId(
@@ -113,25 +113,25 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       }
     };
 
-    $scope.resetErrorMsg = function() {
+    $scope.resetErrorMsg = function () {
       $scope.errorMsg = null;
       $scope.invalidExpId = false;
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
     };
 
-    $scope.validateExplorationId = function() {
+    $scope.validateExplorationId = function () {
       return ValidatorsService.isValidExplorationId(
         $scope.explorationId, false);
     };
 
-    $scope.isValid = function() {
+    $scope.isValid = function () {
       return Boolean(
         $scope.title &&
         ValidatorsService.isValidExplorationId($scope.explorationId, false) &&
         $scope.editableThumbnailFilename);
     };
 
-    $scope.save = function() {
+    $scope.save = function () {
       if ($scope.nodeTitles.indexOf($scope.title) !== -1) {
         $scope.errorMsg = 'A chapter with this title already exists';
         return;

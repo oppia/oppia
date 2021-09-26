@@ -33,7 +33,7 @@ import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-playe
   providedIn: 'root'
 })
 export class ContentTranslationLanguageService {
-  constructor(
+  constructor (
     private languageUtilService: LanguageUtilService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private urlService: UrlService
@@ -45,7 +45,7 @@ export class ContentTranslationLanguageService {
   private currentContentLanguageCode!: string;
   private languageOptions: ExplorationLanguageInfo[] = [];
 
-  _init(
+  _init (
       allContentLanguageCodesInExploration: string[],
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string
@@ -110,7 +110,7 @@ export class ContentTranslationLanguageService {
       });
   }
 
-  init(
+  init (
       allContentLanguageCodesInExploration: string[],
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string): void {
@@ -127,7 +127,7 @@ export class ContentTranslationLanguageService {
   /**
    * @return {string} The current audio language code (eg. en).
    */
-  getCurrentContentLanguageCode(): string {
+  getCurrentContentLanguageCode (): string {
     return this.currentContentLanguageCode;
   }
 
@@ -137,14 +137,14 @@ export class ContentTranslationLanguageService {
    * language codes as well as their displayed language description for
    * the exploration.
    */
-  getLanguageOptionsForDropdown(): ExplorationLanguageInfo[] {
+  getLanguageOptionsForDropdown (): ExplorationLanguageInfo[] {
     return this.languageOptions;
   }
 
   /**
    * @param {string} set a new language code.
    */
-  setCurrentContentLanguageCode(newLanguageCode: string): void {
+  setCurrentContentLanguageCode (newLanguageCode: string): void {
     if (this.currentContentLanguageCode !== newLanguageCode) {
       this.contentTranslationManagerService.displayTranslations(
         newLanguageCode);

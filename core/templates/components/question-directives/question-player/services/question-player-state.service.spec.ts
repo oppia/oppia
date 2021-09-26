@@ -46,7 +46,7 @@ require(
   'question-player-state.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 
-describe('Question player state service', function() {
+describe('Question player state service', function () {
   var qpservice;
   var QuestionObjectFactory;
   var questionId = 'question_1';
@@ -54,7 +54,7 @@ describe('Question player state service', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
@@ -77,13 +77,13 @@ describe('Question player state service', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     qpservice = $injector.get('QuestionPlayerStateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     question = QuestionObjectFactory.createFromBackendDict({
@@ -175,11 +175,11 @@ describe('Question player state service', function() {
     });
   }));
 
-  it('should return an empty question state dictionary', function() {
+  it('should return an empty question state dictionary', function () {
     expect(qpservice.getQuestionPlayerStateData()).toEqual({});
   });
 
-  it('should add a hint to the question state data', function() {
+  it('should add a hint to the question state data', function () {
     qpservice.hintUsed(question);
     var stateData = qpservice.getQuestionPlayerStateData();
     expect(stateData[questionId]).toBeTruthy();
@@ -193,7 +193,7 @@ describe('Question player state service', function() {
   });
 
   it('should record a wrong answer was submitted to the question state data',
-    function() {
+    function () {
       qpservice.answerSubmitted(question, false, 'skill_id_1-0');
       var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
@@ -209,7 +209,7 @@ describe('Question player state service', function() {
     });
 
   it('should record a right answer was submitted to the question state data',
-    function() {
+    function () {
       qpservice.answerSubmitted(question, true, 'skill_id_1-0');
       var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
@@ -225,7 +225,7 @@ describe('Question player state service', function() {
     });
 
   it('should record that a solution was viewed',
-    function() {
+    function () {
       qpservice.solutionViewed(question);
       var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
@@ -239,7 +239,7 @@ describe('Question player state service', function() {
     });
 
   it('should shouldn\'t record a correct answer if a solution was viewed',
-    function() {
+    function () {
       qpservice.solutionViewed(question);
       var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();

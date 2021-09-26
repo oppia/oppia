@@ -79,7 +79,7 @@ declare var angular: ng.IAngularStatic;
   ],
 })
 class BlogAdminPageModule implements DoBootstrap {
-  ngDoBootstrap() {}
+  ngDoBootstrap () {}
 }
 
 angular.module('oppia').requires.push(downgradeModule(extraProviders => {

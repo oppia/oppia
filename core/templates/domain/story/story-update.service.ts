@@ -51,7 +51,7 @@ type Command = BackendChangeObject['cmd'];
   providedIn: 'root'
 })
 export class StoryUpdateService {
-  constructor(
+  constructor (
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
     private _storyEditorStateService: StoryEditorStateService
@@ -59,7 +59,7 @@ export class StoryUpdateService {
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // story.
-  _applyChange(
+  _applyChange (
       story: Story, command: Command, params: Params,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     let changeDict = cloneDeep(params) as BackendChangeObject;
@@ -73,15 +73,15 @@ export class StoryUpdateService {
     }
   }
 
-  _getParameterFromChangeDict(
+  _getParameterFromChangeDict (
       changeDict: BackendChangeObject, paramName: string): string {
     return changeDict[paramName];
   }
 
-  _getNodeIdFromChangeDict(changeDict: BackendChangeObject): string {
+  _getNodeIdFromChangeDict (changeDict: BackendChangeObject): string {
     return this._getParameterFromChangeDict(changeDict, 'node_id');
   }
-  _getStoryNode(storyContents: StoryContents, nodeId: string): StoryNode {
+  _getStoryNode (storyContents: StoryContents, nodeId: string): StoryNode {
     let storyNodeIndex = storyContents.getNodeIndex(nodeId);
     if (storyNodeIndex === -1) {
       throw new Error('The given node doesn\'t exist');
@@ -91,7 +91,7 @@ export class StoryUpdateService {
 
   // Applies a story property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
-  _applyStoryPropertyChange(
+  _applyStoryPropertyChange (
       story: Story, propertyName: string,
       oldValue: string, newValue: string,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
@@ -102,7 +102,7 @@ export class StoryUpdateService {
     }, apply, reverse);
   }
 
-  _applyStoryContentsPropertyChange(
+  _applyStoryContentsPropertyChange (
       story: Story, propertyName: string,
       oldValue: string | number, newValue: string | number,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
@@ -114,7 +114,7 @@ export class StoryUpdateService {
       }, apply, reverse);
   }
 
-  _applyStoryNodePropertyChange(
+  _applyStoryNodePropertyChange (
       story: Story, propertyName: string,
       nodeId: string, oldValue: string | string[],
       newValue: string | string[],
@@ -128,7 +128,7 @@ export class StoryUpdateService {
       }, apply, reverse);
   }
 
-  _getNewPropertyValueFromChangeDict(changeDict: BackendChangeObject): string {
+  _getNewPropertyValueFromChangeDict (changeDict: BackendChangeObject): string {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
@@ -139,7 +139,7 @@ export class StoryUpdateService {
    * Changes the title of a story and records the change in the
    * undo/redo service.
    */
-  setStoryTitle(story: Story, title: string): void {
+  setStoryTitle (story: Story, title: string): void {
     let oldTitle = cloneDeep(story.getTitle());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_TITLE, oldTitle, title,
@@ -157,7 +157,7 @@ export class StoryUpdateService {
    * Changes the url fragment of a story and records the change in the
    * undo/redo service.
    */
-  setStoryUrlFragment(story: Story, urlFragment: string): void {
+  setStoryUrlFragment (story: Story, urlFragment: string): void {
     let oldUrlFragment = cloneDeep(story.getUrlFragment());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_URL_FRAGMENT,
@@ -177,7 +177,7 @@ export class StoryUpdateService {
    * Changes the thumbnail filename of a story and records the change
    * in the undo/redo service.
    */
-  setThumbnailFilename(story: Story, newThumbnailFilename: string): void {
+  setThumbnailFilename (story: Story, newThumbnailFilename: string): void {
     let oldThumbnailFilename = cloneDeep(story.getThumbnailFilename());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_FILENAME,
@@ -197,7 +197,7 @@ export class StoryUpdateService {
    * Changes the thumbnail background color of a story and records the
    * change in the undo/redo service.
    */
-  setThumbnailBgColor(story: Story, newThumbnailBgColor: string): void {
+  setThumbnailBgColor (story: Story, newThumbnailBgColor: string): void {
     let oldThumbnailBgColor = cloneDeep(story.getThumbnailBgColor());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -217,7 +217,7 @@ export class StoryUpdateService {
    * Changes the description of a story and records the change in the
    * undo/redo service.
    */
-  setStoryDescription(story: Story, description: string): void {
+  setStoryDescription (story: Story, description: string): void {
     let oldDescription = cloneDeep(story.getDescription());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_DESCRIPTION,
@@ -236,7 +236,7 @@ export class StoryUpdateService {
    * Changes the notes for a story and records the change in the
    * undo/redo service.
    */
-  setStoryNotes(story: Story, notes: string): void {
+  setStoryNotes (story: Story, notes: string): void {
     let oldNotes = cloneDeep(story.getNotes());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_NOTES, oldNotes, notes,
@@ -254,7 +254,7 @@ export class StoryUpdateService {
    * Changes the language code of a story and records the change in
    * the undo/redo service.
    */
-  setStoryLanguageCode(story: Story, languageCode: string): void {
+  setStoryLanguageCode (story: Story, languageCode: string): void {
     let oldLanguageCode = cloneDeep(story.getLanguageCode());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE,
@@ -273,7 +273,7 @@ export class StoryUpdateService {
    * Changes the meta tag content of a story and records the change in
    * the undo/redo service.
    */
-  setStoryMetaTagContent(story: Story, metaTagContent: string): void {
+  setStoryMetaTagContent (story: Story, metaTagContent: string): void {
     let oldMetaTagContent = cloneDeep(story.getMetaTagContent());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_META_TAG_CONTENT,
@@ -293,7 +293,7 @@ export class StoryUpdateService {
    * Sets the initial node of the story and records the change in
    * the undo/redo service.
    */
-  setInitialNodeId(story: Story, newInitialNodeId: string): void {
+  setInitialNodeId (story: Story, newInitialNodeId: string): void {
     let oldInitialNodeId =
       cloneDeep(story.getStoryContents().getInitialNodeId());
     this._applyStoryContentsPropertyChange(
@@ -312,7 +312,7 @@ export class StoryUpdateService {
    * Creates a story node, adds it to the story and records the change in
    * the undo/redo service.
    */
-  addStoryNode(story: Story, nodeTitle: string): void {
+  addStoryNode (story: Story, nodeTitle: string): void {
     let nextNodeId = story.getStoryContents().getNextNodeId();
     this._applyChange(story, StoryDomainConstants.CMD_ADD_STORY_NODE, {
       node_id: nextNodeId,
@@ -332,7 +332,7 @@ export class StoryUpdateService {
   /**
    * Removes a story node, and records the change in the undo/redo service.
    */
-  deleteStoryNode(story: Story, nodeId: string): void {
+  deleteStoryNode (story: Story, nodeId: string): void {
     this._applyChange(story, StoryDomainConstants.CMD_DELETE_STORY_NODE, {
       node_id: nodeId
     }, (changeDict, story) => {
@@ -349,7 +349,7 @@ export class StoryUpdateService {
    * Marks the node outline of a node as finalized and records the change
    * in the undo/redo service.
    */
-  finalizeStoryNodeOutline(story: Story, nodeId: string): void {
+  finalizeStoryNodeOutline (story: Story, nodeId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     if (storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already finalized.');
@@ -372,7 +372,7 @@ export class StoryUpdateService {
    * Marks the node outline of a node as not finalized and records the
    * change in the undo/redo service.
    */
-  unfinalizeStoryNodeOutline(story: Story, nodeId: string): void {
+  unfinalizeStoryNodeOutline (story: Story, nodeId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     if (!storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already not finalized.');
@@ -395,7 +395,7 @@ export class StoryUpdateService {
    * Sets the outline of a node of the story and records the change
    * in the undo/redo service.
    */
-  setStoryNodeOutline(story: Story, nodeId: string, newOutline: string): void {
+  setStoryNodeOutline (story: Story, nodeId: string, newOutline: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldOutline = storyNode.getOutline();
 
@@ -416,7 +416,7 @@ export class StoryUpdateService {
    * Sets the title of a node of the story and records the change
    * in the undo/redo service.
    */
-  setStoryNodeTitle(story: Story, nodeId: string, newTitle: string): void {
+  setStoryNodeTitle (story: Story, nodeId: string, newTitle: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldTitle = storyNode.getTitle();
 
@@ -436,7 +436,7 @@ export class StoryUpdateService {
    * Sets the description of a node of the story and records the change
    * in the undo/redo service.
    */
-  setStoryNodeDescription(
+  setStoryNodeDescription (
       story: Story, nodeId: string, newDescription: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldDescription = storyNode.getDescription();
@@ -457,7 +457,7 @@ export class StoryUpdateService {
    * Sets the thumbnail filename of a node of the story and records the
    * change in the undo/redo service.
    */
-  setStoryNodeThumbnailFilename(
+  setStoryNodeThumbnailFilename (
       story: Story, nodeId: string, newThumbnailFilename: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldThumbnailFilename = storyNode.getThumbnailFilename();
@@ -478,7 +478,7 @@ export class StoryUpdateService {
    * Sets the thumbnail background color of a node of the story and records
    * the change in the undo/redo service.
    */
-  setStoryNodeThumbnailBgColor(
+  setStoryNodeThumbnailBgColor (
       story: Story, nodeId: string, newThumbnailBgColor: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldThumbnailBgColor = storyNode.getThumbnailBgColor();
@@ -499,7 +499,7 @@ export class StoryUpdateService {
    * Sets the id of the exploration that of a node of the story is linked
    * to and records the change in the undo/redo service.
    */
-  setStoryNodeExplorationId(
+  setStoryNodeExplorationId (
       story: Story, nodeId: string, newExplorationId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldExplorationId = storyNode.getExplorationId();
@@ -524,7 +524,7 @@ export class StoryUpdateService {
    * Adds a destination node id to a node of a story and records the change
    * in the undo/redo service.
    */
-  addDestinationNodeIdToNode(
+  addDestinationNodeIdToNode (
       story: Story, nodeId: string, destinationNodeId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldDestinationNodeIds = cloneDeep(
@@ -550,7 +550,7 @@ export class StoryUpdateService {
    * Removes a destination node id from a node of a story and records the
    * change in the undo/redo service.
    */
-  removeDestinationNodeIdFromNode(
+  removeDestinationNodeIdFromNode (
       story: Story, nodeId: string, destinationNodeId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldDestinationNodeIds = cloneDeep(
@@ -581,7 +581,7 @@ export class StoryUpdateService {
    * Removes a node of a story and records the change in the
    * undo/redo service.
    */
-  rearrangeNodeInStory(story: Story, fromIndex: number, toIndex: number): void {
+  rearrangeNodeInStory (story: Story, fromIndex: number, toIndex: number): void {
     this._applyStoryContentsPropertyChange(
       story, StoryDomainConstants.NODE, fromIndex, toIndex,
       (changeDict, story) => {
@@ -597,7 +597,7 @@ export class StoryUpdateService {
    * Adds a prerequisite skill id to a node of a story and records the
    * change in the undo/redo service.
    */
-  addPrerequisiteSkillIdToNode(
+  addPrerequisiteSkillIdToNode (
       story: Story, nodeId: string, skillId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldPrerequisiteSkillIds = cloneDeep(
@@ -622,7 +622,7 @@ export class StoryUpdateService {
    * Removes a prerequisite skill id from a node of a story and records the
    * change in the undo/redo service.
    */
-  removePrerequisiteSkillIdFromNode(
+  removePrerequisiteSkillIdFromNode (
       story: Story, nodeId: string, skillId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldPrerequisiteSkillIds = cloneDeep(
@@ -653,7 +653,7 @@ export class StoryUpdateService {
    * Adds an acquired skill id to a node of a story and records the change
    * in the undo/redo service.
    */
-  addAcquiredSkillIdToNode(
+  addAcquiredSkillIdToNode (
       story: Story, nodeId: string, skillId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldAcquiredSkillIds = cloneDeep(
@@ -679,7 +679,7 @@ export class StoryUpdateService {
    * Removes an acquired skill id from a node of a story and records the
    * change in the undo/redo service.
    */
-  removeAcquiredSkillIdFromNode(
+  removeAcquiredSkillIdFromNode (
       story: Story, nodeId: string, skillId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldAcquiredSkillIds = cloneDeep(

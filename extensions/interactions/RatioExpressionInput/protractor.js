@@ -20,7 +20,7 @@ var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeInteraction = async function(
+var customizeInteraction = async function (
     elem, placeholderText, minNumberOfTerms) {
   await objects.UnicodeStringEditor(
     elem.element(by.tagName('schema-based-unicode-editor'))
@@ -30,7 +30,7 @@ var customizeInteraction = async function(
   ).setValue(minNumberOfTerms);
 };
 
-var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
+var expectInteractionDetailsToMatch = async function (elem, placeholderText) {
   const ratioExpressionInputInteraction = (
     element(by.tagName('oppia-interactive-ratio-expression-input')));
   // We use presenceOf here instead of visibilityOf because the container
@@ -52,7 +52,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
   ).toBe(true);
 };
 
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   await elem.element(by.tagName('oppia-interactive-ratio-expression-input')).
     element(by.tagName('input')).sendKeys(answer + '\n');
 };

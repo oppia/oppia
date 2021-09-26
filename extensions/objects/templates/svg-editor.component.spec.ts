@@ -174,12 +174,12 @@ describe('SvgEditor', () => {
   class mockReaderObject {
     result = null;
     onload = null;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL (file) {
       this.onload();
       return 'The file is loaded';
     }
@@ -188,12 +188,12 @@ describe('SvgEditor', () => {
   class mockImageObject {
     source = null;
     onload = null;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url) {
+    set src (url) {
       this.onload();
     }
   }
@@ -824,12 +824,12 @@ describe(
     class mockReaderObject {
     result = null;
     onload = null;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL (file) {
       this.onload();
       return 'The file is loaded';
     }
@@ -838,12 +838,12 @@ describe(
     class mockImageObject {
     source = null;
     onload = null;
-    constructor() {
+    constructor () {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
-    set src(url) {
+    set src (url) {
       this.onload();
     }
     }

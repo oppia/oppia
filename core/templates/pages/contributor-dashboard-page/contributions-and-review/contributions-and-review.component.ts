@@ -60,7 +60,7 @@ angular.module('oppia').component('contributionsAndReview', {
     'QuestionObjectFactory', 'SkillBackendApiService',
     'UrlInterpolationService', 'UserService',
     'CORRESPONDING_DELETED_OPPORTUNITY_TEXT', 'IMAGE_CONTEXT',
-    function(
+    function (
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         QuestionObjectFactory, SkillBackendApiService,
@@ -106,10 +106,10 @@ angular.module('oppia').component('contributionsAndReview', {
         }
       };
 
-      var getQuestionContributionsSummary = function(
+      var getQuestionContributionsSummary = function (
           suggestionIdToSuggestions) {
         var questionContributionsSummaryList = [];
-        Object.keys(suggestionIdToSuggestions).forEach(function(key) {
+        Object.keys(suggestionIdToSuggestions).forEach(function (key) {
           var suggestion = suggestionIdToSuggestions[key].suggestion;
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
@@ -135,10 +135,10 @@ angular.module('oppia').component('contributionsAndReview', {
         return questionContributionsSummaryList;
       };
 
-      var getTranslationContributionsSummary = function(
+      var getTranslationContributionsSummary = function (
           suggestionIdToSuggestions) {
         var translationContributionsSummaryList = [];
-        Object.keys(suggestionIdToSuggestions).forEach(function(key) {
+        Object.keys(suggestionIdToSuggestions).forEach(function (key) {
           var suggestion = suggestionIdToSuggestions[key].suggestion;
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
@@ -164,7 +164,7 @@ angular.module('oppia').component('contributionsAndReview', {
         return translationContributionsSummaryList;
       };
 
-      var getTranslationSuggestionHeading = function(suggestion) {
+      var getTranslationSuggestionHeading = function (suggestion) {
         const changeTranslation = suggestion.change.translation_html;
         if (Array.isArray(changeTranslation)) {
           return $filter('formatRtePreview')(changeTranslation.join(', '));
@@ -172,13 +172,13 @@ angular.module('oppia').component('contributionsAndReview', {
         return $filter('formatRtePreview')(changeTranslation);
       };
 
-      var resolveSuggestionSuccess = function(suggestionId) {
+      var resolveSuggestionSuccess = function (suggestionId) {
         AlertsService.addSuccessMessage('Submitted suggestion review.');
         ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
           [suggestionId]);
       };
 
-      var _showQuestionSuggestionModal = function(
+      var _showQuestionSuggestionModal = function (
           suggestion, contributionDetails, reviewable,
           misconceptionsBySkill) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
@@ -199,45 +199,45 @@ angular.module('oppia').component('contributionsAndReview', {
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            suggestion: function() {
+            suggestion: function () {
               return cloneDeep(suggestion);
             },
-            authorName: function() {
+            authorName: function () {
               return authorName;
             },
-            contentHtml: function() {
+            contentHtml: function () {
               return contentHtml;
             },
-            misconceptionsBySkill: function() {
+            misconceptionsBySkill: function () {
               return misconceptionsBySkill;
             },
-            question: function() {
+            question: function () {
               return question;
             },
-            questionHeader: function() {
+            questionHeader: function () {
               return questionHeader;
             },
-            reviewable: function() {
+            reviewable: function () {
               return reviewable;
             },
-            skillRubrics: function() {
+            skillRubrics: function () {
               return skillRubrics;
             },
-            skillDifficulty: function() {
+            skillDifficulty: function () {
               return skillDifficulty;
             },
-            suggestionId: function() {
+            suggestionId: function () {
               return suggestionId;
             }
           },
           controller: 'QuestionSuggestionReviewModalController'
-        }).result.then(function(result) {
+        }).result.then(function (result) {
           ContributionAndReviewService.resolveSuggestiontoSkill(
             targetId, suggestionId, result.action, result.reviewMessage,
             result.skillDifficulty, resolveSuggestionSuccess, () => {
               AlertsService.addInfoMessage('Failed to submit suggestion.');
             });
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
@@ -245,7 +245,7 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
-      var _showTranslationSuggestionModal = function(
+      var _showTranslationSuggestionModal = function (
           suggestionIdToContribution, initialSuggestionId, reviewable) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
@@ -259,40 +259,40 @@ angular.module('oppia').component('contributionsAndReview', {
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            suggestionIdToContribution: function() {
+            suggestionIdToContribution: function () {
               return cloneDeep(suggestionIdToContribution);
             },
-            initialSuggestionId: function() {
+            initialSuggestionId: function () {
               return initialSuggestionId;
             },
-            reviewable: function() {
+            reviewable: function () {
               return reviewable;
             },
-            subheading: function() {
+            subheading: function () {
               return subheading;
             }
           },
           controller: 'TranslationSuggestionReviewModalController'
-        }).result.then(function(resolvedSuggestionIds) {
+        }).result.then(function (resolvedSuggestionIds) {
           ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
             resolvedSuggestionIds);
-          resolvedSuggestionIds.forEach(function(suggestionId) {
+          resolvedSuggestionIds.forEach(function (suggestionId) {
             delete ctrl.contributions[suggestionId];
           });
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      ctrl.isActiveTab = function(tabType, suggestionType) {
+      ctrl.isActiveTab = function (tabType, suggestionType) {
         return (
           ctrl.activeTabType === tabType &&
           ctrl.activeSuggestionType === suggestionType);
       };
 
-      ctrl.onClickViewSuggestion = function(suggestionId) {
+      ctrl.onClickViewSuggestion = function (suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
         if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
@@ -323,7 +323,7 @@ angular.module('oppia').component('contributionsAndReview', {
         }
       };
 
-      var getContributionSummaries = function(suggestionIdToSuggestions) {
+      var getContributionSummaries = function (suggestionIdToSuggestions) {
         if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE) {
           return getTranslationContributionsSummary(suggestionIdToSuggestions);
         } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
@@ -331,14 +331,14 @@ angular.module('oppia').component('contributionsAndReview', {
         }
       };
 
-      ctrl.switchToTab = function(tabType, suggestionType) {
+      ctrl.switchToTab = function (tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
         ctrl.contributions = {};
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
-      ctrl.loadContributions = function() {
+      ctrl.loadContributions = function () {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
             resolve({opportunitiesDicts: [], more: false});
@@ -347,7 +347,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var fetchFunction = tabNameToOpportunityFetchFunction[
           ctrl.activeSuggestionType][ctrl.activeTabType];
 
-        return fetchFunction().then(function(suggestionIdToSuggestions) {
+        return fetchFunction().then(function (suggestionIdToSuggestions) {
           ctrl.contributions = suggestionIdToSuggestions;
           return {
             opportunitiesDicts: getContributionSummaries(ctrl.contributions),
@@ -356,7 +356,7 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.contributions = [];
         ctrl.userDetailsLoading = true;
         ctrl.userIsLoggedIn = false;
@@ -376,12 +376,12 @@ angular.module('oppia').component('contributionsAndReview', {
           }
         ];
 
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function (userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           ctrl.userDetailsLoading = false;
           if (ctrl.userIsLoggedIn) {
             UserService.getUserContributionRightsDataAsync().then(
-              function(userContributionRights) {
+              function (userContributionRights) {
                 var userCanReviewTranslationSuggestionsInLanguages = (
                   userContributionRights
                     .can_review_translation_for_language_codes);

@@ -42,13 +42,13 @@ angular.module('oppia').component('questionMisconceptionEditor', {
   template: require('./question-misconception-editor.component.html'),
   controller: [
     '$uibModal', 'ExternalSaveService', 'StateEditorService',
-    function(
+    function (
         $uibModal, ExternalSaveService, StateEditorService) {
       var ctrl = this;
 
-      ctrl.containsMisconceptions = function() {
+      ctrl.containsMisconceptions = function () {
         var containsMisconceptions = false;
-        Object.keys(ctrl.misconceptionsBySkill).forEach(function(skillId) {
+        Object.keys(ctrl.misconceptionsBySkill).forEach(function (skillId) {
           if (ctrl.misconceptionsBySkill[skillId].length > 0) {
             containsMisconceptions = true;
           }
@@ -56,7 +56,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         return containsMisconceptions;
       };
 
-      ctrl.tagAnswerGroupWithMisconception = function() {
+      ctrl.tagAnswerGroupWithMisconception = function () {
         var taggedSkillMisconceptionId = (
           ctrl.getTaggedSkillMisconceptionId());
         $uibModal.open({
@@ -68,7 +68,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
           resolve: {
             taggedSkillMisconceptionId: taggedSkillMisconceptionId
           }
-        }).result.then(function(returnObject) {
+        }).result.then(function (returnObject) {
           var misconception = returnObject.misconception;
           var misconceptionSkillId = returnObject.misconceptionSkillId;
           var feedbackIsUsed = returnObject.feedbackIsUsed;
@@ -76,14 +76,14 @@ angular.module('oppia').component('questionMisconceptionEditor', {
           ctrl.selectedMisconceptionSkillId = misconceptionSkillId;
           ctrl.feedbackIsUsed = feedbackIsUsed;
           ctrl.updateMisconception();
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      ctrl.updateMisconception = function() {
+      ctrl.updateMisconception = function () {
         var skillId = ctrl.selectedMisconceptionSkillId;
         var misconceptionId = ctrl.selectedMisconception.getId();
         ctrl.getOnSaveTaggedMisconception()(misconceptionId, skillId);
@@ -98,11 +98,11 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         ctrl.misconceptionEditorIsOpen = false;
       };
 
-      ctrl.editMisconception = function() {
+      ctrl.editMisconception = function () {
         ctrl.misconceptionEditorIsOpen = true;
       };
 
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         ctrl.misconceptionName = null;
         ctrl.selectedMisconception = null;
         ctrl.selectedMisconceptionSkillId = null;

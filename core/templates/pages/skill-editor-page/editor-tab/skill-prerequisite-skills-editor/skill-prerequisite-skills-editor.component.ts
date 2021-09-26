@@ -40,7 +40,7 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
     '$scope', 'AlertsService',
     'NgbModal', 'SkillEditorStateService', 'SkillUpdateService',
     'TopicsAndSkillsDashboardBackendApiService', 'WindowDimensionsService',
-    function(
+    function (
         $scope, AlertsService,
         NgbModal, SkillEditorStateService, SkillUpdateService,
         TopicsAndSkillsDashboardBackendApiService, WindowDimensionsService,
@@ -50,15 +50,15 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
       var untriagedSkillSummaries = null;
       var groupedSkillSummaries = null;
 
-      $scope.removeSkillId = function(skillId) {
+      $scope.removeSkillId = function (skillId) {
         SkillUpdateService.deletePrerequisiteSkill($scope.skill, skillId);
       };
 
-      $scope.getSkillEditorUrl = function(skillId) {
+      $scope.getSkillEditorUrl = function (skillId) {
         return '/skill_editor/' + skillId;
       };
 
-      $scope.addSkill = function() {
+      $scope.addSkill = function () {
         // This contains the summaries of skill in the same topic as
         // the current skill as the initial entries followed by the others.
         var skillsInSameTopicCount =
@@ -80,7 +80,7 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
           allowSkillsFromOtherTopics);
         modalRef.componentInstance.untriagedSkillSummaries = (
           untriagedSkillSummaries);
-        modalRef.result.then(function(summary) {
+        modalRef.result.then(function (summary) {
           var skillId = summary.id;
           if (skillId === $scope.skill.getId()) {
             AlertsService.addInfoMessage(
@@ -95,24 +95,24 @@ angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
             }
           }
           SkillUpdateService.addPrerequisiteSkill($scope.skill, skillId);
-        }, function() {
+        }, function () {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
 
-      $scope.togglePrerequisiteSkills = function() {
+      $scope.togglePrerequisiteSkills = function () {
         if (WindowDimensionsService.isWindowNarrow()) {
           $scope.prerequisiteSkillsAreShown = (
             !$scope.prerequisiteSkillsAreShown);
         }
       };
-      ctrl.$onInit = function() {
+      ctrl.$onInit = function () {
         groupedSkillSummaries = SkillEditorStateService
           .getGroupedSkillSummaries();
         TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-          .then(function(response) {
+          .then(function (response) {
             categorizedSkills = response.categorizedSkillsDict;
             untriagedSkillSummaries = response.untriagedSkillSummaries;
           });

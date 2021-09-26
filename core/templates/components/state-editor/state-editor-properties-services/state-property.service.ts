@@ -51,13 +51,13 @@ export class StatePropertyService<StatePropertyType> {
   stateName!: string;
   savedMemento!: StatePropertyType;
 
-  constructor(
+  constructor (
     private alertsService: AlertsService,
     private utilsService: UtilsService) {
     this.setterMethodKey = null;
   }
 
-  init(stateName: string, value: StatePropertyType): void {
+  init (stateName: string, value: StatePropertyType): void {
     if (this.setterMethodKey === null) {
       throw new Error('State property setter method key cannot be null.');
     }
@@ -73,24 +73,24 @@ export class StatePropertyService<StatePropertyType> {
   }
 
   // Returns whether the current value has changed from the memento.
-  hasChanged(): boolean {
+  hasChanged (): boolean {
     return !this.utilsService.isEquivalent(this.savedMemento, this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: StatePropertyType): StatePropertyType {
+  _normalize (value: StatePropertyType): StatePropertyType {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: StatePropertyType): boolean {
+  _isValid (value: StatePropertyType): boolean {
     return true;
   }
 
-  saveDisplayedValue(): void {
+  saveDisplayedValue (): void {
     if (this.setterMethodKey === null) {
       throw new Error('State property setter method key cannot be null.');
     }
@@ -111,7 +111,7 @@ export class StatePropertyService<StatePropertyType> {
   }
 
   // Reverts the displayed value to the saved memento.
-  restoreFromMemento(): void {
+  restoreFromMemento (): void {
     this.displayed = cloneDeep(this.savedMemento);
   }
 }

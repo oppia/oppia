@@ -27,13 +27,13 @@ var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
-describe('Classroom page functionality', function() {
+describe('Classroom page functionality', function () {
   var adminPage = null;
   var classroomPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -46,12 +46,12 @@ describe('Classroom page functionality', function() {
       'creator@classroomPage.com', 'creatorClassroomPage');
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 
   it('should add a new published topic to the Math classroom',
-    async function() {
+    async function () {
       var handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.createTopic(
@@ -66,7 +66,7 @@ describe('Classroom page functionality', function() {
       await adminPage.editConfigProperty(
         'The details for each classroom page.',
         'List',
-        async function(elem) {
+        async function (elem) {
           elem = await elem.editItem(0, 'Dictionary');
           elem = await elem.editEntry(4, 'List');
           elem = await elem.addItem('Unicode');
@@ -104,7 +104,7 @@ describe('Classroom page functionality', function() {
       await classroomPage.expectNumberOfTopicsToBe(1);
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

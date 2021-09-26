@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for PostPublishModalController.
  */
 
-describe('Post Publish Modal Controller', function() {
+describe('Post Publish Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
@@ -32,10 +32,10 @@ describe('Post Publish Modal Controller', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('$window', mockWindow);
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
 
@@ -53,14 +53,14 @@ describe('Post Publish Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.congratsImgUrl).toBe('/assets/images/general/congrats.svg');
       expect($scope.explorationId).toBe(explorationId);
       expect($scope.explorationLinkCopied).toBe(false);
       expect($scope.explorationLink).toBe('https://www.oppia.org/explore/exp1');
     });
 
-  it('should add range from a click event', function() {
+  it('should add range from a click event', function () {
     var removeAllRanges = jasmine.createSpy('removeAllRanges');
     var addRange = jasmine.createSpy('addRange');
     // This throws "Argument of type '{ removeAllRanges:
@@ -83,7 +83,7 @@ describe('Post Publish Modal Controller', function() {
     element.appendChild(firstChild);
     element.appendChild(lastChild);
 
-    element.onclick = function(event) {
+    element.onclick = function (event) {
       $scope.selectText(event);
     };
 

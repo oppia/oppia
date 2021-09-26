@@ -23,7 +23,7 @@ require(
 angular.module('oppia').controller('ExplorationSaveModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'diffData', 'isExplorationPrivate', 'MAX_COMMIT_MESSAGE_LENGTH',
-  function(
+  function (
       $controller, $scope, $uibModalInstance,
       diffData, isExplorationPrivate, MAX_COMMIT_MESSAGE_LENGTH) {
     $controller('ConfirmOrCancelModalController', {
@@ -31,7 +31,7 @@ angular.module('oppia').controller('ExplorationSaveModalController', [
       $uibModalInstance: $uibModalInstance
     });
     $scope.showDiff = false;
-    $scope.onClickToggleDiffButton = function() {
+    $scope.onClickToggleDiffButton = function () {
       $scope.showDiff = !$scope.showDiff;
     };
 

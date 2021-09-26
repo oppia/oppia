@@ -35,7 +35,7 @@ export class SearchResultsComponent {
   someResultsExist: boolean = true;
   userIsLoggedIn: boolean = null;
 
-  constructor(
+  constructor (
     private windowRef: WindowRef,
     private loaderService: LoaderService,
     private searchService: SearchService,
@@ -44,11 +44,11 @@ export class SearchResultsComponent {
     private userService: UserService
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticAssetUrl(imagePath);
   }
 
-  onRedirectToLogin(destinationUrl: string): boolean {
+  onRedirectToLogin (destinationUrl: string): boolean {
     this.siteAnalyticsService.registerStartLoginEvent('noSearchResults');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = destinationUrl;
@@ -56,7 +56,7 @@ export class SearchResultsComponent {
     return false;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then((userInfo) => {
@@ -77,7 +77,7 @@ export class SearchResultsComponent {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

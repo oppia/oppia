@@ -28,15 +28,15 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
-  dismiss(): void {}
+  dismiss (): void {}
 }
 
 class MockExplorationCreationService {
-  createNewExploration(): void {}
+  createNewExploration (): void {}
 }
 
 class MockCollectionCreationService {
-  createNewCollection(): void {}
+  createNewCollection (): void {}
 }
 
 describe('Create Activity Modal Component', () =>{

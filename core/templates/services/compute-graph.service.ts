@@ -42,12 +42,12 @@ interface GraphData {
   providedIn: 'root'
 })
 export class ComputeGraphService {
-  _computeGraphData(initStateId: string, states: States): GraphData {
+  _computeGraphData (initStateId: string, states: States): GraphData {
     let nodes: Record<string, string> = {};
     let links: { source: string; target: string; }[] = [];
     let finalStateIds = states.getFinalStateNames();
 
-    states.getStateNames().forEach(function(stateName) {
+    states.getStateNames().forEach(function (stateName) {
       let interaction = states.getState(stateName).interaction;
       nodes[stateName] = stateName;
       if (interaction.id) {
@@ -76,7 +76,7 @@ export class ComputeGraphService {
     };
   }
 
-  _computeBfsTraversalOfStates(
+  _computeBfsTraversalOfStates (
       initStateId: string, states: States, sourceStateName: string): string[] {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder: string[] = [];
@@ -102,11 +102,11 @@ export class ComputeGraphService {
     return stateNamesInBfsOrder;
   }
 
-  compute(initStateId: string, states: States): GraphData {
+  compute (initStateId: string, states: States): GraphData {
     return this._computeGraphData(initStateId, states);
   }
 
-  computeBfsTraversalOfStates(
+  computeBfsTraversalOfStates (
       initStateId: string, states: States, sourceStateName: string): string[] {
     return this._computeBfsTraversalOfStates(
       initStateId, states, sourceStateName);

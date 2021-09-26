@@ -26,7 +26,7 @@ export interface StateStatsBackendDict {
 }
 
 export class StateStats {
-  constructor(
+  constructor (
       public readonly totalAnswersCount: number,
       public readonly usefulFeedbackCount: number,
       public readonly totalHitCount: number,
@@ -34,7 +34,7 @@ export class StateStats {
       public readonly numTimesSolutionViewed: number,
       public readonly numCompletions: number) {}
 
-  static createFromBackendDict(backendDict: StateStatsBackendDict): StateStats {
+  static createFromBackendDict (backendDict: StateStatsBackendDict): StateStats {
     return new StateStats(
       backendDict.total_answers_count, backendDict.useful_feedback_count,
       backendDict.total_hit_count, backendDict.first_hit_count,

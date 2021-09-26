@@ -34,7 +34,7 @@ describe('Flag Exploration modal', () => {
   let ngbActiveModal: NgbActiveModal;
 
   class MockPlayerPositionService {
-    getCurrentStateName(): string {
+    getCurrentStateName (): string {
       return stateName;
     }
   }

@@ -28,7 +28,7 @@ import { State } from 'domain/state/StateObjectFactory';
 export class ImprovementsService {
   INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
-  isStateForcedToResolveOutstandingUnaddressedAnswers(state: State): boolean {
+  isStateForcedToResolveOutstandingUnaddressedAnswers (state: State): boolean {
     if (!state || (state.interaction.id === null)) {
       return false;
     }

@@ -30,7 +30,7 @@ describe('Schema Based Editor Directive', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
@@ -57,7 +57,7 @@ describe('Schema Based Editor Component', () => {
       'schemaBasedEditor',
       [SchemaBasedEditorDirective]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
+      async (textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

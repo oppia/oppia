@@ -27,13 +27,13 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
   providedIn: 'root'
 })
 export class DeleteAccountBackendApiService {
-  constructor(
+  constructor (
     private siteAnalyticsService: SiteAnalyticsService,
     private windowRef: WindowRef,
     private http: HttpClient,
   ) {}
 
-  deleteAccount(): void {
+  deleteAccount (): void {
     this.http.delete('/delete-account-handler').subscribe(() => {
       this.siteAnalyticsService.registerAccountDeletion();
       setTimeout(() => {

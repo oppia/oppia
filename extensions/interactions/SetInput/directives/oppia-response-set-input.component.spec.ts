@@ -26,7 +26,7 @@ describe('ResponseSetInputComponent', () => {
   let fixture: ComponentFixture<ResponseSetInputComponent>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
+    escapedJsonToObj (answer: string): string {
       return JSON.parse(answer);
     }
   }

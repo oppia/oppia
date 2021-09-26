@@ -27,7 +27,7 @@ var CollectionEditorPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-describe('Collections', function() {
+describe('Collections', function () {
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
   var collectionId = null;
@@ -37,7 +37,7 @@ describe('Collections', function() {
   var fourthExplorationId = null;
   var libraryPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -128,7 +128,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('should visit the collection editor', async function() {
+  it('should visit the collection editor', async function () {
     await users.login('alice@collections.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
@@ -157,7 +157,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('should visit the collection player', async function() {
+  it('should visit the collection player', async function () {
     await users.login('alice@collections.com');
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
@@ -166,7 +166,7 @@ describe('Collections', function() {
   });
 
   it('should check for errors in a collection with varying node count',
-    async function() {
+    async function () {
     // Checking in a collection with one node.
       await users.login('player@collections.com');
       await browser.get('/collection/' + collectionId);
@@ -208,7 +208,7 @@ describe('Collections', function() {
       await users.logout();
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

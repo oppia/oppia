@@ -27,7 +27,7 @@ describe('ShortResponseGraphInput', () => {
   let fixture: ComponentFixture<ShortResponseGraphInput>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function (answer) {
       return JSON.parse(answer);
     }
   };

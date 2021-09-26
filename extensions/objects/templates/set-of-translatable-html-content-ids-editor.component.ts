@@ -41,9 +41,9 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
       type: 'html'
     }
   };
-  constructor() { }
+  constructor () { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!this.value) {
       this.value = [];
     }
@@ -53,7 +53,7 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     );
   }
 
-  toggleSelection(choiceListIndex: number): void {
+  toggleSelection (choiceListIndex: number): void {
     const choiceContentId = this.choices[choiceListIndex].val;
     const selectedChoicesIndex = this.value.indexOf(choiceContentId);
     if (selectedChoicesIndex > -1) {

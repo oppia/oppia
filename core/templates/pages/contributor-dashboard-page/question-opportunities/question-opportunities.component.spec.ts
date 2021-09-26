@@ -32,7 +32,7 @@ import { UserService } from 'services/user.service';
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Question opportunities component', function() {
+describe('Question opportunities component', function () {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -47,7 +47,7 @@ describe('Question opportunities component', function() {
   var opportunitiesArray = [];
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(function () {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
@@ -59,13 +59,13 @@ describe('Question opportunities component', function() {
   });
 
   beforeEach(angular.mock.module(
-    'oppia', function($provide) {
+    'oppia', function ($provide) {
       $provide.value(
         'ContributionOpportunitiesBackendApiService',
         TestBed.get(ContributionOpportunitiesBackendApiService));
     }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
@@ -107,7 +107,7 @@ describe('Question opportunities component', function() {
     });
   });
 
-  it('should load more question opportunities', function() {
+  it('should load more question opportunities', function () {
     spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
       .returnValue(Promise.resolve({
         opportunities: opportunitiesArray,
@@ -133,7 +133,7 @@ describe('Question opportunities component', function() {
   });
 
   it('should register Contributor Dashboard suggest event when clicking on' +
-    ' suggest question button', function() {
+    ' suggest question button', function () {
     spyOn($uibModal, 'open').and.callThrough();
     spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
@@ -150,7 +150,7 @@ describe('Question opportunities component', function() {
   });
 
   it('should open requires login modal when trying to select a question and' +
-    ' a skill difficulty and user is not logged', function() {
+    ' a skill difficulty and user is not logged', function () {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => false
@@ -169,7 +169,7 @@ describe('Question opportunities component', function() {
 
 
   it('should open select skill and skill difficulty modal when clicking' +
-    ' on suggesting question button', function() {
+    ' on suggesting question button', function () {
     spyOn($uibModal, 'open').and.callThrough();
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
@@ -184,7 +184,7 @@ describe('Question opportunities component', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('should open create question modal when creating a question', function() {
+  it('should open create question modal when creating a question', function () {
     spyOn($uibModal, 'open').and.callThrough();
     ctrl.createQuestion(
       skillObjectFactory.createFromBackendDict({
@@ -211,7 +211,7 @@ describe('Question opportunities component', function() {
   });
 
   it('should create a question when closing create question modal',
-    function() {
+    function () {
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         $q.resolve({
@@ -258,7 +258,7 @@ describe('Question opportunities component', function() {
     });
 
   it('should suggest a question when dismissing create question modal',
-    function() {
+    function () {
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         $q.resolve({
@@ -305,7 +305,7 @@ describe('Question opportunities component', function() {
     });
 
   it('should not create a question when dismissing select skill and skill' +
-    ' difficulty modal', function() {
+    ' difficulty modal', function () {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });

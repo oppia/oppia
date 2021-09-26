@@ -64,18 +64,18 @@ export interface FeaturedActivityResponse {
   providedIn: 'root'
 })
 export class ModeratorPageBackendApiService {
-  constructor(
+  constructor (
     private httpClient: HttpClient
   ) {}
 
-  async saveFeaturedActivityReferencesAsync(
+  async saveFeaturedActivityReferencesAsync (
       activityReferencesToSave: ActivityIdTypeDict[]): Promise<Object> {
     return this.httpClient.post('/moderatorhandler/featured', {
       featured_activity_reference_dicts: activityReferencesToSave
     }, {}).toPromise();
   }
 
-  async getRecentCommitsAsync(): Promise<RecentCommitResponse> {
+  async getRecentCommitsAsync (): Promise<RecentCommitResponse> {
     let options = {params: new HttpParams()
       .set('query_type', 'all_non_private_commits')};
     // TODO(sll): Update this to also support collections.
@@ -83,12 +83,12 @@ export class ModeratorPageBackendApiService {
       '/recentcommitshandler/recent_commits', options).toPromise();
   }
 
-  async getRecentFeedbackMessagesAsync(): Promise<RecentFeedbackMessages> {
+  async getRecentFeedbackMessagesAsync (): Promise<RecentFeedbackMessages> {
     return this.httpClient
       .get<RecentFeedbackMessages>('/recent_feedback_messages').toPromise();
   }
 
-  async getFeaturedActivityReferencesAsync():
+  async getFeaturedActivityReferencesAsync ():
   Promise<FeaturedActivityResponse> {
     return this.httpClient
       .get<FeaturedActivityResponse>('/moderatorhandler/featured').toPromise();

@@ -32,7 +32,7 @@ import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Create New Chapter Modal Controller', function() {
+describe('Create New Chapter Modal Controller', function () {
   var $scope = null;
   var $q = null;
   var $rootScope = null;
@@ -51,7 +51,7 @@ describe('Create New Chapter Modal Controller', function() {
       imports: [HttpClientTestingModule]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'ExplorationIdValidationService',
       TestBed.get(ExplorationIdValidationService));
@@ -60,7 +60,7 @@ describe('Create New Chapter Modal Controller', function() {
       TestBed.get(ExplorationSummaryBackendApiService));
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
       TestBed.get(
@@ -70,7 +70,7 @@ describe('Create New Chapter Modal Controller', function() {
       new StoryObjectFactory(new StoryContentsObjectFactory()));
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     StoryUpdateService = $injector.get('StoryUpdateService');
@@ -135,13 +135,13 @@ describe('Create New Chapter Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.nodeTitles).toEqual(nodeTitles);
       expect($scope.errorMsg).toBe(null);
     });
 
   it('should validate explorationId correctly',
-    function() {
+    function () {
       $scope.explorationId = 'validId';
       expect($scope.validateExplorationId()).toBeTrue();
       $scope.explorationId = 'oppia.org/validId';
@@ -149,7 +149,7 @@ describe('Create New Chapter Modal Controller', function() {
     });
 
   it('should update thumbnail filename when changing thumbnail file',
-    function() {
+    function () {
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'setStoryNodeThumbnailFilename');
       $scope.updateThumbnailFilename('abc');
@@ -158,7 +158,7 @@ describe('Create New Chapter Modal Controller', function() {
     });
 
   it('should update thumbnail bg color when changing thumbnail color',
-    function() {
+    function () {
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'setStoryNodeThumbnailBgColor');
       $scope.updateThumbnailBgColor('abc');
@@ -167,20 +167,20 @@ describe('Create New Chapter Modal Controller', function() {
     });
 
   it('should delete the story node when closing the modal',
-    function() {
+    function () {
       var storyUpdateSpy = spyOn(StoryUpdateService, 'deleteStoryNode');
       $scope.cancel();
       expect(storyUpdateSpy).toHaveBeenCalled();
     });
 
-  it('should update the title', function() {
+  it('should update the title', function () {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeTitle');
     $scope.updateTitle();
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should check if chapter is valid when it has title, exploration id and' +
-    ' thumbnail file', function() {
+    ' thumbnail file', function () {
     expect($scope.isValid()).toEqual(false);
     $scope.title = 'title';
     $scope.explorationId = '1';
@@ -192,7 +192,7 @@ describe('Create New Chapter Modal Controller', function() {
   });
 
   it('should warn that the exploration is not published when trying to save' +
-    ' a chapter with an invalid exploration id', function() {
+    ' a chapter with an invalid exploration id', function () {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(false);
@@ -205,7 +205,7 @@ describe('Create New Chapter Modal Controller', function() {
 
   it('should warn that the exploration already exists in the story when' +
     ' trying to save a chapter with an already used exploration id',
-  function() {
+  function () {
     $scope.explorationId = 'exp_1';
     $scope.updateExplorationId();
     expect($scope.invalidExpErrorString).toEqual(
@@ -214,7 +214,7 @@ describe('Create New Chapter Modal Controller', function() {
   });
 
   it('should close the modal when saving a chapter with a valid exploration id',
-    function() {
+    function () {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
       var deferred = $q.defer();
       deferred.resolve(true);
@@ -226,7 +226,7 @@ describe('Create New Chapter Modal Controller', function() {
     });
 
   it('should set story node exploration id when updating exploration id',
-    function() {
+    function () {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(false);
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'setStoryNodeExplorationId');
@@ -234,14 +234,14 @@ describe('Create New Chapter Modal Controller', function() {
       expect(storyUpdateSpy).toHaveBeenCalled();
     });
 
-  it('should not save when the chapter title is already used', function() {
+  it('should not save when the chapter title is already used', function () {
     $scope.title = nodeTitles[0];
     $scope.save();
     expect($scope.errorMsg).toBe('A chapter with this title already exists');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
-  it('should clear error message when changing exploration id', function() {
+  it('should clear error message when changing exploration id', function () {
     $scope.title = nodeTitles[0];
     $scope.save();
     expect($scope.errorMsg).toBe('A chapter with this title already exists');

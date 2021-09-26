@@ -47,7 +47,7 @@ export class NumberWithUnits {
   fraction: Fraction;
   units: Unit[];
 
-  constructor(
+  constructor (
       type: string, real: number, fractionObj: Fraction,
       unitsObj: Units) {
     this.type = type;
@@ -67,7 +67,7 @@ export class NumberWithUnits {
     this.units = unitsObj.units;
   }
 
-  toString(): string {
+  toString (): string {
     let numberWithUnitsString = '';
     // The NumberWithUnits class is allowed to have 4 properties namely
     // type, real, fraction and units. Hence, we cannot inject
@@ -98,7 +98,7 @@ export class NumberWithUnits {
     return numberWithUnitsString;
   }
 
-  toMathjsCompatibleString(): string {
+  toMathjsCompatibleString (): string {
     let numberWithUnitsString = '';
     let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
@@ -116,7 +116,7 @@ export class NumberWithUnits {
     return numberWithUnitsString;
   }
 
-  toDict(): NumberWithUnitsAnswer {
+  toDict (): NumberWithUnitsAnswer {
     return {
       type: this.type,
       real: this.real,
@@ -130,14 +130,14 @@ export class NumberWithUnits {
   providedIn: 'root'
 })
 export class NumberWithUnitsObjectFactory {
-  constructor(private unitsFactory: UnitsObjectFactory) {}
-  createCurrencyUnits(): void {
+  constructor (private unitsFactory: UnitsObjectFactory) {}
+  createCurrencyUnits (): void {
     try {
       this.unitsFactory.createCurrencyUnits();
     } catch (parsingError) {}
   }
 
-  fromRawInputString(rawInput: string): NumberWithUnits {
+  fromRawInputString (rawInput: string): NumberWithUnits {
     rawInput = rawInput.trim();
     let type = '';
     let real = 0.0;
@@ -262,7 +262,7 @@ export class NumberWithUnitsObjectFactory {
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
-  fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
+  fromDict (numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,

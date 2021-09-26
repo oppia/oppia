@@ -30,12 +30,12 @@ var waitFor = require(
 //    handler.appendUnderlineText('emphasised');
 // 'maxSelectionAllowed' is the maximum number of selections to be allowed in
 // this item selection interaction.
-var customizeInteraction = async function(
+var customizeInteraction = async function (
     elem, richTextInstructionsArray, maxSelectionAllowed) {
   await objects.IntEditor(
     elem.all(by.repeater(
       'customizationArgSpec in customizationArgSpecs track by $index'))
-      .filter(async function(elem, index) {
+      .filter(async function (elem, index) {
         var text = await elem.getText();
         return text === 'Maximum number of selections permitted';
       }).first()
@@ -52,7 +52,7 @@ var customizeInteraction = async function(
 // 'richTextInstructionsArray' is an array of functions, each of which describe
 // how to check the expected details of one of the options (an example member
 // function would be readPlainText).
-var expectInteractionDetailsToMatch = async function(
+var expectInteractionDetailsToMatch = async function (
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
     by.repeater('choice in $ctrl.choices track by $index'));
@@ -70,7 +70,7 @@ var answerObjectType = 'SetOfHtmlString';
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' is the array of item selection answer options to submit.
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   var answerArray = Array.from(answer);
 
   for (var i = 0; i < answerArray.length; i++) {
@@ -90,26 +90,26 @@ var submitAnswer = async function(elem, answer) {
 
 var interactionArgumentsArray = [
   [
-    async function(editor) {
+    async function (editor) {
       await editor.appendBoldText('answer1');
     },
-    async function(editor) {
+    async function (editor) {
       await editor.appendItalicText('answer2');
     },
-    async function(editor) {
+    async function (editor) {
       await editor.appendPlainText('answer3');
     }
   ], 3];
 
 var interactionDetailsArray = [
   [
-    async function(checker) {
+    async function (checker) {
       await checker.readBoldText('answer1');
     },
-    async function(checker) {
+    async function (checker) {
       await checker.readItalicText('answer2');
     },
-    async function(checker) {
+    async function (checker) {
       checker.readPlainText('answer3');
     }
   ]

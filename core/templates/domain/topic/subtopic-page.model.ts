@@ -31,7 +31,7 @@ export interface SubtopicPageBackendDict {
 }
 
 export class SubtopicPage {
-  constructor(
+  constructor (
     private id: string,
     private topicId: string,
     private pageContents: SubtopicPageContents,
@@ -39,42 +39,42 @@ export class SubtopicPage {
   ) {}
 
   // Returns the id of the subtopic page.
-  getId(): string {
+  getId (): string {
     return this.id;
   }
 
-  setId(id: string): void {
+  setId (id: string): void {
     this.id = id;
   }
 
   // Returns the topic id that the subtopic page is linked to.
-  getTopicId(): string {
+  getTopicId (): string {
     return this.topicId;
   }
 
   // Returns the page data for the subtopic page.
-  getPageContents(): SubtopicPageContents {
+  getPageContents (): SubtopicPageContents {
     return this.pageContents;
   }
 
   // Sets the page data for the subtopic page.
-  setPageContents(pageContents: SubtopicPageContents): void {
+  setPageContents (pageContents: SubtopicPageContents): void {
     this.pageContents = cloneDeep(pageContents);
   }
 
   // Returns the language code for the subtopic page.
-  getLanguageCode(): string {
+  getLanguageCode (): string {
     return this.languageCode;
   }
 
-  copyFromSubtopicPage(otherSubtopicPage: SubtopicPage): void {
+  copyFromSubtopicPage (otherSubtopicPage: SubtopicPage): void {
     this.id = otherSubtopicPage.getId();
     this.topicId = otherSubtopicPage.getTopicId();
     this.pageContents = cloneDeep(otherSubtopicPage.getPageContents());
     this.languageCode = otherSubtopicPage.getLanguageCode();
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       subtopicPageBackendDict: SubtopicPageBackendDict): SubtopicPage {
     return new SubtopicPage(
       subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
@@ -84,11 +84,11 @@ export class SubtopicPage {
     );
   }
 
-  static getSubtopicPageId(topicId: string, subtopicId: number): string {
+  static getSubtopicPageId (topicId: string, subtopicId: number): string {
     return topicId + '-' + subtopicId.toString();
   }
 
-  static createDefault(topicId: string, subtopicId: number): SubtopicPage {
+  static createDefault (topicId: string, subtopicId: number): SubtopicPage {
     return new SubtopicPage(
       this.getSubtopicPageId(topicId, subtopicId),
       topicId, SubtopicPageContents.createDefault(),
@@ -97,7 +97,7 @@ export class SubtopicPage {
 
   // Create an interstitial subtopic page that would be displayed in the
   // editor until the actual subtopic page is fetched from the backend.
-  static createInterstitialSubtopicPage(): SubtopicPage {
+  static createInterstitialSubtopicPage (): SubtopicPage {
     return new SubtopicPage(null, null, null, 'en');
   }
 }

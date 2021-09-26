@@ -37,7 +37,7 @@ export class ExplorationFooterComponent {
   contributorNames: string[] = [];
   resizeSubscription: Subscription;
 
-  constructor(
+  constructor (
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
@@ -46,11 +46,11 @@ export class ExplorationFooterComponent {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
+  getStaticImageUrl (imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     // TODO(#13494): Implement a different footer for practice-session-page.
     // This component is used at 'exploration-player-page' and
     // 'practice-session-page' with different usage at both places.
@@ -92,7 +92,7 @@ export class ExplorationFooterComponent {
     } catch (err) { }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }

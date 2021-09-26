@@ -28,14 +28,14 @@ import { DraftAutoSaveResponse } from './exploration-data.service';
   providedIn: 'root'
 })
 export class ExplorationDataBackendApiService {
-  constructor(private httpClient: HttpClient) {}
+  constructor (private httpClient: HttpClient) {}
 
-  discardDraft(url: string): Observable<void> {
+  discardDraft (url: string): Observable<void> {
     return this.httpClient.post<void>(
       url, {});
   }
 
-  saveChangeList(
+  saveChangeList (
       url: string,
       changeList: ExplorationChange[],
       version: number): Observable<DraftAutoSaveResponse> {

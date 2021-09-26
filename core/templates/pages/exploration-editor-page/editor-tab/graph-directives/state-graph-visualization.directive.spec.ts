@@ -63,7 +63,7 @@ require(
   'state-graph-visualization.directive.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
-describe('State Graph Visualization directive', function() {
+describe('State Graph Visualization directive', function () {
   var ctrl = null;
   var $element = null;
   var $flushPendingTasks = null;
@@ -112,10 +112,10 @@ describe('State Graph Visualization directive', function() {
 
   beforeEach(angular.mock.module('directiveTemplates'));
 
-  beforeEach(function() {
+  beforeEach(function () {
     stateGraphLayoutService = TestBed.get(StateGraphLayoutService);
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'TextInputRulesService',
@@ -140,7 +140,7 @@ describe('State Graph Visualization directive', function() {
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     $provide.value('WindowDimensionsService', {
-      getResizeEvent: function() {
+      getResizeEvent: function () {
         return of(new Event('resize'));
       }
     });
@@ -153,7 +153,7 @@ describe('State Graph Visualization directive', function() {
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -222,19 +222,19 @@ describe('State Graph Visualization directive', function() {
     ctrl.$onInit();
   }));
 
-  afterEach(function() {
+  afterEach(function () {
     ctrl.$onDestroy();
   });
 
   describe('when graph is redrawn',
-    function() {
-      beforeEach(function() {
+    function () {
+      beforeEach(function () {
         angular.element(window).triggerHandler('resize');
         $flushPendingTasks();
       });
 
       it('should initialize $scope properties after controller is initialized',
-        function() {
+        function () {
           expect($scope.graphLoaded).toBe(true);
           expect($scope.GRAPH_WIDTH).toBe(630);
           expect($scope.GRAPH_HEIGHT).toBe(280);
@@ -251,31 +251,31 @@ describe('State Graph Visualization directive', function() {
         });
 
       it('should get highlight transform css value based on provided values',
-        function() {
+        function () {
           expect($scope.getHighlightTransform(20, 10)).toBe('rotate(-10,10,5)');
           expect($scope.getHighlightTextTransform(20, 10)).toBe(
             'rotate(-10,20,6)');
         });
 
       it('should check if can navigate to node whenever node id is equal to' +
-      ' current state id', function() {
+      ' current state id', function () {
         expect($scope.canNavigateToNode('state_1')).toBe(false);
         expect($scope.canNavigateToNode('state_3')).toBe(true);
       });
 
       it('should call deleteFunction when deleting a non initial node',
-        function() {
+        function () {
           $scope.onNodeDeletionClick('state_3');
           expect($scope.onDeleteFunction).toHaveBeenCalled();
         });
 
-      it('should call deleteFunction when deleting a initial node', function() {
+      it('should call deleteFunction when deleting a initial node', function () {
         $scope.onNodeDeletionClick('state_1');
         expect($scope.onDeleteFunction).not.toHaveBeenCalled();
       });
 
       it('should get node complete title with its secondary label and' +
-      ' warnings', function() {
+      ' warnings', function () {
         expect($scope.getNodeTitle(nodes.state_1)).toBe(
           'This is a label for node 1 Second label for node 1 ' +
         '(Warning: this state is unreachable.)');
@@ -285,13 +285,13 @@ describe('State Graph Visualization directive', function() {
         'END state.)');
       });
 
-      it('should get truncated label with truncate filter', function() {
+      it('should get truncated label with truncate filter', function () {
         expect($scope.getTruncatedLabel('This is a label for node 3')).toBe(
           'This is a la...');
       });
 
       it('should get node error message from node label when' +
-      ' showTranslationWarnings is true', function() {
+      ' showTranslationWarnings is true', function () {
         var nodeErrorMessage = 'Node 1 error message';
         spyOn(translationStatusService, 'getAllStatesNeedUpdatewarning').and
           .returnValue({
@@ -302,7 +302,7 @@ describe('State Graph Visualization directive', function() {
       });
 
       it('should get node error message from node label when' +
-      ' showTranslationWarnings is false', function() {
+      ' showTranslationWarnings is false', function () {
         $scope.showTranslationWarnings = false;
         var nodeErrorMessage = 'Node 1 error message from exploration warnings';
         spyOn(explorationWarningsService, 'getAllStateRelatedWarnings').and
@@ -314,7 +314,7 @@ describe('State Graph Visualization directive', function() {
       });
     });
 
-  it('should redraw graph when resizing page', function() {
+  it('should redraw graph when resizing page', function () {
     expect($scope.graphLoaded).toBe(false);
 
     angular.element(window).triggerHandler('resize');
@@ -324,7 +324,7 @@ describe('State Graph Visualization directive', function() {
   });
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
-    ' x and y axis to 0', function() {
+    ' x and y axis to 0', function () {
     // Spies for element dimensions.
     spyOn($element, 'height').and.returnValue(100);
     spyOn($element, 'width').and.returnValue(100);
@@ -359,7 +359,7 @@ describe('State Graph Visualization directive', function() {
   });
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
-  ' x and y axis to custom value', function() {
+  ' x and y axis to custom value', function () {
     spyOn($element, 'height').and.returnValue(10);
     spyOn($element, 'width').and.returnValue(10);
     spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
@@ -390,7 +390,7 @@ describe('State Graph Visualization directive', function() {
     expect($scope.overallTransformStr).toBe('translate(-20,-20)');
   });
 
-  it('should check if state is a checkpoint', function() {
+  it('should check if state is a checkpoint', function () {
     explorationStatesService.init({
       'First State': {
         card_is_checkpoint: true,

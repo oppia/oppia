@@ -31,7 +31,7 @@ import { AppConstants } from 'app.constants';
    templateUrl: './community-lessons-tab.component.html'
  })
 export class CommunityLessonsTabComponent {
-  constructor(
+  constructor (
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
     private deviceInfoService: DeviceInfoService) {
@@ -85,7 +85,7 @@ export class CommunityLessonsTabComponent {
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.noCommunityLessonActivity = (
       (this.incompleteExplorationsList.length === 0) &&
         (this.completedExplorationsList.length === 0) &&
@@ -117,19 +117,19 @@ export class CommunityLessonsTabComponent {
     this.dropdownEnabled = false;
   }
 
-  decodePngURIData(base64ImageData: string): string {
+  decodePngURIData (base64ImageData: string): string {
     return decodeURIComponent(base64ImageData);
   }
 
-  checkMobileView(): boolean {
+  checkMobileView (): boolean {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  toggleDropdown(): void {
+  toggleDropdown (): void {
     this.dropdownEnabled = !this.dropdownEnabled;
   }
 
-  changeSection(section: string): void {
+  changeSection (section: string): void {
     this.dropdownEnabled = !this.dropdownEnabled;
     this.selectedSection = section;
     if (section === this.completed) {
@@ -146,7 +146,7 @@ export class CommunityLessonsTabComponent {
     this.endIndexInCommunityLessons = 3;
   }
 
-  getLessonType(tile: LearnerExplorationSummary | CollectionSummary): string {
+  getLessonType (tile: LearnerExplorationSummary | CollectionSummary): string {
     if (this.totalIncompleteLessonsList.includes(tile)) {
       return this.incomplete;
     } else if (this.totalCompletedLessonsList.includes(tile)) {
@@ -154,7 +154,7 @@ export class CommunityLessonsTabComponent {
     }
   }
 
-  showUsernamePopover(subscriberUsername: string): string {
+  showUsernamePopover (subscriberUsername: string): string {
     // The popover on the subscription card is only shown if the length
     // of the subscriber username is greater than 10 and the user hovers
     // over the truncated username.
@@ -165,7 +165,7 @@ export class CommunityLessonsTabComponent {
     }
   }
 
-  handleShowMore(section: string): void {
+  handleShowMore (section: string): void {
     this.showMoreInSection[section] = !this.showMoreInSection[section];
     if (
       section === 'incomplete' && this.showMoreInSection.incomplete === true) {
@@ -193,14 +193,14 @@ export class CommunityLessonsTabComponent {
     }
   }
 
-  getTileType(tile: LearnerExplorationSummary | CollectionSummary): string {
+  getTileType (tile: LearnerExplorationSummary | CollectionSummary): string {
     if (tile instanceof LearnerExplorationSummary) {
       return 'exploration';
     }
     return 'collection';
   }
 
-  changePageByOne(direction: string, section: string): void {
+  changePageByOne (direction: string, section: string): void {
     if (section === 'communityLessons') {
       let totalPages = this.displayInCommunityLessons.length / this.pageSize;
       if (direction === this.moveToPrevPage &&
@@ -240,7 +240,7 @@ export class CommunityLessonsTabComponent {
     }
   }
 
-  openRemoveActivityModal(
+  openRemoveActivityModal (
       sectionNameI18nId: string, subsectionName: string,
       activity: LearnerExplorationSummary | CollectionSummary): void {
     this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(

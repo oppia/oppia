@@ -33,7 +33,7 @@ export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
 
-  getDirectedEdgeArrowPoints(graph: GraphAnswer, index: number): string {
+  getDirectedEdgeArrowPoints (graph: GraphAnswer, index: number): string {
     var ARROW_WIDTH = 5;
     var ARROW_HEIGHT = 10;
 
@@ -66,7 +66,7 @@ export class GraphDetailService {
     return ret;
   }
 
-  getEdgeCentre(graph: GraphAnswer, index: number): EdgeCentre {
+  getEdgeCentre (graph: GraphAnswer, index: number): EdgeCentre {
     var edge = graph.edges[index];
     var srcVertex = graph.vertices[edge.src];
     var dstVertex = graph.vertices[edge.dst];

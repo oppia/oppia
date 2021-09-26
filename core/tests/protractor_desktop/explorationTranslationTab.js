@@ -27,7 +27,7 @@ var CreatorDashboardPage = require(
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 
-describe('Exploration translation and voiceover tab', function() {
+describe('Exploration translation and voiceover tab', function () {
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
@@ -36,7 +36,7 @@ describe('Exploration translation and voiceover tab', function() {
   var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
   var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -94,7 +94,7 @@ describe('Exploration translation and voiceover tab', function() {
   });
 
   it('should walkthrough translation tutorial when user clicks next',
-    async function() {
+    async function () {
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
@@ -116,7 +116,7 @@ describe('Exploration translation and voiceover tab', function() {
     });
 
   it('should cache the selected language for translation and voiceover',
-    async function() {
+    async function () {
       await users.login('voiceArtist@translationTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
@@ -130,7 +130,7 @@ describe('Exploration translation and voiceover tab', function() {
       await users.logout();
     });
 
-  it('should have voiceover as a default mode', async function() {
+  it('should have voiceover as a default mode', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -141,7 +141,7 @@ describe('Exploration translation and voiceover tab', function() {
   });
 
   it('should have all the state contents for voiceover in exploration language',
-    async function() {
+    async function () {
       await users.login('voiceArtist@translationTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
@@ -158,7 +158,7 @@ describe('Exploration translation and voiceover tab', function() {
       await users.logout();
     });
 
-  it('should contain accessibility elements', async function() {
+  it('should contain accessibility elements', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -185,7 +185,7 @@ describe('Exploration translation and voiceover tab', function() {
   });
 
   it('should maintain its active sub-tab on saving draft',
-    async function() {
+    async function () {
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
@@ -201,7 +201,7 @@ describe('Exploration translation and voiceover tab', function() {
     });
 
 
-  it('should change translation language correctly', async function() {
+  it('should change translation language correctly', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -211,7 +211,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  it('should correctly switch to different modes', async function() {
+  it('should correctly switch to different modes', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -228,7 +228,7 @@ describe('Exploration translation and voiceover tab', function() {
   });
 
   it('should allow adding translation and reflect the progress',
-    async function() {
+    async function () {
       let expEditorTranslationTab = explorationEditorTranslationTab;
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
@@ -292,7 +292,7 @@ describe('Exploration translation and voiceover tab', function() {
       await users.logout();
     });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

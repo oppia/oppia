@@ -31,9 +31,9 @@ export interface MetaAttribute {
   providedIn: 'root'
 })
 export class MetaTagCustomizationService {
-  constructor(private windowRef: WindowRef) {}
+  constructor (private windowRef: WindowRef) {}
 
-  addOrReplaceMetaTags(attrArray: MetaAttribute[]): void {
+  addOrReplaceMetaTags (attrArray: MetaAttribute[]): void {
     attrArray.forEach(attr => {
       // Find and remove exisiting meta tag.
       let existingMetaTag = (

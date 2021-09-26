@@ -61,7 +61,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   mapMarkers;
   mapOptions: {center: LatLng; layers: TileLayer[]; zoom: number};
 
-  constructor(
+  constructor (
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
@@ -71,7 +71,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => {
@@ -108,7 +108,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  private _getArgs() {
+  private _getArgs () {
     return {
       latitudeWithValue: this.latitudeWithValue,
       longitudeWithValue: this.longitudeWithValue,
@@ -116,7 +116,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     };
   }
 
-  private _changeMarkerPosition(lat, lng) {
+  private _changeMarkerPosition (lat, lng) {
     const newMarker = marker(
       [lat, lng],
       {
@@ -146,7 +146,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     this.mapMarkers = newMarker;
   }
 
-  leafletClick(e: LeafletMouseEvent): void {
+  leafletClick (e: LeafletMouseEvent): void {
     if (this.interactionIsActive) {
       const newLat = e.latlng.lat;
       const newLng = e.latlng.lng;
@@ -158,19 +158,19 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  leafletMouseOver(): void {
+  leafletMouseOver (): void {
     if (!this.interactionIsActive) {
       this.setOverlay();
     }
   }
 
-  leafletMouseOut(): void {
+  leafletMouseOut (): void {
     if (!this.interactionIsActive) {
       this.hideOverlay();
     }
   }
 
-  setOverlay(): void {
+  setOverlay (): void {
     this.overlayStyle = {
       'background-color': '#fff',
       opacity: 0.5,
@@ -178,13 +178,13 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     };
   }
 
-  hideOverlay(): void {
+  hideOverlay (): void {
     this.overlayStyle = {
       'background-color': '#fff'
     };
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

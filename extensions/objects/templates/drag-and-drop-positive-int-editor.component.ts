@@ -34,7 +34,7 @@ export class DragAndDropPositiveIntEditorComponent implements OnInit {
   allowedRanks!: number[];
   choices!: string[];
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     if (!parseInt(<string> this.value)) {
       this.value = 1;
       this.valueChanged.emit(this.value);
@@ -49,7 +49,7 @@ export class DragAndDropPositiveIntEditorComponent implements OnInit {
     }
   }
 
-  selection(selectedRank: string | number): void {
+  selection (selectedRank: string | number): void {
     this.value = +selectedRank;
     this.valueChanged.emit(this.value);
   }

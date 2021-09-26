@@ -80,7 +80,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
 
-  constructor(
+  constructor (
     private focusManagerService: FocusManagerService,
     private createNewSkillModalService: CreateNewSkillModalService,
     private topicCreationService: TopicCreationService,
@@ -91,7 +91,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.activeTab = this.TAB_NAME_TOPICS;
     this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.filterObject = TopicsAndSkillsDashboardFilter.createDefault();
@@ -120,11 +120,11 @@ export class TopicsAndSkillsDashboardPageComponent {
     this._initDashboard(false);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy (): void {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  generateNumbersTillRange(range: number): number[] {
+  generateNumbersTillRange (range: number): number[] {
     let arr: number[] = [];
     for (let i = 0; i < range; i++) {
       arr.push(i);
@@ -140,7 +140,7 @@ export class TopicsAndSkillsDashboardPageComponent {
    * we first check if the next page is present in memory.
    * @returns {Boolean} - Whether the next page is present or not.
    */
-  isNextSkillPagePresent(): boolean {
+  isNextSkillPagePresent (): boolean {
     let totalSkillsPresent: number = this.skillSummaries.length;
     // Here +1 is used since we are checking the next page and
     // another +1 because page numbers start from 0.
@@ -154,7 +154,7 @@ export class TopicsAndSkillsDashboardPageComponent {
    * Sets the active tab to topics or skills.
    * @param {String} tabName - name of the tab to set.
    */
-  setActiveTab(tabName: string): void {
+  setActiveTab (tabName: string): void {
     this.activeTab = tabName;
     this.filterObject.reset();
     if (this.activeTab === this.TAB_NAME_TOPICS) {
@@ -166,7 +166,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     }
   }
 
-  initSkillDashboard(): void {
+  initSkillDashboard (): void {
     this.skillStatusOptions = [];
     this.moreSkillsPresent = true;
     this.firstTimeFetchingSkills = true;
@@ -178,18 +178,18 @@ export class TopicsAndSkillsDashboardPageComponent {
     this.applyFilters();
   }
 
-  createTopic(): void {
+  createTopic (): void {
     this.topicCreationService.createNewTopic();
   }
 
-  createSkill(): void {
+  createSkill (): void {
     this.createNewSkillModalService.createNewSkill();
   }
 
   /**
    * @param {Number} pageNumber - Page number to navigate to.
    */
-  goToPageNumber(pageNumber: number): void {
+  goToPageNumber (pageNumber: number): void {
     if (this.activeTab === this.TAB_NAME_TOPICS) {
       this.topicPageNumber = pageNumber;
       this.pageNumber = this.topicPageNumber;
@@ -207,7 +207,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     }
   }
 
-  fetchSkills(): void {
+  fetchSkills (): void {
     if (this.moreSkillsPresent) {
       this.topicsAndSkillsDashboardBackendApiService
         .fetchSkillsDashboardDataAsync(
@@ -230,7 +230,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     }
   }
 
-  navigateSkillPage(direction: string): void {
+  navigateSkillPage (direction: string): void {
     if (direction === this.MOVE_TO_NEXT_PAGE) {
       if (this.isNextSkillPagePresent()) {
         this.goToPageNumber(this.pageNumber + 1);
@@ -246,7 +246,7 @@ export class TopicsAndSkillsDashboardPageComponent {
    * @param {String} direction - Direction, whether to change the
    * page to left or right by 1.
    */
-  changePageByOne(direction: string): void {
+  changePageByOne (direction: string): void {
     this.lastPage = parseInt(
       String(this.currentCount / this.itemsPerPage));
     if (direction === this.MOVE_TO_PREV_PAGE && this.pageNumber >= 1) {
@@ -257,7 +257,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     }
   }
 
-  applyFilters(): void {
+  applyFilters (): void {
     if (this.activeTab === this.TAB_NAME_SKILLS) {
       this.moreSkillsPresent = true;
       this.firstTimeFetchingSkills = true;
@@ -276,7 +276,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     this.goToPageNumber(0);
   }
 
-  resetFilters(): void {
+  resetFilters (): void {
     this.getUpperLimitValueForPagination();
     this.topicSummaries = this.totalTopicSummaries;
     this.currentCount = this.totalEntityCountToDisplay;
@@ -284,18 +284,18 @@ export class TopicsAndSkillsDashboardPageComponent {
     this.applyFilters();
   }
 
-  toggleFilterBox(): void {
+  toggleFilterBox (): void {
     this.filterBoxIsShown = !this.filterBoxIsShown;
   }
 
-  getUpperLimitValueForPagination(): number {
+  getUpperLimitValueForPagination (): number {
     return (
       Math.min((
         (this.pageNumber * this.itemsPerPage) +
           this.itemsPerPage), this.currentCount));
   }
 
-  getTotalCountValueForSkills(): number | string {
+  getTotalCountValueForSkills (): number | string {
     if (this.skillSummaries.length > this.itemsPerPage) {
       return 'many';
     }
@@ -303,7 +303,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     return this.skillSummaries.length;
   }
 
-  refreshPagination(): void {
+  refreshPagination (): void {
     this.goToPageNumber(0);
   }
 
@@ -312,7 +312,7 @@ export class TopicsAndSkillsDashboardPageComponent {
    * the topics and skills dashboard data.
    * @param {Boolean} stayInSameTab - To stay in the same tab or not.
   */
-  _initDashboard(stayInSameTab: boolean): void {
+  _initDashboard (stayInSameTab: boolean): void {
     this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
       .then((response) => {
         this.totalTopicSummaries = response.topicSummaries;

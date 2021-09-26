@@ -51,10 +51,10 @@ import { ExplorationDataService } from '../services/exploration-data.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
-  get onRefreshSettingsTab() {
+  get onRefreshSettingsTab () {
     return this.refreshSettingsTabEventEmitter;
   }
-  set refreshSettingsTabEmitter(val) {
+  set refreshSettingsTabEmitter (val) {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
@@ -114,7 +114,7 @@ describe('Settings Tab Component', () => {
               param_changes: []
             },
             getDataAsync: () => $q.resolve(),
-            autosaveChangeListAsync() {
+            autosaveChangeListAsync () {
               return;
             }
           }
@@ -374,7 +374,7 @@ describe('Settings Tab Component', () => {
         expect(windowRef.nativeWindow.location).toBe('');
       });
 
-    it('should open a modal when removeRole is called', function() {
+    it('should open a modal when removeRole is called', function () {
       spyOn($uibModal, 'open').and.callThrough();
 
       ctrl.removeRole('username', 'editor');
@@ -409,7 +409,7 @@ describe('Settings Tab Component', () => {
         explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
     });
 
-    it('should open a modal when removeVoiceArtist is called', function() {
+    it('should open a modal when removeVoiceArtist is called', function () {
       spyOn($uibModal, 'open').and.callThrough();
 
       ctrl.removeVoiceArtist('username');
@@ -755,7 +755,7 @@ describe('Settings Tab Component', () => {
       expect(ctrl.areParametersUsed()).toBe(true);
     });
 
-    describe('on calling onRolesFormUsernameBlur', function() {
+    describe('on calling onRolesFormUsernameBlur', function () {
       it('should disable save button when exploration title is empty', () => {
         ctrl.newMemberUsername = 'newUser';
         ctrl.rolesSaveButtonEnabled = true;
@@ -931,7 +931,7 @@ describe('Settings Tab Component', () => {
       expect(ctrl.basicSettingIsShown).toEqual(true);
     });
 
-    it('should display Unpublish button', function() {
+    it('should display Unpublish button', function () {
       ctrl.canUnpublish = false;
       expect(ctrl.canUnpublish).toBe(false);
 
@@ -944,7 +944,7 @@ describe('Settings Tab Component', () => {
       expect(ctrl.canUnpublish).toBe(true);
     });
 
-    it('should display Transfer ownership button', function() {
+    it('should display Transfer ownership button', function () {
       ctrl.canReleaseOwnership = false;
       expect(ctrl.canReleaseOwnership).toBe(false);
 

@@ -39,9 +39,9 @@ type CollectionUpdateReverse = (
   providedIn: 'root'
 })
 export class CollectionUpdateService {
-  constructor(private undoRedoService: UndoRedoService) {}
+  constructor (private undoRedoService: UndoRedoService) {}
 
-  private _applyChange(
+  private _applyChange (
       collection: Collection,
       command: string, params,
       apply: CollectionUpdateApply,
@@ -52,13 +52,13 @@ export class CollectionUpdateService {
     this.undoRedoService.applyChange(changeObj, collection);
   }
 
-  private _getParameterFromChangeDict(changeDict, paramName) {
+  private _getParameterFromChangeDict (changeDict, paramName) {
     return changeDict[paramName];
   }
 
   // Applies a collection property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
-  private _applyPropertyChange(
+  private _applyPropertyChange (
       collection: Collection,
       propertyName: string,
       newValue: string|string[],
@@ -73,23 +73,23 @@ export class CollectionUpdateService {
       }, apply, reverse);
   }
 
-  private _getNewPropertyValueFromChangeDict(changeDict) {
+  private _getNewPropertyValueFromChangeDict (changeDict) {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
-  private _getExplorationIdFromChangeDict(changeDict): string {
+  private _getExplorationIdFromChangeDict (changeDict): string {
     return this._getParameterFromChangeDict(changeDict, 'exploration_id');
   }
 
-  private _getFirstIndexFromChangeDict(changeDict): number {
+  private _getFirstIndexFromChangeDict (changeDict): number {
     return this._getParameterFromChangeDict(changeDict, 'first_index');
   }
 
-  private _getSecondIndexFromChangeDict(changeDict): number {
+  private _getSecondIndexFromChangeDict (changeDict): number {
     return this._getParameterFromChangeDict(changeDict, 'second_index');
   }
 
-  addCollectionNode(
+  addCollectionNode (
       collection: Collection,
       explorationId: string,
       explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict
@@ -114,7 +114,7 @@ export class CollectionUpdateService {
       });
   }
 
-  swapNodes(
+  swapNodes (
       collection: Collection,
       firstIndex: number,
       secondIndex: number): void {
@@ -142,7 +142,7 @@ export class CollectionUpdateService {
    * Removes an exploration from a collection and records the change in
    * the undo/redo service.
    */
-  deleteCollectionNode(
+  deleteCollectionNode (
       collection: Collection,
       explorationId: string): void {
     let oldCollectionNode = collection.getCollectionNodeByExplorationId(
@@ -165,7 +165,7 @@ export class CollectionUpdateService {
    * Changes the title of a collection and records the change in the
    * undo/redo service.
    */
-  setCollectionTitle(
+  setCollectionTitle (
       collection: Collection,
       title: string): void {
     const oldTitle = collection.getTitle();
@@ -186,7 +186,7 @@ export class CollectionUpdateService {
    * Changes the category of a collection and records the change in the
    * undo/redo service.
    */
-  setCollectionCategory(
+  setCollectionCategory (
       collection: Collection,
       category: string): void {
     let oldCategory = collection.getCategory();
@@ -207,7 +207,7 @@ export class CollectionUpdateService {
    * Changes the objective of a collection and records the change in the
    * undo/redo service.
    */
-  setCollectionObjective(collection: Collection, objective: string): void {
+  setCollectionObjective (collection: Collection, objective: string): void {
     let oldObjective = collection.getObjective();
     this._applyPropertyChange(
       collection, CollectionDomainConstants.COLLECTION_PROPERTY_OBJECTIVE,
@@ -225,7 +225,7 @@ export class CollectionUpdateService {
    * Changes the language code of a collection and records the change in
    * the undo/redo service.
    */
-  setCollectionLanguageCode(
+  setCollectionLanguageCode (
       collection: Collection,
       languageCode: string): void {
     let oldLanguageCode = collection.getLanguageCode();
@@ -245,7 +245,7 @@ export class CollectionUpdateService {
    * Changes the tags of a collection and records the change in
    * the undo/redo service.
    */
-  setCollectionTags(collection: Collection, tags: string[]): void {
+  setCollectionTags (collection: Collection, tags: string[]): void {
     const oldTags = collection.getTags();
     this._applyPropertyChange(
       collection, CollectionDomainConstants.COLLECTION_PROPERTY_TAGS,
@@ -263,7 +263,7 @@ export class CollectionUpdateService {
    * Returns whether the given change object constructed by this service
    * is adding a new collection node to a collection.
    */
-  isAddingCollectionNode(changeObject: Change): boolean {
+  isAddingCollectionNode (changeObject: Change): boolean {
     let backendChangeObject = changeObject.getBackendChangeObject();
     return backendChangeObject.cmd === (
       CollectionDomainConstants.CMD_ADD_COLLECTION_NODE);
@@ -275,7 +275,7 @@ export class CollectionUpdateService {
    * exploration ID. The change object is expected to be one constructed
    * by this service.
    */
-  getExplorationIdFromChangeObject(changeObject: Change): string {
+  getExplorationIdFromChangeObject (changeObject: Change): string {
     return this._getExplorationIdFromChangeDict(
       changeObject.getBackendChangeObject());
   }

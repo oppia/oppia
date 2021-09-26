@@ -43,7 +43,7 @@ export interface ImageDimensions {
   providedIn: 'root'
 })
 export class ImagePreloaderService {
-  constructor(
+  constructor (
       private assetsBackendApiService: AssetsBackendApiService,
       private computeGraphService: ComputeGraphService,
       private contextService: ContextService,
@@ -62,7 +62,7 @@ export class ImagePreloaderService {
   // attached with getInImageUrl method.
   private imageLoadedCallback: {[filename: string]: ImageCallback} = {};
 
-  init(exploration: Exploration): void {
+  init (exploration: Exploration): void {
     this.exploration = exploration;
     this.imagePreloaderServiceHasStarted = true;
   }
@@ -74,7 +74,7 @@ export class ImagePreloaderService {
    *                            removed from the
    *                            this.filenamesOfImageFailedToDownload array.
    */
-  isInFailedDownload(filename: string): boolean {
+  isInFailedDownload (filename: string): boolean {
     return this.filenamesOfImageFailedToDownload.includes(filename);
   }
 
@@ -83,7 +83,7 @@ export class ImagePreloaderService {
    * @param {string} sourceStateName - The name of the state from which
    *                                   preloader should start.
    */
-  kickOffImagePreloader(sourceStateName: string): void {
+  kickOffImagePreloader (sourceStateName: string): void {
     this.filenamesOfImageToBeDownloaded = (
       this.getImageFilenamesInBfsOrder(sourceStateName));
     const imageFilesInGivenState = (
@@ -104,7 +104,7 @@ export class ImagePreloaderService {
   /**
    * Cancels the preloading of the images that are being downloaded.
    */
-  cancelPreloading(): void {
+  cancelPreloading (): void {
     this.assetsBackendApiService.abortAllCurrentImageDownloads();
     this.filenamesOfImageCurrentlyDownloading.length = 0;
   }
@@ -114,7 +114,7 @@ export class ImagePreloaderService {
    * starting from the 'stateName' state or not.
    * @param {string} stateName - The name of the state the user shifts to.
    */
-  onStateChange(stateName: string): void {
+  onStateChange (stateName: string): void {
     if (stateName !== this.exploration.getInitialState().name) {
       this.imageLoadedCallback = {};
 
@@ -150,7 +150,7 @@ export class ImagePreloaderService {
   * @param {string} filename - The string from which the dimensions of the
   *                           images should be extracted.
   */
-  getDimensionsOfImage(filename: string): ImageDimensions {
+  getDimensionsOfImage (filename: string): ImageDimensions {
     const dimensionsRegex = RegExp(
       '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif|svg)$', 'g');
     var imageDimensions = dimensionsRegex.exec(filename);
@@ -171,7 +171,7 @@ export class ImagePreloaderService {
   * @param {string} filename - The string from which the dimensions of the
   *                           math SVGs should be extracted.
   */
-  getDimensionsOfMathSvg(filename: string): ImageDimensions {
+  getDimensionsOfMathSvg (filename: string): ImageDimensions {
     var dimensionsRegex = RegExp(
       '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\.svg', 'g');
     var imageDimensions = dimensionsRegex.exec(filename);
@@ -188,20 +188,20 @@ export class ImagePreloaderService {
     }
   }
 
-  isLoadingImageFile(filename: string): boolean {
+  isLoadingImageFile (filename: string): boolean {
     return this.filenamesOfImageCurrentlyDownloading.includes(filename);
   }
 
-  restartImagePreloader(sourceStateName: string): void {
+  restartImagePreloader (sourceStateName: string): void {
     this.cancelPreloading();
     this.kickOffImagePreloader(sourceStateName);
   }
 
-  getFilenamesOfImageCurrentlyDownloading(): string[] {
+  getFilenamesOfImageCurrentlyDownloading (): string[] {
     return this.filenamesOfImageCurrentlyDownloading;
   }
 
-  private convertImageFileToSafeBase64Url(
+  private convertImageFileToSafeBase64Url (
       imageFile: Blob,
       callback: (src: string | ArrayBuffer | SafeResourceUrl) => void): void {
     const reader = new FileReader();
@@ -224,7 +224,7 @@ export class ImagePreloaderService {
    * @param {function} onLoadCallback - Function that is called when the
    *                                    Url of the loaded image is obtained.
    */
-  async getImageUrlAsync(filename: string): Promise<string|ArrayBuffer> {
+  async getImageUrlAsync (filename: string): Promise<string|ArrayBuffer> {
     return new Promise((resolve, reject) => {
       if (this.assetsBackendApiService.isCached(filename) ||
           this.isInFailedDownload(filename)) {
@@ -248,7 +248,7 @@ export class ImagePreloaderService {
     });
   }
 
-  inExplorationPlayer(): boolean {
+  inExplorationPlayer (): boolean {
     return this.imagePreloaderServiceHasStarted;
   }
 
@@ -258,7 +258,7 @@ export class ImagePreloaderService {
    *                            removed from the
    *                            this.filenamesOfImageFailedToDownload array.
    */
-  private removeFromFailedDownload(filename: string): void {
+  private removeFromFailedDownload (filename: string): void {
     var index = this.filenamesOfImageFailedToDownload.indexOf(filename);
     this.filenamesOfImageFailedToDownload.splice(index, 1);
   }
@@ -269,7 +269,7 @@ export class ImagePreloaderService {
    *                                   from which the filenames should
    *                                   be obtained.
    */
-  private getImageFilenamesInBfsOrder(sourceStateName: string): string[] {
+  private getImageFilenamesInBfsOrder (sourceStateName: string): string[] {
     var stateNamesInBfsOrder = (
       this.computeGraphService.computeBfsTraversalOfStates(
         this.exploration.getInitialState().name, this.exploration.getStates(),
@@ -290,7 +290,7 @@ export class ImagePreloaderService {
    * @param {string} filename - The filename which is to be removed from the
    *                            filenamesOfImageCurrentlyDownloading array.
    */
-  private removeCurrentAndLoadNextImage(filename: string): void {
+  private removeCurrentAndLoadNextImage (filename: string): void {
     this.filenamesOfImageCurrentlyDownloading.splice(
       this.filenamesOfImageCurrentlyDownloading.findIndex(
         imageFilename => filename === imageFilename),
@@ -306,7 +306,7 @@ export class ImagePreloaderService {
    * Handles the loading of the image file.
    * @param {string} imageFilename - The filename of the image to be loaded.
    */
-  private loadImage(imageFilename: string): void {
+  private loadImage (imageFilename: string): void {
     this.assetsBackendApiService.loadImage(
       AppConstants.ENTITY_TYPE.EXPLORATION,
       this.contextService.getExplorationId(), imageFilename

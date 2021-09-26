@@ -27,12 +27,12 @@ import { waitForAsync } from '@angular/core/testing';
 class MockReaderObject {
   result = null;
   onload = null;
-  constructor() {
+  constructor () {
     this.onload = () => {
       return 'Fake onload executed';
     };
   }
-  readAsDataURL(file) {
+  readAsDataURL (file) {
     this.onload();
     return 'The file is loaded';
   }
@@ -40,7 +40,7 @@ class MockReaderObject {
 
 describe(
   'Questions Opportunities Select Skill And Difficulty Modal Controller',
-  function() {
+  function () {
     var $q = null;
     var $scope = null;
     var $uibModalInstance = null;
@@ -57,9 +57,9 @@ describe(
 
     importAllAngularServices();
 
-    describe('when fetching skill successfully', function() {
+    describe('when fetching skill successfully', function () {
       beforeEach(waitForAsync(() => angular.mock.inject(
-        function($injector, $controller) {
+        function ($injector, $controller) {
           var $rootScope = $injector.get('$rootScope');
           SkillBackendApiService = $injector.get('SkillBackendApiService');
           alertsService = $injector.get('AlertsService');
@@ -137,7 +137,7 @@ describe(
         })));
 
       it('should initialize $scope properties after controller is' +
-        ' initialized', function() {
+        ' initialized', function () {
         expect($scope.skill).toEqual(skillObjectFactory.createFromBackendDict(
           skill));
         expect($scope.linkedSkillsWithDifficulty).toEqual(
@@ -147,7 +147,7 @@ describe(
       });
 
       it('should create a question and select its difficulty when closing' +
-        ' the modal', function() {
+        ' the modal', function () {
         $scope.startQuestionCreation();
 
         expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -157,8 +157,8 @@ describe(
       });
     });
 
-    describe('when fetching skill fails', function() {
-      beforeEach(angular.mock.inject(function($injector, $controller) {
+    describe('when fetching skill fails', function () {
+      beforeEach(angular.mock.inject(function ($injector, $controller) {
         $q = $injector.get('$q');
         var $rootScope = $injector.get('$rootScope');
         alertsService = $injector.get('AlertsService');
@@ -181,7 +181,7 @@ describe(
           });
       }));
 
-      it('should shows a warning error', function() {
+      it('should shows a warning error', function () {
         var addWarningSpy = spyOn(alertsService, 'addWarning');
         $scope.$apply();
 

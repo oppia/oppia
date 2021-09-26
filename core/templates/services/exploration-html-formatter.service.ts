@@ -51,7 +51,7 @@ export class ExplorationHtmlFormatterService {
     'MathEquationInput'
   ];
 
-  constructor(
+  constructor (
       private camelCaseToHyphens: CamelCaseToHyphensPipe,
       private extensionTagAssembler: ExtensionTagAssemblerService,
       private htmlEscaper: HtmlEscaperService
@@ -73,7 +73,7 @@ export class ExplorationHtmlFormatterService {
    *   containing the savedSolution in the scope. The scope here is the
    *   scope where the return value of this function is compiled.
    */
-  getInteractionHtml(
+  getInteractionHtml (
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
@@ -125,7 +125,7 @@ export class ExplorationHtmlFormatterService {
     return directiveOuterHtml;
   }
 
-  getAnswerHtml(
+  getAnswerHtml (
       answer: string, interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
@@ -146,7 +146,7 @@ export class ExplorationHtmlFormatterService {
     return ($('<div>').append(el)).html();
   }
 
-  getShortAnswerHtml(
+  getShortAnswerHtml (
       answer: InteractionAnswer, interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;

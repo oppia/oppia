@@ -32,7 +32,7 @@ import { StateTopAnswersStatsBackendApiService } from
 import { State } from 'domain/state/StateObjectFactory';
 
 export class AnswerStatsEntry {
-  constructor(
+  constructor (
       public readonly answers: readonly AnswerStats[],
       public readonly interactionId: string) {}
 }
@@ -48,7 +48,7 @@ export class StateTopAnswersStatsService {
   private rejectInitPromise: (_) => void;
   private initPromise: Promise<void>;
 
-  constructor(
+  constructor (
       private answerClassificationService: AnswerClassificationService,
       private interactionRulesRegistryService: InteractionRulesRegistryService,
       private stateTopAnswersStatsBackendApiService:
@@ -65,7 +65,7 @@ export class StateTopAnswersStatsService {
    * Calls the backend asynchronously to setup the answer statistics of each
    * state this exploration contains.
    */
-  async initAsync(explorationId: string, states: States): Promise<void> {
+  async initAsync (explorationId: string, states: States): Promise<void> {
     if (!this.initializationHasStarted) {
       this.initializationHasStarted = true;
       try {
@@ -86,56 +86,56 @@ export class StateTopAnswersStatsService {
     return this.initPromise;
   }
 
-  async getInitPromiseAsync(): Promise<void> {
+  async getInitPromiseAsync (): Promise<void> {
     return this.initPromise;
   }
 
-  getStateNamesWithStats(): string[] {
+  getStateNamesWithStats (): string[] {
     return [...this.topAnswersStatsByStateName.keys()];
   }
 
-  hasStateStats(stateName: string): boolean {
+  hasStateStats (stateName: string): boolean {
     return this.topAnswersStatsByStateName.has(stateName);
   }
 
-  getStateStats(stateName: string): AnswerStats[] {
+  getStateStats (stateName: string): AnswerStats[] {
     if (!this.hasStateStats(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
     return [...this.topAnswersStatsByStateName.get(stateName).answers];
   }
 
-  getUnresolvedStateStats(stateName: string): AnswerStats[] {
+  getUnresolvedStateStats (stateName: string): AnswerStats[] {
     return this.getStateStats(stateName).filter(a => !a.isAddressed);
   }
 
-  async getTopAnswersByStateNameAsync(): Promise<
+  async getTopAnswersByStateNameAsync (): Promise<
       Map<string, readonly AnswerStats[]>> {
     await this.initPromise;
     return new Map([...this.topAnswersStatsByStateName].map(
       ([stateName, cachedStats]) => [stateName, cachedStats.answers]));
   }
 
-  onStateAdded(stateName: string): void {
+  onStateAdded (stateName: string): void {
     this.topAnswersStatsByStateName.set(
       stateName, new AnswerStatsEntry([], null));
   }
 
-  onStateDeleted(stateName: string): void {
+  onStateDeleted (stateName: string): void {
     this.topAnswersStatsByStateName.delete(stateName);
   }
 
-  onStateRenamed(oldStateName: string, newStateName: string): void {
+  onStateRenamed (oldStateName: string, newStateName: string): void {
     this.topAnswersStatsByStateName.set(
       newStateName, this.topAnswersStatsByStateName.get(oldStateName));
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 
-  onStateInteractionSaved(updatedState: State): void {
+  onStateInteractionSaved (updatedState: State): void {
     this.refreshAddressedInfo(updatedState);
   }
 
-  private refreshAddressedInfo(updatedState: State): void {
+  private refreshAddressedInfo (updatedState: State): void {
     const stateName = updatedState.name;
 
     if (!this.topAnswersStatsByStateName.has(stateName)) {

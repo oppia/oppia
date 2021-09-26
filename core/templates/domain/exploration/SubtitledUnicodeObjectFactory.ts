@@ -29,35 +29,35 @@ export class SubtitledUnicode {
   // A null 'content_id' indicates that the 'SubtitledHtml' has been created
   // but not saved. Before the 'SubtitledHtml' object is saved into a State,
   // the 'content_id' should be set to a string.
-  constructor(
+  constructor (
     private _unicode: string,
     private _contentId: string | null
   ) {}
 
-  toBackendDict(): SubtitledUnicodeBackendDict {
+  toBackendDict (): SubtitledUnicodeBackendDict {
     return {
       unicode_str: this._unicode,
       content_id: this._contentId
     };
   }
 
-  isEmpty(): boolean {
+  isEmpty (): boolean {
     return !this._unicode;
   }
 
-  get contentId(): string | null {
+  get contentId (): string | null {
     return this._contentId;
   }
 
-  set contentId(contentId: string | null) {
+  set contentId (contentId: string | null) {
     this._contentId = contentId;
   }
 
-  get unicode(): string {
+  get unicode (): string {
     return this._unicode;
   }
 
-  set unicode(unicode: string) {
+  set unicode (unicode: string) {
     this._unicode = unicode;
   }
 }
@@ -66,7 +66,7 @@ export class SubtitledUnicode {
   providedIn: 'root'
 })
 export class SubtitledUnicodeObjectFactory {
-  createFromBackendDict(
+  createFromBackendDict (
       subtitledUnicodeBackendDict: SubtitledUnicodeBackendDict
   ): SubtitledUnicode {
     return new SubtitledUnicode(
@@ -74,7 +74,7 @@ export class SubtitledUnicodeObjectFactory {
       subtitledUnicodeBackendDict.content_id);
   }
 
-  createDefault(unicode: string, contentId: string | null): SubtitledUnicode {
+  createDefault (unicode: string, contentId: string | null): SubtitledUnicode {
     return new SubtitledUnicode(unicode, contentId);
   }
 }

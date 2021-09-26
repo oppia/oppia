@@ -18,15 +18,14 @@
  * no-bypass-security-phrase which is not allowed.
  */
 
-import { DomSanitizer } from '@angular/platform-browser';
 import { SvgSanitizerService } from './svg-sanitizer.service';
 
 
 let svgSanitizerService: SvgSanitizerService;
 let domParser: DOMParser = new DOMParser();
 class MockDomSanitizer {
-    // eslint-disable-next-line oppia/no-bypass-security-phrase
-    bypassSecurityTrustResourceUrl(str: string): string {
-        return str;
-    }
+  // eslint-disable-next-line oppia/no-bypass-security-phrase
+  bypassSecurityTrustResourceUrl (str: string): string {
+    return str;
+  }
 }

@@ -51,12 +51,12 @@ type StatsReportingUrlsKey = (
   providedIn: 'root'
 })
 export class StatsReportingBackendApiService {
-  constructor(
+  constructor (
     private contextService: ContextService,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private getFullStatsUrl(
+  private getFullStatsUrl (
       urlIdentifier: string, explorationId: string,
       currentStateName: string, nextExpId: string,
       previousStateName: string, nextStateName: string): string {
@@ -92,7 +92,7 @@ export class StatsReportingBackendApiService {
     }
   }
 
-  async postsStatsAsync(
+  async postsStatsAsync (
       aggregatedStats: AggregatedStats, expVersion: number,
       explorationId: string, currentStateName: string, nextExpId: string,
       previousStateName: string, nextStateName: string): Promise<Object> {
@@ -104,7 +104,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordExpStartedAsync(
+  async recordExpStartedAsync (
       params: Object, sessionId: string, stateName: string, expVersion: number,
       explorationId: string, currentStateName: string, nextExpId: string,
       previousStateName: string, nextStateName: string): Promise<Object> {
@@ -118,7 +118,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordStateHitAsync(
+  async recordStateHitAsync (
       clientTimeSpentInSecs: number, expVersion: number, newStateName: string,
       oldParams: Object, sessionId: string,
       explorationId: string, currentStateName: string, nextExpId: string,
@@ -134,7 +134,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordExplorationActuallyStartedAsync(
+  async recordExplorationActuallyStartedAsync (
       expVersion: number, stateName: string,
       sessionId: string, explorationId: string, currentStateName: string,
       nextExpId: string, previousStateName: string,
@@ -148,7 +148,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordSolutionHitAsync(
+  async recordSolutionHitAsync (
       timeSpentInStateSecs: number, expVersion: number, stateName: string,
       sessionId: string, explorationId: string, currentStateName: string,
       nextExpId: string, previousStateName: string,
@@ -163,7 +163,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordLeaveForRefresherExpAsync(
+  async recordLeaveForRefresherExpAsync (
       expVersion: number, refresherExpId: string, stateName: string,
       sessionId: string, timeSpentInStateSecs: number,
       explorationId: string, currentStateName: string,
@@ -180,7 +180,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordStateCompletedAsync(
+  async recordStateCompletedAsync (
       expVersion: number, sessionId: string, stateName: string,
       timeSpentInStateSecs: number, explorationId: string,
       currentStateName: string, nextExpId: string, previousStateName: string,
@@ -195,7 +195,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordExplorationCompletedAsync(
+  async recordExplorationCompletedAsync (
       clientTimeSpentInSecs: number, collectionId: string, params: Object,
       sessionId: string, stateName: string, version: number,
       explorationId: string, currentStateName: string, nextExpId: string,
@@ -212,7 +212,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordAnswerSubmittedAsync(
+  async recordAnswerSubmittedAsync (
       answer: string, params: Object, version: number, sessionId: string,
       clientTimeSpentInSecs: number, oldStateName: string,
       answerGroupIndex: number, ruleSpecIndex: number,
@@ -234,7 +234,7 @@ export class StatsReportingBackendApiService {
     }).toPromise();
   }
 
-  async recordMaybeLeaveEventAsync(
+  async recordMaybeLeaveEventAsync (
       clientTimeSpentInSecs: number, collectionId: string, params: Object,
       sessionId: string, stateName: string, version: number,
       explorationId: string, currentStateName: string, nextExpId: string,

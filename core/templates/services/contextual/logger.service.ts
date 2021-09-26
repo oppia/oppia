@@ -22,13 +22,13 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoggerService {
-  constructor() {}
+  constructor () {}
 
   /**
    * Logs a message to console at the debug level.
    * @param msg - A message to log.
    */
-  debug(msg: string): void {
+  debug (msg: string): void {
     // eslint-disable-next-line no-console
     console.debug(msg);
   }
@@ -37,7 +37,7 @@ export class LoggerService {
    * Logs a message to console at the info level.
    * @param msg - A message to log.
    */
-  info(msg: string): void {
+  info (msg: string): void {
     // eslint-disable-next-line no-console
     console.info(msg);
   }
@@ -46,7 +46,7 @@ export class LoggerService {
    * Logs a message to console at the warning level.
    * @param msg - A message to log.
    */
-  warn(msg: string): void {
+  warn (msg: string): void {
     console.warn(msg);
   }
 
@@ -54,7 +54,7 @@ export class LoggerService {
    * Logs a message to console at the error level.
    * @param msg - A message to log.
    */
-  error(msg: string): void {
+  error (msg: string): void {
     console.error(msg);
   }
 
@@ -62,7 +62,7 @@ export class LoggerService {
    * Logs a message to console.
    * @param msg - A message to log.
    */
-  log(msg: string): void {
+  log (msg: string): void {
     // eslint-disable-next-line no-console
     console.log(msg);
   }

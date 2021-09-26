@@ -57,14 +57,14 @@ export interface ReadOnlyCollectionBackendResponse {
   providedIn: 'root'
 })
 export class ReadOnlyCollectionBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
   private _collectionCache: CollectionCache = {};
   private _collectionDetailsCache: CollectionDetailsCache = {};
   private _collectionLoadedEventEmitter = new EventEmitter<void>();
 
-  private _fetchCollection(
+  private _fetchCollection (
       collectionId: string,
       successCallback: (value: Collection) => void,
       errorCallback: (reason: string) => void): void {
@@ -89,7 +89,7 @@ export class ReadOnlyCollectionBackendApiService {
     });
   }
 
-  private _cacheCollectionDetails(
+  private _cacheCollectionDetails (
       details: ReadOnlyCollectionBackendResponse): void {
     this._collectionDetailsCache[details.collection.id] = {
       canEdit: details.can_edit,
@@ -97,7 +97,7 @@ export class ReadOnlyCollectionBackendApiService {
     };
   }
 
-  private _isCached(collectionId: string): boolean {
+  private _isCached (collectionId: string): boolean {
     return this._collectionCache.hasOwnProperty(collectionId);
   }
 
@@ -111,7 +111,7 @@ export class ReadOnlyCollectionBackendApiService {
    * it will store it in the cache to avoid requests from the backend in
    * further function calls.
    */
-  async loadCollectionAsync(collectionId: string): Promise<Collection> {
+  async loadCollectionAsync (collectionId: string): Promise<Collection> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {
@@ -130,7 +130,7 @@ export class ReadOnlyCollectionBackendApiService {
     });
   }
 
-  getCollectionDetails(collectionId: string): CollectionDetails {
+  getCollectionDetails (collectionId: string): CollectionDetails {
     if (this._collectionDetailsCache[collectionId]) {
       return this._collectionDetailsCache[collectionId];
     } else {
@@ -142,7 +142,7 @@ export class ReadOnlyCollectionBackendApiService {
    * Returns whether the given collection is stored within the local data
    * cache or if it needs to be retrieved from the backend upon a laod.
    */
-  isCached(collectionId: string): boolean {
+  isCached (collectionId: string): boolean {
     return this._isCached(collectionId);
   }
 
@@ -150,7 +150,7 @@ export class ReadOnlyCollectionBackendApiService {
    * Replaces the current collection in the cache given by the specified
    * collection ID with a new collection object.
    */
-  cacheCollection(collectionId: string, collection: Collection): void {
+  cacheCollection (collectionId: string, collection: Collection): void {
     this._collectionCache[collectionId] = cloneDeep(collection);
   }
 
@@ -158,11 +158,11 @@ export class ReadOnlyCollectionBackendApiService {
    * Clears the local collection data cache, forcing all future loads to
    * re-request the previously loaded collections from the backend.
    */
-  clearCollectionCache(): void {
+  clearCollectionCache (): void {
     this._collectionCache = {};
   }
 
-  get onCollectionLoad(): EventEmitter<void> {
+  get onCollectionLoad (): EventEmitter<void> {
     return this._collectionLoadedEventEmitter;
   }
 }

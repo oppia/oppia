@@ -25,7 +25,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import CONSTANTS from 'assets/constants';
 
-describe('Create New Story Modal Controller', function() {
+describe('Create New Story Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
@@ -43,13 +43,13 @@ describe('Create New Story Modal Controller', function() {
       providers: [EditableStoryBackendApiService]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -68,14 +68,14 @@ describe('Create New Story Modal Controller', function() {
     });
   }));
 
-  it('should check if properties was initialized correctly', function() {
+  it('should check if properties was initialized correctly', function () {
     expect($scope.story.title).toBe('');
     expect($scope.story.description).toBe('');
     expect($scope.MAX_CHARS_IN_STORY_TITLE).toBe(
       CONSTANTS.MAX_CHARS_IN_STORY_TITLE);
   });
 
-  it('should check if url fragment already exists', function() {
+  it('should check if url fragment already exists', function () {
     spyOn(
       StoryEditorStateService,
       'updateExistenceOfStoryUrlFragment').and.callFake(
@@ -90,7 +90,7 @@ describe('Create New Story Modal Controller', function() {
   });
 
   it('should not update story url fragment existence for empty url fragment',
-    function() {
+    function () {
       spyOn(StoryEditorStateService, 'updateExistenceOfStoryUrlFragment');
       $scope.story.urlFragment = '';
       $scope.onStoryUrlFragmentChange();
@@ -99,7 +99,7 @@ describe('Create New Story Modal Controller', function() {
       ).not.toHaveBeenCalled();
     });
 
-  it('should check if the story is valid', function() {
+  it('should check if the story is valid', function () {
     expect($scope.isValid()).toBe(false);
 
     $scope.story.title = 'title';
@@ -121,7 +121,7 @@ describe('Create New Story Modal Controller', function() {
     expect($scope.isValid()).toBe(false);
   });
 
-  it ('should update View when thumbnail has been uploaded', function() {
+  it ('should update View when thumbnail has been uploaded', function () {
     $scope.updateView();
   });
 });

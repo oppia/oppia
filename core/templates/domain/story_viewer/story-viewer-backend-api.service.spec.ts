@@ -177,7 +177,7 @@ describe('Story viewer backend API service', () => {
     })
   );
 
-  it('should emit the story data event correctly', function() {
+  it('should emit the story data event correctly', function () {
     let storyDataEventEmitter = new EventEmitter<StoryDataDict>();
     expect(storyViewerBackendApiService.onSendStoryData).toEqual(
       storyDataEventEmitter);

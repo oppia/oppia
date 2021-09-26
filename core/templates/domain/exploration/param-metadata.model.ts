@@ -34,7 +34,7 @@ export class ParamMetadata {
    * e.g. answer, content, feedback or param_changes (changing value of param)
    * @param {String} sourceInd - index of this parameter in a set of changes
    */
-  constructor(
+  constructor (
       action: string, paramName: string, source: string, sourceInd: string) {
     this.action = action;
     this.paramName = paramName;
@@ -50,7 +50,7 @@ export class ParamMetadata {
    * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
-  static createWithSetAction(
+  static createWithSetAction (
       paramName: string, source: string, sourceInd: string): ParamMetadata {
     return new ParamMetadata(
       ExplorationEditorPageConstants.PARAM_ACTION_SET, paramName, source,
@@ -65,7 +65,7 @@ export class ParamMetadata {
    * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
-  static createWithGetAction(
+  static createWithGetAction (
       paramName: string, source: string, sourceInd: string): ParamMetadata {
     return new ParamMetadata(
       ExplorationEditorPageConstants.PARAM_ACTION_GET, paramName, source,

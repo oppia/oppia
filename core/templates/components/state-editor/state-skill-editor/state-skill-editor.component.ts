@@ -45,7 +45,7 @@ export class StateSkillEditorComponent implements OnInit {
   untriagedSkillSummaries: SkillSummary[] = null;
   skillEditorIsShown: boolean = true;
 
-  constructor(
+  constructor (
     private topicsAndSkillsDashboardBackendApiService: (
       TopicsAndSkillsDashboardBackendApiService),
     private storyEditorStateService: StoryEditorStateService,
@@ -56,7 +56,7 @@ export class StateSkillEditorComponent implements OnInit {
     private ngbModal: NgbModal
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.skillEditorIsShown = (!this.windowDimensionsService.isWindowNarrow());
     this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
       .then((response: TopicsAndSkillDashboardData) => {
@@ -65,7 +65,7 @@ export class StateSkillEditorComponent implements OnInit {
       });
   }
 
-  addSkill(): void {
+  addSkill (): void {
     let sortedSkillSummaries = <SkillSummaryBackendDict[]> (
       this.storyEditorStateService.getSkillSummaries());
     let allowSkillsFromOtherTopics = <boolean> true;
@@ -95,7 +95,7 @@ export class StateSkillEditorComponent implements OnInit {
     });
   }
 
-  deleteSkill(): void {
+  deleteSkill (): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(
       DeleteStateSkillModalComponent, {
@@ -111,7 +111,7 @@ export class StateSkillEditorComponent implements OnInit {
     });
   }
 
-  getSkillEditorUrl(): string {
+  getSkillEditorUrl (): string {
     if (this.stateLinkedSkillIdService.displayed) {
       return this.urlInterpolationService.interpolateUrl(
         '/skill_editor/<skill_id>', {
@@ -120,7 +120,7 @@ export class StateSkillEditorComponent implements OnInit {
     }
   }
 
-  toggleSkillEditor(): void {
+  toggleSkillEditor (): void {
     this.skillEditorIsShown = !this.skillEditorIsShown;
   }
 }

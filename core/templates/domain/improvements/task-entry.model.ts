@@ -80,7 +80,7 @@ export class TaskEntry<TaskType = string> {
   protected issueDescription: string | null;
   private taskStatus: string;
 
-  constructor(backendDict: TaskEntryBackendDict<TaskType>) {
+  constructor (backendDict: TaskEntryBackendDict<TaskType>) {
     this.entityType = backendDict.entity_type;
     this.entityId = backendDict.entity_id;
     this.entityVersion = backendDict.entity_version;
@@ -95,11 +95,11 @@ export class TaskEntry<TaskType = string> {
     this.taskStatus = backendDict.status;
   }
 
-  static createFromBackendDict(backendDict: TaskEntryBackendDict): TaskEntry {
+  static createFromBackendDict (backendDict: TaskEntryBackendDict): TaskEntry {
     return new TaskEntry(backendDict);
   }
 
-  public toBackendDict(): TaskEntryBackendDict<TaskType> {
+  public toBackendDict (): TaskEntryBackendDict<TaskType> {
     return {
       entity_type: this.entityType,
       entity_id: this.entityId,
@@ -115,7 +115,7 @@ export class TaskEntry<TaskType = string> {
     };
   }
 
-  public toPayloadDict(): TaskEntryPayloadDict<TaskType> {
+  public toPayloadDict (): TaskEntryPayloadDict<TaskType> {
     return {
       entity_version: this.entityVersion,
       task_type: this.taskType,
@@ -125,35 +125,35 @@ export class TaskEntry<TaskType = string> {
     };
   }
 
-  public getStatus(): string {
+  public getStatus (): string {
     return this.taskStatus;
   }
 
-  public getIssueDescription(): string | null {
+  public getIssueDescription (): string | null {
     return this.issueDescription;
   }
 
-  public isOpen(): boolean {
+  public isOpen (): boolean {
     return this.taskStatus === ImprovementsConstants.TASK_STATUS_OPEN;
   }
 
-  public isObsolete(): boolean {
+  public isObsolete (): boolean {
     return this.taskStatus === ImprovementsConstants.TASK_STATUS_OBSOLETE;
   }
 
-  public isResolved(): boolean {
+  public isResolved (): boolean {
     return this.taskStatus === ImprovementsConstants.TASK_STATUS_RESOLVED;
   }
 
-  public markAsObsolete(): void {
+  public markAsObsolete (): void {
     this.taskStatus = ImprovementsConstants.TASK_STATUS_OBSOLETE;
   }
 
-  protected markAsOpen(): void {
+  protected markAsOpen (): void {
     this.taskStatus = ImprovementsConstants.TASK_STATUS_OPEN;
   }
 
-  protected markAsResolved(): void {
+  protected markAsResolved (): void {
     this.taskStatus = ImprovementsConstants.TASK_STATUS_RESOLVED;
   }
 }

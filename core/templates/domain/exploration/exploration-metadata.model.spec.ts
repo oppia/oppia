@@ -34,7 +34,7 @@ describe('Exploration Metadata model', () => {
       createFromBackendDict(sampleExplorationMetadataBackendDict);
   });
 
-  it('should be able to get all the values', function() {
+  it('should be able to get all the values', function () {
     expect(sampleExplorationMetadata.id).toEqual('12');
     expect(sampleExplorationMetadata.objective).toEqual(
       'learn how to count permutations accurately and systematically');

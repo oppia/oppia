@@ -43,7 +43,7 @@ export class Outcome {
   paramChanges: readonly ParamChangeBackendDict[];
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
-  constructor(
+  constructor (
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],
       refresherExplorationId: string | null,
@@ -56,11 +56,11 @@ export class Outcome {
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
   }
 
-  setDestination(newValue: string): void {
+  setDestination (newValue: string): void {
     this.dest = newValue;
   }
 
-  toBackendDict(): OutcomeBackendDict {
+  toBackendDict (): OutcomeBackendDict {
     return {
       dest: this.dest,
       feedback: this.feedback.toBackendDict(),
@@ -71,7 +71,7 @@ export class Outcome {
     };
   }
 
-  hasNonemptyFeedback(): boolean {
+  hasNonemptyFeedback (): boolean {
     return this.feedback.html.trim() !== '';
   }
 
@@ -79,7 +79,7 @@ export class Outcome {
    * Returns true iff an outcome has a self-loop, no feedback, and no
    * refresher exploration.
    */
-  isConfusing(currentStateName: string): boolean {
+  isConfusing (currentStateName: string): boolean {
     return (
       this.dest === currentStateName &&
       !this.hasNonemptyFeedback() &&
@@ -92,9 +92,9 @@ export class Outcome {
   providedIn: 'root'
 })
 export class OutcomeObjectFactory {
-  constructor() {}
+  constructor () {}
 
-  createNew(
+  createNew (
       dest: string, feedbackTextId: string, feedbackText: string,
       paramChanges: readonly ParamChangeBackendDict[]): Outcome {
     return new Outcome(
@@ -107,7 +107,7 @@ export class OutcomeObjectFactory {
       null);
   }
 
-  createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
+  createFromBackendDict (outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
       SubtitledHtml.createFromBackendDict(

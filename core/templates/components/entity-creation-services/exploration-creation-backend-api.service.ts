@@ -33,9 +33,9 @@ export interface ExplorationCreationResponse {
   providedIn: 'root'
 })
 export class ExplorationCreationBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor (private http: HttpClient) {}
 
-  private _createExploration(
+  private _createExploration (
       successCallback: (value: ExplorationCreationResponse) => void,
       errorCallback: (reason: string) => void): void {
     this.http.post<ExplorationCreationBackendDict>(
@@ -53,7 +53,7 @@ export class ExplorationCreationBackendApiService {
       });
   }
 
-  async registerNewExplorationAsync(): Promise<ExplorationCreationResponse> {
+  async registerNewExplorationAsync (): Promise<ExplorationCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createExploration(resolve, reject);
     });

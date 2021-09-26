@@ -35,7 +35,7 @@ type RTEComponentSpecsKey = keyof typeof ServicesConstants.RTE_COMPONENT_SPECS;
   providedIn: 'root'
 })
 export class SpeechSynthesisChunkerService {
-  constructor(private htmlEscaper: HtmlEscaperService) {}
+  constructor (private htmlEscaper: HtmlEscaperService) {}
 
   // Max number of characters to fit into one chunk.
   CHUNK_LENGTH: number = 160;
@@ -72,7 +72,7 @@ export class SpeechSynthesisChunkerService {
    * @param {requestCallback} - Callback that is activated when the last
    *    chunked utterance finishes playing.
    */
-  _speechUtteranceChunker(
+  _speechUtteranceChunker (
       utterance: SpeechSynthesisUtterance, offset: number,
       callback: () => void): void {
     var newUtterance: SpeechSynthesisUtterance;
@@ -136,7 +136,7 @@ export class SpeechSynthesisChunkerService {
     }, 0);
   }
 
-  _formatLatexToSpeakableText(latex: string): string {
+  _formatLatexToSpeakableText (latex: string): string {
     return latex
       .replace(/&quot;/g, '')
       .replace(/\\/g, '')
@@ -173,7 +173,7 @@ export class SpeechSynthesisChunkerService {
       .trim();
   }
 
-  _convertToSpeakableText(html: string): string {
+  _convertToSpeakableText (html: string): string {
     const rteCompSpecsKeys = <RTEComponentSpecsKey[]> Object.keys(
       ServicesConstants.RTE_COMPONENT_SPECS);
     rteCompSpecsKeys.forEach(
@@ -188,7 +188,7 @@ export class SpeechSynthesisChunkerService {
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
-      .replaceWith(function() {
+      .replaceWith(function () {
         var element = <HTMLElement> this;
         const _newTextAttr = element.attributes[
           <keyof NamedNodeMap> 'text-with-value'] as Attr;
@@ -207,7 +207,7 @@ export class SpeechSynthesisChunkerService {
     var _this = this;
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
-      .replaceWith(function() {
+      .replaceWith(function () {
         var element = <HTMLElement> this;
         const _mathContentAttr = element.attributes[
           <keyof NamedNodeMap> 'math_content-with-value'] as Attr;
@@ -250,23 +250,23 @@ export class SpeechSynthesisChunkerService {
     return textToSpeak;
   }
 
-  speak(utterance: SpeechSynthesisUtterance, callback: () => void): void {
+  speak (utterance: SpeechSynthesisUtterance, callback: () => void): void {
     this.cancelRequested = false;
     this._speechUtteranceChunker(utterance, 0, callback);
   }
 
-  cancel(): void {
+  cancel (): void {
     this.cancelRequested = true;
     if (this._speechSynthesis) {
       this._speechSynthesis.cancel();
     }
   }
 
-  convertToSpeakableText(html: string): string {
+  convertToSpeakableText (html: string): string {
     return this._convertToSpeakableText(html);
   }
 
-  formatLatexToSpeakableText(latex: string): string {
+  formatLatexToSpeakableText (latex: string): string {
     return this._formatLatexToSpeakableText(latex);
   }
 }

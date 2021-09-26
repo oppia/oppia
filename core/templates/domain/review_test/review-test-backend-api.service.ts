@@ -33,12 +33,12 @@ import { UrlService } from 'services/contextual/url.service';
   providedIn: 'root'
 })
 export class ReviewTestBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
-  async _fetchReviewTestDataAsync(storyUrlFragment: string):
+  async _fetchReviewTestDataAsync (storyUrlFragment: string):
     Promise<ReviewTest> {
     return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
@@ -58,7 +58,7 @@ export class ReviewTestBackendApiService {
       throw new Error(errorResponse.error.error);
     });
   }
-  async fetchReviewTestDataAsync(storyUrlFragment: string):
+  async fetchReviewTestDataAsync (storyUrlFragment: string):
     Promise<ReviewTest> {
     return this._fetchReviewTestDataAsync(storyUrlFragment);
   }

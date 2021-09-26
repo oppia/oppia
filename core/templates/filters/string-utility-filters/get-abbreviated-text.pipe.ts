@@ -20,7 +20,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'getAbbreviatedText'})
 export class GetAbbreviatedTextPipe implements PipeTransform {
-  transform(text: string, characterCount: number): string {
+  transform (text: string, characterCount: number): string {
     if (text.length > characterCount) {
       let subject = text.substr(0, characterCount);
 

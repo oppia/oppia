@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for AddWorkedExampleModalController.
  */
 
-describe('Add Worked Example Modal Controller', function() {
+describe('Add Worked Example Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function ($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -35,12 +35,12 @@ describe('Add Worked Example Modal Controller', function() {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    function() {
+    function () {
       expect($scope.tmpWorkedExampleQuestionHtml).toEqual('');
       expect($scope.tmpWorkedExampleExplanationHtml).toBe('');
     });
 
-  it('should close modal when saving worked example', function() {
+  it('should close modal when saving worked example', function () {
     $scope.saveWorkedExample();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       workedExampleQuestionHtml: '',

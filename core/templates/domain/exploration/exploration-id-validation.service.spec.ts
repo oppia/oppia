@@ -75,7 +75,7 @@ describe('Exploration id validation service', () => {
     };
   });
 
-  afterEach(function() {
+  afterEach(function () {
     httpTestingController.verify();
   });
 

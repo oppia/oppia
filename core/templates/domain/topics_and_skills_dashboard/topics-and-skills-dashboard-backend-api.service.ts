@@ -113,14 +113,14 @@ export interface AssignedSkillDataBackendDict {
 })
 
 export class TopicsAndSkillsDashboardBackendApiService {
-  constructor(
+  constructor (
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _topicsAndSkillsDashboardReinitializedEventEmitter =
     new EventEmitter<boolean>();
 
-  async fetchDashboardDataAsync(): Promise<TopicsAndSkillDashboardData> {
+  async fetchDashboardDataAsync (): Promise<TopicsAndSkillDashboardData> {
     return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise().then(response => {
       let categorizedSkills: CategorizedSkills = {};
@@ -164,7 +164,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
-  async fetchTopicAssignmentsForSkillAsync(
+  async fetchTopicAssignmentsForSkillAsync (
       skillId: string
   ): Promise<AssignedSkill[]> {
     const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -181,7 +181,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
-  async fetchSkillsDashboardDataAsync(
+  async fetchSkillsDashboardDataAsync (
       filter: TopicsAndSkillsDashboardFilter,
       itemsPerPage: number, nextCursor: string): Promise<SkillsDashboardData> {
     return this.http.post<SkillsDashboardDataBackendDict>(
@@ -205,7 +205,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
-  async mergeSkillsAsync(
+  async mergeSkillsAsync (
       oldSkillId: string, newSkillId: string): Promise<void> {
     let mergeSkillsData = {
       old_skill_id: oldSkillId,
@@ -220,7 +220,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
       });
   }
 
-  get onTopicsAndSkillsDashboardReinitialized(): EventEmitter<boolean> {
+  get onTopicsAndSkillsDashboardReinitialized (): EventEmitter<boolean> {
     return this._topicsAndSkillsDashboardReinitializedEventEmitter;
   }
 }

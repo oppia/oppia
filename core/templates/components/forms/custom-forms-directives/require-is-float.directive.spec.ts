@@ -25,24 +25,24 @@ require(
   'components/forms/custom-forms-directives/' +
   'require-is-float.directive.ts');
 
-describe('Testing requireIsFloat directive', function() {
+describe('Testing requireIsFloat directive', function () {
   var scope, testInput;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function($compile, $rootScope) {
+  beforeEach(angular.mock.inject(function ($compile, $rootScope) {
     scope = $rootScope.$new();
     var element = '<form name="testForm">' +
       '<input name="floatValue" type="number" ng-model="localValue" ' +
       'require-is-float apply-validation>' +
       '</form>';
-    scope.validators = function() {
+    scope.validators = function () {
       return [{
         id: 'isFloat'
       }];
@@ -51,7 +51,7 @@ describe('Testing requireIsFloat directive', function() {
     testInput = scope.testForm.floatValue;
   }));
 
-  it('should validate if value is a float', function() {
+  it('should validate if value is a float', function () {
     testInput.$setViewValue('2');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
@@ -69,7 +69,7 @@ describe('Testing requireIsFloat directive', function() {
     expect(testInput.$valid).toEqual(true);
   });
 
-  it('should invalidate if value is not a float', function() {
+  it('should invalidate if value is not a float', function () {
     testInput.$setViewValue('-abc');
     scope.$digest();
     expect(testInput.$valid).toEqual(false);

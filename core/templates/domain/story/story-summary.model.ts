@@ -40,7 +40,7 @@ export interface StorySummaryBackendDict {
 }
 
 export class StorySummary {
-  constructor(
+  constructor (
     private _id: string,
     private _title: string,
     private _nodeTitles: string[],
@@ -56,63 +56,63 @@ export class StorySummary {
     private _classroomUrlFragment: string | undefined
   ) {}
 
-  getId(): string {
+  getId (): string {
     return this._id;
   }
 
-  getTitle(): string {
+  getTitle (): string {
     return this._title;
   }
 
-  getNodeTitles(): string[] {
+  getNodeTitles (): string[] {
     return this._nodeTitles.slice();
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename (): string {
     return this._thumbnailFilename;
   }
 
-  isNodeCompleted(nodeTitle: string): boolean {
+  isNodeCompleted (nodeTitle: string): boolean {
     return (this._completedNodeTitles.indexOf(nodeTitle) !== -1);
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor (): string {
     return this._thumbnailBgColor;
   }
 
-  getDescription(): string | undefined {
+  getDescription (): string | undefined {
     return this._description;
   }
 
-  getCompletedNodeTitles(): string[] {
+  getCompletedNodeTitles (): string[] {
     return this._completedNodeTitles;
   }
 
-  getTopicName(): string | undefined {
+  getTopicName (): string | undefined {
     return this._topicName;
   }
 
-  isStoryPublished(): boolean {
+  isStoryPublished (): boolean {
     return this._storyIsPublished;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment (): string {
     return this._urlFragment;
   }
 
-  getAllNodes(): StoryNode[] {
+  getAllNodes (): StoryNode[] {
     return this._allNodes;
   }
 
-  getTopicUrlFragment(): string | undefined {
+  getTopicUrlFragment (): string | undefined {
     return this._topicUrlFragment;
   }
 
-  getClassroomUrlFragment(): string | undefined {
+  getClassroomUrlFragment (): string | undefined {
     return this._classroomUrlFragment;
   }
 
-  static createFromBackendDict(
+  static createFromBackendDict (
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     let allNodes = (
       storySummaryBackendDict.all_node_dicts.map(storyNodeDict => {

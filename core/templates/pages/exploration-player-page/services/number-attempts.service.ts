@@ -33,14 +33,14 @@ export class NumberAttemptsService {
   /**
    * Increments the number of answer attempts by the learner by 1.
    */
-  submitAttempt(): void {
+  submitAttempt (): void {
     NumberAttemptsService.numberAttempts++;
   }
 
   /**
    * Resets number of answer attempts to 0.
    */
-  reset(): void {
+  reset (): void {
     NumberAttemptsService.numberAttempts = 0;
   }
 
@@ -48,7 +48,7 @@ export class NumberAttemptsService {
    * @returns - The number of answer attempts by the learner
    * within a card.
    */
-  getNumberAttempts(): number {
+  getNumberAttempts (): number {
     return NumberAttemptsService.numberAttempts;
   }
 }

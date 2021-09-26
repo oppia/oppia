@@ -22,17 +22,17 @@ var autoSaveIndicatorElement = element(
   by.css('.protractor-test-autosave-indicator'));
 
 // Waits for the invisibility of the autosave message.
-var waitForAutosave = async function() {
+var waitForAutosave = async function () {
   await waitFor.invisibilityOf(
     autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
 };
 
-var clear = async function(inputName, inputElement) {
+var clear = async function (inputName, inputElement) {
   await click(inputName, inputElement);
   await inputElement.clear();
 };
 
-var click = async function(elementName, clickableElement, elementIsMasked) {
+var click = async function (elementName, clickableElement, elementIsMasked) {
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   await waitFor.elementToBeClickable(
@@ -51,33 +51,33 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
   }
 };
 
-var getText = async function(elementName, element) {
+var getText = async function (elementName, element) {
   await waitFor.visibilityOf(
     element, `${elementName} is not visible for getText()`);
   return await element.getText();
 };
 
-var getAttribute = async function(elementName, element, attribute) {
+var getAttribute = async function (elementName, element, attribute) {
   await waitFor.presenceOf(
     element, `${elementName} is not present for getAttribute(${attribute})`);
   return await element.getAttribute(attribute);
 };
 
-var select = async function(selectorName, selectorElement, optionToSelect) {
+var select = async function (selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = selectorElement.element(
     by.cssContainingText('option', optionToSelect));
   await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
-var matSelect = async function(selectorName, selectorElement, optionToSelect) {
+var matSelect = async function (selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = element(
     by.cssContainingText('.mat-option-text', optionToSelect));
   await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
-var select2 = async function(selectorName, selectorElement, optionToSelect) {
+var select2 = async function (selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var select2Results = element(by.css('.select2-results'));
   await waitFor.visibilityOf(
@@ -87,7 +87,7 @@ var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(`${optionToSelect} in ${selectorName}`, option);
 };
 
-var sendKeys = async function(
+var sendKeys = async function (
     inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
     await click(inputName, inputElement);

@@ -25,15 +25,15 @@ import { AnswerStatsBackendDict, AnswerStats } from
   'domain/exploration/answer-stats.model';
 import { UtilsService } from 'services/utils.service';
 
-describe('Oppia sorted tiles visualization', function() {
+describe('Oppia sorted tiles visualization', function () {
   let $compile, $rootScope, $uibModal;
   let utilsService: UtilsService;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     utilsService = TestBed.get(UtilsService);
     $provide.value('UtilsService', utilsService);
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function ($injector) {
     $compile = $injector.get('$compile');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');

@@ -42,21 +42,21 @@ class LearnerDashboardIconsComponentStub {
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'summarizeNonnegativeNumber'})
 class MockSummarizeNonnegativeNumberPipe {
-  transform(value: string, params: Object | undefined): string {
+  transform (value: string, params: Object | undefined): string {
     return value;
   }
 }
@@ -67,49 +67,49 @@ class MockWindowRef {
       _hash: '',
       _hashChange: null,
       _href: '',
-      get hash() {
+      get hash () {
         return this._hash;
       },
-      set hash(val) {
+      set hash (val) {
         this._hash = val;
         if (this._hashChange === null) {
           return;
         }
       },
-      get href() {
+      get href () {
         return this._href;
       },
-      set href(val) {
+      set href (val) {
         this._href = val;
       },
       reload: (val: string) => val
     },
-    get onhashchange() {
+    get onhashchange () {
       return this.location._hashChange;
     },
 
-    set onhashchange(val) {
+    set onhashchange (val) {
       this.location._hashChange = val;
     }
   };
-  get nativeWindow() {
+  get nativeWindow () {
     return this._window;
   }
 }
 
 class MockUrlService {
-  addField(url: string, fieldName: string, fieldValue: string): string {
+  addField (url: string, fieldName: string, fieldValue: string): string {
     let encodedFieldValue = fieldValue;
     let encodedFieldName = fieldName;
     return url + (url.indexOf('?') !== -1 ? '&' : '?') + encodedFieldName +
         '=' + encodedFieldValue;
   }
 
-  getPathname(): string {
+  getPathname (): string {
     return '/story/fhfhvhgvhvvh';
   }
 
-  getUrlParams(): UrlParamsType {
+  getUrlParams (): UrlParamsType {
     return {
       collection_id: '1',
       story_id: '1',
@@ -117,7 +117,7 @@ class MockUrlService {
     };
   }
 
-  getStoryIdFromViewerUrl(): string {
+  getStoryIdFromViewerUrl (): string {
     return '1';
   }
 }

@@ -50,19 +50,19 @@ export class AdminRolesTabComponent implements OnInit {
   userIsBanned = false;
   roleIsCurrentlyBeingEdited = false;
 
-  constructor(
+  constructor (
     private adminDataService: AdminDataService,
     private adminBackendApiService: AdminBackendApiService,
     private alertsService: AlertsService,
     private modalService: NgbModal
   ) {}
 
-  addWarning(errorMessage: string): void {
+  addWarning (errorMessage: string): void {
     this.alertsService.addWarning(
       errorMessage || 'Error communicating with server.');
   }
 
-  startEditing(): void {
+  startEditing (): void {
     this.roleIsCurrentlyBeingEdited = true;
     this.adminBackendApiService.viewUsersRoleAsync(
       this.username).then((userRoles) => {
@@ -73,13 +73,13 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 
-  showNewRoleSelector(): void {
+  showNewRoleSelector (): void {
     this.possibleRolesToAdd = this.UPDATABLE_ROLES.filter(
       role => !this.userRoles.includes(role)).sort();
     this.roleSelectorIsShown = true;
   }
 
-  removeRole(roleToRemove: string): void {
+  removeRole (roleToRemove: string): void {
     this.roleCurrentlyBeingUpdatedInBackend = roleToRemove;
 
     var roleIndex = this.userRoles.indexOf(roleToRemove);
@@ -93,7 +93,7 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 
-  openTopicManagerRoleEditor(): void {
+  openTopicManagerRoleEditor (): void {
     const modalRef = this.modalService.open(
       TopicManagerRoleEditorModalComponent);
     modalRef.componentInstance.managedTopicIds = (
@@ -114,7 +114,7 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 
-  addNewRole(role: string): void {
+  addNewRole (role: string): void {
     if (role === 'TOPIC_MANAGER') {
       this.openTopicManagerRoleEditor();
       return;
@@ -130,7 +130,7 @@ export class AdminRolesTabComponent implements OnInit {
     }, this.addWarning.bind(this));
   }
 
-  markUserBanned(): void {
+  markUserBanned (): void {
     this.bannedStatusChangeInProgress = true;
     this.adminBackendApiService.markUserBannedAsync(this.username).then(() => {
       this.bannedStatusChangeInProgress = false;
@@ -139,7 +139,7 @@ export class AdminRolesTabComponent implements OnInit {
     }, this.addWarning.bind(this));
   }
 
-  unmarkUserBanned(): void {
+  unmarkUserBanned (): void {
     this.bannedStatusChangeInProgress = true;
     this.adminBackendApiService.unmarkUserBannedAsync(
       this.username).then(() => {
@@ -149,7 +149,7 @@ export class AdminRolesTabComponent implements OnInit {
     }, this.addWarning.bind(this));
   }
 
-  clearEditor(): void {
+  clearEditor (): void {
     this.rolesFetched = false;
     this.roleSelectorIsShown = false;
     this.username = '';
@@ -162,7 +162,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.roleIsCurrentlyBeingEdited = false;
   }
 
-  ngOnInit(): void {
+  ngOnInit (): void {
     this.adminDataService.getDataAsync().then(adminDataObject => {
       this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
       this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
