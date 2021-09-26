@@ -39,11 +39,9 @@ fdescribe('Progress nav component', () => {
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
   let browserCheckerService: BrowserCheckerService;
-  let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
-  let windowDimensionsService: WindowDimensionsService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
@@ -77,12 +75,10 @@ fdescribe('Progress nav component', () => {
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     browserCheckerService = TestBed.inject(BrowserCheckerService);
-    explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
   });
 
   afterEach(() => {
