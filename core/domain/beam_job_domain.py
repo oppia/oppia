@@ -28,6 +28,10 @@ import utils
 
 from typing import Dict, List, Type, Union # isort: skip
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import beam_job_models
+
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 
@@ -94,7 +98,7 @@ class BeamJobRun(python_utils.OBJECT):
             job_started_on: datetime.datetime,
             job_updated_on: datetime.datetime,
             job_is_synchronous: bool
-    ):
+    ) -> None:
         """Initializes a new BeamJobRun instance.
 
         Args:
@@ -169,7 +173,7 @@ class AggregateBeamJobRunResult(python_utils.OBJECT):
         stderr: str. The error output produced by the job.
     """
 
-    def __init__(self, stdout: str, stderr: str):
+    def __init__(self, stdout: str, stderr: str) -> None:
         """Initializes a new instance of AggregateBeamJobRunResult.
 
         Args:

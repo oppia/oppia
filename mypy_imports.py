@@ -34,6 +34,7 @@ from core.storage.app_feedback_report import (
 from core.storage.audit import gae_models as audit_models
 from core.storage.auth import gae_models as auth_models
 from core.storage.base_model import gae_models as base_models
+from core.storage.beam_job import gae_models as beam_job_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.classifier import gae_models as classifier_models
 from core.storage.collection import gae_models as collection_models
@@ -61,6 +62,7 @@ __all__ = [
     'audit_models',
     'auth_models',
     'base_models',
+    'beam_job_models',
     'blog_models',
     'classifier_models',
     'collection_models',

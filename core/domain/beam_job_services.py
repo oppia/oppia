@@ -27,10 +27,14 @@ from jobs import registry as jobs_registry
 
 from typing import List, Optional # isort: skip
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import beam_job_models
+    from mypy_imports import datastore_services
+
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 datastore_services = models.Registry.import_datastore_services()
-transaction_services = models.Registry.import_transaction_services()
 
 
 def run_beam_job(job_name: str) -> beam_job_domain.BeamJobRun:
@@ -48,6 +52,29 @@ def run_beam_job(job_name: str) -> beam_job_domain.BeamJobRun:
     run_model = jobs_manager.run_job(job_class, run_synchronously)
 
     return get_beam_job_run_from_model(run_model)
+
+
+def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
+    """Cancels an existing Apache Beam job and returns its updated metadata.
+
+    Args:
+        job_id: str. The Oppia-provided ID of the job.
+
+    Returns:
+        BeamJobRun. Metadata about the updated run's execution.
+    """
+    beam_job_run_model = (
+        beam_job_models.BeamJobRunModel.get(job_id, strict=False))
+
+    if beam_job_run_model is None:
+        raise ValueError('No such job with id="%s"' % job_id)
+
+    elif beam_job_run_model.dataflow_job_id is None:
+        raise ValueError('Job with id="%s" cannot be cancelled' % job_id)
+
+    else:
+        jobs_manager.cancel_job(beam_job_run_model)
+        return get_beam_job_run_from_model(beam_job_run_model)
 
 
 def get_beam_jobs() -> List[beam_job_domain.BeamJob]:

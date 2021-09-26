@@ -244,42 +244,34 @@ def get_beam_query_from_ndb_query(
 
     Args:
         query: datastore_services.Query. The NDB query to convert.
-        namespace: str|None. Namespace for isolating the NDB operations of
-            tests.
+        namespace: str|None. Namespace for isolating the NDB operations of unit
+            tests. IMPORTANT: Do not use this argument outside of unit tests.
 
     Returns:
         beam_datastore_types.Query. The equivalent Apache Beam query.
     """
     kind = query.kind
-    # This is needed mainly for testing and it adds an easy way to force
-    # the queries into their own namespace.
     namespace = namespace or query.namespace
+    filters = (
+        _get_beam_filters_from_ndb_node(query.filters) if query.filters else ()
+    )
+    order = (
+        _get_beam_order_from_ndb_order(query.order_by) if query.order_by else ()
+    )
 
-    if query.filters:
-        filters = _get_beam_filters_from_ndb_node(query.filters)
-    else:
-        filters = []
-
-    if query.order_by:
-        order = _get_beam_order_from_ndb_order(query.order_by)
-    else:
-        order = ()
-
-    if kind is None and not order:
+    if not kind and not order:
+        # NOTE: When kind is omitted, Apache Beam requires the query to order
+        # its results by __key__ (the models' .key() value).
         order = ('__key__',)
 
     return beam_datastore_types.Query(
-        kind=kind,
-        namespace=namespace,
-        project=feconf.OPPIA_PROJECT_ID,
-        filters=filters or None,
-        order=order
-    )
+        kind=kind, namespace=namespace, project=feconf.OPPIA_PROJECT_ID,
+        filters=filters, order=order)
 
 
 def _get_beam_filters_from_ndb_node(
     node: ndb_query.Node
-) -> List[Tuple[str, str, Any]]:
+) -> Tuple[Tuple[str, str, Any], ...]:
     """Returns an equivalent Apache Beam filter from the given NDB filter node.
 
     Args:
@@ -289,7 +281,8 @@ def _get_beam_filters_from_ndb_node(
         tuple(tuple(str, str, *)). The equivalent Apache Beam filters. Items
         are: (property name, comparison operator, property value).
     """
-    beam_filters = []
+    beam_filters: List[Tuple[str, str, Any]] = []
+
     if isinstance(node, ndb_query.ConjunctionNode):
         for n in node:
             beam_filters.extend(_get_beam_filters_from_ndb_node(n))
@@ -301,7 +294,7 @@ def _get_beam_filters_from_ndb_node(
             'behavior, use multiple AND queries and flatten them into a single '
             'PCollection.')
 
-    return beam_filters
+    return tuple(beam_filters)
 
 
 def _get_beam_order_from_ndb_order(
