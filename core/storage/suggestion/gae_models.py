@@ -325,8 +325,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 review.
 
         Returns:
-            list(SuggestionModel|None). A list of translation suggestions in review
-            with given suggestion ids.
+            list(SuggestionModel|None). A list of translation suggestions in
+            review with given suggestion ids.
         """
         return GeneralSuggestionModel.get_multi(thread_ids)
 
